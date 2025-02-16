@@ -1,0 +1,59 @@
+.movie-poster {
+  transition: transform 0.15s;
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  .movie-item-wrapper:hover &,
+  .movie-item-wrapper:focus & {
+    transform: scale(1.12) translateY(-20px);
+    z-index: 5;
+  }
+
+  &.movie-poster--shadow {
+    overflow: hidden;
+    filter: drop-shadow(0 0 0.3rem rgba(0, 0, 0, 0.4));
+
+    .movie-item-wrapper:hover &,
+    .movie-item-wrapper:focus & {
+      filter: drop-shadow(0 0 0.6rem rgba(0, 0, 0, 0.4));
+    }
+  }
+
+  img,
+  .no-poster-background {
+    border-radius: 2px;
+  }
+
+  .movie-poster-children {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+.no-poster {
+  position: relative;
+
+  & &-background {
+    box-sizing: border-box;
+    background: #ccc;
+  }
+
+  & &-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    text-wrap: balance;
+    box-sizing: border-box;
+  }
+}

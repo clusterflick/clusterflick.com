@@ -1,0 +1,43 @@
+.movie-venues {
+  summary {
+    &::marker,
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    .movie-venues-preview {
+      display: inline-block;
+    }
+    .movie-venues-hide-control {
+      display: none;
+    }
+  }
+
+  &[open] {
+    + .venue-fade-out {
+      display: none;
+    }
+
+    summary {
+      .movie-venues-preview {
+        display: none;
+      }
+      .movie-venues-hide-control {
+        display: inline-block;
+        margin-left: 2rem;
+      }
+    }
+  }
+}
+
+.venue-fade-out {
+  float: right;
+  position: relative;
+  width: 4rem;
+  height: 1.5rem;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgb(255, 255, 255) 100%
+  );
+}

@@ -1,0 +1,20 @@
+.performance-list {
+  .performance-details {
+    height: 2.7rem;
+    line-height: 2.2rem;
+    padding-left: 10px;
+  }
+
+  summary.performance-details {
+    cursor: pointer;
+    list-style-position: outside;
+  }
+
+  .peformance-booking-button {
+    float: right;
+  }
+
+  .performance-extra-details {
+    margin: -0.25rem 0 1rem 0;
+  }
+}

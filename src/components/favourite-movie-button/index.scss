@@ -1,0 +1,56 @@
+.favourite-movie-button {
+  transition:
+    visibility 0s,
+    opacity 0.2s linear;
+  padding: 0.25rem;
+
+  &--small {
+    padding: 0.18rem;
+  }
+
+  .movie-item-wrapper:hover & {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &--not-favourite:not(&--show) {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  &--not-favourite {
+    background-color: var(--rs-blue-600);
+    &:hover,
+    &:focus {
+      background-color: var(--rs-blue-600);
+    }
+  }
+
+  &--favourite {
+    background-color: var(--rs-gray-800);
+    &:hover,
+    &:focus {
+      background-color: var(--rs-gray-800);
+    }
+  }
+}
+
+.favourite-movie-button-icon {
+  font-size: 1.25rem;
+
+  .favourite-movie-button--small & {
+    font-size: 0.8rem;
+  }
+
+  .favourite-movie-button--not-favourite & {
+    color: #fff;
+  }
+
+  .favourite-movie-button--favourite & {
+    color: var(--rs-yellow-400);
+  }
+}

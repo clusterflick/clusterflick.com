@@ -1,0 +1,24 @@
+.filter-header {
+  background-color: var(--rs-primary-200);
+  padding: 1rem !important;
+  padding-bottom: 0 !important;
+
+  .rs-panel-header,
+  .rs-panel-body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .rs-panel-header button {
+    width: auto;
+    margin: auto;
+
+    .rs-panel-title {
+      font-weight: normal;
+    }
+
+    > span {
+      margin-right: 0.3rem;
+    }
+  }
+}

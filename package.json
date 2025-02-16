@@ -1,0 +1,41 @@
+{
+  "name": "london-cinemas",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write --ignore-path .gitignore .",
+    "compress-combined-data": "node ./scripts/compress-combined-data.js"
+  },
+  "dependencies": {
+    "@rsuite/icons": "^1.3.0",
+    "@sindresorhus/slugify": "^2.2.1",
+    "classnames": "^2.5.1",
+    "compress-json": "^3.1.0",
+    "contra-color": "^1.1.2",
+    "date-fns": "^4.1.0",
+    "html-entities": "^2.5.2",
+    "next": "15.0.2",
+    "octokit": "^4.1.0",
+    "prettier": "^3.3.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-virtualized": "^9.22.5",
+    "rsuite": "^5.77.0",
+    "sass": "^1.81.0",
+    "string-to-color": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/react-virtualized": "^9.22.0",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.2",
+    "postcss": "^8",
+    "typescript": "^5"
+  }
+}
