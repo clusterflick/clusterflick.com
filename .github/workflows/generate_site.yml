@@ -25,13 +25,14 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           static_site_generator: next
+          generator_config_file: ./next.config.ts
       - run: npm ci
       - uses: robinraju/release-downloader@v1
         with:
           repository: "clusterflick/data-combined"
           latest: true
           fileName: "*"
-          out-file-path: "public"
+          out-file-path: "combined-data"
       - run: npm run compress-combined-data
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
