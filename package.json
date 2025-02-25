@@ -1,6 +1,5 @@
 {
-  "name": "london-cinemas",
-  "version": "0.1.0",
+  "name": "clusterflick.com",
   "private": true,
   "scripts": {
     "dev": "next dev",
