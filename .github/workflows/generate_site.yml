@@ -15,8 +15,6 @@ jobs:
   build:
     name: Build site
     runs-on: ubuntu-latest
-    env:
-      MOVIEDB_API_KEY: ${{ secrets.MOVIEDB_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

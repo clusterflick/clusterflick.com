@@ -25,13 +25,15 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
 }
 
 export function GetCinemaData({ children }: { children: ReactNode }) {
+  const dataFilename =
+    process.env.NEXT_PUBLIC_DATA_FILENAME || "combined-data.json";
   const { data, setData } = useCinemaData();
 
   useEffect(function () {
     if (data) return;
 
     (async () => {
-      const response = await fetch("/combined-data.json");
+      const response = await fetch(`/${dataFilename}`);
       const compressedData = await response.json();
       setData(decompress(compressedData));
     })();
