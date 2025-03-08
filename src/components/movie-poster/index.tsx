@@ -54,7 +54,11 @@ export default function MoviePoster({
   return (
     <div className={`movie-poster ${hideShadow ? "" : "movie-poster--shadow"}`}>
       {isUnmatched || !posterPath ? (
-        <NoPoster title={title} width={width} height={height} />
+        <NoPoster
+          title={title.replace(" : ", ": ")}
+          width={width}
+          height={height}
+        />
       ) : (
         <Image
           unoptimized

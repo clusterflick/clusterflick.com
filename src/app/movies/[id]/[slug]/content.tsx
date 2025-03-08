@@ -82,6 +82,7 @@ export default function MoviePageContent({
     ));
 
   const classification = getMovieClassification(displayedMovie);
+
   return (
     <Container>
       <AppHeading />
@@ -130,10 +131,15 @@ export default function MoviePageContent({
                       ) : null}
                       <Stack.Item>
                         <Heading level={2}>
-                          {displayedMovie.title}{" "}
-                          {displayedMovie.year
-                            ? `(${displayedMovie.year})`
-                            : null}
+                          {displayedMovie.title}
+                          {displayedMovie.year ? (
+                            <>
+                              {" "}
+                              <span style={{ color: "#999" }}>
+                                ({displayedMovie.year})
+                              </span>
+                            </>
+                          ) : null}
                         </Heading>
                       </Stack.Item>
                     </Stack>
@@ -273,6 +279,8 @@ export default function MoviePageContent({
                             <li>
                               <a
                                 href={`https://www.themoviedb.org/search?query=${encodeURIComponent(displayedMovie.normalizedTitle)}`}
+                                target="_blank"
+                                rel="noopener"
                               >
                                 🔍 Search TheMovieDB
                               </a>
@@ -282,6 +290,8 @@ export default function MoviePageContent({
                             <li>
                               <a
                                 href={`https://www.themoviedb.org/movie/${displayedMovie.id}`}
+                                target="_blank"
+                                rel="noopener"
                               >
                                 🎬 TheMovieDB
                               </a>
@@ -291,6 +301,8 @@ export default function MoviePageContent({
                             <li>
                               <a
                                 href={`https://www.imdb.com/title/${displayedMovie.imdbId}`}
+                                target="_blank"
+                                rel="noopener"
                               >
                                 🗂️ IMDb
                               </a>
@@ -300,6 +312,8 @@ export default function MoviePageContent({
                             <li>
                               <a
                                 href={`https://www.youtube.com/watch?v=${displayedMovie.youtubeTrailer}`}
+                                target="_blank"
+                                rel="noopener"
                               >
                                 🎞️ Trailer on YouTube
                               </a>

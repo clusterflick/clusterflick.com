@@ -189,9 +189,13 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                         breakInside: "avoid",
                       }}
                     >
-                      <a href={showing.url}>{venue?.name}</a>
+                      <a href={showing.url} target="_blank" rel="noopener">
+                        {venue?.name}
+                      </a>
                       <Button
                         href={performance.bookingUrl}
+                        target="_blank"
+                        rel="noopener"
                         className="peformance-booking-button"
                         style={
                           isInThePast ? { textDecoration: "line-through" } : {}
@@ -215,9 +219,13 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                         isInThePast ? { textDecoration: "line-through" } : {}
                       }
                     >
-                      <a href={showing.url}>{venue?.name}</a>
+                      <a href={showing.url} target="_blank" rel="noopener">
+                        {venue?.name}
+                      </a>
                       <Button
                         href={performance.bookingUrl}
+                        target="_blank"
+                        rel="noopener"
                         className="peformance-booking-button"
                         style={
                           isInThePast ? { textDecoration: "line-through" } : {}

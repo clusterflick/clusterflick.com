@@ -6,6 +6,7 @@ import {
   type CinemaData,
   type Movie,
 } from "@/types";
+import { Fragment } from "react";
 import {
   formatDuration,
   intervalToDuration,
@@ -71,6 +72,54 @@ const getMarathons = filterUnmatched([
 ]);
 const getPremiere = filterUnmatched(["Premier", "Preview"]);
 const getMystery = filterUnmatched(["mystery", "secret"]);
+const getComedy = filterUnmatched(["Comedy"]);
+const getMusic = filterUnmatched([
+  "Music",
+  "Sound",
+  "Jazz",
+  "Pitchblack Mixtapes",
+  "Pitchblack Playback",
+]);
+const getQuiz = filterUnmatched(["Quiz"]);
+const getClubs = filterUnmatched(["Club", "Reunion"]);
+const getWorkshops = filterUnmatched(["Workshop"]);
+const getTalks = filterUnmatched([
+  "Talk",
+  "Research",
+  "Writings",
+  "Symposium",
+  "Conversation",
+]);
+
+function UnmatchedStats({ movies }: { movies: CinemaData["movies"] }) {
+  const groupings = [
+    { movies: getFestivalShowings(movies), suffix: "festival showings" },
+    { movies: getMarathons(movies), suffix: "movie marathons" },
+    { movies: getPremiere(movies), suffix: "mystery movies" },
+    { movies: getMystery(movies), suffix: "premieres" },
+    { movies: getClubs(movies), suffix: "clubs" },
+    { movies: getWorkshops(movies), suffix: "workshops" },
+    { movies: getTalks(movies), suffix: "talks" },
+    { movies: getComedy(movies), suffix: "comedy nights" },
+    { movies: getMusic(movies), suffix: "music events" },
+    { movies: getQuiz(movies), suffix: "quizes" },
+  ];
+  return (
+    <>
+      The remaining unmatched events include{" "}
+      {groupings.map(({ movies, suffix }, index) => (
+        <Fragment key={suffix}>
+          {index === groupings.length - 1 ? "and " : ""}
+          <FilterLink filters={{ filteredMovies: convertToMapping(movies) }}>
+            {showNumber(movies.length)} {suffix}
+          </FilterLink>
+          {index === groupings.length - 1 ? "" : ", "}
+        </Fragment>
+      ))}
+      .
+    </>
+  );
+}
 
 const getMatchedMoviesCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).filter(({ isUnmatched }) => !isUnmatched).length;
@@ -239,10 +288,6 @@ export default function AboutContent() {
     data!.movies,
   );
   const movieAccessibilityTotals = getMovieAccessibilityCount(data!.movies);
-  const festivalShowings = getFestivalShowings(data!.movies);
-  const marathons = getMarathons(data!.movies);
-  const premieres = getPremiere(data!.movies);
-  const mysteries = getMystery(data!.movies);
   const filmsOrderedByYear = Object.values(data!.movies)
     .filter(({ releaseDate }) => !!releaseDate)
     .sort(
@@ -302,31 +347,7 @@ export default function AboutContent() {
               <ExternalLink href="https://www.themoviedb.org">
                 The Movie Database (TMDB)
               </ExternalLink>
-              . The remaining unmatched events include{" "}
-              <FilterLink
-                filters={{ filteredMovies: convertToMapping(festivalShowings) }}
-              >
-                {showNumber(festivalShowings.length)} festival showings
-              </FilterLink>
-              ,{" "}
-              <FilterLink
-                filters={{ filteredMovies: convertToMapping(marathons) }}
-              >
-                {showNumber(marathons.length)} movie marathons
-              </FilterLink>
-              ,{" "}
-              <FilterLink
-                filters={{ filteredMovies: convertToMapping(mysteries) }}
-              >
-                {showNumber(mysteries.length)} mystery movies
-              </FilterLink>
-              , and{" "}
-              <FilterLink
-                filters={{ filteredMovies: convertToMapping(premieres) }}
-              >
-                {showNumber(premieres.length)} premieres
-              </FilterLink>
-              .
+              . <UnmatchedStats movies={data!.movies} />
             </Text>
           </Stack.Item>
           <Stack.Item>
