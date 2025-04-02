@@ -95,8 +95,8 @@ function UnmatchedStats({ movies }: { movies: CinemaData["movies"] }) {
   const groupings = [
     { movies: getFestivalShowings(movies), suffix: "festival showings" },
     { movies: getMarathons(movies), suffix: "movie marathons" },
-    { movies: getPremiere(movies), suffix: "mystery movies" },
-    { movies: getMystery(movies), suffix: "premieres" },
+    { movies: getMystery(movies), suffix: "mystery movies" },
+    { movies: getPremiere(movies), suffix: "premieres" },
     { movies: getClubs(movies), suffix: "clubs" },
     { movies: getWorkshops(movies), suffix: "workshops" },
     { movies: getTalks(movies), suffix: "talks" },
@@ -310,9 +310,9 @@ export default function AboutContent() {
       { ...data!.movies },
     ),
   );
-  const moviesWithOnePerformanceToday = Object.values(matchingMovies).filter(
+  const moviesWithOnlyPerformancesToday = Object.values(matchingMovies).filter(
     ({ performances }) =>
-      performances.length === 1 && isToday(new Date(performances[0].time)),
+      performances.every(({ time }) => isToday(new Date(time))),
   );
 
   return (
@@ -380,7 +380,7 @@ export default function AboutContent() {
               performances
             </Text>
           </Stack.Item>
-          {moviesWithOnePerformanceToday.length ? (
+          {moviesWithOnlyPerformancesToday.length ? (
             <Stack.Item>
               <details>
                 <Text
@@ -394,9 +394,9 @@ export default function AboutContent() {
                 >
                   ℹ️&nbsp;&nbsp;
                   <strong>
-                    {showNumber(moviesWithOnePerformanceToday.length)}
+                    {showNumber(moviesWithOnlyPerformancesToday.length)}
                   </strong>{" "}
-                  {moviesWithOnePerformanceToday.length === 1 ? (
+                  {moviesWithOnlyPerformancesToday.length === 1 ? (
                     <>
                       movie has its last performance today &mdash; last chance
                       to see it on the big screen!
@@ -410,7 +410,7 @@ export default function AboutContent() {
                 </Text>
                 <br />
                 <ol>
-                  {moviesWithOnePerformanceToday.map((movie) => (
+                  {moviesWithOnlyPerformancesToday.map((movie) => (
                     <li key={movie.id}>
                       <Link href={getMoviePath(movie)}>
                         {movie.title} {movie.year ? `(${movie.year})` : ""}
