@@ -174,7 +174,7 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                 const isExtraDetails = !!(
                   performance.screen ||
                   showing.title ||
-                  performance.status ||
+                  performance.status?.soldOut ||
                   performance.accessibility ||
                   performance.notes
                 );
