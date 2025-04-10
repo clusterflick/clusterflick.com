@@ -83,6 +83,26 @@ export const classificationOrder: Classification[] = [
   Classification.Unknown,
 ];
 
+type RottenTomatoesScore = {
+  dislikes: number;
+  likes: number;
+  reviews: number;
+  rating?: string;
+  score?: string;
+};
+
+type RottenTomatoes = {
+  url: string;
+  audience: {
+    all: RottenTomatoesScore;
+    verified: RottenTomatoesScore;
+  };
+  critics: {
+    all: RottenTomatoesScore;
+    top: RottenTomatoesScore;
+  };
+};
+
 export type Movie = {
   id: string;
   title: string;
@@ -101,6 +121,7 @@ export type Movie = {
   posterPath?: string;
   showings: Record<string, Showing>;
   performances: MoviePerformance[];
+  rottenTomatoes?: RottenTomatoes;
 };
 
 export type CinemaData = {

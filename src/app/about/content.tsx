@@ -124,6 +124,9 @@ function UnmatchedStats({ movies }: { movies: CinemaData["movies"] }) {
 const getMatchedMoviesCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).filter(({ isUnmatched }) => !isUnmatched).length;
 
+const getMoviesWithRottenTomatoesCount = (movies: CinemaData["movies"]) =>
+  Object.values(movies).filter(({ rottenTomatoes }) => !!rottenTomatoes).length;
+
 const getMovieCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).length;
 
@@ -346,6 +349,20 @@ export default function AboutContent() {
               ({showNumber(getMatchedMoviesCount(data!.movies))}) with{" "}
               <ExternalLink href="https://www.themoviedb.org">
                 The Movie Database (TMDB)
+              </ExternalLink>{" "}
+              and{" "}
+              <strong>
+                {Math.round(
+                  (getMoviesWithRottenTomatoesCount(data!.movies) /
+                    movieCount) *
+                    100,
+                )}
+                %
+              </strong>{" "}
+              ({showNumber(getMoviesWithRottenTomatoesCount(data!.movies))})
+              with{" "}
+              <ExternalLink href="https://www.rottentomatoes.com">
+                Rotten Tomatoes
               </ExternalLink>
               . <UnmatchedStats movies={data!.movies} />
             </Text>

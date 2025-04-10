@@ -21,8 +21,8 @@ import MoviePoster from "@/components/movie-poster";
 import MovieClassification from "@/components/movie-classification";
 import PerformanceList from "@/components/performance-list";
 import AppHeading from "@/components/app-heading";
-import "./index.scss";
 import FavouriteMovieButton from "@/components/favourite-movie-button";
+import "./index.scss";
 
 export default function MoviePageContent({
   params,
@@ -251,7 +251,9 @@ export default function MoviePageContent({
                         <Stack.Item>
                           <TagGroup style={{ margin: "0" }}>
                             <strong>Starring:</strong>{" "}
-                            {Object.values(displayedMovie.actors)
+                            {Array.from(
+                              new Set(Object.values(displayedMovie.actors)),
+                            )
                               .map((id) => data!.people[id])
                               .sort((a, b) => a.name.localeCompare(b.name))
                               .map(({ id, name }) => (
@@ -321,6 +323,72 @@ export default function MoviePageContent({
                           ) : null}
                         </ul>
                       </Stack.Item>
+                      {displayedMovie.rottenTomatoes &&
+                      (displayedMovie.rottenTomatoes.audience.all.score ||
+                        displayedMovie.rottenTomatoes.critics.all.score) ? (
+                        <Stack.Item style={{ display: "flex" }}>
+                          <strong>Rating:</strong> &nbsp;&nbsp;
+                          <div style={{ display: "flex", gap: "2rem" }}>
+                            {displayedMovie.rottenTomatoes.critics.all.score ? (
+                              <div>
+                                🍅{" "}
+                                <strong>
+                                  {
+                                    displayedMovie.rottenTomatoes.critics.all
+                                      .score
+                                  }
+                                  %
+                                </strong>{" "}
+                                of the critics liked it
+                                {displayedMovie.rottenTomatoes.critics.all
+                                  .rating ? (
+                                  <>
+                                    , scoring{" "}
+                                    <strong>
+                                      {
+                                        displayedMovie.rottenTomatoes.critics
+                                          .all.rating
+                                      }
+                                    </strong>{" "}
+                                    / 10
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            ) : null}
+                            {displayedMovie.rottenTomatoes.audience.all
+                              .score ? (
+                              <div>
+                                🍿{" "}
+                                <strong>
+                                  {
+                                    displayedMovie.rottenTomatoes.audience.all
+                                      .score
+                                  }
+                                  %
+                                </strong>{" "}
+                                of the audience liked it
+                                {displayedMovie.rottenTomatoes.audience.all
+                                  .rating ? (
+                                  <>
+                                    , scoring{" "}
+                                    <strong>
+                                      {
+                                        displayedMovie.rottenTomatoes.audience
+                                          .all.rating
+                                      }
+                                    </strong>{" "}
+                                    / 5
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            ) : null}
+                          </div>
+                        </Stack.Item>
+                      ) : null}
                     </Stack>
                   </Stack.Item>
                 </Stack>
