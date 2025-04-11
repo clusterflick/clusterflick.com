@@ -94,12 +94,12 @@ type RottenTomatoesScore = {
 type RottenTomatoes = {
   url: string;
   audience: {
-    all: RottenTomatoesScore;
-    verified: RottenTomatoesScore;
+    all: RottenTomatoesScore | undefined;
+    verified: RottenTomatoesScore | undefined;
   };
   critics: {
-    all: RottenTomatoesScore;
-    top: RottenTomatoesScore;
+    all: RottenTomatoesScore | undefined;
+    top: RottenTomatoesScore | undefined;
   };
 };
 

@@ -60,6 +60,7 @@ const filterUnmatched = (matches: string[]) => (movies: CinemaData["movies"]) =>
 const getFestivalShowings = filterUnmatched([
   "LSFF",
   "LSSF",
+  "FF: ",
   "Festival",
   "Fest",
   "Awards",

@@ -83,6 +83,11 @@ export default function MoviePageContent({
 
   const classification = getMovieClassification(displayedMovie);
 
+  const audienceScore = displayedMovie.rottenTomatoes?.audience?.all?.score;
+  const audienceRating = displayedMovie.rottenTomatoes?.audience?.all?.rating;
+  const criticsScore = displayedMovie.rottenTomatoes?.critics?.all?.score;
+  const criticsRating = displayedMovie.rottenTomatoes?.critics?.all?.rating;
+
   return (
     <Container>
       <AppHeading />
@@ -310,6 +315,17 @@ export default function MoviePageContent({
                               </a>
                             </li>
                           ) : null}
+                          {displayedMovie.rottenTomatoes?.url ? (
+                            <li>
+                              <a
+                                href={displayedMovie.rottenTomatoes.url}
+                                target="_blank"
+                                rel="noopener"
+                              >
+                                🍅 Rotten Tomatoes
+                              </a>
+                            </li>
+                          ) : null}
                           {displayedMovie.youtubeTrailer ? (
                             <li>
                               <a
@@ -323,63 +339,41 @@ export default function MoviePageContent({
                           ) : null}
                         </ul>
                       </Stack.Item>
-                      {displayedMovie.rottenTomatoes &&
-                      (displayedMovie.rottenTomatoes.audience.all.score ||
-                        displayedMovie.rottenTomatoes.critics.all.score) ? (
-                        <Stack.Item style={{ display: "flex" }}>
+                      {audienceScore || criticsScore ? (
+                        <Stack.Item
+                          style={{ display: "flex", flexWrap: "wrap" }}
+                        >
                           <strong>Rating:</strong> &nbsp;&nbsp;
-                          <div style={{ display: "flex", gap: "2rem" }}>
-                            {displayedMovie.rottenTomatoes.critics.all.score ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              columnGap: "1rem",
+                              rowGap: "0.4rem",
+                            }}
+                          >
+                            {criticsScore ? (
                               <div>
-                                🍅{" "}
-                                <strong>
-                                  {
-                                    displayedMovie.rottenTomatoes.critics.all
-                                      .score
-                                  }
-                                  %
-                                </strong>{" "}
-                                of the critics liked it
-                                {displayedMovie.rottenTomatoes.critics.all
-                                  .rating ? (
+                                🍅 <strong>{criticsScore}%</strong> of the
+                                critics liked it
+                                {criticsRating ? (
                                   <>
-                                    , scoring{" "}
-                                    <strong>
-                                      {
-                                        displayedMovie.rottenTomatoes.critics
-                                          .all.rating
-                                      }
-                                    </strong>{" "}
-                                    / 10
+                                    , scoring <strong>{criticsRating}</strong>
+                                    &nbsp;/&nbsp;10
                                   </>
                                 ) : (
                                   ""
                                 )}
                               </div>
                             ) : null}
-                            {displayedMovie.rottenTomatoes.audience.all
-                              .score ? (
+                            {audienceScore ? (
                               <div>
-                                🍿{" "}
-                                <strong>
-                                  {
-                                    displayedMovie.rottenTomatoes.audience.all
-                                      .score
-                                  }
-                                  %
-                                </strong>{" "}
-                                of the audience liked it
-                                {displayedMovie.rottenTomatoes.audience.all
-                                  .rating ? (
+                                🍿 <strong>{audienceScore}%</strong> of the
+                                audience liked it
+                                {audienceRating ? (
                                   <>
-                                    , scoring{" "}
-                                    <strong>
-                                      {
-                                        displayedMovie.rottenTomatoes.audience
-                                          .all.rating
-                                      }
-                                    </strong>{" "}
-                                    / 5
+                                    , scoring <strong>{audienceRating}</strong>
+                                    &nbsp;/&nbsp;5
                                   </>
                                 ) : (
                                   ""
