@@ -260,7 +260,6 @@ export default function MoviePageContent({
                               new Set(Object.values(displayedMovie.actors)),
                             )
                               .map((id) => data!.people[id])
-                              .sort((a, b) => a.name.localeCompare(b.name))
                               .map(({ id, name }) => (
                                 <Tag key={id} size="md">
                                   {name}
@@ -341,7 +340,11 @@ export default function MoviePageContent({
                       </Stack.Item>
                       {audienceScore || criticsScore ? (
                         <Stack.Item
-                          style={{ display: "flex", flexWrap: "wrap" }}
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            marginTop: "0.25rem",
+                          }}
                         >
                           <strong>Rating:</strong> &nbsp;&nbsp;
                           <div
