@@ -326,22 +326,24 @@ export default function AboutContent() {
     Object.values(movies)
       .filter(
         ({ rottenTomatoes }) =>
-          (rottenTomatoes?.[reviewer]?.all?.reviews ?? 0) >= 100,
+          (rottenTomatoes?.[reviewer]?.all?.reviews ?? 0) >= 50,
       )
       .sort(
         (a, b) =>
-          parseInt(b.rottenTomatoes?.[reviewer].all?.rating ?? "0", 10) -
-          parseInt(a.rottenTomatoes?.[reviewer].all?.rating ?? "0", 10),
+          parseFloat(b.rottenTomatoes?.[reviewer].all?.rating ?? "0") -
+          parseFloat(a.rottenTomatoes?.[reviewer].all?.rating ?? "0"),
       )
-      .slice(0, 10);
+      .slice(0, 25);
 
   const topRatedAudience = getTopRatedBy(data!.movies, "audience");
   const topRatedCritics = getTopRatedBy(data!.movies, "critics");
-  const commonTopRatedMovies = topRatedAudience.filter((audienceMovie) =>
-    topRatedCritics.some(
-      (criticsMovie) => criticsMovie.id === audienceMovie.id,
-    ),
-  );
+  const commonTopRatedMovies = topRatedAudience
+    .filter((audienceMovie) =>
+      topRatedCritics.some(
+        (criticsMovie) => criticsMovie.id === audienceMovie.id,
+      ),
+    )
+    .sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <Container>
@@ -432,7 +434,7 @@ export default function AboutContent() {
                     {commonTopRatedMovies.length === 1 ? "movie" : "movies"}
                   </strong>{" "}
                   currently being shown:
-                  <ul>
+                  <ol>
                     {commonTopRatedMovies.map((movie) => (
                       <li key={movie.id}>
                         <span>
@@ -450,7 +452,7 @@ export default function AboutContent() {
                         </span>
                       </li>
                     ))}
-                  </ul>
+                  </ol>
                 </>
               ) : (
                 <>
