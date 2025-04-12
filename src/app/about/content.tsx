@@ -319,6 +319,30 @@ export default function AboutContent() {
       performances.every(({ time }) => isToday(new Date(time))),
   );
 
+  const getTopRatedBy = (
+    movies: CinemaData["movies"],
+    reviewer: "audience" | "critics",
+  ) =>
+    Object.values(movies)
+      .filter(
+        ({ rottenTomatoes }) =>
+          (rottenTomatoes?.[reviewer]?.all?.reviews ?? 0) >= 100,
+      )
+      .sort(
+        (a, b) =>
+          parseInt(b.rottenTomatoes?.[reviewer].all?.rating ?? "0", 10) -
+          parseInt(a.rottenTomatoes?.[reviewer].all?.rating ?? "0", 10),
+      )
+      .slice(0, 10);
+
+  const topRatedAudience = getTopRatedBy(data!.movies, "audience");
+  const topRatedCritics = getTopRatedBy(data!.movies, "critics");
+  const commonTopRatedMovies = topRatedAudience.filter((audienceMovie) =>
+    topRatedCritics.some(
+      (criticsMovie) => criticsMovie.id === audienceMovie.id,
+    ),
+  );
+
   return (
     <Container>
       <AppHeading />
@@ -397,6 +421,44 @@ export default function AboutContent() {
               &mdash; {showNumber(mostPerformancesMovie.performances.length)}{" "}
               performances
             </Text>
+          </Stack.Item>
+          <Stack.Item>
+            <div>
+              {commonTopRatedMovies.length > 0 ? (
+                <>
+                  Critics 🍅 and Audiences 🍿 agree on ⭐️{" "}
+                  <strong>
+                    {commonTopRatedMovies.length} top rated{" "}
+                    {commonTopRatedMovies.length === 1 ? "movie" : "movies"}
+                  </strong>{" "}
+                  currently being shown:
+                  <ul>
+                    {commonTopRatedMovies.map((movie) => (
+                      <li key={movie.id}>
+                        <span>
+                          <Link href={getMoviePath(movie)}>
+                            {movie.title} ({movie.year})
+                          </Link>{" "}
+                          &mdash; 🍅{" "}
+                          <strong>
+                            {movie.rottenTomatoes?.critics.all?.rating}
+                          </strong>{" "}
+                          and 🍿{" "}
+                          <strong>
+                            {movie.rottenTomatoes?.audience.all?.rating}
+                          </strong>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <>
+                  🍅 Critics and 🍿 audiences can&apos;t agree on a top rated
+                  movie being shown
+                </>
+              )}
+            </div>
           </Stack.Item>
           {moviesWithOnlyPerformancesToday.length ? (
             <Stack.Item>
