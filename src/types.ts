@@ -33,6 +33,7 @@ type Overview = {
 export type Showing = {
   id: string;
   title?: string;
+  seen?: number;
   overview: Overview;
   url: string;
   venueId: string;

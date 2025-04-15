@@ -1,5 +1,7 @@
 import type { Filters, Movie } from "@/types";
+import { Tag } from "rsuite";
 import classNames from "classnames";
+import { endOfToday, isWithinInterval, startOfYesterday } from "date-fns";
 import { useFilters } from "@/state/filters-context";
 import showNumber from "@/utils/show-number";
 import MoviePoster from "../movie-poster";
@@ -27,6 +29,19 @@ export default function MovieItem({
 }) {
   const { filters } = useFilters();
 
+  const movieFirstSeen = Object.values(movie.showings).reduce(
+    (earliestTime: number | null, { seen }) => {
+      if (!earliestTime || !seen) return null;
+      return seen < earliestTime ? seen : earliestTime;
+    },
+    Date.now(),
+  );
+  const isNewMovie =
+    movieFirstSeen &&
+    isWithinInterval(movieFirstSeen, {
+      start: startOfYesterday(),
+      end: endOfToday(),
+    });
   const performanceCount = movie.performances.length;
   const performanceSummary =
     performanceCount === 1
@@ -53,6 +68,14 @@ export default function MovieItem({
       </MoviePoster>
       <div className="movie-item-text-wrapper">
         <div className="movie-item-title" tabIndex={-1}>
+          {isNewMovie ? (
+            <>
+              <Tag color="blue" size="sm">
+                New
+              </Tag>
+              &nbsp;
+            </>
+          ) : null}{" "}
           {movie.title}
         </div>
         <div className="movie-item-summary">
