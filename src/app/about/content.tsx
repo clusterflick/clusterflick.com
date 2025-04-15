@@ -12,6 +12,9 @@ import {
   intervalToDuration,
   isToday,
   parseISO,
+  endOfToday,
+  isWithinInterval,
+  startOfYesterday,
 } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
@@ -136,6 +139,54 @@ const getPerformanceCount = (movies: CinemaData["movies"]) =>
     (total: number, movie: Movie) => total + movie.performances.length,
     0,
   );
+
+const getNewPerformanceCount = (movies: CinemaData["movies"]) =>
+  Object.values(movies).reduce((total: number, movie: Movie) => {
+    const newPerformancesForShowings = Object.values(movie.showings).reduce(
+      (newPerformances, showing) => {
+        const range = { start: startOfYesterday(), end: endOfToday() };
+        if (showing.seen && isWithinInterval(showing.seen, range)) {
+          const performances = movie.performances.filter(
+            ({ showingId }) => showingId === showing.id,
+          );
+          return newPerformances + performances.length;
+        }
+        return newPerformances;
+      },
+      0,
+    );
+    return total + newPerformancesForShowings;
+  }, 0);
+
+const getMoviesWithNewPerformances = (movies: CinemaData["movies"]) =>
+  Object.values(movies)
+    .filter(({ showings }) => {
+      const movieFirstSeen = Object.values(showings).reduce(
+        (latestTime: number, { seen }) => {
+          if (!seen) return latestTime;
+          return seen > latestTime ? seen : latestTime;
+        },
+        0,
+      );
+      const range = { start: startOfYesterday(), end: endOfToday() };
+      return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
+    })
+    .map(({ id }) => id);
+
+const getNewMovies = (movies: CinemaData["movies"]) =>
+  Object.values(movies)
+    .filter(({ showings }) => {
+      const movieFirstSeen = Object.values(showings).reduce(
+        (earliestTime: number | null, { seen }) => {
+          if (!earliestTime || !seen) return null;
+          return seen < earliestTime ? seen : earliestTime;
+        },
+        Date.now(),
+      );
+      const range = { start: startOfYesterday(), end: endOfToday() };
+      return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
+    })
+    .map(({ id }) => id);
 
 type MovieAccessibilityTotals = Record<AccessibilityFeature, Set<Movie["id"]>>;
 const getMovieAccessibilityCount = (movies: CinemaData["movies"]) => {
@@ -285,7 +336,12 @@ export default function AboutContent() {
   });
 
   const movieCount = getMovieCount(data!.movies);
+  const newMovieCount = getNewMovies(data!.movies).length;
+  const moviesWithNewPerformancesCount = getMoviesWithNewPerformances(
+    data!.movies,
+  ).length;
   const performanceCount = getPerformanceCount(data!.movies);
+  const newPerformanceCount = getNewPerformanceCount(data!.movies);
   const classificationTotals = getClassificationCounts(data!.movies);
   const genreTotals = getGenreCounts(data!.movies);
   const performanceAccessibilityTotals = getPerformanceAccessibilityCount(
@@ -363,7 +419,30 @@ export default function AboutContent() {
               </strong>{" "}
               from <strong>{showNumber(getVenueCount(data!.venues))}</strong>{" "}
               venues, showing <strong>{showNumber(performanceCount)}</strong>{" "}
-              performances of <strong>{showNumber(movieCount)}</strong> movies.
+              performances of <strong>{showNumber(movieCount)}</strong> movies.{" "}
+              Since the last scan, there have been{" "}
+              <strong>{showNumber(newPerformanceCount)}</strong> performances
+              added to{" "}
+              <FilterLink
+                filters={{
+                  filteredMovies: convertToMapping(
+                    getMoviesWithNewPerformances(data!.movies),
+                  ),
+                }}
+              >
+                <strong>{showNumber(moviesWithNewPerformancesCount)}</strong>{" "}
+                movies
+              </FilterLink>
+              , of which{" "}
+              <FilterLink
+                filters={{
+                  filteredMovies: convertToMapping(getNewMovies(data!.movies)),
+                }}
+              >
+                <strong>{showNumber(newMovieCount)}</strong> are newly
+                introduced
+              </FilterLink>
+              .
             </Text>
             <Text>
               Of these, we were able to match{" "}
