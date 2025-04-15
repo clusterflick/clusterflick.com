@@ -19,12 +19,10 @@ export default function AccessibilityFeatureFilter({
   values: Record<AccessibilityFeature, boolean>;
   onChange: (values: Record<string, boolean>) => void;
 }) {
-  const data = [...Object.values(AccessibilityFeature), "none"].map(
-    (value) => ({
-      value,
-      label: accessibilityNames[value],
-    }),
-  );
+  const data = accessibilityFeatures.map((value) => ({
+    value,
+    label: accessibilityNames[value],
+  }));
 
   return (
     <div>

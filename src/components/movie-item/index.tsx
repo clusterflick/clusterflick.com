@@ -1,5 +1,5 @@
 import type { Filters, Movie } from "@/types";
-import { Tag } from "rsuite";
+import Tag from "rsuite/cjs/Tag";
 import classNames from "classnames";
 import { endOfToday, isWithinInterval, startOfYesterday } from "date-fns";
 import { useFilters } from "@/state/filters-context";

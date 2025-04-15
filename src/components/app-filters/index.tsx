@@ -16,6 +16,9 @@ import MovieFilter from "@/components/movie-filter";
 import ClassificationFilter from "@/components/classification-filter";
 import GenreFilter from "@/components/genre-filter";
 import AccessibilityFeatureFilter from "@/components/accessibility-feature-filter";
+import AudienceRatingFilter from "@/components/audience-ratings-filter";
+import PerformanceTimesFilter from "@/components/performance-times-filter";
+import CriticsRatingFilter from "../critics-ratings-filter";
 
 export default function AppFilters() {
   const [isDesktop] = useMediaQuery(["lg"]);
@@ -32,6 +35,10 @@ export default function AppFilters() {
     dateRange,
     yearRange,
     includeUnknownYears,
+    // seenRange,
+    filteredAudienceRatings,
+    filteredCriticsRatings,
+    filteredPerformanceTimes,
   } = filters;
   const setFilteredVenues = (filteredVenues: Filters["filteredVenues"]) =>
     setFilters({ ...filters, filteredVenues });
@@ -54,6 +61,17 @@ export default function AppFilters() {
   const setIncludeUnknownYears = (
     includeUnknownYears: Filters["includeUnknownYears"],
   ) => setFilters({ ...filters, includeUnknownYears });
+  // const setSeenRange = (seenRange: Filters["seenRange"]) =>
+  //   setFilters({ ...filters, seenRange });
+  const setFilteredAudienceRatings = (
+    filteredAudienceRatings: Filters["filteredAudienceRatings"],
+  ) => setFilters({ ...filters, filteredAudienceRatings });
+  const setFilteredCriticsRatings = (
+    filteredCriticsRatings: Filters["filteredCriticsRatings"],
+  ) => setFilters({ ...filters, filteredCriticsRatings });
+  const setFilteredPerformanceTimes = (
+    filteredPerformanceTimes: Filters["filteredPerformanceTimes"],
+  ) => setFilters({ ...filters, filteredPerformanceTimes });
 
   return (
     <>
@@ -89,12 +107,36 @@ export default function AppFilters() {
                   defaultValue={defaultFilters?.dateRange}
                   onChange={setDateRange}
                 />
-                <></>
+                <PerformanceTimesFilter
+                  performanceTimes={Object.keys(
+                    defaultFilters!.filteredPerformanceTimes,
+                  )}
+                  values={filteredPerformanceTimes}
+                  onChange={setFilteredPerformanceTimes}
+                />
               </ResponsiveStack>
             </Stack.Item>
           </Stack>
           <Divider style={{ marginBottom: 20 }}>Movie Filters</Divider>
           <Stack direction="column" spacing={18}>
+            <Stack.Item style={{ width: "100%" }}>
+              <ResponsiveStack>
+                <AudienceRatingFilter
+                  audienceRating={Object.keys(
+                    defaultFilters!.filteredAudienceRatings,
+                  )}
+                  values={filteredAudienceRatings}
+                  onChange={setFilteredAudienceRatings}
+                />
+                <CriticsRatingFilter
+                  criticsRating={Object.keys(
+                    defaultFilters!.filteredCriticsRatings,
+                  )}
+                  values={filteredCriticsRatings}
+                  onChange={setFilteredCriticsRatings}
+                />
+              </ResponsiveStack>
+            </Stack.Item>
             <Stack.Item style={{ width: "100%" }}>
               <ResponsiveStack>
                 <MovieFilter

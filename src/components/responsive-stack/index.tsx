@@ -5,7 +5,7 @@ import useMediaQuery from "rsuite/cjs/useMediaQuery";
 
 function ResponsiveStack({ children }: { children: ReactElement[] }) {
   const [isDesktop] = useMediaQuery(["lg"]);
-  const width = `calc(${100 / children.length}% - ${25 / children.length}px)`;
+  const width = `calc(${100 / children.length}% - ${(25 * (children.length - 1)) / children.length}px)`;
 
   return (
     <Stack

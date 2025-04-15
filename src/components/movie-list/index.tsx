@@ -52,11 +52,17 @@ const rowRenderer = (
   );
 };
 
-const MovieList = memo(function MovieList({ filters }: { filters: Filters }) {
+const MovieList = memo(function MovieList({
+  filters,
+  defaultFilters,
+}: {
+  filters: Filters;
+  defaultFilters?: Filters;
+}) {
   const { data } = useCinemaData();
   const movies = useMemo(
-    () => getMatchingMovies(data!.movies, filters),
-    [data, filters],
+    () => getMatchingMovies(data!.movies, filters, defaultFilters),
+    [data, filters, defaultFilters],
   );
 
   return (

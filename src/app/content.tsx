@@ -13,7 +13,7 @@ import MovieList from "@/components/movie-list";
 
 export default function Home() {
   const { data } = useCinemaData();
-  const { filters } = useFilters();
+  const { filters, defaultFilters } = useFilters();
   const deferredFilters = useDeferredValue(filters);
 
   return (
@@ -25,8 +25,10 @@ export default function Home() {
         <AppFilters />
       </AppHeading>
       <Content>
-        <Summary movies={getMatchingMovies(data!.movies, filters)} />
-        <MovieList filters={deferredFilters} />
+        <Summary
+          movies={getMatchingMovies(data!.movies, filters, defaultFilters)}
+        />
+        <MovieList filters={deferredFilters} defaultFilters={defaultFilters} />
       </Content>
     </Container>
   );

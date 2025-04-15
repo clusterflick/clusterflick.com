@@ -360,7 +360,11 @@ export default function AboutContent() {
     (a, b) => b.performances.length - a.performances.length,
   );
   const mostPerformancesMovie = filmsOrderedByPerformanceCount[0];
-  const matchingMovies = getMatchingMovies(data!.movies, defaultFilters!);
+  const matchingMovies = getMatchingMovies(
+    data!.movies,
+    defaultFilters!,
+    defaultFilters!,
+  );
   const moviesWithoutPerformances = Object.values(
     matchingMovies.reduce(
       (movies, { id }) => {

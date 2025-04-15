@@ -34,10 +34,14 @@ export default function MoviePageContent({
   const { id } = use(params);
   const router = useRouter();
   const { data } = useCinemaData();
-  const { filters } = useFilters();
+  const { filters, defaultFilters } = useFilters();
   const [isDesktop] = useMediaQuery(["lg"]);
 
-  const matchingMovies = getMatchingMovies(data!.movies, filters);
+  const matchingMovies = getMatchingMovies(
+    data!.movies,
+    filters,
+    defaultFilters,
+  );
   const movieAllPerformances = data?.movies[id];
   const movie = matchingMovies.find((movie) => movie.id === id);
   const displayedMovie = movie || movieAllPerformances;

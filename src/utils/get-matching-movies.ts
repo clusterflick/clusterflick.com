@@ -3,8 +3,9 @@ import {
   type Movie,
   type Filters,
   type CinemaData,
-  AccessibilityFeature,
+  type AccessibilityFeature,
 } from "@/types";
+import { getHours, isWithinInterval } from "date-fns";
 import getMovieClassification from "./get-movie-classification";
 import normalizeString from "./normalize-string";
 
@@ -44,7 +45,12 @@ const getMatchingMovies = (
     filteredGenres,
     yearRange,
     includeUnknownYears,
+    seenRange,
+    filteredAudienceRatings,
+    filteredCriticsRatings,
+    filteredPerformanceTimes,
   }: Filters,
+  defaultFilters?: Filters,
 ) => {
   const sortedMovies = Object.keys(movies)
     .map((id) => movies[id])
@@ -89,15 +95,46 @@ const getMatchingMovies = (
       }
     }
 
+    const audienceRating = movie.rottenTomatoes?.audience.all?.rating;
+    if (audienceRating) {
+      const key = audienceRating.split(".")[0];
+      if (!filteredAudienceRatings[key]) {
+        return matchingMovies;
+      }
+    } else {
+      if (!filteredAudienceRatings["none"]) {
+        return matchingMovies;
+      }
+    }
+
+    const criticsRating = movie.rottenTomatoes?.critics.all?.rating;
+    if (criticsRating) {
+      const key = criticsRating.split(".")[0];
+      if (!filteredCriticsRatings[key]) {
+        return matchingMovies;
+      }
+    } else {
+      if (!filteredCriticsRatings["none"]) {
+        return matchingMovies;
+      }
+    }
+
     const performances = movie.performances.reduce(
       (matchingPerformances, performance) => {
-        const { venueId } = movie.showings[performance.showingId];
+        // Default showings without a seen date to the oldest value
+        const { venueId, seen = defaultFilters!.seenRange.start } =
+          movie.showings[performance.showingId];
         if (
           // Performances that are in the expected venues
           filteredVenues[venueId] &&
-          // Performances that start in the expected time range (in the future)
+          // Performances that are in the expected seen range
+          isWithinInterval(seen, seenRange) &&
+          // Performances that start in the expected date range (in the future)
           performance.time > Math.max(dateRange.start, Date.now()) &&
           performance.time < dateRange.end &&
+          // Performances that start in the expected times slots
+          filteredPerformanceTimes[getHours(performance.time)] &&
+          // Performances with matching accessibiliy features
           matchesAccessibility(performance, filteredAccessibilityFeatures)
         ) {
           matchingPerformances.push(performance);

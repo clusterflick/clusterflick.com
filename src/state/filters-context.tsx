@@ -14,7 +14,13 @@ import {
   useState,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { startOfDay, endOfDay, addYears } from "date-fns";
+import {
+  startOfDay,
+  endOfDay,
+  addYears,
+  endOfToday,
+  startOfYesterday,
+} from "date-fns";
 import { useCinemaData } from "@/state/cinema-data-context";
 import getMovieClassification from "@/utils/get-movie-classification";
 import { safelyJsonStringify, safelyJsonParse } from "@/utils/json-handling";
@@ -39,6 +45,44 @@ export const processingFunctions: Record<keyof Filters, any> = {
     toUrl: (value: Filters["includeUnknownYears"]) =>
       value ? "true" : "false",
     fromUrl: (value: string) => value === "true",
+  },
+  seenRange: {
+    toUrl: (value: Filters["seenRange"]) =>
+      safelyJsonStringify<Filters["seenRange"]>(value),
+    fromUrl: (value: string) => safelyJsonParse<Filters["seenRange"]>(value),
+  },
+  filteredAudienceRatings: {
+    toUrl: (value: Filters["filteredAudienceRatings"]) =>
+      Object.keys(value).sort().join(","),
+    fromUrl: (value: string) =>
+      value
+        .split(",")
+        .reduce(
+          (mapping, id) => ({ ...mapping, [id.trim()]: true }),
+          {} as Record<string, boolean>,
+        ),
+  },
+  filteredCriticsRatings: {
+    toUrl: (value: Filters["filteredCriticsRatings"]) =>
+      Object.keys(value).sort().join(","),
+    fromUrl: (value: string) =>
+      value
+        .split(",")
+        .reduce(
+          (mapping, id) => ({ ...mapping, [id.trim()]: true }),
+          {} as Record<string, boolean>,
+        ),
+  },
+  filteredPerformanceTimes: {
+    toUrl: (value: Filters["filteredPerformanceTimes"]) =>
+      Object.keys(value).sort().join(","),
+    fromUrl: (value: string) =>
+      value
+        .split(",")
+        .reduce(
+          (mapping, id) => ({ ...mapping, [id.trim()]: true }),
+          {} as Record<string, boolean>,
+        ),
   },
   filteredVenues: {
     toUrl: (value: Filters["filteredVenues"]) =>
@@ -119,6 +163,7 @@ const FiltersContext = createContext<{
   filters: Filters;
   defaultFilters?: Filters;
   getYearRange: () => Filters["yearRange"];
+  getSeenRange: () => Filters["seenRange"];
   setFilters: (
     value: SetStateAction<Filters>,
     options?: { resetParams?: boolean },
@@ -129,6 +174,10 @@ const FiltersContext = createContext<{
     dateRange: { start: 0, end: 0 },
     yearRange: { min: Infinity, max: -Infinity },
     includeUnknownYears: true,
+    seenRange: { start: 0, end: 0 },
+    filteredAudienceRatings: {},
+    filteredCriticsRatings: {},
+    filteredPerformanceTimes: {},
     filteredVenues: {},
     filteredMovies: {},
     filteredClassifications: {} as Record<Classification, boolean>,
@@ -137,6 +186,10 @@ const FiltersContext = createContext<{
   },
   defaultFilters: undefined,
   getYearRange: () => ({ min: Infinity, max: -Infinity }),
+  getSeenRange: () => ({
+    start: startOfYesterday().getTime(),
+    end: endOfToday().getTime(),
+  }),
   setFilters: () => "",
 });
 
@@ -166,6 +219,32 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     [data?.movies],
   );
 
+  const getSeenRange = useCallback(() => {
+    if (!data?.movies)
+      return {
+        start: startOfYesterday().getTime(),
+        end: endOfToday().getTime(),
+      };
+    const oldestSeen = Object.values(data.movies).reduce(
+      (oldest, { showings }) => {
+        const movieFirstSeen = Object.values(showings).reduce(
+          (earliestTime, { seen }) => {
+            if (!seen) return earliestTime;
+            return seen < earliestTime ? seen : earliestTime;
+          },
+          Date.now(),
+        );
+        return movieFirstSeen < oldest ? movieFirstSeen : oldest;
+      },
+      Date.now(),
+    );
+
+    return {
+      start: startOfDay(oldestSeen).getTime(),
+      end: endOfToday().getTime(),
+    };
+  }, [data?.movies]);
+
   const defaultFilters = useMemo(() => {
     const filteredVenues = data?.venues ? convertToFilterList(data.venues) : {};
     const filteredMovies = data?.movies ? convertToFilterList(data.movies) : {};
@@ -185,19 +264,74 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
       start: startOfDay(Date.now()).getTime(),
       end: endOfDay(addYears(Date.now(), 1)).getTime(),
     };
+    const seenRange = getSeenRange();
+
+    const filteredAudienceRatings = {
+      none: true,
+      0: true,
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+    };
+    const filteredCriticsRatings = {
+      none: true,
+      0: true,
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true,
+      10: true,
+    };
+    const filteredPerformanceTimes = {
+      0: true,
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true,
+      10: true,
+      11: true,
+      12: true,
+      13: true,
+      14: true,
+      15: true,
+      16: true,
+      17: true,
+      18: true,
+      19: true,
+      20: true,
+      21: true,
+      22: true,
+      23: true,
+    };
 
     return {
       searchTerm: "",
       dateRange,
       yearRange,
       includeUnknownYears: true,
+      seenRange,
+      filteredAudienceRatings,
+      filteredCriticsRatings,
+      filteredPerformanceTimes,
       filteredVenues,
       filteredMovies,
       filteredClassifications,
       filteredAccessibilityFeatures,
       filteredGenres,
     };
-  }, [data?.genres, data?.venues, data?.movies, getYearRange]);
+  }, [data?.genres, data?.venues, data?.movies, getYearRange, getSeenRange]);
 
   const getUrlFilters = () => {
     const urlFilters = {} as Filters;
@@ -224,6 +358,37 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     if (includeUnknownYears) {
       urlFilters.includeUnknownYears =
         processingFunctions.includeUnknownYears.fromUrl(includeUnknownYears);
+    }
+
+    const seenRange = searchParams.get("seenRange");
+    if (seenRange) {
+      urlFilters.seenRange = processingFunctions.seenRange.fromUrl(seenRange);
+    }
+
+    const filteredAudienceRatings = searchParams.get("filteredAudienceRatings");
+    if (filteredAudienceRatings) {
+      urlFilters.filteredAudienceRatings =
+        processingFunctions.filteredAudienceRatings.fromUrl(
+          filteredAudienceRatings,
+        );
+    }
+
+    const filteredCriticsRatings = searchParams.get("filteredCriticsRatings");
+    if (filteredCriticsRatings) {
+      urlFilters.filteredCriticsRatings =
+        processingFunctions.filteredCriticsRatings.fromUrl(
+          filteredCriticsRatings,
+        );
+    }
+
+    const filteredPerformanceTimes = searchParams.get(
+      "filteredPerformanceTimes",
+    );
+    if (filteredPerformanceTimes) {
+      urlFilters.filteredPerformanceTimes =
+        processingFunctions.filteredPerformanceTimes.fromUrl(
+          filteredPerformanceTimes,
+        );
     }
 
     const filteredVenues = searchParams.get("filteredVenues");
@@ -308,6 +473,7 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
         filters,
         defaultFilters,
         getYearRange,
+        getSeenRange,
         setFilters: setFiltersAndUpdateUrl,
       }}
     >

@@ -148,6 +148,10 @@ export type Filters = {
   dateRange: DateRange;
   yearRange: YearRange;
   includeUnknownYears: boolean;
+  seenRange: DateRange;
+  filteredAudienceRatings: Record<string, boolean>;
+  filteredCriticsRatings: Record<string, boolean>;
+  filteredPerformanceTimes: Record<string, boolean>;
   filteredVenues: Record<Venue["id"], boolean>;
   filteredMovies: Record<Movie["id"], boolean>;
   filteredClassifications: Record<Classification, boolean>;

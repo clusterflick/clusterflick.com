@@ -182,7 +182,7 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                 if (!isExtraDetails) {
                   return (
                     <div
-                      key={`${performance.showingId}-${performance.bookingUrl}`}
+                      key={`${performance.showingId}-${performance.bookingUrl}-${performance.time}`}
                       className="performance-details"
                       style={{
                         ...(isInThePast
@@ -212,7 +212,7 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
 
                 return (
                   <details
-                    key={`${performance.showingId}-${performance.bookingUrl}`}
+                    key={`${performance.showingId}-${performance.bookingUrl}-${performance.time}`}
                     style={{ breakInside: "avoid" }}
                   >
                     <summary
