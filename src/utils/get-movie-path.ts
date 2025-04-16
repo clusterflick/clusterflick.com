@@ -1,7 +1,9 @@
 import type { FavouriteMovie, Movie } from "@/types";
-import slugify from "@sindresorhus/slugify";
+import getMovieUrlSegments from "./get-movie-url-segments";
 
-const getMoviePath = ({ id, title }: Movie | FavouriteMovie) =>
-  `/movies/${id}/${slugify(title)}`;
+const getMoviePath = (movie: Movie | FavouriteMovie) => {
+  const { id, slug } = getMovieUrlSegments(movie);
+  return `/movies/${id}/${slug}`;
+};
 
 export default getMoviePath;

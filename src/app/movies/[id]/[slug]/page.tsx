@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import slugify from "@sindresorhus/slugify";
 import getData from "@/utils/get-data";
+import getMovieUrlSegments from "@/utils/get-movie-url-segments";
 import MoviePageContent from "./content";
 
 export async function generateStaticParams() {
   const data = await getData();
   const movies = Object.values(data.movies);
-  return movies.map(({ id, title }) => ({ id, slug: slugify(title) }));
+  return movies.map(getMovieUrlSegments);
 }
 
 export async function generateMetadata({

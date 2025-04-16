@@ -2,12 +2,12 @@ import type { Movie, Filters } from "@/types";
 import { memo, ReactNode, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import slugify from "@sindresorhus/slugify";
 import { List, type ListRowProps } from "react-virtualized/dist/es/List";
 import { AutoSizer } from "react-virtualized/dist/es/AutoSizer";
 import { WindowScroller } from "react-virtualized/dist/es/WindowScroller";
 import { useCinemaData } from "@/state/cinema-data-context";
 import getMatchingMovies from "@/utils/get-matching-movies";
+import getMoviePath from "@/utils/get-movie-path";
 import MovieItem from "@/components/movie-item";
 import "./index.scss";
 
@@ -20,7 +20,7 @@ function MovieItemLink({ movie }: { movie: Movie }) {
     searchParams.size > 0 ? `?${searchParams.toString()}` : "";
   return (
     <Link
-      href={`/movies/${movie.id}/${slugify(movie.title)}${filterParams}`}
+      href={`${getMoviePath(movie)}${filterParams}`}
       className="movie-item-wrapper"
     >
       <MovieItem
