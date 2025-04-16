@@ -14,7 +14,7 @@ import {
   parseISO,
   endOfToday,
   isWithinInterval,
-  startOfYesterday,
+  startOfToday,
 } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
@@ -144,7 +144,7 @@ const getNewPerformanceCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).reduce((total: number, movie: Movie) => {
     const newPerformancesForShowings = Object.values(movie.showings).reduce(
       (newPerformances, showing) => {
-        const range = { start: startOfYesterday(), end: endOfToday() };
+        const range = { start: startOfToday(), end: endOfToday() };
         if (showing.seen && isWithinInterval(showing.seen, range)) {
           const performances = movie.performances.filter(
             ({ showingId }) => showingId === showing.id,
@@ -168,7 +168,7 @@ const getMoviesWithNewPerformances = (movies: CinemaData["movies"]) =>
         },
         0,
       );
-      const range = { start: startOfYesterday(), end: endOfToday() };
+      const range = { start: startOfToday(), end: endOfToday() };
       return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
     })
     .map(({ id }) => id);
@@ -183,7 +183,7 @@ const getNewMovies = (movies: CinemaData["movies"]) =>
         },
         Date.now(),
       );
-      const range = { start: startOfYesterday(), end: endOfToday() };
+      const range = { start: startOfToday(), end: endOfToday() };
       return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
     })
     .map(({ id }) => id);
