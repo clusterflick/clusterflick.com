@@ -1,13 +1,27 @@
-import type { Filters, Movie } from "@/types";
+import { type Filters, type Movie } from "@/types";
 import Tag from "rsuite/cjs/Tag";
 import classNames from "classnames";
-import { endOfToday, isWithinInterval, startOfYesterday } from "date-fns";
+import { endOfToday, isWithinInterval, startOfToday } from "date-fns";
 import { useFilters } from "@/state/filters-context";
 import showNumber from "@/utils/show-number";
+import getMovieCategory from "@/utils/gete-movie-category";
 import MoviePoster from "../movie-poster";
 import FavouriteMovieButton from "../favourite-movie-button";
 import showTimeToNextPerformance from "./show-time-to-next-performance";
 import "./index.scss";
+
+const categoryLabels = {
+  movie: "Movie",
+  "multiple-movies": "Movie Marathon",
+  tv: "TV",
+  quiz: "Quiz",
+  comedy: "Comedy",
+  music: "Music",
+  talk: "Talk",
+  workshop: "Workshop",
+  shorts: "Short Movies",
+  event: "Event",
+};
 
 const getVenueCount = (movie: Movie, filters: Filters) =>
   movie.performances.reduce((venueIds, { showingId }) => {
@@ -36,12 +50,13 @@ export default function MovieItem({
     },
     Date.now(),
   );
-  const isNewMovie =
-    movieFirstSeen &&
-    isWithinInterval(movieFirstSeen, {
-      start: startOfYesterday(),
-      end: endOfToday(),
-    });
+  const range = { start: startOfToday(), end: endOfToday() };
+  const isNewMovie = movieFirstSeen && isWithinInterval(movieFirstSeen, range);
+  const categoryKey = getMovieCategory(movie);
+  const category = {
+    key: categoryKey,
+    label: categoryLabels[categoryKey] || "Event",
+  };
   const performanceCount = movie.performances.length;
   const performanceSummary =
     performanceCount === 1
@@ -60,6 +75,22 @@ export default function MovieItem({
       style={{ width, height }}
     >
       <MoviePoster movie={movie}>
+        {isNewMovie ? (
+          <div
+            style={{ position: "absolute", left: "0.65rem", top: "0.25rem" }}
+          >
+            <Tag color="blue" size="sm">
+              New
+            </Tag>
+          </div>
+        ) : null}
+        <div
+          style={{ position: "absolute", left: "0.65rem", bottom: "0.25rem" }}
+        >
+          <Tag color="violet" key={category.key} size="sm">
+            {category.label}
+          </Tag>
+        </div>
         <div
           style={{ position: "absolute", right: "0.8rem", bottom: "0.4rem" }}
         >
@@ -68,14 +99,6 @@ export default function MovieItem({
       </MoviePoster>
       <div className="movie-item-text-wrapper">
         <div className="movie-item-title" tabIndex={-1}>
-          {isNewMovie ? (
-            <>
-              <Tag color="blue" size="sm">
-                New
-              </Tag>
-              &nbsp;
-            </>
-          ) : null}{" "}
           {movie.title}
         </div>
         <div className="movie-item-summary">

@@ -1,6 +1,7 @@
 "use client";
 import {
   AccessibilityFeature,
+  Category,
   Classification,
   classificationOrder,
   type CinemaData,
@@ -31,6 +32,7 @@ import getMovieClassification from "@/utils/get-movie-classification";
 import getMatchingMovies from "@/utils/get-matching-movies";
 import showNumber from "@/utils/show-number";
 import getMoviePath from "@/utils/get-movie-path";
+import getMovieCategory from "@/utils/gete-movie-category";
 import AppHeading from "@/components/app-heading";
 import MovieClassification from "@/components/movie-classification";
 import FilterLink from "@/components/filter-link";
@@ -50,64 +52,40 @@ const getMoviesShowingAt = (venueId: string, movies: CinemaData["movies"]) => {
     .map(({ id }) => id);
 };
 
-const filterUnmatched = (matches: string[]) => (movies: CinemaData["movies"]) =>
-  Object.values(movies)
-    .filter(
-      ({ title, isUnmatched }) =>
-        isUnmatched &&
-        matches.some((match) =>
-          title.toLowerCase().includes(match.toLowerCase()),
-        ),
-    )
-    .map(({ id }) => id);
-const getFestivalShowings = filterUnmatched([
-  "LSFF",
-  "LSSF",
-  "FF: ",
-  "Festival",
-  "Fest",
-  "Awards",
-]);
-const getMarathons = filterUnmatched([
-  "Trilogy",
-  "Marathon",
-  "Double",
-  "Variety",
-]);
-const getPremiere = filterUnmatched(["Premier", "Preview"]);
-const getMystery = filterUnmatched(["mystery", "secret"]);
-const getComedy = filterUnmatched(["Comedy"]);
-const getMusic = filterUnmatched([
-  "Music",
-  "Sound",
-  "Jazz",
-  "Pitchblack Mixtapes",
-  "Pitchblack Playback",
-]);
-const getQuiz = filterUnmatched(["Quiz"]);
-const getClubs = filterUnmatched(["Club", "Reunion"]);
-const getWorkshops = filterUnmatched(["Workshop"]);
-const getTalks = filterUnmatched([
-  "Talk",
-  "Research",
-  "Writings",
-  "Symposium",
-  "Conversation",
-]);
+const categorySuffix: Record<Category, { suffix: string; index: number }> = {
+  movie: { suffix: "unknown movies", index: 0 },
+  "multiple-movies": { suffix: "movie marathons", index: 1 },
+  tv: { suffix: "TV showings", index: 2 },
+  quiz: { suffix: "quizes", index: 3 },
+  comedy: { suffix: "comedy events", index: 4 },
+  music: { suffix: "music events", index: 5 },
+  talk: { suffix: "talks", index: 6 },
+  workshop: { suffix: "workshops", index: 7 },
+  shorts: { suffix: "short movies", index: 8 },
+  event: { suffix: "other events", index: 9 },
+};
 
 function UnmatchedStats({ movies }: { movies: CinemaData["movies"] }) {
-  const groupings = [
-    { movies: getFestivalShowings(movies), suffix: "festival showings" },
-    { movies: getMarathons(movies), suffix: "movie marathons" },
-    { movies: getMystery(movies), suffix: "mystery movies" },
-    { movies: getPremiere(movies), suffix: "premieres" },
-    { movies: getClubs(movies), suffix: "clubs" },
-    { movies: getWorkshops(movies), suffix: "workshops" },
-    { movies: getTalks(movies), suffix: "talks" },
-    { movies: getComedy(movies), suffix: "comedy nights" },
-    { movies: getMusic(movies), suffix: "music events" },
-    { movies: getQuiz(movies), suffix: "quizes" },
-  ];
+  const categoryMapping = Object.values(movies).reduce(
+    (mapping, movie) => {
+      if (!movie.isUnmatched) return mapping;
+      const category = getMovieCategory(movie);
+      const { suffix } = categorySuffix[category];
+      mapping[category] = mapping[category] || { suffix, movies: [] };
+      mapping[category].movies.push(movie.id);
+      return mapping;
+    },
+    {} as Record<Category, { suffix: string; movies: Movie["id"][] }>,
+  );
+
+  const groupings = Object.keys(categoryMapping)
+    .sort(
+      (a, b) =>
+        categorySuffix[a as Category].index -
+        categorySuffix[b as Category].index,
+    )
+    .map((key) => categoryMapping[key as Category]);
+
   return (
     <>
       The remaining unmatched events include{" "}
@@ -443,8 +421,8 @@ export default function AboutContent() {
                   filteredMovies: convertToMapping(getNewMovies(data!.movies)),
                 }}
               >
-                <strong>{showNumber(newMovieCount)}</strong> are newly
-                introduced
+                <strong>{showNumber(newMovieCount)}</strong> are newly added
+                movies
               </FilterLink>
               .
             </Text>
@@ -633,7 +611,7 @@ export default function AboutContent() {
             </Stack.Item>
           ) : null}
           <Stack.Item>
-            <Text>The spread of classifications of the movies is:</Text>
+            <Text>Classifications:</Text>
             <ul
               style={{
                 listStyleType: "none",
@@ -687,7 +665,7 @@ export default function AboutContent() {
             </ul>
           </Stack.Item>
           <Stack.Item>
-            <Text>And the genres of these movies:</Text>
+            <Text>Genres:</Text>
             <ul
               style={{
                 listStyleType: "none",

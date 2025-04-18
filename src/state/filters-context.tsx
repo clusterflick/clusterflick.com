@@ -1,5 +1,6 @@
 import {
   AccessibilityFeature,
+  Category,
   Classification,
   Movie,
   type CinemaData,
@@ -50,6 +51,17 @@ export const processingFunctions: Record<keyof Filters, any> = {
     toUrl: (value: Filters["seenRange"]) =>
       safelyJsonStringify<Filters["seenRange"]>(value),
     fromUrl: (value: string) => safelyJsonParse<Filters["seenRange"]>(value),
+  },
+  filteredCategories: {
+    toUrl: (value: Filters["filteredCategories"]) =>
+      Object.keys(value).sort().join(","),
+    fromUrl: (value: string) =>
+      value
+        .split(",")
+        .reduce(
+          (mapping, id) => ({ ...mapping, [id.trim()]: true }),
+          {} as Record<string, boolean>,
+        ),
   },
   filteredAudienceRatings: {
     toUrl: (value: Filters["filteredAudienceRatings"]) =>
@@ -175,6 +187,7 @@ const FiltersContext = createContext<{
     yearRange: { min: Infinity, max: -Infinity },
     includeUnknownYears: true,
     seenRange: { start: 0, end: 0 },
+    filteredCategories: {},
     filteredAudienceRatings: {},
     filteredCriticsRatings: {},
     filteredPerformanceTimes: {},
@@ -265,7 +278,10 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
       end: endOfDay(addYears(Date.now(), 1)).getTime(),
     };
     const seenRange = getSeenRange();
-
+    const filteredCategories = Object.values(Category).reduce(
+      (mapping, category) => ({ ...mapping, [category]: true }),
+      {},
+    );
     const filteredAudienceRatings = {
       none: true,
       0: true,
@@ -322,6 +338,7 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
       yearRange,
       includeUnknownYears: true,
       seenRange,
+      filteredCategories,
       filteredAudienceRatings,
       filteredCriticsRatings,
       filteredPerformanceTimes,
@@ -363,6 +380,12 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     const seenRange = searchParams.get("seenRange");
     if (seenRange) {
       urlFilters.seenRange = processingFunctions.seenRange.fromUrl(seenRange);
+    }
+
+    const filteredCategories = searchParams.get("filteredCategories");
+    if (filteredCategories) {
+      urlFilters.filteredCategories =
+        processingFunctions.filteredCategories.fromUrl(filteredCategories);
     }
 
     const filteredAudienceRatings = searchParams.get("filteredAudienceRatings");

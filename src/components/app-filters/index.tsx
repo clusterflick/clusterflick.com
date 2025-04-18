@@ -11,14 +11,15 @@ import { useFilters } from "@/state/filters-context";
 import ResponsiveStack from "@/components/responsive-stack";
 import Search from "@/components/search";
 import DateRangePicker from "@/components/date-range";
+import PerformanceTimesFilter from "@/components/performance-times-filter";
 import VenueFilter from "@/components/venue-filter";
 import MovieFilter from "@/components/movie-filter";
 import ClassificationFilter from "@/components/classification-filter";
 import GenreFilter from "@/components/genre-filter";
 import AccessibilityFeatureFilter from "@/components/accessibility-feature-filter";
 import AudienceRatingFilter from "@/components/audience-ratings-filter";
-import PerformanceTimesFilter from "@/components/performance-times-filter";
-import CriticsRatingFilter from "../critics-ratings-filter";
+import CriticsRatingFilter from "@/components/critics-ratings-filter";
+import CategoriesFilter from "@/components/categories-filter";
 
 export default function AppFilters() {
   const [isDesktop] = useMediaQuery(["lg"]);
@@ -36,6 +37,7 @@ export default function AppFilters() {
     yearRange,
     includeUnknownYears,
     // seenRange,
+    filteredCategories,
     filteredAudienceRatings,
     filteredCriticsRatings,
     filteredPerformanceTimes,
@@ -63,6 +65,9 @@ export default function AppFilters() {
   ) => setFilters({ ...filters, includeUnknownYears });
   // const setSeenRange = (seenRange: Filters["seenRange"]) =>
   //   setFilters({ ...filters, seenRange });
+  const setFilteredCategories = (
+    filteredCategories: Filters["filteredCategories"],
+  ) => setFilters({ ...filters, filteredCategories });
   const setFilteredAudienceRatings = (
     filteredAudienceRatings: Filters["filteredAudienceRatings"],
   ) => setFilters({ ...filters, filteredAudienceRatings });
@@ -114,6 +119,16 @@ export default function AppFilters() {
                   values={filteredPerformanceTimes}
                   onChange={setFilteredPerformanceTimes}
                 />
+              </ResponsiveStack>
+            </Stack.Item>
+            <Stack.Item style={{ width: "100%" }}>
+              <ResponsiveStack>
+                <CategoriesFilter
+                  categories={Object.keys(defaultFilters!.filteredCategories)}
+                  values={filteredCategories}
+                  onChange={setFilteredCategories}
+                />
+                <></>
               </ResponsiveStack>
             </Stack.Item>
           </Stack>

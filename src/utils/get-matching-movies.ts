@@ -8,6 +8,7 @@ import {
 import { getHours, isWithinInterval } from "date-fns";
 import getMovieClassification from "./get-movie-classification";
 import normalizeString from "./normalize-string";
+import getMovieCategory from "./gete-movie-category";
 
 const matchesAccessibility = (
   performance: MoviePerformance,
@@ -46,6 +47,7 @@ const getMatchingMovies = (
     yearRange,
     includeUnknownYears,
     seenRange,
+    filteredCategories,
     filteredAudienceRatings,
     filteredCriticsRatings,
     filteredPerformanceTimes,
@@ -93,6 +95,11 @@ const getMatchingMovies = (
       if (!includeUnknownYears) {
         return matchingMovies;
       }
+    }
+
+    const category = getMovieCategory(movie);
+    if (!filteredCategories[category]) {
+      return matchingMovies;
     }
 
     const audienceRating = movie.rottenTomatoes?.audience.all?.rating;

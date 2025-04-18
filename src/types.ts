@@ -30,10 +30,24 @@ type Overview = {
   year: string;
 };
 
+export enum Category {
+  Movie = "movie",
+  MultipleMovies = "multiple-movies",
+  Tv = "tv",
+  Quiz = "quiz",
+  Comedy = "comedy",
+  Music = "music",
+  Talk = "talk",
+  Workshop = "workshop",
+  Shorts = "shorts",
+  Event = "event",
+}
+
 export type Showing = {
   id: string;
   title?: string;
   seen?: number;
+  category: Category;
   overview: Overview;
   url: string;
   venueId: string;
@@ -149,6 +163,7 @@ export type Filters = {
   yearRange: YearRange;
   includeUnknownYears: boolean;
   seenRange: DateRange;
+  filteredCategories: Record<string, boolean>;
   filteredAudienceRatings: Record<string, boolean>;
   filteredCriticsRatings: Record<string, boolean>;
   filteredPerformanceTimes: Record<string, boolean>;
