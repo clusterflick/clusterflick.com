@@ -15,7 +15,6 @@ import {
   parseISO,
   endOfToday,
   isWithinInterval,
-  startOfToday,
 } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
@@ -118,12 +117,21 @@ const getPerformanceCount = (movies: CinemaData["movies"]) =>
     0,
   );
 
-const getNewPerformanceCount = (movies: CinemaData["movies"]) =>
+const rangeFrom = (generatedAt: string) => ({
+  start: parseISO(generatedAt),
+  end: endOfToday(),
+});
+const getNewPerformanceCount = (
+  movies: CinemaData["movies"],
+  generatedAt: string,
+) =>
   Object.values(movies).reduce((total: number, movie: Movie) => {
     const newPerformancesForShowings = Object.values(movie.showings).reduce(
       (newPerformances, showing) => {
-        const range = { start: startOfToday(), end: endOfToday() };
-        if (showing.seen && isWithinInterval(showing.seen, range)) {
+        if (
+          showing.seen &&
+          isWithinInterval(showing.seen, rangeFrom(generatedAt))
+        ) {
           const performances = movie.performances.filter(
             ({ showingId }) => showingId === showing.id,
           );
@@ -136,7 +144,10 @@ const getNewPerformanceCount = (movies: CinemaData["movies"]) =>
     return total + newPerformancesForShowings;
   }, 0);
 
-const getMoviesWithNewPerformances = (movies: CinemaData["movies"]) =>
+const getMoviesWithNewPerformances = (
+  movies: CinemaData["movies"],
+  generatedAt: string,
+) =>
   Object.values(movies)
     .filter(({ showings }) => {
       const movieFirstSeen = Object.values(showings).reduce(
@@ -146,12 +157,14 @@ const getMoviesWithNewPerformances = (movies: CinemaData["movies"]) =>
         },
         0,
       );
-      const range = { start: startOfToday(), end: endOfToday() };
-      return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
+      return (
+        movieFirstSeen &&
+        isWithinInterval(movieFirstSeen, rangeFrom(generatedAt))
+      );
     })
     .map(({ id }) => id);
 
-const getNewMovies = (movies: CinemaData["movies"]) =>
+const getNewMovies = (movies: CinemaData["movies"], generatedAt: string) =>
   Object.values(movies)
     .filter(({ showings }) => {
       const movieFirstSeen = Object.values(showings).reduce(
@@ -161,8 +174,10 @@ const getNewMovies = (movies: CinemaData["movies"]) =>
         },
         Date.now(),
       );
-      const range = { start: startOfToday(), end: endOfToday() };
-      return movieFirstSeen && isWithinInterval(movieFirstSeen, range);
+      return (
+        movieFirstSeen &&
+        isWithinInterval(movieFirstSeen, rangeFrom(generatedAt))
+      );
     })
     .map(({ id }) => id);
 
@@ -314,12 +329,16 @@ export default function AboutContent() {
   });
 
   const movieCount = getMovieCount(data!.movies);
-  const newMovieCount = getNewMovies(data!.movies).length;
+  const newMovieCount = getNewMovies(data!.movies, data!.generatedAt).length;
   const moviesWithNewPerformancesCount = getMoviesWithNewPerformances(
     data!.movies,
+    data!.generatedAt,
   ).length;
   const performanceCount = getPerformanceCount(data!.movies);
-  const newPerformanceCount = getNewPerformanceCount(data!.movies);
+  const newPerformanceCount = getNewPerformanceCount(
+    data!.movies,
+    data!.generatedAt,
+  );
   const classificationTotals = getClassificationCounts(data!.movies);
   const genreTotals = getGenreCounts(data!.movies);
   const performanceAccessibilityTotals = getPerformanceAccessibilityCount(
@@ -408,7 +427,10 @@ export default function AboutContent() {
               <FilterLink
                 filters={{
                   filteredMovies: convertToMapping(
-                    getMoviesWithNewPerformances(data!.movies),
+                    getMoviesWithNewPerformances(
+                      data!.movies,
+                      data!.generatedAt,
+                    ),
                   ),
                 }}
               >
@@ -418,7 +440,9 @@ export default function AboutContent() {
               , of which{" "}
               <FilterLink
                 filters={{
-                  filteredMovies: convertToMapping(getNewMovies(data!.movies)),
+                  filteredMovies: convertToMapping(
+                    getNewMovies(data!.movies, data!.generatedAt),
+                  ),
                 }}
               >
                 <strong>{showNumber(newMovieCount)}</strong> are newly added

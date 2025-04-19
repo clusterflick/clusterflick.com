@@ -1,7 +1,8 @@
 import { type Filters, type Movie } from "@/types";
 import Tag from "rsuite/cjs/Tag";
 import classNames from "classnames";
-import { endOfToday, isWithinInterval, startOfToday } from "date-fns";
+import { endOfToday, isWithinInterval, parseISO } from "date-fns";
+import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilters } from "@/state/filters-context";
 import showNumber from "@/utils/show-number";
 import getMovieCategory from "@/utils/gete-movie-category";
@@ -50,7 +51,8 @@ export default function MovieItem({
     },
     Date.now(),
   );
-  const range = { start: startOfToday(), end: endOfToday() };
+  const { data } = useCinemaData();
+  const range = { start: parseISO(data!.generatedAt), end: endOfToday() };
   const isNewMovie = movieFirstSeen && isWithinInterval(movieFirstSeen, range);
   const categoryKey = getMovieCategory(movie);
   const category = {
