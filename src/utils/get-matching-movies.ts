@@ -34,6 +34,12 @@ const matchesAccessibility = (
   return false;
 };
 
+const simplifySorting = (value: string) =>
+  value
+    .trim()
+    .replace(/^the /i, "")
+    .replace(/[^a-zA-Z0-9]/g, "");
+
 const getMatchingMovies = (
   movies: CinemaData["movies"],
   {
@@ -57,9 +63,7 @@ const getMatchingMovies = (
   const sortedMovies = Object.keys(movies)
     .map((id) => movies[id])
     .sort((a, b) =>
-      a.normalizedTitle
-        .replace(/[^a-zA-Z0-9]/g, "")
-        .localeCompare(b.normalizedTitle.replace(/[^a-zA-Z0-9]/g, "")),
+      simplifySorting(a.title).localeCompare(simplifySorting(b.title)),
     );
 
   return sortedMovies.reduce((matchingMovies, movie) => {

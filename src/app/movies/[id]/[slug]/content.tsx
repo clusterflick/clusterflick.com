@@ -304,7 +304,7 @@ export default function MoviePageContent({
                           {displayedMovie.isUnmatched ? (
                             <li>
                               <a
-                                href={`https://www.themoviedb.org/search?query=${encodeURIComponent(displayedMovie.normalizedTitle)}`}
+                                href={`https://www.themoviedb.org/search?query=${encodeURIComponent(displayedMovie.title)}`}
                                 target="_blank"
                                 rel="noopener"
                               >

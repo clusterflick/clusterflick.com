@@ -184,12 +184,20 @@ function removeIdProperty(data) {
   return data;
 }
 
+function removeNormalizedTitle(data) {
+  Object.values(data.movies).forEach((movie) => {
+    delete movie.normalizedTitle;
+  });
+  return data;
+}
+
 function removeOptionalData(data) {
   return [
     removeShowingOverviews,
     trimRottenTomatoData,
     extractCommonUrlPrefix,
     removeIdProperty,
+    removeNormalizedTitle,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);
 }
 
@@ -203,20 +211,19 @@ try {
   };
   Object.keys(movies).forEach((id) => {
     const movie = movies[id];
-    const initial = movie.normalizedTitle[0];
-    const key = /[a-z]/i.test(initial) ? initial : "other";
+    const initial = id[id.length - 1];
+    const key = /[a-z]/i.test(initial) ? "other" : initial;
     files[key] = files[key] || {};
     files[key][id] = movie;
   });
 
   trimUndefinedRecursively(files);
-  const hash = getHash(JSON.stringify(files));
 
   Object.keys(files).forEach((id) => {
-    const outputFilename = `data.${id}.${hash}.json`;
     const compressed = JSON.stringify(compress(files[id]));
     const outputPath = path.join(__dirname, "..", "public");
     if (!existsSync(outputPath)) mkdirSync(outputPath, { recursive: true });
+    const outputFilename = `data.${id}.${getHash(compressed)}.json`;
     writeFileSync(path.join(outputPath, outputFilename), compressed);
   });
 } catch (e) {
