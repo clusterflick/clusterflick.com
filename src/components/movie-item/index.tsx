@@ -5,24 +5,14 @@ import { endOfToday, isWithinInterval, parseISO } from "date-fns";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilters } from "@/state/filters-context";
 import showNumber from "@/utils/show-number";
-import getMovieCategory from "@/utils/gete-movie-category";
+import {
+  getCategoryLabel,
+  getMovieCategory,
+} from "@/utils/gete-movie-category";
 import MoviePoster from "../movie-poster";
 import FavouriteMovieButton from "../favourite-movie-button";
 import showTimeToNextPerformance from "./show-time-to-next-performance";
 import "./index.scss";
-
-const categoryLabels = {
-  movie: "Movie",
-  "multiple-movies": "Movie Marathon",
-  tv: "TV",
-  quiz: "Quiz",
-  comedy: "Comedy",
-  music: "Music",
-  talk: "Talk",
-  workshop: "Workshop",
-  shorts: "Short Movies",
-  event: "Event",
-};
 
 const getVenueCount = (movie: Movie, filters: Filters) =>
   movie.performances.reduce((venueIds, { showingId }) => {
@@ -55,10 +45,6 @@ export default function MovieItem({
   const range = { start: parseISO(data!.generatedAt), end: endOfToday() };
   const isNewMovie = movieFirstSeen && isWithinInterval(movieFirstSeen, range);
   const categoryKey = getMovieCategory(movie);
-  const category = {
-    key: categoryKey,
-    label: categoryLabels[categoryKey] || "Event",
-  };
   const performanceCount = movie.performances.length;
   const performanceSummary =
     performanceCount === 1
@@ -89,8 +75,8 @@ export default function MovieItem({
         <div
           style={{ position: "absolute", left: "0.65rem", bottom: "0.25rem" }}
         >
-          <Tag color="violet" key={category.key} size="sm">
-            {category.label}
+          <Tag color="violet" size="sm">
+            {getCategoryLabel(categoryKey)}
           </Tag>
         </div>
         <div

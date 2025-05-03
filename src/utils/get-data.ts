@@ -1,13 +1,17 @@
-import type { CinemaData } from "@/types";
-import { type Compressed, decompress } from "compress-json";
 import getDataFilename from "./get-data-filename";
+import expandAndCombine from "./expand-and-combine";
 
 const getData = async () => {
-  const filename = getDataFilename();
-  const compressedData = await import(`../../public/${filename}`, {
-    with: { type: "json" },
-  });
-  return decompress(compressedData.default as Compressed) as CinemaData;
+  const filenames = getDataFilename();
+  const compressedFiles = await Promise.all(
+    filenames.map(
+      async (filename) =>
+        (await import(`../../public/${filename}`, { with: { type: "json" } }))
+          .default,
+    ),
+  );
+  const combinedData = expandAndCombine(filenames, compressedFiles);
+  return combinedData;
 };
 
 export default getData;

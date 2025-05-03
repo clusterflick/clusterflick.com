@@ -8,7 +8,7 @@ import {
 import { getHours, isWithinInterval } from "date-fns";
 import getMovieClassification from "./get-movie-classification";
 import normalizeString from "./normalize-string";
-import getMovieCategory from "./gete-movie-category";
+import { getMovieCategory } from "./gete-movie-category";
 
 const matchesAccessibility = (
   performance: MoviePerformance,

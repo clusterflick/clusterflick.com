@@ -118,7 +118,7 @@ function PerformanceAccessibility({
 }
 
 export default function PerformanceList({ movie }: { movie?: Movie }) {
-  const { data } = useCinemaData();
+  const { data, hydrateUrl } = useCinemaData();
 
   if (!movie) {
     return (
@@ -191,11 +191,15 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                         breakInside: "avoid",
                       }}
                     >
-                      <a href={showing.url} target="_blank" rel="noopener">
+                      <a
+                        href={hydrateUrl(showing.url)}
+                        target="_blank"
+                        rel="noopener"
+                      >
                         {venue?.name}
                       </a>
                       <Button
-                        href={performance.bookingUrl}
+                        href={hydrateUrl(performance.bookingUrl)}
                         target="_blank"
                         rel="noopener"
                         className="peformance-booking-button"
@@ -221,11 +225,15 @@ export default function PerformanceList({ movie }: { movie?: Movie }) {
                         isInThePast ? { textDecoration: "line-through" } : {}
                       }
                     >
-                      <a href={showing.url} target="_blank" rel="noopener">
+                      <a
+                        href={hydrateUrl(showing.url)}
+                        target="_blank"
+                        rel="noopener"
+                      >
                         {venue?.name}
                       </a>
                       <Button
-                        href={performance.bookingUrl}
+                        href={hydrateUrl(performance.bookingUrl)}
                         target="_blank"
                         rel="noopener"
                         className="peformance-booking-button"

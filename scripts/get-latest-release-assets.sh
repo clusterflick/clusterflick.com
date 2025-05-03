@@ -8,4 +8,4 @@ do
     wget "$f" --quiet -P ./combined-data/
 done
 
-npm run compress-combined-data
+npm run process-combined-data

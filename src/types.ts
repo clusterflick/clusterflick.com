@@ -11,7 +11,7 @@ export type Venue = {
   geo: Position;
 };
 
-type Person = {
+export type Person = {
   id: string;
   name: string;
 };
@@ -19,15 +19,6 @@ type Person = {
 export type Genre = {
   id: string;
   name: string;
-};
-
-type Overview = {
-  actors: string[];
-  categories: string[];
-  directors: string[];
-  classification: string;
-  duration: number;
-  year: string;
 };
 
 export enum Category {
@@ -48,7 +39,6 @@ export type Showing = {
   title?: string;
   seen?: number;
   category: Category;
-  overview: Overview;
   url: string;
   venueId: string;
 };
@@ -145,6 +135,7 @@ export type CinemaData = {
   people: Record<string, Person>;
   genres: Record<string, Genre>;
   movies: Record<string, Movie>;
+  urlPrefixes: string[];
 };
 
 export type DateRange = {

@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     silenceDeprecations: ["legacy-js-api"],
   },
   env: {
-    NEXT_PUBLIC_DATA_FILENAME: getDataFilename(),
+    NEXT_PUBLIC_DATA_FILENAME: getDataFilename().join(","),
   },
 };
 

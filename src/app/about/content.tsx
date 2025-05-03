@@ -31,7 +31,7 @@ import getMovieClassification from "@/utils/get-movie-classification";
 import getMatchingMovies from "@/utils/get-matching-movies";
 import showNumber from "@/utils/show-number";
 import getMoviePath from "@/utils/get-movie-path";
-import getMovieCategory from "@/utils/gete-movie-category";
+import { getMovieCategory } from "@/utils/gete-movie-category";
 import AppHeading from "@/components/app-heading";
 import MovieClassification from "@/components/movie-classification";
 import FilterLink from "@/components/filter-link";

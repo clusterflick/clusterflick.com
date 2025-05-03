@@ -4,10 +4,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npx serve@latest out",
     "lint": "next lint",
     "format": "prettier --write --ignore-path .gitignore .",
-    "compress-combined-data": "node ./scripts/compress-combined-data.js"
+    "process-combined-data": "node ./scripts/process-combined-data.js"
   },
   "dependencies": {
     "@rsuite/icons": "^1.3.0",

@@ -1,5 +1,5 @@
 "use client";
-import { Classification } from "@/types";
+import { Classification, Movie } from "@/types";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { intervalToDuration, formatDuration } from "date-fns";
@@ -23,6 +23,10 @@ import PerformanceList from "@/components/performance-list";
 import AppHeading from "@/components/app-heading";
 import FavouriteMovieButton from "@/components/favourite-movie-button";
 import "./index.scss";
+import {
+  getCategoryLabel,
+  getMovieCategory,
+} from "@/utils/gete-movie-category";
 
 export default function MoviePageContent({
   params,
@@ -33,7 +37,7 @@ export default function MoviePageContent({
     useState(false);
   const { id } = use(params);
   const router = useRouter();
-  const { data } = useCinemaData();
+  const { data, hydrateUrl } = useCinemaData();
   const { filters, defaultFilters } = useFilters();
   const [isDesktop] = useMediaQuery(["lg"]);
 
@@ -58,18 +62,19 @@ export default function MoviePageContent({
 
   const isFilterApplied =
     movie?.performances.length !== movieAllPerformances.performances.length;
-  const duration =
-    displayedMovie.duration ||
-    displayedMovie.showings[Object.keys(displayedMovie.showings)[0]].overview
-      .duration;
-  const now = Date.now();
-  const dateDuration = intervalToDuration({
-    start: new Date(now),
-    end: new Date(now + duration),
-  });
-  const formattedDuration = formatDuration(dateDuration, {
-    format: ["hours", "minutes"],
-  });
+
+  const getFormattedDurationFor = ({ duration }: Movie) => {
+    if (!duration) return "";
+
+    const now = Date.now();
+    const dateDuration = intervalToDuration({
+      start: new Date(now),
+      end: new Date(now + duration),
+    });
+    return formatDuration(dateDuration, {
+      format: ["hours", "minutes"],
+    });
+  };
 
   const venueTags = Array.from(
     Object.values(displayedMovie.showings).reduce(
@@ -86,6 +91,7 @@ export default function MoviePageContent({
     ));
 
   const classification = getMovieClassification(displayedMovie);
+  const categoryKey = getMovieCategory(displayedMovie);
 
   const audienceScore = displayedMovie.rottenTomatoes?.audience?.all?.score;
   const audienceRating = displayedMovie.rottenTomatoes?.audience?.all?.rating;
@@ -114,6 +120,15 @@ export default function MoviePageContent({
                     }}
                   >
                     <FavouriteMovieButton movie={displayedMovie} show />
+                  </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "0.35rem",
+                      right: "0.35rem",
+                    }}
+                  >
+                    <Tag color="violet">{getCategoryLabel(categoryKey)}</Tag>
                   </div>
                 </MoviePoster>
               ) : null}
@@ -185,10 +200,11 @@ export default function MoviePageContent({
                           </MoviePoster>
                         </Stack.Item>
                       ) : null}
-                      {duration ? (
+                      {displayedMovie.duration ? (
                         <Stack.Item style={{ marginBottom: "1rem" }}>
                           <Text>
-                            <strong>Duration:</strong> {formattedDuration}
+                            <strong>Duration:</strong>{" "}
+                            {getFormattedDurationFor(displayedMovie)}
                           </Text>
                         </Stack.Item>
                       ) : null}
@@ -321,7 +337,9 @@ export default function MoviePageContent({
                           {displayedMovie.rottenTomatoes?.url ? (
                             <li>
                               <a
-                                href={displayedMovie.rottenTomatoes.url}
+                                href={hydrateUrl(
+                                  displayedMovie.rottenTomatoes.url,
+                                )}
                                 target="_blank"
                                 rel="noopener"
                               >

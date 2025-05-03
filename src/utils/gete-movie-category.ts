@@ -1,6 +1,6 @@
 import { Category, type Movie } from "@/types";
 
-const getMovieCategory = (movie: Movie) => {
+export const getMovieCategory = (movie: Movie) => {
   const categories = Array.from(
     new Set(Object.values(movie.showings).map(({ category }) => category)),
   );
@@ -11,4 +11,19 @@ const getMovieCategory = (movie: Movie) => {
   return categoriesWithoutDefault[0];
 };
 
-export default getMovieCategory;
+const categoryLabels: Record<string, string> = {
+  movie: "Movie",
+  "multiple-movies": "Movie Marathon",
+  tv: "TV",
+  quiz: "Quiz",
+  comedy: "Comedy",
+  music: "Music",
+  talk: "Talk",
+  workshop: "Workshop",
+  shorts: "Short Movies",
+  event: "Event",
+};
+
+export const getCategoryLabel = (categoryKey: string) => {
+  return categoryLabels[categoryKey] || categoryLabels.event;
+};
