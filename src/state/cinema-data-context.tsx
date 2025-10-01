@@ -35,9 +35,19 @@ async function getDataForListing(
   }, 100);
 }
 
-async function getData(filenames: string[]) {
+async function getData(
+  filenames: string[],
+  onProgress?: (param: { filename: string }) => void,
+) {
   const compressedFiles = await Promise.all(
-    filenames.map(async (filename) => (await fetch(`/${filename}`)).json()),
+    filenames.map((filename) =>
+      fetch(`/${filename}`)
+        .then((r) => r.json())
+        .then((result) => {
+          if (onProgress) onProgress({ filename });
+          return result;
+        }),
+    ),
   );
   return expandAndCombine(filenames, compressedFiles);
 }
@@ -74,6 +84,8 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
 export function GetCinemaData({ children }: { children: ReactNode }) {
   const params = useParams();
   const filenames = process.env.NEXT_PUBLIC_DATA_FILENAME!.split(",");
+  const [isFinishedLoadingApp, setIsFinishedLoadingApp] = useState(false);
+  const [loadedFilenames, setLoadedFilenames] = useState<string[]>([]);
   const { data, setData } = useCinemaData();
 
   useEffect(function () {
@@ -86,15 +98,39 @@ export function GetCinemaData({ children }: { children: ReactNode }) {
     }
 
     (async () => {
-      const data = await getData(filenames);
+      const data = await getData(filenames, ({ filename }) => {
+        setLoadedFilenames((filenames) => filenames.concat(filename));
+        setIsFinishedLoadingApp(true);
+      });
       setData(data);
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!data) {
+    const percentageData = Math.round(
+      (loadedFilenames.length / filenames.length) * 100,
+    );
     return (
       <div>
-        <Loader backdrop content="Loading..." />
+        {isFinishedLoadingApp ? (
+          <Loader
+            backdrop
+            content={`🎬 Loading data [${percentageData}%] ... `}
+          />
+        ) : (
+          <Loader
+            backdrop
+            content={
+              <>
+                🍿 Loading app{" "}
+                <span className="loading-percentage" suppressHydrationWarning>
+                  [0%]
+                </span>{" "}
+                ...
+              </>
+            }
+          />
+        )}
       </div>
     );
   }
