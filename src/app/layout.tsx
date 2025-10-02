@@ -24,6 +24,8 @@ const appLoadingTracker = `
           $appLoadingPercentage.innerHTML = "[" + percentage + "%]";
           return result;
         },
+        // Let webpage overrwrite the push function
+        writable: true
       });
     }
 
