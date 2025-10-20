@@ -25,12 +25,20 @@ jobs:
           static_site_generator: next
           generator_config_file: ./next.config.ts
       - run: npm ci
-      - uses: robinraju/release-downloader@v1
+      - name: Download combined data
+        uses: robinraju/release-downloader@v1
         with:
           repository: "clusterflick/data-combined"
           latest: true
           fileName: "*"
           out-file-path: "combined-data"
+      - name: Download matched data
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: "clusterflick/data-matched"
+          latest: true
+          fileName: "*"
+          out-file-path: "matched-data"
       - run: npm run process-combined-data
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
