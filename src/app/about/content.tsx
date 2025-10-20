@@ -105,6 +105,15 @@ function UnmatchedStats({ movies }: { movies: CinemaData["movies"] }) {
 const getMatchedMoviesCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).filter(({ isUnmatched }) => !isUnmatched).length;
 
+const getMoviesWithImdbCount = (movies: CinemaData["movies"]) =>
+  Object.values(movies).filter(({ imdb }) => !!imdb).length;
+
+const getMoviesWithLetterboxdCount = (movies: CinemaData["movies"]) =>
+  Object.values(movies).filter(({ letterboxd }) => !!letterboxd).length;
+
+const getMoviesWithMetacriticCount = (movies: CinemaData["movies"]) =>
+  Object.values(movies).filter(({ metacritic }) => !!metacritic).length;
+
 const getMoviesWithRottenTomatoesCount = (movies: CinemaData["movies"]) =>
   Object.values(movies).filter(({ rottenTomatoes }) => !!rottenTomatoes).length;
 
@@ -387,8 +396,8 @@ export default function AboutContent() {
       )
       .sort(
         (a, b) =>
-          parseFloat(b.rottenTomatoes?.[reviewer].all?.rating ?? "0") -
-          parseFloat(a.rottenTomatoes?.[reviewer].all?.rating ?? "0"),
+          (b.rottenTomatoes?.[reviewer].all?.rating || 0) -
+          (a.rottenTomatoes?.[reviewer].all?.rating || 0),
       )
       .slice(0, 25);
 
@@ -450,34 +459,79 @@ export default function AboutContent() {
               </FilterLink>
               .
             </Text>
-            <Text>
-              Of these, we were able to match{" "}
-              <strong>
-                {Math.round(
-                  (getMatchedMoviesCount(data!.movies) / movieCount) * 100,
-                )}
-                %
-              </strong>{" "}
-              ({showNumber(getMatchedMoviesCount(data!.movies))}) with{" "}
-              <ExternalLink href="https://www.themoviedb.org">
-                The Movie Database (TMDB)
-              </ExternalLink>{" "}
-              and{" "}
-              <strong>
-                {Math.round(
-                  (getMoviesWithRottenTomatoesCount(data!.movies) /
-                    movieCount) *
-                    100,
-                )}
-                %
-              </strong>{" "}
-              ({showNumber(getMoviesWithRottenTomatoesCount(data!.movies))})
-              with{" "}
-              <ExternalLink href="https://www.rottentomatoes.com">
-                Rotten Tomatoes
-              </ExternalLink>
-              . <UnmatchedStats movies={data!.movies} />
-            </Text>
+            <div>
+              <Text>Of these, we were able to match:</Text>
+              <ul>
+                <li>
+                  <strong>
+                    {Math.round(
+                      (getMatchedMoviesCount(data!.movies) / movieCount) * 100,
+                    )}
+                    %
+                  </strong>{" "}
+                  ({showNumber(getMatchedMoviesCount(data!.movies))}) with{" "}
+                  <ExternalLink href="https://www.themoviedb.org">
+                    The Movie Database (TMDB)
+                  </ExternalLink>
+                </li>
+                <li>
+                  <strong>
+                    {Math.round(
+                      (getMoviesWithImdbCount(data!.movies) / movieCount) * 100,
+                    )}
+                    %
+                  </strong>{" "}
+                  ({showNumber(getMoviesWithImdbCount(data!.movies))}) with{" "}
+                  <ExternalLink href="https://www.imdb.com">IMDb</ExternalLink>
+                </li>
+                <li>
+                  <strong>
+                    {Math.round(
+                      (getMoviesWithRottenTomatoesCount(data!.movies) /
+                        movieCount) *
+                        100,
+                    )}
+                    %
+                  </strong>{" "}
+                  ({showNumber(getMoviesWithRottenTomatoesCount(data!.movies))})
+                  with{" "}
+                  <ExternalLink href="https://www.rottentomatoes.com">
+                    Rotten Tomatoes
+                  </ExternalLink>
+                </li>
+                <li>
+                  <strong>
+                    {Math.round(
+                      (getMoviesWithLetterboxdCount(data!.movies) /
+                        movieCount) *
+                        100,
+                    )}
+                    %
+                  </strong>{" "}
+                  ({showNumber(getMoviesWithLetterboxdCount(data!.movies))})
+                  with{" "}
+                  <ExternalLink href="https://letterboxd.com">
+                    Letterboxd
+                  </ExternalLink>
+                </li>
+                <li>
+                  <strong>
+                    {Math.round(
+                      (getMoviesWithMetacriticCount(data!.movies) /
+                        movieCount) *
+                        100,
+                    )}
+                    %
+                  </strong>{" "}
+                  ({showNumber(getMoviesWithMetacriticCount(data!.movies))})
+                  with{" "}
+                  <ExternalLink href="https://www.metacritic.com">
+                    Metacritic
+                  </ExternalLink>
+                </li>
+              </ul>
+              <UnmatchedStats movies={data!.movies} />
+            </div>
           </Stack.Item>
           <Stack.Item>
             <Text>

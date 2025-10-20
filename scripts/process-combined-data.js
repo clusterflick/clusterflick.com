@@ -3,6 +3,10 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 const { compress, trimUndefinedRecursively } = require("compress-json");
 const data = require("../combined-data/combined-data.json");
+const imdbReviews = require("../matched-data/imdb.json");
+const letterboxdReviews = require("../matched-data/letterboxd.json");
+const metacriticReviews = require("../matched-data/metacritic.json");
+const rottentomatoesReviews = require("../matched-data/rottentomatoes.json");
 
 function getHash(inputString) {
   const hash = crypto.createHash("sha256");
@@ -132,6 +136,12 @@ function extractCommonUrlPrefix(data) {
   data.urlPrefixes = urlPrefixes;
 
   Object.values(data.movies).forEach((movie) => {
+    // Add reviews to movie data
+    movie.imdb = imdbReviews[movie.id];
+    movie.letterboxd = letterboxdReviews[movie.id];
+    movie.metacritic = metacriticReviews[movie.id];
+    movie.rottenTomatoes = rottentomatoesReviews[movie.id];
+
     if (movie.rottenTomatoes) {
       urlPrefixes.forEach((prefix, index) => {
         movie.rottenTomatoes.url = movie.rottenTomatoes.url.replace(

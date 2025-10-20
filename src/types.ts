@@ -88,15 +88,47 @@ export const classificationOrder: Classification[] = [
   Classification.Unknown,
 ];
 
+type Imdb = {
+  id: string;
+  url: string;
+  rating: number | null;
+  reviews: number;
+  unweightedRating: number | null;
+};
+
+type Letterboxd = {
+  id: string;
+  url: string;
+  likes: number;
+  reviews: number;
+  rating?: string | null;
+  unweightedRating?: string | null;
+};
+
+type MetacriticScore = {
+  dislikes?: number | null;
+  likes?: number | null;
+  rating?: number | null;
+  reviews?: number | null;
+};
+
+type Metacritic = {
+  id: string;
+  url: string;
+  audience: MetacriticScore;
+  critics: MetacriticScore;
+};
+
 type RottenTomatoesScore = {
   dislikes: number;
   likes: number;
   reviews: number;
-  rating?: string;
-  score?: string;
+  rating?: number | null;
+  score?: number | null;
 };
 
 type RottenTomatoes = {
+  id: string;
   url: string;
   audience: {
     all: RottenTomatoesScore | undefined;
@@ -126,6 +158,9 @@ export type Movie = {
   posterPath?: string;
   showings: Record<string, Showing>;
   performances: MoviePerformance[];
+  imdb?: Imdb;
+  letterboxd?: Letterboxd;
+  metacritic?: Metacritic;
   rottenTomatoes?: RottenTomatoes;
 };
 

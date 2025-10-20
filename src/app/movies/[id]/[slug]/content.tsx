@@ -28,6 +28,162 @@ import {
   getMovieCategory,
 } from "@/utils/gete-movie-category";
 
+function ImdbRating({ ratings }: { ratings: Movie["imdb"] }) {
+  if (!ratings?.rating) return;
+  return (
+    <Stack.Item
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        marginTop: "0.25rem",
+      }}
+    >
+      <strong>IMDb:</strong> &nbsp;&nbsp;
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          columnGap: "1rem",
+          rowGap: "0.4rem",
+        }}
+      >
+        <div>
+          🗂️ Scored <strong>{ratings.rating}</strong> / 10 from{" "}
+          {showNumber(ratings.reviews)} reviews
+        </div>
+      </div>
+    </Stack.Item>
+  );
+}
+
+function RottenTomatoesRating({
+  ratings,
+}: {
+  ratings: Movie["rottenTomatoes"];
+}) {
+  const audienceScore = ratings?.audience?.all?.score;
+  const audienceRating = ratings?.audience?.all?.rating;
+  const criticsScore = ratings?.critics?.all?.score;
+  const criticsRating = ratings?.critics?.all?.rating;
+
+  if (!audienceScore && !criticsScore) return;
+  return (
+    <Stack.Item
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        marginTop: "0.25rem",
+      }}
+    >
+      <strong>Rotten Tomatoes:</strong> &nbsp;&nbsp;
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          columnGap: "1rem",
+          rowGap: "0.4rem",
+        }}
+      >
+        {criticsScore ? (
+          <div>
+            🍅 <strong>{criticsScore}%</strong> of the critics liked it
+            {criticsRating ? (
+              <>
+                , scoring <strong>{criticsRating}</strong>
+                &nbsp;/&nbsp;10
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+        ) : null}
+        {audienceScore ? (
+          <div>
+            🍿 <strong>{audienceScore}%</strong> of the audience liked it
+            {audienceRating ? (
+              <>
+                , scoring <strong>{audienceRating}</strong>
+                &nbsp;/&nbsp;5
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+        ) : null}
+      </div>
+    </Stack.Item>
+  );
+}
+
+function LetterboxdRating({ ratings }: { ratings: Movie["letterboxd"] }) {
+  if (!ratings?.rating) return;
+  return (
+    <Stack.Item
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        marginTop: "0.25rem",
+      }}
+    >
+      <strong>Letterboxd:</strong> &nbsp;&nbsp;
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          columnGap: "1rem",
+          rowGap: "0.4rem",
+        }}
+      >
+        <div>
+          🚥 Scored <strong>{ratings.rating}</strong> / 5 from{" "}
+          {showNumber(ratings.reviews)} reviews
+        </div>
+      </div>
+    </Stack.Item>
+  );
+}
+
+function MetacriticRating({ ratings }: { ratings: Movie["metacritic"] }) {
+  const audienceRating = ratings?.audience?.rating;
+  const audienceReviews = ratings?.audience?.reviews;
+  const criticsRating = ratings?.critics?.rating;
+  const criticsReviews = ratings?.critics?.reviews;
+
+  if (!audienceRating && !criticsRating) return;
+  return (
+    <Stack.Item
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        marginTop: "0.25rem",
+      }}
+    >
+      <strong>Metacritic:</strong> &nbsp;&nbsp;
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          columnGap: "1rem",
+          rowGap: "0.4rem",
+        }}
+      >
+        {criticsRating && criticsReviews ? (
+          <div>
+            Ⓜ️ Critics scored it <strong>{criticsRating}%</strong> from{" "}
+            {showNumber(criticsReviews)} reviews
+          </div>
+        ) : null}
+        {audienceRating && audienceReviews ? (
+          <div>
+            🍿 Audiences scored it <strong>{audienceRating}</strong> / 10 from{" "}
+            {showNumber(audienceReviews)} reviews
+          </div>
+        ) : null}
+      </div>
+    </Stack.Item>
+  );
+}
+
 export default function MoviePageContent({
   params,
 }: {
@@ -93,11 +249,6 @@ export default function MoviePageContent({
   const classification = getMovieClassification(displayedMovie);
   const categoryKey = getMovieCategory(displayedMovie);
 
-  const audienceScore = displayedMovie.rottenTomatoes?.audience?.all?.score;
-  const audienceRating = displayedMovie.rottenTomatoes?.audience?.all?.rating;
-  const criticsScore = displayedMovie.rottenTomatoes?.critics?.all?.score;
-  const criticsRating = displayedMovie.rottenTomatoes?.critics?.all?.rating;
-
   return (
     <Container>
       <AppHeading />
@@ -124,7 +275,7 @@ export default function MoviePageContent({
                   <div
                     style={{
                       position: "absolute",
-                      bottom: "0.35rem",
+                      top: "345px",
                       right: "0.35rem",
                     }}
                   >
@@ -323,10 +474,10 @@ export default function MoviePageContent({
                               </a>
                             </li>
                           )}
-                          {displayedMovie.imdbId ? (
+                          {displayedMovie.imdb?.url ? (
                             <li>
                               <a
-                                href={`https://www.imdb.com/title/${displayedMovie.imdbId}`}
+                                href={displayedMovie.imdb.url}
                                 target="_blank"
                                 rel="noopener"
                               >
@@ -347,6 +498,28 @@ export default function MoviePageContent({
                               </a>
                             </li>
                           ) : null}
+                          {displayedMovie.letterboxd?.url ? (
+                            <li>
+                              <a
+                                href={hydrateUrl(displayedMovie.letterboxd.url)}
+                                target="_blank"
+                                rel="noopener"
+                              >
+                                🚥 Letterboxd
+                              </a>
+                            </li>
+                          ) : null}
+                          {displayedMovie.metacritic?.url ? (
+                            <li>
+                              <a
+                                href={hydrateUrl(displayedMovie.metacritic.url)}
+                                target="_blank"
+                                rel="noopener"
+                              >
+                                Ⓜ️ Metacritic
+                              </a>
+                            </li>
+                          ) : null}
                           {displayedMovie.youtubeTrailer ? (
                             <li>
                               <a
@@ -360,54 +533,12 @@ export default function MoviePageContent({
                           ) : null}
                         </ul>
                       </Stack.Item>
-                      {audienceScore || criticsScore ? (
-                        <Stack.Item
-                          style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            marginTop: "0.25rem",
-                          }}
-                        >
-                          <strong>Rating:</strong> &nbsp;&nbsp;
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              columnGap: "1rem",
-                              rowGap: "0.4rem",
-                            }}
-                          >
-                            {criticsScore ? (
-                              <div>
-                                🍅 <strong>{criticsScore}%</strong> of the
-                                critics liked it
-                                {criticsRating ? (
-                                  <>
-                                    , scoring <strong>{criticsRating}</strong>
-                                    &nbsp;/&nbsp;10
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            ) : null}
-                            {audienceScore ? (
-                              <div>
-                                🍿 <strong>{audienceScore}%</strong> of the
-                                audience liked it
-                                {audienceRating ? (
-                                  <>
-                                    , scoring <strong>{audienceRating}</strong>
-                                    &nbsp;/&nbsp;5
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            ) : null}
-                          </div>
-                        </Stack.Item>
-                      ) : null}
+                      <ImdbRating ratings={displayedMovie.imdb} />
+                      <RottenTomatoesRating
+                        ratings={displayedMovie.rottenTomatoes}
+                      />
+                      <LetterboxdRating ratings={displayedMovie.letterboxd} />
+                      <MetacriticRating ratings={displayedMovie.metacritic} />
                     </Stack>
                   </Stack.Item>
                 </Stack>

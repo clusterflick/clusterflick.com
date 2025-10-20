@@ -108,7 +108,7 @@ const getMatchingMovies = (
 
     const audienceRating = movie.rottenTomatoes?.audience.all?.rating;
     if (audienceRating) {
-      const key = audienceRating.split(".")[0];
+      const key = `${audienceRating}`.split(".")[0];
       if (!filteredAudienceRatings[key]) {
         return matchingMovies;
       }
@@ -120,7 +120,7 @@ const getMatchingMovies = (
 
     const criticsRating = movie.rottenTomatoes?.critics.all?.rating;
     if (criticsRating) {
-      const key = criticsRating.split(".")[0];
+      const key = `${criticsRating}`.split(".")[0];
       if (!filteredCriticsRatings[key]) {
         return matchingMovies;
       }
