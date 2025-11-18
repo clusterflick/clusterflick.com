@@ -271,9 +271,7 @@ export default function FavouritesContent() {
                 </Text>
               </Stack.Item>
               <Stack.Item>
-                <Text>
-                  <strong>Want some inspiration?</strong>
-                </Text>
+                <Text weight="bold">Want some inspiration?</Text>
                 <ul>
                   <li>
                     Take a look at the{" "}
