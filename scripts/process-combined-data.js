@@ -171,6 +171,22 @@ function extractCommonUrlPrefix(data) {
   return data;
 }
 
+function removeOffAccessiblityIndicators(data) {
+  Object.values(data.movies).forEach((movie) => {
+    const performances = Object.values(movie.performances);
+    performances.forEach((performance) => {
+      if (!performance.accessibility) return;
+      const accessibility = Object.keys(performance.accessibility);
+      accessibility.forEach((flag) => {
+        if (!performance.accessibility[flag]) {
+          delete performance.accessibility[flag];
+        }
+      });
+    });
+  });
+  return data;
+}
+
 function removeIdProperty(data) {
   Object.keys(data.genres).forEach((id) => {
     if (data.genres[id].id === id) delete data.genres[id].id;
@@ -206,6 +222,7 @@ function removeOptionalData(data) {
     removeShowingOverviews,
     trimRottenTomatoData,
     extractCommonUrlPrefix,
+    removeOffAccessiblityIndicators,
     removeIdProperty,
     removeNormalizedTitle,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);

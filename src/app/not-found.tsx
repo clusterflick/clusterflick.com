@@ -1,14 +1,17 @@
 "use client";
 import { useEffect } from "react";
+import Heading from "rsuite/cjs/Heading";
+import Container from "rsuite/cjs/Container";
+import Stack from "rsuite/cjs/Stack";
+import Text from "rsuite/cjs/Text";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCinemaData } from "@/state/cinema-data-context";
 import getMovieUrlSegments from "@/utils/get-movie-url-segments";
-import { Container, Heading, Stack, Text } from "rsuite";
+import getMoviePath from "@/utils/get-movie-path";
 import AppHeading from "@/components/app-heading";
 import FilterLink from "@/components/filter-link";
 import ExternalLink from "@/components/external-link";
-import getMoviePath from "@/utils/get-movie-path";
-import Link from "next/link";
 import bestMoviesFilter from "@/components/app-heading/best-movies-filter";
 
 export default function NotFoundPage() {
