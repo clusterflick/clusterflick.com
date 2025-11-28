@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import getData from "@/utils/get-data";
 import HomePageContent from "./content";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getData();
   return {
-    title: `London Cinema Movies - ${Object.keys(data.movies).length} to pick from!`,
+    title: `Clusterflick`,
+    description:
+      "Every film, every cinema, one place. Compare screenings across London and find your perfect movie night.",
   };
 }
 

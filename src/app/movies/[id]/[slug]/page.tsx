@@ -18,7 +18,9 @@ export async function generateMetadata({
   const id = (await params).id;
   const movie = data.movies[id];
   return {
-    title: `${movie.title} ${movie.year ? `(${movie.year})` : ""} - Performances`,
+    title: `${movie.title} ${movie.year ? `(${movie.year})` : ""} on Clusterflick`,
+    description:
+      "Every film, every cinema, one place. Compare screenings across London and find your perfect movie night.",
   };
 }
 

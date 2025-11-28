@@ -3,7 +3,9 @@ import AboutContent from "./content";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: `London Cinema Movies - About`,
+    title: `About Clusterflick`,
+    description:
+      "Every film, every cinema, one place. Compare screenings across London and find your perfect movie night.",
   };
 }
 

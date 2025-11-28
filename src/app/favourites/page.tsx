@@ -3,7 +3,9 @@ import FavouritesContent from "./content";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: `London Cinema Movies - Favourites`,
+    title: `Favourite movies on Clusterflick`,
+    description:
+      "Every film, every cinema, one place. Compare screenings across London and find your perfect movie night.",
   };
 }
 

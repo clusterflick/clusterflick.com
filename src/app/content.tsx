@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <Container>
       <Head>
-        <title>London Cinema Movies</title>
+        <title>Clusterflick</title>
       </Head>
       <AppHeading>
         <AppFilters />
