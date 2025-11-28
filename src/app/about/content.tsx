@@ -884,29 +884,78 @@ export default function AboutContent() {
         <Divider />
         <Stack spacing={24} direction="column" alignItems="flex-start">
           <Stack.Item>
-            <Heading>Development</Heading>
+            <Heading>About Clusterflick</Heading>
+          </Stack.Item>
+          <Stack.Item>
+            <Text>You can find us around the internet. Say hi! 👋 </Text>
+            <ul>
+              <li>
+                <ExternalLink href="https://letterboxd.com/clusterflick/">
+                  🚥 letterboxd.com/<strong>clusterflick</strong>
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://www.instagram.com/clusterflick_/">
+                  🖼️ instagram.com/<strong>clusterflick_</strong>
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://www.reddit.com/user/clusterflick_/">
+                  🧍 reddit.com/user/<strong>clusterflick_</strong>
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://www.threads.com/clusterflick_/">
+                  🧵 threads.com/<strong>clusterflick_</strong>
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://x.com/clusterflick/">
+                  🐦 x.com/<strong>clusterflick</strong>
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://bsky.app/profile/clusterflick.bsky.social">
+                  🩵 bsky.app/profile/<strong>clusterflick</strong>.bsky.social
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://github.com/clusterflick/">
+                  🧑‍💻 github.com/<strong>clusterflick</strong>
+                </ExternalLink>
+              </li>
+            </ul>
           </Stack.Item>
           <Stack.Item>
             <Text>
-              The code for powering this site, including retrieving performances
-              from venue sites and matching against TMDB API is{" "}
+              The code for this site, the processing pipeline, and data
+              generated is all open source and{" "}
               <ExternalLink href="https://github.com/clusterflick/">
                 available on Github
               </ExternalLink>
               .
             </Text>
             <Text>
-              Data is refreshed early every morning and available in normalized
-              form in a{" "}
-              <ExternalLink href="https://github.com/clusterflick/data-transformed/releases/latest">
-                JSON file per venue
-              </ExternalLink>
-              . This data is also available in a{" "}
-              <ExternalLink href="https://github.com/clusterflick/data-calendar/releases/latest">
-                ICS calendar file per venue
-              </ExternalLink>
-              .
+              The data is refreshed early every morning and available in
+              normalized form in different formats depending on your needs:
             </Text>
+            <ul>
+              <li>
+                <ExternalLink href="https://github.com/clusterflick/data-transformed/releases/latest">
+                  JSON file per venue
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://github.com/clusterflick/data-combined/releases/latest">
+                  Data combined by movie
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href="https://github.com/clusterflick/data-calendar/releases/latest">
+                  ICS calendar file per venue
+                </ExternalLink>
+              </li>
+            </ul>
           </Stack.Item>
           <Stack.Item>
             <Message bordered>
@@ -924,10 +973,7 @@ export default function AboutContent() {
                 🐞
               </span>{" "}
               If you see any issues or bugs with the data shown or how this site
-              works, please let us know by logging an issue at{" "}
-              <ExternalLink href="https://github.com/clusterflick/clusterflick.com/issues">
-                https://github.com/clusterflick/clusterflick.com/issues
-              </ExternalLink>
+              works, please let us know.
             </Message>
           </Stack.Item>
         </Stack>
@@ -984,8 +1030,95 @@ export default function AboutContent() {
               </Stack.Item>
               <Stack.Item>
                 <Text>
-                  Performances are retrieved for each of the venues below:
+                  Performances are retrieved for each of the venues below, as
+                  well as being retrieved from these sources:
                 </Text>
+              </Stack.Item>
+              <Stack.Item>
+                <ol
+                  style={{
+                    listStyleType: "none",
+                    padding: 0,
+                    width: "100%",
+                    columns: "26em 4",
+                    gap: "5em",
+                    columnRule: "1px dotted #666",
+                  }}
+                >
+                  <li>
+                    <span
+                      style={{
+                        flex: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🚏{" "}
+                      <ExternalLink href="https://www.designmynight.com/london">
+                        DesignMyNight
+                      </ExternalLink>
+                    </span>
+                  </li>
+                  <li>
+                    <span
+                      style={{
+                        flex: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🚏{" "}
+                      <ExternalLink href="https://dice.fm">DICE</ExternalLink>
+                    </span>
+                  </li>
+                  <li>
+                    <span
+                      style={{
+                        flex: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🚏{" "}
+                      <ExternalLink href="https://www.eventbrite.co.uk">
+                        Eventbrite
+                      </ExternalLink>
+                    </span>
+                  </li>
+                  <li>
+                    <span
+                      style={{
+                        flex: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🚏{" "}
+                      <ExternalLink href="https://outsavvy.com">
+                        OutSavvy
+                      </ExternalLink>
+                    </span>
+                  </li>
+                  <li>
+                    <span
+                      style={{
+                        flex: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🚏{" "}
+                      <ExternalLink href="https://www.ticketsource.co.uk">
+                        TicketSource
+                      </ExternalLink>
+                    </span>
+                  </li>
+                </ol>
               </Stack.Item>
               <Stack.Item>
                 <ol
