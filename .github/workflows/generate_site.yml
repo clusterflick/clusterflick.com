@@ -28,6 +28,7 @@ jobs:
       - name: Download combined data
         uses: robinraju/release-downloader@v1
         with:
+          token: ${{ secrets.PAT }}
           repository: "clusterflick/data-combined"
           latest: true
           fileName: "*"
@@ -35,6 +36,7 @@ jobs:
       - name: Download matched data
         uses: robinraju/release-downloader@v1
         with:
+          token: ${{ secrets.PAT }}
           repository: "clusterflick/data-matched"
           latest: true
           fileName: "*"
