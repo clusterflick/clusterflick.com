@@ -5,6 +5,10 @@ on:
 
 name: Build and deploy website
 
+concurrency:
+  group: build-site
+  cancel-in-progress: true
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
