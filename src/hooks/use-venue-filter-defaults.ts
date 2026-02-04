@@ -20,12 +20,8 @@ export function useVenueFilterDefaults() {
   const initialized = useRef(false);
 
   useEffect(() => {
-    // Reset the initialized flag when venues is reset to null (e.g., by resetFilters)
-    // This allows the default to be re-applied
-    if (filterState.venues === null) {
-      initialized.current = false;
-    }
-
+    // Only apply default on initial mount, not on subsequent resets
+    // This prevents overwriting user's "Select All" action
     if (
       metaData?.venues &&
       !initialized.current &&
