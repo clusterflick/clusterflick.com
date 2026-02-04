@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { existsSync, mkdirSync, writeFileSync } = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
@@ -7,6 +8,15 @@ const imdbReviews = require("../matched-data/imdb.json");
 const letterboxdReviews = require("../matched-data/letterboxd.json");
 const metacriticReviews = require("../matched-data/metacritic.json");
 const rottentomatoesReviews = require("../matched-data/rottentomatoes.json");
+
+const simplifySorting = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/^the /i, "")
+    .normalize("NFD")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .trim();
 
 function getHash(inputString) {
   const hash = crypto.createHash("sha256");
@@ -60,79 +70,106 @@ function trimRottenTomatoData(data) {
   return data;
 }
 
-const urlPrefixes = [
-  "https://www.rottentomatoes.com/m/",
-  "http://www.cinemamuseum.org.uk/",
-  "https://bookings.thegardencinema.co.uk/TheGardenCinema.dll/TSelectItems.waSelectItemsPrompt.TcsWebMenuItem_0.TcsWebTab_0.TcsPerformance_",
-  "https://cinelumiere.savoysystems.co.uk/CineLumiere.dll/TSelectItems.waSelectItemsPrompt.TcsWebMenuItem_600.TcsWebTab_601.",
-  "https://experience.cineworld.co.uk/select-tickets?sitecode=",
-  "https://genesis.admit-one.co.uk/seats/?perfCode=",
-  "https://princecharlescinema.com/film/",
-  "https://princecharlescinema.com/prince-charles-cinema/booknow/",
-  "https://purchase.everymancinema.com/startticketing/",
-  "https://purchase.jw3.org.uk/ChooseSeats/",
-  "https://richmix.org.uk/book-online/",
-  "https://richmix.org.uk/cinema/",
-  "https://riocinema.org.uk/Rio.dll/WhatsOn?f=",
-  "https://riversidestudios.co.uk/see-and-do/",
-  "https://thearzner.com/TheArzner.dll/Booking?Booking=TSelectItems.waSelectItemsPrompt.TcsWebMenuItem_0.TcsWebTab_0.TcsPerformance_",
-  "https://thearzner.com/TheArzner.dll/WhatsOn?f=",
-  "https://thecastlecinema.com/bookings/",
-  "https://thecastlecinema.com/programme/",
-  "https://thelexicinema.co.uk/TheLexiCinema.dll/Booking?Booking=TSelectItems.waSelectItemsPrompt.TcsWebMenuItem_0.TcsWebTab_0.TcsPerformance_",
-  "https://thelexicinema.co.uk/TheLexiCinema.dll/WhatsOn?f=",
-  "https://ticketing.picturehouses.com/Ticketing/visSelectTickets.aspx?cinemacode=",
-  "https://ticketlab.co.uk/event/id/",
-  "https://ticketlab.co.uk/series/id/",
-  "https://tickets.barbican.org.uk/choose-seats/",
-  "https://web1.empire.mycloudcinema.com/#/book/",
-  "https://web2.empire.mycloudcinema.com/#/book/",
-  "https://web3.empire.mycloudcinema.com/#/book/",
-  "https://whatson.bfi.org.uk/imax/Online/default.asp?default.asp?doWork::WScontent::loadArticle=Load&BOparam::WScontent::loadArticle::article_id=",
-  "https://whatson.bfi.org.uk/Online/default.asp?default.asp?doWork::WScontent::loadArticle=Load&BOparam::WScontent::loadArticle::article_id=",
-  "https://www.actonecinema.co.uk/checkout/showing/",
-  "https://www.actonecinema.co.uk/movie/",
-  "https://www.barbican.org.uk/whats-on/",
-  "https://www.chiswickcinema.co.uk/films/",
-  "https://www.chiswickcinema.co.uk/tickets/",
-  "https://www.cineworld.co.uk/films/",
-  "https://www.closeupfilmcentre.com/film_programmes/",
-  "https://www.curzon.com/films/",
-  "https://www.curzon.com/ticketing/seats/",
-  "https://www.ealingproject.co.uk/checkout/showing/",
-  "https://www.ealingproject.co.uk/movie/",
-  "https://www.electriccinema.co.uk/film/",
-  "https://www.electriccinema.co.uk/tickets/",
-  "https://www.eventbrite.co.uk/e/",
-  "https://www.eventbrite.com/checkout-external?eid=",
-  "https://www.eventbrite.com/e/",
-  "https://www.everymancinema.com/film-listing/",
-  "https://www.genesiscinema.co.uk/event/",
-  "https://www.institut-francais.org.uk/cinema/",
-  "https://www.jw3.org.uk/book/",
-  "https://www.jw3.org.uk/whats-on/",
-  "https://www.myvue.com/book-tickets/summary/",
-  "https://www.myvue.com/cinema/",
-  "https://www.odeon.co.uk/films/",
-  "https://www.odeon.co.uk/ticketing/seat-picker/?showtimeId=",
-  "https://www.olympiccinema.com/film/",
-  "https://www.phoenixcinema.co.uk/checkout/showing/",
-  "https://www.phoenixcinema.co.uk/movie/",
-  "https://www.picturehouses.com/movie-details/",
-  "https://www.regentstreetcinema.com/checkout/showing/",
-  "https://www.regentstreetcinema.com/movie/",
-  "https://www.riocinema.org.uk/Rio.dll/Booking?Booking=TSelectItems.waSelectItemsPrompt.TcsWebMenuItem_0.TcsWebTab_0.TcsPerformance_",
-  "https://www.sidcupstoryteller.co.uk/checkout/showing/",
-  "https://www.sidcupstoryteller.co.uk/movie/",
-  "https://www.thecinemaatselfridges.com/film/",
-  "https://www.thecinemainthepowerstation.com/film/",
-  "https://www.thegardencinema.co.uk/film/",
-  "https://www.throwleyyardcinema.co.uk/checkout/showing/",
-  "https://www.throwleyyardcinema.co.uk/movie/",
-  "https://www.ticketsource.co.uk/close-up-cinema/",
-];
+/**
+ * Generate URL prefixes automatically based on the data.
+ * Finds common prefixes that provide net byte savings when replaced with {index} placeholders.
+ */
+function generateUrlPrefixes(data, minPrefixLength = 20) {
+  const urls = [];
+
+  Object.values(data.movies).forEach((movie) => {
+    Object.values(movie.showings).forEach((showing) => {
+      if (showing.url) urls.push(showing.url);
+    });
+
+    movie.performances.forEach((performance) => {
+      if (performance.bookingUrl) urls.push(performance.bookingUrl);
+    });
+  });
+
+  Object.values(imdbReviews).forEach((review) => {
+    if (review?.url) urls.push(review.url);
+  });
+  Object.values(letterboxdReviews).forEach((review) => {
+    if (review?.url) urls.push(review.url);
+  });
+  Object.values(metacriticReviews).forEach((review) => {
+    if (review?.url) urls.push(review.url);
+  });
+  Object.values(rottentomatoesReviews).forEach((review) => {
+    if (review?.url) urls.push(review.url);
+  });
+
+  // Find candidate prefixes at natural URL boundaries
+  const prefixCounts = new Map();
+  urls.forEach((url) => {
+    for (let i = 0; i < url.length; i++) {
+      if (
+        url[i] === "/" ||
+        url[i] === "?" ||
+        url[i] === "=" ||
+        url[i] === "&"
+      ) {
+        const prefix = url.substring(0, i + 1);
+        if (prefix.length >= minPrefixLength) {
+          prefixCounts.set(prefix, (prefixCounts.get(prefix) || 0) + 1);
+        }
+      }
+    }
+  });
+
+  // Calculate net savings for each prefix
+  // Savings = (prefix_length - placeholder_length) × usage_count - prefix_length_in_meta
+  const prefixesWithSavings = [];
+
+  prefixCounts.forEach((count, prefix) => {
+    if (count < 2) return; // Must be used at least twice to be worthwhile
+
+    // Placeholder length varies: {0}-{9} = 3 chars, {10}-{99} = 4 chars, etc.
+    // Use conservative estimate of 4 chars
+    const placeholderLength = 4;
+    const savingsPerUse = prefix.length - placeholderLength;
+    const storageCost = prefix.length;
+    const netSavings = savingsPerUse * count - storageCost;
+
+    if (netSavings > 0) {
+      prefixesWithSavings.push({ prefix, count, savings: netSavings });
+    }
+  });
+
+  // Sort by savings (descending)
+  prefixesWithSavings.sort((a, b) => b.savings - a.savings);
+
+  // Greedily select prefixes, preferring longer ones when they subsume shorter ones
+  const selectedPrefixes = [];
+
+  prefixesWithSavings.forEach(({ prefix }) => {
+    // Check if this prefix would be redundant
+    // A shorter prefix that's already selected would match all URLs this one matches
+    const subsumedByExisting = selectedPrefixes.some(
+      (selected) => prefix.startsWith(selected) && prefix !== selected,
+    );
+
+    if (subsumedByExisting) return;
+
+    // Check if this prefix would subsume an existing one with less savings
+    // If so, the existing shorter one is already covering those URLs
+    const wouldSubsumeExisting = selectedPrefixes.some(
+      (selected) => selected.startsWith(prefix) && selected !== prefix,
+    );
+
+    if (wouldSubsumeExisting) return;
+
+    selectedPrefixes.push(prefix);
+  });
+
+  // Sort alphabetically for consistent output
+  return selectedPrefixes.sort();
+}
 
 function extractCommonUrlPrefix(data) {
+  // Generate prefixes dynamically based on actual data
+  const urlPrefixes = generateUrlPrefixes(data);
   data.urlPrefixes = urlPrefixes;
 
   Object.values(data.movies).forEach((movie) => {
@@ -233,26 +270,60 @@ try {
   const { generatedAt, genres, people, venues, urlPrefixes, movies } =
     reducedData;
 
-  const files = {
-    common: { generatedAt, genres, people, venues, urlPrefixes },
-  };
-  Object.keys(movies).forEach((id) => {
-    const movie = movies[id];
-    const initial = id[id.length - 1];
-    const key = /[a-z]/i.test(initial) ? "other" : initial;
-    files[key] = files[key] || {};
-    files[key][id] = movie;
-  });
+  const files = {};
+  const mapping = {};
+  let bucket = 0;
+  let countInBucket = 0;
+  const MAX_PERFORMANCES_PER_BUCKET = 1000;
+
+  Object.entries(movies)
+    .sort(([, a], [, b]) =>
+      simplifySorting(a.title).localeCompare(simplifySorting(b.title)),
+    )
+    .forEach(([id, movie]) => {
+      const count = Object.keys(movie.performances).length;
+
+      if (
+        count > MAX_PERFORMANCES_PER_BUCKET ||
+        (countInBucket > 0 &&
+          countInBucket + count > MAX_PERFORMANCES_PER_BUCKET)
+      ) {
+        bucket++;
+        countInBucket = 0;
+      }
+
+      files[bucket] = files[bucket] || {};
+      files[bucket][id] = movie;
+      mapping[bucket] = mapping[bucket] || [];
+      mapping[bucket].push(id);
+
+      if (count <= MAX_PERFORMANCES_PER_BUCKET) countInBucket += count;
+    });
 
   trimUndefinedRecursively(files);
 
+  const outputPath = path.join(__dirname, "..", "public", "data");
+  const filenames = [];
   Object.keys(files).forEach((id) => {
     const compressed = JSON.stringify(compress(files[id]));
-    const outputPath = path.join(__dirname, "..", "public");
     if (!existsSync(outputPath)) mkdirSync(outputPath, { recursive: true });
     const outputFilename = `data.${id}.${getHash(compressed)}.json`;
+    filenames.push(outputFilename);
     writeFileSync(path.join(outputPath, outputFilename), compressed);
   });
+
+  const meta = {
+    generatedAt,
+    genres,
+    people,
+    venues,
+    urlPrefixes,
+    mapping,
+    filenames,
+  };
+  const compressed = JSON.stringify(compress(meta));
+  const outputFilename = `data.meta.${getHash(compressed)}.json`;
+  writeFileSync(path.join(outputPath, outputFilename), compressed);
 } catch (e) {
   throw e;
 }

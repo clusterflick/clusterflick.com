@@ -2,6 +2,9 @@ REPO_URL='https://api.github.com/repos/clusterflick/data-combined/releases/lates
 
 COMBINED_LIST=$(curl -sS -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" $REPO_URL)
 
+rm -rf ./combined-data/
+rm -rf ./matched-data/
+
 for f in $(echo "$COMBINED_LIST" | grep browser_download | cut -d\" -f4);
 do
     echo "Getting $f ..."
@@ -18,4 +21,5 @@ do
     wget "$f" --quiet -P ./matched-data/
 done
 
+rm -rf ./public/data
 npm run process-combined-data

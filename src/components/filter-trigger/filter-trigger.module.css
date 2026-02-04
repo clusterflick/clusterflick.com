@@ -1,0 +1,141 @@
+.trigger {
+  --trigger-closed-font-size: 14px;
+  --trigger-open-font-size: 28px;
+  --text-margin-top: 80px;
+  --trigger-height: 46px;
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px 20px;
+  height: var(--trigger-height);
+  background: transparent;
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.3);
+  border-radius: 24px;
+  cursor: pointer;
+  color: var(--color-light-gray);
+  font-size: var(--trigger-closed-font-size);
+  font-weight: 400;
+  max-width: calc(100vw - 650px);
+  text-align: center;
+  line-height: 1.5;
+  z-index: 200;
+  overflow: visible;
+  transition:
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 1024px) {
+  .trigger {
+    max-width: calc(100vw - 200px);
+  }
+}
+
+.trigger:hover {
+  border-color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  box-shadow: 0 0 20px rgba(var(--color-neon-pink-rgb), 0.2);
+}
+
+.trigger:hover .highlight {
+  color: var(--color-neon-pink);
+}
+
+.trigger.open {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  max-width: 100vw;
+}
+
+.trigger.open:hover {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.textWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0;
+  max-width: 100%;
+  transition:
+    margin-top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.textWrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition:
+    opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trigger.open .textWrapper::before {
+  opacity: 1;
+  box-shadow:
+    0 10px 20px 25px rgba(var(--color-midnight-navy-rgb), 0.9),
+    0 10px 20px 30px rgba(var(--color-midnight-navy-rgb), 0.9);
+  background: rgba(var(--color-midnight-navy-rgb), 1);
+}
+
+.trigger.open .textWrapper {
+  margin-top: var(--text-margin-top);
+  font-size: var(--trigger-open-font-size);
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
+.text {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.trigger.open .text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.highlight {
+  color: var(--color-neon-pink);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.chevron {
+  width: 1em;
+  height: 1em;
+  color: var(--color-neon-pink);
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.trigger:hover .chevron {
+  opacity: 1;
+}
+
+.trigger.open .chevron {
+  opacity: 1;
+  transform: rotate(180deg);
+}

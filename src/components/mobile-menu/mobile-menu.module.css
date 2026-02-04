@@ -1,0 +1,126 @@
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobileMenu {
+    display: block;
+    position: absolute;
+    top: 19px;
+    right: 16px;
+  }
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 2px solid rgba(var(--color-electric-blue-rgb), 0.5);
+  border-radius: 8px;
+  color: var(--color-electric-blue);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-neon-pink);
+    color: var(--color-neon-pink);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--color-black-rgb), 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.menuPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: linear-gradient(
+    180deg,
+    var(--color-dark-navy) 0%,
+    var(--color-midnight-navy) 100%
+  );
+  border-left: 1px solid var(--color-neon-pink);
+  box-shadow:
+    -4px 0 30px rgba(var(--color-neon-pink-rgb), 0.2),
+    -8px 0 60px rgba(var(--color-neon-pink-rgb), 0.1);
+  z-index: 101;
+  padding: 24px;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 2px solid rgba(var(--color-electric-blue-rgb), 0.5);
+  border-radius: 8px;
+  color: var(--color-electric-blue);
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-neon-pink);
+    color: var(--color-neon-pink);
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.navLink {
+  display: block;
+  padding: 16px 20px;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(var(--color-electric-blue-rgb), 0.1);
+    color: var(--color-neon-pink);
+  }
+}

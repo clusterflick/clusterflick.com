@@ -1,138 +1,379 @@
-import type { CinemaData } from "@/types";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Loader from "rsuite/cjs/Loader";
-import expandAndCombine from "@/utils/expand-and-combine";
+"use client";
 
-async function getDataForListing(
-  filenames: string[],
-  setData: Dispatch<SetStateAction<CinemaData | null>>,
-  id: string,
-) {
-  const initial = id[id.length - 1];
-  const key = /[a-z]/i.test(initial) ? "other" : initial;
-  const commonFilename = filenames.find((filename) =>
-    filename.startsWith("data.common."),
-  );
-  const listingFilename = filenames.find((filename) =>
-    filename.startsWith(`data.${key}.`),
-  );
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useMemo,
+  useRef,
+} from "react";
+import { CinemaData, MetaData } from "@/types";
+import { decompress, Compressed } from "compress-json";
 
-  if (commonFilename && listingFilename) {
-    console.time("Retrieved listing data");
-    const data = await getData([commonFilename, listingFilename]);
-    console.timeEnd("Retrieved listing data");
-    setData(data);
+/**
+ * Custom error class for data fetching errors with additional context.
+ */
+export class DataFetchError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: unknown,
+    public readonly statusCode?: number,
+  ) {
+    super(message);
+    this.name = "DataFetchError";
+  }
+}
+
+type ContextType = {
+  metaData: MetaData | null;
+  movies: CinemaData["movies"];
+  isLoading: boolean;
+  isEmpty: boolean;
+  error: DataFetchError | null;
+  getData: () => Promise<void>;
+  getDataWithPriority: (movieId: string) => Promise<void>;
+  hydrateUrl: (truncatedUrl: string) => string;
+  retry: () => Promise<void>;
+};
+
+/**
+ * Adds the `id` property to each item based on its key.
+ * Note: Intentionally mutates the input for performance - this is only called
+ * on freshly fetched data before it enters React state.
+ */
+function expandData<T extends Record<string, { id: string }>>(data: T): T {
+  Object.keys(data).forEach((id: string) => {
+    data[id].id = id;
+  });
+  return data;
+}
+
+const UNCATEGORISED_GENRE_ID = "uncategorised";
+
+/**
+ * Find or create the "Uncategorised" genre in the genres metadata.
+ * Note: Intentionally mutates the input for performance - this is only called
+ * on freshly fetched data before it enters React state.
+ */
+function ensureUncategorisedGenre(
+  genres: Record<string, { id: string; name: string }>,
+): string {
+  // First, check if it already exists
+  for (const genre of Object.values(genres)) {
+    if (genre.name === "Uncategorised") {
+      return genre.id;
+    }
   }
 
-  // Get all the rest of the data now that we've loaded the listing data
-  setTimeout(async () => {
-    console.time("Retrieved follow-up data");
-    const data = await getData(filenames);
-    console.timeEnd("Retrieved follow-up data");
-    setData(data);
-  }, 100);
+  // If not found, create it
+  genres[UNCATEGORISED_GENRE_ID] = {
+    id: UNCATEGORISED_GENRE_ID,
+    name: "Uncategorised",
+  };
+  return UNCATEGORISED_GENRE_ID;
 }
 
-async function getData(
-  filenames: string[],
-  onProgress?: (param: { filename: string }) => void,
-) {
-  const compressedFiles = await Promise.all(
-    filenames.map((filename) =>
-      fetch(`/${filename}`)
-        .then((r) => r.json())
-        .then((result) => {
-          if (onProgress) onProgress({ filename });
-          return result;
-        }),
-    ),
-  );
-  return expandAndCombine(filenames, compressedFiles);
+/**
+ * Assign "Uncategorised" genre to movies that have no genres,
+ * or whose genres don't exist in the metadata.
+ * Note: Intentionally mutates the input for performance - this is only called
+ * on freshly fetched data before it enters React state.
+ */
+function assignUncategorisedGenre(
+  movies: CinemaData["movies"],
+  uncategorisedGenreId: string,
+  validGenreIds: Set<string>,
+): CinemaData["movies"] {
+  for (const movie of Object.values(movies)) {
+    if (!movie.genres || movie.genres.length === 0) {
+      // No genres at all
+      movie.genres = [uncategorisedGenreId];
+    } else {
+      // Check if any of the movie's genres are valid (exist in metadata)
+      const hasValidGenre = movie.genres.some((id) => validGenreIds.has(id));
+      if (!hasValidGenre) {
+        // All genre IDs are invalid/orphaned, add uncategorised
+        movie.genres = [...movie.genres, uncategorisedGenreId];
+      }
+    }
+  }
+  return movies;
 }
 
-const CinemaDataContext = createContext<{
-  data: CinemaData | null;
-  setData: Dispatch<SetStateAction<CinemaData | null>>;
-  hydrateUrl: (truncatedUrl: string) => string;
-}>({
-  data: null,
-  setData: () => {},
-  hydrateUrl: () => "",
-});
+export async function getMetaData(): Promise<MetaData> {
+  const metaFilename = process.env.NEXT_PUBLIC_DATA_FILENAME;
 
-export const useCinemaData = () => useContext(CinemaDataContext);
+  if (!metaFilename) {
+    throw new DataFetchError(
+      "Configuration error: NEXT_PUBLIC_DATA_FILENAME is not set",
+    );
+  }
+
+  const url = `/data/${metaFilename}`;
+  let response: Response;
+
+  try {
+    response = await fetch(url);
+  } catch (err) {
+    throw new DataFetchError(
+      "Network error: Unable to connect to the server. Please check your internet connection.",
+      err,
+    );
+  }
+
+  if (!response.ok) {
+    throw new DataFetchError(
+      `Failed to load metadata: ${response.status} ${response.statusText}`,
+      undefined,
+      response.status,
+    );
+  }
+
+  let compressed: Compressed;
+  try {
+    compressed = await response.json();
+  } catch (err) {
+    throw new DataFetchError(
+      "Data error: Failed to parse metadata response",
+      err,
+    );
+  }
+
+  try {
+    const metaData = decompress(compressed) as MetaData;
+    return {
+      ...metaData,
+      genres: expandData<CinemaData["genres"]>(metaData.genres),
+      people: expandData<CinemaData["people"]>(metaData.people),
+      venues: expandData<CinemaData["venues"]>(metaData.venues),
+    };
+  } catch (err) {
+    throw new DataFetchError("Data error: Failed to decompress metadata", err);
+  }
+}
+
+export async function getMovieData(
+  filename: string,
+): Promise<CinemaData["movies"]> {
+  const url = `/data/${filename}`;
+  let response: Response;
+
+  try {
+    response = await fetch(url);
+  } catch (err) {
+    throw new DataFetchError(
+      `Network error: Unable to fetch movie data from ${filename}`,
+      err,
+    );
+  }
+
+  if (!response.ok) {
+    throw new DataFetchError(
+      `Failed to load movie data: Server returned ${response.status} ${response.statusText}`,
+      undefined,
+      response.status,
+    );
+  }
+
+  let compressed: Compressed;
+  try {
+    compressed = await response.json();
+  } catch (err) {
+    throw new DataFetchError(
+      `Data error: Failed to parse movie data from ${filename}`,
+      err,
+    );
+  }
+
+  try {
+    const movies = decompress(compressed) as CinemaData["movies"];
+    return expandData<CinemaData["movies"]>(movies);
+  } catch (err) {
+    throw new DataFetchError(
+      `Data error: Failed to decompress movie data from ${filename}`,
+      err,
+    );
+  }
+}
+
+const Context = createContext<ContextType | undefined>(undefined);
 
 export function CinemaDataProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<CinemaData | null>(null);
+  const [metaData, setMetaData] = useState<MetaData | null>(null);
+  const [movies, setMovies] = useState<CinemaData["movies"]>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<DataFetchError | null>(null);
 
-  const hydrateUrl = (truncatedUrl: string) => {
-    const match = truncatedUrl.match(/^{(\d+)}/);
-    if (!match) return truncatedUrl;
-    const index = parseInt(match[1], 10);
-    return truncatedUrl.replace(`{${index}}`, data!.urlPrefixes[index]);
-  };
+  // Ref for synchronous loading check to prevent race conditions
+  // State updates are async, so rapid calls could both pass the isLoading check
+  // before the first one sets isLoading to true
+  const isLoadingRef = useRef(false);
 
-  return (
-    <CinemaDataContext.Provider value={{ data, setData, hydrateUrl }}>
-      {children}
-    </CinemaDataContext.Provider>
+  const hydrateUrl = useCallback(
+    (truncatedUrl: string) => {
+      if (!truncatedUrl) return truncatedUrl;
+      const match = truncatedUrl.match(/^{(\d+)}/);
+      if (!match || !metaData) return truncatedUrl;
+      const index = parseInt(match[1], 10);
+      return truncatedUrl.replace(`{${index}}`, metaData.urlPrefixes[index]);
+    },
+    [metaData],
   );
+
+  const updateMovies = useCallback((newMovies: CinemaData["movies"]) => {
+    setMovies((state) => ({ ...state, ...newMovies }));
+  }, []);
+
+  /**
+   * Core loading function that fetches metadata and movie data.
+   * Extracted to avoid duplication between getDataWithPriority and retry.
+   */
+  const loadData = useCallback(
+    async (movieId?: string) => {
+      isLoadingRef.current = true;
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Get the meta data first
+        const metaData = await getMetaData();
+        setMetaData(metaData);
+
+        // Ensure "Uncategorised" genre exists and get its ID
+        const uncategorisedId = ensureUncategorisedGenre(metaData.genres);
+        const validGenreIds = new Set(Object.keys(metaData.genres));
+
+        // Helper to process and update movies
+        const processAndUpdateMovies = (newMovies: CinemaData["movies"]) => {
+          const processed = assignUncategorisedGenre(
+            newMovies,
+            uncategorisedId,
+            validGenreIds,
+          );
+          updateMovies(processed);
+        };
+
+        // Find the filename for the prioritised movie
+        // If no movieId is provided, no matching filename will be found
+        let filenameKey: number | undefined;
+        for (const [key, movieIds] of Object.entries(metaData.mapping)) {
+          if (movieId && movieIds.includes(movieId)) {
+            filenameKey = parseInt(key, 10);
+            break;
+          }
+        }
+        let prioritisedFilename: string | undefined;
+        if (filenameKey !== undefined) {
+          prioritisedFilename = metaData.filenames[filenameKey];
+          await getMovieData(prioritisedFilename).then(processAndUpdateMovies);
+        }
+
+        // Get the remaining data files
+        // Use Promise.allSettled to continue loading even if some files fail
+        const results = await Promise.allSettled(
+          metaData.filenames
+            .filter((filename: string) => filename !== prioritisedFilename)
+            .map((filename: string) =>
+              getMovieData(filename).then(processAndUpdateMovies),
+            ),
+        );
+
+        // Check for any failures and log them (but don't fail completely)
+        const failures = results.filter(
+          (result): result is PromiseRejectedResult =>
+            result.status === "rejected",
+        );
+        if (failures.length > 0) {
+          console.error(
+            `Failed to load ${failures.length} data file(s):`,
+            failures.map((f) => f.reason),
+          );
+          // If all files failed, set an error
+          if (failures.length === results.length && !prioritisedFilename) {
+            throw new DataFetchError(
+              "Failed to load movie data. Please try again later.",
+            );
+          }
+        }
+      } catch (err) {
+        const dataError =
+          err instanceof DataFetchError
+            ? err
+            : new DataFetchError(
+                "An unexpected error occurred while loading data",
+                err,
+              );
+        setError(dataError);
+        console.error("Data fetch error:", dataError);
+      } finally {
+        isLoadingRef.current = false;
+        setIsLoading(false);
+      }
+    },
+    [updateMovies],
+  );
+
+  const getDataWithPriority = useCallback(
+    async (movieId?: string) => {
+      // Use ref for synchronous check to prevent race conditions
+      // State updates are async, so we check the ref which updates immediately
+      if (isLoadingRef.current) return;
+      if (Object.keys(movies).length > 0) return;
+
+      await loadData(movieId);
+    },
+    [loadData, movies],
+  );
+
+  const getData = useCallback(async () => {
+    // Reuse the priority function without providing a movieId to prioritise
+    await getDataWithPriority();
+  }, [getDataWithPriority]);
+
+  const retry = useCallback(async () => {
+    // Reset state and try again
+    setError(null);
+    setMovies({});
+    setMetaData(null);
+    await loadData();
+  }, [loadData]);
+
+  const isEmpty = useMemo(() => Object.keys(movies).length === 0, [movies]);
+
+  const contextValue = useMemo(
+    () => ({
+      metaData,
+      movies,
+      isLoading,
+      isEmpty,
+      error,
+      getData,
+      getDataWithPriority,
+      hydrateUrl,
+      retry,
+    }),
+    [
+      metaData,
+      movies,
+      isLoading,
+      isEmpty,
+      error,
+      getData,
+      getDataWithPriority,
+      hydrateUrl,
+      retry,
+    ],
+  );
+
+  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 }
 
-export function GetCinemaData({ children }: { children: ReactNode }) {
-  const params = useParams();
-  const filenames = process.env.NEXT_PUBLIC_DATA_FILENAME!.split(",");
-  const [isFinishedLoadingApp, setIsFinishedLoadingApp] = useState(false);
-  const [loadedFilenames, setLoadedFilenames] = useState<string[]>([]);
-  const { data, setData } = useCinemaData();
-
-  useEffect(function () {
-    if (data) return;
-
-    const id = Array.isArray(params.id) ? params.id[0] : params.id;
-    if (id) {
-      getDataForListing(filenames, setData, id);
-      return;
-    }
-
-    (async () => {
-      const data = await getData(filenames, ({ filename }) => {
-        setLoadedFilenames((filenames) => filenames.concat(filename));
-        setIsFinishedLoadingApp(true);
-      });
-      setData(data);
-    })();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!data) {
-    const percentageData = Math.round(
-      (loadedFilenames.length / filenames.length) * 100,
-    );
-    return (
-      <div>
-        {isFinishedLoadingApp ? (
-          <Loader
-            backdrop
-            content={`🎬 Loading data [${percentageData}%] ... `}
-          />
-        ) : (
-          <Loader
-            backdrop
-            content={
-              <>
-                🍿 Loading app{" "}
-                <span className="loading-percentage" suppressHydrationWarning>
-                  [0%]
-                </span>{" "}
-                ...
-              </>
-            }
-          />
-        )}
-      </div>
-    );
+export function useCinemaData() {
+  const context = useContext(Context);
+  if (context === undefined) {
+    throw new Error("useCinemaData must be used within a CinemaDataProvider");
   }
-  return <>{children}</>;
+  return context;
 }

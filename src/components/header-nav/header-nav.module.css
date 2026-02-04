@@ -1,0 +1,14 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  top: 28px;
+  right: 20px;
+}
+
+@media (max-width: 1024px) {
+  .nav {
+    display: none;
+  }
+}

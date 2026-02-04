@@ -1,0 +1,117 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--color-midnight-navy);
+  color: var(--color-light-gray);
+}
+
+/* Two-column hero layout for movie detail */
+.heroContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.posterSection {
+  flex-shrink: 0;
+}
+
+.mainInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  margin-bottom: 16px;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+}
+
+.classification {
+  padding: 4px 12px;
+  background-color: rgba(var(--color-electric-blue-rgb), 0.2);
+  border: 1px solid var(--color-electric-blue);
+  border-radius: 4px;
+}
+
+.overview {
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 800px;
+}
+
+.trailerButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background-color: var(--color-neon-pink);
+  color: var(--color-midnight-navy);
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
+
+  &:hover {
+    background-color: var(--color-electric-blue);
+    color: var(--color-midnight-navy);
+    box-shadow: 0 4px 15px rgba(var(--color-electric-blue-rgb), 0.5);
+  }
+}
+
+.detailsContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px 60px 20px;
+}
+
+@media (max-width: 900px) {
+  .heroContent {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 16px;
+  }
+
+  .posterSection {
+    display: flex;
+    justify-content: center;
+  }
+
+  .mainInfo {
+    text-align: center;
+    width: 100%;
+  }
+
+  .metadata {
+    justify-content: center;
+  }
+
+  .overview {
+    text-align: left;
+  }
+
+  .trailerButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .detailsContainer {
+    padding-top: 32px;
+  }
+}

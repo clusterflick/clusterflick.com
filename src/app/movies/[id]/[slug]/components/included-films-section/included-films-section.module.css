@@ -1,0 +1,231 @@
+.filmIcon {
+  position: relative;
+  top: -2px;
+}
+
+.filmsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px;
+}
+
+@media (min-width: 600px) {
+  .filmsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+.filmCardWrapper {
+  display: block;
+  position: relative;
+}
+
+.filmCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.posterWrapper {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+/* Scale down the poster for the grid */
+.posterWrapper :global(.poster),
+.posterWrapper :global(.noPoster) {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+}
+
+.filmInfo {
+  padding: 0 4px;
+}
+
+.filmTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.filmMeta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-soft-gray);
+}
+
+.filmMeta span {
+  display: flex;
+  align-items: center;
+}
+
+.filmMeta span:not(:last-child)::after {
+  content: "·";
+  margin-left: 8px;
+  color: var(--color-soft-gray);
+}
+
+.soloButton {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: linear-gradient(
+    135deg,
+    var(--color-electric-blue) 0%,
+    rgba(var(--color-electric-blue-rgb), 0.8) 100%
+  );
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-white);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.posterWrapper:hover .soloButton {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.soloButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-neon-pink-rgb), 0.9) 0%,
+    var(--color-neon-pink) 100%
+  );
+  box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
+  color: var(--color-white);
+}
+
+@media (max-width: 768px) {
+  .soloButton {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Inline variant for hero placement */
+.inlineWrapper {
+  margin-top: 24px;
+  text-align: left;
+  width: 100%;
+}
+
+.inlineLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-soft-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 16px 0;
+}
+
+.filmsGridInline {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+/* Override the grid filmCardWrapper for inline flex layout */
+.filmsGridInline .filmCardWrapper {
+  flex: 0 1 180px;
+  min-width: 100px;
+  margin-right: -20px;
+}
+
+.filmsGridInline .filmCardWrapper:last-child {
+  margin-right: 0;
+}
+
+/* Stacking order - later items on top */
+.filmsGridInline .filmCardWrapper:nth-child(1) {
+  z-index: 1;
+}
+.filmsGridInline .filmCardWrapper:nth-child(2) {
+  z-index: 2;
+}
+.filmsGridInline .filmCardWrapper:nth-child(3) {
+  z-index: 3;
+}
+.filmsGridInline .filmCardWrapper:nth-child(4) {
+  z-index: 4;
+}
+.filmsGridInline .filmCardWrapper:nth-child(5) {
+  z-index: 5;
+}
+.filmsGridInline .filmCardWrapper:nth-child(6) {
+  z-index: 6;
+}
+
+/* Add subtle shadow for depth when overlapping */
+.filmsGridInline .posterWrapper {
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.filmsGridInline .filmCardWrapper:first-child .posterWrapper {
+  box-shadow: none;
+}
+
+.filmsGridInline .filmTitle {
+  font-size: 13px;
+}
+
+.filmsGridInline .filmMeta {
+  font-size: 11px;
+}
+
+.filmsGridInline .filmInfo {
+  text-align: left;
+  padding-right: 24px;
+}
+
+@media (min-width: 700px) {
+  .filmsGridInline .filmCardWrapper {
+    flex: 0 1 200px;
+    margin-right: -10px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .filmsGridInline .filmCardWrapper {
+    margin-right: 16px;
+  }
+
+  .filmsGridInline .filmCardWrapper:last-child {
+    margin-right: 0;
+  }
+
+  .filmsGridInline .posterWrapper {
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .filmsGridInline {
+    justify-content: center;
+  }
+
+  .inlineLabel {
+    text-align: center;
+  }
+}

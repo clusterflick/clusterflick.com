@@ -1,0 +1,149 @@
+.stackContainer {
+  position: relative;
+  width: 200px;
+  height: 300px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.stackContainerLarge {
+  position: relative;
+  width: 342px;
+  height: 513px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Poster cards sized to allow stacking with visible offsets */
+.posterCard {
+  position: relative;
+  width: 168px;
+  height: 252px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--color-midnight-navy);
+  box-shadow: 0 2px 8px rgba(var(--color-black-rgb), 0.3);
+}
+
+.posterCardLarge {
+  width: 285px;
+  height: 428px;
+  border-radius: 8px;
+}
+
+.posterImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Wrapper for each poster - positioned via inline styles */
+.posterWrapper {
+  position: absolute;
+}
+
+/* Top poster gets enhanced shadow */
+.posterWrapper:last-of-type .posterCard {
+  box-shadow:
+    0 4px 16px rgba(var(--color-black-rgb), 0.5),
+    0 0 8px rgba(var(--color-neon-pink-rgb), 0.2);
+}
+
+/* Fallback poster pattern styles */
+.noPoster {
+  position: relative;
+  background-color: var(--color-midnight-navy);
+}
+
+.colorPink {
+  --pattern-color: var(--color-neon-pink);
+}
+
+.colorBlue {
+  --pattern-color: var(--color-electric-blue);
+}
+
+.colorYellow {
+  --pattern-color: var(--color-buttery-yellow);
+}
+
+.textPattern {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  transform: rotate(-31deg);
+  opacity: 0.75;
+}
+
+.textRow {
+  white-space: nowrap;
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  line-height: 1.4;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--pattern-color);
+  user-select: none;
+}
+
+.textRow.filled {
+  color: var(--pattern-color);
+  -webkit-text-stroke: 0;
+}
+
+.textContent {
+  display: inline-block;
+}
+
+/* Overlay covers the full 200x300 container */
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(var(--color-midnight-navy-rgb), 0.9),
+    rgba(var(--color-midnight-navy-rgb), 0.7)
+  );
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 16px 12px;
+  text-align: left;
+  z-index: 10;
+}
+
+/* Hover on the container to show overlay */
+.stackContainer:hover .overlay,
+.stackContainerLarge:hover .overlay,
+.overlayVisible {
+  transform: translateY(0);
+}
+
+.title {
+  color: var(--color-light-gray);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 4px 0;
+  text-shadow:
+    0 1px 4px rgba(var(--color-black-rgb), 0.8),
+    0 2px 8px rgba(var(--color-black-rgb), 0.6);
+}
+
+.subtitle {
+  color: var(--color-electric-blue);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  text-shadow:
+    0 1px 4px rgba(var(--color-black-rgb), 0.8),
+    0 2px 8px rgba(var(--color-black-rgb), 0.6);
+}

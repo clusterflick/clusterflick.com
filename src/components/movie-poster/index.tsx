@@ -1,76 +1,118 @@
-import type { Movie } from "@/types";
-import type { ReactNode } from "react";
 import Image from "next/image";
-import { getContrastingColor } from "contra-color";
-import stringToColor from "string-to-color";
-import "./index.scss";
+import { getPosterColor } from "@/utils/get-poster-color";
+import styles from "./movie-poster.module.css";
 
-const NoPoster = ({
-  title,
-  width,
-  height,
-}: {
+interface MoviePosterImageProps {
   title: string;
-  width: number;
-  height: number;
-}) => {
-  const background = stringToColor(`${title}`);
-  const { color } = getContrastingColor(background);
-  const { color: shadow } = getContrastingColor(color);
+  size: "small" | "large";
+  posterPath: string;
+  overlay: React.ReactNode | null;
+}
+
+function MoviePosterImage({
+  title,
+  size,
+  posterPath,
+  overlay,
+}: MoviePosterImageProps) {
+  const dimensions =
+    size === "large"
+      ? { width: 342, height: 513 }
+      : { width: 200, height: 300 };
+
+  const imageSize = size === "large" ? "w500" : "w342";
+
   return (
-    <div className="no-poster">
-      <div
-        className="no-poster-background"
-        style={{ background, width, height }}
-      ></div>
-      <div
-        className="no-poster-text"
-        style={{
-          color,
-          filter: `drop-shadow(0 0 0.5rem ${shadow})`,
-          width,
-          height,
-        }}
-      >
-        {title}
-      </div>
+    <div className={`${styles.poster} ${styles[size]}`}>
+      <Image
+        src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
+        alt={title}
+        width={dimensions.width}
+        height={dimensions.height}
+        priority={size === "large"}
+      />
+      {overlay}
     </div>
   );
-};
+}
+
+interface TextPatternPosterProps {
+  title: string;
+  size: "small" | "large";
+  overlay: React.ReactNode | null;
+}
+
+function TextPatternPoster({ title, size, overlay }: TextPatternPosterProps) {
+  const color = getPosterColor(title);
+  const displayTitle = title.toUpperCase();
+  const rowCount = size === "large" ? 24 : 18;
+  const offsetStep = size === "large" ? 20 : 15;
+
+  // Create the repeating text for each row
+  const repeatedText = `${displayTitle} `.repeat(8);
+
+  return (
+    <div
+      className={`${styles.noPoster} ${styles[size]} ${styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`]}`}
+    >
+      <div className={styles.textPattern} aria-hidden="true">
+        {Array.from({ length: rowCount }).map((_, i) => (
+          <div
+            key={i}
+            className={`${styles.textRow} ${i % 2 === 1 ? styles.filled : ""}`}
+            style={{
+              transform: `translateX(${(-i * offsetStep) / (i % 2 === 1 ? 1 : 2)}px)`,
+            }}
+          >
+            <span className={styles.textContent}>{repeatedText}</span>
+          </div>
+        ))}
+      </div>
+      <span className={styles.srOnly}>{title}</span>
+      {overlay}
+    </div>
+  );
+}
+
+interface MoviePosterProps {
+  posterPath?: string;
+  title: string;
+  subtitle?: string;
+  size?: "small" | "large";
+  showOverlay?: boolean;
+}
 
 export default function MoviePoster({
-  movie: { isUnmatched, posterPath, title },
-  width = 171,
-  height = 260,
-  hideShadow = false,
-  children,
-}: {
-  movie: Movie;
-  width?: number;
-  height?: number;
-  hideShadow?: boolean;
-  children?: ReactNode;
-}) {
-  return (
-    <div className={`movie-poster ${hideShadow ? "" : "movie-poster--shadow"}`}>
-      {isUnmatched || !posterPath ? (
-        <NoPoster
-          title={title.replace(" : ", ": ")}
-          width={width}
-          height={height}
-        />
-      ) : (
-        <Image
-          unoptimized
-          src={`https://image.tmdb.org/t/p/w${2 * width}${posterPath}`}
-          alt={title}
-          width={width}
-          height={height}
-        />
-      )}
-      {children ? (
-        <div className="movie-poster-children">{children}</div>
-      ) : null}
+  posterPath,
+  title,
+  subtitle,
+  size = "small",
+  showOverlay = false,
+}: MoviePosterProps) {
+  // For placeholder posters, always show the overlay so users know what the movie is
+  const alwaysShowOverlay = !posterPath;
+
+  const overlay = showOverlay ? (
+    <div
+      className={`${styles.overlay} ${alwaysShowOverlay ? styles.overlayVisible : ""}`}
+    >
+      <div>
+        <h3 className={styles.title}>{title}</h3>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      </div>
     </div>
-  );
+  ) : null;
+
+  if (posterPath) {
+    return (
+      <MoviePosterImage
+        title={title}
+        size={size}
+        posterPath={posterPath}
+        overlay={overlay}
+      />
+    );
+  }
+
+  return <TextPatternPoster title={title} size={size} overlay={overlay} />;
 }

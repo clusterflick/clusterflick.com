@@ -1,0 +1,12 @@
+.spinner {
+  border: 3px solid rgba(var(--color-electric-blue-rgb), 0.2);
+  border-top-color: var(--color-neon-pink);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

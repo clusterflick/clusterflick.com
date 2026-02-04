@@ -9,6 +9,9 @@ export type Venue = {
   url: string;
   address: string;
   geo: Position;
+  structure: "solo" | "group";
+  type: string;
+  groupName?: string;
 };
 
 export type Person = {
@@ -34,6 +37,21 @@ export enum Category {
   Event = "event",
 }
 
+export type IncludedMovie = {
+  id: string;
+  title: string;
+  posterPath?: string;
+  year?: string;
+  duration?: number;
+  genres?: Genre["id"][];
+  directors?: Person["id"][];
+  actors?: Person["id"][];
+  imdbId?: string;
+  overview?: string;
+  normalizedTitle?: string;
+  releaseDate?: string;
+};
+
 export type Showing = {
   id: string;
   title?: string;
@@ -41,6 +59,7 @@ export type Showing = {
   category: Category;
   url: string;
   venueId: string;
+  includedMovies?: IncludedMovie[];
 };
 
 type MoviePerformanceStatus = {
@@ -101,8 +120,8 @@ type Letterboxd = {
   url: string;
   likes: number;
   reviews: number;
-  rating?: string | null;
-  unweightedRating?: string | null;
+  rating?: number | null;
+  unweightedRating?: number | null;
 };
 
 type MetacriticScore = {
@@ -165,6 +184,7 @@ export type Movie = {
 };
 
 export type CinemaData = {
+  filenames: string[];
   generatedAt: string;
   venues: Record<string, Venue>;
   people: Record<string, Person>;
@@ -173,36 +193,6 @@ export type CinemaData = {
   urlPrefixes: string[];
 };
 
-export type DateRange = {
-  start: number;
-  end: number;
-};
-
-export type YearRange = {
-  min: number;
-  max: number;
-};
-
-export type Filters = {
-  searchTerm: string;
-  dateRange: DateRange;
-  yearRange: YearRange;
-  includeUnknownYears: boolean;
-  seenRange: DateRange;
-  filteredCategories: Record<string, boolean>;
-  filteredAudienceRatings: Record<string, boolean>;
-  filteredCriticsRatings: Record<string, boolean>;
-  filteredPerformanceTimes: Record<string, boolean>;
-  filteredVenues: Record<Venue["id"], boolean>;
-  filteredMovies: Record<Movie["id"], boolean>;
-  filteredClassifications: Record<Classification, boolean>;
-  filteredGenres: Record<Genre["id"], boolean>;
-  filteredAccessibilityFeatures: Record<AccessibilityFeature, boolean>;
-};
-
-export type FavouriteMovie = {
-  id: string;
-  title: string;
-  year?: string;
-  addedOn: number;
+export type MetaData = Omit<CinemaData, "movies"> & {
+  mapping: Record<string, string[]>;
 };

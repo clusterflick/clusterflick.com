@@ -1,18 +1,18 @@
-import type { CinemaData, Movie, Venue, Person, Genre } from "@/types";
+import type {
+  CinemaData,
+  Movie,
+  Venue,
+  Person,
+  Genre,
+  MetaData,
+} from "@/types";
 import { type Compressed, decompress } from "compress-json";
 
-function expandAndCombine(filenames: string[], compressedFiles: Compressed[]) {
-  const data = compressedFiles.map(decompress);
-  const combinedData = filenames.reduce(
-    (combined, filename, index) => {
-      const [, key] = filename.split(".");
-      const fileData = data[index];
-      if (key === "common") return { ...combined, ...fileData };
-      return { ...combined, movies: { ...combined.movies, ...fileData } };
-    },
-    { movies: {} } as CinemaData,
-  );
-
+function expandAndCombine(metaData: MetaData, compressedFiles: Compressed[]) {
+  const movies = compressedFiles
+    .map(decompress)
+    .reduce((combined, data) => ({ ...combined, ...data }), {});
+  const combinedData = { ...metaData, movies } as CinemaData;
   const keysWithIds = ["genres", "movies", "people", "venues"] as Partial<
     keyof CinemaData
   >[];

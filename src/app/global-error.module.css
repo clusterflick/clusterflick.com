@@ -1,0 +1,38 @@
+/*
+ * Global error styles use hardcoded colors as fallback
+ * since CSS variables from globals.css may not be loaded
+ * when the root layout fails.
+ */
+
+.body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #010013;
+  color: #e5e5e5;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.content {
+  text-align: center;
+  padding: 40px;
+}
+
+.title {
+  font-size: clamp(32px, 8vw, 48px);
+  font-weight: 900;
+  color: #f12869;
+  margin: 0 0 16px 0;
+}
+
+.message {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #888888;
+  margin: 0 0 24px 0;
+}

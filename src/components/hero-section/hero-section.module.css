@@ -1,0 +1,63 @@
+.hero {
+  position: relative;
+  padding-top: 80px;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  overflow: hidden;
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
+}
+
+.backdropImage {
+  object-fit: cover;
+}
+
+.backdropOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--color-midnight-navy-rgb), 0.7) 0%,
+    rgba(var(--color-midnight-navy-rgb), 0.9) 50%,
+    var(--color-midnight-navy) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  padding: 40px 20px;
+}
+
+/* Backdrop height variants */
+.heightStandard {
+  height: 100%;
+}
+
+.heightExtended {
+  height: 150%;
+}
+
+/* Alignment variants */
+.alignLeft {
+  /* Default - no additional styles needed */
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignCenter .heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

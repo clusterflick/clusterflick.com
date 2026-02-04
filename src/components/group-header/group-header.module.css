@@ -1,0 +1,16 @@
+.groupHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.icon {
+  margin-top: -6px;
+}
+
+.title {
+  margin: 0;
+}

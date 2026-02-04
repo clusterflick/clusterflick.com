@@ -1,0 +1,80 @@
+/* Base empty state styles */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.icon {
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+  margin-bottom: 12px;
+  text-shadow: 0 0 30px rgba(var(--color-neon-pink-rgb), 0.3);
+}
+
+.message {
+  font-size: 16px;
+  color: var(--color-muted-gray);
+  max-width: 400px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--color-soft-gray);
+  margin: 8px 0 0 0;
+  opacity: 0.8;
+}
+
+.actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Fullscreen variant - for page-level empty states */
+.fullscreen {
+  padding: 80px 20px;
+  min-height: calc(100vh - 200px);
+}
+
+.fullscreen .icon {
+  opacity: 0.7;
+}
+
+/* Contained variant - for section-level empty states */
+.contained {
+  padding: 48px 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-dark-navy-rgb), 0.6) 0%,
+    rgba(var(--color-electric-blue-rgb), 0.05) 100%
+  );
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.2);
+  border-radius: 12px;
+}
+
+.contained .icon {
+  margin-bottom: 16px;
+}
+
+.contained .message {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+.contained .actions {
+  margin-top: 16px;
+}

@@ -1,0 +1,38 @@
+.grid {
+  display: grid;
+}
+
+/* Size variants - column minimum widths */
+.size-sm {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.size-md {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.size-lg {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Gap variants */
+.gap-sm {
+  gap: 12px;
+}
+
+.gap-md {
+  gap: 16px;
+}
+
+.gap-lg {
+  gap: 24px;
+}
+
+/* Responsive adjustments for small size on mobile */
+@media (max-width: 768px) {
+  .size-sm {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

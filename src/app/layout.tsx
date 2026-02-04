@@ -1,44 +1,69 @@
-"use client";
-import { CinemaDataProvider, GetCinemaData } from "@/state/cinema-data-context";
-import { FiltersProvider } from "@/state/filters-context";
-import { UserSettingsProvider } from "@/state/user-settings-context";
-import "rsuite/dist/rsuite.min.css";
+import type { Metadata } from "next";
+import { Montserrat, Inter } from "next/font/google";
+import { CinemaDataProvider } from "@/state/cinema-data-context";
+import { FilterConfigProvider } from "@/state/filter-config-context";
+import { GeolocationProvider } from "@/state/geolocation-context";
+import "./globals.css";
 
-const appLoadingTracker = `
-// Add a progress info when the app is loading by tracking chunks as webpack
-// loads them in
-(function () {
-  // Grab the script details before the frameworks loads and modifies the DOM
-  var $appScripts = document.querySelectorAll("script[async]");
-  window.addEventListener("DOMContentLoaded", function () {
-    var $webpackScript = document.querySelector('script[src*="webpack"]');
-    var $appLoadingPercentage = document.querySelector(".loading-percentage");
-    if (!$appScripts || !$appLoadingPercentage || !$webpackScript) return;
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+});
 
-    function updateProgressAsChunksLoad() {
-      var originalPush = window.webpackChunk_N_E.push;
-      Object.defineProperty(window.webpackChunk_N_E, "push", {
-        value: function () {
-          var result = originalPush.apply(this, arguments);
-          var percentage = Math.round((this.length / $appScripts.length) * 100);
-          $appLoadingPercentage.innerHTML = "[" + percentage + "%]";
-          return result;
-        },
-        // Let webpage overrwrite the push function
-        writable: true
-      });
-    }
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 
-    if (window.webpackChunk_N_E) {
-      updateProgressAsChunksLoad();
-    } else {
-      $webpackScript.addEventListener("load", function () {
-        updateProgressAsChunksLoad();
-      });
-    }
-  });
-})();
-`;
+export const metadata: Metadata = {
+  title: {
+    default: "Clusterflick – Every film, every cinema, one place",
+    template: "%s | Clusterflick",
+  },
+  description:
+    "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+  keywords: [
+    "cinema",
+    "movies",
+    "London",
+    "film screenings",
+    "movie showtimes",
+    "independent cinema",
+    "arthouse",
+  ],
+  authors: [{ name: "Clusterflick" }],
+  creator: "Clusterflick",
+  metadataBase: new URL("https://clusterflick.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: "https://clusterflick.com",
+    siteName: "Clusterflick",
+    title: "Clusterflick – Every film, every cinema, one place",
+    description:
+      "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 675,
+        alt: "Clusterflick",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clusterflick – Every film, every cinema, one place",
+    description:
+      "Compare screenings across London cinemas and find your perfect movie night.",
+    creator: "@clusterflick",
+    images: ["/images/og-image.png"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/images/icon.svg",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -54,15 +79,12 @@ export default function RootLayout({
           data-website-id="80a133a1-82b7-47ce-9b96-2baca324b9ea"
         />
       </head>
-      <body>
+      <body className={`${montserrat.variable} ${inter.variable}`}>
         <CinemaDataProvider>
-          <GetCinemaData>
-            <UserSettingsProvider>
-              <FiltersProvider>{children}</FiltersProvider>
-            </UserSettingsProvider>
-          </GetCinemaData>
+          <FilterConfigProvider>
+            <GeolocationProvider>{children}</GeolocationProvider>
+          </FilterConfigProvider>
         </CinemaDataProvider>
-        <script dangerouslySetInnerHTML={{ __html: appLoadingTracker }} />
       </body>
     </html>
   );

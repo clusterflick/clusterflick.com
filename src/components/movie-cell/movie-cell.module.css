@@ -1,0 +1,6 @@
+.movieLink {
+  text-decoration: none;
+  border-bottom: none;
+  color: var(--color-light-gray);
+  display: block;
+}

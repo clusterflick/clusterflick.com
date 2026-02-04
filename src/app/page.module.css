@@ -1,0 +1,8 @@
+.page {
+  margin-top: 100px;
+}
+
+/* Override padding for loading footer at bottom of page */
+.loadingFooter {
+  padding: 40px 20px 60px;
+}

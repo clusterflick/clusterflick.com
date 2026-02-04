@@ -1,0 +1,42 @@
+.wrapper {
+  min-height: 100vh;
+  position: relative;
+  color: var(--color-light-gray);
+}
+
+/* Mesh gradient background with soft blobs */
+.wrapper::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background:
+    /* Pink blob top-left */
+    radial-gradient(
+      circle 600px at 5% 15%,
+      rgba(var(--color-neon-pink-rgb), 0.15) 0%,
+      transparent 60%
+    ),
+    /* Blue blob bottom-right */
+    radial-gradient(
+        circle 500px at 95% 85%,
+        rgba(var(--color-electric-blue-rgb), 0.12) 0%,
+        transparent 60%
+      ),
+    /* Subtle purple blob center */
+    radial-gradient(
+        circle 400px at 50% 50%,
+        rgba(var(--color-purple-accent-rgb), 0.08) 0%,
+        transparent 60%
+      ),
+    /* Deep base */
+    linear-gradient(
+        160deg,
+        var(--color-deep-navy) 0%,
+        var(--color-midnight-navy) 50%,
+        var(--color-deep-navy-alt) 100%
+      );
+}

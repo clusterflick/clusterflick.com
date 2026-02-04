@@ -1,0 +1,11 @@
+.clapperIcon {
+  position: relative;
+  top: -3px;
+}
+
+.creditsGrid {
+  display: grid;
+  grid-template-columns: fit-content(50%) 1fr;
+  gap: 40px;
+  align-items: start;
+}

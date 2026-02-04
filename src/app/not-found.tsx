@@ -1,79 +1,105 @@
 "use client";
-import { useEffect } from "react";
-import Heading from "rsuite/cjs/Heading";
-import Container from "rsuite/cjs/Container";
-import Stack from "rsuite/cjs/Stack";
-import Text from "rsuite/cjs/Text";
-import Link from "next/link";
+
+import { useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCinemaData } from "@/state/cinema-data-context";
-import getMovieUrlSegments from "@/utils/get-movie-url-segments";
-import getMoviePath from "@/utils/get-movie-path";
-import AppHeading from "@/components/app-heading";
-import FilterLink from "@/components/filter-link";
-import ExternalLink from "@/components/external-link";
-import bestMoviesFilter from "@/components/app-heading/best-movies-filter";
+import { getMovieUrl } from "@/utils/get-movie-url";
+import { ButtonLink } from "@/components/button";
+import LoadingIndicator from "@/components/loading-indicator";
+import StatusPage, { StatusPageLoading } from "@/components/status-page";
 
-export default function NotFoundPage() {
-  const router = useRouter();
-  const { data } = useCinemaData();
-
+export default function NotFound() {
   const pathname = usePathname();
-  const movieUrlMatch = pathname?.match(/^\/movies\/([^\/]+)\//);
+  const router = useRouter();
+  const { movies, isLoading, getData } = useCinemaData();
 
-  let movie = undefined;
-  if (movieUrlMatch && data) {
-    const id = movieUrlMatch[1];
-    movie = data.movies[id];
+  // Use refs to track state that shouldn't trigger re-renders
+  const isRedirectingRef = useRef(false);
+  const hasCheckedRef = useRef(false);
+
+  const isWaitingForData = useMemo(
+    () => isLoading || Object.keys(movies).length === 0,
+    [isLoading, movies],
+  );
+
+  // Check if this is a movie URL pattern: /movies/<id>/<slug>
+  const movieMatch = pathname?.match(/^\/movies\/([^/]+)\/([^/]?)\/?$/);
+  const movieId = movieMatch?.[1];
+
+  // Compute derived state from movies data
+  const movieCheckResult = useMemo(() => {
+    if (!movieId) {
+      return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
+    }
+    if (isWaitingForData) {
+      return { hasChecked: false, shouldRedirect: false, redirectUrl: null };
+    }
+    const movie = movies[movieId];
+    if (movie) {
+      return {
+        hasChecked: true,
+        shouldRedirect: true,
+        redirectUrl: `${getMovieUrl(movie)}/`,
+      };
+    }
+    return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
+  }, [movieId, movies, isWaitingForData]);
+
+  // Fetch data if we have a movieId
+  useEffect(() => {
+    if (movieId) {
+      getData();
+    }
+  }, [movieId, getData]);
+
+  // Handle redirect when needed
+  useEffect(() => {
+    if (
+      movieCheckResult.shouldRedirect &&
+      movieCheckResult.redirectUrl &&
+      !isRedirectingRef.current
+    ) {
+      isRedirectingRef.current = true;
+      router.replace(movieCheckResult.redirectUrl);
+    }
+    if (movieCheckResult.hasChecked) {
+      hasCheckedRef.current = true;
+    }
+  }, [movieCheckResult, router]);
+
+  // Show loading state while checking for redirect
+  const showLoading =
+    movieId &&
+    (!movieCheckResult.hasChecked || movieCheckResult.shouldRedirect);
+
+  if (showLoading) {
+    return (
+      <StatusPageLoading>
+        <LoadingIndicator
+          size="lg"
+          message={
+            movieCheckResult.shouldRedirect
+              ? "Redirecting..."
+              : "Looking for that film..."
+          }
+        />
+      </StatusPageLoading>
+    );
   }
 
-  const movies = Object.values(data!.movies);
-  const randomIndex = Math.floor(Math.random() * movies.length);
-  const randomMovie = movies[randomIndex];
-
-  useEffect(() => {
-    // If movie exists, redirect to correct URL
-    if (movie) {
-      const correctSegments = getMovieUrlSegments(movie);
-      router.replace(`/movies/${correctSegments.id}/${correctSegments.slug}/`);
-    }
-  }, [router, movie]);
-
-  if (movie) return null;
-
   return (
-    <Container>
-      <AppHeading />
-      <Container style={{ padding: "2rem" }}>
-        <Stack spacing={18} direction="column" alignItems="flex-start">
-          <Stack.Item>
-            <Heading level={4}>Page not found! 🙈</Heading>
-          </Stack.Item>
-          <Stack.Item>
-            <Text weight="bold">Want some inspiration?</Text>
-            <ul>
-              <li>
-                Take a look at the{" "}
-                <FilterLink filters={{ filteredMovies: bestMoviesFilter }}>
-                  🍅 Best Movies
-                </FilterLink>{" "}
-                which filters for any movie from the Rotten Tomatoes{" "}
-                <ExternalLink href="https://editorial.rottentomatoes.com/guide/best-movies-of-all-time/">
-                  300 Best Movies of All Time
-                </ExternalLink>
-                .
-              </li>
-              <li>
-                Or{" "}
-                <Link href={getMoviePath(randomMovie)}>
-                  try your luck with a randomly selected movie
-                </Link>
-                !
-              </li>
-            </ul>
-          </Stack.Item>
-        </Stack>
-      </Container>
-    </Container>
+    <StatusPage
+      iconSrc="/images/icons/neon-ticket-ripped.svg"
+      title="Show Not Found"
+      message={
+        <>
+          We couldn&apos;t find that page.
+          <br />
+          It may have been moved or no longer exists.
+        </>
+      }
+      backLink={{ url: "/", text: "Back to film list" }}
+      actions={<ButtonLink href="/">Back to Film List</ButtonLink>}
+    />
   );
 }

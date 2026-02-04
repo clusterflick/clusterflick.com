@@ -1,0 +1,12 @@
+.genres {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .genres {
+    justify-content: center;
+  }
+}

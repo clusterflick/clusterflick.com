@@ -1,15 +1,15 @@
 import type { NextConfig } from "next";
-import getDataFilename from "@/utils/get-data-filename";
+import getMetaDataFilename from "./src/utils/get-meta-data-filename";
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
   output: "export",
   reactStrictMode: true,
-  sassOptions: {
-    silenceDeprecations: ["legacy-js-api"],
+  images: {
+    unoptimized: true, // Required for static export
   },
   env: {
-    NEXT_PUBLIC_DATA_FILENAME: getDataFilename().join(","),
+    NEXT_PUBLIC_DATA_FILENAME: getMetaDataFilename(),
   },
 };
 

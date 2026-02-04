@@ -1,0 +1,18 @@
+.divider {
+  height: 1px;
+  min-height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-neon-pink-rgb), 0.5) 20%,
+    rgba(var(--color-electric-blue-rgb), 0.5) 50%,
+    rgba(var(--color-neon-pink-rgb), 0.5) 80%,
+    transparent 100%
+  );
+  margin: 0 auto 90px auto;
+  z-index: 1;
+  position: relative;
+  max-width: 800px;
+  width: 100%;
+  border: none;
+}

@@ -1,0 +1,250 @@
+.filterBanner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  background-color: rgba(var(--color-electric-blue-rgb), 0.1);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
+  border-radius: 8px;
+}
+
+.filterInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.filterLabel {
+  font-size: 13px;
+  color: var(--color-light-gray);
+  line-height: 1.4;
+}
+
+.filterHighlight {
+  color: var(--color-electric-blue);
+  font-weight: 500;
+}
+
+.filterCount {
+  font-size: 12px;
+  color: var(--color-soft-gray);
+  white-space: nowrap;
+}
+
+.dateHeader {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  margin-bottom: 16px;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(var(--color-electric-blue-rgb), 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  /* Sticky positioning below fixed header */
+  position: sticky;
+  top: 63px;
+  z-index: 10;
+  background: var(--color-midnight-navy);
+  /* Extend to edges of detailsContainer (which has 20px padding) */
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.daysFromNow {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-neon-pink);
+  opacity: 0.9;
+}
+
+.performancesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.performanceCard {
+  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.performanceCard:hover {
+  border-color: var(--color-electric-blue);
+  box-shadow: 0 0 16px rgba(var(--color-electric-blue-rgb), 0.3);
+  transform: translateY(-2px);
+}
+
+.performanceCard.soldOut,
+.performanceCard.past {
+  opacity: 0.6;
+  border-color: rgba(var(--color-light-gray-rgb), 0.3);
+}
+
+.performanceCard.soldOut:hover,
+.performanceCard.past:hover {
+  border-color: rgba(var(--color-light-gray-rgb), 0.5);
+  box-shadow: none;
+  transform: none;
+}
+
+.performanceTime {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-neon-pink);
+}
+
+.performanceVenue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+.showingTitle {
+  font-size: 12px;
+  color: var(--color-soft-gray);
+  font-style: italic;
+}
+
+.performanceScreen {
+  font-size: 12px;
+  color: rgba(var(--color-light-gray-rgb), 0.7);
+}
+
+.performanceAccessibility {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.performanceNotes {
+  font-size: 12px;
+  color: rgba(var(--color-light-gray-rgb), 0.8);
+  font-style: italic;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(var(--color-electric-blue-rgb), 0.2);
+}
+
+.soldOutBadge,
+.finishedBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  background-color: rgba(var(--color-light-gray-rgb), 0.2);
+  border: 1px solid var(--color-light-gray);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.cardLink {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 8px;
+  border-bottom: none;
+  text-decoration: none;
+}
+
+.cardLink:hover {
+  border-bottom: none;
+}
+
+.cardLink:hover ~ .performanceVenue,
+.performanceCard:hover .performanceVenue {
+  color: var(--color-electric-blue);
+}
+
+.bookingButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: linear-gradient(
+    135deg,
+    var(--color-neon-pink) 0%,
+    rgba(var(--color-neon-pink-rgb), 0.8) 100%
+  );
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-white);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+}
+
+.performanceCard:hover .bookingButton {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bookingButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-neon-pink-rgb), 0.9) 0%,
+    var(--color-neon-pink) 100%
+  );
+  box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
+  color: var(--color-white);
+  border-bottom: none;
+}
+
+.soldOut .bookingButton {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-light-gray-rgb), 0.4) 0%,
+    rgba(var(--color-light-gray-rgb), 0.3) 100%
+  );
+}
+
+.soldOut .bookingButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-light-gray-rgb), 0.5) 0%,
+    rgba(var(--color-light-gray-rgb), 0.4) 100%
+  );
+  box-shadow: none;
+  color: var(--color-white);
+}
+
+@media (max-width: 768px) {
+  .bookingButton {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

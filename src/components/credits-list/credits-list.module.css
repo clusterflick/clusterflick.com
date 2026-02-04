@@ -1,0 +1,23 @@
+.role {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.name {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
+}

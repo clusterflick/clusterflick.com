@@ -1,0 +1,192 @@
+import Image from "next/image";
+import { getPosterColor } from "@/utils/get-poster-color";
+import styles from "./stacked-poster.module.css";
+
+interface StackedPosterProps {
+  /** The main movie's poster path */
+  mainPosterPath?: string;
+  /** The main movie's title */
+  mainTitle: string;
+  /** Array of included movies with their poster paths */
+  includedMovies: Array<{
+    posterPath?: string;
+    title: string;
+  }>;
+  /** Subtitle to show on hover */
+  subtitle?: string;
+  /** Whether to show the overlay on hover */
+  showOverlay?: boolean;
+  /** Size variant */
+  size?: "small" | "large";
+}
+
+// Dimensions for poster cards at each size
+const POSTER_DIMENSIONS = {
+  small: { width: 168, height: 252 },
+  large: { width: 285, height: 428 },
+};
+
+function PosterImage({
+  posterPath,
+  title,
+  className,
+  size = "small",
+}: {
+  posterPath?: string;
+  title: string;
+  className?: string;
+  size?: "small" | "large";
+}) {
+  const dimensions = POSTER_DIMENSIONS[size];
+  const sizeClass = size === "large" ? styles.posterCardLarge : "";
+
+  if (posterPath) {
+    const imageSize = size === "large" ? "w500" : "w342";
+    return (
+      <div className={`${styles.posterCard} ${sizeClass} ${className || ""}`}>
+        <Image
+          src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
+          alt={title}
+          width={dimensions.width}
+          height={dimensions.height}
+          className={styles.posterImage}
+        />
+      </div>
+    );
+  }
+
+  // Fallback pattern for missing posters
+  const color = getPosterColor(title);
+  const displayTitle = title.toUpperCase();
+  const repeatedText = `${displayTitle} `.repeat(4);
+  const rowCount = size === "large" ? 20 : 14;
+  const offsetStep = size === "large" ? 18 : 12;
+
+  return (
+    <div
+      className={`${styles.posterCard} ${sizeClass} ${styles.noPoster} ${styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`]} ${className || ""}`}
+    >
+      <div className={styles.textPattern} aria-hidden="true">
+        {Array.from({ length: rowCount }).map((_, i) => (
+          <div
+            key={i}
+            className={`${styles.textRow} ${i % 2 === 1 ? styles.filled : ""}`}
+            style={{ transform: `translateX(${-i * offsetStep}px)` }}
+          >
+            <span className={styles.textContent}>{repeatedText}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Position configs for different poster counts and sizes
+// Spread from top-left (0,0) to bottom-right
+const POSITIONS = {
+  small: {
+    // Container: 200x300, Poster: 168x252, Available: 32x48
+    1: [{ top: 24, left: 16 }],
+    2: [
+      { top: 0, left: 0 },
+      { top: 48, left: 32 },
+    ],
+    3: [
+      { top: 0, left: 0 },
+      { top: 24, left: 16 },
+      { top: 48, left: 32 },
+    ],
+  },
+  large: {
+    // Container: 342x513, Poster: 285x428, Available: 57x85
+    1: [{ top: 42, left: 28 }],
+    2: [
+      { top: 0, left: 0 },
+      { top: 85, left: 57 },
+    ],
+    3: [
+      { top: 0, left: 0 },
+      { top: 42, left: 28 },
+      { top: 85, left: 57 },
+    ],
+  },
+};
+
+export default function StackedPoster({
+  mainPosterPath,
+  mainTitle,
+  includedMovies,
+  subtitle,
+  showOverlay = false,
+  size = "small",
+}: StackedPosterProps) {
+  // Only use movies that have poster paths
+  const moviesWithPosters = includedMovies.filter((m) => m.posterPath);
+
+  // Build the list of all posters to render (background + main)
+  const allPosters: Array<{ posterPath: string; title: string }> = [];
+
+  // Add background posters first
+  const backgroundMovies = mainPosterPath
+    ? moviesWithPosters.slice(0, 2)
+    : moviesWithPosters.slice(1, 3);
+
+  backgroundMovies.forEach((movie) => {
+    if (movie.posterPath) {
+      allPosters.push({ posterPath: movie.posterPath, title: movie.title });
+    }
+  });
+
+  // Add the main poster last (on top)
+  const frontPosterPath = mainPosterPath || moviesWithPosters[0]?.posterPath;
+  if (frontPosterPath) {
+    allPosters.push({ posterPath: frontPosterPath, title: mainTitle });
+  }
+
+  // Get positions based on total count and size
+  const posterCount = Math.min(allPosters.length, 3) as 1 | 2 | 3;
+  const sizePositions = POSITIONS[size];
+  const positions = sizePositions[posterCount] || sizePositions[1];
+
+  // If no posters available, always show the overlay so users know what the event is
+  const alwaysShowOverlay = allPosters.length === 0;
+
+  const containerClass =
+    size === "large" ? styles.stackContainerLarge : styles.stackContainer;
+
+  const overlay = showOverlay ? (
+    <div
+      className={`${styles.overlay} ${alwaysShowOverlay ? styles.overlayVisible : ""}`}
+    >
+      <div>
+        <h3 className={styles.title}>{mainTitle}</h3>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div className={containerClass}>
+      {allPosters.map((poster, index) => (
+        <div
+          key={poster.posterPath}
+          className={styles.posterWrapper}
+          style={{
+            top: positions[index].top,
+            left: positions[index].left,
+            zIndex: index,
+          }}
+        >
+          <PosterImage
+            posterPath={poster.posterPath}
+            title={poster.title}
+            size={size}
+          />
+        </div>
+      ))}
+
+      {/* Overlay covers the full container */}
+      {overlay}
+    </div>
+  );
+}

@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.message {
+  color: var(--color-muted-gray);
+}
+
+/* Size variants */
+.sm {
+  gap: 8px;
+  padding: 16px;
+}
+
+.sm .message {
+  font-size: 13px;
+}
+
+.md {
+  padding: 48px 20px;
+}
+
+.md .message {
+  font-size: 14px;
+}
+
+.lg {
+  padding: 60px 20px;
+}
+
+.lg .message {
+  font-size: 16px;
+}
