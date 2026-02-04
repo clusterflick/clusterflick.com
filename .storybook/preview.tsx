@@ -50,13 +50,14 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <div
-        style={{
-          fontFamily: "Inter, Arial, Helvetica, sans-serif",
-          // Set CSS variables for fonts
-          ["--font-inter" as any]: "Inter, Arial, Helvetica, sans-serif",
-          ["--font-montserrat" as any]:
-            "Montserrat, Arial, Helvetica, sans-serif",
-        }}
+        style={
+          {
+            fontFamily: "Inter, Arial, Helvetica, sans-serif",
+            // Set CSS variables for fonts
+            "--font-inter": "Inter, Arial, Helvetica, sans-serif",
+            "--font-montserrat": "Montserrat, Arial, Helvetica, sans-serif",
+          } as React.CSSProperties
+        }
       >
         <Story />
       </div>

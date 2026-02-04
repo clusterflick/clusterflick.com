@@ -21,7 +21,15 @@ const POSTER_HEIGHT = 300;
 const GAP = 8;
 
 export default function Home() {
-  const { movies, isEmpty, isLoading, error, getData, retry } = useCinemaData();
+  const {
+    movies,
+    isEmpty,
+    isLoading,
+    hasAttemptedLoad,
+    error,
+    getData,
+    retry,
+  } = useCinemaData();
   const { filterState, hasActiveFilters } = useFilterConfig();
 
   // Fetch data once on mount. Empty deps are intentional: all movie data is loaded
@@ -72,10 +80,11 @@ export default function Home() {
   useEffect(() => {
     // Set initial dimensions on mount - must be done in effect as window
     // is not available during SSR. This is a valid use of setState in effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- valid: window not available during SSR
     setWindowDimensions({
       width: window.innerWidth,
       height: window.innerHeight,
-    }); // eslint-disable-line react-hooks/set-state-in-effect
+    });
 
     const handleResize = () => {
       setWindowDimensions({
@@ -109,7 +118,12 @@ export default function Home() {
       );
     }
 
-    if (!isLoading && moviesList.length === 0 && hasActiveFilters) {
+    if (
+      hasAttemptedLoad &&
+      !isLoading &&
+      moviesList.length === 0 &&
+      hasActiveFilters
+    ) {
       return (
         <EmptyState
           variant="fullscreen"
@@ -125,7 +139,12 @@ export default function Home() {
     }
 
     // No movies available at all (empty data)
-    if (!isLoading && moviesList.length === 0 && !hasActiveFilters) {
+    if (
+      hasAttemptedLoad &&
+      !isLoading &&
+      moviesList.length === 0 &&
+      !hasActiveFilters
+    ) {
       return (
         <EmptyState
           variant="fullscreen"
@@ -157,8 +176,9 @@ export default function Home() {
       />
       {renderEmptyState()}
       <WindowScroller>
-        {({ height, isScrolling, onChildScroll, scrollTop }) => (
+        {({ height, isScrolling, registerChild, onChildScroll, scrollTop }) => (
           <div
+            ref={registerChild}
             style={{
               display: "flex",
               justifyContent: "center",

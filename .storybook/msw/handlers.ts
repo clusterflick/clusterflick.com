@@ -29,7 +29,7 @@ export const handlers = [
 
 // Handlers for loading state - adds significant delay
 export const loadingHandlers = [
-  http.get("/data/*.meta.*.json", async ({ request }) => {
+  http.get("/data/*.meta.*.json", async () => {
     // Let metadata load quickly so UI shows, but delay movie data
     return passthrough();
   }),

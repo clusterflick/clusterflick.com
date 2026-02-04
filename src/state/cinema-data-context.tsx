@@ -31,6 +31,7 @@ type ContextType = {
   movies: CinemaData["movies"];
   isLoading: boolean;
   isEmpty: boolean;
+  hasAttemptedLoad: boolean;
   error: DataFetchError | null;
   getData: () => Promise<void>;
   getDataWithPriority: (movieId: string) => Promise<void>;
@@ -204,6 +205,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
   const [metaData, setMetaData] = useState<MetaData | null>(null);
   const [movies, setMovies] = useState<CinemaData["movies"]>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState<boolean>(false);
   const [error, setError] = useState<DataFetchError | null>(null);
 
   // Ref for synchronous loading check to prevent race conditions
@@ -234,6 +236,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
     async (movieId?: string) => {
       isLoadingRef.current = true;
       setIsLoading(true);
+      setHasAttemptedLoad(true);
       setError(null);
 
       try {
@@ -348,6 +351,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       movies,
       isLoading,
       isEmpty,
+      hasAttemptedLoad,
       error,
       getData,
       getDataWithPriority,
@@ -359,6 +363,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       movies,
       isLoading,
       isEmpty,
+      hasAttemptedLoad,
       error,
       getData,
       getDataWithPriority,

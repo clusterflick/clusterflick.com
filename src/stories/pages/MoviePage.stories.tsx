@@ -139,6 +139,7 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
   }
 
   // Exclude performances for the movie prop
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
 
   return {

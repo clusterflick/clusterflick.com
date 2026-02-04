@@ -96,6 +96,7 @@ export default async function MovieDetailPage({
   }
 
   // Exclude performances from the movie object to avoid passing unnecessary data to client
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
 
   return (
