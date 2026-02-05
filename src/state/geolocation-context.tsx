@@ -6,9 +6,14 @@ import {
   useState,
   useCallback,
   useMemo,
+  useEffect,
   ReactNode,
 } from "react";
 import { Position } from "@/types";
+import {
+  fetchGeolocation,
+  fetchGeolocationIfPermissionGranted,
+} from "@/utils/fetch-geolocation";
 
 type GeolocationContextType = {
   position: Position | null;
@@ -29,57 +34,33 @@ export function GeolocationProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requestLocation = useCallback((): Promise<Position | null> => {
+  // On mount, try to fetch position if permission was previously granted.
+  useEffect(() => {
+    fetchGeolocationIfPermissionGranted().then((pos) => {
+      if (pos) setPosition(pos);
+    });
+  }, []);
+
+  const requestLocation = useCallback(async (): Promise<Position | null> => {
     // If we already have a position, return it immediately
     if (position) {
-      return Promise.resolve(position);
-    }
-
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
-      return Promise.resolve(null);
+      return position;
     }
 
     setLoading(true);
     setError(null);
 
-    return new Promise((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        (geoPosition) => {
-          const newPosition: Position = {
-            lat: geoPosition.coords.latitude,
-            lon: geoPosition.coords.longitude,
-          };
-          setPosition(newPosition);
-          setLoading(false);
-          resolve(newPosition);
-        },
-        (geoError) => {
-          setLoading(false);
-          let errorMessage: string;
-          switch (geoError.code) {
-            case geoError.PERMISSION_DENIED:
-              errorMessage = "Location access was denied";
-              break;
-            case geoError.POSITION_UNAVAILABLE:
-              errorMessage = "Location information is unavailable";
-              break;
-            case geoError.TIMEOUT:
-              errorMessage = "Location request timed out";
-              break;
-            default:
-              errorMessage = "An unknown error occurred";
-          }
-          setError(errorMessage);
-          resolve(null);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 300000, // Cache position for 5 minutes
-        },
-      );
-    });
+    const result = await fetchGeolocation();
+
+    setLoading(false);
+
+    if (result.success) {
+      setPosition(result.position);
+      return result.position;
+    } else {
+      setError(result.error);
+      return null;
+    }
   }, [position]);
 
   const contextValue = useMemo(

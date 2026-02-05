@@ -3,7 +3,10 @@
 import { useMemo } from "react";
 import { CinemaData, MetaData, Position } from "@/types";
 import { getDistanceInMiles, NEARBY_RADIUS_MILES } from "@/utils/geo-distance";
-import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
+import {
+  getCinemaVenueIds,
+  getSmallScreeningVenueIds,
+} from "@/utils/get-cinema-venue-ids";
 
 export type VenueGroup = {
   id: string;
@@ -15,6 +18,7 @@ type UseVenueGroupsReturn = {
   venueGroups: VenueGroup[];
   allVenueIds: string[];
   cinemaVenueIds: string[];
+  smallScreeningVenueIds: string[];
   nearbyVenueIds: string[];
 };
 
@@ -105,6 +109,11 @@ export function useVenueGroups(
     return getCinemaVenueIds(metaData?.venues);
   }, [metaData]);
 
+  // Small screening venue IDs (venues that are NOT cinemas or concert halls)
+  const smallScreeningVenueIds = useMemo(() => {
+    return getSmallScreeningVenueIds(metaData?.venues);
+  }, [metaData]);
+
   // Nearby venue IDs (venues within NEARBY_RADIUS_MILES of user's location)
   const nearbyVenueIds = useMemo(() => {
     if (!metaData?.venues || !userPosition) return [];
@@ -120,6 +129,7 @@ export function useVenueGroups(
     venueGroups,
     allVenueIds,
     cinemaVenueIds,
+    smallScreeningVenueIds,
     nearbyVenueIds,
   };
 }

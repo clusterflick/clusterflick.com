@@ -32,8 +32,10 @@ export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
 
 // Venue quick-select options
 export const VENUE_OPTIONS = [
-  { value: "cinemas", label: "Cinemas" },
+  { value: "all", label: "All Venues" },
   { value: "nearby", label: "Venues Near Me" },
+  { value: "cinemas", label: "Cinemas" },
+  { value: "small", label: "Screening Spaces" },
 ] as const;
 
 export type VenueOption = (typeof VENUE_OPTIONS)[number]["value"];
@@ -253,7 +255,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       setFilterState((prev) => {
         switch (option) {
           case "cinemas":
-            return filterManager.set(prev, FilterId.Venues, venueIds);
+          case "small":
           case "nearby":
             return filterManager.set(prev, FilterId.Venues, venueIds);
           default:

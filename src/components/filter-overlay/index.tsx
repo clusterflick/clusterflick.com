@@ -53,8 +53,13 @@ export default function FilterOverlay({
   } = useGeolocationContext();
 
   // Venue groups hook
-  const { venueGroups, allVenueIds, cinemaVenueIds, nearbyVenueIds } =
-    useVenueGroups(metaData, movies, userPosition);
+  const {
+    venueGroups,
+    allVenueIds,
+    cinemaVenueIds,
+    smallScreeningVenueIds,
+    nearbyVenueIds,
+  } = useVenueGroups(metaData, movies, userPosition);
 
   // Compute filtered movie and performance counts
   const { movieCount, performanceCount } = useMemo(() => {
@@ -221,6 +226,7 @@ export default function FilterOverlay({
             venueGroups={venueGroups}
             allVenueIds={allVenueIds}
             cinemaVenueIds={cinemaVenueIds}
+            smallScreeningVenueIds={smallScreeningVenueIds}
             nearbyVenueIds={nearbyVenueIds}
             selectedVenues={filterState.venues}
             geoLoading={geoLoading}

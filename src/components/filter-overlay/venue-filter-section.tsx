@@ -12,6 +12,7 @@ interface VenueFilterSectionProps {
   venueGroups: VenueGroup[];
   allVenueIds: string[];
   cinemaVenueIds: string[];
+  smallScreeningVenueIds: string[];
   nearbyVenueIds: string[];
   selectedVenues: string[] | null;
   geoLoading: boolean;
@@ -27,6 +28,7 @@ export default function VenueFilterSection({
   venueGroups,
   allVenueIds,
   cinemaVenueIds,
+  smallScreeningVenueIds,
   nearbyVenueIds,
   selectedVenues,
   geoLoading,
@@ -57,6 +59,17 @@ export default function VenueFilterSection({
 
   const hasVenueSearchFilter = venueSearchQuery.trim().length > 0;
 
+  // Get count for a venue option chip
+  const getVenueOptionCount = (option: VenueOption): number | undefined => {
+    const counts: Record<VenueOption, number | undefined> = {
+      all: allVenueIds.length,
+      cinemas: cinemaVenueIds.length,
+      small: smallScreeningVenueIds.length,
+      nearby: nearbyVenueIds.length > 0 ? nearbyVenueIds.length : undefined,
+    };
+    return counts[option];
+  };
+
   // Helper to check if a venue is selected
   const isVenueSelected = (venueId: string) => {
     if (selectedVenues === null) return true;
@@ -65,7 +78,8 @@ export default function VenueFilterSection({
 
   // Determine current venue option
   const currentVenueOption: VenueOption | null = useMemo(() => {
-    if (selectedVenues === null) return null;
+    // All venues selected (null means no filter = all)
+    if (selectedVenues === null) return "all";
     // Check if current selection matches cinema venues exactly
     if (
       cinemaVenueIds.length > 0 &&
@@ -73,6 +87,14 @@ export default function VenueFilterSection({
       selectedVenues.every((id) => cinemaVenueIds.includes(id))
     ) {
       return "cinemas";
+    }
+    // Check if current selection matches small screening venues exactly
+    if (
+      smallScreeningVenueIds.length > 0 &&
+      selectedVenues.length === smallScreeningVenueIds.length &&
+      selectedVenues.every((id) => smallScreeningVenueIds.includes(id))
+    ) {
+      return "small";
     }
     // Check if current selection matches nearby venues exactly
     if (
@@ -83,7 +105,7 @@ export default function VenueFilterSection({
       return "nearby";
     }
     return null;
-  }, [selectedVenues, cinemaVenueIds, nearbyVenueIds]);
+  }, [selectedVenues, cinemaVenueIds, smallScreeningVenueIds, nearbyVenueIds]);
 
   return (
     <section className={styles.section} aria-labelledby="venues-heading">
@@ -130,19 +152,17 @@ export default function VenueFilterSection({
             name="venue-option"
             label={value === "nearby" && geoLoading ? "Locating..." : label}
             value={value}
-            count={
-              value === "cinemas"
-                ? cinemaVenueIds.length
-                : value === "nearby" && nearbyVenueIds.length > 0
-                  ? nearbyVenueIds.length
-                  : undefined
-            }
+            count={getVenueOptionCount(value)}
             checked={currentVenueOption === value}
             disabled={value === "nearby" && geoLoading}
             onChange={(v) => {
               const option = v as VenueOption;
-              if (option === "cinemas") {
+              if (option === "all") {
+                clearVenues();
+              } else if (option === "cinemas") {
                 onVenueOptionChange(option, cinemaVenueIds);
+              } else if (option === "small") {
+                onVenueOptionChange(option, smallScreeningVenueIds);
               } else if (option === "nearby") {
                 onNearbyClick();
               }
