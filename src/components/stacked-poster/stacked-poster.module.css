@@ -42,6 +42,19 @@
 /* Wrapper for each poster - positioned via inline styles */
 .posterWrapper {
   position: absolute;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fan-out animation on hover - back poster moves right and rotates anti-clockwise */
+.stackContainer.interactive:hover .posterBack,
+.stackContainerLarge.interactive:hover .posterBack {
+  transform: translate(5px, 5px) rotate(-2.5deg);
+}
+
+/* Front poster moves left and rotates clockwise */
+.stackContainer.interactive:hover .posterFront,
+.stackContainerLarge.interactive:hover .posterFront {
+  transform: translate(-5px, -5px) rotate(2.5deg);
 }
 
 /* Top poster gets enhanced shadow */
@@ -127,10 +140,21 @@
   transform: translateY(0);
 }
 
-/* Always show overlay on mobile/touch devices */
+/* Always show overlay on mobile/touch devices, disable hover animations */
 @media (max-width: 768px) {
   .overlay {
     transform: translateY(0);
+  }
+
+  .posterWrapper {
+    transition: none;
+  }
+
+  .stackContainer.interactive:hover .posterBack,
+  .stackContainerLarge.interactive:hover .posterBack,
+  .stackContainer.interactive:hover .posterFront,
+  .stackContainerLarge.interactive:hover .posterFront {
+    transform: none;
   }
 }
 

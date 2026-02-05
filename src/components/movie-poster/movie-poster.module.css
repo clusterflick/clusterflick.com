@@ -37,7 +37,7 @@
 }
 
 .poster {
-  &.small:hover img {
+  &.small.interactive:hover img {
     transform: scale(1.05);
   }
 
@@ -88,6 +88,12 @@
   overflow: hidden;
   transform: rotate(-31deg);
   opacity: 0.75;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Zoom effect on hover for interactive placeholder posters */
+.noPoster.small.interactive:hover .textPattern {
+  transform: rotate(-31deg) scale(1.05);
 }
 
 .textRow {

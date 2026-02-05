@@ -177,6 +177,7 @@ export default function PageContent({
               mainTitle={movie.title}
               includedMovies={includedMovies}
               size="large"
+              interactive={false}
             />
           ) : (
             <MoviePoster

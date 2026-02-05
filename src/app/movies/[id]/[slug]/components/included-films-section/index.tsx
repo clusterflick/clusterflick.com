@@ -44,13 +44,14 @@ export default function IncludedFilmsSection({
                   posterPath={movie.posterPath}
                   title={movie.title}
                   size="small"
+                  interactive={false}
                 />
                 {hasStandalonePage && standaloneMovie && (
                   <Link
                     href={getMovieUrl(standaloneMovie)}
                     className={styles.soloButton}
                   >
-                    View Single Film
+                    Watch Single Film
                   </Link>
                 )}
               </div>

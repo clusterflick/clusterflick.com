@@ -8,6 +8,7 @@ interface MoviePosterImageProps {
   size: "small" | "large";
   posterPath: string;
   overlay: React.ReactNode | null;
+  interactive: boolean;
 }
 
 function MoviePosterImage({
@@ -15,6 +16,7 @@ function MoviePosterImage({
   size,
   posterPath,
   overlay,
+  interactive,
 }: MoviePosterImageProps) {
   const dimensions =
     size === "large"
@@ -24,7 +26,13 @@ function MoviePosterImage({
   const imageSize = size === "large" ? "w500" : "w342";
 
   return (
-    <div className={clsx(styles.poster, styles[size])}>
+    <div
+      className={clsx(
+        styles.poster,
+        styles[size],
+        interactive && styles.interactive,
+      )}
+    >
       <Image
         src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
         alt={title}
@@ -41,9 +49,15 @@ interface TextPatternPosterProps {
   title: string;
   size: "small" | "large";
   overlay: React.ReactNode | null;
+  interactive: boolean;
 }
 
-function TextPatternPoster({ title, size, overlay }: TextPatternPosterProps) {
+function TextPatternPoster({
+  title,
+  size,
+  overlay,
+  interactive,
+}: TextPatternPosterProps) {
   const color = getPosterColor(title);
   const displayTitle = title.toUpperCase();
   const rowCount = size === "large" ? 24 : 18;
@@ -58,6 +72,7 @@ function TextPatternPoster({ title, size, overlay }: TextPatternPosterProps) {
         styles.noPoster,
         styles[size],
         styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`],
+        interactive && styles.interactive,
       )}
     >
       <div className={styles.textPattern} aria-hidden="true">
@@ -85,6 +100,8 @@ interface MoviePosterProps {
   subtitle?: string;
   size?: "small" | "large";
   showOverlay?: boolean;
+  /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
+  interactive?: boolean;
 }
 
 export default function MoviePoster({
@@ -93,6 +110,7 @@ export default function MoviePoster({
   subtitle,
   size = "small",
   showOverlay = false,
+  interactive = true,
 }: MoviePosterProps) {
   // For placeholder posters, always show the overlay so users know what the movie is
   const alwaysShowOverlay = !posterPath;
@@ -118,9 +136,17 @@ export default function MoviePoster({
         size={size}
         posterPath={posterPath}
         overlay={overlay}
+        interactive={interactive}
       />
     );
   }
 
-  return <TextPatternPoster title={title} size={size} overlay={overlay} />;
+  return (
+    <TextPatternPoster
+      title={title}
+      size={size}
+      overlay={overlay}
+      interactive={interactive}
+    />
+  );
 }

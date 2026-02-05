@@ -19,6 +19,8 @@ interface StackedPosterProps {
   showOverlay?: boolean;
   /** Size variant */
   size?: "small" | "large";
+  /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
+  interactive?: boolean;
 }
 
 // Dimensions for poster cards at each size
@@ -126,6 +128,7 @@ export default function StackedPoster({
   subtitle,
   showOverlay = false,
   size = "small",
+  interactive = true,
 }: StackedPosterProps) {
   // Only use movies that have poster paths
   const moviesWithPosters = includedMovies.filter((m) => m.posterPath);
@@ -158,8 +161,10 @@ export default function StackedPoster({
   // If no posters available, always show the overlay so users know what the event is
   const alwaysShowOverlay = allPosters.length === 0;
 
-  const containerClass =
-    size === "large" ? styles.stackContainerLarge : styles.stackContainer;
+  const containerClass = clsx(
+    size === "large" ? styles.stackContainerLarge : styles.stackContainer,
+    interactive && styles.interactive,
+  );
 
   const overlay = showOverlay ? (
     <div
@@ -175,12 +180,23 @@ export default function StackedPoster({
     </div>
   ) : null;
 
+  // Determine position classes for hover animation
+  const getPositionClass = (index: number, total: number) => {
+    if (total === 1) return "";
+    if (index === 0) return styles.posterBack;
+    if (index === total - 1) return styles.posterFront;
+    return styles.posterMiddle;
+  };
+
   return (
     <div className={containerClass}>
       {allPosters.map((poster, index) => (
         <div
           key={poster.posterPath}
-          className={styles.posterWrapper}
+          className={clsx(
+            styles.posterWrapper,
+            getPositionClass(index, allPosters.length),
+          )}
           style={{
             top: positions[index].top,
             left: positions[index].left,

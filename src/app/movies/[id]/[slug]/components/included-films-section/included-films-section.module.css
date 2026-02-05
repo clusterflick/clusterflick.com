@@ -9,12 +9,6 @@
   gap: 24px;
 }
 
-@media (min-width: 600px) {
-  .filmsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-}
-
 .filmCardWrapper {
   display: block;
   position: relative;
@@ -144,13 +138,15 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0;
+  overflow-x: scroll;
+  padding-right: 25px;
+  justify-content: center;
 }
 
 /* Override the grid filmCardWrapper for inline flex layout */
 .filmsGridInline .filmCardWrapper {
   flex: 0 1 180px;
-  min-width: 100px;
-  margin-right: -20px;
+  min-width: 140px;
 }
 
 .filmsGridInline .filmCardWrapper:last-child {
@@ -200,6 +196,10 @@
 }
 
 @media (min-width: 700px) {
+  .filmsGridInline {
+    justify-content: normal;
+  }
+
   .filmsGridInline .filmCardWrapper {
     flex: 0 1 200px;
     margin-right: -10px;
@@ -221,10 +221,6 @@
 }
 
 @media (max-width: 900px) {
-  .filmsGridInline {
-    justify-content: center;
-  }
-
   .inlineLabel {
     text-align: center;
   }
