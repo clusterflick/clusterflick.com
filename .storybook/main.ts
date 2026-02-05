@@ -25,6 +25,10 @@ const config: StorybookConfig = {
           "data.meta.adeda41fc3.json",
         ),
       },
+      build: {
+        // Suppress sourcemap warnings for Next.js app directory files
+        sourcemap: false,
+      },
     });
   },
 };
