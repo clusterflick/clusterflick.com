@@ -20,11 +20,6 @@
 }
 
 @media (max-width: 768px) {
-  .creditsGrid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
   .castMobile {
     display: block;
   }

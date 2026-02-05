@@ -66,17 +66,20 @@ export default function RatingsGrid({
             <LinkCard href={hydrateUrl(rottenTomatoes.url)} variant="rating">
               <CardLabel>Rotten Tomatoes</CardLabel>
               <CardValue>
-                {rottenTomatoes.critics.all.score}%
-                {rottenTomatoes.audience.all?.score && (
-                  <>
-                    <span className={styles.separator}> · </span>
-                    {rottenTomatoes.audience.all.score}%
-                  </>
-                )}
+                <div className={styles.ratingsSpacing}>
+                  <span>{rottenTomatoes.critics.all.score}%</span>
+                  {rottenTomatoes.audience.all?.score && (
+                    <span className={styles.audienceRatingsScore}>
+                      {rottenTomatoes.audience.all.score}%
+                    </span>
+                  )}
+                </div>
               </CardValue>
               <CardSubtext>
-                Critics
-                {rottenTomatoes.audience.all?.score && " · Audience"}
+                <div className={styles.ratingsSpacing}>
+                  <span>Critics</span>
+                  {rottenTomatoes.audience.all?.score && <span>Audience</span>}
+                </div>
               </CardSubtext>
             </LinkCard>
           )}

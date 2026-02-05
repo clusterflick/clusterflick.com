@@ -13,6 +13,10 @@
   display: contents;
 }
 
+.ratingsGrid > a {
+  min-width: 160px;
+}
+
 @media (max-width: 900px) {
   .ratingsGrid {
     justify-content: center;
@@ -50,7 +54,6 @@
   }
 
   .ratingsGrid > a {
-    min-width: 140px;
     flex-shrink: 0;
   }
 
@@ -66,6 +69,23 @@
   opacity: 0.6;
 }
 
-.separator {
+.ratingsSpacing {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 16px;
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.audienceRatingsScore {
+  position: relative;
+}
+
+.audienceRatingsScore::before {
+  content: "·";
+  position: absolute;
+  left: -12px;
   opacity: 0.5;
 }
