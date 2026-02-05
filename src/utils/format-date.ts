@@ -184,14 +184,40 @@ export function formatDateLong(date: Date | string | number): string {
 /**
  * Format a date in short form.
  * Used for date range display in filters.
- * @returns "30 Jan"
+ * @param date - Date to format
+ * @param options.includeYearIfDifferent - If true, includes year when it differs from current year
+ * @returns "30 Jan" or "30 Jan 2027" (if year differs and option enabled)
  */
-export function formatDateShort(date: Date | string): string {
+export function formatDateShort(
+  date: Date | string,
+  options: { includeYearIfDifferent?: boolean } = {},
+): string {
+  const { includeYearIfDifferent = false } = options;
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-GB", {
+
+  const formatOptions: Intl.DateTimeFormatOptions = {
     day: "numeric",
     month: "short",
-  });
+    timeZone: LONDON_TIMEZONE,
+  };
+
+  if (includeYearIfDifferent) {
+    // Get current year in London timezone
+    const currentYear = new Date().toLocaleDateString("en-GB", {
+      year: "numeric",
+      timeZone: LONDON_TIMEZONE,
+    });
+    const dateYear = d.toLocaleDateString("en-GB", {
+      year: "numeric",
+      timeZone: LONDON_TIMEZONE,
+    });
+
+    if (dateYear !== currentYear) {
+      formatOptions.year = "numeric";
+    }
+  }
+
+  return d.toLocaleDateString("en-GB", formatOptions);
 }
 
 /**

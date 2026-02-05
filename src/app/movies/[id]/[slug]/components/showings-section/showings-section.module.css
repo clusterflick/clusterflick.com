@@ -243,13 +243,6 @@
 }
 
 @media (max-width: 768px) {
-  .filterBanner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 12px;
-    padding: 12px;
-  }
-
   .filterInfo {
     display: contents;
   }

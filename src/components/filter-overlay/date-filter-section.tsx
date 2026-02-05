@@ -60,6 +60,8 @@ export default function DateFilterSection({
     dateRange.end !== null ? timestampToLondonDateString(dateRange.end) : "";
 
   // Handle date input changes - convert string to timestamp
+  // Note: HTML min/max attributes handle bounds validation, so we only need
+  // to ensure start/end relationship is maintained
   const handleDateStartChange = (value: string) => {
     if (value === "") {
       setDateRange(null, dateRange.end);
@@ -67,11 +69,6 @@ export default function DateFilterSection({
     }
 
     const newStartTimestamp = dateStringToLondonTimestamp(value);
-
-    // Validate within bounds
-    if (newStartTimestamp < minTimestamp || newStartTimestamp > maxTimestamp) {
-      return;
-    }
 
     // Ensure start doesn't exceed end
     if (dateRange.end !== null && newStartTimestamp > dateRange.end) {
@@ -88,11 +85,6 @@ export default function DateFilterSection({
     }
 
     const newEndTimestamp = dateStringToLondonTimestamp(value);
-
-    // Validate within bounds
-    if (newEndTimestamp < minTimestamp || newEndTimestamp > maxTimestamp) {
-      return;
-    }
 
     // Ensure end doesn't go before start
     if (dateRange.start !== null && newEndTimestamp < dateRange.start) {

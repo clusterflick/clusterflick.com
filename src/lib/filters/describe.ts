@@ -306,21 +306,23 @@ function describeDateRange(state: FilterState): string {
   }
 
   // Custom range - convert timestamps to strings for display
+  const formatOpts = { includeYearIfDifferent: true };
+
   if (range.start !== null && range.end !== null) {
     const startStr = timestampToLondonDateString(range.start);
     const endStr = timestampToLondonDateString(range.end);
     if (range.start === range.end) {
-      return `Showing on ${formatDateShort(startStr)}`;
+      return `Showing on ${formatDateShort(startStr, formatOpts)}`;
     }
-    return `Showing ${formatDateShort(startStr)} - ${formatDateShort(endStr)}`;
+    return `Showing ${formatDateShort(startStr, formatOpts)} - ${formatDateShort(endStr, formatOpts)}`;
   }
 
   if (range.start !== null) {
-    return `Showing from ${formatDateShort(timestampToLondonDateString(range.start))}`;
+    return `Showing from ${formatDateShort(timestampToLondonDateString(range.start), formatOpts)}`;
   }
 
   if (range.end !== null) {
-    return `Showing until ${formatDateShort(timestampToLondonDateString(range.end))}`;
+    return `Showing until ${formatDateShort(timestampToLondonDateString(range.end), formatOpts)}`;
   }
 
   return "Showing any time";

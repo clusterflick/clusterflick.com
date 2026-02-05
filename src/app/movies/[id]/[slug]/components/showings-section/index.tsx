@@ -104,8 +104,8 @@ export default function ShowingsSection({
                     </span>
                     {filteredPerformanceCount > 0 && (
                       <span className={styles.filterCount}>
-                        ({filteredPerformanceCount} of{" "}
-                        {unfilteredPerformanceCount} showings)
+                        Showing {filteredPerformanceCount} of{" "}
+                        {unfilteredPerformanceCount} showings
                       </span>
                     )}
                   </>
