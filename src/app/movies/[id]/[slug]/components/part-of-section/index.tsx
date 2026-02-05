@@ -1,47 +1,41 @@
 import Link from "next/link";
 import { Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { getIncludedMovies } from "@/utils/get-included-movies";
-import CardGrid from "@/components/card-grid";
 import StackedPoster from "@/components/stacked-poster";
 import styles from "./part-of-section.module.css";
 
 interface PartOfSectionProps {
-  parentMovies: Omit<Movie, "performances">[];
+  containingEvents: Omit<Movie, "performances">[];
 }
 
-export default function PartOfSection({ parentMovies }: PartOfSectionProps) {
-  if (!parentMovies || parentMovies.length === 0) {
+export default function PartOfSection({
+  containingEvents,
+}: PartOfSectionProps) {
+  if (!containingEvents || containingEvents.length === 0) {
     return null;
   }
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.label}>
-        {parentMovies.length === 1 ? "Also showing as:" : "Also showing in:"}
-      </h3>
-      <CardGrid size="md" gap="md">
-        {parentMovies.map((parentMovie) => {
-          const includedMovies = getIncludedMovies(parentMovie.showings);
-
-          return (
-            <Link
-              key={parentMovie.id}
-              href={getMovieUrl(parentMovie)}
-              className={styles.card}
-            >
-              <StackedPoster
-                mainPosterPath={parentMovie.posterPath}
-                mainTitle={parentMovie.title}
-                includedMovies={includedMovies || []}
-                subtitle={parentMovie.year}
-                showOverlay
-                size="small"
-              />
-            </Link>
-          );
-        })}
-      </CardGrid>
+      <h3 className={styles.label}>Also showing as part of:</h3>
+      <div className={styles.cardList}>
+        {containingEvents.map((event) => (
+          <Link
+            key={event.id}
+            href={getMovieUrl(event)}
+            className={styles.card}
+          >
+            <StackedPoster
+              mainPosterPath={event.posterPath}
+              mainTitle={event.title}
+              includedMovies={event.includedMovies || []}
+              subtitle={event.year}
+              showOverlay
+              size="small"
+            />
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

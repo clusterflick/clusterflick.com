@@ -175,6 +175,8 @@ export type Movie = {
   imdbId?: string;
   youtubeTrailer?: string;
   posterPath?: string;
+  /** Included movies for multi-movie events (double features, marathons, etc.) */
+  includedMovies?: IncludedMovie[];
   showings: Record<string, Showing>;
   performances: MoviePerformance[];
   imdb?: Imdb;

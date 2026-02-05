@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import type { Category, Movie } from "@/types";
 import Link from "next/link";
 import { formatCategory } from "@/app/utils";
-import { getIncludedMovies } from "@/utils/get-included-movies";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
@@ -25,7 +24,7 @@ export default function MovieCell({
   style: CSSProperties;
 }) {
   const href = getMovieUrl(movie);
-  const includedMovies = getIncludedMovies(movie.showings);
+  const includedMovies = movie.includedMovies;
   const subtitle = movie.year || getMovieCategory(movie.showings);
 
   // Count available posters (main + included movies with posters)

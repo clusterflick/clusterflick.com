@@ -16,7 +16,6 @@ import {
 import { useVenueFilterDefaults } from "@/hooks/use-venue-filter-defaults";
 import { filterManager, describeFilters } from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
-import { getIncludedMovies } from "@/utils/get-included-movies";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
@@ -37,7 +36,7 @@ type PageContentProps = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
-  parentMovies: Omit<Movie, "performances">[];
+  containingEvents: Omit<Movie, "performances">[];
 };
 
 export default function PageContent({
@@ -45,7 +44,7 @@ export default function PageContent({
   genres,
   people,
   venues,
-  parentMovies,
+  containingEvents,
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState, hasActiveFilters } = useFilterConfig();
@@ -120,8 +119,8 @@ export default function PageContent({
     setShowAll((prev) => !prev);
   }, []);
 
-  // Check if this is a multiple-movies event with stacked posters
-  const includedMovies = getIncludedMovies(movie.showings);
+  // Check if this event has included movies for stacked posters
+  const includedMovies = movie.includedMovies;
   const includedWithPosters = includedMovies?.filter((m) => m.posterPath) || [];
   const totalPosters = (movie.posterPath ? 1 : 0) + includedWithPosters.length;
   const useStackedPoster =
@@ -242,7 +241,7 @@ export default function PageContent({
             }
           />
 
-          <PartOfSection parentMovies={parentMovies} />
+          <PartOfSection containingEvents={containingEvents} />
         </div>
       </HeroSection>
 

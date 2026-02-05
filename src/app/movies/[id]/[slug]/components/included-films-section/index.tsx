@@ -50,7 +50,7 @@ export default function IncludedFilmsSection({
                     href={getMovieUrl(standaloneMovie)}
                     className={styles.soloButton}
                   >
-                    View solo
+                    View Single Film
                   </Link>
                 )}
               </div>

@@ -29,7 +29,7 @@ type MoviePageData = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
-  parentMovies: Omit<Movie, "performances">[];
+  containingEvents: Omit<Movie, "performances">[];
 };
 
 // Fetch and decompress real data
@@ -148,7 +148,7 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     genres,
     people,
     venues,
-    parentMovies: [],
+    containingEvents: [],
   };
 }
 
@@ -226,7 +226,7 @@ function MoviePageWithRealData({
             genres={data.genres}
             people={data.people}
             venues={data.venues}
-            parentMovies={data.parentMovies}
+            containingEvents={data.containingEvents}
           />
         </GeolocationProvider>
       </FilterConfigProvider>
@@ -246,15 +246,11 @@ const findSingleMovie = (movies: CinemaData["movies"]) =>
       Object.values(m.showings).some((s) => s.category === Category.Movie),
   );
 
-const findMultipleMoviesEvent = (movies: CinemaData["movies"]) =>
-  findMovie(movies, (m) =>
-    // Find a multiple-movies event with included films
-    Object.values(m.showings).some(
-      (s) =>
-        s.category === Category.MultipleMovies &&
-        s.includedMovies &&
-        s.includedMovies.length > 1,
-    ),
+const findEventWithIncludedMovies = (movies: CinemaData["movies"]) =>
+  findMovie(
+    movies,
+    // Find any event with included films (double feature, marathon, etc.)
+    (m) => !!m.includedMovies && m.includedMovies.length > 1,
   );
 
 // Default component
@@ -304,11 +300,13 @@ export const Loaded: Story = {
 };
 
 /**
- * A multiple-movies event (e.g., double feature, marathon)
+ * An event with included films (e.g., double feature, marathon)
  * showing stacked posters and included films.
  */
-export const MultipleMovies: Story = {
-  render: () => <MoviePageWithRealData movieFinder={findMultipleMoviesEvent} />,
+export const WithIncludedMovies: Story = {
+  render: () => (
+    <MoviePageWithRealData movieFinder={findEventWithIncludedMovies} />
+  ),
   parameters: {
     msw: {
       handlers,

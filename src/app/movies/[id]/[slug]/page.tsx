@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
-import { getParentMovies } from "@/utils/get-parent-movies";
+import { getContainingEvents } from "@/utils/get-containing-events";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import PageContent from "./page-content";
 
@@ -96,15 +96,14 @@ export default async function MovieDetailPage({
     }
   }
 
-  // Find parent movies (multi-movie events that include this film)
-  const parentMovies = getParentMovies(movie.id, data.movies);
+  // Find multi-movie events that include this film
+  const containingEvents = getContainingEvents(movie.id, data.movies);
 
-  // Exclude performances from parent movies to reduce data size
-  const parentMoviesWithoutPerformances = parentMovies.map((parent) => {
+  // Exclude performances from containing events to reduce data size
+  const containingEventsWithoutPerformances = containingEvents.map((event) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { performances: _performances, ...parentWithoutPerformances } =
-      parent;
-    return parentWithoutPerformances as Omit<Movie, "performances">;
+    const { performances: _performances, ...eventWithoutPerformances } = event;
+    return eventWithoutPerformances as Omit<Movie, "performances">;
   });
 
   // Exclude performances from the movie object to avoid passing unnecessary data to client
@@ -117,7 +116,7 @@ export default async function MovieDetailPage({
       genres={genres}
       people={people}
       venues={venues}
-      parentMovies={parentMoviesWithoutPerformances}
+      containingEvents={containingEventsWithoutPerformances}
     />
   );
 }

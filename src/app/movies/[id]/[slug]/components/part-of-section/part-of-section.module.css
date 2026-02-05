@@ -11,13 +11,21 @@
   margin: 0 0 16px 0;
 }
 
+.cardList {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 900px) {
+  .cardList {
+    justify-content: center;
+  }
+}
+
 .card {
   display: block;
   text-decoration: none;
   border-bottom: none;
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
 }
