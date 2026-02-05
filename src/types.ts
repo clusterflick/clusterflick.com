@@ -139,8 +139,8 @@ type Metacritic = {
 };
 
 type RottenTomatoesScore = {
-  dislikes: number;
-  likes: number;
+  dislikes?: number;
+  likes?: number;
   reviews: number;
   rating?: number | null;
   score?: number | null;

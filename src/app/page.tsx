@@ -12,7 +12,6 @@ import FilterOverlay from "@/components/filter-overlay";
 import LoadingIndicator from "@/components/loading-indicator";
 import PageWrapper from "@/components/page-wrapper";
 import EmptyState from "@/components/empty-state";
-import simplifySorting from "@/utils/sort-titles";
 import "react-virtualized/styles.css";
 import styles from "./page.module.css";
 
@@ -52,7 +51,7 @@ export default function Home() {
     if (isEmpty) return [];
     const filteredMovies = filterManager.apply(movies, filterState);
     return Object.values(filteredMovies).sort((a, b) =>
-      simplifySorting(a.title).localeCompare(simplifySorting(b.title)),
+      a.normalizedTitle.localeCompare(b.normalizedTitle),
     );
   }, [isEmpty, movies, filterState]);
 

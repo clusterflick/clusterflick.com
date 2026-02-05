@@ -247,13 +247,6 @@ function removeIdProperty(data) {
   return data;
 }
 
-function removeNormalizedTitle(data) {
-  Object.values(data.movies).forEach((movie) => {
-    delete movie.normalizedTitle;
-  });
-  return data;
-}
-
 function removeOptionalData(data) {
   return [
     removeShowingOverviews,
@@ -261,7 +254,6 @@ function removeOptionalData(data) {
     extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
     removeIdProperty,
-    removeNormalizedTitle,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);
 }
 
