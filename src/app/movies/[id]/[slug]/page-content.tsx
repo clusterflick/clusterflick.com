@@ -49,6 +49,10 @@ export default function PageContent({
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState, hasActiveFilters } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 900px)").matches;
+  });
 
   // Defer showings computation to allow hero content to render first
   const [isShowingsReady, setIsShowingsReady] = useState(false);
@@ -66,6 +70,14 @@ export default function PageContent({
     startTransition(() => {
       setIsShowingsReady(true);
     });
+  }, []);
+
+  // Track mobile breakpoint for responsive poster size
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 900px)");
+    const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   // Initialize default venue filter to "Cinemas"
@@ -176,7 +188,7 @@ export default function PageContent({
               mainPosterPath={movie.posterPath}
               mainTitle={movie.title}
               includedMovies={includedMovies}
-              size="large"
+              size={isMobile ? "small" : "large"}
               interactive={false}
             />
           ) : (
@@ -185,7 +197,7 @@ export default function PageContent({
                 movie.posterPath || includedWithPosters[0]?.posterPath
               }
               title={movie.title}
-              size="large"
+              size={isMobile ? "small" : "large"}
             />
           )}
         </div>

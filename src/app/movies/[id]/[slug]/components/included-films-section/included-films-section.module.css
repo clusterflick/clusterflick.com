@@ -121,7 +121,6 @@
 /* Inline variant for hero placement */
 .inlineWrapper {
   margin-top: 24px;
-  text-align: left;
   width: 100%;
 }
 
@@ -140,7 +139,6 @@
   gap: 0;
   overflow-x: scroll;
   padding-right: 25px;
-  justify-content: center;
 }
 
 /* Override the grid filmCardWrapper for inline flex layout */
@@ -196,10 +194,6 @@
 }
 
 @media (min-width: 700px) {
-  .filmsGridInline {
-    justify-content: normal;
-  }
-
   .filmsGridInline .filmCardWrapper {
     flex: 0 1 200px;
     margin-right: -10px;

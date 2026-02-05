@@ -28,7 +28,7 @@ export default function DateFilterSection({
   setDateOption,
 }: DateFilterSectionProps) {
   // Calculate date range from performance data
-  const { minTimestamp, maxTimestamp, minDateStr, maxDateStr } = useMemo(() => {
+  const { minDateStr, maxDateStr } = useMemo(() => {
     const todayMidnight = getLondonMidnightTimestamp();
 
     // Find the latest performance timestamp using fast numeric comparison
@@ -43,8 +43,6 @@ export default function DateFilterSection({
     });
 
     return {
-      minTimestamp: todayMidnight,
-      maxTimestamp: latestTimestamp,
       // Convert to strings only for HTML date input min/max attributes
       minDateStr: timestampToLondonDateString(todayMidnight),
       maxDateStr: timestampToLondonDateString(latestTimestamp),
