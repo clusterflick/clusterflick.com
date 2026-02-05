@@ -29,6 +29,7 @@ type MoviePageData = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
+  parentMovies: Omit<Movie, "performances">[];
 };
 
 // Fetch and decompress real data
@@ -147,6 +148,7 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     genres,
     people,
     venues,
+    parentMovies: [],
   };
 }
 
@@ -224,6 +226,7 @@ function MoviePageWithRealData({
             genres={data.genres}
             people={data.people}
             venues={data.venues}
+            parentMovies={data.parentMovies}
           />
         </GeolocationProvider>
       </FilterConfigProvider>

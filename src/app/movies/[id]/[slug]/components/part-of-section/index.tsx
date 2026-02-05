@@ -7,7 +7,7 @@ import StackedPoster from "@/components/stacked-poster";
 import styles from "./part-of-section.module.css";
 
 interface PartOfSectionProps {
-  parentMovies: Movie[];
+  parentMovies: Omit<Movie, "performances">[];
 }
 
 export default function PartOfSection({ parentMovies }: PartOfSectionProps) {
