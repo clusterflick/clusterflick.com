@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint_and_test:
-    name: Run linter
+    name: Run linter and build
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -22,4 +22,21 @@ jobs:
           node-version-file: .node-version
       - run: npm ci
       - run: npm run lint
+      - name: Download combined data
+        uses: robinraju/release-downloader@v1
+        with:
+          token: ${{ secrets.PAT }}
+          repository: "clusterflick/data-combined"
+          latest: true
+          fileName: "*"
+          out-file-path: "combined-data"
+      - name: Download matched data
+        uses: robinraju/release-downloader@v1
+        with:
+          token: ${{ secrets.PAT }}
+          repository: "clusterflick/data-matched"
+          latest: true
+          fileName: "*"
+          out-file-path: "matched-data"
+      - run: npm run process-combined-data
       - run: npm run build
