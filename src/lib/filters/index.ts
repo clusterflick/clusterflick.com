@@ -14,6 +14,7 @@ export {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  getPrimaryCategory,
 } from "./modules";
 
 // Manager functions and object

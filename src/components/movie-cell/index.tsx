@@ -1,20 +1,14 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type { Category, Movie } from "@/types";
+import type { Movie } from "@/types";
 import Link from "next/link";
 import { formatCategory } from "@/app/utils";
+import { getPrimaryCategory } from "@/lib/filters";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import styles from "./movie-cell.module.css";
-
-const getMovieCategory = (
-  showings: Record<string, { category: Category }>,
-): string | undefined => {
-  const firstShowing = Object.values(showings)[0];
-  return firstShowing ? formatCategory(firstShowing.category) : undefined;
-};
 
 export default function MovieCell({
   movie,
@@ -25,7 +19,7 @@ export default function MovieCell({
 }) {
   const href = getMovieUrl(movie);
   const includedMovies = movie.includedMovies;
-  const subtitle = movie.year || getMovieCategory(movie.showings);
+  const subtitle = movie.year || formatCategory(getPrimaryCategory(movie));
 
   // Count available posters (main + included movies with posters)
   const includedWithPosters = includedMovies?.filter((m) => m.posterPath) || [];

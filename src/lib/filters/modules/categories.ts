@@ -11,10 +11,17 @@ const DEFAULT_CATEGORIES: Category[] = [
 ];
 
 /**
- * Determines the primary category for a movie based on its showings.
- * Returns the most common category, but deprioritizes "event" if other categories exist.
+ * Determines the primary category for a movie.
+ * - If the movie has includedMovies, it's a multiple-movies event
+ * - Otherwise, returns the most common category from showings
+ * - Deprioritizes "event" if other categories exist
  */
-function getPrimaryCategory(movie: Movie): Category {
+export function getPrimaryCategory(movie: Movie): Category {
+  // If the movie has included movies, it's a multiple-movies event
+  if (movie.includedMovies && movie.includedMovies.length > 0) {
+    return Category.MultipleMovies;
+  }
+
   const showings = Object.values(movie.showings);
   if (showings.length === 0) {
     return Category.Event; // Fallback
