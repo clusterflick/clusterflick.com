@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import styles from "./tag.module.css";
 
 interface TagProps {
@@ -35,7 +36,7 @@ export default function Tag({
   const sizeClass = styles[size];
 
   return (
-    <span className={`${styles.tag} ${colorClass} ${sizeClass} ${className}`}>
+    <span className={clsx(styles.tag, colorClass, sizeClass, className)}>
       {children}
     </span>
   );

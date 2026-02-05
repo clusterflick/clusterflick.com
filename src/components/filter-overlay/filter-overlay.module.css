@@ -730,6 +730,19 @@
     grid-template-columns: 1fr;
     gap: 64px;
   }
+
+  /* Reverse order on mobile: Dates, Venues, Events */
+  .dateSection {
+    order: 1;
+  }
+
+  .venueSection {
+    order: 2;
+  }
+
+  .categorySection {
+    order: 3;
+  }
 }
 
 /* ==========================================================================

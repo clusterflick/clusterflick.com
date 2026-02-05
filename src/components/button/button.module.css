@@ -4,6 +4,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
+  border-bottom: none;
+  display: inline-block;
 }
 
 .button:disabled {
@@ -35,6 +38,7 @@
 }
 
 .primary:hover:not(:disabled) {
+  color: var(--color-white);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(var(--color-neon-pink-rgb), 0.4);
 }

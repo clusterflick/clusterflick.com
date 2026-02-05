@@ -243,6 +243,25 @@
 }
 
 @media (max-width: 768px) {
+  .filterBanner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 12px;
+  }
+
+  .filterInfo {
+    display: contents;
+  }
+
+  .filterLabel {
+    grid-column: 1 / -1;
+  }
+
+  .filterCount {
+    align-self: center;
+  }
+
   .bookingButton {
     opacity: 1;
     transform: translateY(0);

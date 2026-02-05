@@ -1,4 +1,5 @@
 import Image from "next/image";
+import clsx from "clsx";
 import { getPosterColor } from "@/utils/get-poster-color";
 import styles from "./movie-poster.module.css";
 
@@ -23,7 +24,7 @@ function MoviePosterImage({
   const imageSize = size === "large" ? "w500" : "w342";
 
   return (
-    <div className={`${styles.poster} ${styles[size]}`}>
+    <div className={clsx(styles.poster, styles[size])}>
       <Image
         src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
         alt={title}
@@ -53,13 +54,17 @@ function TextPatternPoster({ title, size, overlay }: TextPatternPosterProps) {
 
   return (
     <div
-      className={`${styles.noPoster} ${styles[size]} ${styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`]}`}
+      className={clsx(
+        styles.noPoster,
+        styles[size],
+        styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`],
+      )}
     >
       <div className={styles.textPattern} aria-hidden="true">
         {Array.from({ length: rowCount }).map((_, i) => (
           <div
             key={i}
-            className={`${styles.textRow} ${i % 2 === 1 ? styles.filled : ""}`}
+            className={clsx(styles.textRow, i % 2 === 1 && styles.filled)}
             style={{
               transform: `translateX(${(-i * offsetStep) / (i % 2 === 1 ? 1 : 2)}px)`,
             }}
@@ -94,7 +99,10 @@ export default function MoviePoster({
 
   const overlay = showOverlay ? (
     <div
-      className={`${styles.overlay} ${alwaysShowOverlay ? styles.overlayVisible : ""}`}
+      className={clsx(
+        styles.overlay,
+        alwaysShowOverlay && styles.overlayVisible,
+      )}
     >
       <div>
         <h3 className={styles.title}>{title}</h3>

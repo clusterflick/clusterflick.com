@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import styles from "./outline-heading.module.css";
 
 type ColorVariant = "pink" | "blue";
@@ -21,9 +22,9 @@ export default function OutlineHeading({
   color = "pink",
 }: OutlineHeadingProps) {
   return (
-    <Component className={`${styles.heading} ${className}`}>
+    <Component className={clsx(styles.heading, className)}>
       <span
-        className={`${styles.overlap} ${colorStyles[color]}`}
+        className={clsx(styles.overlap, colorStyles[color])}
         aria-hidden="true"
       >
         {children}

@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import styles from "./chip.module.css";
 
 interface ChipBaseProps {
@@ -43,7 +44,11 @@ export default function Chip(props: ChipProps) {
   return (
     <label
       htmlFor={inputId}
-      className={`${styles.chip} ${checked ? styles.checked : ""} ${disabled ? styles.disabled : ""}`}
+      className={clsx(
+        styles.chip,
+        checked && styles.checked,
+        disabled && styles.disabled,
+      )}
     >
       <input
         type={type}

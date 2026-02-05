@@ -1,0 +1,23 @@
+.container {
+  margin-bottom: 32px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 16px 0;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  border-bottom: none;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}

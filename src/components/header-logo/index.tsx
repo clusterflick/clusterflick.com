@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import clsx from "clsx";
 import OutlineHeading from "@/components/outline-heading";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
@@ -30,7 +31,7 @@ export default function HeaderLogo() {
         alt="Clusterflick"
         width={40}
         height={40}
-        className={`${styles.logo} ${isLoading ? styles.spinning : ""}`}
+        className={clsx(styles.logo, isLoading && styles.spinning)}
       />
       <OutlineHeading as="h1">Clusterflick</OutlineHeading>
     </button>

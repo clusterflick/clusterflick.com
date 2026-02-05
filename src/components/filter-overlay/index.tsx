@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useMemo, useRef } from "react";
+import clsx from "clsx";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { filterManager } from "@/lib/filters";
 import { useFilterConfig } from "@/state/filter-config-context";
@@ -123,7 +124,7 @@ export default function FilterOverlay({
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
 
   return (
-    <div className={`${styles.overlay} ${isOpen ? styles.open : ""}`}>
+    <div className={clsx(styles.overlay, isOpen && styles.open)}>
       {/* Counts Section */}
       <div
         className={styles.countsSection}
@@ -133,8 +134,8 @@ export default function FilterOverlay({
         }}
       >
         <span className={styles.counts} aria-live="polite" aria-atomic="true">
-          {movieCount.toLocaleString()} events •{" "}
-          {performanceCount.toLocaleString()} showings
+          {movieCount.toLocaleString("en-GB")} events •{" "}
+          {performanceCount.toLocaleString("en-GB")} showings
         </span>
       </div>
 
@@ -198,42 +199,48 @@ export default function FilterOverlay({
       </div>
 
       <div className={styles.content}>
-        <CategoryFilterSection
-          movies={movies}
-          genres={genres}
-          filterState={{
-            categories: filterState.categories,
-            genres: filterState.genres,
-          }}
-          toggleCategory={toggleCategory}
-          selectAllCategories={selectAllCategories}
-          clearAllCategories={clearAllCategories}
-          toggleGenre={toggleGenre}
-          selectAllGenres={selectAllGenres}
-          clearAllGenres={clearAllGenres}
-        />
+        <div className={styles.categorySection}>
+          <CategoryFilterSection
+            movies={movies}
+            genres={genres}
+            filterState={{
+              categories: filterState.categories,
+              genres: filterState.genres,
+            }}
+            toggleCategory={toggleCategory}
+            selectAllCategories={selectAllCategories}
+            clearAllCategories={clearAllCategories}
+            toggleGenre={toggleGenre}
+            selectAllGenres={selectAllGenres}
+            clearAllGenres={clearAllGenres}
+          />
+        </div>
 
-        <VenueFilterSection
-          venueGroups={venueGroups}
-          allVenueIds={allVenueIds}
-          cinemaVenueIds={cinemaVenueIds}
-          nearbyVenueIds={nearbyVenueIds}
-          selectedVenues={filterState.venues}
-          geoLoading={geoLoading}
-          geoError={geoError}
-          onVenueOptionChange={setVenueOption}
-          onNearbyClick={handleNearbyClick}
-          toggleVenue={toggleVenue}
-          selectVenues={selectVenues}
-          clearVenues={clearVenues}
-        />
+        <div className={styles.venueSection}>
+          <VenueFilterSection
+            venueGroups={venueGroups}
+            allVenueIds={allVenueIds}
+            cinemaVenueIds={cinemaVenueIds}
+            nearbyVenueIds={nearbyVenueIds}
+            selectedVenues={filterState.venues}
+            geoLoading={geoLoading}
+            geoError={geoError}
+            onVenueOptionChange={setVenueOption}
+            onNearbyClick={handleNearbyClick}
+            toggleVenue={toggleVenue}
+            selectVenues={selectVenues}
+            clearVenues={clearVenues}
+          />
+        </div>
 
-        <DateFilterSection
-          movies={movies}
-          dateRange={filterState.dateRange}
-          setDateRange={setDateRange}
-          setDateOption={setDateOption}
-        />
+        <div className={styles.dateSection}>
+          <DateFilterSection
+            movies={movies}
+            dateRange={filterState.dateRange}
+            setDateRange={setDateRange}
+            setDateOption={setDateOption}
+          />
+        </div>
       </div>
     </div>
   );

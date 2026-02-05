@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, ReactNode, useId } from "react";
+import clsx from "clsx";
 import styles from "./expandable-section.module.css";
 
 interface ExpandableSectionProps {
@@ -28,7 +29,7 @@ export default function ExpandableSection({
       >
         <span className={styles.title}>{title}</span>
         <span
-          className={`${styles.icon} ${isExpanded ? styles.expanded : ""}`}
+          className={clsx(styles.icon, isExpanded && styles.expanded)}
           aria-hidden="true"
         >
           <svg
@@ -50,7 +51,7 @@ export default function ExpandableSection({
       </button>
       <div
         id={contentId}
-        className={`${styles.content} ${isExpanded ? styles.expanded : ""}`}
+        className={clsx(styles.content, isExpanded && styles.expanded)}
         hidden={!isExpanded}
       >
         {children}

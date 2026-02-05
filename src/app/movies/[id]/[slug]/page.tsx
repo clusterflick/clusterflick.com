@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
-import type { Genre, Person, Venue } from "@/types";
+import { getParentMovies } from "@/utils/get-parent-movies";
+import type { Genre, Person, Venue, Movie } from "@/types";
 import PageContent from "./page-content";
 
 // Only allow routes from generateStaticParams, 404 for everything else
@@ -95,6 +96,17 @@ export default async function MovieDetailPage({
     }
   }
 
+  // Find parent movies (multi-movie events that include this film)
+  const parentMovies = getParentMovies(movie.id, data.movies);
+
+  // Exclude performances from parent movies to reduce data size
+  const parentMoviesWithoutPerformances = parentMovies.map((parent) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { performances: _performances, ...parentWithoutPerformances } =
+      parent;
+    return parentWithoutPerformances as Omit<Movie, "performances">;
+  });
+
   // Exclude performances from the movie object to avoid passing unnecessary data to client
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
@@ -105,6 +117,7 @@ export default async function MovieDetailPage({
       genres={genres}
       people={people}
       venues={venues}
+      parentMovies={parentMoviesWithoutPerformances}
     />
   );
 }

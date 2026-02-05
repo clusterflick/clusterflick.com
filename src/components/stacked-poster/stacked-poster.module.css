@@ -127,6 +127,13 @@
   transform: translateY(0);
 }
 
+/* Always show overlay on mobile/touch devices */
+@media (max-width: 768px) {
+  .overlay {
+    transform: translateY(0);
+  }
+}
+
 .title {
   color: var(--color-light-gray);
   font-size: 14px;

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import clsx from "clsx";
 import OutlineHeading from "@/components/outline-heading";
 import styles from "./group-header.module.css";
 
@@ -35,7 +36,7 @@ export default function GroupHeader({
   className = "",
 }: GroupHeaderProps) {
   return (
-    <div className={`${styles.groupHeader} ${className}`}>
+    <div className={clsx(styles.groupHeader, className)}>
       <Image
         src={icon}
         alt=""

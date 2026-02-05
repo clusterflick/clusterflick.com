@@ -52,8 +52,9 @@
 }
 
 .trailerButton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   padding: 14px 28px;
   background-color: var(--color-neon-pink);
@@ -66,6 +67,13 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
+  white-space: nowrap;
+  height: 50px;
+  align-self: center;
+
+  & svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
     background-color: var(--color-electric-blue);

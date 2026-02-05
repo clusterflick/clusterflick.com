@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Spinner from "@/components/spinner";
 import styles from "./loading-indicator.module.css";
 
@@ -28,9 +29,7 @@ export default function LoadingIndicator({
   className,
 }: LoadingIndicatorProps) {
   return (
-    <div
-      className={`${styles.container} ${styles[size]} ${className || ""}`.trim()}
-    >
+    <div className={clsx(styles.container, styles[size], className)}>
       <Spinner size={spinnerSizes[size]} />
       {message && <span className={styles.message}>{message}</span>}
     </div>

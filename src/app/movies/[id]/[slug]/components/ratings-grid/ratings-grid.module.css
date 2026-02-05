@@ -1,5 +1,63 @@
 .container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
   margin-bottom: 32px;
+}
+
+.ratingsWrapper {
+  display: contents;
+}
+
+.ratingsGrid {
+  display: contents;
+}
+
+@media (max-width: 900px) {
+  .ratingsGrid {
+    justify-content: center;
+    margin: 0 auto;
+  }
+}
+
+.extraItem {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .container {
+    display: block;
+  }
+
+  .ratingsWrapper {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ratingsWrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ratingsGrid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    width: max-content;
+  }
+
+  .ratingsGrid > a {
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .extraItem {
+    width: 100%;
+    margin-top: 12px;
+  }
 }
 
 .suffix {

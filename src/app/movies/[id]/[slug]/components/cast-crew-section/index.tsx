@@ -24,6 +24,8 @@ export default function CastCrewSection({
     return null;
   }
 
+  const actorNames = actors ? getNames(actors, people) : [];
+
   return (
     <ContentSection
       title="Cast & Crew"
@@ -43,11 +45,16 @@ export default function CastCrewSection({
         )}
 
         {hasActors && (
-          <CreditsList
-            role="Cast"
-            names={getNames(actors, people)}
-            maxDisplay={6}
-          />
+          <>
+            {/* Mobile: Show only 2 cast members */}
+            <div className={styles.castMobile}>
+              <CreditsList role="Cast" names={actorNames} maxDisplay={2} />
+            </div>
+            {/* Desktop: Show 6 cast members */}
+            <div className={styles.castDesktop}>
+              <CreditsList role="Cast" names={actorNames} maxDisplay={6} />
+            </div>
+          </>
         )}
       </div>
     </ContentSection>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
+import clsx from "clsx";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
@@ -79,7 +80,7 @@ export default function RootLayout({
           data-website-id="80a133a1-82b7-47ce-9b96-2baca324b9ea"
         />
       </head>
-      <body className={`${montserrat.variable} ${inter.variable}`}>
+      <body className={clsx(montserrat.variable, inter.variable)}>
         <CinemaDataProvider>
           <FilterConfigProvider>
             <GeolocationProvider>{children}</GeolocationProvider>

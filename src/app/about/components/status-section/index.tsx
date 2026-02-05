@@ -64,7 +64,7 @@ export default function StatusSection() {
             ) : (
               <>
                 <span className={styles.statValue}>
-                  {stat.value.toLocaleString()}
+                  {stat.value.toLocaleString("en-GB")}
                 </span>
                 <span className={styles.statLabel}>{stat.label}</span>
               </>

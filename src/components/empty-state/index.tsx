@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 import styles from "./empty-state.module.css";
 
 interface IconProps {
@@ -43,7 +44,7 @@ export default function EmptyState({
     variant === "fullscreen" ? styles.fullscreen : styles.contained;
 
   return (
-    <div className={`${styles.emptyState} ${variantClass}`}>
+    <div className={clsx(styles.emptyState, variantClass)}>
       <Image
         src={icon.src}
         alt=""

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import clsx from "clsx";
 import styles from "./link-card.module.css";
 
 type CardVariant = "rating" | "social" | "contact" | "feature";
@@ -21,7 +22,7 @@ export default function LinkCard({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${styles.card} ${styles[variant]} ${className}`}
+      className={clsx(styles.card, styles[variant], className)}
     >
       {children}
     </a>

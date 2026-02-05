@@ -1,4 +1,5 @@
 import Image from "next/image";
+import clsx from "clsx";
 import { getPosterColor } from "@/utils/get-poster-color";
 import styles from "./stacked-poster.module.css";
 
@@ -43,7 +44,7 @@ function PosterImage({
   if (posterPath) {
     const imageSize = size === "large" ? "w500" : "w342";
     return (
-      <div className={`${styles.posterCard} ${sizeClass} ${className || ""}`}>
+      <div className={clsx(styles.posterCard, sizeClass, className)}>
         <Image
           src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
           alt={title}
@@ -64,13 +65,19 @@ function PosterImage({
 
   return (
     <div
-      className={`${styles.posterCard} ${sizeClass} ${styles.noPoster} ${styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`]} ${className || ""}`}
+      className={clsx(
+        styles.posterCard,
+        sizeClass,
+        styles.noPoster,
+        styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`],
+        className,
+      )}
     >
       <div className={styles.textPattern} aria-hidden="true">
         {Array.from({ length: rowCount }).map((_, i) => (
           <div
             key={i}
-            className={`${styles.textRow} ${i % 2 === 1 ? styles.filled : ""}`}
+            className={clsx(styles.textRow, i % 2 === 1 && styles.filled)}
             style={{ transform: `translateX(${-i * offsetStep}px)` }}
           >
             <span className={styles.textContent}>{repeatedText}</span>
@@ -156,7 +163,10 @@ export default function StackedPoster({
 
   const overlay = showOverlay ? (
     <div
-      className={`${styles.overlay} ${alwaysShowOverlay ? styles.overlayVisible : ""}`}
+      className={clsx(
+        styles.overlay,
+        alwaysShowOverlay && styles.overlayVisible,
+      )}
     >
       <div>
         <h3 className={styles.title}>{mainTitle}</h3>

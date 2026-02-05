@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 import styles from "./hero-section.module.css";
 
 type BackdropHeight = "standard" | "extended";
@@ -43,10 +44,8 @@ export default function HeroSection({
   contentClassName,
 }: HeroSectionProps) {
   return (
-    <div
-      className={`${styles.hero} ${alignStyles[align]} ${className || ""}`.trim()}
-    >
-      <div className={`${styles.backdrop} ${heightStyles[backdropHeight]}`}>
+    <div className={clsx(styles.hero, alignStyles[align], className)}>
+      <div className={clsx(styles.backdrop, heightStyles[backdropHeight])}>
         <Image
           src={backgroundImage}
           alt=""
@@ -57,7 +56,7 @@ export default function HeroSection({
         <div className={styles.backdropOverlay} />
       </div>
 
-      <div className={`${styles.heroContent} ${contentClassName || ""}`.trim()}>
+      <div className={clsx(styles.heroContent, contentClassName)}>
         {children}
       </div>
     </div>

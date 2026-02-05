@@ -9,3 +9,27 @@
   gap: 40px;
   align-items: start;
 }
+
+/* Show/hide cast lists based on screen size */
+.castMobile {
+  display: none;
+}
+
+.castDesktop {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .creditsGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .castMobile {
+    display: block;
+  }
+
+  .castDesktop {
+    display: none;
+  }
+}

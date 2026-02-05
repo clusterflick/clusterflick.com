@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import styles from "./page-wrapper.module.css";
 
 interface PageWrapperProps {
@@ -11,7 +12,5 @@ interface PageWrapperProps {
  * Use this for full-page layouts that need the signature mesh gradient.
  */
 export default function PageWrapper({ children, className }: PageWrapperProps) {
-  return (
-    <div className={`${styles.wrapper} ${className || ""}`}>{children}</div>
-  );
+  return <div className={clsx(styles.wrapper, className)}>{children}</div>;
 }

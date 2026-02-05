@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import styles from "./card-grid.module.css";
 
 interface CardGridProps {
@@ -36,7 +37,7 @@ export default function CardGrid({
   const gapClass = styles[`gap-${gap}`];
 
   return (
-    <div className={`${styles.grid} ${sizeClass} ${gapClass} ${className}`}>
+    <div className={clsx(styles.grid, sizeClass, gapClass, className)}>
       {children}
     </div>
   );

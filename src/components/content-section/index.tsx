@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 import styles from "./content-section.module.css";
 
 type HeadingLevel = "h2" | "h3" | "h4";
@@ -44,7 +45,7 @@ export default function ContentSection({
   const alignmentClass = align === "center" ? styles.centered : "";
 
   return (
-    <section className={`${styles.section} ${alignmentClass} ${className}`}>
+    <section className={clsx(styles.section, alignmentClass, className)}>
       <Heading className={styles.title}>
         {icon && (
           <Image
@@ -52,7 +53,7 @@ export default function ContentSection({
             alt=""
             width={icon.width}
             height={icon.height}
-            className={`${styles.icon} ${icon.className || ""}`}
+            className={clsx(styles.icon, icon.className)}
           />
         )}
         {title}

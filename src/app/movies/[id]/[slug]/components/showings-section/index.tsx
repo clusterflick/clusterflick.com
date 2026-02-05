@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import clsx from "clsx";
 import { MoviePerformance, Showing, Venue } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { titlesDiffer } from "@/utils/title-differs";
@@ -111,7 +112,7 @@ export default function ShowingsSection({
                 )}
               </div>
               <Button variant="secondary" size="sm" onClick={onShowAllToggle}>
-                {showingAll ? "Apply filters" : "Show all showings"}
+                {showingAll ? "Apply filters" : "Show all"}
               </Button>
             </div>
           )}
@@ -158,13 +159,11 @@ export default function ShowingsSection({
                           return (
                             <div
                               key={`${performance.showingId}-${index}`}
-                              className={`${styles.performanceCard} ${
-                                isPast
-                                  ? styles.past
-                                  : isSoldOut
-                                    ? styles.soldOut
-                                    : ""
-                              }`}
+                              className={clsx(
+                                styles.performanceCard,
+                                isPast && styles.past,
+                                !isPast && isSoldOut && styles.soldOut,
+                              )}
                             >
                               {/* Card overlay link - covers the whole card */}
                               <a

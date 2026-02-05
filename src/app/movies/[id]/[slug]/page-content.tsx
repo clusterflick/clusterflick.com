@@ -28,6 +28,7 @@ import GenresList from "./components/genres-list";
 import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
+import PartOfSection from "./components/part-of-section";
 import ShowingsSection from "./components/showings-section";
 import styles from "./page.module.css";
 
@@ -36,6 +37,7 @@ type PageContentProps = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
+  parentMovies: Omit<Movie, "performances">[];
 };
 
 export default function PageContent({
@@ -43,6 +45,7 @@ export default function PageContent({
   genres,
   people,
   venues,
+  parentMovies,
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState, hasActiveFilters } = useFilterConfig();
@@ -224,19 +227,22 @@ export default function PageContent({
             imdb={movie.imdb}
             letterboxd={movie.letterboxd}
             rottenTomatoes={movie.rottenTomatoes}
+            extraItem={
+              movie.youtubeTrailer ? (
+                <a
+                  href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.trailerButton}
+                >
+                  <PlayIcon />
+                  Watch Trailer
+                </a>
+              ) : undefined
+            }
           />
 
-          {movie.youtubeTrailer && (
-            <a
-              href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.trailerButton}
-            >
-              <PlayIcon />
-              Watch Trailer
-            </a>
-          )}
+          <PartOfSection parentMovies={parentMovies} />
         </div>
       </HeroSection>
 

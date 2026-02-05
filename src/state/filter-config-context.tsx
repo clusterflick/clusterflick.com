@@ -70,6 +70,9 @@ type FilterConfigContextType = {
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
   selectVenues: (venueIds: string[]) => void;
   clearVenues: () => void;
+  // Venue default tracking (persists across page navigations)
+  venueDefaultApplied: boolean;
+  setVenueDefaultApplied: () => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -81,6 +84,12 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   const [filterState, setFilterState] = useState<FilterState>(
     filterManager.getDefaultState,
   );
+
+  // Track whether venue default has been applied (persists across page navigations)
+  const [venueDefaultApplied, setVenueDefaultAppliedState] = useState(false);
+  const setVenueDefaultApplied = useCallback(() => {
+    setVenueDefaultAppliedState(true);
+  }, []);
 
   // Search
   const setSearchQuery = useCallback((query: string) => {
@@ -322,6 +331,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      venueDefaultApplied,
+      setVenueDefaultApplied,
       resetFilters,
       hasActiveFilters,
     }),
@@ -340,6 +351,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      venueDefaultApplied,
+      setVenueDefaultApplied,
       resetFilters,
       hasActiveFilters,
     ],

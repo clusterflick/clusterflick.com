@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useEffect } from "react";
+import clsx from "clsx";
 import { ChevronDownIcon } from "@/components/icons";
 import {
   useFilterConfig,
@@ -77,7 +78,7 @@ export default function FilterTrigger({
 
   return (
     <button
-      className={`${styles.trigger} ${isOverlayOpen ? styles.open : ""}`}
+      className={clsx(styles.trigger, isOverlayOpen && styles.open)}
       onClick={onClick}
       aria-label={
         isOverlayOpen ? "Close filter options" : "Open filter options"

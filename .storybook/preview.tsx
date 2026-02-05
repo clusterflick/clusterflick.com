@@ -1,9 +1,22 @@
 import React from "react";
 import type { Preview } from "@storybook/nextjs-vite";
 import { initialize, mswLoader } from "msw-storybook-addon";
+import { Montserrat, Inter } from "next/font/google";
+import clsx from "clsx";
 import { handlers } from "./msw/handlers";
 import "../src/app/globals.css";
 import "react-virtualized/styles.css";
+
+// Load Google Fonts with Next.js optimization
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
 
 // Initialize MSW
 initialize({
@@ -48,20 +61,31 @@ const preview: Preview = {
 
   // Global decorators to apply fonts and set env var
   decorators: [
-    (Story) => (
-      <div
-        style={
-          {
-            fontFamily: "Inter, Arial, Helvetica, sans-serif",
-            // Set CSS variables for fonts
-            "--font-inter": "Inter, Arial, Helvetica, sans-serif",
-            "--font-montserrat": "Montserrat, Arial, Helvetica, sans-serif",
-          } as React.CSSProperties
-        }
-      >
-        <Story />
-      </div>
-    ),
+    (Story) => {
+      React.useEffect(() => {
+        // Manually set font CSS variables on document root to ensure they're available
+        // This is needed because Storybook's iframe might not pick them up from the className
+        const style = getComputedStyle(document.documentElement);
+        const interFont =
+          style.getPropertyValue("--font-inter") ||
+          "'Inter', Arial, Helvetica, sans-serif";
+        const montserratFont =
+          style.getPropertyValue("--font-montserrat") ||
+          "'Montserrat', Arial, Helvetica, sans-serif";
+
+        document.documentElement.style.setProperty("--font-inter", interFont);
+        document.documentElement.style.setProperty(
+          "--font-montserrat",
+          montserratFont,
+        );
+      }, []);
+
+      return (
+        <div className={clsx(montserrat.variable, inter.variable)}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
