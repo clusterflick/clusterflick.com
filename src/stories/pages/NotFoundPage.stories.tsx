@@ -28,6 +28,7 @@ const meta = {
         pathname: "/some-invalid-path",
       },
     },
+    chromatic: { disableSnapshot: true },
   },
 } satisfies Meta<typeof NotFoundPageWrapper>;
 

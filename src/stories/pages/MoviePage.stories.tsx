@@ -269,6 +269,7 @@ const meta = {
     msw: {
       handlers,
     },
+    chromatic: { disableSnapshot: true },
   },
 } satisfies Meta<typeof DefaultMoviePage>;
 

@@ -21,7 +21,9 @@ jobs:
         with:
           node-version-file: .node-version
       - run: npm ci
+      # Lint the code
       - run: npm run lint
+      # Download data
       - name: Download combined data
         uses: robinraju/release-downloader@v1
         with:
@@ -39,4 +41,13 @@ jobs:
           fileName: "*"
           out-file-path: "matched-data"
       - run: npm run process-combined-data
+      # Storybook
+      - run: npm run build-storybook
+      - name: Publish to Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: storybook-static
+          onlyChanged: true
+      # Build the static site
       - run: npm run build

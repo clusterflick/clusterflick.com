@@ -63,6 +63,7 @@ const meta = {
     nextjs: {
       appDirectory: true,
     },
+    chromatic: { disableSnapshot: true },
   },
 } satisfies Meta<typeof HomePageWrapper>;
 
