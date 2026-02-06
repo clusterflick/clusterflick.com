@@ -27,7 +27,7 @@ jobs:
       - run: npm run lint
       # Download data
       - name: Download combined data
-        uses: robinraju/release-downloader@v1
+        uses: clusterflick/release-downloader@v1
         with:
           token: ${{ secrets.PAT }}
           repository: "clusterflick/data-combined"
@@ -35,7 +35,7 @@ jobs:
           fileName: "*"
           out-file-path: "combined-data"
       - name: Download matched data
-        uses: robinraju/release-downloader@v1
+        uses: clusterflick/release-downloader@v1
         with:
           token: ${{ secrets.PAT }}
           repository: "clusterflick/data-matched"
