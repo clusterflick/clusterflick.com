@@ -9,7 +9,8 @@
     "format": "prettier --write --ignore-path .gitignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts"
   },
   "dependencies": {
     "@sindresorhus/slugify": "^3.0.0",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
+    "@playwright/test": "^1.58.1",
     "@storybook/addon-a11y": "^10.2.6",
     "@storybook/addon-docs": "^10.2.6",
     "@storybook/addon-onboarding": "^10.2.6",
