@@ -76,6 +76,27 @@ export const categoriesFilter: FilterModule<FilterId.Categories> = {
     return !DEFAULT_CATEGORIES.every((c) => state.categories!.includes(c));
   },
 
+  toUrlParams: (state: FilterState, params: URLSearchParams) => {
+    const categories = state.categories;
+    if (categories !== null) {
+      params.set("categories", categories.join(","));
+    }
+  },
+
+  fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("categories")) {
+      const values = params
+        .get("categories")!
+        .split(",")
+        .map((v) => v.trim())
+        .filter((v) =>
+          Object.values(Category).includes(v as Category),
+        ) as Category[];
+      return values;
+    }
+    return undefined;
+  },
+
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const categories = state.categories;
 

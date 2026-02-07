@@ -1,5 +1,10 @@
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import {
+  getLondonMidnightTimestamp,
+  dateStringToLondonTimestamp,
+  timestampToLondonDateString,
+  MS_PER_DAY,
+} from "@/utils/format-date";
 import { pruneByPerformances } from "@/utils/prune-movies";
 
 /**
@@ -45,6 +50,39 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
       state.dateRange.start !== defaultRange.start ||
       state.dateRange.end !== defaultRange.end
     );
+  },
+
+  toUrlParams: (state: FilterState, params: URLSearchParams) => {
+    const defaultRange = getDefaultDateRange();
+    const { start, end } = state.dateRange;
+    if (start !== defaultRange.start || end !== defaultRange.end) {
+      if (start !== null) {
+        params.set("dateStart", timestampToLondonDateString(start));
+      }
+      if (end !== null) {
+        params.set("dateEnd", timestampToLondonDateString(end));
+      }
+    }
+  },
+
+  fromUrlParams: (params: URLSearchParams) => {
+    if (!params.has("dateStart") && !params.has("dateEnd")) {
+      return undefined;
+    }
+    const defaults = getDefaultDateRange();
+    const startStr = params.get("dateStart");
+    const endStr = params.get("dateEnd");
+
+    const start = startStr
+      ? dateStringToLondonTimestamp(startStr)
+      : defaults.start;
+    const end = endStr ? dateStringToLondonTimestamp(endStr) : defaults.end;
+
+    // Only apply if we got valid numbers
+    if ((start === null || !isNaN(start)) && (end === null || !isNaN(end))) {
+      return { start, end };
+    }
+    return undefined;
   },
 
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {

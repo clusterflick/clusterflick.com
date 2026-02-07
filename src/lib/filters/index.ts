@@ -27,6 +27,8 @@ export {
   hasActiveFilters,
   getActiveFilterIds,
   apply,
+  parseUrlParams,
+  buildFilterUrl,
 } from "./manager";
 
 // Description utilities

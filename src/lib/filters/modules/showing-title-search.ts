@@ -23,6 +23,19 @@ export const showingTitleSearchFilter: FilterModule<FilterId.ShowingTitleSearch>
       return state.showingTitleSearch.trim().length > 0;
     },
 
+    toUrlParams: (state: FilterState, params: URLSearchParams) => {
+      if (state.showingTitleSearch.trim().length > 0) {
+        params.set("showingTitle", state.showingTitleSearch);
+      }
+    },
+
+    fromUrlParams: (params: URLSearchParams) => {
+      if (params.has("showingTitle")) {
+        return params.get("showingTitle")!;
+      }
+      return undefined;
+    },
+
     apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
       const query = normalizeForSearch(state.showingTitleSearch);
 

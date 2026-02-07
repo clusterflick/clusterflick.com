@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import clsx from "clsx";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { filterManager } from "@/lib/filters";
+import { filterManager, buildFilterUrl } from "@/lib/filters";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
@@ -131,6 +131,20 @@ export default function FilterOverlay({
     };
   }, [isOpen, handleClose]);
 
+  // Share filters
+  const [copied, setCopied] = useState(false);
+
+  const handleShareFilters = useCallback(async () => {
+    const url = buildFilterUrl(filterState);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: silently fail if clipboard is unavailable
+    }
+  }, [filterState]);
+
   // Get genres array from metadata
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
 
@@ -144,20 +158,36 @@ export default function FilterOverlay({
             filterTextHeight > 0 ? `${countsPaddingTop}px` : undefined,
         }}
       >
-        <span className={styles.counts} aria-live="polite" aria-atomic="true">
-          {movieCount.toLocaleString("en-GB")} events •{" "}
+        <div className={styles.counts} aria-live="polite" aria-atomic="true">
+          {movieCount.toLocaleString("en-GB")} events,{" "}
           {performanceCount.toLocaleString("en-GB")} showings
-        </span>
-        <Button
-          variant="link"
-          size="sm"
-          className={styles.resetButton}
-          onClick={resetFilters}
-          disabled={!hasActiveFilters}
-          aria-label="Reset all filters to defaults"
-        >
-          Reset Filters
-        </Button>
+        </div>
+        <div className={styles.filterControls}>
+          <span className={styles.controlLeft}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={resetFilters}
+              disabled={!hasActiveFilters}
+              aria-label="Reset all filters to defaults"
+            >
+              Reset Filters
+            </Button>
+          </span>
+          <span className={styles.countsDivider} aria-hidden="true">
+            •
+          </span>
+          <span className={styles.controlRight}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleShareFilters}
+              aria-label="Copy shareable filter URL to clipboard"
+            >
+              {copied ? "Copied!" : "Share Filters"}
+            </Button>
+          </span>
+        </div>
       </div>
 
       {/* Search Section */}

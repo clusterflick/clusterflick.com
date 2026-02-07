@@ -107,6 +107,45 @@ export function apply(movies: MoviesRecord, state: FilterState): MoviesRecord {
 }
 
 /**
+ * Parse URL search params into a partial FilterState.
+ * Only recognised params with valid values are included.
+ * Returns null if no filter-related params are present.
+ */
+export function parseUrlParams(search: string): Partial<FilterState> | null {
+  const params = new URLSearchParams(search);
+  const result: Partial<FilterState> = {};
+  let hasAny = false;
+
+  for (const filterModule of modules) {
+    const value = filterModule.fromUrlParams(params);
+    if (value !== undefined) {
+      (result as Record<string, unknown>)[filterModule.id] = value;
+      hasAny = true;
+    }
+  }
+
+  return hasAny ? result : null;
+}
+
+/**
+ * Build a shareable URL with the current filter state encoded as query params.
+ * Only includes params that differ from the defaults.
+ */
+export function buildFilterUrl(state: FilterState): string {
+  const params = new URLSearchParams();
+
+  for (const filterModule of modules) {
+    if (filterModule.hasActiveFilter(state)) {
+      filterModule.toUrlParams(state, params);
+    }
+  }
+
+  const query = params.toString();
+  const base = typeof window !== "undefined" ? window.location.origin : "";
+  return query ? `${base}?${query}` : base;
+}
+
+/**
  * The filter manager object - a convenient namespace for all filter operations.
  */
 export const filterManager = {
@@ -115,4 +154,6 @@ export const filterManager = {
   set,
   hasActiveFilters,
   apply,
+  parseUrlParams,
+  buildFilterUrl,
 };

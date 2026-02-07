@@ -21,6 +21,19 @@ export const searchFilter: FilterModule<FilterId.Search> = {
     return state.search.trim().length > 0;
   },
 
+  toUrlParams: (state: FilterState, params: URLSearchParams) => {
+    if (state.search.trim().length > 0) {
+      params.set("search", state.search);
+    }
+  },
+
+  fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("search")) {
+      return params.get("search")!;
+    }
+    return undefined;
+  },
+
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const query = normalizeForSearch(state.search);
 

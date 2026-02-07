@@ -23,6 +23,24 @@ export const venuesFilter: FilterModule<FilterId.Venues> = {
     return state.venues !== null;
   },
 
+  toUrlParams: (state: FilterState, params: URLSearchParams) => {
+    const venues = state.venues;
+    if (venues !== null) {
+      params.set("venues", venues.join(","));
+    }
+  },
+
+  fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("venues")) {
+      return params
+        .get("venues")!
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    }
+    return undefined;
+  },
+
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const venues = state.venues;
 

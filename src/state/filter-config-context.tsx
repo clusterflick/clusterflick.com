@@ -97,24 +97,60 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setVenueDefaultAppliedState(true);
   }, []);
 
-  // Restore filter state from session storage on mount.
-  // Children are not rendered until this completes (see return below),
-  // so there is no flash of default filters.
+  // Restore filter state on mount from session storage, then overlay any
+  // URL params on top. Children are not rendered until this completes
+  // (see return below), so there is no flash of default filters.
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // 1. Start with defaults
+    let state = filterManager.getDefaultState();
+
+    // 2. Merge session storage (if available)
+    let restoredFromSession = false;
     try {
       const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored) as FilterState;
-        setFilterState(parsed);
-        // Session storage exists, so venue defaults were already applied
-        // in a previous page load — skip re-applying them
-        setVenueDefaultAppliedState(true);
+        state = JSON.parse(stored) as FilterState;
+        restoredFromSession = true;
       }
     } catch {
       // Silently ignore — will use defaults
     }
+
+    // 3. Merge URL params on top (highest priority)
+    const urlOverrides = filterManager.parseUrlParams(window.location.search);
+    if (urlOverrides) {
+      state = { ...state, ...urlOverrides };
+
+      // Strip URL params so a refresh uses session storage
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    // 4. Discard stale dates — if a restored start or end date is in the
+    //    past, fall back to the default so the user doesn't see zero results
+    const todayMidnight = getLondonMidnightTimestamp();
+    const dateRange = state[FilterId.DateRange];
+    const defaultDateRange =
+      filterManager.getDefaultState()[FilterId.DateRange];
+    if (
+      (dateRange.start !== null && dateRange.start < todayMidnight) ||
+      (dateRange.end !== null && dateRange.end < todayMidnight)
+    ) {
+      state = {
+        ...state,
+        [FilterId.DateRange]: defaultDateRange,
+      };
+    }
+
+    setFilterState(state);
+
+    // Skip venue default hook if we restored from session or URL params
+    // specified filters — the user already has an established session
+    if (restoredFromSession || urlOverrides) {
+      setVenueDefaultAppliedState(true);
+    }
+
     setIsReady(true);
   }, []);
 

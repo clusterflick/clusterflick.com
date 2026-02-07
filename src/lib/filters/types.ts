@@ -57,6 +57,18 @@ export interface FilterModule<K extends FilterId> {
    * May filter performances within movies and remove movies with no remaining performances.
    */
   apply: (movies: MoviesRecord, state: FilterState) => MoviesRecord;
+
+  /**
+   * Write this filter's value to URL search params.
+   * Only writes if the value differs from the default.
+   */
+  toUrlParams: (state: FilterState, params: URLSearchParams) => void;
+
+  /**
+   * Read this filter's value from URL search params.
+   * Returns the parsed value if a recognised param is present, or undefined to skip.
+   */
+  fromUrlParams: (params: URLSearchParams) => FilterState[K] | undefined;
 }
 
 /**

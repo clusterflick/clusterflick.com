@@ -24,6 +24,24 @@ export const genresFilter: FilterModule<FilterId.Genres> = {
     return state.genres !== null;
   },
 
+  toUrlParams: (state: FilterState, params: URLSearchParams) => {
+    const genres = state.genres;
+    if (genres !== null) {
+      params.set("genres", genres.join(","));
+    }
+  },
+
+  fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("genres")) {
+      return params
+        .get("genres")!
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    }
+    return undefined;
+  },
+
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const genres = state.genres;
 
