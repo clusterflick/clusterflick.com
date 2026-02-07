@@ -11,6 +11,8 @@ import {
 } from "react";
 import { CinemaData, MetaData } from "@/types";
 import { decompress, Compressed } from "compress-json";
+import { getLondonMidnightTimestamp } from "@/utils/format-date";
+import { pruneByPerformances } from "@/utils/prune-movies";
 
 /**
  * Custom error class for data fetching errors with additional context.
@@ -101,6 +103,18 @@ function assignUncategorisedGenre(
     }
   }
   return movies;
+}
+
+/**
+ * Remove performances before today, then prune any showings and movies
+ * that have no remaining performances. This ensures stale data never
+ * enters React state regardless of which filters are active.
+ */
+function stripPastPerformances(
+  movies: CinemaData["movies"],
+): CinemaData["movies"] {
+  const todayMidnight = getLondonMidnightTimestamp();
+  return pruneByPerformances(movies, (perf) => perf.time >= todayMidnight);
 }
 
 export async function getMetaData(): Promise<MetaData> {
@@ -250,8 +264,9 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
 
         // Helper to process and update movies
         const processAndUpdateMovies = (newMovies: CinemaData["movies"]) => {
+          const withoutPast = stripPastPerformances(newMovies);
           const processed = assignUncategorisedGenre(
-            newMovies,
+            withoutPast,
             uncategorisedId,
             validGenreIds,
           );

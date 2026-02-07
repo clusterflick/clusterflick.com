@@ -1,6 +1,6 @@
-import { MoviePerformance } from "@/types";
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import { pruneByPerformances } from "@/utils/prune-movies";
 
 /**
  * Gets the default date range: today to 7 days from now (in London time).
@@ -59,45 +59,14 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
     // to include performances on that date (using < comparison)
     const endTimestamp = end !== null ? end + MS_PER_DAY : null;
 
-    const result: MoviesRecord = {};
-
-    for (const [id, movie] of Object.entries(movies)) {
-      // Filter performances by date using fast timestamp comparisons
-      const filteredPerformances: MoviePerformance[] =
-        movie.performances.filter((perf) => {
-          if (start !== null && perf.time < start) {
-            return false;
-          }
-          if (endTimestamp !== null && perf.time >= endTimestamp) {
-            return false;
-          }
-
-          return true;
-        });
-
-      // If no performances remain, skip this movie
-      if (filteredPerformances.length === 0) {
-        continue;
+    return pruneByPerformances(movies, (perf) => {
+      if (start !== null && perf.time < start) {
+        return false;
       }
-
-      // Filter showings to only those with remaining performances
-      const remainingShowingIds = new Set(
-        filteredPerformances.map((p) => p.showingId),
-      );
-      const filteredShowings: typeof movie.showings = {};
-      for (const [showingId, showing] of Object.entries(movie.showings)) {
-        if (remainingShowingIds.has(showingId)) {
-          filteredShowings[showingId] = showing;
-        }
+      if (endTimestamp !== null && perf.time >= endTimestamp) {
+        return false;
       }
-
-      result[id] = {
-        ...movie,
-        showings: filteredShowings,
-        performances: filteredPerformances,
-      };
-    }
-
-    return result;
+      return true;
+    });
   },
 };

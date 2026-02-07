@@ -1,5 +1,5 @@
-import { MoviePerformance } from "@/types";
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
+import { pruneByShowings } from "@/utils/prune-movies";
 
 /**
  * Venues filter module.
@@ -37,41 +37,6 @@ export const venuesFilter: FilterModule<FilterId.Venues> = {
     }
 
     const venueSet = new Set(venues);
-    const result: MoviesRecord = {};
-
-    for (const [id, movie] of Object.entries(movies)) {
-      // Filter showings to only those at selected venues
-      const filteredShowings: typeof movie.showings = {};
-      for (const [showingId, showing] of Object.entries(movie.showings)) {
-        if (venueSet.has(showing.venueId)) {
-          filteredShowings[showingId] = showing;
-        }
-      }
-
-      // If no showings remain, skip this movie
-      if (Object.keys(filteredShowings).length === 0) {
-        continue;
-      }
-
-      // Filter performances to only those with remaining showings
-      const validShowingIds = new Set(Object.keys(filteredShowings));
-      const filteredPerformances: MoviePerformance[] =
-        movie.performances.filter((perf) =>
-          validShowingIds.has(perf.showingId),
-        );
-
-      // If no performances remain, skip this movie
-      if (filteredPerformances.length === 0) {
-        continue;
-      }
-
-      result[id] = {
-        ...movie,
-        showings: filteredShowings,
-        performances: filteredPerformances,
-      };
-    }
-
-    return result;
+    return pruneByShowings(movies, (showing) => venueSet.has(showing.venueId));
   },
 };
