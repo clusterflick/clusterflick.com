@@ -269,9 +269,7 @@ try {
   const MAX_PERFORMANCES_PER_BUCKET = 1000;
 
   Object.entries(movies)
-    .sort(([, a], [, b]) =>
-      simplifySorting(a.title).localeCompare(simplifySorting(b.title)),
-    )
+    .sort(([, a], [, b]) => a.normalizedTitle.localeCompare(b.normalizedTitle))
     .forEach(([id, movie]) => {
       const count = Object.keys(movie.performances).length;
 

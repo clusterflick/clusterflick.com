@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   ReactNode,
   useMemo,
 } from "react";
@@ -15,6 +16,8 @@ import {
   getLondonDayOfWeek,
   MS_PER_DAY,
 } from "@/utils/format-date";
+
+const SESSION_STORAGE_KEY = "clusterflick-filters";
 
 // Event categories that can be filtered
 export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
@@ -93,6 +96,39 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   const setVenueDefaultApplied = useCallback(() => {
     setVenueDefaultAppliedState(true);
   }, []);
+
+  // Restore filter state from session storage on mount.
+  // Children are not rendered until this completes (see return below),
+  // so there is no flash of default filters.
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as FilterState;
+        setFilterState(parsed);
+        // Session storage exists, so venue defaults were already applied
+        // in a previous page load — skip re-applying them
+        setVenueDefaultAppliedState(true);
+      }
+    } catch {
+      // Silently ignore — will use defaults
+    }
+    setIsReady(true);
+  }, []);
+
+  // Sync filter state to session storage on every change.
+  // Skip until the initial restore is complete so we don't overwrite
+  // stored values with defaults.
+  useEffect(() => {
+    if (!isReady) return;
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(filterState));
+    } catch {
+      // Silently ignore — storage may be full or disabled
+    }
+  }, [filterState, isReady]);
 
   // Search
   const setSearchQuery = useCallback((query: string) => {
@@ -368,6 +404,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       hasActiveFilters,
     ],
   );
+
+  if (!isReady) return null;
 
   return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 }
