@@ -8,6 +8,7 @@ import { useFilterConfig } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
 import { getDistanceInMiles, NEARBY_RADIUS_MILES } from "@/utils/geo-distance";
+import Button from "@/components/button";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import DateFilterSection from "./date-filter-section";
@@ -41,6 +42,8 @@ export default function FilterOverlay({
     toggleVenue,
     selectVenues,
     clearVenues,
+    resetFilters,
+    hasActiveFilters,
   } = useFilterConfig();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -145,6 +148,16 @@ export default function FilterOverlay({
           {movieCount.toLocaleString("en-GB")} events •{" "}
           {performanceCount.toLocaleString("en-GB")} showings
         </span>
+        <Button
+          variant="link"
+          size="sm"
+          className={styles.resetButton}
+          onClick={resetFilters}
+          disabled={!hasActiveFilters}
+          aria-label="Reset all filters to defaults"
+        >
+          Reset Filters
+        </Button>
       </div>
 
       {/* Search Section */}
