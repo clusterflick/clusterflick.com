@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import clsx from "clsx";
 import { MoviePerformance, Showing, Venue } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
@@ -16,6 +16,93 @@ import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
 import Tag from "@/components/tag";
 import styles from "./showings-section.module.css";
+
+function renderPerformanceCard(
+  performance: MoviePerformance,
+  index: number,
+  showings: Record<string, Showing>,
+  venues: Record<string, Venue>,
+  movieTitle: string,
+  hydrateUrl: (url: string) => string,
+) {
+  const showing = showings[performance.showingId];
+  const venue = venues[showing?.venueId];
+  const isPast = isInPast(performance.time);
+  const isSoldOut = performance.status?.soldOut;
+
+  return (
+    <div
+      key={`${performance.showingId}-${index}`}
+      className={clsx(
+        styles.performanceCard,
+        isPast && styles.past,
+        !isPast && isSoldOut && styles.soldOut,
+      )}
+    >
+      {/* Card overlay link - covers the whole card */}
+      <a
+        href={showing ? hydrateUrl(showing.url) : undefined}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.cardLink}
+        aria-label={`View ${venue?.name || "venue"} listing`}
+      />
+      <div className={styles.performanceTime}>
+        {new Date(performance.time).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Europe/London",
+        })}
+      </div>
+      {venue && <div className={styles.performanceVenue}>{venue.name}</div>}
+      {showing?.title && titlesDiffer(movieTitle, showing.title) && (
+        <div className={styles.showingTitle}>{showing.title}</div>
+      )}
+      {performance.screen && (
+        <div className={styles.performanceScreen}>
+          {performance.screen.length > 3
+            ? performance.screen
+            : "Screen " + performance.screen}
+        </div>
+      )}
+      {performance.accessibility && (
+        <div className={styles.performanceAccessibility}>
+          {Object.entries(performance.accessibility)
+            .filter(([, enabled]) => enabled)
+            .map(([feature]) => (
+              <Tag key={feature} color="blue" size="sm">
+                {getAccessibilityLabel(feature)}
+              </Tag>
+            ))}
+        </div>
+      )}
+      {performance.notes && (
+        <div className={styles.performanceNotes}>
+          {performance.notes.split("\n").map((note, noteIndex) => (
+            <Fragment key={noteIndex}>
+              {note}
+              <br />
+            </Fragment>
+          ))}
+        </div>
+      )}
+      {isPast && <div className={styles.finishedBadge}>Finished</div>}
+      {isSoldOut && !isPast && (
+        <div className={styles.soldOutBadge}>Sold Out</div>
+      )}
+      {!isPast && !isSoldOut && (
+        <a
+          href={hydrateUrl(performance.bookingUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.bookingButton}
+        >
+          Book
+        </a>
+      )}
+    </div>
+  );
+}
 
 interface ShowingsSectionProps {
   isLoading: boolean;
@@ -47,6 +134,7 @@ export default function ShowingsSection({
 }: ShowingsSectionProps) {
   const { hydrateUrl, error, retry } = useCinemaData();
   const hasPerformances = Object.keys(performancesByDate).length > 0;
+  const [showFinished, setShowFinished] = useState(false);
 
   // Show filter info banner when filters are reducing results
   const showFilterBanner =
@@ -139,6 +227,18 @@ export default function ShowingsSection({
               {Object.entries(performancesByDate).map(
                 ([date, datePerformances]) => {
                   const daysFromNow = getDaysFromNow(datePerformances[0].time);
+                  const pastPerformances = datePerformances.filter((p) =>
+                    isInPast(p.time),
+                  );
+                  const upcomingPerformances = datePerformances.filter(
+                    (p) => !isInPast(p.time),
+                  );
+                  const hasFinished = pastPerformances.length > 0;
+                  const hasUpcoming = upcomingPerformances.length > 0;
+                  const visiblePerformances = showFinished
+                    ? datePerformances
+                    : upcomingPerformances;
+
                   return (
                     <Fragment key={date}>
                       <h3 className={styles.dateHeader}>
@@ -149,109 +249,63 @@ export default function ShowingsSection({
                           </span>
                         )}
                       </h3>
-                      <div className={styles.performancesList}>
-                        {datePerformances.map((performance, index) => {
-                          const showing = showings[performance.showingId];
-                          const venue = venues[showing?.venueId];
-                          const isPast = isInPast(performance.time);
-                          const isSoldOut = performance.status?.soldOut;
-
-                          return (
-                            <div
-                              key={`${performance.showingId}-${index}`}
-                              className={clsx(
-                                styles.performanceCard,
-                                isPast && styles.past,
-                                !isPast && isSoldOut && styles.soldOut,
-                              )}
-                            >
-                              {/* Card overlay link - covers the whole card */}
-                              <a
-                                href={
-                                  showing ? hydrateUrl(showing.url) : undefined
-                                }
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={styles.cardLink}
-                                aria-label={`View ${venue?.name || "venue"} listing`}
-                              />
-                              <div className={styles.performanceTime}>
-                                {new Date(performance.time).toLocaleTimeString(
-                                  "en-GB",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    timeZone: "Europe/London",
-                                  },
-                                )}
-                              </div>
-                              {venue && (
-                                <div className={styles.performanceVenue}>
-                                  {venue.name}
-                                </div>
-                              )}
-                              {showing?.title &&
-                                titlesDiffer(movieTitle, showing.title) && (
-                                  <div className={styles.showingTitle}>
-                                    {showing.title}
-                                  </div>
-                                )}
-                              {performance.screen && (
-                                <div className={styles.performanceScreen}>
-                                  {performance.screen.length > 3
-                                    ? performance.screen
-                                    : "Screen " + performance.screen}
-                                </div>
-                              )}
-                              {performance.accessibility && (
-                                <div
-                                  className={styles.performanceAccessibility}
-                                >
-                                  {Object.entries(performance.accessibility)
-                                    .filter(([, enabled]) => enabled)
-                                    .map(([feature]) => (
-                                      <Tag key={feature} color="blue" size="sm">
-                                        {getAccessibilityLabel(feature)}
-                                      </Tag>
-                                    ))}
-                                </div>
-                              )}
-                              {performance.notes && (
-                                <div className={styles.performanceNotes}>
-                                  {performance.notes
-                                    .split("\n")
-                                    .map((note, noteIndex) => (
-                                      <Fragment key={noteIndex}>
-                                        {note}
-                                        <br />
-                                      </Fragment>
-                                    ))}
-                                </div>
-                              )}
-                              {isPast && (
-                                <div className={styles.finishedBadge}>
-                                  Finished
-                                </div>
-                              )}
-                              {isSoldOut && !isPast && (
-                                <div className={styles.soldOutBadge}>
-                                  Sold Out
-                                </div>
-                              )}
-                              {!isPast && !isSoldOut && (
-                                <a
-                                  href={hydrateUrl(performance.bookingUrl)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={styles.bookingButton}
-                                >
-                                  Book
-                                </a>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                      {hasFinished && (
+                        <div className={styles.finishedBanner}>
+                          <span className={styles.finishedLabel}>
+                            {showFinished ? (
+                              <>
+                                Showing{" "}
+                                <span className={styles.finishedCount}>
+                                  {pastPerformances.length}
+                                </span>{" "}
+                                {pastPerformances.length === 1
+                                  ? "showing"
+                                  : "showings"}{" "}
+                                which{" "}
+                                {pastPerformances.length === 1 ? "has" : "have"}{" "}
+                                already finished
+                              </>
+                            ) : (
+                              <>
+                                Hiding{" "}
+                                <span className={styles.finishedCount}>
+                                  {pastPerformances.length}
+                                </span>{" "}
+                                {pastPerformances.length === 1
+                                  ? "showing"
+                                  : "showings"}{" "}
+                                which{" "}
+                                {pastPerformances.length === 1 ? "has" : "have"}{" "}
+                                already finished
+                              </>
+                            )}
+                          </span>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setShowFinished(!showFinished)}
+                          >
+                            {showFinished ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      )}
+                      {visiblePerformances.length > 0 && (
+                        <div className={styles.performancesList}>
+                          {visiblePerformances.map((performance, index) =>
+                            renderPerformanceCard(
+                              performance,
+                              index,
+                              showings,
+                              venues,
+                              movieTitle,
+                              hydrateUrl,
+                            ),
+                          )}
+                        </div>
+                      )}
+                      {!hasUpcoming && !hasFinished && (
+                        <div className={styles.performancesList} />
+                      )}
                     </Fragment>
                   );
                 },

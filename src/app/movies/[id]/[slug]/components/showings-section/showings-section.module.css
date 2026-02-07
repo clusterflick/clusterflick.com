@@ -37,6 +37,30 @@
   white-space: nowrap;
 }
 
+.finishedBanner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background-color: rgba(var(--color-light-gray-rgb), 0.08);
+  border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
+  border-radius: 8px;
+}
+
+.finishedLabel {
+  font-size: 13px;
+  color: var(--color-soft-gray);
+  line-height: 1.4;
+}
+
+.finishedCount {
+  color: var(--color-light-gray);
+  font-weight: 600;
+}
+
 .dateHeader {
   font-size: 20px;
   font-weight: 700;
