@@ -13,7 +13,6 @@ import {
   useFilterConfig,
   EVENT_CATEGORIES,
 } from "@/state/filter-config-context";
-import { useVenueFilterDefaults } from "@/hooks/use-venue-filter-defaults";
 import { filterManager, describeFilters } from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
@@ -79,9 +78,6 @@ export default function PageContent({
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
-
-  // Initialize default venue filter to "Cinemas"
-  useVenueFilterDefaults();
 
   // Get unfiltered movie data
   const unfilteredMovie = movies[movie.id] || null;

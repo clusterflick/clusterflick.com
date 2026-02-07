@@ -76,9 +76,6 @@ type FilterConfigContextType = {
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
   selectVenues: (venueIds: string[]) => void;
   clearVenues: () => void;
-  // Venue default tracking (persists across page navigations)
-  venueDefaultApplied: boolean;
-  setVenueDefaultApplied: () => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -87,48 +84,34 @@ type FilterConfigContextType = {
 const Context = createContext<FilterConfigContextType | undefined>(undefined);
 
 export function FilterConfigProvider({ children }: { children: ReactNode }) {
-  const [filterState, setFilterState] = useState<FilterState>(
-    filterManager.getDefaultState,
-  );
-
-  // Track whether venue default has been applied (persists across page navigations)
-  const [venueDefaultApplied, setVenueDefaultAppliedState] = useState(false);
-  const setVenueDefaultApplied = useCallback(() => {
-    setVenueDefaultAppliedState(true);
-  }, []);
-
-  // Restore filter state on mount from session storage, then overlay any
-  // URL params on top. Children are not rendered until this completes
-  // (see return below), so there is no flash of default filters.
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // 1. Start with defaults
+  // Compute initial filter state lazily (runs once during the first render)
+  // so the tree never sees stale defaults and we avoid setState-in-effect.
+  // Guard browser APIs for SSR — during server render we just use defaults.
+  const [filterState, setFilterState] = useState<FilterState>(() => {
     let state = filterManager.getDefaultState();
 
-    // 2. Merge session storage (if available)
-    let restoredFromSession = false;
+    if (typeof window === "undefined") {
+      return state;
+    }
+
+    // Merge session storage (if available)
     try {
       const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (stored) {
         state = JSON.parse(stored) as FilterState;
-        restoredFromSession = true;
       }
     } catch {
       // Silently ignore — will use defaults
     }
 
-    // 3. Merge URL params on top (highest priority)
+    // Merge URL params on top (highest priority)
     const urlOverrides = filterManager.parseUrlParams(window.location.search);
     if (urlOverrides) {
       state = { ...state, ...urlOverrides };
-
-      // Strip URL params so a refresh uses session storage
-      window.history.replaceState({}, "", window.location.pathname);
     }
 
-    // 4. Discard stale dates — if a restored start or end date is in the
-    //    past, fall back to the default so the user doesn't see zero results
+    // Discard stale dates — if a restored start or end date is in the
+    // past, fall back to the default so the user doesn't see zero results
     const todayMidnight = getLondonMidnightTimestamp();
     const dateRange = state[FilterId.DateRange];
     const defaultDateRange =
@@ -137,34 +120,27 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       (dateRange.start !== null && dateRange.start < todayMidnight) ||
       (dateRange.end !== null && dateRange.end < todayMidnight)
     ) {
-      state = {
-        ...state,
-        [FilterId.DateRange]: defaultDateRange,
-      };
+      state = { ...state, [FilterId.DateRange]: defaultDateRange };
     }
 
-    setFilterState(state);
+    return state;
+  });
 
-    // Skip venue default hook if we restored from session or URL params
-    // specified filters — the user already has an established session
-    if (restoredFromSession || urlOverrides) {
-      setVenueDefaultAppliedState(true);
+  // Strip URL params on mount so a refresh uses session storage.
+  useEffect(() => {
+    if (filterManager.parseUrlParams(window.location.search)) {
+      window.history.replaceState({}, "", window.location.pathname);
     }
-
-    setIsReady(true);
   }, []);
 
   // Sync filter state to session storage on every change.
-  // Skip until the initial restore is complete so we don't overwrite
-  // stored values with defaults.
   useEffect(() => {
-    if (!isReady) return;
     try {
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(filterState));
     } catch {
       // Silently ignore — storage may be full or disabled
     }
-  }, [filterState, isReady]);
+  }, [filterState]);
 
   // Search
   const setSearchQuery = useCallback((query: string) => {
@@ -413,8 +389,6 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
-      venueDefaultApplied,
-      setVenueDefaultApplied,
       resetFilters,
       hasActiveFilters,
     }),
@@ -434,14 +408,10 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
-      venueDefaultApplied,
-      setVenueDefaultApplied,
       resetFilters,
       hasActiveFilters,
     ],
   );
-
-  if (!isReady) return null;
 
   return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 }

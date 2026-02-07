@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Grid, WindowScroller, GridCellProps } from "react-virtualized";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
-import { useVenueFilterDefaults } from "@/hooks/use-venue-filter-defaults";
 import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
 import MovieCell from "@/components/movie-cell";
@@ -36,9 +35,6 @@ export default function Home() {
   useEffect(() => {
     getData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Initialize default venue filter to "Cinemas"
-  useVenueFilterDefaults();
 
   const [windowDimensions, setWindowDimensions] = useState({
     width: POSTER_WIDTH * 1.5,
