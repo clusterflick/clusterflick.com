@@ -11,6 +11,7 @@ import { getDistanceInMiles, NEARBY_RADIUS_MILES } from "@/utils/geo-distance";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import DateFilterSection from "./date-filter-section";
+import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
 
 interface FilterOverlayProps {
@@ -30,6 +31,7 @@ export default function FilterOverlay({
     selectAllCategories,
     clearAllCategories,
     setSearchQuery,
+    setShowingTitleSearchQuery,
     toggleGenre,
     selectAllGenres,
     clearAllGenres,
@@ -42,6 +44,7 @@ export default function FilterOverlay({
   } = useFilterConfig();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const showingTitleSearchInputRef = useRef<HTMLInputElement>(null);
   const { movies, metaData } = useCinemaData();
 
   // Geolocation context (persists across overlay open/close)
@@ -201,6 +204,68 @@ export default function FilterOverlay({
             </button>
           )}
         </div>
+        <ExpandableSection
+          title="More Search Options"
+          defaultExpanded={filterState.showingTitleSearch.length > 0}
+        >
+          <div className={styles.showingTitleSearchWrapper}>
+            <div className={styles.searchInputWrapper}>
+              <svg
+                className={styles.searchIcon}
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <input
+                ref={showingTitleSearchInputRef}
+                type="text"
+                id="filter-showing-title-search"
+                className={styles.searchInput}
+                placeholder="Search original venue title..."
+                value={filterState.showingTitleSearch}
+                onChange={(e) => setShowingTitleSearchQuery(e.target.value)}
+              />
+              {filterState.showingTitleSearch && (
+                <button
+                  type="button"
+                  className={styles.searchClear}
+                  onClick={() => {
+                    setShowingTitleSearchQuery("");
+                    showingTitleSearchInputRef.current?.focus();
+                  }}
+                  aria-label="Clear showing title search"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 6L6 18M6 6L18 18"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+        </ExpandableSection>
       </div>
 
       <div className={styles.content}>

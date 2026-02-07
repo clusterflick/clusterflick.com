@@ -10,6 +10,7 @@ export type {
 // Filter modules
 export {
   searchFilter,
+  showingTitleSearchFilter,
   categoriesFilter,
   venuesFilter,
   dateRangeFilter,

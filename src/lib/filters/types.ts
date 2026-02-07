@@ -5,6 +5,7 @@ import { Category, Movie } from "@/types";
  */
 export enum FilterId {
   Search = "search",
+  ShowingTitleSearch = "showingTitleSearch",
   Categories = "categories",
   Venues = "venues",
   DateRange = "dateRange",
@@ -18,6 +19,7 @@ export enum FilterId {
  */
 export type FilterState = {
   [FilterId.Search]: string;
+  [FilterId.ShowingTitleSearch]: string;
   [FilterId.Categories]: Category[] | null;
   [FilterId.Venues]: string[] | null;
   [FilterId.DateRange]: { start: number | null; end: number | null };
@@ -62,6 +64,7 @@ export interface FilterModule<K extends FilterId> {
  */
 export type AnyFilterModule =
   | FilterModule<FilterId.Search>
+  | FilterModule<FilterId.ShowingTitleSearch>
   | FilterModule<FilterId.Categories>
   | FilterModule<FilterId.Venues>
   | FilterModule<FilterId.DateRange>

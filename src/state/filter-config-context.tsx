@@ -56,6 +56,7 @@ type FilterConfigContextType = {
   filterState: FilterState;
   // Search
   setSearchQuery: (query: string) => void;
+  setShowingTitleSearchQuery: (query: string) => void;
   // Categories
   toggleCategory: (category: Category) => void;
   selectAllCategories: () => void;
@@ -96,6 +97,12 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   // Search
   const setSearchQuery = useCallback((query: string) => {
     setFilterState((prev) => filterManager.set(prev, FilterId.Search, query));
+  }, []);
+
+  const setShowingTitleSearchQuery = useCallback((query: string) => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.ShowingTitleSearch, query),
+    );
   }, []);
 
   // Categories
@@ -321,6 +328,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     () => ({
       filterState,
       setSearchQuery,
+      setShowingTitleSearchQuery,
       toggleCategory,
       selectAllCategories,
       clearAllCategories,
@@ -341,6 +349,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     [
       filterState,
       setSearchQuery,
+      setShowingTitleSearchQuery,
       toggleCategory,
       selectAllCategories,
       clearAllCategories,

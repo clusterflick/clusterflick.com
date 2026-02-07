@@ -61,7 +61,6 @@ async function waitForImagesToLoad(page: Page): Promise<void> {
   }
 }
 
-
 test.describe("Smoke Tests", () => {
   test.beforeEach(async ({ page }) => {
     // Set desktop viewport
@@ -103,7 +102,9 @@ test.describe("Smoke Tests", () => {
 
     await expect(async () => {
       const posterCount = await countVisiblePosters(page);
-      expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS_AT_BOTTOM);
+      expect(posterCount).toBeGreaterThanOrEqual(
+        EXPECTED_MIN_POSTERS_AT_BOTTOM,
+      );
     }).toPass({ timeout: 5000 });
 
     await waitForImagesToLoad(page);

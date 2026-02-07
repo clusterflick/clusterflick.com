@@ -282,6 +282,11 @@
   outline-offset: 2px;
 }
 
+/* Showing Title Search (inside expandable section) */
+.showingTitleSearchWrapper {
+  padding-top: 4px;
+}
+
 /* ==========================================================================
    Chip Group
    ========================================================================== */

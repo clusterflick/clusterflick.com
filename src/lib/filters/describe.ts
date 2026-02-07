@@ -341,6 +341,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const categoryDesc = describeCategories(state, categories);
   const genreDesc = describeGenres(state, genres);
   const searchQuery = state.search?.trim();
+  const showingTitleQuery = state.showingTitleSearch?.trim();
 
   // Check if "all events" (all categories, all genres)
   const allCategories = state.categories === null;
@@ -354,6 +355,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     eventsDesc = "All events";
     if (searchQuery) {
       eventsDesc += ` matching "${searchQuery}"`;
+    }
+    if (showingTitleQuery) {
+      eventsDesc += ` with showing title "${showingTitleQuery}"`;
     }
   } else {
     const parts: string[] = [];
@@ -375,6 +379,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     // Add search suffix
     if (searchQuery) {
       eventsDesc += ` matching "${searchQuery}"`;
+    }
+    if (showingTitleQuery) {
+      eventsDesc += ` with showing title "${showingTitleQuery}"`;
     }
   }
 
