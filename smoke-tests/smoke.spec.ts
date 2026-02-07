@@ -61,25 +61,6 @@ async function waitForImagesToLoad(page: Page): Promise<void> {
   }
 }
 
-async function waitForPosterCountToChange(
-  page: Page,
-  previousCount: number,
-  timeout = 5000,
-): Promise<number> {
-  // Used for search/filter where the actual count changes
-  const startTime = Date.now();
-  let currentCount = previousCount;
-
-  while (Date.now() - startTime < timeout) {
-    currentCount = await countVisiblePosters(page);
-    if (currentCount !== previousCount) {
-      return currentCount;
-    }
-    await page.waitForTimeout(100);
-  }
-
-  return currentCount;
-}
 
 test.describe("Smoke Tests", () => {
   test.beforeEach(async ({ page }) => {
@@ -95,14 +76,15 @@ test.describe("Smoke Tests", () => {
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
 
-    const posterCount = await countVisiblePosters(page);
+    await expect(async () => {
+      const posterCount = await countVisiblePosters(page);
+      expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
+    }).toPass({ timeout: 5000 });
 
     await waitForImagesToLoad(page);
     await page.screenshot({
       path: "test-results/screenshots/initial-load.png",
     });
-
-    expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
   });
 
   test("scrolling to bottom loads more posters", async ({ page }) => {
@@ -119,14 +101,15 @@ test.describe("Smoke Tests", () => {
     // Wait for scroll to actually reach the bottom
     await waitForScrollToBottom(page);
 
-    const posterCount = await countVisiblePosters(page);
+    await expect(async () => {
+      const posterCount = await countVisiblePosters(page);
+      expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS_AT_BOTTOM);
+    }).toPass({ timeout: 5000 });
 
     await waitForImagesToLoad(page);
     await page.screenshot({
       path: "test-results/screenshots/after-scroll-bottom.png",
     });
-
-    expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS_AT_BOTTOM);
   });
 
   test("scrolling back to middle maintains expected poster count", async ({
@@ -155,14 +138,16 @@ test.describe("Smoke Tests", () => {
     // Wait for scroll to reach the middle
     await waitForScrollToPosition(page, middlePosition);
 
-    const posterCount = await countVisiblePosters(page);
+    // Wait for virtualized list to render posters for the new viewport
+    await expect(async () => {
+      const posterCount = await countVisiblePosters(page);
+      expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
+    }).toPass({ timeout: 5000 });
 
     await waitForImagesToLoad(page);
     await page.screenshot({
       path: "test-results/screenshots/after-scroll-middle.png",
     });
-
-    expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
   });
 
   test("search for first movie title shows exactly 1 match", async ({
@@ -172,7 +157,6 @@ test.describe("Smoke Tests", () => {
 
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
-    const initialCount = await countVisiblePosters(page);
 
     // Get the first movie title from the image alt attribute
     const firstMovieTitle = await getFirstMovieTitle(page);
@@ -190,9 +174,6 @@ test.describe("Smoke Tests", () => {
     // Type the movie title
     await page.fill(SEARCH_INPUT_SELECTOR, firstMovieTitle!);
 
-    // Wait for the poster count to change (filter applied)
-    await waitForPosterCountToChange(page, initialCount);
-
     // Close overlay by pressing escape
     await page.keyboard.press("Escape");
 
@@ -202,15 +183,16 @@ test.describe("Smoke Tests", () => {
       timeout: 2000,
     });
 
-    // Count posters after search
-    const searchResultCount = await countVisiblePosters(page);
+    // Wait for filter to apply and show exactly 1 result
+    await expect(async () => {
+      const searchResultCount = await countVisiblePosters(page);
+      expect(searchResultCount).toBe(1);
+    }).toPass({ timeout: 5000 });
 
     await waitForImagesToLoad(page);
     await page.screenshot({
       path: "test-results/screenshots/after-search.png",
     });
-
-    expect(searchResultCount).toBe(1);
   });
 
   test("clicking first poster loads movie details with at least one performance", async ({
