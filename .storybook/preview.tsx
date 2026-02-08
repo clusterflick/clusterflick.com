@@ -62,6 +62,16 @@ const preview: Preview = {
   // Global decorators to apply fonts and set env var
   decorators: [
     (Story) => {
+      // Clear filter state from sessionStorage before each story so that
+      // persisted filters don't leak between stories or across sessions.
+      React.useEffect(() => {
+        sessionStorage.removeItem("clusterflick-filters");
+        return () => sessionStorage.removeItem("clusterflick-filters");
+      }, []);
+
+      return <Story />;
+    },
+    (Story) => {
       React.useEffect(() => {
         // Manually set font CSS variables on document root to ensure they're available
         // This is needed because Storybook's iframe might not pick them up from the className
