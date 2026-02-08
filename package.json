@@ -9,7 +9,7 @@
     "format": "prettier --write --ignore-path .gitignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build --stats-json",
     "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts"
   },
   "dependencies": {
