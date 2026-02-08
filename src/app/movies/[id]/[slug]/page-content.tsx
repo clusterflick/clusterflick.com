@@ -46,7 +46,7 @@ export default function PageContent({
   containingEvents,
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
-  const { filterState, hasActiveFilters } = useFilterConfig();
+  const { filterState } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -268,7 +268,6 @@ export default function PageContent({
           venues={venues}
           movieTitle={movie.title}
           filterDescription={filterDescription}
-          hasActiveFilters={hasActiveFilters}
           showingAll={showAll}
           onShowAllToggle={handleShowAllToggle}
           unfilteredPerformanceCount={unfilteredPerformances.length}

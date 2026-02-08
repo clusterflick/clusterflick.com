@@ -112,7 +112,6 @@ interface ShowingsSectionProps {
   movieTitle: string;
   // Filter-related props
   filterDescription: FilterDescription | null;
-  hasActiveFilters: boolean;
   showingAll: boolean;
   onShowAllToggle: () => void;
   unfilteredPerformanceCount: number;
@@ -126,7 +125,6 @@ export default function ShowingsSection({
   venues,
   movieTitle,
   filterDescription,
-  hasActiveFilters,
   showingAll,
   onShowAllToggle,
   unfilteredPerformanceCount,
@@ -136,12 +134,11 @@ export default function ShowingsSection({
   const hasPerformances = Object.keys(performancesByDate).length > 0;
   const [showFinished, setShowFinished] = useState(false);
 
-  // Show filter info banner when filters are reducing results
-  const showFilterBanner =
-    !isLoading &&
-    hasActiveFilters &&
+  // Show filter info banner when filters are reducing results (including defaults)
+  const filtersReducedResults =
     unfilteredPerformanceCount > 0 &&
-    (filteredPerformanceCount < unfilteredPerformanceCount || showingAll);
+    filteredPerformanceCount < unfilteredPerformanceCount;
+  const showFilterBanner = !isLoading && (filtersReducedResults || showingAll);
 
   return (
     <ContentSection
@@ -212,12 +209,12 @@ export default function ShowingsSection({
                 height: 80,
               }}
               message={
-                hasActiveFilters && unfilteredPerformanceCount > 0
+                unfilteredPerformanceCount > 0
                   ? "No showings match your current filters"
                   : "No showings currently available"
               }
               hint={
-                hasActiveFilters && unfilteredPerformanceCount > 0
+                unfilteredPerformanceCount > 0
                   ? "Try adjusting your filters to see more results"
                   : undefined
               }
