@@ -25,7 +25,7 @@ export default function HeaderLogo() {
         height={40}
         className={clsx(styles.logo, isLoading && styles.spinning)}
       />
-      <OutlineHeading as="h1">Clusterflick</OutlineHeading>
+      <OutlineHeading as="div">Clusterflick</OutlineHeading>
     </button>
   );
 }

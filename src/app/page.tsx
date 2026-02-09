@@ -1,207 +1,152 @@
-"use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Grid, WindowScroller, GridCellProps } from "react-virtualized";
-import { useCinemaData } from "@/state/cinema-data-context";
-import { useFilterConfig } from "@/state/filter-config-context";
-import { filterManager } from "@/lib/filters";
-import Button from "@/components/button";
-import MovieCell from "@/components/movie-cell";
-import MainHeader from "@/components/main-header";
-import FilterOverlay from "@/components/filter-overlay";
-import LoadingIndicator from "@/components/loading-indicator";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import slugify from "@sindresorhus/slugify";
 import PageWrapper from "@/components/page-wrapper";
-import EmptyState from "@/components/empty-state";
-import "react-virtualized/styles.css";
+import { getStaticData } from "@/utils/get-static-data";
+import { getPrimaryCategory } from "@/lib/filters/modules/categories";
+import { Category } from "@/types";
+import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import IntroSection from "./intro-section";
+import PageContent from "./page-content";
+import SSROnly from "./ssr-only";
 import styles from "./page.module.css";
 
-const POSTER_WIDTH = 200;
-const POSTER_HEIGHT = 300;
-const GAP = 8;
+export const metadata: Metadata = {
+  title: "Every Film Showing in London — Search London Cinema Listings",
+  description:
+    "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+};
 
-export default function Home() {
-  const {
-    movies,
-    isEmpty,
-    isLoading,
-    hasAttemptedLoad,
-    error,
-    getData,
-    retry,
-  } = useCinemaData();
-  const { filterState, hasActiveFilters } = useFilterConfig();
+export default async function Home() {
+  const data = await getStaticData();
 
-  // Fetch data once on mount. Empty deps are intentional: all movie data is loaded
-  // into global context once, and getData returns early if data already exists.
-  useEffect(() => {
-    getData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Apply the same default filters as the client so SSR output matches hydrated content
+  const defaultCategories = new Set([
+    Category.Movie,
+    Category.MultipleMovies,
+    Category.Shorts,
+  ]);
+  const todayMidnight = getLondonMidnightTimestamp();
+  const rangeStart = todayMidnight;
+  const rangeEnd = todayMidnight + 8 * MS_PER_DAY; // 7-day range, end is exclusive (midnight + 1 day)
 
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: POSTER_WIDTH * 1.5,
-    height: POSTER_HEIGHT * 1.5,
-  }); // Default values for SSR to render one placeholder poster
-  const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
-  const [filterTextHeight, setFilterTextHeight] = useState(0);
-
-  const moviesList = useMemo(() => {
-    if (isEmpty) return [];
-    const filteredMovies = filterManager.apply(movies, filterState);
-    return Object.values(filteredMovies).sort((a, b) =>
-      a.normalizedTitle.localeCompare(b.normalizedTitle),
-    );
-  }, [isEmpty, movies, filterState]);
-
-  const columnsForWindow = Math.floor(
-    (windowDimensions.width + GAP) / (POSTER_WIDTH + GAP),
-  );
-  // Limit columns to the number of movies so they stay centered when there are few items
-  const columnCount = Math.max(
-    1,
-    Math.min(columnsForWindow, moviesList.length || 1),
-  );
-  const rowCount = Math.ceil(moviesList.length / columnCount);
-  const gridWidth = columnCount * (POSTER_WIDTH + GAP);
-
-  const cellRenderer = useCallback(
-    ({ columnIndex, key, rowIndex, style }: GridCellProps) => {
-      const index = rowIndex * columnCount + columnIndex;
-      const movie = moviesList[index];
-      if (!movie) return null;
-      return <MovieCell key={key} movie={movie} style={style} />;
-    },
-    [moviesList, columnCount],
-  );
-
-  useEffect(() => {
-    // Set initial dimensions on mount - must be done in effect as window
-    // is not available during SSR. This is a valid use of setState in effect.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- valid: window not available during SSR
-    setWindowDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const renderEmptyState = () => {
-    if (error) {
-      return (
-        <EmptyState
-          variant="fullscreen"
-          icon={{
-            src: "/images/icons/neon-projector.svg",
-            width: 120,
-            height: 120,
-          }}
-          title="Something went wrong"
-          message={error.message}
-          actions={
-            <Button onClick={retry} disabled={isLoading}>
-              {isLoading ? "Retrying..." : "Try Again"}
-            </Button>
-          }
-        />
+  const staticMovies = Object.values(data.movies)
+    .filter((movie) => {
+      // Category filter: only default categories
+      if (!defaultCategories.has(getPrimaryCategory(movie))) return false;
+      // Date range filter: must have at least one performance in range
+      return movie.performances.some(
+        (p) => p.time >= rangeStart && p.time < rangeEnd,
       );
-    }
-
-    if (
-      hasAttemptedLoad &&
-      !isLoading &&
-      moviesList.length === 0 &&
-      hasActiveFilters
-    ) {
-      return (
-        <EmptyState
-          variant="fullscreen"
-          icon={{
-            src: "/images/icons/neon-clapper.svg",
-            width: 120,
-            height: 120,
-          }}
-          title="No events found"
-          message="No events match your customisation. Try adjusting your filters or search for something else."
-        />
-      );
-    }
-
-    // No movies available at all (empty data)
-    if (
-      hasAttemptedLoad &&
-      !isLoading &&
-      moviesList.length === 0 &&
-      !hasActiveFilters
-    ) {
-      return (
-        <EmptyState
-          variant="fullscreen"
-          icon={{
-            src: "/images/icons/neon-ticket.svg",
-            width: 120,
-            height: 120,
-          }}
-          title="No events available"
-          message="There are currently no events or screenings to display. Check back soon for updates."
-        />
-      );
-    }
-
-    return null;
-  };
+    })
+    .sort((a, b) => a.normalizedTitle.localeCompare(b.normalizedTitle))
+    .slice(0, 30);
 
   return (
-    <PageWrapper className={styles.page}>
-      <MainHeader
-        isFilterOverlayOpen={isFilterOverlayOpen}
-        onFilterClick={() => setIsFilterOverlayOpen(!isFilterOverlayOpen)}
-        onFilterTextHeightChange={setFilterTextHeight}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Clusterflick",
+            description: "Every London cinema listing in one place",
+            url: "https://clusterflick.com",
+          }),
+        }}
       />
-      <FilterOverlay
-        isOpen={isFilterOverlayOpen}
-        onClose={() => setIsFilterOverlayOpen(false)}
-        filterTextHeight={filterTextHeight}
-      />
-      {renderEmptyState()}
-      <WindowScroller>
-        {({ height, isScrolling, registerChild, onChildScroll, scrollTop }) => (
-          <div
-            ref={registerChild}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Grid
-              autoHeight
-              cellRenderer={cellRenderer}
-              columnCount={columnCount}
-              columnWidth={POSTER_WIDTH + GAP}
-              height={height}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              rowCount={rowCount}
-              rowHeight={POSTER_HEIGHT + GAP}
-              scrollTop={scrollTop}
-              width={gridWidth}
-              overscanRowCount={3}
-            />
-          </div>
-        )}
-      </WindowScroller>
-      {isLoading && (
-        <LoadingIndicator
-          message="Loading movies..."
-          className={styles.loadingFooter}
-        />
-      )}
-    </PageWrapper>
+      <PageWrapper className={styles.page}>
+        <IntroSection
+          heading={
+            <h1>
+              Every Film Showing in London &mdash; Search London Cinema Listings
+            </h1>
+          }
+          signOff={
+            <p className={styles.signOff}>
+              We hope you enjoy the site! Any questions?{" "}
+              <Link href="/about">Please get in touch</Link> &mdash; Your
+              friends at{" "}
+              <span className={styles.textWithIcon}>
+                Clusterflick
+                <Image src="/images/icon.svg" alt="" width={20} height={20} />
+              </span>
+            </p>
+          }
+        >
+          <p>
+            Welcome to Clusterflick 👋 &mdash; Find every film showing across
+            London, all in one place. From blockbusters at Picturehouses and
+            Everyman, to independent gems at BFI, Genesis Cinema, and Prince
+            Charles Cinema (and more, there&apos;s way too many venues to name
+            them all!)
+            <br />
+            We&apos;re currently tracking over 1,000 films showing across
+            London&apos;s 240+ venues.
+          </p>
+          <p>
+            With so much to choose from, use the menu at the top to filter for
+            the showings you&apos;re looking for. We&apos;ve started you off
+            with{" "}
+            <span className={styles.filterHighlight}>
+              Films, Multiple Films & Short Film
+            </span>
+            {" • "}
+            <span className={styles.filterHighlight}>At all Venues</span>
+            {" • "}
+            <span className={styles.filterHighlight}>
+              Showing in Next 7 Days
+            </span>{" "}
+            but that&apos;s just the start of your discovery journey. Jump in!
+            🍿
+          </p>
+          <p>
+            Compare showtimes, find screenings, discover late-night films, and
+            book tickets all from one page. No more checking dozens of cinema
+            websites ❤️
+          </p>
+        </IntroSection>
+        <PageContent />
+        <SSROnly>
+          <section className={styles.staticMovies}>
+            <h2 style={{ marginTop: -48, textAlign: "left" }}>
+              Films Showing in London
+            </h2>
+            <div className={styles.staticGrid}>
+              {staticMovies.map((movie) => {
+                const posterPath =
+                  movie.posterPath ||
+                  movie.includedMovies?.find((m) => m.posterPath)?.posterPath;
+                return (
+                  <Link
+                    key={movie.id}
+                    href={`/movies/${movie.id}/${slugify(movie.title)}`}
+                    className={styles.staticMovieLink}
+                  >
+                    {posterPath && (
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w200${posterPath}`}
+                        alt={movie.title}
+                        width={150}
+                        height={225}
+                        className={styles.staticPoster}
+                      />
+                    )}
+                    <span className={styles.staticTitle}>
+                      {movie.title}
+                      {movie.year && (
+                        <span className={styles.staticYear}>{movie.year}</span>
+                      )}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </SSROnly>
+      </PageWrapper>
+    </>
   );
 }

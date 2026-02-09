@@ -3,6 +3,8 @@
   color: var(--color-midnight-navy);
   display: inline-block;
   z-index: 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 900;
 }
 
 .overlap {

@@ -2,7 +2,152 @@
   margin-top: 100px;
 }
 
+.intro {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  background-color: rgba(var(--color-light-gray-rgb), 0.08);
+  border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
+  border-radius: 8px;
+}
+
+.introHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.introHeader h1 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.toggleButton {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.toggleButton:hover {
+  color: var(--color-light-gray);
+}
+
+.introBody {
+  margin: 12px 0;
+}
+
+.introBody p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  margin-bottom: 12px;
+}
+
+.introBody p:last-child {
+  margin-bottom: 0;
+}
+
+.collapsedIndicator {
+  text-align: center;
+  color: var(--color-muted-gray);
+  font-size: 18px;
+  letter-spacing: 4px;
+  padding: 6px 0 0 0;
+}
+
+.filterHighlight {
+  color: var(--color-electric-blue);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.signOff {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  text-align: center;
+  margin-bottom: 0;
+}
+
 /* Override padding for loading footer at bottom of page */
 .loadingFooter {
   padding: 40px 20px 60px;
+}
+
+.textWithIcon {
+  white-space: nowrap;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Static movie grid for SSR — hidden once JS loads */
+.staticMovies {
+  padding: 0 20px;
+}
+
+.staticMovies h2 {
+  font-size: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.staticGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.staticMovieLink {
+  display: block;
+  width: 200px;
+  height: 300px;
+  text-decoration: none;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
+}
+
+.staticPoster {
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.staticTitle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-white);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85) 70%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+}
+
+.staticYear {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-electric-blue);
 }

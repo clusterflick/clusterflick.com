@@ -18,7 +18,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Clusterflick – Every film, every cinema, one place",
+    default:
+      "Every Film Showing in London — Search London Cinema Listings | Clusterflick",
     template: "%s | Clusterflick",
   },
   description:

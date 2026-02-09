@@ -11,7 +11,7 @@ const colorStyles: Record<ColorVariant, string> = {
 interface OutlineHeadingProps {
   children: string;
   className?: string;
-  as?: "h1" | "h2" | "h3";
+  as?: "h1" | "h2" | "h3" | "div";
   color?: ColorVariant;
 }
 

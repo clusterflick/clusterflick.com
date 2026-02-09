@@ -19,7 +19,7 @@
     animation: spin 2s linear infinite;
   }
 
-  h1 {
+  div {
     margin: 0;
     position: relative;
     color: var(--color-midnight-navy);
@@ -41,7 +41,7 @@
     top: 19px;
     left: 16px;
 
-    h1 {
+    div {
       display: none;
     }
   }

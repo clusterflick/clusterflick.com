@@ -86,11 +86,19 @@ export default function FilterTrigger({
     >
       <span className={styles.textWrapper} ref={textWrapperRef}>
         <span className={styles.text}>
-          <span className={styles.highlight}>{description.events}</span>
+          <span className={styles.highlight}>
+            {metaData
+              ? description.events
+              : "Films, Multiple Films & Short Films"}
+          </span>
           {" • "}
-          <span className={styles.highlight}>{description.venues}</span>
+          <span className={styles.highlight}>
+            {metaData ? description.venues : "At all venues"}
+          </span>
           {" • "}
-          <span className={styles.highlight}>{description.dates}</span>
+          <span className={styles.highlight}>
+            {metaData ? description.dates : "Showing in Next 7 Days"}
+          </span>
         </span>
         <ChevronDownIcon className={styles.chevron} />
       </span>
