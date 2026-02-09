@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import Home from "@/app/page";
+import PageContent from "@/app/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import {
   FilterConfigProvider,
@@ -21,7 +21,7 @@ function HomePageWrapper() {
     <CinemaDataProvider>
       <FilterConfigProvider>
         <GeolocationProvider>
-          <Home />
+          <PageContent />
         </GeolocationProvider>
       </FilterConfigProvider>
     </CinemaDataProvider>
@@ -47,7 +47,7 @@ function HomePageWithNoMatchingFilter() {
       <FilterConfigProvider>
         <GeolocationProvider>
           <ApplyNoMatchFilter>
-            <Home />
+            <PageContent />
           </ApplyNoMatchFilter>
         </GeolocationProvider>
       </FilterConfigProvider>
