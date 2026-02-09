@@ -22,8 +22,8 @@ export default function NotFound() {
     [isLoading, movies],
   );
 
-  // Check if this is a movie URL pattern: /movies/<id>/<slug>
-  const movieMatch = pathname?.match(/^\/movies\/([^/]+)\/([^/]?)\/?$/);
+  // Grab the piece of the URL after `/movies` which should be an ID
+  const movieMatch = pathname?.match(/^\/movies\/([^/]+)\/?/i);
   const movieId = movieMatch?.[1];
 
   // Compute derived state from movies data
