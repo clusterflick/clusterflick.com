@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -15,16 +17,17 @@ function VenueBlurb() {
         unpredictable event.
       </p>
       <p>
-        Now in permanent residency at The Castle Cinema in Homerton, Ciné-Real
-        has been selling out monthly screenings for years, building a passionate
-        community of film lovers and filmmakers united by their appreciation for
-        the warmth and colour reproduction that only 16mm can deliver. Before
-        each screening, Liam and Ümit introduce the film and share insights,
-        creating an intimate, conversational atmosphere that feels like stepping
-        into Cinema Paradiso. There&apos;s even a raffle at the end with prizes
-        like Ciné-Real tote bags and super 8mm prints. It&apos;s not resistance
-        against digital—just an elegant case for why celluloid and digital
-        should coexist.
+        Now in permanent residency at{" "}
+        <Link href="/venues/the-castle-cinema">The Castle Cinema</Link> in
+        Homerton, Ciné-Real has been selling out monthly screenings for years,
+        building a passionate community of film lovers and filmmakers united by
+        their appreciation for the warmth and colour reproduction that only 16mm
+        can deliver. Before each screening, Liam and Ümit introduce the film and
+        share insights, creating an intimate, conversational atmosphere that
+        feels like stepping into Cinema Paradiso. There&apos;s even a raffle at
+        the end with prizes like Ciné-Real tote bags and super 8mm prints.
+        It&apos;s not resistance against digital—just an elegant case for why
+        celluloid and digital should coexist.
       </p>
     </section>
   );

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -14,8 +16,10 @@ function VenueBlurb() {
       </p>
       <p>
         The Forum is also behind watchAUT, an annual festival (held in
-        partnership with other venues like the ICA and Ciné Lumière) that
-        showcases the best new Austrian films, many of which haven&apos;t had UK
+        partnership with other venues like the{" "}
+        <Link href="/venues/institute-of-contemporary-arts">ICA</Link> and{" "}
+        <Link href="/venues/cine-lumiere">Ciné Lumière</Link>) that showcases
+        the best new Austrian films, many of which haven&apos;t had UK
         theatrical releases. Located in Knightsbridge, the venue itself is an
         intimate space that fosters dialogue between filmmakers and audiences,
         with screenings often part of wider cultural events. It&apos;s less
