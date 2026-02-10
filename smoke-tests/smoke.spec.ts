@@ -130,27 +130,56 @@ test.describe("Smoke Tests", () => {
     // Wait for scroll to reach the bottom
     await waitForScrollToBottom(page);
 
-    // Scroll to the middle of the page
-    await page.evaluate(() => {
-      const middle = document.body.scrollHeight / 2;
-      window.scrollTo({ top: middle, behavior: "instant" });
+    // Calculate a concrete target position before scrolling, so it isn't
+    // invalidated by virtualisation re-rendering and changing scrollHeight.
+    const targetScroll = await page.evaluate(() => {
+      const target = Math.floor(document.body.scrollHeight / 2);
+      window.scrollTo({ top: target, behavior: "instant" });
+      return target;
     });
 
-    // Wait for scroll to settle away from the bottom (i.e. we're somewhere in the middle)
-    await page.waitForFunction(
-      () => {
-        const scrollY = window.scrollY;
-        const maxScroll = document.body.scrollHeight - window.innerHeight;
-        return scrollY > 100 && scrollY < maxScroll - 100;
-      },
-      { timeout: 5000 },
-    );
+    // Wait for the scroll position to arrive near the target we requested.
+    // We avoid re-reading scrollHeight here because virtualisation may have
+    // already changed it by the time this runs.
+    try {
+      await page.waitForFunction(
+        (target) => {
+          return Math.abs(window.scrollY - target) < 200;
+        },
+        targetScroll,
+        { timeout: 5000 },
+      );
+    } catch (e) {
+      const debug = await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        scrollHeight: document.body.scrollHeight,
+        innerHeight: window.innerHeight,
+        maxScroll: document.body.scrollHeight - window.innerHeight,
+      }));
+      throw new Error(
+        `Scroll-to-middle timed out. Target: ${targetScroll}, actual state: ${JSON.stringify(debug)}`,
+        { cause: e },
+      );
+    }
 
     // Wait for virtualized list to render posters for the new viewport
-    await expect(async () => {
-      const posterCount = await countVisiblePosters(page);
-      expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
-    }).toPass({ timeout: 5000 });
+    try {
+      await expect(async () => {
+        const posterCount = await countVisiblePosters(page);
+        expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
+      }).toPass({ timeout: 5000 });
+    } catch (e) {
+      const debug = await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        posterCount: document.querySelectorAll('a[href^="/movies/"]').length,
+        scrollHeight: document.body.scrollHeight,
+        innerHeight: window.innerHeight,
+      }));
+      throw new Error(
+        `Poster count check failed after scroll-to-middle. State: ${JSON.stringify(debug)}`,
+        { cause: e },
+      );
+    }
 
     await waitForImagesToLoad(page);
     await page.screenshot({
