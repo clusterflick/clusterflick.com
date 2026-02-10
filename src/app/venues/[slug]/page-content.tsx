@@ -215,7 +215,7 @@ export default function VenueDetailPageContent({
         </div>
         {nearbyVenues.length > 0 && (
           <div>
-            <ContentSection title="Other Venues Nearby" as="h2">
+            <ContentSection title={`Cinemas Near ${venue.name}`} as="h2">
               <NearbyVenues venues={nearbyVenues} />
             </ContentSection>
           </div>
