@@ -15,6 +15,7 @@ import StackedPoster from "@/components/stacked-poster";
 import { LetterboxdIcon, InstagramIcon, XIcon } from "@/components/icons";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
+import NearbyVenues from "./nearby-venues";
 import styles from "./page.module.css";
 
 type SocialLink = {
@@ -57,6 +58,12 @@ function buildSocialLinks(attributes: VenueAttributes): SocialLink[] {
   return links;
 }
 
+export type NearbyVenue = {
+  venue: Venue;
+  distance: number;
+  url: string;
+};
+
 export interface VenueDetailPageContentProps {
   venue: Venue;
   attributes: VenueAttributes | null;
@@ -66,6 +73,7 @@ export interface VenueDetailPageContentProps {
   performanceCount: number;
   gridMovies: { movie: Movie; performanceCount: number }[];
   VenueBlurb: ComponentType | null;
+  nearbyVenues: NearbyVenue[];
 }
 
 export default function VenueDetailPageContent({
@@ -77,6 +85,7 @@ export default function VenueDetailPageContent({
   performanceCount,
   gridMovies,
   VenueBlurb,
+  nearbyVenues,
 }: VenueDetailPageContentProps) {
   const hasEvents = performanceCount > 0;
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
@@ -202,6 +211,13 @@ export default function VenueDetailPageContent({
             </ContentSection>
           </div>
         </div>
+        {nearbyVenues.length > 0 && (
+          <div>
+            <ContentSection title="Other Venues Nearby" as="h2">
+              <NearbyVenues venues={nearbyVenues} />
+            </ContentSection>
+          </div>
+        )}
       </div>
 
       <Divider />

@@ -175,6 +175,62 @@
   color: var(--color-neon-pink);
 }
 
+.nearbyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nearbyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nearbyItem[hidden] {
+  display: none;
+}
+
+.nearbyItem:last-child {
+  border-bottom: none;
+}
+
+.nearbyLink {
+  color: var(--color-electric-blue);
+  text-decoration: none;
+  font-size: 15px;
+  transition:
+    color 0.2s,
+    border-bottom 0.2s;
+}
+
+.nearbyLink:hover {
+  color: var(--color-neon-pink);
+}
+
+.nearbyDistance {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  white-space: nowrap;
+}
+
+.nearbyToggle {
+  background: none;
+  border: none;
+  color: var(--color-electric-blue);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px 0 0;
+  transition: color 0.2s;
+}
+
+.nearbyToggle:hover {
+  color: var(--color-neon-pink);
+}
+
 .mapImage {
   width: 100%;
   height: auto;

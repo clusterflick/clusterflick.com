@@ -6,6 +6,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getVenueAttributes } from "@/utils/get-venue-attributes";
 import { getVenueImagePath, getVenueMapPath } from "@/utils/get-venue-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getDistanceInMiles } from "@/utils/geo-distance";
 import type { Movie, Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
@@ -185,6 +186,26 @@ export default async function VenueDetailPage({
     // No blurb component for this venue
   }
 
+  const NEARBY_RADIUS = 1;
+  const nearbyVenues: { venue: Venue; distance: number; url: string }[] = [];
+
+  for (const other of Object.values(data.venues)) {
+    if (other.id === venue.id) continue;
+    const distance = getDistanceInMiles(
+      { lat: venue.geo.lat, lon: venue.geo.lon },
+      { lat: other.geo.lat, lon: other.geo.lon },
+    );
+    if (distance <= NEARBY_RADIUS) {
+      nearbyVenues.push({
+        venue: other,
+        distance,
+        url: getVenueUrl(other),
+      });
+    }
+  }
+
+  nearbyVenues.sort((a, b) => a.distance - b.distance);
+
   // Build JSON-LD structured data for this venue
   const venueJsonLd = {
     "@context": "https://schema.org",
@@ -222,6 +243,7 @@ export default async function VenueDetailPage({
         performanceCount={performanceCount}
         gridMovies={gridMovies}
         VenueBlurb={VenueBlurb}
+        nearbyVenues={nearbyVenues}
       />
     </>
   );
