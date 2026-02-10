@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "riverside Fulham bar with film events";
+export const seoHighlights =
+  "outdoor screenings, waterside cinema and seasonal events";
+
 export default VenueBlurb;

@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Docklands";
+export const seoHighlights =
+  "community-focused screenings and independent film";
+
 export default VenueBlurb;

@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "leisure park multiplex in south Croydon";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

@@ -23,4 +23,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Bayswater cinema in a restored landmark";
+export const seoHighlights =
+  "new releases, independent films and luxury seating";
+
 export default VenueBlurb;

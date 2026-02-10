@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "LGBTQ+ cultural centre in Deptford";
+export const seoHighlights =
+  "LGBTQ+ film screenings, discussions and cultural events";
+
 export default VenueBlurb;

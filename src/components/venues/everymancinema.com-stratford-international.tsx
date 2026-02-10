@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema near Olympic Park";
+export const seoHighlights = "new releases, arthouse films and sofa seating";
+
 export default VenueBlurb;

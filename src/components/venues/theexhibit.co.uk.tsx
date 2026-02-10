@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Balham bar, restaurant and screening room";
+export const seoHighlights = "films with food, drinks and in-seat dining";
+
 export default VenueBlurb;

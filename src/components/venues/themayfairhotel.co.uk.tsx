@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury West End hotel screening room";
+export const seoHighlights =
+  "premieres, private screenings and industry events";
+
 export default VenueBlurb;

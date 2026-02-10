@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Kensington library";
+export const seoHighlights = "community screenings and affordable local cinema";
+
 export default VenueBlurb;

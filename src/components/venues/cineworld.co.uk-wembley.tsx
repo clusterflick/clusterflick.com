@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex near Wembley Stadium";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

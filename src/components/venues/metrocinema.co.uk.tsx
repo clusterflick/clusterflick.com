@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent cinema in Harrow";
+export const seoHighlights = "new releases, Bollywood and South Asian films";
+
 export default VenueBlurb;

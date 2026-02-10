@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "South Kensington IMAX cinema";
+export const seoHighlights =
+  "IMAX documentaries, blockbusters and special events";
+
 export default VenueBlurb;

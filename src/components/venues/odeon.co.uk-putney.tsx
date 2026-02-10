@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe cinema on Putney High Street";
+export const seoHighlights = "blockbusters, recliner seating and new releases";
+
 export default VenueBlurb;

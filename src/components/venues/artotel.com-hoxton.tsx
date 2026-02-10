@@ -25,4 +25,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique hotel screening room in Hoxton";
+export const seoHighlights = "classics, emerging talent and themed film nights";
+
 export default VenueBlurb;

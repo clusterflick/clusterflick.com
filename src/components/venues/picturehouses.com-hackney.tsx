@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema on Mare Street, Hackney";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and special events";
+
 export default VenueBlurb;

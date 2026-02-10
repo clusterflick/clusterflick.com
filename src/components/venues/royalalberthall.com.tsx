@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "iconic Kensington concert hall";
+export const seoHighlights = "films in concert with live orchestra";
+
 export default VenueBlurb;

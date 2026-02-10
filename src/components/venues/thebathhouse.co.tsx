@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hackney Wick community cinema";
+export const seoHighlights =
+  "community screenings, workshops and cultural events";
+
 export default VenueBlurb;

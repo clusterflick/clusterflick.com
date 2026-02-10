@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema in Kingston upon Thames";
+export const seoHighlights =
+  "independent, foreign-language and documentary films";
+
 export default VenueBlurb;

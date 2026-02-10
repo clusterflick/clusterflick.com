@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community-owned pub in Nunhead";
+export const seoHighlights =
+  "community cinema nights, live music and pub screenings";
+
 export default VenueBlurb;

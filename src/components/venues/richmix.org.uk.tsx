@@ -19,4 +19,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent Shoreditch arts centre and cinema";
+export const seoHighlights =
+  "arthouse, Bollywood, world cinema and film festivals";
+
 export default VenueBlurb;

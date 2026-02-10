@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury Fitzrovia hotel screening room";
+export const seoHighlights =
+  "new releases, classics and supper club screenings";
+
 export default VenueBlurb;

@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community space in Bethnal Green";
+export const seoHighlights = "occasional film screenings and community events";
+
 export default VenueBlurb;

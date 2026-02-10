@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Grade II listed Victorian music hall in Clapham";
+export const seoHighlights =
+  "occasional film screenings, live music and comedy";
+
 export default VenueBlurb;

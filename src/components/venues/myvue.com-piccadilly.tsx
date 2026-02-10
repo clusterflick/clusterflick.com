@@ -18,4 +18,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "West End multiplex near Piccadilly Circus";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

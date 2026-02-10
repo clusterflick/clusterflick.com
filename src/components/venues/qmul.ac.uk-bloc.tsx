@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "university cinema at Mile End campus";
+export const seoHighlights = "indie films, arthouse, classics and world cinema";
+
 export default VenueBlurb;

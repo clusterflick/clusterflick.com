@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Kilburn community arts and cinema space";
+export const seoHighlights =
+  "community cinema, exhibitions and creative events";
+
 export default VenueBlurb;

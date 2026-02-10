@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Shoreditch bar and event space";
+export const seoHighlights = "film screenings, live music and creative events";
+
 export default VenueBlurb;

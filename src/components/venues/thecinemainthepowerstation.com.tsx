@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema in Battersea Power Station";
+export const seoHighlights = "new releases, independent films and classics";
+
 export default VenueBlurb;

@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hampstead museum with occasional screenings";
+export const seoHighlights =
+  "psychoanalysis-themed films, documentaries and cultural events";
+
 export default VenueBlurb;

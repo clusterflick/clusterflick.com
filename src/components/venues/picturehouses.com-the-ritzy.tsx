@@ -24,4 +24,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "iconic 1911 cinema overlooking Brixton Windrush Square";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and community events";
+
 export default VenueBlurb;

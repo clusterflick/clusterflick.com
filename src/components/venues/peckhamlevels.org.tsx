@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "creative space and pop-up cinema in Peckham";
+export const seoHighlights = "pop-up screenings, cultural events and food";
+
 export default VenueBlurb;

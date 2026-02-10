@@ -59,18 +59,27 @@ function getVenueMovieCounts(venue: Venue, movies: Record<string, Movie>) {
 function buildVenueDescription(
   venue: Venue,
   movieCount: number,
-  performanceCount: number,
+  seoDescription?: string,
+  seoHighlights?: string,
 ): string {
+  const filmWord = movieCount === 1 ? "film" : "films";
+
+  if (seoDescription && seoHighlights && movieCount > 0) {
+    return `${venue.name} showings - ${seoDescription}. ${movieCount} ${filmWord} showing, including ${seoHighlights}. Find screenings and book tickets.`;
+  }
+
+  if (seoDescription) {
+    return `${venue.name} showings - ${seoDescription}. Find screenings and book tickets.`;
+  }
+
   const typePart =
     venue.type.toLowerCase() !== "unknown" ? venue.type : "venue";
 
   if (movieCount > 0) {
-    const filmWord = movieCount === 1 ? "film" : "films";
-    const showingWord = performanceCount === 1 ? "showing" : "showings";
-    return `${venue.name} is a London ${typePart} tracked by Clusterflick. Currently listing ${movieCount} ${filmWord} across ${performanceCount} ${showingWord}. View screenings, location, and more.`;
+    return `${venue.name} is a London ${typePart}. ${movieCount} ${filmWord} showing. Find screenings and book tickets.`;
   }
 
-  return `${venue.name} is a London ${typePart} tracked by Clusterflick. View screenings, location, and more.`;
+  return `${venue.name} is a London ${typePart}. Find screenings and book tickets.`;
 }
 
 export async function generateMetadata({
@@ -87,14 +96,21 @@ export async function generateMetadata({
   }
 
   const data = await getStaticData();
-  const { movieCount, performanceCount } = getVenueMovieCounts(
-    venue,
-    data.movies,
-  );
+  const { movieCount } = getVenueMovieCounts(venue, data.movies);
+  let seoDescription: string | undefined;
+  let seoHighlights: string | undefined;
+  try {
+    const mod = await import(`@/components/venues/${venue.id}`);
+    seoDescription = mod.seoDescription;
+    seoHighlights = mod.seoHighlights;
+  } catch {
+    // No blurb component for this venue
+  }
   const description = buildVenueDescription(
     venue,
     movieCount,
-    performanceCount,
+    seoDescription,
+    seoHighlights,
   );
   const imagePath = getVenueImagePath(venue.id);
   const venueUrl = `https://clusterflick.com${getVenueUrl(venue)}`;

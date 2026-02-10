@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "luxury cinema at the former BBC Television Centre";
+export const seoHighlights = "new releases, arthouse films and in-seat dining";
+
 export default VenueBlurb;

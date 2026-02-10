@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hungarian cultural centre near Trafalgar Square";
+export const seoHighlights =
+  "Hungarian film, Central European cinema and cultural events";
+
 export default VenueBlurb;

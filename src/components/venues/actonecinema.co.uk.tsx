@@ -25,4 +25,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community-driven independent in Acton";
+export const seoHighlights =
+  "arthouse, independent films and family screenings";
+
 export default VenueBlurb;

@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "free local history museum in Islington";
+export const seoHighlights =
+  "heritage screenings, local history films and community events";
+
 export default VenueBlurb;

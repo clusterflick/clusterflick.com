@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hammersmith hub for Irish culture";
+export const seoHighlights =
+  "Irish film, classic and contemporary works and live events";
+
 export default VenueBlurb;

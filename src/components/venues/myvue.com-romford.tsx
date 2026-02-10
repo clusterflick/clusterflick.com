@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex at The Brewery, Romford";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

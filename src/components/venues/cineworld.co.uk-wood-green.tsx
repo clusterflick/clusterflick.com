@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "north London multiplex on the High Road";
+export const seoHighlights = "blockbusters, mainstream films and new releases";
+
 export default VenueBlurb;

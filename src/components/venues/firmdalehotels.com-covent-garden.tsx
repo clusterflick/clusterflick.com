@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "private screening room in theatreland";
+export const seoHighlights =
+  "curated new releases, classic films and special screenings";
+
 export default VenueBlurb;

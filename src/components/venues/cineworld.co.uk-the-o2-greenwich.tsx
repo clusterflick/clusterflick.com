@@ -23,4 +23,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "IMAX, 4DX and ScreenX at The O2";
+export const seoHighlights = "blockbusters, IMAX, 4DX and ScreenX formats";
+
 export default VenueBlurb;

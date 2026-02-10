@@ -23,4 +23,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "the original 1933 Hampstead village cinema";
+export const seoHighlights =
+  "arthouse classics, independent films and repertory screenings";
+
 export default VenueBlurb;

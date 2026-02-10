@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "German cultural institute in South Kensington";
+export const seoHighlights =
+  "German-language films, themed seasons and subtitled classics";
+
 export default VenueBlurb;

@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema inside Oxford Street Selfridges";
+export const seoHighlights = "new releases, independent films and classics";
+
 export default VenueBlurb;

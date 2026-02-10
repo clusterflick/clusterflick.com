@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "intimate independent cinema in Clerkenwell";
+export const seoHighlights =
+  "new releases, arthouse, independent and classic films";
+
 export default VenueBlurb;

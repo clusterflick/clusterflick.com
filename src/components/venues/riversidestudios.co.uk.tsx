@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hammersmith arts complex with cinema screens";
+export const seoHighlights =
+  "mainstream, independent, arthouse and classic films";
+
 export default VenueBlurb;

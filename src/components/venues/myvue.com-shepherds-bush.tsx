@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "west London multiplex in West 12 Centre";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "immersive West End cinema bar";
+export const seoHighlights =
+  "immersive screenings, themed cocktails and interactive film events";
+
 export default VenueBlurb;

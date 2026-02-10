@@ -23,4 +23,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "flagship Picturehouse near Piccadilly Circus";
+export const seoHighlights =
+  "indie films, premieres, documentaries and Q&A events";
+
 export default VenueBlurb;

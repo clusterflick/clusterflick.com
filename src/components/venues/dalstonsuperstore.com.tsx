@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "LGBTQ+ bar and cultural space in Dalston";
+export const seoHighlights =
+  "queer film screenings, club nights and live events";
+
 export default VenueBlurb;

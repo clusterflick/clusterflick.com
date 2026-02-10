@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "cinema and library combo in West Norwood";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and family screenings";
+
 export default VenueBlurb;

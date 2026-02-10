@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Kensington Czech cultural embassy venue";
+export const seoHighlights =
+  "Czech film, Central European cinema and subtitled classics";
+
 export default VenueBlurb;

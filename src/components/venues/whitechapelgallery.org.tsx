@@ -13,4 +13,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "pioneering contemporary art gallery in east London";
+export const seoHighlights =
+  "artists\' film, experimental work and exhibition screenings";
+
 export default VenueBlurb;

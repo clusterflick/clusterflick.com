@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Bromley multiscreen multiplex cinema";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

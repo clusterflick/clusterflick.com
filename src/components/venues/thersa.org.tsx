@@ -13,4 +13,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "historic Strand venue with basement screening room";
+export const seoHighlights =
+  "festival screenings, premieres and special events";
+
 export default VenueBlurb;

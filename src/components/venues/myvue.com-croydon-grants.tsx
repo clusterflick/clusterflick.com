@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "mainstream multiplex on Croydon High Street";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

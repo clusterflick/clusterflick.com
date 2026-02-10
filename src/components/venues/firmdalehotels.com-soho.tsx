@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury Soho hotel screening room";
+export const seoHighlights =
+  "new releases, classic films and film club suppers";
+
 export default VenueBlurb;

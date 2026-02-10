@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "creative studio and cinema in Peckham";
+export const seoHighlights = "community screenings, workshops and talks";
+
 export default VenueBlurb;

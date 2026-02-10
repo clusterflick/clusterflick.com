@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "flagship West End cinema off Leicester Square";
+export const seoHighlights = "premieres, blockbusters and new releases";
+
 export default VenueBlurb;

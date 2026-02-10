@@ -24,4 +24,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hackney Wick cult cinema pub night";
+export const seoHighlights = "cult classics, horror and queer cinema";
+
 export default VenueBlurb;

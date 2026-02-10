@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Holocaust archive and library in Bloomsbury";
+export const seoHighlights =
+  "documentaries, historical drama and remembrance screenings";
+
 export default VenueBlurb;

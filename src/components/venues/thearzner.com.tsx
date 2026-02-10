@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent cinema in Bermondsey";
+export const seoHighlights = "new releases, arthouse and classic films";
+
 export default VenueBlurb;

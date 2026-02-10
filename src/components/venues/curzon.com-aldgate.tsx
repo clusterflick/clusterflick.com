@@ -21,4 +21,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema in east London";
+export const seoHighlights = "independent, foreign-language and Q&A events";
+
 export default VenueBlurb;

@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "private screening venue in Soho";
+export const seoHighlights = "press screenings, previews and industry events";
+
 export default VenueBlurb;

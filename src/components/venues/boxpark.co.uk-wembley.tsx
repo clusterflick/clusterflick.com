@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Wembley street food and events venue";
+export const seoHighlights =
+  "outdoor screenings, live events and pop-up cinema";
+
 export default VenueBlurb;

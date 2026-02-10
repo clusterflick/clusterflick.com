@@ -29,4 +29,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Kennington museum of cinema history";
+export const seoHighlights =
+  "silent films, vintage projections and cinema heritage events";
+
 export default VenueBlurb;

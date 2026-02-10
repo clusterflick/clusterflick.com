@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "UCL Bloomsbury campus screening venue";
+export const seoHighlights = "academic screenings and public engagement events";
+
 export default VenueBlurb;

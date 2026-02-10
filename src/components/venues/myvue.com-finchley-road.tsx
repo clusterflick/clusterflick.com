@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "north London multiplex at the O2 Centre";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

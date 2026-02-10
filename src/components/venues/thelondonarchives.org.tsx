@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Clerkenwell public archive with film events";
+export const seoHighlights =
+  "archival screenings, London history and documentary events";
+
 export default VenueBlurb;

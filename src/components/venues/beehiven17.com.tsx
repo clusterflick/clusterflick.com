@@ -27,4 +27,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Tottenham pub hosting community cinema";
+export const seoHighlights =
+  "indie shorts, classic films and the Tottenham Film Festival";
+
 export default VenueBlurb;

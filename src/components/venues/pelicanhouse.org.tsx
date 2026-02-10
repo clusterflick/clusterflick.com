@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Bethnal Green";
+export const seoHighlights =
+  "community screenings, cultural events and local programming";
+
 export default VenueBlurb;

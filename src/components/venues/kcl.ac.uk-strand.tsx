@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Strand campus university screenings";
+export const seoHighlights =
+  "film society screenings, public events and academic programming";
+
 export default VenueBlurb;

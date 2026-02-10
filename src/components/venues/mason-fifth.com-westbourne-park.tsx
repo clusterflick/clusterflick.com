@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Westbourne Park co-living community space";
+export const seoHighlights =
+  "community screenings, social events and cultural programming";
+
 export default VenueBlurb;

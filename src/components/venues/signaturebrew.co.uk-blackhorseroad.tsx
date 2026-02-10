@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Walthamstow brewery taproom cinema";
+export const seoHighlights = "film screenings, craft beer and cultural events";
+
 export default VenueBlurb;

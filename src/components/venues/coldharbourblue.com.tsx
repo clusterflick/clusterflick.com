@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "independent community cinema in Loughborough Junction";
+export const seoHighlights = "arthouse, classic films and live cultural events";
+
 export default VenueBlurb;

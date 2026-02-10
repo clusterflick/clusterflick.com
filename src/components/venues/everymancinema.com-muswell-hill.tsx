@@ -21,4 +21,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Muswell Hill community boutique cinema";
+export const seoHighlights = "new releases, arthouse picks and in-seat drinks";
+
 export default VenueBlurb;

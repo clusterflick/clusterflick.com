@@ -30,4 +30,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Knightsbridge Austrian cultural institute";
+export const seoHighlights =
+  "Austrian cinema, documentaries and experimental works";
+
 export default VenueBlurb;

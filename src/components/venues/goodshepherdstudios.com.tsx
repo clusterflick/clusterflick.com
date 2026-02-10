@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Leytonstone";
+export const seoHighlights = "independent, classic and mainstream films";
+
 export default VenueBlurb;

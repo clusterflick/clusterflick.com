@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "pioneering arts centre on The Mall";
+export const seoHighlights =
+  "experimental, avant-garde, world cinema and filmmaker Q&As";
+
 export default VenueBlurb;

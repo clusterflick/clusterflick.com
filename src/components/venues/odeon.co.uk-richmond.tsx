@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "southwest London multiplex in Richmond";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

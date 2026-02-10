@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "leafy Belsize Park boutique cinema";
+export const seoHighlights =
+  "mainstream releases, arthouse picks and sofa seating";
+
 export default VenueBlurb;

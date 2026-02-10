@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe cinema in west London";
+export const seoHighlights = "blockbusters, recliner seating and new releases";
+
 export default VenueBlurb;

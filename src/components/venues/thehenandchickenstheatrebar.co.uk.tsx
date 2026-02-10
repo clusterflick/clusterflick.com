@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Highbury fringe theatre pub with screenings";
+export const seoHighlights = "film screenings, theatre and live comedy";
+
 export default VenueBlurb;

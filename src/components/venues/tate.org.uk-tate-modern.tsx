@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "South Bank modern art gallery";
+export const seoHighlights = "experimental, avant-garde and artist-led film";
+
 export default VenueBlurb;

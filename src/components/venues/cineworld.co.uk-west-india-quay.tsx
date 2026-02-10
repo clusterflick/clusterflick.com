@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Docklands multiplex near Canary Wharf";
+export const seoHighlights = "blockbusters, new releases and mainstream cinema";
+
 export default VenueBlurb;

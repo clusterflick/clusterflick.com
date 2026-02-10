@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "national gallery of British art in Pimlico";
+export const seoHighlights =
+  "artist film, exhibition tie-ins and moving-image events";
+
 export default VenueBlurb;

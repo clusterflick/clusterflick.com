@@ -10,4 +10,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "creative space in Shoreditch";
+export const seoHighlights = "cultural events and occasional film screenings";
+
 export default VenueBlurb;

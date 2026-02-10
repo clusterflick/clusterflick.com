@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema in historic Barnes studios";
+export const seoHighlights =
+  "new releases, arthouse, classics and special screenings";
+
 export default VenueBlurb;

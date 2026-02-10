@@ -21,4 +21,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema near Borough Market";
+export const seoHighlights = "new releases, independent films and cocktail bar";
+
 export default VenueBlurb;

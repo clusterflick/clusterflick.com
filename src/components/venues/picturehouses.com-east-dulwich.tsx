@@ -20,4 +20,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "intimate Picturehouse cafe-cinema in East Dulwich";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and family screenings";
+
 export default VenueBlurb;

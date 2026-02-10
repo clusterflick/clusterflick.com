@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Nunhead community centre with film screenings";
+export const seoHighlights = "community screenings and local cultural events";
+
 export default VenueBlurb;

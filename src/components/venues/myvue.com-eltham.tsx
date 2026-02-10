@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex on Eltham High Street";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

@@ -16,4 +16,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe and Dine cinema in Islington";
+export const seoHighlights =
+  "blockbusters, in-seat dining and recliner seating";
+
 export default VenueBlurb;

@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hampton performing arts venue and local cinema";
+export const seoHighlights = "film screenings, live theatre and comedy";
+
 export default VenueBlurb;

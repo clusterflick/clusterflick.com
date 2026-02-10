@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "UEL Stratford campus with public screenings";
+export const seoHighlights = "public film screenings and university events";
+
 export default VenueBlurb;

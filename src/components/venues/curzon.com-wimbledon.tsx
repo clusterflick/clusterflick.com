@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema on The Broadway, Wimbledon";
+export const seoHighlights = "independent, world cinema and special screenings";
+
 export default VenueBlurb;

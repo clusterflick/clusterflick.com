@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "hi-fi audio showroom in Fitzrovia";
+export const seoHighlights =
+  "film screenings, listening sessions and audiovisual events";
+
 export default VenueBlurb;

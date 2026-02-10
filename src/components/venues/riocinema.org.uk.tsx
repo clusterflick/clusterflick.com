@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "beloved independent Art Deco cinema in Dalston";
+export const seoHighlights =
+  "indie, arthouse, world cinema and community events";
+
 export default VenueBlurb;

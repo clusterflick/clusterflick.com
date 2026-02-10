@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "historic single-screen cinema in East Finchley";
+export const seoHighlights = "arthouse, classics, world cinema and Q&A events";
+
 export default VenueBlurb;

@@ -25,4 +25,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "giant IMAX screen in Waterloo";
+export const seoHighlights = "blockbusters, 70mm IMAX and nature docs";
+
 export default VenueBlurb;

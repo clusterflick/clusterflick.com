@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "art university campus in Battersea";
+export const seoHighlights = "moving image, animation and fine art screenings";
+
 export default VenueBlurb;

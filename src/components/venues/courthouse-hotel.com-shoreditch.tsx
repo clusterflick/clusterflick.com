@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique hotel screening room on Old Street";
+export const seoHighlights =
+  "private screenings, luxury seating and hotel events";
+
 export default VenueBlurb;

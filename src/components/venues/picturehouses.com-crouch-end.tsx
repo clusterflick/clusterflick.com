@@ -19,4 +19,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent-minded Crouch End arthouse";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and community screenings";
+
 export default VenueBlurb;

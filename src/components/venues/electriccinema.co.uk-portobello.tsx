@@ -20,4 +20,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "iconic luxury cinema on Portobello Road since 1910";
+export const seoHighlights =
+  "new releases, arthouse films and luxury armchair seating";
+
 export default VenueBlurb;

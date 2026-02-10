@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Cambridge Heath museum with film screenings";
+export const seoHighlights =
+  "feminist film, documentary screenings and cultural events";
+
 export default VenueBlurb;

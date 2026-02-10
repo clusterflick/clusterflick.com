@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Barking Riverside community hub";
+export const seoHighlights = "community screenings and local events";
+
 export default VenueBlurb;

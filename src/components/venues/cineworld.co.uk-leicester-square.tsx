@@ -25,4 +25,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "flagship West End premiere destination";
+export const seoHighlights =
+  "IMAX with Laser, 4DX, ScreenX and global premieres";
+
 export default VenueBlurb;

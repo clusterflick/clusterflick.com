@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community centre in Thamesmead";
+export const seoHighlights = "community screenings and local events";
+
 export default VenueBlurb;

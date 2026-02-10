@@ -12,4 +12,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "free community cinema at Queen Elizabeth Olympic Park";
+export const seoHighlights =
+  "free screenings, low-cost films and community events";
+
 export default VenueBlurb;

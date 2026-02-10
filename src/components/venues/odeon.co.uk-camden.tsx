@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex on The Parkway in Camden";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

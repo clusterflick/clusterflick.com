@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "retro Hackney bar and events venue";
+export const seoHighlights = "film screenings, live music and cultural events";
+
 export default VenueBlurb;

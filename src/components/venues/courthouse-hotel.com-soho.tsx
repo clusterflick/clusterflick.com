@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "former magistrates court screening room in Soho";
+export const seoHighlights =
+  "private screenings, luxury cinema and hotel events";
+
 export default VenueBlurb;

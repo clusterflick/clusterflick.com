@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "New Cross community centre";
+export const seoHighlights = "community screenings, arts and culture";
+
 export default VenueBlurb;

@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "UCL Eastern European studies screening room";
+export const seoHighlights =
+  "Central European, Eastern European and Russian cinema";
+
 export default VenueBlurb;

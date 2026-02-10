@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Sydenham";
+export const seoHighlights = "independent, classic and world films";
+
 export default VenueBlurb;

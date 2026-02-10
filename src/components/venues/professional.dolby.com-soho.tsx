@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "state-of-the-art screening room on Soho Square";
+export const seoHighlights = "Dolby Atmos, Dolby Vision and industry previews";
+
 export default VenueBlurb;

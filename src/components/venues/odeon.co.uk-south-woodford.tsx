@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex on South Woodford High Road";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

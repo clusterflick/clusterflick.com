@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "modern arthouse cinema near Victoria station";
+export const seoHighlights =
+  "independent, documentary and foreign-language films";
+
 export default VenueBlurb;

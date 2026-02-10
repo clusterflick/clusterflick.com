@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "southwest London multiplex near Fulham Road";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

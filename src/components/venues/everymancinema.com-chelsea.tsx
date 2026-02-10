@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "stylish King's Road boutique cinema";
+export const seoHighlights = "new releases, arthouse films and sofa seating";
+
 export default VenueBlurb;

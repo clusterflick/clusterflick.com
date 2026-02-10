@@ -18,4 +18,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "independent Hackney cinema in a converted church";
+export const seoHighlights =
+  "new releases, arthouse, classics and community screenings";
+
 export default VenueBlurb;

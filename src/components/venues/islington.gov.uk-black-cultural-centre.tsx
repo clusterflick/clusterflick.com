@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Islington Black culture community centre";
+export const seoHighlights =
+  "culturally focused screenings, exhibitions and community events";
+
 export default VenueBlurb;

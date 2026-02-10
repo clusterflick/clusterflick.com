@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "floating hotel at Royal Victoria Dock";
+export const seoHighlights =
+  "community screenings, cultural events and social enterprise cinema";
+
 export default VenueBlurb;

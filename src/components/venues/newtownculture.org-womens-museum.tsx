@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "museum and cultural space in Barking";
+export const seoHighlights = "film screenings, talks and workshops";
+
 export default VenueBlurb;

@@ -21,4 +21,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Docklands boutique sofa cinema";
+export const seoHighlights =
+  "new releases, independent films and in-seat drinks";
+
 export default VenueBlurb;

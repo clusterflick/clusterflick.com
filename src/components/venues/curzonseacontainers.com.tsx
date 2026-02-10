@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "South Bank arthouse cinema near Blackfriars";
+export const seoHighlights = "independent, documentary and world cinema";
+
 export default VenueBlurb;

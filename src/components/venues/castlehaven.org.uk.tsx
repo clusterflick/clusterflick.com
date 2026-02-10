@@ -27,4 +27,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "free community cinema in Camden";
+export const seoHighlights =
+  "world cinema, documentaries and award-winning international films";
+
 export default VenueBlurb;

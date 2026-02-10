@@ -20,4 +20,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique Marylebone sofa cinema";
+export const seoHighlights = "new releases, arthouse films and in-seat dining";
+
 export default VenueBlurb;

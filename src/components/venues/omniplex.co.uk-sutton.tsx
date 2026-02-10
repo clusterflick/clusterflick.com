@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex in St Nicholas Centre, Sutton";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

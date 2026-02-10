@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "high street multiplex in Beckenham";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "north London leisure park multiplex";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

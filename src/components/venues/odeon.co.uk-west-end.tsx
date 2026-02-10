@@ -19,4 +19,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe cinema on Leicester Square";
+export const seoHighlights = "blockbusters, premium screens and new releases";
+
 export default VenueBlurb;

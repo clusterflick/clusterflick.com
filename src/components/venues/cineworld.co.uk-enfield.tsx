@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Enfield multiplex with IMAX";
+export const seoHighlights = "blockbusters, IMAX screenings and new releases";
+
 export default VenueBlurb;

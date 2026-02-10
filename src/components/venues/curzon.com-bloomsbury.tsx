@@ -22,4 +22,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema in the Brunswick Centre";
+export const seoHighlights =
+  "independent, documentary and foreign-language films";
+
 export default VenueBlurb;

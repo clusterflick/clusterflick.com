@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Spitalfields food hall and events space";
+export const seoHighlights = "cinema events, street food and social screenings";
+
 export default VenueBlurb;

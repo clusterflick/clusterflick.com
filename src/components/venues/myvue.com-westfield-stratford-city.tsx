@@ -17,4 +17,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "multiplex at Westfield Stratford near Olympic Park";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

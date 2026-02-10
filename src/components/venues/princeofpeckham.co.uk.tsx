@@ -12,4 +12,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "rooftop pub with occasional screenings in Peckham";
+export const seoHighlights =
+  "pop-up screenings, live music and cultural events";
+
 export default VenueBlurb;

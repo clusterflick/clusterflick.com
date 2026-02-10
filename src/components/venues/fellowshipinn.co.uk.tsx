@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Grade II listed Bellingham community cinema";
+export const seoHighlights =
+  "mainstream films, independent picks and classic screenings";
+
 export default VenueBlurb;

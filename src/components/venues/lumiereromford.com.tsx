@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent Romford multiscreen cinema";
+export const seoHighlights = "new releases, Bollywood films and popular titles";
+
 export default VenueBlurb;

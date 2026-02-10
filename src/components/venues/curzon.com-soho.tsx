@@ -23,4 +23,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "West End arthouse cinema on Shaftesbury Avenue";
+export const seoHighlights =
+  "premieres, independent cinema and filmmaker events";
+
 export default VenueBlurb;

@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "South Kensington university campus screenings";
+export const seoHighlights =
+  "public screenings, student film society events and cultural programmes";
+
 export default VenueBlurb;

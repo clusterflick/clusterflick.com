@@ -22,4 +22,9 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "legendary independent cinema off Leicester Square";
+export const seoHighlights =
+  "cult classics, sing-alongs, marathons and double bills";
+
 export default VenueBlurb;

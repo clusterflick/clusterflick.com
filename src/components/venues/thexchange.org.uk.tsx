@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Maida Vale";
+export const seoHighlights =
+  "accessible community screenings and local film events";
+
 export default VenueBlurb;

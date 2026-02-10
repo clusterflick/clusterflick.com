@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique south London sofa cinema";
+export const seoHighlights =
+  "new releases, independent films and in-seat dining";
+
 export default VenueBlurb;

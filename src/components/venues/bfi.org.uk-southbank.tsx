@@ -25,4 +25,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "world-leading four-screen film venue";
+export const seoHighlights =
+  "restored classics, international arthouse and film festivals";
+
 export default VenueBlurb;

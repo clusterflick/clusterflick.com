@@ -17,4 +17,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury independent cinema in Covent Garden";
+export const seoHighlights =
+  "arthouse, world cinema, documentaries and new releases";
+
 export default VenueBlurb;

@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Sutton community centre with regular screenings";
+export const seoHighlights = "community film screenings and local events";
+
 export default VenueBlurb;

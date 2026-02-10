@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "central London multiplex near the West End";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

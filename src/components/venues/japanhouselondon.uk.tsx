@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Kensington Japanese cultural centre";
+export const seoHighlights =
+  "Japanese cinema classics, contemporary works and free screenings";
+
 export default VenueBlurb;

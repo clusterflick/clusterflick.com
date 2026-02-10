@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "intimate Maida Vale neighbourhood cinema";
+export const seoHighlights =
+  "mainstream releases, independent films and sofa seating";
+
 export default VenueBlurb;

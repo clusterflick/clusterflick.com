@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "experimental film centre in Shoreditch";
+export const seoHighlights =
+  "avant-garde, world cinema and rare underseen films";
+
 export default VenueBlurb;

@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "riverside community cinema in Barking";
+export const seoHighlights = "independent, international and documentary films";
+
 export default VenueBlurb;

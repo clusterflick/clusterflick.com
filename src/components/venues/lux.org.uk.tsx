@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "north London moving image arts agency";
+export const seoHighlights =
+  "experimental film, avant-garde and artists\' moving image";
+
 export default VenueBlurb;

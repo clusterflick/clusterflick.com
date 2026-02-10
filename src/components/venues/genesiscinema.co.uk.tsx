@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "affordable independent Whitechapel cinema";
+export const seoHighlights =
+  "new releases, Bollywood, world cinema and film festivals";
+
 export default VenueBlurb;

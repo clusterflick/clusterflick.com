@@ -21,4 +21,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "historic West End cinema since 1896";
+export const seoHighlights = "arthouse, classic, world cinema and Q&A events";
+
 export default VenueBlurb;

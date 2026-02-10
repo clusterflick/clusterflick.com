@@ -25,4 +25,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent Crouch End arthouse";
+export const seoHighlights =
+  "arthouse, short films and local filmmaker showcases";
+
 export default VenueBlurb;

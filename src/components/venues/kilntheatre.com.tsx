@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Kilburn fringe theatre and cinema";
+export const seoHighlights =
+  "independent, arthouse, world cinema and documentaries";
+
 export default VenueBlurb;

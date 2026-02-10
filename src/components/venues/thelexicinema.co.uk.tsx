@@ -18,4 +18,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "charity-run independent cinema in Kensal Rise";
+export const seoHighlights =
+  "new releases, indie films, classics and family screenings";
+
 export default VenueBlurb;

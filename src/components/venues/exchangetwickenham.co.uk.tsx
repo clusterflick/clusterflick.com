@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Twickenham community arts and cinema venue";
+export const seoHighlights =
+  "mainstream films, indie picks and classic screenings";
+
 export default VenueBlurb;

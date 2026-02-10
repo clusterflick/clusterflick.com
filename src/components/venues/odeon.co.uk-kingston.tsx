@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex in Kingston upon Thames";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

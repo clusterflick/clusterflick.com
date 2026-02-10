@@ -18,4 +18,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "affordable independent multiplex in Peckham";
+export const seoHighlights =
+  "new releases, Bollywood, world cinema and indie films";
+
 export default VenueBlurb;

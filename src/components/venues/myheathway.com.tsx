@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Dagenham community space at Heathway Mall";
+export const seoHighlights =
+  "community screenings and accessible local cinema events";
+
 export default VenueBlurb;

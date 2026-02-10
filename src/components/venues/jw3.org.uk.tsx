@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Finchley Road Jewish cultural centre cinema";
+export const seoHighlights =
+  "arthouse, world cinema, Israeli film and themed seasons";
+
 export default VenueBlurb;

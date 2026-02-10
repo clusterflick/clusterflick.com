@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "intimate Rotherhithe film studio and cinema";
+export const seoHighlights =
+  "independent, classic, documentary and world cinema";
+
 export default VenueBlurb;

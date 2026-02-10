@@ -19,4 +19,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema at City North, Finsbury Park";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and Q&A events";
+
 export default VenueBlurb;

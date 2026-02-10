@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "South Kensington French cultural cinema";
+export const seoHighlights =
+  "French-language film, arthouse, world cinema and themed seasons";
+
 export default VenueBlurb;

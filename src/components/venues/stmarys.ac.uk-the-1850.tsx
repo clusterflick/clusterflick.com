@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "student union venue in Twickenham";
+export const seoHighlights = "university screenings and community events";
+
 export default VenueBlurb;

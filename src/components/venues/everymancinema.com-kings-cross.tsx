@@ -23,4 +23,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique cinema at Coal Drops Yard";
+export const seoHighlights = "new releases, arthouse films and in-seat dining";
+
 export default VenueBlurb;

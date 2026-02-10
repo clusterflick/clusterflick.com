@@ -18,4 +18,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "rooftop cinema at Battersea Power Station";
+export const seoHighlights =
+  "classic films, rooftop dining and seasonal pop-ups";
+
 export default VenueBlurb;

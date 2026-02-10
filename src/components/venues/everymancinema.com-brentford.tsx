@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "boutique west London sofa cinema";
+export const seoHighlights =
+  "mainstream releases, arthouse films and in-seat dining";
+
 export default VenueBlurb;

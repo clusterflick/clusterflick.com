@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "dance and arts space near Elephant and Castle";
+export const seoHighlights = "moving-image events, dance film and video art";
+
 export default VenueBlurb;

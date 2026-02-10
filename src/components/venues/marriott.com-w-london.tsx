@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury Leicester Square hotel screening room";
+export const seoHighlights =
+  "private screenings, premium events and intimate cinema experiences";
+
 export default VenueBlurb;

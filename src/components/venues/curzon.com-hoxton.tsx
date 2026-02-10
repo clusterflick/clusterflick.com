@@ -21,4 +21,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema on Pitfield Street, Hoxton";
+export const seoHighlights = "independent, documentary and world cinema";
+
 export default VenueBlurb;

@@ -19,4 +19,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "volunteer-run community cinema in Croydon";
+export const seoHighlights = "arthouse, classic films and world cinema";
+
 export default VenueBlurb;

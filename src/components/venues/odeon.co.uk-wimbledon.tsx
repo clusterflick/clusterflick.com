@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex on Wimbledon Broadway";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

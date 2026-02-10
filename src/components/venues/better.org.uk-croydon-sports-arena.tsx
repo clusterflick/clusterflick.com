@@ -16,4 +16,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Croydon sports venue with occasional screenings";
+export const seoHighlights = "documentaries, community films and themed events";
+
 export default VenueBlurb;

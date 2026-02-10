@@ -19,4 +19,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe cinema in the West End";
+export const seoHighlights = "blockbusters, recliner seating and new releases";
+
 export default VenueBlurb;

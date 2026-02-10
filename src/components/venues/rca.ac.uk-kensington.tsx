@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "art university campus in Kensington";
+export const seoHighlights = "moving image, animation and cultural events";
+
 export default VenueBlurb;

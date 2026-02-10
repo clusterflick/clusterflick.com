@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "north London multiplex at Hollywood Green";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

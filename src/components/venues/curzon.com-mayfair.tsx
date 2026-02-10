@@ -24,4 +24,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "historic flagship cinema since 1934";
+export const seoHighlights = "premieres, independent film and filmmaker Q&As";
+
 export default VenueBlurb;

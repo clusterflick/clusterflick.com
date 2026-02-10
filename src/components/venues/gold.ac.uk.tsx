@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "New Cross university arts venue";
+export const seoHighlights =
+  "film screenings, cultural events and academic talks";
+
 export default VenueBlurb;

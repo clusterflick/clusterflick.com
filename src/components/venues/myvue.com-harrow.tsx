@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "northwest London multiplex in Harrow";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

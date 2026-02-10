@@ -12,4 +12,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent Walthamstow high street cinema";
+export const seoHighlights =
+  "new releases, Bollywood films and independent cinema";
+
 export default VenueBlurb;

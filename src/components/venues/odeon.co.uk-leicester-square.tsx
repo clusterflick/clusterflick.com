@@ -22,4 +22,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "iconic flagship premiere cinema since 1937";
+export const seoHighlights = "premieres, blockbusters and premium Luxe screens";
+
 export default VenueBlurb;

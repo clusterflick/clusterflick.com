@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Haggerston pub with film screenings";
+export const seoHighlights =
+  "community screenings, cultural events and pub nights";
+
 export default VenueBlurb;

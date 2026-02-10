@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "premium Luxe cinema in The Chimes, Uxbridge";
+export const seoHighlights =
+  "blockbusters, recliner seating and premium comfort";
+
 export default VenueBlurb;

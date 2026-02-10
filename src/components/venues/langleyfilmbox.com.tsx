@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "volunteer-run Beckenham community cinema";
+export const seoHighlights = "mainstream, independent and classic films";
+
 export default VenueBlurb;

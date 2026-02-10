@@ -29,4 +29,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "members-only BFI screening rooms";
+export const seoHighlights =
+  "exclusive previews, member screenings and festival events";
+
 export default VenueBlurb;

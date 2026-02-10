@@ -16,4 +16,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription =
+  "southwest London multiplex on Wandsworth High Street";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

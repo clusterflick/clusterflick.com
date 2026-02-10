@@ -10,4 +10,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Dalston bar with occasional screenings";
+export const seoHighlights = "film screenings and cultural events";
+
 export default VenueBlurb;

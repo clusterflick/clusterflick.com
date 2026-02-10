@@ -13,4 +13,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community arts venue in Enfield";
+export const seoHighlights = "mainstream, independent and classic films";
+
 export default VenueBlurb;

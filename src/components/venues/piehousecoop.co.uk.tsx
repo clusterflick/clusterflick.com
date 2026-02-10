@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Deptford";
+export const seoHighlights = "community screenings and locally curated films";
+
 export default VenueBlurb;

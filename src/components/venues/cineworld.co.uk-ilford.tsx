@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Ilford multiplex cinema";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

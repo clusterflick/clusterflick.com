@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "biomedical research centre near St Pancras";
+export const seoHighlights =
+  "science-themed screenings and public engagement events";
+
 export default VenueBlurb;

@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "underground arts venue in Bloomsbury";
+export const seoHighlights = "experimental, cult and underground film";
+
 export default VenueBlurb;

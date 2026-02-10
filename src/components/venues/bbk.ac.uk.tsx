@@ -28,4 +28,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Bloomsbury university film programme";
+export const seoHighlights =
+  "rare prints, international cinema and academic film seasons";
+
 export default VenueBlurb;

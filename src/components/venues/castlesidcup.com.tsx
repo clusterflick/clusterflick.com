@@ -30,4 +30,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "independent community cinema in Sidcup";
+export const seoHighlights = "new releases, indie films and cult classics";
+
 export default VenueBlurb;

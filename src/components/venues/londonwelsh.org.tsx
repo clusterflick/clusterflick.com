@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Welsh cultural centre near King\'s Cross";
+export const seoHighlights =
+  "Welsh-language film, cultural screenings and community events";
+
 export default VenueBlurb;

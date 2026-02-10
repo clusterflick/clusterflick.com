@@ -19,4 +19,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema in the Ealing Filmworks";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and special screenings";
+
 export default VenueBlurb;

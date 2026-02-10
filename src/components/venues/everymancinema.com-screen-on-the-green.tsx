@@ -22,4 +22,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "historic 1913 Islington single-screen cinema";
+export const seoHighlights =
+  "mainstream releases, independent films and classic screenings";
+
 export default VenueBlurb;

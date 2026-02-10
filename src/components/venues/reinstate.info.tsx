@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community venue in Silvertown";
+export const seoHighlights = "community screenings and cultural events";
+
 export default VenueBlurb;

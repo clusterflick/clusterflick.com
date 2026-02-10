@@ -27,4 +27,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "luxury private screening room in Knightsbridge";
+export const seoHighlights = "private screenings, premieres and classic films";
+
 export default VenueBlurb;

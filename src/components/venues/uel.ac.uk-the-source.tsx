@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "UEL Stratford creative and performance space";
+export const seoHighlights = "film screenings and cultural events";
+
 export default VenueBlurb;

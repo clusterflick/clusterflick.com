@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "intimate Picturehouse on Notting Hill Gate";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and Q&A events";
+
 export default VenueBlurb;

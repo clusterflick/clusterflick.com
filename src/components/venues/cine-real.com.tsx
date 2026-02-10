@@ -33,4 +33,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "16mm film club in Homerton";
+export const seoHighlights =
+  "rare 16mm prints, classic Hollywood and arthouse gems";
+
 export default VenueBlurb;

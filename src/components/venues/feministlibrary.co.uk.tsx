@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "feminist library and cultural space in Peckham";
+export const seoHighlights = "feminist film screenings, talks and workshops";
+
 export default VenueBlurb;

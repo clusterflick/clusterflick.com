@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Peckham cafe-bar on Rye Lane";
+export const seoHighlights = "film screenings and local cultural events";
+
 export default VenueBlurb;

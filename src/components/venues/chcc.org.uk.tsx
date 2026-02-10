@@ -17,4 +17,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "East London community centre cinema";
+export const seoHighlights =
+  "independent films, documentaries and filmmaker Q&As";
+
 export default VenueBlurb;

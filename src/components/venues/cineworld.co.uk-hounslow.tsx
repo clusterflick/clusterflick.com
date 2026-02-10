@@ -15,4 +15,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Hounslow multiplex cinema";
+export const seoHighlights = "blockbusters, new releases and Bollywood films";
+
 export default VenueBlurb;

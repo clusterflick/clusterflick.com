@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema near the Thames in Richmond";
+export const seoHighlights =
+  "independent, foreign-language films and Q&A events";
+
 export default VenueBlurb;

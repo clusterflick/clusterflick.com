@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "historic Hammersmith Art Deco concert hall";
+export const seoHighlights =
+  "live event screenings, concerts and classic film revivals";
+
 export default VenueBlurb;

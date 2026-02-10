@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "intimate De Beauvoir Town community cinema";
+export const seoHighlights = "international, subtitled and world cinema";
+
 export default VenueBlurb;

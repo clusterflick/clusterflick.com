@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Feltham multiplex cinema";
+export const seoHighlights =
+  "mainstream blockbusters, new releases and family films";
+
 export default VenueBlurb;

@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Walthamstow civic venue with film screenings";
+export const seoHighlights = "community screenings and borough cultural events";
+
 export default VenueBlurb;

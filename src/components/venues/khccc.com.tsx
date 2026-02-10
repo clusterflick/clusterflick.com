@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Dagenham community centre screenings";
+export const seoHighlights =
+  "affordable community cinema and family-friendly screenings";
+
 export default VenueBlurb;

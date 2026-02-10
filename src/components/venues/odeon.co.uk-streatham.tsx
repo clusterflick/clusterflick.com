@@ -14,4 +14,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "south London multiplex on Streatham High Road";
+export const seoHighlights = "blockbusters, new releases and popular films";
+
 export default VenueBlurb;

@@ -29,4 +29,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "immersive pop-up cinema experience";
+export const seoHighlights =
+  "cult classics, blockbusters and seasonal favourites";
+
 export default VenueBlurb;

@@ -15,4 +15,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Vauxhall eco workspace and screening venue";
+export const seoHighlights =
+  "documentaries, activist cinema and socially engaged films";
+
 export default VenueBlurb;

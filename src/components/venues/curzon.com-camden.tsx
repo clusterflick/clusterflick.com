@@ -20,4 +20,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema in vibrant Camden Town";
+export const seoHighlights =
+  "independent, foreign-language films and special screenings";
+
 export default VenueBlurb;

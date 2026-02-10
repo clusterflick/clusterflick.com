@@ -14,4 +14,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "1950s ballroom in Crofton Park";
+export const seoHighlights =
+  "occasional screenings in an atmospheric ballroom setting";
+
 export default VenueBlurb;

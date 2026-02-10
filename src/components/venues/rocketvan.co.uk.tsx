@@ -12,4 +12,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "cafe and bar in Walworth";
+export const seoHighlights = "community screenings and cultural events";
+
 export default VenueBlurb;

@@ -27,4 +27,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "five-screen independent on Chiswick High Road";
+export const seoHighlights =
+  "new releases, filmed performances and curated seasons";
+
 export default VenueBlurb;

@@ -22,4 +22,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "City of London boutique cinema";
+export const seoHighlights =
+  "after-work screenings, new releases and arthouse films";
+
 export default VenueBlurb;

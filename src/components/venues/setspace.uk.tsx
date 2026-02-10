@@ -11,4 +11,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "community cinema in Peckham";
+export const seoHighlights =
+  "community-led screenings and cultural programming";
+
 export default VenueBlurb;

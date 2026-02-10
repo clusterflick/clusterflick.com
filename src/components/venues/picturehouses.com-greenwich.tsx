@@ -19,4 +19,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "arthouse cinema on Greenwich High Road";
+export const seoHighlights =
+  "indie films, foreign language, documentaries and community screenings";
+
 export default VenueBlurb;

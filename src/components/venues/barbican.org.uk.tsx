@@ -29,4 +29,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "three-screen arthouse in the Barbican Centre";
+export const seoHighlights =
+  "arthouse, world cinema and director retrospectives";
+
 export default VenueBlurb;

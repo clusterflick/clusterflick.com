@@ -16,4 +16,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Paddington journalism club and screening venue";
+export const seoHighlights =
+  "documentaries, global affairs films and filmmaker Q&As";
+
 export default VenueBlurb;

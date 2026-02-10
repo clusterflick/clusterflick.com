@@ -11,4 +11,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Leyton pub with occasional film screenings";
+export const seoHighlights = "film screenings and local arts events";
+
 export default VenueBlurb;

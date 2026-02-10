@@ -17,4 +17,7 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "multiplex inside Westfield London, west London";
+export const seoHighlights = "blockbusters, new releases and mainstream films";
+
 export default VenueBlurb;

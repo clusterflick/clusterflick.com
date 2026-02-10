@@ -13,4 +13,8 @@ function VenueBlurb() {
   );
 }
 
+export const seoDescription = "Deptford library community cinema club";
+export const seoHighlights =
+  "free and low-cost screenings, mainstream and classic films";
+
 export default VenueBlurb;
