@@ -11,6 +11,7 @@ import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
 import MoviePoster from "@/components/movie-poster";
+import StackedPoster from "@/components/stacked-poster";
 import { LetterboxdIcon, InstagramIcon, XIcon } from "@/components/icons";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
@@ -221,24 +222,44 @@ export default function VenueDetailPageContent({
           </a>
           {gridMovies.length > 0 && (
             <div className={styles.filmGrid}>
-              {gridMovies.map(({ movie }) => (
-                <Link
-                  key={movie.id}
-                  href={getMovieUrl(movie)}
-                  className={styles.filmGridLink}
-                >
-                  <MoviePoster
-                    posterPath={
-                      movie.posterPath ||
-                      movie.includedMovies?.find((m) => m.posterPath)
-                        ?.posterPath
-                    }
-                    title={movie.title}
-                    subtitle={movie.year}
-                    showOverlay
-                  />
-                </Link>
-              ))}
+              {gridMovies.map(({ movie }) => {
+                const includedMovies = movie.includedMovies;
+                const includedWithPosters =
+                  includedMovies?.filter((m) => m.posterPath) || [];
+                const totalPosters =
+                  (movie.posterPath ? 1 : 0) + includedWithPosters.length;
+                const useStackedPoster =
+                  includedMovies &&
+                  includedMovies.length > 1 &&
+                  totalPosters >= 2;
+
+                return (
+                  <Link
+                    key={movie.id}
+                    href={getMovieUrl(movie)}
+                    className={styles.filmGridLink}
+                  >
+                    {useStackedPoster ? (
+                      <StackedPoster
+                        mainPosterPath={movie.posterPath}
+                        mainTitle={movie.title}
+                        includedMovies={includedMovies}
+                        subtitle={movie.year}
+                        showOverlay
+                      />
+                    ) : (
+                      <MoviePoster
+                        posterPath={
+                          movie.posterPath || includedWithPosters[0]?.posterPath
+                        }
+                        title={movie.title}
+                        subtitle={movie.year}
+                        showOverlay
+                      />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </ContentSection>
