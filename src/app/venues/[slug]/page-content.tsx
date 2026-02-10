@@ -72,6 +72,7 @@ export interface VenueDetailPageContentProps {
   movieCount: number;
   performanceCount: number;
   gridMovies: { movie: Movie; performanceCount: number }[];
+  gridMoviesTruncated?: boolean;
   VenueBlurb: ComponentType | null;
   nearbyVenues: NearbyVenue[];
 }
@@ -84,6 +85,7 @@ export default function VenueDetailPageContent({
   movieCount,
   performanceCount,
   gridMovies,
+  gridMoviesTruncated,
   VenueBlurb,
   nearbyVenues,
 }: VenueDetailPageContentProps) {
@@ -237,45 +239,54 @@ export default function VenueDetailPageContent({
             Start exploring films at {venue.name}
           </a>
           {gridMovies.length > 0 && (
-            <div className={styles.filmGrid}>
-              {gridMovies.map(({ movie }) => {
-                const includedMovies = movie.includedMovies;
-                const includedWithPosters =
-                  includedMovies?.filter((m) => m.posterPath) || [];
-                const totalPosters =
-                  (movie.posterPath ? 1 : 0) + includedWithPosters.length;
-                const useStackedPoster =
-                  includedMovies &&
-                  includedMovies.length > 1 &&
-                  totalPosters >= 2;
+            <div
+              className={
+                gridMoviesTruncated
+                  ? styles.filmGridFadeWrapper
+                  : styles.filmGridWrapper
+              }
+            >
+              <div className={styles.filmGrid}>
+                {gridMovies.map(({ movie }) => {
+                  const includedMovies = movie.includedMovies;
+                  const includedWithPosters =
+                    includedMovies?.filter((m) => m.posterPath) || [];
+                  const totalPosters =
+                    (movie.posterPath ? 1 : 0) + includedWithPosters.length;
+                  const useStackedPoster =
+                    includedMovies &&
+                    includedMovies.length > 1 &&
+                    totalPosters >= 2;
 
-                return (
-                  <Link
-                    key={movie.id}
-                    href={getMovieUrl(movie)}
-                    className={styles.filmGridLink}
-                  >
-                    {useStackedPoster ? (
-                      <StackedPoster
-                        mainPosterPath={movie.posterPath}
-                        mainTitle={movie.title}
-                        includedMovies={includedMovies}
-                        subtitle={movie.year}
-                        showOverlay
-                      />
-                    ) : (
-                      <MoviePoster
-                        posterPath={
-                          movie.posterPath || includedWithPosters[0]?.posterPath
-                        }
-                        title={movie.title}
-                        subtitle={movie.year}
-                        showOverlay
-                      />
-                    )}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={movie.id}
+                      href={getMovieUrl(movie)}
+                      className={styles.filmGridLink}
+                    >
+                      {useStackedPoster ? (
+                        <StackedPoster
+                          mainPosterPath={movie.posterPath}
+                          mainTitle={movie.title}
+                          includedMovies={includedMovies}
+                          subtitle={movie.year}
+                          showOverlay
+                        />
+                      ) : (
+                        <MoviePoster
+                          posterPath={
+                            movie.posterPath ||
+                            includedWithPosters[0]?.posterPath
+                          }
+                          title={movie.title}
+                          subtitle={movie.year}
+                          showOverlay
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
         </ContentSection>

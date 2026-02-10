@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Beer Merchants Tap in Hackney Wick hosts BAR TRASH, a regular cult
         cinema night run by Token Homo that brings queer, cult, and curious
-        cinema to the pub&apos;s upstairs screening space. Events feature
+        cinema to the pub&apos;s backroom screening space. Events feature
         everything from blaxploitation classics and horror films to banned Video
         Nasties and cult favourites, all presented with themed drinks,
         introductions, intermissions, prize giveaways, and subtitles. The

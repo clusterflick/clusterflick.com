@@ -87,7 +87,9 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     return a.movie.normalizedTitle.localeCompare(b.movie.normalizedTitle);
   });
 
-  const gridMovies = venueMovies.slice(0, 72);
+  const GRID_MOVIE_LIMIT = 72;
+  const gridMovies = venueMovies.slice(0, GRID_MOVIE_LIMIT);
+  const gridMoviesTruncated = venueMovies.length > GRID_MOVIE_LIMIT;
 
   return {
     venue,
@@ -97,6 +99,7 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     movieCount,
     performanceCount,
     gridMovies,
+    gridMoviesTruncated,
   };
 }
 

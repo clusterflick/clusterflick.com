@@ -192,7 +192,9 @@ export default async function VenueDetailPage({
     return a.movie.title.localeCompare(b.movie.title);
   });
 
-  const gridMovies = venueMovies.slice(0, 72);
+  const GRID_MOVIE_LIMIT = 72;
+  const gridMovies = venueMovies.slice(0, GRID_MOVIE_LIMIT);
+  const gridMoviesTruncated = venueMovies.length > GRID_MOVIE_LIMIT;
 
   let VenueBlurb: ComponentType | null = null;
   try {
@@ -258,6 +260,7 @@ export default async function VenueDetailPage({
         movieCount={movieCount}
         performanceCount={performanceCount}
         gridMovies={gridMovies}
+        gridMoviesTruncated={gridMoviesTruncated}
         VenueBlurb={VenueBlurb}
         nearbyVenues={nearbyVenues}
       />
