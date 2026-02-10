@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_DATA_FILENAME: getMetaDataFilename(),
   },
+  experimental: {
+    optimizeCss: true, // Enable CSS optimization
+  },
 };
 
 export default nextConfig;
