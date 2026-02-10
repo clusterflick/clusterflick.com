@@ -83,8 +83,8 @@ export default async function Home() {
             Charles Cinema (and more, there&apos;s way too many venues to name
             them all!)
             <br />
-            We&apos;re currently tracking over 1,000 films showing across
-            London&apos;s 240+ venues.
+            We&apos;re currently tracking over 1,000 films showing across{" "}
+            <Link href="/venues">London&apos;s 240+ venues</Link>.
           </p>
           <p>
             With so much to choose from, use the menu at the top to filter for

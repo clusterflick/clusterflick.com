@@ -5,6 +5,18 @@ export default function HeaderNav() {
   return (
     <div className={styles.nav}>
       <Link
+        href="/venues"
+        onClick={() => {
+          try {
+            sessionStorage.setItem("useBrowserBack", "true");
+          } catch {
+            // Ignore - UX optimization only
+          }
+        }}
+      >
+        Venues
+      </Link>
+      <Link
         href="/about"
         onClick={() => {
           try {

@@ -1,8 +1,12 @@
+import dynamic from "next/dynamic";
 import HeaderLogo from "@/components/header-logo";
-import FilterTrigger from "@/components/filter-trigger";
 import HeaderNav from "@/components/header-nav";
 import MobileMenu from "@/components/mobile-menu";
 import styles from "./main-header.module.css";
+
+const FilterTrigger = dynamic(() => import("@/components/filter-trigger"), {
+  ssr: false,
+});
 
 export default function MainHeader({
   isFilterOverlayOpen,

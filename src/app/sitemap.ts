@@ -1,7 +1,7 @@
 import { type MetadataRoute } from "next";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
-import { Movie } from "@/types";
+import { Movie, Venue } from "@/types";
 
 export const dynamic = "force-static";
 
@@ -13,6 +13,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
+  }));
+
+  const venuePages = Object.values(data.venues).map((venue: Venue) => ({
+    url: `https://clusterflick.com/venues/${slugify(venue.name)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
   }));
 
   const staticPages = [
@@ -28,7 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
+    {
+      url: "https://clusterflick.com/venues",
+      lastModified: data.generatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
   ];
 
-  return [...staticPages, ...moviePages];
+  return [...staticPages, ...moviePages, ...venuePages];
 }

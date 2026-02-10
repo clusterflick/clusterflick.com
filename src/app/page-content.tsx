@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { Grid, WindowScroller, GridCellProps } from "react-virtualized";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
@@ -7,11 +8,14 @@ import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
 import MovieCell from "@/components/movie-cell";
 import MainHeader from "@/components/main-header";
-import FilterOverlay from "@/components/filter-overlay";
 import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
 import "react-virtualized/styles.css";
 import styles from "./page.module.css";
+
+const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
+  ssr: false,
+});
 
 const POSTER_WIDTH = 200;
 const POSTER_HEIGHT = 300;

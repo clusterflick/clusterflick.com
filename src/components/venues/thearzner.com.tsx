@@ -1,0 +1,15 @@
+function VenueBlurb() {
+  return (
+    <section>
+      <p>
+        The Arzner is an independent cinema at Bermondsey Square in southeast
+        London. Named after Dorothy Arzner, the pioneering Hollywood director,
+        the venue programmes a curated selection of new releases, independent,
+        arthouse, and classic films. Its Bermondsey Square location places it at
+        the heart of one of south London&apos;s most vibrant neighbourhoods.
+      </p>
+    </section>
+  );
+}
+
+export default VenueBlurb;

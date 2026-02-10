@@ -42,6 +42,8 @@
     "msw-storybook-addon": "^2.0.6",
     "playwright": "^1.58.1",
     "prettier": "^3.7.3",
+    "scripts": "github:clusterflick/scripts",
+    "sharp": "^0.34.5",
     "storybook": "^10.2.6",
     "typescript": "^5",
     "vite": "^7.3.1",

@@ -1,0 +1,14 @@
+function VenueBlurb() {
+  return (
+    <section>
+      <p>
+        The Source is a creative and performance space at Theatre Square in
+        Stratford, east London, operated by the University of East London. The
+        venue hosts a range of cultural events, including occasional film
+        screenings, as part of UEL&apos;s public engagement programme.
+      </p>
+    </section>
+  );
+}
+
+export default VenueBlurb;

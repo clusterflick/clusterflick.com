@@ -1,0 +1,173 @@
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.intro {
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.8;
+  margin-bottom: 32px;
+}
+
+/* Search input */
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-muted-gray);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 40px;
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--color-light-gray);
+  transition: all 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: var(--color-muted-gray);
+}
+
+.searchInput:hover {
+  background: rgba(var(--color-white-rgb), 0.08);
+  border-color: rgba(var(--color-white-rgb), 0.25);
+}
+
+.searchInput:focus {
+  outline: none;
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: var(--color-neon-pink);
+  box-shadow: 0 0 0 2px rgba(var(--color-neon-pink-rgb), 0.15);
+}
+
+.searchWrapper:focus-within .searchIcon {
+  color: var(--color-neon-pink);
+}
+
+.searchClear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(var(--color-white-rgb), 0.1);
+  color: var(--color-muted-gray);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.searchClear:hover {
+  background: rgba(var(--color-neon-pink-rgb), 0.2);
+  color: var(--color-neon-pink);
+}
+
+.searchResultCount {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: -20px 0 24px;
+}
+
+/* Venue groups */
+
+.group {
+  margin-bottom: 40px;
+}
+
+.groupTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.groupCount {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted-gray);
+}
+
+.venueList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 24px;
+}
+
+.venueLink {
+  color: var(--color-electric-blue);
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 2;
+  transition:
+    color 0.2s,
+    border 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.venueLink:hover {
+  color: var(--color-neon-pink);
+}
+
+.venueName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.venueEventCount {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-white-rgb), 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  line-height: 1.6;
+}
+
+.noResults {
+  font-size: 16px;
+  color: var(--color-muted-gray);
+  padding: 40px 0;
+  text-align: center;
+}

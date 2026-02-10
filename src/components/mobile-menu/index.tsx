@@ -61,6 +61,20 @@ export default function MobileMenu() {
         </button>
         <nav className={styles.nav} aria-label="Main navigation">
           <Link
+            href="/venues"
+            className={styles.navLink}
+            onClick={() => {
+              setIsOpen(false);
+              try {
+                sessionStorage.setItem("useBrowserBack", "true");
+              } catch {
+                // Ignore - UX optimization only
+              }
+            }}
+          >
+            Venues
+          </Link>
+          <Link
             href="/about"
             className={styles.navLink}
             onClick={() => {
