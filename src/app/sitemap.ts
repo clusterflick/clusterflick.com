@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `https://clusterflick.com/venues/${slugify(venue.name)}`,
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
-    priority: 0.5,
+    priority: 0.6,
   }));
 
   const staticPages = [

@@ -8,6 +8,20 @@ export const metadata: Metadata = {
   title: "Venues",
   description:
     "Browse all cinema venues across London tracked by Clusterflick. From major chains like Curzon, Everyman and Picturehouse to independent cinemas, arts centres and pop-up screenings.",
+  openGraph: {
+    title: "London Cinema Venues | Clusterflick",
+    description:
+      "Browse all cinema venues across London tracked by Clusterflick. From major chains like Curzon, Everyman and Picturehouse to independent cinemas, arts centres and pop-up screenings.",
+    url: "https://clusterflick.com/venues",
+    siteName: "Clusterflick",
+  },
+  twitter: {
+    card: "summary",
+    title: "London Cinema Venues | Clusterflick",
+    description:
+      "Browse all cinema venues across London tracked by Clusterflick. From major chains to independent cinemas and pop-up screenings.",
+    creator: "@clusterflick",
+  },
 };
 
 export type VenueGroupData = {
