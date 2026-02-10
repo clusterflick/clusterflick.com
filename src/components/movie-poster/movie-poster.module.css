@@ -23,16 +23,16 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 900px) {
   .poster.large,
   .noPoster.large {
-    width: 260px;
-    height: 390px;
+    width: 200px;
+    height: 300px;
   }
 
   .poster.large img {
-    width: 260px;
-    height: 390px;
+    width: 200px;
+    height: 300px;
   }
 }
 

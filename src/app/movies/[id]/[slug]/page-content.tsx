@@ -48,10 +48,6 @@ export default function PageContent({
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(max-width: 900px)").matches;
-  });
 
   // Defer showings computation to allow hero content to render first
   const [isShowingsReady, setIsShowingsReady] = useState(false);
@@ -69,18 +65,6 @@ export default function PageContent({
     startTransition(() => {
       setIsShowingsReady(true);
     });
-  }, []);
-
-  // Track mobile breakpoint for responsive poster size
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 900px)");
-    // Correct the server-side default (false) to match the actual viewport on mount.
-    // This is a genuine sync with an external system, not a cascading render issue.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMobile(mediaQuery.matches);
-    const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   // Get unfiltered movie data
@@ -188,7 +172,7 @@ export default function PageContent({
               mainPosterPath={movie.posterPath}
               mainTitle={movie.title}
               includedMovies={includedMovies}
-              size={isMobile ? "small" : "large"}
+              size="large"
               interactive={false}
             />
           ) : (
@@ -197,7 +181,7 @@ export default function PageContent({
                 movie.posterPath || includedWithPosters[0]?.posterPath
               }
               title={movie.title}
-              size={isMobile ? "small" : "large"}
+              size="large"
             />
           )}
         </div>
