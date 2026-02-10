@@ -14,6 +14,7 @@ const POSTER_IMAGE_SELECTOR = `${POSTER_SELECTOR} img`;
 const FILTER_TRIGGER_SELECTOR = 'button[aria-label*="filter options"]';
 const SEARCH_INPUT_SELECTOR = "#filter-search";
 const PERFORMANCE_CARD_SELECTOR = '[class*="performanceCard"]';
+const COLLAPSE_BUTTON_SELECTOR = 'button[aria-expanded="true"]';
 
 async function countVisiblePosters(page: Page): Promise<number> {
   return await page.locator(POSTER_SELECTOR).count();
@@ -25,6 +26,17 @@ async function getFirstMovieTitle(page: Page): Promise<string | null> {
   return await firstImage.getAttribute("alt");
 }
 
+async function collapseIntroNotice(page: Page): Promise<void> {
+  const collapseButton = page.locator(COLLAPSE_BUTTON_SELECTOR);
+  if (await collapseButton.isVisible({ timeout: 2000 })) {
+    await collapseButton.click();
+    // Wait for the section to collapse (button text changes to "Expand")
+    await page.waitForSelector('button[aria-expanded="false"]', {
+      timeout: 2000,
+    });
+  }
+}
+
 async function waitForScrollToBottom(page: Page): Promise<void> {
   // Wait for scroll to reach the bottom of the page
   await page.waitForFunction(
@@ -33,20 +45,6 @@ async function waitForScrollToBottom(page: Page): Promise<void> {
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       return scrollY >= maxScroll - 10; // within 10px of bottom
     },
-    { timeout: 5000 },
-  );
-}
-
-async function waitForScrollToPosition(
-  page: Page,
-  targetY: number,
-): Promise<void> {
-  // Wait for scroll to reach a specific position
-  await page.waitForFunction(
-    (target) => {
-      return Math.abs(window.scrollY - target) < 50; // within 50px
-    },
-    targetY,
     { timeout: 5000 },
   );
 }
@@ -74,6 +72,7 @@ test.describe("Smoke Tests", () => {
 
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
+    await collapseIntroNotice(page);
 
     await expect(async () => {
       const posterCount = await countVisiblePosters(page);
@@ -91,10 +90,11 @@ test.describe("Smoke Tests", () => {
 
     // Wait for initial posters
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
+    await collapseIntroNotice(page);
 
     // Scroll to bottom
     await page.evaluate(() => {
-      window.scrollTo(0, document.body.scrollHeight);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
     });
 
     // Wait for scroll to actually reach the bottom
@@ -120,24 +120,31 @@ test.describe("Smoke Tests", () => {
 
     // Wait for initial posters
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
+    await collapseIntroNotice(page);
 
     // Scroll to bottom
     await page.evaluate(() => {
-      window.scrollTo(0, document.body.scrollHeight);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
     });
 
     // Wait for scroll to reach the bottom
     await waitForScrollToBottom(page);
 
-    // Get the middle scroll position and scroll there
-    const middlePosition = await page.evaluate(() => {
+    // Scroll to the middle of the page
+    await page.evaluate(() => {
       const middle = document.body.scrollHeight / 2;
-      window.scrollTo(0, middle);
-      return middle;
+      window.scrollTo({ top: middle, behavior: "instant" });
     });
 
-    // Wait for scroll to reach the middle
-    await waitForScrollToPosition(page, middlePosition);
+    // Wait for scroll to settle away from the bottom (i.e. we're somewhere in the middle)
+    await page.waitForFunction(
+      () => {
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        return scrollY > 100 && scrollY < maxScroll - 100;
+      },
+      { timeout: 5000 },
+    );
 
     // Wait for virtualized list to render posters for the new viewport
     await expect(async () => {
@@ -158,6 +165,7 @@ test.describe("Smoke Tests", () => {
 
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
+    await collapseIntroNotice(page);
 
     // Get the first movie title from the image alt attribute
     const firstMovieTitle = await getFirstMovieTitle(page);
@@ -203,6 +211,7 @@ test.describe("Smoke Tests", () => {
 
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
+    await collapseIntroNotice(page);
 
     // Get the first movie title for verification later
     const expectedTitle = await getFirstMovieTitle(page);
