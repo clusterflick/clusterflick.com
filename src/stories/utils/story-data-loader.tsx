@@ -28,9 +28,8 @@ export default function StoryDataLoader<T>({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Ref keeps the loader stable across renders so the effect only runs once.
+  // Ref captures the initial loader so the effect only runs once on mount.
   const loaderRef = useRef(loader);
-  loaderRef.current = loader;
 
   useEffect(() => {
     loaderRef

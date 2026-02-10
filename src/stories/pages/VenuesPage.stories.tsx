@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import VenuesPageContent from "@/app/venues/page-content";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import type { VenueGroupData } from "@/app/venues/page";
-import type { Venue, CinemaData } from "@/types";
+import type { Venue } from "@/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
