@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import type { Venue } from "@/types";
-import PageHeader from "@/components/page-header";
-import HeroSection from "@/components/hero-section";
-import OutlineHeading from "@/components/outline-heading";
-import Divider from "@/components/divider";
-import PreloadCinemaData from "@/components/preload-cinema-data";
-import VenueList from "./venue-list";
-import styles from "./page.module.css";
+import VenuesPageContent from "./page-content";
 
 export const metadata: Metadata = {
   title: "Venues",
@@ -113,34 +107,5 @@ export default async function VenuesPage() {
   const groups = buildVenueGroups(data.venues, eventCounts);
   const totalVenues = Object.keys(data.venues).length;
 
-  return (
-    <div>
-      <PreloadCinemaData />
-      <PageHeader backUrl="/" backText="Back to film list" />
-
-      <HeroSection
-        backgroundImage="/images/light-circles.jpg"
-        backdropHeight="standard"
-        align="center"
-      >
-        <OutlineHeading className={styles.title}>Venues</OutlineHeading>
-        <p className={styles.subtitle}>{totalVenues} venues across London</p>
-      </HeroSection>
-
-      <Divider />
-
-      <div className={styles.content}>
-        <p className={styles.intro}>
-          Clusterflick tracks film screenings from {totalVenues} venues across
-          London, from major cinema chains like Curzon, Everyman, ODEON and
-          Picturehouse to independent cinemas, arts centres, museums, cultural
-          institutes, bars and pop-up screening spaces. Whether you&apos;re
-          looking for the latest blockbusters at a multiplex or a rare 35mm
-          print at a neighbourhood arthouse, you&apos;ll find it here.
-        </p>
-
-        <VenueList groups={groups} />
-      </div>
-    </div>
-  );
+  return <VenuesPageContent groups={groups} totalVenues={totalVenues} />;
 }

@@ -1,11 +1,5 @@
-import { useState, useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { decompress } from "compress-json";
 import PageContent from "@/app/movies/[id]/[slug]/page-content";
-import { CinemaDataProvider } from "@/state/cinema-data-context";
-import { FilterConfigProvider } from "@/state/filter-config-context";
-import { GeolocationProvider } from "@/state/geolocation-context";
-import LoadingIndicator from "@/components/loading-indicator";
 import { Category } from "@/types";
 import type {
   Movie,
@@ -15,6 +9,8 @@ import type {
   MetaData,
   CinemaData,
 } from "@/types";
+import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
+import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
 
 /**
@@ -31,62 +27,6 @@ type MoviePageData = {
   venues: Record<string, Venue>;
   containingEvents: Omit<Movie, "performances">[];
 };
-
-// Fetch and decompress real data
-async function fetchRealData(
-  movieFinder?: (movies: CinemaData["movies"]) => Movie | null,
-): Promise<{
-  metaData: MetaData;
-  movies: CinemaData["movies"];
-} | null> {
-  try {
-    // Fetch metadata
-    const metaFilename = process.env.NEXT_PUBLIC_DATA_FILENAME;
-    if (!metaFilename) return null;
-
-    const metaResponse = await fetch(`/data/${metaFilename}`);
-    const metaCompressed = await metaResponse.json();
-    const metaData = decompress(metaCompressed) as MetaData;
-
-    // If a finder is provided, search across files until we find a match
-    if (movieFinder) {
-      for (const filename of metaData.filenames) {
-        const moviesResponse = await fetch(`/data/${filename}`);
-        const moviesCompressed = await moviesResponse.json();
-        const movies = decompress(moviesCompressed) as CinemaData["movies"];
-
-        // Add IDs to movies
-        Object.keys(movies).forEach((id) => {
-          movies[id].id = id;
-        });
-
-        // Check if this file has a matching movie
-        const found = movieFinder(movies);
-        if (found) {
-          return { metaData, movies };
-        }
-      }
-      // No match found in any file
-      return { metaData, movies: {} };
-    }
-
-    // Default: just fetch first file
-    const firstFilename = metaData.filenames[0];
-    const moviesResponse = await fetch(`/data/${firstFilename}`);
-    const moviesCompressed = await moviesResponse.json();
-    const movies = decompress(moviesCompressed) as CinemaData["movies"];
-
-    // Add IDs to movies
-    Object.keys(movies).forEach((id) => {
-      movies[id].id = id;
-    });
-
-    return { metaData, movies };
-  } catch (error) {
-    console.error("Failed to fetch real data:", error);
-    return null;
-  }
-}
 
 // Find a movie matching criteria
 function findMovie(
@@ -152,110 +92,55 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
   };
 }
 
-// Component that loads real data and renders PageContent
-function MoviePageWithRealData({
-  movieFinder,
-}: {
-  movieFinder: (movies: CinemaData["movies"]) => Movie | null;
-}) {
-  const [data, setData] = useState<MoviePageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Loader for a single movie with full metadata
+async function loadSingleMovieData(): Promise<MoviePageData | null> {
+  const metaData = await fetchMetaData();
+  const movies = await fetchAllMovies(metaData);
 
-  useEffect(() => {
-    // Pass movieFinder to fetchRealData so it can search across all files
-    fetchRealData(movieFinder).then((result) => {
-      if (!result) {
-        setError("Failed to load data");
-        setLoading(false);
-        return;
-      }
-
-      const movie = movieFinder(result.movies);
-      if (!movie) {
-        setError("No matching movie found in data");
-        setLoading(false);
-        return;
-      }
-
-      const pageData = extractMoviePageData(movie, result.metaData);
-      setData(pageData);
-      setLoading(false);
-    });
-  }, [movieFinder]);
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#010013",
-        }}
-      >
-        <LoadingIndicator message="Loading movie data..." />
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "#010013",
-          color: "#fff",
-        }}
-      >
-        {error || "No data available"}
-      </div>
-    );
-  }
-
-  return (
-    <CinemaDataProvider>
-      <FilterConfigProvider>
-        <GeolocationProvider>
-          <PageContent
-            movie={data.movie}
-            genres={data.genres}
-            people={data.people}
-            venues={data.venues}
-            containingEvents={data.containingEvents}
-          />
-        </GeolocationProvider>
-      </FilterConfigProvider>
-    </CinemaDataProvider>
-  );
-}
-
-// Movie finders for different story types
-const findSingleMovie = (movies: CinemaData["movies"]) =>
-  findMovie(
+  const movie = findMovie(
     movies,
     (m) =>
-      // Find a movie with poster, ratings, and actors
       !!m.posterPath &&
       !!m.imdb?.rating &&
       !!m.actors?.length &&
       Object.values(m.showings).some((s) => s.category === Category.Movie),
   );
 
-const findEventWithIncludedMovies = (movies: CinemaData["movies"]) =>
-  findMovie(
+  if (!movie) return null;
+  return extractMoviePageData(movie, metaData);
+}
+
+// Loader for an event with included films
+async function loadEventWithIncludedMoviesData(): Promise<MoviePageData | null> {
+  const metaData = await fetchMetaData();
+  const movies = await fetchAllMovies(metaData);
+
+  const movie = findMovie(
     movies,
-    // Find any event with included films (double feature, marathon, etc.)
     (m) => !!m.includedMovies && m.includedMovies.length > 1,
   );
 
-// Default component
+  if (!movie) return null;
+  return extractMoviePageData(movie, metaData);
+}
+
 function DefaultMoviePage() {
-  return <MoviePageWithRealData movieFinder={findSingleMovie} />;
+  return (
+    <StoryDataLoader<MoviePageData>
+      loader={loadSingleMovieData}
+      loadingMessage="Loading movie data..."
+    >
+      {(data) => (
+        <PageContent
+          movie={data.movie}
+          genres={data.genres}
+          people={data.people}
+          venues={data.venues}
+          containingEvents={data.containingEvents}
+        />
+      )}
+    </StoryDataLoader>
+  );
 }
 
 const meta = {
@@ -306,7 +191,20 @@ export const Loaded: Story = {
  */
 export const WithIncludedMovies: Story = {
   render: () => (
-    <MoviePageWithRealData movieFinder={findEventWithIncludedMovies} />
+    <StoryDataLoader<MoviePageData>
+      loader={loadEventWithIncludedMoviesData}
+      loadingMessage="Loading movie data..."
+    >
+      {(data) => (
+        <PageContent
+          movie={data.movie}
+          genres={data.genres}
+          people={data.people}
+          venues={data.venues}
+          containingEvents={data.containingEvents}
+        />
+      )}
+    </StoryDataLoader>
   ),
   parameters: {
     msw: {
