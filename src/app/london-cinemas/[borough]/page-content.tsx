@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
@@ -5,6 +6,7 @@ import OutlineHeading from "@/components/outline-heading";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
+import LinkedList from "@/components/linked-list";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import styles from "./page.module.css";
 
@@ -14,6 +16,8 @@ export type BoroughVenueItem = {
   href: string;
   type: string;
   eventCount: number;
+  performanceCount: number;
+  imagePath: string | null;
 };
 
 export type NeighborBorough = {
@@ -86,41 +90,61 @@ export default function BoroughPageContent({
         </p>
 
         <ContentSection title="Venues" as="h2">
-          <ul className={styles.venueList}>
+          <div className={styles.venueGrid}>
             {venues.map((venue) => (
-              <li key={venue.id}>
-                <Link href={venue.href} className={styles.venueLink}>
-                  <span className={styles.venueName}>{venue.name}</span>
-                  {venue.type.toLowerCase() !== "unknown" && (
-                    <Tag color="blue" size="sm">
-                      {venue.type}
-                    </Tag>
-                  )}
-                  {venue.eventCount > 0 && (
-                    <span className={styles.venueEventCount}>
-                      {venue.eventCount}
+              <Link
+                key={venue.id}
+                href={venue.href}
+                className={styles.venueCard}
+              >
+                <div className={styles.venueCardLogo}>
+                  {venue.imagePath ? (
+                    <Image
+                      src={venue.imagePath}
+                      alt={`${venue.name} logo`}
+                      width={48}
+                      height={48}
+                      className={styles.venueCardImage}
+                    />
+                  ) : (
+                    <span className={styles.venueCardInitial}>
+                      {venue.name.charAt(0)}
                     </span>
                   )}
-                </Link>
-              </li>
+                </div>
+                <div className={styles.venueCardBody}>
+                  <span className={styles.venueCardName}>{venue.name}</span>
+                  <div className={styles.venueCardMeta}>
+                    <Tag color="blue" size="sm">
+                      {venue.type.toLowerCase() === "unknown"
+                        ? "Other"
+                        : venue.type}
+                    </Tag>
+                  </div>
+                  {venue.eventCount > 0 && (
+                    <span className={styles.venueCardStats}>
+                      {venue.eventCount}{" "}
+                      {venue.eventCount === 1 ? "film" : "films"} &middot;{" "}
+                      {venue.performanceCount}{" "}
+                      {venue.performanceCount === 1 ? "showing" : "showings"}
+                    </span>
+                  )}
+                </div>
+              </Link>
             ))}
-          </ul>
+          </div>
         </ContentSection>
 
         {neighborBoroughs.length > 0 && (
           <ContentSection title="Nearby Boroughs" as="h2">
-            <ul className={styles.neighborList}>
-              {neighborBoroughs.map((nb) => (
-                <li key={nb.href}>
-                  <Link href={nb.href} className={styles.neighborLink}>
-                    <span className={styles.neighborName}>{nb.name}</span>
-                    <span className={styles.neighborVenueCount}>
-                      {nb.venueCount} {nb.venueCount === 1 ? "venue" : "venues"}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <LinkedList
+              items={neighborBoroughs.map((nb) => ({
+                key: nb.href,
+                href: nb.href,
+                label: nb.name,
+                detail: `${nb.venueCount} ${nb.venueCount === 1 ? "venue" : "venues"}`,
+              }))}
+            />
           </ContentSection>
         )}
       </div>

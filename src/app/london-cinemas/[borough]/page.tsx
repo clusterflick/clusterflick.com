@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
@@ -47,6 +48,9 @@ export async function generateMetadata({
   return {
     title: `Cinemas in ${borough.name}`,
     description,
+    alternates: {
+      canonical: getBoroughUrl(borough),
+    },
     openGraph: {
       title: `Cinemas in ${borough.name} | Clusterflick`,
       description,
@@ -82,8 +86,9 @@ export default async function BoroughPage({
     notFound();
   }
 
-  // Count movies per venue (same pattern as /venues/page.tsx)
+  // Count movies and performances per venue
   const eventCounts = new Map<string, number>();
+  const perfCounts = new Map<string, number>();
   for (const movie of Object.values(data.movies)) {
     const venueIds = new Set<string>();
     for (const showing of Object.values(movie.showings)) {
@@ -91,6 +96,15 @@ export default async function BoroughPage({
     }
     for (const venueId of venueIds) {
       eventCounts.set(venueId, (eventCounts.get(venueId) || 0) + 1);
+    }
+    for (const perf of movie.performances) {
+      const showing = movie.showings[perf.showingId];
+      if (showing) {
+        perfCounts.set(
+          showing.venueId,
+          (perfCounts.get(showing.venueId) || 0) + 1,
+        );
+      }
     }
   }
 
@@ -101,6 +115,8 @@ export default async function BoroughPage({
       href: getVenueUrl(venue),
       type: venue.type,
       eventCount: eventCounts.get(venue.id) || 0,
+      performanceCount: perfCounts.get(venue.id) || 0,
+      imagePath: getVenueImagePath(venue.id),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -131,22 +147,48 @@ export default async function BoroughPage({
     .sort((a, b) => a.name.localeCompare(b.name));
 
   // JSON-LD structured data
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `Cinemas in ${borough.name}, London`,
-    description: `Cinema venues in the London Borough of ${borough.name}`,
-    numberOfItems: venueItems.length,
-    itemListElement: venueItems.map((venue, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "MovieTheater",
-        name: venue.name,
-        url: `https://clusterflick.com${venue.href}`,
-      },
-    })),
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `Cinemas in ${borough.name}, London`,
+      description: `Cinema venues in the London Borough of ${borough.name}`,
+      numberOfItems: venueItems.length,
+      itemListElement: venueItems.map((venue, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "MovieTheater",
+          name: venue.name,
+          url: `https://clusterflick.com${venue.href}`,
+        },
+      })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://clusterflick.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "London Cinemas",
+          item: "https://clusterflick.com/london-cinemas",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: borough.name,
+          item: `https://clusterflick.com${getBoroughUrl(borough)}`,
+        },
+      ],
+    },
+  ];
 
   return (
     <>

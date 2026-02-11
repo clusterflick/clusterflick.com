@@ -14,9 +14,12 @@
   },
   "dependencies": {
     "@sindresorhus/slugify": "^3.0.0",
+    "@turf/boolean-point-in-polygon": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
     "@types/react-virtualized": "^9.22.3",
     "clsx": "^2.1.1",
     "compress-json": "^3.4.0",
+    "data-analysed": "github:clusterflick/data-analysed",
     "next": "16.1.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",

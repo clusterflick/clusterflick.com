@@ -20,6 +20,7 @@ import {
   OutlookCalendarIcon,
   CalendarIcon,
 } from "@/components/icons";
+import EmptyState from "@/components/empty-state";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
@@ -71,6 +72,11 @@ export type NearbyVenue = {
   url: string;
 };
 
+export type VenueBorough = {
+  name: string;
+  href: string;
+};
+
 export interface VenueDetailPageContentProps {
   venue: Venue;
   attributes: VenueAttributes | null;
@@ -82,6 +88,7 @@ export interface VenueDetailPageContentProps {
   gridMoviesTruncated?: boolean;
   VenueBlurb: ComponentType | null;
   nearbyVenues: NearbyVenue[];
+  borough?: VenueBorough | null;
 }
 
 export default function VenueDetailPageContent({
@@ -95,6 +102,7 @@ export default function VenueDetailPageContent({
   gridMoviesTruncated,
   VenueBlurb,
   nearbyVenues,
+  borough,
 }: VenueDetailPageContentProps) {
   const hasEvents = performanceCount > 0;
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
@@ -153,9 +161,11 @@ export default function VenueDetailPageContent({
             ))}
           </div>
           <div>
-            {venue.type.toLowerCase().trim() !== "unknown" ? (
-              <Tag color="blue">{venue.type}</Tag>
-            ) : null}
+            <Tag color="blue">
+              {venue.type.toLowerCase().trim() === "unknown"
+                ? "Other"
+                : venue.type}
+            </Tag>
           </div>
           <div className={styles.heroTagRowSide}>
             <a
@@ -229,11 +239,22 @@ export default function VenueDetailPageContent({
                   </Fragment>
                 ))}
               </p>
-              <VenueDistance
-                venueLat={venue.geo.lat}
-                venueLon={venue.geo.lon}
-                className={styles.distance}
-              />
+              {borough ? (
+                <p className={styles.borough}>
+                  Located in <Link href={borough.href}>{borough.name}</Link>
+                  <VenueDistance
+                    venueLat={venue.geo.lat}
+                    venueLon={venue.geo.lon}
+                    parenthesized
+                  />
+                </p>
+              ) : (
+                <VenueDistance
+                  venueLat={venue.geo.lat}
+                  venueLon={venue.geo.lon}
+                  className={styles.distance}
+                />
+              )}
               {mapImagePath && (
                 <p>
                   <a
@@ -271,64 +292,76 @@ export default function VenueDetailPageContent({
           as="h2"
           className={styles.venueFilms}
         >
-          <a
-            href={`/?venues=${encodeURIComponent(venue.id)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.exploreLink}
-          >
-            Start exploring films at {venue.name}
-          </a>
-          {gridMovies.length > 0 && (
-            <div
-              className={
-                gridMoviesTruncated
-                  ? styles.filmGridFadeWrapper
-                  : styles.filmGridWrapper
-              }
-            >
-              <div className={styles.filmGrid}>
-                {gridMovies.map(({ movie }) => {
-                  const includedMovies = movie.includedMovies;
-                  const includedWithPosters =
-                    includedMovies?.filter((m) => m.posterPath) || [];
-                  const totalPosters =
-                    (movie.posterPath ? 1 : 0) + includedWithPosters.length;
-                  const useStackedPoster =
-                    includedMovies &&
-                    includedMovies.length > 1 &&
-                    totalPosters >= 2;
+          {gridMovies.length === 0 ? (
+            <EmptyState
+              icon={{
+                src: "/images/icons/neon-ticket-ripped.svg",
+                width: 120,
+                height: 80,
+              }}
+              message="No showings currently listed"
+              hint="Check back soon — new showings are added regularly"
+            />
+          ) : (
+            <>
+              <a
+                href={`/?venues=${encodeURIComponent(venue.id)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.exploreLink}
+              >
+                Start exploring films at {venue.name}
+              </a>
+              <div
+                className={
+                  gridMoviesTruncated
+                    ? styles.filmGridFadeWrapper
+                    : styles.filmGridWrapper
+                }
+              >
+                <div className={styles.filmGrid}>
+                  {gridMovies.map(({ movie }) => {
+                    const includedMovies = movie.includedMovies;
+                    const includedWithPosters =
+                      includedMovies?.filter((m) => m.posterPath) || [];
+                    const totalPosters =
+                      (movie.posterPath ? 1 : 0) + includedWithPosters.length;
+                    const useStackedPoster =
+                      includedMovies &&
+                      includedMovies.length > 1 &&
+                      totalPosters >= 2;
 
-                  return (
-                    <Link
-                      key={movie.id}
-                      href={getMovieUrl(movie)}
-                      className={styles.filmGridLink}
-                    >
-                      {useStackedPoster ? (
-                        <StackedPoster
-                          mainPosterPath={movie.posterPath}
-                          mainTitle={movie.title}
-                          includedMovies={includedMovies}
-                          subtitle={movie.year}
-                          showOverlay
-                        />
-                      ) : (
-                        <MoviePoster
-                          posterPath={
-                            movie.posterPath ||
-                            includedWithPosters[0]?.posterPath
-                          }
-                          title={movie.title}
-                          subtitle={movie.year}
-                          showOverlay
-                        />
-                      )}
-                    </Link>
-                  );
-                })}
+                    return (
+                      <Link
+                        key={movie.id}
+                        href={getMovieUrl(movie)}
+                        className={styles.filmGridLink}
+                      >
+                        {useStackedPoster ? (
+                          <StackedPoster
+                            mainPosterPath={movie.posterPath}
+                            mainTitle={movie.title}
+                            includedMovies={includedMovies}
+                            subtitle={movie.year}
+                            showOverlay
+                          />
+                        ) : (
+                          <MoviePoster
+                            posterPath={
+                              movie.posterPath ||
+                              includedWithPosters[0]?.posterPath
+                            }
+                            title={movie.title}
+                            subtitle={movie.year}
+                            showOverlay
+                          />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </ContentSection>
       </div>

@@ -5,12 +5,12 @@ import type {
   NeighborBorough,
 } from "@/app/london-cinemas/[borough]/page-content";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
-import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import type { Venue } from "@/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
+import { groupVenuesByBoroughSimple } from "../utils/group-venues-by-borough-simple";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
 
@@ -19,6 +19,8 @@ import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
  *
  * Uses real data from public/data files. Shows the venue list,
  * film counts, and nearby boroughs for a specific London borough.
+ * Uses a simple center+radius approximation for grouping (the real
+ * pages use GeoJSON boundary data which requires Node.js fs access).
  */
 
 const BOROUGH_SLUG = "hackney";
@@ -42,13 +44,14 @@ async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
     venues[id] = { ...venue, id };
   }
 
-  const map = groupVenuesByBorough(venues);
+  const map = groupVenuesByBoroughSimple(venues);
   const boroughVenues = map.get(BOROUGH_SLUG) || [];
 
   if (boroughVenues.length === 0) return null;
 
-  // Count movies per venue
+  // Count movies and performances per venue
   const eventCounts = new Map<string, number>();
+  const perfCounts = new Map<string, number>();
   for (const movie of Object.values(allMovies)) {
     const venueIds = new Set<string>();
     for (const showing of Object.values(movie.showings)) {
@@ -56,6 +59,15 @@ async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
     }
     for (const venueId of venueIds) {
       eventCounts.set(venueId, (eventCounts.get(venueId) || 0) + 1);
+    }
+    for (const perf of movie.performances) {
+      const showing = movie.showings[perf.showingId];
+      if (showing) {
+        perfCounts.set(
+          showing.venueId,
+          (perfCounts.get(showing.venueId) || 0) + 1,
+        );
+      }
     }
   }
 
@@ -66,6 +78,8 @@ async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
       href: getVenueUrl(venue),
       type: venue.type,
       eventCount: eventCounts.get(venue.id) || 0,
+      performanceCount: perfCounts.get(venue.id) || 0,
+      imagePath: null, // Venue images require fs access (server-only)
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 

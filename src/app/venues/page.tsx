@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Venues",
   description:
     "Browse all cinema venues across London tracked by Clusterflick. From major chains like Curzon, Everyman and Picturehouse to independent cinemas, arts centres and pop-up screenings.",
+  alternates: {
+    canonical: "/venues",
+  },
   openGraph: {
     title: "London Cinema Venues | Clusterflick",
     description:
@@ -121,5 +124,33 @@ export default async function VenuesPage() {
   const groups = buildVenueGroups(data.venues, eventCounts);
   const totalVenues = Object.keys(data.venues).length;
 
-  return <VenuesPageContent groups={groups} totalVenues={totalVenues} />;
+  // JSON-LD structured data
+  const allVenues = groups.flatMap((g) => g.venues);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "London Cinema Venues",
+    description:
+      "All cinema venues across London tracked by Clusterflick, from major chains to independent cinemas.",
+    numberOfItems: allVenues.length,
+    itemListElement: allVenues.map((venue, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "MovieTheater",
+        name: venue.name,
+        url: `https://clusterflick.com${venue.href}`,
+      },
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <VenuesPageContent groups={groups} totalVenues={totalVenues} />
+    </>
+  );
 }

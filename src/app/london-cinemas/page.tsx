@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "London Cinemas by Borough",
   description:
     "Find cinemas in every London borough. Browse independent cinemas, arthouse venues and major chains near you, from Hackney to Hammersmith, Camden to Croydon.",
+  alternates: {
+    canonical: "/london-cinemas",
+  },
   openGraph: {
     title: "London Cinemas by Borough | Clusterflick",
     description:
@@ -49,10 +52,35 @@ export default async function LondonCinemasPage() {
 
   const totalBoroughs = boroughs.length;
 
+  // JSON-LD structured data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "London Cinemas by Borough",
+    description:
+      "Browse cinemas across London boroughs, from independent arthouse venues to major multiplex chains.",
+    numberOfItems: boroughs.length,
+    itemListElement: boroughs.map((borough, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "City",
+        name: borough.name,
+        url: `https://clusterflick.com${borough.href}`,
+      },
+    })),
+  };
+
   return (
-    <LondonCinemasPageContent
-      boroughs={boroughs}
-      totalBoroughs={totalBoroughs}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <LondonCinemasPageContent
+        boroughs={boroughs}
+        totalBoroughs={totalBoroughs}
+      />
+    </>
   );
 }

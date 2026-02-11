@@ -7,6 +7,8 @@ import { getVenueAttributes } from "@/utils/get-venue-attributes";
 import { getVenueImagePath, getVenueMapPath } from "@/utils/get-venue-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getVenueBorough } from "@/utils/get-borough-venues";
+import { getBoroughUrl } from "@/utils/get-borough-url";
 import type { Movie, Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
@@ -118,6 +120,9 @@ export async function generateMetadata({
   return {
     title: venue.name,
     description,
+    alternates: {
+      canonical: getVenueUrl(venue),
+    },
     openGraph: {
       title: `${venue.name} | Clusterflick`,
       description,
@@ -224,25 +229,57 @@ export default async function VenueDetailPage({
 
   nearbyVenues.sort((a, b) => a.distance - b.distance);
 
+  // Find which London borough this venue is in
+  const borough = getVenueBorough(venue);
+  const boroughInfo = borough
+    ? { name: borough.name, href: getBoroughUrl(borough) }
+    : null;
+
   // Build JSON-LD structured data for this venue
-  const venueJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "MovieTheater",
-    name: venue.name,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: venue.address,
-      addressLocality: "London",
-      addressCountry: "GB",
+  const venueJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "MovieTheater",
+      name: venue.name,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: venue.address,
+        addressLocality: "London",
+        addressCountry: "GB",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: venue.geo.lat,
+        longitude: venue.geo.lon,
+      },
+      url: attributes?.url || venue.url,
+      image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
     },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: venue.geo.lat,
-      longitude: venue.geo.lon,
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://clusterflick.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Venues",
+          item: "https://clusterflick.com/venues",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: venue.name,
+          item: `https://clusterflick.com${getVenueUrl(venue)}`,
+        },
+      ],
     },
-    url: attributes?.url || venue.url,
-    image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
-  };
+  ];
 
   return (
     <>
@@ -263,6 +300,7 @@ export default async function VenueDetailPage({
         gridMoviesTruncated={gridMoviesTruncated}
         VenueBlurb={VenueBlurb}
         nearbyVenues={nearbyVenues}
+        borough={boroughInfo}
       />
     </>
   );

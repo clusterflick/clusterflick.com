@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
+import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import type { BoroughListItem } from "./page";
@@ -37,11 +38,13 @@ export default function LondonCinemasPageContent({
       <Divider />
 
       <div className={styles.content}>
-        <p className={styles.intro}>
-          Explore cinemas across London by borough. Each area page shows all the
-          venues Clusterflick tracks in that part of London, from independent
-          arthouse cinemas to major multiplex chains.
-        </p>
+        <ContentSection title="Explore London Cinemas by Borough" as="h2">
+          <p className={styles.intro}>
+            Explore cinemas across London by borough. Each area page shows all
+            the venues Clusterflick tracks in that part of London, from
+            independent arthouse cinemas to major multiplex chains.
+          </p>
+        </ContentSection>
 
         <ul className={styles.boroughList}>
           {boroughs.map((borough) => (
