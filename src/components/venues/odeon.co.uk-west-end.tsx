@@ -13,7 +13,7 @@ function VenueBlurb() {
       <p>
         The venue shows a wide range of mainstream blockbusters, new releases,
         and popular films. Its prime Leicester Square location makes it a
-        popular destination for cinema-goers visiting central London.
+        popular destination for cinema-goers visiting Central London.
       </p>
     </section>
   );

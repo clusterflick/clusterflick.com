@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Clapham Grand is a Grade II listed concert hall and entertainment
-        venue on St John&apos;s Hill in Clapham, south London. Originally built
+        venue on St John&apos;s Hill in Clapham, South London. Originally built
         in 1900 as a music hall, it has served variously as a theatre, cinema,
         bingo hall, and nightclub over the decades. Today it operates as a
         multi-purpose live events space hosting concerts, comedy nights, club

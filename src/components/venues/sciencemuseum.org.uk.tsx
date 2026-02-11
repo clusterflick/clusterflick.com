@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Science Museum is a major national museum on Exhibition Road in
-        South Kensington, central London. The museum houses an IMAX cinema—one
+        South Kensington, Central London. The museum houses an IMAX cinema—one
         of the largest screens in London—which shows a programme of IMAX
         documentary films alongside blockbuster releases in the immersive
         large-format. The museum also occasionally hosts special film screenings

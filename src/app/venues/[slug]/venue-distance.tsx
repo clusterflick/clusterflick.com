@@ -8,12 +8,15 @@ interface VenueDistanceProps {
   venueLat: number;
   venueLon: number;
   className?: string;
+  /** When true, renders as " (X miles away)" for inline use */
+  parenthesized?: boolean;
 }
 
 export default function VenueDistance({
   venueLat,
   venueLon,
   className,
+  parenthesized,
 }: VenueDistanceProps) {
   const [distance, setDistance] = useState<number | null>(null);
 
@@ -37,6 +40,10 @@ export default function VenueDistance({
       : distance < 10
         ? `${distance.toFixed(1)} miles away`
         : `${Math.round(distance)} miles away`;
+
+  if (parenthesized) {
+    return <span className={className}> ({formatted})</span>;
+  }
 
   return <span className={className}>{formatted}</span>;
 }

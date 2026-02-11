@@ -5,7 +5,7 @@ function VenueBlurb() {
         Curzon Victoria is part of the Curzon cinema group, a celebrated chain
         of independent cinemas known for championing arthouse, independent, and
         world cinema alongside quality mainstream releases. Located on Victoria
-        Street in central London, close to Victoria station, this modern venue
+        Street in Central London, close to Victoria station, this modern venue
         features multiple screening rooms with comfortable seating, as well as a
         bar area. Like all Curzon venues, it offers the Curzon membership scheme
         and access to Curzon Home Cinema, the chain&apos;s on-demand streaming
@@ -15,7 +15,7 @@ function VenueBlurb() {
         The programme blends independent, foreign-language, and documentary
         films with selected mainstream releases, special screenings, and Q&amp;A
         events, providing a quality arthouse cinema experience in a well-
-        connected part of central London.
+        connected part of Central London.
       </p>
     </section>
   );

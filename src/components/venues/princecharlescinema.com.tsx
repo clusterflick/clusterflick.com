@@ -12,7 +12,7 @@ function VenueBlurb() {
         its themed all-night movie marathons.
       </p>
       <p>
-        With some of the cheapest ticket prices in central London and a fiercely
+        With some of the cheapest ticket prices in Central London and a fiercely
         loyal following, the Prince Charles Cinema has carved out a unique niche
         as a celebration of cinema in all its forms—from the mainstream to the
         weird and wonderful. Its membership scheme offers further discounts for

@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Telegraph Hill Centre is a community centre on Kitto Road in New Cross,
-        southeast London. The centre hosts a wide range of community activities
+        Southeast London. The centre hosts a wide range of community activities
         and events, including regular film screenings as part of its programme
         of arts and culture for the local area.
       </p>

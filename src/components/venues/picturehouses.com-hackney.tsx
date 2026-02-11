@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -5,9 +7,10 @@ function VenueBlurb() {
         Hackney Picturehouse is part of the Picturehouse cinema group, a chain
         of independent-minded cinemas known for combining quality arthouse and
         mainstream programming with stylish bar and cafe spaces. Located on Mare
-        Street in Hackney, east London, the venue features multiple screens and
-        a bar area. Picturehouse cinemas offer a membership scheme that provides
-        discounts and priority booking across the chain.
+        Street in <Link href="/london-cinemas/hackney/">Hackney</Link>, east
+        London, the venue features multiple screens and a bar area. Picturehouse
+        cinemas offer a membership scheme that provides discounts and priority
+        booking across the chain.
       </p>
       <p>
         The programme blends independent, foreign-language, and documentary

@@ -5,7 +5,7 @@ function VenueBlurb() {
         Clapham Picturehouse is part of the Picturehouse cinema group, a chain
         of independent-minded cinemas known for combining quality arthouse and
         mainstream programming with stylish bar and cafe spaces. Located on Venn
-        Street in Clapham, south London, the venue features multiple screens and
+        Street in Clapham, South London, the venue features multiple screens and
         a bar area. Picturehouse cinemas offer a membership scheme that provides
         discounts and priority booking across the chain.
       </p>

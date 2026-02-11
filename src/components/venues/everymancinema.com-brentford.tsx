@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Everyman Brentford is part of the Everyman cinema group, a boutique
         chain known for its intimate, living-room-style cinema experience.
-        Located on West Bradbury Yard in Brentford, west London, the venue
+        Located on West Bradbury Yard in Brentford, West London, the venue
         offers sofa-style seating, food and drink served directly to your seat,
         and a curated programme of mainstream releases alongside independent and
         arthouse films. The cinema also features a bar area for pre- and
@@ -20,7 +20,7 @@ function VenueBlurb() {
   );
 }
 
-export const seoDescription = "boutique west London sofa cinema";
+export const seoDescription = "boutique West London sofa cinema";
 export const seoHighlights =
   "mainstream releases, arthouse films and in-seat dining";
 

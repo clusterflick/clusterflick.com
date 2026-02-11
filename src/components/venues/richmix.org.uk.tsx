@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Rich Mix is an independent arts centre and cinema on Bethnal Green Road
-        in Shoreditch, east London. The venue features multiple cinema screens
+        in Shoreditch, East London. The venue features multiple cinema screens
         alongside performance spaces, exhibition areas, and a cafe bar. Its
         cinema programme is diverse and community-focused, screening a mix of
         independent, arthouse, world, Bollywood, and documentary films alongside

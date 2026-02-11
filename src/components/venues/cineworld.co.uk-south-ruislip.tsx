@@ -15,7 +15,7 @@ function VenueBlurb() {
   );
 }
 
-export const seoDescription = "multiplex in outer west London";
+export const seoDescription = "multiplex in outer West London";
 export const seoHighlights =
   "blockbusters, new releases and Unlimited membership";
 

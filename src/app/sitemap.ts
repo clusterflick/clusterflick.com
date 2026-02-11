@@ -2,6 +2,8 @@ import { type MetadataRoute } from "next";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
 import { Movie, Venue } from "@/types";
+import { LONDON_BOROUGHS } from "@/data/london-boroughs";
+import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 
 export const dynamic = "force-static";
 
@@ -20,6 +22,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
+  }));
+
+  const venuesByBorough = groupVenuesByBorough(data.venues);
+
+  const boroughPages = LONDON_BOROUGHS.filter((b) =>
+    venuesByBorough.has(b.slug),
+  ).map((b) => ({
+    url: `https://clusterflick.com/london-cinemas/${b.slug}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
   }));
 
   const staticPages = [
@@ -41,7 +54,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.7,
     },
+    {
+      url: "https://clusterflick.com/london-cinemas",
+      lastModified: data.generatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    },
   ];
 
-  return [...staticPages, ...moviePages, ...venuePages];
+  return [...staticPages, ...moviePages, ...venuePages, ...boroughPages];
 }

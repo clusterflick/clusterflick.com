@@ -1,8 +1,11 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
-        My Heathway is a community space at Heathway Mall in Dagenham, east
+        My Heathway is a community space at Heathway Mall in{" "}
+        <Link href="/london-cinemas/barking-and-dagenham/">Dagenham</Link>, east
         London. The venue hosts a range of community activities and events,
         including occasional film screenings, providing an accessible cultural
         resource for the local area.

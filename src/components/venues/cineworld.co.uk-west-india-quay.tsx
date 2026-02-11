@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Cineworld West India Quay is part of the Cineworld chain, the UK&apos;s
         largest cinema operator with over 100 multiplexes nationwide. Located on
-        Hertsmere Road in the Docklands area of east London, close to Canary
+        Hertsmere Road in the Docklands area of East London, close to Canary
         Wharf, the venue features multiple screens equipped with digital
         projection and modern sound systems, showing a wide range of mainstream
         blockbusters, new releases, and popular films. As a standard Cineworld

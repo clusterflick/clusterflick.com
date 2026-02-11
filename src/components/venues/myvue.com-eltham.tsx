@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Vue Eltham is part of the Vue cinema chain, one of the UK&apos;s largest
-        cinema operators. Located on Eltham High Street in southeast London, the
+        cinema operators. Located on Eltham High Street in Southeast London, the
         venue features multiple screens with digital projection and modern sound
         systems, showing a wide range of mainstream blockbusters, new releases,
         and popular films. As a standard Vue location, it offers online booking,

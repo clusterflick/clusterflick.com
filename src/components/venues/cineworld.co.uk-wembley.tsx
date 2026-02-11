@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Cineworld Wembley is part of the Cineworld chain, the UK&apos;s largest
         cinema operator with over 100 multiplexes nationwide. Located on Wembley
-        Park Boulevard in northwest London, close to the iconic Wembley Stadium
+        Park Boulevard in Northwest London, close to the iconic Wembley Stadium
         and SSE Arena, the venue features multiple screens equipped with digital
         projection and modern sound systems, showing a wide range of mainstream
         blockbusters, new releases, and popular films. As a standard Cineworld

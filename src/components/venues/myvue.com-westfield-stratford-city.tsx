@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Vue Westfield Stratford is part of the Vue cinema chain, one of the
         UK&apos;s largest cinema operators. Located within the Westfield
-        Stratford City shopping centre on Stratford Place in east London, near
+        Stratford City shopping centre on Stratford Place in East London, near
         the Queen Elizabeth Olympic Park, the venue features multiple screens
         with digital projection and modern sound systems, showing a wide range
         of mainstream blockbusters, new releases, and popular films. As a

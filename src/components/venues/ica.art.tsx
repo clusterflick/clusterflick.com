@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Institute of Contemporary Arts (ICA) is a leading arts centre on The
-        Mall in central London, near Buckingham Palace. Founded in 1946, the ICA
+        Mall in Central London, near Buckingham Palace. Founded in 1946, the ICA
         has been at the forefront of contemporary art, film, music, and cultural
         debate for decades. Its cinema programme is one of the most adventurous
         in London, showcasing experimental, avant-garde, documentary, and world

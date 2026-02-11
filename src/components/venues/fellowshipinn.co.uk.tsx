@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Fellowship Inn is a historic Grade II listed pub on Randlesdown Road
-        in Bellingham, southeast London. Originally built in 1924 as part of the
+        in Bellingham, Southeast London. Originally built in 1924 as part of the
         Bellingham Estate—one of London&apos;s largest interwar housing
         developments—it was restored with Heritage Lottery funding and reopened
         as a community hub. The venue now houses The Fellowship Cinema alongside

@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Genesis Cinema is an independent cinema on Mile End Road in Whitechapel,
-        east London. One of the oldest surviving cinema buildings in the East
+        East London. One of the oldest surviving cinema buildings in the East
         End, it has been screening films since 1999 under its current guise,
         following a long history as a cinema and theatre dating back to 1912.
         The venue features multiple screens and offers a programme blending

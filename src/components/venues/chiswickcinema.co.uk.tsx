@@ -21,7 +21,7 @@ function VenueBlurb() {
         groups, and jazz nights. With a 16-seater private screening room
         available for hire, comfortable seating, and a membership programme
         offering perks and discounts, it&apos;s become a cultural anchor for the
-        local community and a destination for film lovers across west London.
+        local community and a destination for film lovers across West London.
       </p>
     </section>
   );

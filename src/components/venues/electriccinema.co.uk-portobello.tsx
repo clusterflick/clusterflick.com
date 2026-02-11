@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Electric Cinema Portobello is one of London&apos;s oldest and most
-        iconic cinemas, located on Portobello Road in Notting Hill, west London.
+        iconic cinemas, located on Portobello Road in Notting Hill, West London.
         Originally opened in 1910, it is one of the earliest purpose-built
         cinemas in Britain. Now part of the Electric Cinema group and owned by
         Soho House, the venue has been beautifully restored and features luxury

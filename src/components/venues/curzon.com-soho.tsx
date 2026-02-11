@@ -6,7 +6,7 @@ function VenueBlurb() {
         independent cinemas known for championing arthouse, independent, and
         world cinema alongside quality mainstream releases. Located on
         Shaftesbury Avenue in the heart of London&apos;s West End, this is one
-        of the chain&apos;s key central London venues. It features multiple
+        of the chain&apos;s key Central London venues. It features multiple
         screening rooms with comfortable seating, a bar, and a cafe, and is a
         popular destination for film industry professionals, critics, and
         cinephiles alike.

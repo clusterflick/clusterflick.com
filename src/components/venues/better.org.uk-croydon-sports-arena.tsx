@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -9,8 +11,9 @@ function VenueBlurb() {
         people together around particular topics or causes. While the venue is
         primarily known for its football pitches and athletics facilities, the
         flexibility of its indoor spaces allows it to transform into a screening
-        venue for events that serve the local Croydon community, offering an
-        alternative cinema experience outside traditional theatre settings.
+        venue for events that serve the local{" "}
+        <Link href="/london-cinemas/croydon/">Croydon</Link> community, offering
+        an alternative cinema experience outside traditional theatre settings.
       </p>
     </section>
   );

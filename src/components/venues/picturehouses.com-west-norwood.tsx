@@ -5,7 +5,7 @@ function VenueBlurb() {
         West Norwood Library &amp; Picturehouse is part of the Picturehouse
         cinema group, a chain of independent-minded cinemas known for combining
         quality arthouse and mainstream programming with stylish bar and cafe
-        spaces. Located on Norwood High Street in West Norwood, south London,
+        spaces. Located on Norwood High Street in West Norwood, South London,
         this venue is uniquely integrated with the local public library, forming
         a combined community and cultural space. Picturehouse cinemas offer a
         membership scheme that provides discounts and priority booking across

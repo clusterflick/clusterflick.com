@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Freud Museum London is located at 20 Maresfield Gardens in
-        Hampstead, north London—the final home of Sigmund Freud after he fled
+        Hampstead, North London—the final home of Sigmund Freud after he fled
         Nazi-annexed Vienna in 1938. The museum preserves Freud&apos;s study,
         including his famous psychoanalytic couch, library, and collection of
         antiquities. Alongside its permanent exhibition, the museum hosts a

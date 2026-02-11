@@ -1,0 +1,166 @@
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 12px;
+}
+
+.statusCardActive,
+.statusCardInactive {
+  margin-top: 24px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.statusCardActive {
+  background: rgba(46, 196, 134, 0.15);
+  border: 1px solid rgba(46, 196, 134, 0.4);
+  color: #5ee6a0;
+}
+
+.statusCardInactive {
+  background: rgba(250, 222, 5, 0.1);
+  border: 1px solid rgba(250, 222, 5, 0.3);
+  color: var(--color-buttery-yellow);
+}
+
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.introColumns {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .introColumns {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 40px;
+  }
+}
+
+.introText {
+  flex: 1;
+  min-width: 0;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.intro {
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+.mapContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.mapImage {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+/* Venue card grid */
+
+.venueGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.venueCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.venueCard:hover {
+  background: rgba(var(--color-white-rgb), 0.08);
+  border-color: rgba(var(--color-white-rgb), 0.16);
+}
+
+.venueCardLogo {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(var(--color-white-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.venueCardImage {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.venueCardInitial {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(var(--color-white-rgb), 0.4);
+}
+
+.venueCardBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.venueCardName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-electric-blue);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+
+.venueCard:hover .venueCardName {
+  color: var(--color-neon-pink);
+}
+
+.venueCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.venueCardStats {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  margin-top: 2px;
+}

@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Peckhamplex is an independent multiplex cinema on Rye Lane in Peckham,
-        south London. Famous for its remarkably low ticket prices—consistently
+        South London. Famous for its remarkably low ticket prices—consistently
         among the cheapest in London—it has become a beloved local institution
         and a destination for cinema-goers from across the city. The venue
         features multiple screens showing a broad mix of mainstream new

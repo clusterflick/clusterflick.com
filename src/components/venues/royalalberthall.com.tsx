@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Royal Albert Hall is one of the world&apos;s most famous concert
-        venues, located on Kensington Gore in South Kensington, central London.
+        venues, located on Kensington Gore in South Kensington, Central London.
         Opened in 1871, the Grade I listed building hosts a vast programme of
         live music, from the BBC Proms to rock and pop concerts. Alongside its
         main programme, the Royal Albert Hall hosts a popular &quot;Films in

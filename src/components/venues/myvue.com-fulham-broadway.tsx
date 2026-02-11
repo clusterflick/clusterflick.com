@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Vue Fulham Broadway is part of the Vue cinema chain, one of the
         UK&apos;s largest cinema operators. Located within the Fulham Broadway
-        Retail Centre on Fulham Road in southwest London, the venue features
+        Retail Centre on Fulham Road in Southwest London, the venue features
         multiple screens with digital projection and modern sound systems,
         showing a wide range of mainstream blockbusters, new releases, and
         popular films. As a standard Vue location, it offers online booking,
@@ -15,7 +15,7 @@ function VenueBlurb() {
   );
 }
 
-export const seoDescription = "southwest London multiplex near Fulham Road";
+export const seoDescription = "Southwest London multiplex near Fulham Road";
 export const seoHighlights = "blockbusters, new releases and mainstream films";
 
 export default VenueBlurb;
