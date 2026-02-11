@@ -49,12 +49,12 @@ export const accessibilityFilter: FilterModule<FilterId.Accessibility> = {
   }),
 
   hasActiveFilter: (state: FilterState): boolean => {
-    return state.accessibility !== null;
+    return !!state.accessibility;
   },
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const accessibility = state.accessibility;
-    if (accessibility !== null) {
+    if (accessibility) {
       params.set("accessibility", accessibility.join(","));
     }
   },
@@ -74,8 +74,8 @@ export const accessibilityFilter: FilterModule<FilterId.Accessibility> = {
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const accessibility = state.accessibility;
 
-    // null = no filter, include all
-    if (accessibility === null) {
+    // null/undefined = no filter, include all
+    if (!accessibility) {
       return movies;
     }
 

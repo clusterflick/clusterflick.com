@@ -21,12 +21,12 @@ export const genresFilter: FilterModule<FilterId.Genres> = {
 
   hasActiveFilter: (state: FilterState): boolean => {
     // Active if explicitly filtering (not all selected)
-    return state.genres !== null;
+    return !!state.genres;
   },
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const genres = state.genres;
-    if (genres !== null) {
+    if (genres) {
       params.set("genres", genres.join(","));
     }
   },
@@ -45,8 +45,8 @@ export const genresFilter: FilterModule<FilterId.Genres> = {
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const genres = state.genres;
 
-    // null = no filter, include all
-    if (genres === null) {
+    // null/undefined = no filter, include all
+    if (!genres) {
       return movies;
     }
 

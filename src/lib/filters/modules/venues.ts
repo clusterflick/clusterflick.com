@@ -20,12 +20,12 @@ export const venuesFilter: FilterModule<FilterId.Venues> = {
   }),
 
   hasActiveFilter: (state: FilterState): boolean => {
-    return state.venues !== null;
+    return !!state.venues;
   },
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const venues = state.venues;
-    if (venues !== null) {
+    if (venues) {
       params.set("venues", venues.join(","));
     }
   },
@@ -44,8 +44,8 @@ export const venuesFilter: FilterModule<FilterId.Venues> = {
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const venues = state.venues;
 
-    // null = no filter, include all
-    if (venues === null) {
+    // null/undefined = no filter, include all
+    if (!venues) {
       return movies;
     }
 

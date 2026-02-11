@@ -64,15 +64,16 @@ export const categoriesFilter: FilterModule<FilterId.Categories> = {
   }),
 
   hasActiveFilter: (state: FilterState): boolean => {
+    const categories = state.categories;
     // Active if not the default selection
-    if (state.categories === null) return true; // All selected is different from default
-    if (state.categories.length !== DEFAULT_CATEGORIES.length) return true;
-    return !DEFAULT_CATEGORIES.every((c) => state.categories!.includes(c));
+    if (!categories) return categories === null; // null = all selected (active); undefined = missing (inactive)
+    if (categories.length !== DEFAULT_CATEGORIES.length) return true;
+    return !DEFAULT_CATEGORIES.every((c) => categories.includes(c));
   },
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const categories = state.categories;
-    if (categories !== null) {
+    if (categories) {
       params.set("categories", categories.join(","));
     }
   },
@@ -94,8 +95,8 @@ export const categoriesFilter: FilterModule<FilterId.Categories> = {
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
     const categories = state.categories;
 
-    // null = no filter, include all
-    if (categories === null) {
+    // null/undefined = no filter, include all
+    if (!categories) {
       return movies;
     }
 

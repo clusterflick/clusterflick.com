@@ -45,16 +45,15 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
   }),
 
   hasActiveFilter: (state: FilterState): boolean => {
+    const range = state.dateRange;
+    if (!range) return false;
     const defaultRange = getDefaultDateRange();
-    return (
-      state.dateRange.start !== defaultRange.start ||
-      state.dateRange.end !== defaultRange.end
-    );
+    return range.start !== defaultRange.start || range.end !== defaultRange.end;
   },
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const defaultRange = getDefaultDateRange();
-    const { start, end } = state.dateRange;
+    const { start, end } = state.dateRange ?? defaultRange;
     if (start !== defaultRange.start || end !== defaultRange.end) {
       if (start !== null) {
         params.set("dateStart", timestampToLondonDateString(start));
@@ -86,9 +85,15 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
   },
 
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
-    const { start, end } = state.dateRange;
+    const range = state.dateRange;
 
     // No date filter applied
+    if (!range) {
+      return movies;
+    }
+
+    const { start, end } = range;
+
     if (start === null && end === null) {
       return movies;
     }

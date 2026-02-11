@@ -47,6 +47,27 @@ export function getDefaultState(): FilterState {
 }
 
 /**
+ * Sanitises an unknown object into a valid FilterState.
+ * Any missing or corrupt keys are replaced with their module defaults.
+ * This protects against stale session storage, malformed URL params,
+ * or future schema changes.
+ */
+export function sanitizeFilterState(raw: Record<string, unknown>): FilterState {
+  const defaults = getDefaultState();
+  const state = { ...defaults };
+
+  for (const filterModule of modules) {
+    const key = filterModule.id;
+    if (key in raw && raw[key] !== undefined) {
+      (state as Record<string, unknown>)[key] = raw[key];
+    }
+    // Otherwise the default from getDefaultState() is already in place
+  }
+
+  return state;
+}
+
+/**
  * Gets a filter value from the state.
  *
  * Note: The `as FilterState[K]` cast is needed because getModule returns
@@ -152,6 +173,7 @@ export function buildFilterUrl(state: FilterState): string {
  */
 export const filterManager = {
   getDefaultState,
+  sanitizeFilterState,
   get,
   set,
   hasActiveFilters,

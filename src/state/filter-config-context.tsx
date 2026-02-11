@@ -103,20 +103,26 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       return state;
     }
 
-    // Merge session storage (if available)
+    // Restore session storage (if available).
+    // sanitizeFilterState fills in defaults for any keys that are missing
+    // or undefined, so stale storage from before a schema change won't crash.
     try {
       const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (stored) {
-        state = JSON.parse(stored) as FilterState;
+        state = filterManager.sanitizeFilterState(JSON.parse(stored));
       }
     } catch {
       // Silently ignore — will use defaults
     }
 
     // Merge URL params on top (highest priority)
-    const urlOverrides = filterManager.parseUrlParams(window.location.search);
-    if (urlOverrides) {
-      state = { ...state, ...urlOverrides };
+    try {
+      const urlOverrides = filterManager.parseUrlParams(window.location.search);
+      if (urlOverrides) {
+        state = { ...state, ...urlOverrides };
+      }
+    } catch {
+      // Malformed URL params — ignore
     }
 
     // Discard stale dates — if a restored start or end date is in the

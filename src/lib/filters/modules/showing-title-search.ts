@@ -20,11 +20,11 @@ export const showingTitleSearchFilter: FilterModule<FilterId.ShowingTitleSearch>
     }),
 
     hasActiveFilter: (state: FilterState): boolean => {
-      return state.showingTitleSearch.trim().length > 0;
+      return (state.showingTitleSearch ?? "").trim().length > 0;
     },
 
     toUrlParams: (state: FilterState, params: URLSearchParams) => {
-      if (state.showingTitleSearch.trim().length > 0) {
+      if ((state.showingTitleSearch ?? "").trim().length > 0) {
         params.set("showingTitle", state.showingTitleSearch);
       }
     },
@@ -37,7 +37,7 @@ export const showingTitleSearchFilter: FilterModule<FilterId.ShowingTitleSearch>
     },
 
     apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
-      const query = normalizeForSearch(state.showingTitleSearch);
+      const query = normalizeForSearch(state.showingTitleSearch ?? "");
 
       // No search query = no filtering
       if (query.length === 0) {

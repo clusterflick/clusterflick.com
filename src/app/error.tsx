@@ -9,10 +9,24 @@ interface ErrorProps {
   reset: () => void;
 }
 
+/**
+ * Clears any client-side storage that could contain stale or corrupt data,
+ * giving the app a clean slate on recovery.
+ */
+function clearClientStorage() {
+  try {
+    sessionStorage.clear();
+  } catch {
+    // Ignore — storage may be unavailable
+  }
+}
+
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error("Application error:", error);
+    console.error("[Clusterflick] Unhandled error:", error);
+    // Eagerly clear storage so that "Try Again" or a manual refresh
+    // doesn't hit the same corrupt state in a loop.
+    clearClientStorage();
   }, [error]);
 
   return (

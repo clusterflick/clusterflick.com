@@ -73,8 +73,8 @@ function describeCategories(
 ): string | null {
   const categories = state.categories;
 
-  // null means all categories selected
-  if (categories === null) {
+  // null/undefined means all categories selected
+  if (!categories) {
     return null; // Will be handled by caller as "All events"
   }
 
@@ -103,8 +103,8 @@ function describeGenres(
 ): string | null | "none" {
   const genres = state.genres;
 
-  // null means all genres (no filter)
-  if (genres === null || !genreLookup) {
+  // null/undefined means all genres (no filter)
+  if (!genres || !genreLookup) {
     return null;
   }
 
@@ -173,8 +173,8 @@ function describeVenues(
 ): string {
   const venues = state.venues;
 
-  // null means all venues
-  if (venues === null) {
+  // null/undefined means all venues
+  if (!venues) {
     return "At all venues";
   }
 
@@ -306,6 +306,10 @@ function matchDatePreset(range: {
 function describeDateRange(state: FilterState): string {
   const range = state.dateRange;
 
+  if (!range) {
+    return "Showing any time";
+  }
+
   // Check for preset match
   const preset = matchDatePreset(range);
   if (preset) {
@@ -345,8 +349,8 @@ function describeDateRange(state: FilterState): string {
 function describeAccessibility(state: FilterState): string | null | "none" {
   const accessibility = state.accessibility;
 
-  // null means no filter
-  if (accessibility === null) {
+  // null/undefined means no filter
+  if (!accessibility) {
     return null;
   }
 
@@ -381,9 +385,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const showingTitleQuery = state.showingTitleSearch?.trim();
 
   // Check if "all events" (all categories, all genres, all accessibility)
-  const allCategories = state.categories === null;
-  const allGenres = state.genres === null;
-  const allAccessibility = state.accessibility === null;
+  const allCategories = !state.categories;
+  const allGenres = !state.genres;
+  const allAccessibility = !state.accessibility;
 
   // Handle no genres or no accessibility selected case
   if (genreDesc === "none") {
