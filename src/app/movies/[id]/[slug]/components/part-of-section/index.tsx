@@ -32,6 +32,7 @@ export default function PartOfSection({
               subtitle={event.year}
               showOverlay
               size="small"
+              headingLevel="h3"
             />
           </Link>
         ))}

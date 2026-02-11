@@ -13,9 +13,11 @@ import styles from "./movie-cell.module.css";
 export default function MovieCell({
   movie,
   style,
+  priority,
 }: {
   movie: Movie;
   style: CSSProperties;
+  priority?: boolean;
 }) {
   const href = getMovieUrl(movie);
   const includedMovies = movie.includedMovies;
@@ -30,7 +32,7 @@ export default function MovieCell({
     includedMovies && includedMovies.length > 1 && totalPosters >= 2;
 
   return (
-    <div style={style}>
+    <div style={style} role="listitem">
       <Link
         href={href}
         className={styles.movieLink}
@@ -49,6 +51,7 @@ export default function MovieCell({
             includedMovies={includedMovies}
             subtitle={subtitle}
             showOverlay
+            priority={priority}
           />
         ) : (
           <MoviePoster
@@ -56,6 +59,7 @@ export default function MovieCell({
             title={movie.title}
             subtitle={subtitle}
             showOverlay
+            priority={priority}
           />
         )}
       </Link>

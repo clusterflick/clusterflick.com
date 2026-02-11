@@ -327,6 +327,7 @@ export default function VenueFilterSection({
                       <Chip
                         key={venue.id}
                         type="checkbox"
+                        name="venue"
                         label={displayName}
                         count={venue.count}
                         checked={isVenueSelected(venue.id)}

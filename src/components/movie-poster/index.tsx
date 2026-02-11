@@ -9,6 +9,7 @@ interface MoviePosterImageProps {
   posterPath: string;
   overlay: React.ReactNode | null;
   interactive: boolean;
+  priority?: boolean;
 }
 
 function MoviePosterImage({
@@ -17,6 +18,7 @@ function MoviePosterImage({
   posterPath,
   overlay,
   interactive,
+  priority,
 }: MoviePosterImageProps) {
   const dimensions =
     size === "large"
@@ -24,6 +26,7 @@ function MoviePosterImage({
       : { width: 200, height: 300 };
 
   const imageSize = size === "large" ? "w500" : "w342";
+  const isPriority = priority ?? size === "large";
 
   return (
     <div
@@ -38,7 +41,7 @@ function MoviePosterImage({
         alt={title}
         width={dimensions.width}
         height={dimensions.height}
-        priority={size === "large"}
+        priority={isPriority}
       />
       {overlay}
     </div>
@@ -102,6 +105,10 @@ interface MoviePosterProps {
   showOverlay?: boolean;
   /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
   interactive?: boolean;
+  /** Whether this image should be loaded eagerly with fetchpriority="high". */
+  priority?: boolean;
+  /** Heading level for the overlay title. Defaults to "h2". */
+  headingLevel?: "h2" | "h3";
 }
 
 export default function MoviePoster({
@@ -111,6 +118,8 @@ export default function MoviePoster({
   size = "small",
   showOverlay = false,
   interactive = true,
+  priority,
+  headingLevel: HeadingTag = "h2",
 }: MoviePosterProps) {
   // For placeholder posters, always show the overlay so users know what the movie is
   const alwaysShowOverlay = !posterPath;
@@ -123,7 +132,7 @@ export default function MoviePoster({
       )}
     >
       <div>
-        <h3 className={styles.title}>{title}</h3>
+        <HeadingTag className={styles.title}>{title}</HeadingTag>
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
     </div>
@@ -137,6 +146,7 @@ export default function MoviePoster({
         posterPath={posterPath}
         overlay={overlay}
         interactive={interactive}
+        priority={priority}
       />
     );
   }

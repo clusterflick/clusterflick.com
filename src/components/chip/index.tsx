@@ -8,38 +8,39 @@ interface ChipBaseProps {
   checked: boolean;
   count?: number;
   disabled?: boolean;
+  name: string;
 }
 
 interface ChipCheckboxProps extends ChipBaseProps {
   type: "checkbox";
   onChange: (checked: boolean) => void;
-  name?: string;
 }
 
 interface ChipRadioProps extends ChipBaseProps {
   type: "radio";
   onChange: (value: string) => void;
-  name: string;
   value: string;
 }
 
 type ChipProps = ChipCheckboxProps | ChipRadioProps;
 
 export default function Chip(props: ChipProps) {
-  const { type, label, checked, count, disabled } = props;
+  const { type, label, checked, count, disabled, name } = props;
 
+  // Use `props.type` (not destructured `type`) when accessing type-specific
+  // props like `props.value` or `props.onChange` — TypeScript only narrows
+  // the full `props` object, not standalone destructured variables.
   const handleChange = () => {
     if (disabled) return;
-    if (type === "checkbox") {
+    if (props.type === "checkbox") {
       props.onChange(!checked);
     } else {
       props.onChange(props.value);
     }
   };
 
-  const inputId = `chip-${props.type}-${type === "radio" ? props.value : label}`
-    .toLowerCase()
-    .replace(/\s+/g, "-");
+  const value = props.type === "radio" ? props.value : label;
+  const inputId = `chip-${name}-${value}`.toLowerCase().replace(/\s+/g, "-");
 
   return (
     <label
@@ -53,8 +54,8 @@ export default function Chip(props: ChipProps) {
       <input
         type={type}
         id={inputId}
-        name={type === "radio" ? props.name : props.name || label}
-        value={type === "radio" ? props.value : undefined}
+        name={name}
+        value={props.type === "radio" ? props.value : undefined}
         checked={checked}
         onChange={handleChange}
         disabled={disabled}

@@ -233,6 +233,7 @@ export default function CategoryFilterSection({
           <Chip
             key={value}
             type="checkbox"
+            name="category"
             label={label}
             count={categoryCounts.get(value)}
             checked={isCategorySelected(value)}
@@ -271,6 +272,7 @@ export default function CategoryFilterSection({
             <Chip
               key={value}
               type="checkbox"
+              name="accessibility"
               label={label}
               count={accessibilityCounts.get(value)}
               checked={isAccessibilitySelected(value)}
@@ -310,6 +312,7 @@ export default function CategoryFilterSection({
                 <Chip
                   key={genre.id}
                   type="checkbox"
+                  name="genre"
                   label={genre.name}
                   count={genreCounts.get(genre.id)}
                   checked={isGenreSelected(genre.id)}

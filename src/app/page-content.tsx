@@ -65,12 +65,22 @@ export default function PageContent() {
   const rowCount = Math.ceil(moviesList.length / columnCount);
   const gridWidth = columnCount * (POSTER_WIDTH + GAP);
 
+  // Number of initial rows to eagerly load images for (above the fold)
+  const priorityRows = 2;
+
   const cellRenderer = useCallback(
     ({ columnIndex, key, rowIndex, style }: GridCellProps) => {
       const index = rowIndex * columnCount + columnIndex;
       const movie = moviesList[index];
       if (!movie) return null;
-      return <MovieCell key={key} movie={movie} style={style} />;
+      return (
+        <MovieCell
+          key={key}
+          movie={movie}
+          style={style}
+          priority={rowIndex < priorityRows}
+        />
+      );
     },
     [moviesList, columnCount],
   );
@@ -195,6 +205,8 @@ export default function PageContent() {
               scrollTop={scrollTop}
               width={gridWidth}
               overscanRowCount={3}
+              role="list"
+              containerRole="presentation"
             />
           </div>
         )}

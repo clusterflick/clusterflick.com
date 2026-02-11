@@ -21,6 +21,10 @@ interface StackedPosterProps {
   size?: "small" | "large";
   /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
   interactive?: boolean;
+  /** Whether images should be loaded eagerly with fetchpriority="high". */
+  priority?: boolean;
+  /** Heading level for the overlay title. Defaults to "h2". */
+  headingLevel?: "h2" | "h3";
 }
 
 // Dimensions for poster cards at each size
@@ -34,11 +38,13 @@ function PosterImage({
   title,
   className,
   size = "small",
+  priority,
 }: {
   posterPath?: string;
   title: string;
   className?: string;
   size?: "small" | "large";
+  priority?: boolean;
 }) {
   const dimensions = POSTER_DIMENSIONS[size];
   const sizeClass = size === "large" ? styles.posterCardLarge : "";
@@ -53,6 +59,7 @@ function PosterImage({
           width={dimensions.width}
           height={dimensions.height}
           className={styles.posterImage}
+          {...(priority ? { priority: true } : {})}
         />
       </div>
     );
@@ -129,6 +136,8 @@ export default function StackedPoster({
   showOverlay = false,
   size = "small",
   interactive = true,
+  priority,
+  headingLevel: HeadingTag = "h2",
 }: StackedPosterProps) {
   // Only use movies that have poster paths
   const moviesWithPosters = includedMovies.filter((m) => m.posterPath);
@@ -174,7 +183,7 @@ export default function StackedPoster({
       )}
     >
       <div>
-        <h3 className={styles.title}>{mainTitle}</h3>
+        <HeadingTag className={styles.title}>{mainTitle}</HeadingTag>
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
     </div>
@@ -207,6 +216,7 @@ export default function StackedPoster({
             posterPath={poster.posterPath}
             title={poster.title}
             size={size}
+            priority={priority}
           />
         </div>
       ))}
