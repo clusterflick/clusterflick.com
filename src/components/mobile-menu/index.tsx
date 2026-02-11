@@ -46,11 +46,7 @@ export default function MobileMenu() {
 
   const menuContent = isOpen && (
     <>
-      <div
-        className={styles.overlay}
-        onClick={closeMenu}
-        aria-hidden="true"
-      />
+      <div className={styles.overlay} onClick={closeMenu} aria-hidden="true" />
       <div
         className={styles.menuPanel}
         role="dialog"

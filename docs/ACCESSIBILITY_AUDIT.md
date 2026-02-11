@@ -59,6 +59,7 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 
 **WCAG:** 1.3.1 Info and Relationships (A), 4.1.2 Name, Role, Value (A)
 **Files:**
+
 - `src/components/filter-overlay/index.tsx:213-221` — "Search event title..." input has `id` but no `<label>` or `aria-label`
 - `src/components/filter-overlay/index.tsx:273-281` — "Search original venue title..." input, same issue
 - `src/components/filter-overlay/venue-filter-section.tsx:195-201` — "Filter venues..." input has no `id`, `<label>`, or `aria-label`
@@ -81,6 +82,7 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 
 **WCAG:** 4.1.3 Status Messages (AA)
 **Files:**
+
 - `src/components/spinner/index.tsx:9` — renders a bare `<div>` with no ARIA attributes
 - `src/components/loading-indicator/index.tsx:32-35` — wrapper div has no `role="status"` or `aria-live`
 
@@ -98,10 +100,11 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 
 **WCAG:** 2.4.4 Link Purpose (A), 1.1.1 Non-text Content (A)
 **Files:**
+
 - `src/app/about/page.tsx:78-85` — social `LinkCard` components
 - `src/components/link-card/index.tsx:21-28` — `<a>` element accepts no `aria-label` prop
 
-**Issue:** Social links render as `<a>` with an SVG icon + handle text. While the handle text provides *some* context, the `LinkCard` component doesn't support `aria-label`, so links like the email one announce with less clarity. More critically, the SVG icons have no `aria-hidden="true"`, so screen readers may attempt to describe them.
+**Issue:** Social links render as `<a>` with an SVG icon + handle text. While the handle text provides _some_ context, the `LinkCard` component doesn't support `aria-label`, so links like the email one announce with less clarity. More critically, the SVG icons have no `aria-hidden="true"`, so screen readers may attempt to describe them.
 **Fix:** Add `aria-label` prop support to `LinkCard`. Mark social media SVG icons with `aria-hidden="true"` in the icon components. Use `aria-label` like `"Clusterflick on Instagram"` for each social link.
 
 #### 10. Mobile menu focus not restored on close
@@ -115,7 +118,7 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 
 **WCAG:** 2.4.4 Link Purpose (A)
 **File:** `src/components/header-logo/index.tsx:20`
-**Issue:** The button's accessible name is derived from its content: the image alt ("Clusterflick") and the text "Clusterflick". But the button's *action* is to reset filters and scroll to top — not navigation to a homepage. Users expect a logo to be a link to home, not a button with a side effect.
+**Issue:** The button's accessible name is derived from its content: the image alt ("Clusterflick") and the text "Clusterflick". But the button's _action_ is to reset filters and scroll to top — not navigation to a homepage. Users expect a logo to be a link to home, not a button with a side effect.
 **Fix:** Add `aria-label="Clusterflick — reset filters and return to top"` to the button.
 
 ---
@@ -127,18 +130,19 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 **WCAG:** 1.4.3 Contrast (Minimum) (AA)
 **File:** `src/app/globals.css:11`
 **Used in:**
+
 - `src/components/filter-overlay/filter-overlay.module.css` (section descriptions, date labels, geo error text)
 - `src/components/expandable-section/expandable-section.module.css` (trigger text)
 - `src/components/chip/chip.module.css` (count text)
 
-**Issue:** `#888888` on `#010013` (midnight navy) gives a contrast ratio of approximately 5.3:1, which passes AA for normal text (4.5:1). However, at small font sizes (11px used for date labels, chip counts), some of this text may be *effectively* hard to read. The expandable section trigger text at `#888888` on darker overlay backgrounds may also be borderline.
+**Issue:** `#888888` on `#010013` (midnight navy) gives a contrast ratio of approximately 5.3:1, which passes AA for normal text (4.5:1). However, at small font sizes (11px used for date labels, chip counts), some of this text may be _effectively_ hard to read. The expandable section trigger text at `#888888` on darker overlay backgrounds may also be borderline.
 **Recommendation:** Increase to `#999999` or `#9a9a9a` for more comfortable readability, especially for small text.
 
 #### 13. Venue group "Select All"/"Clear All" buttons missing `aria-label`
 
 **WCAG:** 2.4.4 Link Purpose (A)
 **File:** `src/components/filter-overlay/venue-filter-section.tsx:286-301`
-**Issue:** Within each venue group, the "Select All" and "Clear All" buttons have no `aria-label` indicating *which group* they apply to. Multiple identical "Select All" buttons on one page are confusing for screen reader users.
+**Issue:** Within each venue group, the "Select All" and "Clear All" buttons have no `aria-label` indicating _which group_ they apply to. Multiple identical "Select All" buttons on one page are confusing for screen reader users.
 **Fix:** Add `aria-label={`Select all ${group.label} venues`}` to each button.
 
 #### 14. Genre filter "Select All"/"Clear All" missing `aria-label`
@@ -188,7 +192,7 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 #### 20. Expandable section uses `hidden` attribute
 
 **File:** `src/components/expandable-section/index.tsx:55`
-**Issue:** The `hidden` attribute completely removes content from the accessibility tree when collapsed. This is actually *correct* behavior for a disclosure widget — screen readers should not access hidden content. No fix needed, just confirming this is intentional.
+**Issue:** The `hidden` attribute completely removes content from the accessibility tree when collapsed. This is actually _correct_ behavior for a disclosure widget — screen readers should not access hidden content. No fix needed, just confirming this is intentional.
 
 #### 21. External links missing indication they open in new tab
 
@@ -201,23 +205,23 @@ Before listing issues, it's worth noting that Clusterflick already has a solid a
 
 ## Fix Plan (Ordered by Priority)
 
-| # | Issue | Priority | Effort | Files to Change |
-|---|-------|----------|--------|-----------------|
-| 1 | Add `<main>` landmark | P0 | Low | `page-wrapper/index.tsx`, `about/page.tsx` |
-| 2 | Add `<header>` landmark | P0 | Low | `main-header/index.tsx` |
-| 3 | Add `<nav>` to desktop navigation | P0 | Low | `header-nav/index.tsx` |
-| 4 | Add skip navigation link | P0 | Low | `layout.tsx`, `globals.css` |
-| 5 | Add `aria-label` to search inputs | P0 | Low | `filter-overlay/index.tsx`, `venue-filter-section.tsx` |
-| 6 | Add dialog role + focus trap to filter overlay | P0 | Medium | `filter-overlay/index.tsx` |
-| 7 | Add `role="status"` to loading indicator | P1 | Low | `loading-indicator/index.tsx`, `spinner/index.tsx` |
-| 8 | Announce "Copied!" to screen readers | P1 | Low | `filter-overlay/index.tsx` |
-| 9 | Add accessible names to social links | P1 | Low | `link-card/index.tsx`, `about/page.tsx`, `icons/index.tsx` |
-| 10 | Restore focus on mobile menu close | P1 | Low | `mobile-menu/index.tsx` |
-| 11 | Improve header logo button label | P1 | Low | `header-logo/index.tsx` |
-| 12 | Review muted gray contrast | P2 | Low | `globals.css` |
-| 13 | Add `aria-label` to venue group buttons | P2 | Low | `venue-filter-section.tsx` |
-| 14 | Add `aria-label` to genre filter buttons | P2 | Low | `category-filter-section.tsx` |
-| 15 | Add `<main>` to about page | P2 | Low | `about/page.tsx` |
-| 16 | Add `aria-hidden` to decorative SVG icons | P2 | Low | `icons/index.tsx` |
-| 17 | Announce geolocation error | P2 | Low | `venue-filter-section.tsx` |
-| 18-21 | Low-priority enhancements | P3 | Low | Various |
+| #     | Issue                                          | Priority | Effort | Files to Change                                            |
+| ----- | ---------------------------------------------- | -------- | ------ | ---------------------------------------------------------- |
+| 1     | Add `<main>` landmark                          | P0       | Low    | `page-wrapper/index.tsx`, `about/page.tsx`                 |
+| 2     | Add `<header>` landmark                        | P0       | Low    | `main-header/index.tsx`                                    |
+| 3     | Add `<nav>` to desktop navigation              | P0       | Low    | `header-nav/index.tsx`                                     |
+| 4     | Add skip navigation link                       | P0       | Low    | `layout.tsx`, `globals.css`                                |
+| 5     | Add `aria-label` to search inputs              | P0       | Low    | `filter-overlay/index.tsx`, `venue-filter-section.tsx`     |
+| 6     | Add dialog role + focus trap to filter overlay | P0       | Medium | `filter-overlay/index.tsx`                                 |
+| 7     | Add `role="status"` to loading indicator       | P1       | Low    | `loading-indicator/index.tsx`, `spinner/index.tsx`         |
+| 8     | Announce "Copied!" to screen readers           | P1       | Low    | `filter-overlay/index.tsx`                                 |
+| 9     | Add accessible names to social links           | P1       | Low    | `link-card/index.tsx`, `about/page.tsx`, `icons/index.tsx` |
+| 10    | Restore focus on mobile menu close             | P1       | Low    | `mobile-menu/index.tsx`                                    |
+| 11    | Improve header logo button label               | P1       | Low    | `header-logo/index.tsx`                                    |
+| 12    | Review muted gray contrast                     | P2       | Low    | `globals.css`                                              |
+| 13    | Add `aria-label` to venue group buttons        | P2       | Low    | `venue-filter-section.tsx`                                 |
+| 14    | Add `aria-label` to genre filter buttons       | P2       | Low    | `category-filter-section.tsx`                              |
+| 15    | Add `<main>` to about page                     | P2       | Low    | `about/page.tsx`                                           |
+| 16    | Add `aria-hidden` to decorative SVG icons      | P2       | Low    | `icons/index.tsx`                                          |
+| 17    | Announce geolocation error                     | P2       | Low    | `venue-filter-section.tsx`                                 |
+| 18-21 | Low-priority enhancements                      | P3       | Low    | Various                                                    |
