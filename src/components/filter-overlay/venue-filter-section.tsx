@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { VenueOption, VENUE_OPTIONS } from "@/state/filter-config-context";
 import { VenueGroup } from "@/hooks/use-venue-groups";
 import Button from "@/components/button";
@@ -110,14 +111,9 @@ export default function VenueFilterSection({
   return (
     <section className={styles.section} aria-labelledby="venues-heading">
       <div className={styles.sectionHeader}>
-        <div className={styles.sectionHeaderText}>
-          <h3 id="venues-heading" className={styles.sectionTitle}>
-            Venues
-          </h3>
-          <p className={styles.sectionDescription}>
-            Choose which venues to include
-          </p>
-        </div>
+        <h3 id="venues-heading" className={styles.sectionTitle}>
+          Venues
+        </h3>
         <div className={styles.selectionControls}>
           <Button
             variant="link"
@@ -140,6 +136,13 @@ export default function VenueFilterSection({
           </Button>
         </div>
       </div>
+      <p className={styles.sectionDescription}>
+        Choose which venues to include.
+        <br />
+        <Link href="/venues" className={styles.sectionLink}>
+          See a list of all venues
+        </Link>
+      </p>
       <div
         className={styles.chipGroup}
         role="radiogroup"

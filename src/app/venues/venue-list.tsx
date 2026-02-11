@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import type { VenueGroupData } from "./page";
+import { normalizeForSearch } from "@/lib/filters/normalize";
 import styles from "./page.module.css";
 
 interface VenueListProps {
@@ -16,11 +17,13 @@ export default function VenueList({ groups }: VenueListProps) {
   const filteredGroups = useMemo(() => {
     if (!query.trim()) return groups;
 
-    const q = query.toLowerCase().trim();
+    const q = normalizeForSearch(query);
     return groups
       .map((group) => ({
         ...group,
-        venues: group.venues.filter((v) => v.name.toLowerCase().includes(q)),
+        venues: group.venues.filter((v) =>
+          normalizeForSearch(v.name).includes(q),
+        ),
       }))
       .filter((group) => group.venues.length > 0);
   }, [groups, query]);

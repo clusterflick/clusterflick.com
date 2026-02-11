@@ -11,11 +11,11 @@ export const normalizeForSearch = (str: string): string => {
       // Remove diacritics: normalize to NFD (decomposed form), then strip combining marks
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      // Remove common punctuation that might differ between query and title
+      // Remove common punctuation and spacing that might differ
       .replace(/[''`´]/g, "") // apostrophes and similar
       .replace(/[.:;,!?]/g, "") // common punctuation
-      .replace(/[-–—]/g, " ") // dashes to spaces
-      .replace(/\s+/g, " ") // collapse multiple spaces
+      .replace(/[-–—]/g, "") // dashes
+      .replace(/\s+/g, "") // spaces
       .trim()
   );
 };

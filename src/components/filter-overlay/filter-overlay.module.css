@@ -54,15 +54,9 @@
 
 .sectionHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-}
-
-.sectionHeaderText {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .sectionTitle {

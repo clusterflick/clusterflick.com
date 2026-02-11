@@ -194,14 +194,9 @@ export default function CategoryFilterSection({
   return (
     <section className={styles.section} aria-labelledby="events-heading">
       <div className={styles.sectionHeader}>
-        <div className={styles.sectionHeaderText}>
-          <h3 id="events-heading" className={styles.sectionTitle}>
-            Events
-          </h3>
-          <p className={styles.sectionDescription}>
-            Select the types of events you want to see
-          </p>
-        </div>
+        <h3 id="events-heading" className={styles.sectionTitle}>
+          Events
+        </h3>
         <div className={styles.selectionControls}>
           <Button
             variant="link"
@@ -224,6 +219,9 @@ export default function CategoryFilterSection({
           </Button>
         </div>
       </div>
+      <p className={styles.sectionDescription}>
+        Select the types of events you want to see
+      </p>
       <div
         className={styles.chipGroup}
         role="group"
