@@ -36,6 +36,9 @@ export default function FilterOverlay({
     toggleGenre,
     selectAllGenres,
     clearAllGenres,
+    toggleAccessibility,
+    selectAllAccessibility,
+    clearAllAccessibility,
     setDateRange,
     setDateOption,
     setVenueOption,
@@ -364,6 +367,7 @@ export default function FilterOverlay({
             filterState={{
               categories: filterState.categories,
               genres: filterState.genres,
+              accessibility: filterState.accessibility,
             }}
             toggleCategory={toggleCategory}
             selectAllCategories={selectAllCategories}
@@ -371,6 +375,9 @@ export default function FilterOverlay({
             toggleGenre={toggleGenre}
             selectAllGenres={selectAllGenres}
             clearAllGenres={clearAllGenres}
+            toggleAccessibility={toggleAccessibility}
+            selectAllAccessibility={selectAllAccessibility}
+            clearAllAccessibility={clearAllAccessibility}
           />
         </div>
 

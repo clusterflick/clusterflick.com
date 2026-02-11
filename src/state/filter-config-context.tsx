@@ -9,7 +9,12 @@ import {
   ReactNode,
   useMemo,
 } from "react";
-import { Category } from "@/types";
+import {
+  AccessibilityFeature,
+  AccessibilityFilterValue,
+  ACCESSIBILITY_NONE,
+  Category,
+} from "@/types";
 import { FilterState, FilterId, filterManager } from "@/lib/filters";
 import {
   getLondonMidnightTimestamp,
@@ -68,6 +73,10 @@ type FilterConfigContextType = {
   toggleGenre: (genreId: string, allGenreIds: string[]) => void;
   selectAllGenres: () => void;
   clearAllGenres: () => void;
+  // Accessibility
+  toggleAccessibility: (feature: AccessibilityFilterValue) => void;
+  selectAllAccessibility: () => void;
+  clearAllAccessibility: () => void;
   // Date range (timestamps representing midnight London time)
   setDateRange: (start: number | null, end: number | null) => void;
   setDateOption: (option: DateOption) => void;
@@ -232,6 +241,55 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState((prev) => filterManager.set(prev, FilterId.Genres, []));
   }, []);
 
+  // Accessibility - null means all (no filter), [] means none, [...] means specific
+  // Includes all real features plus the "none" sentinel for performances without features
+  const toggleAccessibility = useCallback(
+    (feature: AccessibilityFilterValue) => {
+      const allValues: AccessibilityFilterValue[] = [
+        ACCESSIBILITY_NONE,
+        ...Object.values(AccessibilityFeature),
+      ];
+      setFilterState((prev) => {
+        const current = filterManager.get(prev, FilterId.Accessibility);
+        if (current === null) {
+          // All selected (no filter), remove this one (select all except this)
+          return filterManager.set(
+            prev,
+            FilterId.Accessibility,
+            allValues.filter((f) => f !== feature),
+          );
+        }
+        const index = current.indexOf(feature);
+        if (index >= 0) {
+          // Remove
+          const updated = current.filter((f) => f !== feature);
+          return filterManager.set(prev, FilterId.Accessibility, updated);
+        } else {
+          // Add
+          const updated = [...current, feature];
+          // If all now selected, set to null
+          if (updated.length === allValues.length) {
+            return filterManager.set(prev, FilterId.Accessibility, null);
+          }
+          return filterManager.set(prev, FilterId.Accessibility, updated);
+        }
+      });
+    },
+    [],
+  );
+
+  const selectAllAccessibility = useCallback(() => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.Accessibility, null),
+    );
+  }, []);
+
+  const clearAllAccessibility = useCallback(() => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.Accessibility, []),
+    );
+  }, []);
+
   // Date range (all timestamps represent midnight London time)
   const setDateRange = useCallback(
     (start: number | null, end: number | null) => {
@@ -383,6 +441,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleGenre,
       selectAllGenres,
       clearAllGenres,
+      toggleAccessibility,
+      selectAllAccessibility,
+      clearAllAccessibility,
       setDateRange,
       setDateOption,
       setVenueOption,
@@ -402,6 +463,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleGenre,
       selectAllGenres,
       clearAllGenres,
+      toggleAccessibility,
+      selectAllAccessibility,
+      clearAllAccessibility,
       setDateRange,
       setDateOption,
       setVenueOption,

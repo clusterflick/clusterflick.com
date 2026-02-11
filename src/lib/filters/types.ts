@@ -1,4 +1,4 @@
-import { Category, Movie } from "@/types";
+import { AccessibilityFilterValue, Category, Movie } from "@/types";
 
 /**
  * Enum of all filter IDs for consistent usage across the codebase.
@@ -10,6 +10,7 @@ export enum FilterId {
   Venues = "venues",
   DateRange = "dateRange",
   Genres = "genres",
+  Accessibility = "accessibility",
 }
 
 /**
@@ -24,6 +25,7 @@ export type FilterState = {
   [FilterId.Venues]: string[] | null;
   [FilterId.DateRange]: { start: number | null; end: number | null };
   [FilterId.Genres]: string[] | null;
+  [FilterId.Accessibility]: AccessibilityFilterValue[] | null;
 };
 
 /**
@@ -80,4 +82,5 @@ export type AnyFilterModule =
   | FilterModule<FilterId.Categories>
   | FilterModule<FilterId.Venues>
   | FilterModule<FilterId.DateRange>
-  | FilterModule<FilterId.Genres>;
+  | FilterModule<FilterId.Genres>
+  | FilterModule<FilterId.Accessibility>;

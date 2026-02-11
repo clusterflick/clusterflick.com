@@ -374,6 +374,12 @@
   gap: 12px;
 }
 
+/* When an advancedFilterGroup is a direct child of a section (not inside advancedFilters),
+   add top spacing to separate it from the preceding chip group. */
+.section > .advancedFilterGroup {
+  margin-top: 20px;
+}
+
 .advancedFilterHeader {
   display: flex;
   align-items: center;

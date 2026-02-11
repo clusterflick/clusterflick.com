@@ -1,4 +1,11 @@
-import { Category, Genre, Venue } from "@/types";
+import {
+  AccessibilityFeature,
+  ACCESSIBILITY_NONE,
+  Category,
+  Genre,
+  Venue,
+} from "@/types";
+import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import {
   formatDateShort,
   getLondonMidnightTimestamp,
@@ -329,6 +336,35 @@ function describeDateRange(state: FilterState): string {
 }
 
 /**
+ * Describes the accessibility part of the filter.
+ * Returns:
+ * - null if no filter applied (all included)
+ * - "none" if no features selected (empty array)
+ * - formatted feature names otherwise
+ */
+function describeAccessibility(state: FilterState): string | null | "none" {
+  const accessibility = state.accessibility;
+
+  // null means no filter
+  if (accessibility === null) {
+    return null;
+  }
+
+  // Empty array means none selected
+  if (accessibility.length === 0) {
+    return "none";
+  }
+
+  // Get labels for selected features
+  const labels = accessibility.map((value) => {
+    if (value === ACCESSIBILITY_NONE) return "No accessibility";
+    return ACCESSIBILITY_LABELS[value as AccessibilityFeature] ?? value;
+  });
+
+  return formatList(labels, 3);
+}
+
+/**
  * Generates a human-readable description of the current filter state.
  */
 export function describeFilters(options: DescribeOptions): FilterDescription {
@@ -340,18 +376,22 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
 
   const categoryDesc = describeCategories(state, categories);
   const genreDesc = describeGenres(state, genres);
+  const accessibilityDesc = describeAccessibility(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
 
-  // Check if "all events" (all categories, all genres)
+  // Check if "all events" (all categories, all genres, all accessibility)
   const allCategories = state.categories === null;
   const allGenres = state.genres === null;
+  const allAccessibility = state.accessibility === null;
 
-  // Handle no genres selected case
+  // Handle no genres or no accessibility selected case
   if (genreDesc === "none") {
     eventsDesc = "No genres selected";
-  } else if (allCategories && allGenres) {
-    // All categories and all genres selected
+  } else if (accessibilityDesc === "none") {
+    eventsDesc = "No accessibility features selected";
+  } else if (allCategories && allGenres && allAccessibility) {
+    // All categories, all genres, and all accessibility selected
     eventsDesc = "All events";
     if (searchQuery) {
       eventsDesc += ` matching "${searchQuery}"`;
@@ -363,7 +403,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     const parts: string[] = [];
 
     // Add genre prefix if specific genres selected
-    if (genreDesc && genreDesc !== "none") {
+    if (genreDesc) {
       parts.push(`${genreDesc} Genre`);
     }
 
@@ -375,6 +415,11 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
 
     eventsDesc = parts.join(" ");
+
+    // Add accessibility suffix if specific features selected
+    if (accessibilityDesc && accessibilityDesc !== "none") {
+      eventsDesc += ` with ${accessibilityDesc}`;
+    }
 
     // Add search suffix
     if (searchQuery) {

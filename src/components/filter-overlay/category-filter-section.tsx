@@ -1,12 +1,35 @@
 "use client";
 
 import { useMemo } from "react";
-import { Category, CinemaData, Genre } from "@/types";
+import {
+  AccessibilityFeature,
+  AccessibilityFilterValue,
+  ACCESSIBILITY_NONE,
+  Category,
+  CinemaData,
+  Genre,
+} from "@/types";
+import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import { EVENT_CATEGORIES } from "@/state/filter-config-context";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
+
+/**
+ * All accessibility filter options in display order.
+ * "None" comes first to represent performances without accessibility features.
+ */
+const ACCESSIBILITY_OPTIONS: {
+  value: AccessibilityFilterValue;
+  label: string;
+}[] = [
+  { value: ACCESSIBILITY_NONE, label: "None" },
+  ...Object.values(AccessibilityFeature).map((feature) => ({
+    value: feature,
+    label: ACCESSIBILITY_LABELS[feature],
+  })),
+];
 
 interface CategoryFilterSectionProps {
   movies: CinemaData["movies"];
@@ -14,6 +37,7 @@ interface CategoryFilterSectionProps {
   filterState: {
     categories: Category[] | null;
     genres: string[] | null;
+    accessibility: AccessibilityFilterValue[] | null;
   };
   toggleCategory: (category: Category) => void;
   selectAllCategories: () => void;
@@ -21,6 +45,9 @@ interface CategoryFilterSectionProps {
   toggleGenre: (genreId: string, allGenreIds: string[]) => void;
   selectAllGenres: () => void;
   clearAllGenres: () => void;
+  toggleAccessibility: (feature: AccessibilityFilterValue) => void;
+  selectAllAccessibility: () => void;
+  clearAllAccessibility: () => void;
 }
 
 export default function CategoryFilterSection({
@@ -33,6 +60,9 @@ export default function CategoryFilterSection({
   toggleGenre,
   selectAllGenres,
   clearAllGenres,
+  toggleAccessibility,
+  selectAllAccessibility,
+  clearAllAccessibility,
 }: CategoryFilterSectionProps) {
   // Count movies by category
   const categoryCounts = useMemo(() => {
@@ -103,9 +133,59 @@ export default function CategoryFilterSection({
     return filterState.categories.includes(category);
   };
 
+  // Count movies by accessibility feature (including "None")
+  const accessibilityCounts = useMemo(() => {
+    const counts = new Map<AccessibilityFilterValue, number>();
+
+    // Initialize all options with 0
+    ACCESSIBILITY_OPTIONS.forEach(({ value }) => counts.set(value, 0));
+
+    // Count movies that have at least one performance with each feature
+    Object.values(movies).forEach((movie) => {
+      const movieFeatures = new Set<AccessibilityFilterValue>();
+      let hasPerformanceWithoutFeatures = false;
+
+      movie.performances.forEach((perf) => {
+        let perfHasAnyFeature = false;
+        if (perf.accessibility) {
+          Object.entries(perf.accessibility).forEach(([feature, enabled]) => {
+            if (enabled) {
+              perfHasAnyFeature = true;
+              movieFeatures.add(feature as AccessibilityFeature);
+            }
+          });
+        }
+        if (!perfHasAnyFeature) {
+          hasPerformanceWithoutFeatures = true;
+        }
+      });
+
+      if (hasPerformanceWithoutFeatures) {
+        movieFeatures.add(ACCESSIBILITY_NONE);
+      }
+
+      movieFeatures.forEach((feature) => {
+        counts.set(feature, (counts.get(feature) || 0) + 1);
+      });
+    });
+
+    return counts;
+  }, [movies]);
+
+  // Helper to check if an accessibility option is selected
+  const isAccessibilitySelected = (value: AccessibilityFilterValue) => {
+    if (filterState.accessibility === null) return true;
+    return filterState.accessibility.includes(value);
+  };
+
   const allGenresSelected = filterState.genres === null;
   const noGenresSelected =
     filterState.genres !== null && filterState.genres.length === 0;
+
+  const allAccessibilitySelected = filterState.accessibility === null;
+  const noAccessibilitySelected =
+    filterState.accessibility !== null &&
+    filterState.accessibility.length === 0;
 
   const allCategoriesSelected = filterState.categories === null;
   const noCategoriesSelected =
@@ -159,6 +239,45 @@ export default function CategoryFilterSection({
             onChange={() => toggleCategory(value)}
           />
         ))}
+      </div>
+      {/* Accessibility Filter */}
+      <div className={styles.advancedFilterGroup}>
+        <div className={styles.advancedFilterHeader}>
+          <h4 className={styles.advancedFilterTitle}>Accessibility</h4>
+          <div className={styles.selectionControls}>
+            <Button
+              variant="link"
+              onClick={selectAllAccessibility}
+              disabled={allAccessibilitySelected}
+            >
+              Select All
+            </Button>
+            <span className={styles.controlDivider}>/</span>
+            <Button
+              variant="link"
+              onClick={clearAllAccessibility}
+              disabled={noAccessibilitySelected}
+            >
+              Clear All
+            </Button>
+          </div>
+        </div>
+        <div
+          className={styles.chipGroup}
+          role="group"
+          aria-label="Accessibility feature filters"
+        >
+          {ACCESSIBILITY_OPTIONS.map(({ value, label }) => (
+            <Chip
+              key={value}
+              type="checkbox"
+              label={label}
+              count={accessibilityCounts.get(value)}
+              checked={isAccessibilitySelected(value)}
+              onChange={() => toggleAccessibility(value)}
+            />
+          ))}
+        </div>
       </div>
       <ExpandableSection title="More Event Options">
         <div className={styles.advancedFilters}>

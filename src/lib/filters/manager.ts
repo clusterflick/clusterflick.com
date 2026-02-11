@@ -6,6 +6,7 @@ import {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  accessibilityFilter,
 } from "./modules";
 
 /**
@@ -19,6 +20,7 @@ const modules: AnyFilterModule[] = [
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  accessibilityFilter,
 ];
 
 /**

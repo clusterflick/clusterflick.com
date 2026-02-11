@@ -6,7 +6,7 @@ import { AccessibilityFeature } from "@/types";
  */
 export const ACCESSIBILITY_LABELS: Record<AccessibilityFeature, string> = {
   [AccessibilityFeature.AudioDescription]: "Audio Description",
-  [AccessibilityFeature.BabyFriendly]: "Baby",
+  [AccessibilityFeature.BabyFriendly]: "Baby Friendly",
   [AccessibilityFeature.HardOfHearing]: "Hard of Hearing",
   [AccessibilityFeature.Relaxed]: "Relaxed",
   [AccessibilityFeature.Subtitled]: "Subtitles",

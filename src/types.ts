@@ -74,6 +74,21 @@ export enum AccessibilityFeature {
   Subtitled = "subtitled",
 }
 
+/**
+ * Sentinel value representing "no accessibility features".
+ * Used in the accessibility filter to include performances
+ * that don't have any accessibility features set.
+ */
+export const ACCESSIBILITY_NONE = "none" as const;
+
+/**
+ * Union type for accessibility filter values.
+ * Includes all real features plus the "none" sentinel.
+ */
+export type AccessibilityFilterValue =
+  | AccessibilityFeature
+  | typeof ACCESSIBILITY_NONE;
+
 type MoviePerformanceAccessibility = Partial<
   Record<AccessibilityFeature, boolean>
 >;
