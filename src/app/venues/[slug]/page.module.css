@@ -51,6 +51,24 @@
   opacity: 1;
 }
 
+.heroTagRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: 18px;
+  gap: 16px;
+}
+
+.heroTagRowSide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.heroTagRowSide:first-child {
+  justify-content: flex-end;
+}
+
 .heroSocialLink {
   color: rgba(255, 255, 255, 0.7);
   transition: color 0.2s;

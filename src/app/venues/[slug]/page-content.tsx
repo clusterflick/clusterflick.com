@@ -12,7 +12,14 @@ import Divider from "@/components/divider";
 import Tag from "@/components/tag";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
-import { LetterboxdIcon, InstagramIcon, XIcon } from "@/components/icons";
+import {
+  LetterboxdIcon,
+  InstagramIcon,
+  XIcon,
+  GoogleCalendarIcon,
+  OutlookCalendarIcon,
+  CalendarIcon,
+} from "@/components/icons";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
@@ -91,6 +98,8 @@ export default function VenueDetailPageContent({
 }: VenueDetailPageContentProps) {
   const hasEvents = performanceCount > 0;
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
+  const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
+  const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
 
   return (
     <div>
@@ -128,22 +137,54 @@ export default function VenueDetailPageContent({
             </a>
           </div>
         )}
-        <div className={styles.heroLinks}>
-          {venue.type.toLowerCase().trim() !== "unknown" ? (
-            <Tag color="blue">{venue.type}</Tag>
-          ) : null}
-          {socialLinks.map((link) => (
+        <div className={styles.heroTagRow}>
+          <div className={styles.heroTagRowSide}>
+            {socialLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.heroSocialLink}
+                title={link.name}
+              >
+                <link.Icon size={20} />
+              </a>
+            ))}
+          </div>
+          <div>
+            {venue.type.toLowerCase().trim() !== "unknown" ? (
+              <Tag color="blue">{venue.type}</Tag>
+            ) : null}
+          </div>
+          <div className={styles.heroTagRowSide}>
             <a
-              key={link.name}
-              href={link.url}
+              href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.heroSocialLink}
-              title={link.name}
+              title="Add to Google Calendar"
             >
-              <link.Icon size={20} />
+              <GoogleCalendarIcon size={20} />
             </a>
-          ))}
+            <a
+              href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venue.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.heroSocialLink}
+              style={{ padding: 4 }}
+              title="Add to Outlook Calendar"
+            >
+              <OutlookCalendarIcon size={28} />
+            </a>
+            <a
+              href={webcalUrl}
+              className={styles.heroSocialLink}
+              title="Subscribe to calendar"
+            >
+              <CalendarIcon size={20} />
+            </a>
+          </div>
         </div>
 
         <div
