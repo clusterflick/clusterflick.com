@@ -6,6 +6,11 @@ interface SpinnerProps {
 
 export default function Spinner({ size = 40 }: SpinnerProps) {
   return (
-    <div className={styles.spinner} style={{ width: size, height: size }} />
+    <div
+      className={styles.spinner}
+      style={{ width: size, height: size }}
+      role="status"
+      aria-label="Loading"
+    />
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MenuIcon, CloseIcon } from "@/components/icons";
@@ -9,6 +9,12 @@ import styles from "./mobile-menu.module.css";
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => {
+    setIsOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
 
   // Track if component is mounted (for SSR-safe portal rendering).
   // This causes an extra render on mount, but is necessary for hydration safety.
@@ -22,7 +28,7 @@ export default function MobileMenu() {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setIsOpen(false);
+        closeMenu();
       }
     };
 
@@ -36,15 +42,11 @@ export default function MobileMenu() {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, closeMenu]);
 
   const menuContent = isOpen && (
     <>
-      <div
-        className={styles.overlay}
-        onClick={() => setIsOpen(false)}
-        aria-hidden="true"
-      />
+      <div className={styles.overlay} onClick={closeMenu} aria-hidden="true" />
       <div
         className={styles.menuPanel}
         role="dialog"
@@ -54,7 +56,7 @@ export default function MobileMenu() {
         <button
           type="button"
           className={styles.closeButton}
-          onClick={() => setIsOpen(false)}
+          onClick={closeMenu}
           aria-label="Close menu"
         >
           <CloseIcon size={24} />
@@ -97,6 +99,7 @@ export default function MobileMenu() {
     <>
       <div className={styles.mobileMenu}>
         <button
+          ref={menuButtonRef}
           type="button"
           className={styles.menuButton}
           onClick={() => setIsOpen(true)}

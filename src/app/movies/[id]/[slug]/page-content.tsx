@@ -155,7 +155,7 @@ export default function PageContent({
   }, [performances]);
 
   return (
-    <div className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <PageHeader backUrl="/" backText="Back to film list" />
 
       <HeroSection
@@ -263,6 +263,6 @@ export default function PageContent({
           filteredPerformanceCount={filteredMovie?.performances?.length || 0}
         />
       </div>
-    </div>
+    </main>
   );
 }

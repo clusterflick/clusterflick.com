@@ -3,7 +3,7 @@ import styles from "./header-nav.module.css";
 
 export default function HeaderNav() {
   return (
-    <div className={styles.nav}>
+    <nav className={styles.nav} aria-label="Main navigation">
       <Link
         href="/venues"
         onClick={() => {
@@ -28,6 +28,6 @@ export default function HeaderNav() {
       >
         About
       </Link>
-    </div>
+    </nav>
   );
 }

@@ -17,7 +17,7 @@ export default function VenuesPageContent({
   totalVenues,
 }: VenuesPageContentProps) {
   return (
-    <div>
+    <main id="main-content">
       <PreloadCinemaData />
       <PageHeader backUrl="/" backText="Back to film list" />
 
@@ -45,6 +45,6 @@ export default function VenuesPageContent({
 
         <VenueList groups={groups} />
       </div>
-    </div>
+    </main>
   );
 }

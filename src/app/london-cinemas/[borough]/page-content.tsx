@@ -47,7 +47,7 @@ export default function BoroughPageContent({
   const mapImagePath = `/images/boroughs/${boroughSlug}.png`;
 
   return (
-    <div>
+    <main id="main-content">
       <PreloadCinemaData />
       <PageHeader backUrl="/london-cinemas" backText="All boroughs" />
 
@@ -182,6 +182,6 @@ export default function BoroughPageContent({
           </ContentSection>
         )}
       </div>
-    </div>
+    </main>
   );
 }

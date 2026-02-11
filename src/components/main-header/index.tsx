@@ -18,7 +18,7 @@ export default function MainHeader({
   onFilterTextHeightChange?: (height: number) => void;
 }) {
   return (
-    <div className={styles.header}>
+    <header className={styles.header}>
       <HeaderLogo />
       <div className={styles.filter}>
         <FilterTrigger
@@ -29,6 +29,6 @@ export default function MainHeader({
       </div>
       <HeaderNav />
       <MobileMenu />
-    </div>
+    </header>
   );
 }

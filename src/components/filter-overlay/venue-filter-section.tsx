@@ -170,7 +170,11 @@ export default function VenueFilterSection({
           />
         ))}
       </div>
-      {geoError && <p className={styles.geoError}>{geoError}</p>}
+      {geoError && (
+        <p className={styles.geoError} role="alert">
+          {geoError}
+        </p>
+      )}
       <ExpandableSection title="Select Specific Venues">
         <div className={styles.advancedFilters}>
           {/* Venue search filter */}
@@ -197,6 +201,7 @@ export default function VenueFilterSection({
               type="text"
               className={styles.venueSearchInput}
               placeholder="Filter venues..."
+              aria-label="Filter venues"
               value={venueSearchQuery}
               onChange={(e) => setVenueSearchQuery(e.target.value)}
             />
@@ -287,6 +292,7 @@ export default function VenueFilterSection({
                         variant="link"
                         onClick={selectAllInGroup}
                         disabled={allGroupSelected}
+                        aria-label={`Select all ${group.label} venues`}
                       >
                         Select All
                       </Button>
@@ -295,6 +301,7 @@ export default function VenueFilterSection({
                         variant="link"
                         onClick={clearAllInGroup}
                         disabled={noneGroupSelected}
+                        aria-label={`Clear all ${group.label} venues`}
                       >
                         Clear All
                       </Button>

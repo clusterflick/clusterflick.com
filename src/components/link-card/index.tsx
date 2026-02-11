@@ -8,6 +8,7 @@ interface LinkCardProps {
   href: string;
   variant?: CardVariant;
   className?: string;
+  "aria-label"?: string;
   children: ReactNode;
 }
 
@@ -15,6 +16,7 @@ export default function LinkCard({
   href,
   variant = "rating",
   className = "",
+  "aria-label": ariaLabel,
   children,
 }: LinkCardProps) {
   return (
@@ -23,6 +25,7 @@ export default function LinkCard({
       target="_blank"
       rel="noopener noreferrer"
       className={clsx(styles.card, styles[variant], className)}
+      aria-label={ariaLabel}
     >
       {children}
     </a>
