@@ -171,6 +171,7 @@ export default function CategoryFilterSection({
                   variant="link"
                   onClick={selectAllGenres}
                   disabled={allGenresSelected}
+                  aria-label="Select all genres"
                 >
                   Select All
                 </Button>
@@ -179,6 +180,7 @@ export default function CategoryFilterSection({
                   variant="link"
                   onClick={clearAllGenres}
                   disabled={noGenresSelected}
+                  aria-label="Clear all genres"
                 >
                   Clear All
                 </Button>
