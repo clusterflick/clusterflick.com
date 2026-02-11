@@ -27,6 +27,8 @@ const BOROUGH_SLUG = "hackney";
 
 type BoroughDetailData = {
   boroughName: string;
+  boroughSlug: string;
+  boroughDescription: string;
   venues: BoroughVenueItem[];
   totalMovies: number;
   neighborBoroughs: NeighborBorough[];
@@ -111,6 +113,8 @@ async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
 
   return {
     boroughName: borough.name,
+    boroughSlug: borough.slug,
+    boroughDescription: borough.description,
     venues: venueItems,
     totalMovies: boroughMovieIds.size,
     neighborBoroughs,
@@ -126,6 +130,8 @@ function BoroughDetailWithRealData() {
       {(data) => (
         <BoroughPageContent
           boroughName={data.boroughName}
+          boroughSlug={data.boroughSlug}
+          boroughDescription={data.boroughDescription}
           venues={data.venues}
           totalMovies={data.totalMovies}
           neighborBoroughs={data.neighborBoroughs}

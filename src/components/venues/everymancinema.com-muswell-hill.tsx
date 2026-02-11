@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Everyman Muswell Hill is part of the Everyman cinema group, a boutique
         chain known for its intimate, living-room-style cinema experience.
-        Located on Fortis Green Road in Muswell Hill, north London, the venue
+        Located on Fortis Green Road in Muswell Hill, North London, the venue
         offers sofa-style seating, food and drink served directly to your seat,
         and a curated programme of mainstream releases alongside independent and
         arthouse films. The cinema also features a bar area for pre- and
@@ -15,7 +15,7 @@ function VenueBlurb() {
         cinema-goers and a focus on quality over quantity, with smaller,
         carefully designed screening rooms that prioritise comfort and
         atmosphere. The venue serves Muswell Hill&apos;s strong local community
-        in this popular residential area of north London.
+        in this popular residential area of North London.
       </p>
     </section>
   );

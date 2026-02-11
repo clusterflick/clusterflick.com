@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Everyman Hampstead is the original Everyman cinema, the venue from which
         the entire chain grew. Tucked away on Holly Bush Vale in the heart of
-        Hampstead village, north London, this historic single-screen cinema
+        Hampstead village, North London, this historic single-screen cinema
         first opened in 1933 and has been a beloved local institution ever
         since. It was one of the first repertory cinemas in Britain, pioneering
         the idea of showing classic and arthouse films in an intimate,

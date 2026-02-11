@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Close-Up Film Centre is an independent cinema and film resource on
-        Sclater Street in Shoreditch, east London. Founded as a not-for-profit
+        Sclater Street in Shoreditch, East London. Founded as a not-for-profit
         cultural space dedicated to adventurous and experimental cinema, it
         programmes a distinctive mix of arthouse, avant-garde, documentary, and
         world cinema that sits well outside the mainstream. The intimate

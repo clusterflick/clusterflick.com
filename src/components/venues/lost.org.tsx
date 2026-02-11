@@ -6,7 +6,7 @@ function VenueBlurb() {
         of London&apos;s West End. The venue hosts immersive cinema events that
         combine film screenings with themed cocktails, food, and interactive
         experiences, offering a distinctive alternative to a conventional cinema
-        visit in central London.
+        visit in Central London.
       </p>
     </section>
   );

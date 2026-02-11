@@ -1,16 +1,18 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
         Castlehaven Community Cinema is a volunteer-led community cinema at
-        Clarence Hall in Camden that presents free monthly screenings of
-        contemporary world cinema on the first Thursday of every month. Launched
-        in 2024 from a shared love of film, the cinema showcases everything from
-        Oscar-winning international films (Parasite) to critically acclaimed
-        documentaries (Four Daughters), timeless classics, and independent
-        features from the past 20 years. What started with a handful of
-        attendees has grown into a thriving community of regulars united by
-        their passion for cinema.
+        Clarence Hall in <Link href="/london-cinemas/camden/">Camden</Link> that
+        presents free monthly screenings of contemporary world cinema on the
+        first Thursday of every month. Launched in 2024 from a shared love of
+        film, the cinema showcases everything from Oscar-winning international
+        films (Parasite) to critically acclaimed documentaries (Four Daughters),
+        timeless classics, and independent features from the past 20 years. What
+        started with a handful of attendees has grown into a thriving community
+        of regulars united by their passion for cinema.
       </p>
       <p>
         The cinema partners with UFP Film Club to enhance screenings with Q&As,

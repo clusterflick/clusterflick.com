@@ -14,7 +14,7 @@ function VenueBlurb() {
         The cinema offers online booking, regular ticket deals, and concession
         stands. Its prime Leicester Square location makes it one of Vue&apos;s
         most prominent venues and a popular choice for cinema-goers visiting
-        central London.
+        Central London.
       </p>
     </section>
   );

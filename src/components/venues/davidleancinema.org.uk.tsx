@@ -1,14 +1,17 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
         The David Lean Cinema is a volunteer-run community cinema housed within
-        the Croydon Clocktower arts complex on Katharine Street in Croydon,
-        south London. Named after the legendary British film director David
-        Lean—who was born in nearby Croydon—the cinema screens a thoughtfully
-        curated programme of independent, arthouse, classic, and world cinema,
-        alongside selected mainstream releases. The venue is a registered
-        charity and is operated entirely by dedicated volunteers.
+        the Croydon Clocktower arts complex on Katharine Street in{" "}
+        <Link href="/london-cinemas/croydon/">Croydon</Link>, South London.
+        Named after the legendary British film director David Lean—who was born
+        in nearby Croydon—the cinema screens a thoughtfully curated programme of
+        independent, arthouse, classic, and world cinema, alongside selected
+        mainstream releases. The venue is a registered charity and is operated
+        entirely by dedicated volunteers.
       </p>
       <p>
         With its single screen and community-focused ethos, the David Lean

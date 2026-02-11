@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Dolby Screening Room Soho is a state-of-the-art private screening
-        facility on Soho Square in central London, operated by Dolby
+        facility on Soho Square in Central London, operated by Dolby
         Laboratories. Equipped with the latest Dolby Atmos, Dolby Vision, and
         Dolby Cinema technologies, it serves as a showcase for Dolby&apos;s
         premium audio and visual capabilities. The screening room is primarily

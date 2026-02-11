@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         ODEON Orpington is part of the ODEON cinema chain, one of the UK&apos;s
         oldest and largest cinema operators. Located within The Walnuts Shopping
-        Centre in Orpington, southeast London, the venue features multiple
+        Centre in Orpington, Southeast London, the venue features multiple
         screens with digital projection and modern sound systems, showing a wide
         range of mainstream blockbusters, new releases, and popular films. As a
         standard ODEON location, it offers online booking and concession stands

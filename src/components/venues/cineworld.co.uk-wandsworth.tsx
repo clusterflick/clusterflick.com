@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Cineworld Wandsworth is part of the Cineworld chain, the UK&apos;s
         largest cinema operator with over 100 multiplexes nationwide. Located on
-        Wandsworth High Street in southwest London, the venue features multiple
+        Wandsworth High Street in Southwest London, the venue features multiple
         screens equipped with digital projection and modern sound systems,
         showing a wide range of mainstream blockbusters, new releases, and
         popular films. As a standard Cineworld location, it offers the
@@ -17,7 +17,7 @@ function VenueBlurb() {
 }
 
 export const seoDescription =
-  "southwest London multiplex on Wandsworth High Street";
+  "Southwest London multiplex on Wandsworth High Street";
 export const seoHighlights = "blockbusters, new releases and popular films";
 
 export default VenueBlurb;

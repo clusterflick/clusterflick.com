@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -18,10 +20,12 @@ function VenueBlurb() {
         Tottenham programmes everything from classic cinema (like Brief
         Encounter and Romeo and Juliet) to contemporary indies and
         documentaries, with many screenings tied to wider cultural themes or
-        community initiatives like Haringey&apos;s Black History 365 programme.
-        All screenings are for ages 18+ and take place in the cosy pub setting,
-        making it a welcoming, informal space where film lovers and filmmakers
-        can connect over cinema in a true community atmosphere.
+        community initiatives like{" "}
+        <Link href="/london-cinemas/haringey/">Haringey</Link>&apos;s Black
+        History 365 programme. All screenings are for ages 18+ and take place in
+        the cosy pub setting, making it a welcoming, informal space where film
+        lovers and filmmakers can connect over cinema in a true community
+        atmosphere.
       </p>
     </section>
   );

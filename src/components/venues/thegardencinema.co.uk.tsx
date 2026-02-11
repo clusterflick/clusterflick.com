@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Garden Cinema is a beautifully designed independent cinema on Parker
-        Street in Covent Garden, central London. Opened in 2023, the cinema
+        Street in Covent Garden, Central London. Opened in 2023, the cinema
         features two intimate screens with luxurious interiors inspired by
         botanical themes. Its programme champions independent, arthouse, world,
         and documentary cinema alongside carefully selected new releases.

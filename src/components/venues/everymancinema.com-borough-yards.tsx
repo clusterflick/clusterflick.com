@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -14,7 +16,8 @@ function VenueBlurb() {
         Like all Everyman venues, it offers a membership scheme for regular
         cinema-goers and a focus on quality over quantity, with smaller,
         carefully designed screening rooms that prioritise comfort and
-        atmosphere. Its location in the heart of Southwark&apos;s food and
+        atmosphere. Its location in the heart of{" "}
+        <Link href="/london-cinemas/southwark/">Southwark</Link>&apos;s food and
         culture district makes it easy to pair a film with a wider evening out.
       </p>
     </section>

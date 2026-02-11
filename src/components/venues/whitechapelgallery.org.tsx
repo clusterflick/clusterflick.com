@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Whitechapel Gallery is one of London&apos;s most important contemporary
-        art galleries, located on Whitechapel High Street in east London.
+        art galleries, located on Whitechapel High Street in East London.
         Founded in 1901, the gallery has a distinguished history of championing
         pioneering art. Its programme includes regular film screenings and
         moving-image events, often featuring artists&apos; film, experimental
@@ -14,7 +14,7 @@ function VenueBlurb() {
 }
 
 export const seoDescription =
-  "pioneering contemporary art gallery in east London";
+  "pioneering contemporary art gallery in East London";
 export const seoHighlights =
   "artists\' film, experimental work and exhibition screenings";
 

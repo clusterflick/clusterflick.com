@@ -1,8 +1,11 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
-        The Boathouse Studios is a riverside creative venue in Barking&apos;s
+        The Boathouse Studios is a riverside creative venue in{" "}
+        <Link href="/london-cinemas/barking-and-dagenham/">Barking</Link>&apos;s
         Icehouse Creative Quarter that hosts The Boathouse Community Cinema,
         presenting regular film screenings as part of its broader arts and
         events programme. The venue features two large and four smaller airy

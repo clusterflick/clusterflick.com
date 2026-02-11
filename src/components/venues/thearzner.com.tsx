@@ -6,7 +6,7 @@ function VenueBlurb() {
         London. Named after Dorothy Arzner, the pioneering Hollywood director,
         the venue programmes a curated selection of new releases, independent,
         arthouse, and classic films. Its Bermondsey Square location places it at
-        the heart of one of south London&apos;s most vibrant neighbourhoods.
+        the heart of one of South London&apos;s most vibrant neighbourhoods.
       </p>
     </section>
   );

@@ -5,7 +5,7 @@ function VenueBlurb() {
         Curzon Wimbledon is part of the Curzon cinema group, a celebrated chain
         of independent cinemas known for championing arthouse, independent, and
         world cinema alongside quality mainstream releases. Located on The
-        Broadway in Wimbledon, southwest London, this venue features multiple
+        Broadway in Wimbledon, Southwest London, this venue features multiple
         screening rooms with comfortable seating. Like all Curzon venues, it
         offers the Curzon membership scheme and access to Curzon Home Cinema,
         the chain&apos;s on-demand streaming platform.

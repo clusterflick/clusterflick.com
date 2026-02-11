@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Hen &amp; Chickens Theatre Bar is a pub and fringe theatre on St
-        Paul&apos;s Road in Highbury, north London. Known primarily as one of
+        Paul&apos;s Road in Highbury, North London. Known primarily as one of
         London&apos;s best-loved fringe theatre venues, the upstairs space also
         hosts occasional film screenings and cinema events alongside its
         programme of theatre, comedy, and live performance.

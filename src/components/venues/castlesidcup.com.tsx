@@ -6,14 +6,15 @@ function VenueBlurb() {
       <p>
         The Castle Sidcup is an independent, community-driven cinema run by the
         team behind{" "}
-        <Link href="/venues/the-castle-cinema">The Castle Cinema</Link> in
-        Hackney, reopening in late 2025 after the previous Sidcup Storyteller
-        closed. The venue programmes a broad variety of cinematic content
-        including the best new releases, outstanding independent films, family
-        favourites, and plans to screen cult classics and host film clubs and
-        special events. With a cosy, friendly atmosphere and a newly refurbished
-        space, the cinema aims to be an invaluable local asset for Sidcup and
-        the wider Bexley area.
+        <Link href="/venues/the-castle-cinema">The Castle Cinema</Link> in{" "}
+        <Link href="/london-cinemas/hackney/">Hackney</Link>, reopening in late
+        2025 after the previous Sidcup Storyteller closed. The venue programmes
+        a broad variety of cinematic content including the best new releases,
+        outstanding independent films, family favourites, and plans to screen
+        cult classics and host film clubs and special events. With a cosy,
+        friendly atmosphere and a newly refurbished space, the cinema aims to be
+        an invaluable local asset for Sidcup and the wider{" "}
+        <Link href="/london-cinemas/bexley/">Bexley</Link> area.
       </p>
       <p>
         The Castle Sidcup offers a range of accessible and community-focused

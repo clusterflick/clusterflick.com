@@ -1,11 +1,16 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
         The Hammond Theatre is a performing arts venue on Hanworth Road in
-        Hampton, southwest London. Alongside its programme of live theatre,
+        Hampton, Southwest London. Alongside its programme of live theatre,
         music, and comedy, the venue hosts regular film screenings, providing a
-        local cinema experience for the Hampton and wider Richmond upon Thames
+        local cinema experience for the Hampton and wider{" "}
+        <Link href="/london-cinemas/richmond-upon-thames/">
+          Richmond upon Thames
+        </Link>{" "}
         community.
       </p>
     </section>

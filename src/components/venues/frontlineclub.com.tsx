@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Frontline Club is an independent members&apos; club and media hub on
-        Norfolk Place near Paddington, west London. Founded in 2003, it serves
+        Norfolk Place near Paddington, West London. Founded in 2003, it serves
         as a meeting point for journalists, filmmakers, and photographers, with
         a focus on press freedom and conflict reporting. The club hosts a
         regular programme of documentary and journalism-related film screenings,

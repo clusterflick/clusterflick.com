@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         Sands Films Cinema is an independent cinema and film studio on St
-        Marychurch Street in Rotherhithe, southeast London. Originally
+        Marychurch Street in Rotherhithe, Southeast London. Originally
         established as a film production studio—specialising in period costume
         drama—Sands Films expanded to include a small cinema screening room that
         hosts a regular programme of independent, classic, documentary, and

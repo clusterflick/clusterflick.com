@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Everyman at The Whiteley is part of the Everyman cinema group, a
         boutique chain known for its intimate, living-room-style cinema
-        experience. Located on Porchester Gardens in Bayswater, west London,
+        experience. Located on Porchester Gardens in Bayswater, West London,
         within the beautifully restored Whiteleys department store building, the
         venue offers sofa-style seating, food and drink served directly to your
         seat, and a curated programme of mainstream releases alongside

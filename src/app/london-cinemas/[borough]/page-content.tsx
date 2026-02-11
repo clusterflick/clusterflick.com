@@ -28,6 +28,8 @@ export type NeighborBorough = {
 
 interface BoroughPageContentProps {
   boroughName: string;
+  boroughSlug: string;
+  boroughDescription: string;
   venues: BoroughVenueItem[];
   totalMovies: number;
   neighborBoroughs: NeighborBorough[];
@@ -35,11 +37,14 @@ interface BoroughPageContentProps {
 
 export default function BoroughPageContent({
   boroughName,
+  boroughSlug,
+  boroughDescription,
   venues,
   totalMovies,
   neighborBoroughs,
 }: BoroughPageContentProps) {
   const hasEvents = totalMovies > 0;
+  const mapImagePath = `/images/boroughs/${boroughSlug}.png`;
 
   return (
     <div>
@@ -52,7 +57,7 @@ export default function BoroughPageContent({
         align="center"
       >
         <OutlineHeading className={styles.title}>
-          {`Cinemas in ${boroughName}`}
+          {`Cinemas in ${boroughName}, London`}
         </OutlineHeading>
 
         <div
@@ -80,16 +85,44 @@ export default function BoroughPageContent({
       <Divider />
 
       <div className={styles.content}>
-        <p className={styles.intro}>
-          {venues.length === 1
-            ? `There is 1 cinema venue in ${boroughName} tracked by Clusterflick.`
-            : `There are ${venues.length} cinema venues in ${boroughName} tracked by Clusterflick.`}
-          {totalMovies > 0
-            ? ` Between them, ${totalMovies} ${totalMovies === 1 ? "film is" : "films are"} currently showing.`
-            : ""}
-        </p>
+        <div className={styles.introColumns}>
+          <div className={styles.introText}>
+            <p className={styles.description}>{boroughDescription}</p>
+            <p className={styles.intro}>
+              It is home to{" "}
+              <strong>
+                {venues.length} cinema venue{venues.length === 1 ? "" : "s"}
+              </strong>
+              .{" "}
+              {totalMovies > 0 ? (
+                <>
+                  Between them,{" "}
+                  <strong>
+                    {totalMovies} {totalMovies === 1 ? "film is" : "films are"}
+                  </strong>{" "}
+                  currently showing. Browse the venues below to see what&apos;s
+                  on, compare showtimes, and find your next screening.
+                </>
+              ) : (
+                <>
+                  Browse the venues below to explore what each one has to offer.
+                </>
+              )}
+            </p>
+          </div>
 
-        <ContentSection title="Venues" as="h2">
+          <div className={styles.mapContainer}>
+            <Image
+              src={mapImagePath}
+              alt={`Map of ${boroughName} borough`}
+              width={600}
+              height={400}
+              className={styles.mapImage}
+            />
+          </div>
+        </div>
+
+        <ContentSection title={`Cinema Venues in ${boroughName}`} as="h2">
           <div className={styles.venueGrid}>
             {venues.map((venue) => (
               <Link

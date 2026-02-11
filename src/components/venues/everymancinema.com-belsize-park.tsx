@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         Everyman Belsize Park is part of the Everyman cinema group, a boutique
         chain known for its intimate, living-room-style cinema experience.
-        Located on Haverstock Hill in the leafy north London neighbourhood of
+        Located on Haverstock Hill in the leafy North London neighbourhood of
         Belsize Park, the venue offers sofa-style seating, food and drink served
         directly to your seat, and a curated programme of mainstream releases
         alongside independent and arthouse films. The cinema also features a bar

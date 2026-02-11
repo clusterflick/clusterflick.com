@@ -13,7 +13,7 @@ function VenueBlurb() {
       </p>
       <p>
         Its central West End location, close to Piccadilly Circus and Leicester
-        Square, makes it a popular choice for cinema-goers in central London.
+        Square, makes it a popular choice for cinema-goers in Central London.
       </p>
     </section>
   );

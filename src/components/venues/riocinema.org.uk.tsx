@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Rio Cinema is a much-loved independent cinema on Kingsland High
-        Street in Dalston, east London. Originally opened in 1915 as the
+        Street in Dalston, East London. Originally opened in 1915 as the
         Kingsland Empire, the Grade II listed Art Deco building was saved from
         closure by a community campaign in the 1970s and has been run as a
         not-for-profit ever since. The single-screen cinema programmes a

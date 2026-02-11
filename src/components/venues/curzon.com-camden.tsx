@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
@@ -11,10 +13,11 @@ function VenueBlurb() {
         the chain&apos;s on-demand streaming platform.
       </p>
       <p>
-        Fitting in with Camden&apos;s reputation as one of London&apos;s most
-        vibrant cultural neighbourhoods, the cinema programmes a mix of
-        independent, foreign-language, and documentary films alongside broader
-        releases, special screenings, and Q&amp;A events.
+        Fitting in with <Link href="/london-cinemas/camden/">Camden</Link>
+        &apos;s reputation as one of London&apos;s most vibrant cultural
+        neighbourhoods, the cinema programmes a mix of independent,
+        foreign-language, and documentary films alongside broader releases,
+        special screenings, and Q&amp;A events.
       </p>
     </section>
   );

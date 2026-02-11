@@ -3,7 +3,7 @@ function VenueBlurb() {
     <section>
       <p>
         The Charlotte Street Hotel is a luxury boutique hotel on Charlotte
-        Street in Fitzrovia, central London, part of the Firmdale Hotels group
+        Street in Fitzrovia, Central London, part of the Firmdale Hotels group
         founded by Tim and Kit Kemp. The hotel houses a private screening room
         that is used for the Firmdale Film Club, a regular programme of film
         screenings open to hotel guests and members. The intimate, plushly

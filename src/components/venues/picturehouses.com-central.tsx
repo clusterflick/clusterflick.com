@@ -16,7 +16,7 @@ function VenueBlurb() {
         and priority booking across the chain. The programme at Picturehouse
         Central blends independent, foreign-language, and documentary films with
         selected mainstream releases, alongside special seasons and events. Its
-        central London location makes it a hub for the capital&apos;s film
+        Central London location makes it a hub for the capital&apos;s film
         community.
       </p>
     </section>

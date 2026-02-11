@@ -17,7 +17,7 @@ function VenueBlurb() {
         membership scheme for frequent cinema-goers, along with online booking
         and concession stands. Situated within The O2&apos;s complex of
         restaurants, bars, and entertainment venues, it&apos;s a convenient
-        option for combining a film with a wider night out in southeast London.
+        option for combining a film with a wider night out in Southeast London.
       </p>
     </section>
   );

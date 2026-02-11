@@ -43,23 +43,24 @@ export async function generateMetadata({
   const map = await getBoroughVenuesMap();
   const venues = map.get(slug) || [];
   const venueCount = venues.length;
-  const description = `Find ${venueCount} cinema${venueCount === 1 ? "" : "s"} in ${borough.name}. Browse showtimes and screenings at venues across ${borough.name}, London.`;
+  const venueWord = venueCount === 1 ? "cinema" : "cinemas";
+  const description = `Discover ${venueCount} ${venueWord} in ${borough.name}, London. Browse showtimes, compare screenings and find independent, arthouse and multiplex venues across the borough.`;
 
   return {
-    title: `Cinemas in ${borough.name}`,
+    title: `Cinemas in ${borough.name}, London`,
     description,
     alternates: {
       canonical: getBoroughUrl(borough),
     },
     openGraph: {
-      title: `Cinemas in ${borough.name} | Clusterflick`,
+      title: `Cinemas in ${borough.name}, London | Clusterflick`,
       description,
       url: `https://clusterflick.com${getBoroughUrl(borough)}`,
       siteName: "Clusterflick",
     },
     twitter: {
       card: "summary",
-      title: `Cinemas in ${borough.name} | Clusterflick`,
+      title: `Cinemas in ${borough.name}, London | Clusterflick`,
       description,
       creator: "@clusterflick",
     },
@@ -152,7 +153,7 @@ export default async function BoroughPage({
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: `Cinemas in ${borough.name}, London`,
-      description: `Cinema venues in the London Borough of ${borough.name}`,
+      description: `Cinema and screening venues in ${borough.name}, London`,
       numberOfItems: venueItems.length,
       itemListElement: venueItems.map((venue, index) => ({
         "@type": "ListItem",
@@ -198,6 +199,8 @@ export default async function BoroughPage({
       />
       <BoroughPageContent
         boroughName={borough.name}
+        boroughSlug={slug}
+        boroughDescription={borough.description}
         venues={venueItems}
         totalMovies={boroughMovieIds.size}
         neighborBoroughs={neighborBoroughs}

@@ -27,22 +27,25 @@ export default function LondonCinemasPageContent({
         backdropHeight="standard"
         align="center"
       >
-        <OutlineHeading className={styles.title}>
-          London Cinemas by Borough
-        </OutlineHeading>
+        <OutlineHeading className={styles.title}>London Cinemas</OutlineHeading>
         <p className={styles.subtitle}>
-          Cinemas across {totalBoroughs} London boroughs
+          Find screening venues across {totalBoroughs} London boroughs — from
+          independent picture houses to major multiplex chains
         </p>
       </HeroSection>
 
       <Divider />
 
       <div className={styles.content}>
-        <ContentSection title="Explore London Cinemas by Borough" as="h2">
+        <ContentSection title="Browse Cinemas by London Borough" as="h2">
           <p className={styles.intro}>
-            Explore cinemas across London by borough. Each area page shows all
-            the venues Clusterflick tracks in that part of London, from
-            independent arthouse cinemas to major multiplex chains.
+            London is home to one of the richest cinema scenes in the world.
+            Whether you&apos;re looking for an independent arthouse cinema, a
+            repertory venue screening classic films, or a modern multiplex
+            showing the latest releases — you&apos;ll find it here. Browse by
+            borough below to discover every cinema and screening venue in your
+            part of London, see what&apos;s currently showing, and compare
+            showtimes across venues.
           </p>
         </ContentSection>
 

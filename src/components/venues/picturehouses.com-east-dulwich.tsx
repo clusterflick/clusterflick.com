@@ -5,7 +5,7 @@ function VenueBlurb() {
         East Dulwich Picturehouse &amp; Cafe is part of the Picturehouse cinema
         group, a chain of independent-minded cinemas known for combining quality
         arthouse and mainstream programming with stylish bar and cafe spaces.
-        Located on Lordship Lane in East Dulwich, south London, this intimate
+        Located on Lordship Lane in East Dulwich, South London, this intimate
         venue features a small number of screens alongside an integrated cafe
         and bar. Picturehouse cinemas offer a membership scheme that provides
         discounts and priority booking across the chain.

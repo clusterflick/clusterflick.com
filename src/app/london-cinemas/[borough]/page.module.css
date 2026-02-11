@@ -32,11 +32,52 @@
   z-index: 1;
 }
 
+.introColumns {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .introColumns {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 40px;
+  }
+}
+
+.introText {
+  flex: 1;
+  min-width: 0;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
 .intro {
   font-size: 16px;
   line-height: 1.7;
   opacity: 0.8;
-  margin-bottom: 32px;
+  margin-bottom: 0;
+}
+
+.mapContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.mapImage {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
 }
 
 /* Venue card grid */

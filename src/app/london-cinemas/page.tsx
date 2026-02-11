@@ -6,24 +6,26 @@ import { getBoroughUrl } from "@/utils/get-borough-url";
 import LondonCinemasPageContent from "./page-content";
 
 export const metadata: Metadata = {
-  title: "London Cinemas by Borough",
+  title: "London Cinemas — Browse Cinemas Across Every Borough",
   description:
-    "Find cinemas in every London borough. Browse independent cinemas, arthouse venues and major chains near you, from Hackney to Hammersmith, Camden to Croydon.",
+    "Discover cinemas across London, borough by borough. From independent arthouse venues and repertory cinemas to major multiplex chains — find screening venues near you, compare what's on, and book tickets.",
   alternates: {
     canonical: "/london-cinemas",
   },
   openGraph: {
-    title: "London Cinemas by Borough | Clusterflick",
+    title:
+      "London Cinemas — Browse Cinemas Across Every Borough | Clusterflick",
     description:
-      "Find cinemas in every London borough. Browse independent cinemas, arthouse venues and major chains near you.",
+      "Discover cinemas across London, borough by borough. Independent arthouse venues, repertory cinemas and major chains — find what's showing near you.",
     url: "https://clusterflick.com/london-cinemas",
     siteName: "Clusterflick",
   },
   twitter: {
     card: "summary",
-    title: "London Cinemas by Borough | Clusterflick",
+    title:
+      "London Cinemas — Browse Cinemas Across Every Borough | Clusterflick",
     description:
-      "Find cinemas in every London borough. Browse independent cinemas, arthouse venues and major chains near you.",
+      "Discover cinemas across London, borough by borough. Independent arthouse venues, repertory cinemas and major chains — find what's showing near you.",
     creator: "@clusterflick",
   },
 };
@@ -56,9 +58,9 @@ export default async function LondonCinemasPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "London Cinemas by Borough",
+    name: "London Cinemas",
     description:
-      "Browse cinemas across London boroughs, from independent arthouse venues to major multiplex chains.",
+      "Cinemas and screening venues across London boroughs, from independent arthouse cinemas to major multiplex chains.",
     numberOfItems: boroughs.length,
     itemListElement: boroughs.map((borough, index) => ({
       "@type": "ListItem",

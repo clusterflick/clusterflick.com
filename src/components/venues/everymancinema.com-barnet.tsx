@@ -1,14 +1,16 @@
+import Link from "next/link";
+
 function VenueBlurb() {
   return (
     <section>
       <p>
         Everyman Barnet is part of the Everyman cinema group, a boutique chain
         known for its intimate, living-room-style cinema experience. Located on
-        Great North Road in Barnet, north London, the venue offers sofa-style
-        seating, food and drink served directly to your seat, and a curated
-        programme of mainstream releases alongside independent and arthouse
-        films. The cinema also features a bar area for pre- and post-film
-        drinks.
+        Great North Road in <Link href="/london-cinemas/barnet/">Barnet</Link>,
+        North London, the venue offers sofa-style seating, food and drink served
+        directly to your seat, and a curated programme of mainstream releases
+        alongside independent and arthouse films. The cinema also features a bar
+        area for pre- and post-film drinks.
       </p>
       <p>
         Like all Everyman venues, it offers a membership scheme for regular
@@ -20,7 +22,7 @@ function VenueBlurb() {
   );
 }
 
-export const seoDescription = "boutique north London sofa cinema";
+export const seoDescription = "boutique North London sofa cinema";
 export const seoHighlights =
   "new releases, independent films and in-seat dining";
 

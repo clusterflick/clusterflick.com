@@ -4,7 +4,7 @@ function VenueBlurb() {
       <p>
         ODEON Richmond is part of the ODEON cinema chain, one of the UK&apos;s
         oldest and largest cinema operators. Located on Hill Street in Richmond,
-        southwest London, the venue features multiple screens with digital
+        Southwest London, the venue features multiple screens with digital
         projection and modern sound systems, showing a wide range of mainstream
         blockbusters, new releases, and popular films. As a standard ODEON
         location, it offers online booking and concession stands serving the
@@ -14,7 +14,7 @@ function VenueBlurb() {
   );
 }
 
-export const seoDescription = "southwest London multiplex in Richmond";
+export const seoDescription = "Southwest London multiplex in Richmond";
 export const seoHighlights = "blockbusters, new releases and popular films";
 
 export default VenueBlurb;
