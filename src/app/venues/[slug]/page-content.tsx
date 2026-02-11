@@ -116,6 +116,7 @@ export default function VenueDetailPageContent({
 
       <HeroSection
         backgroundImage="/images/light-circles.jpg"
+        backgroundImageAlt="Decorative light circles"
         backdropHeight="standard"
         align="center"
         className={styles.hero}

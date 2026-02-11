@@ -19,6 +19,8 @@ const alignStyles: Record<Alignment, string> = {
 interface HeroSectionProps {
   /** Background image source */
   backgroundImage: string;
+  /** Alt text for the background image */
+  backgroundImageAlt?: string;
   /** Backdrop height variant */
   backdropHeight?: BackdropHeight;
   /** Content alignment */
@@ -37,6 +39,7 @@ interface HeroSectionProps {
  */
 export default function HeroSection({
   backgroundImage,
+  backgroundImageAlt = "",
   backdropHeight = "standard",
   align = "left",
   children,
@@ -48,7 +51,7 @@ export default function HeroSection({
       <div className={clsx(styles.backdrop, heightStyles[backdropHeight])}>
         <Image
           src={backgroundImage}
-          alt=""
+          alt={backgroundImageAlt}
           fill
           className={styles.backdropImage}
           priority

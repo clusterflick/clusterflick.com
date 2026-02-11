@@ -39,7 +39,7 @@ export default function GroupHeader({
     <div className={clsx(styles.groupHeader, className)}>
       <Image
         src={icon}
-        alt=""
+        alt={title}
         width={iconWidth}
         height={iconHeight}
         className={styles.icon}

@@ -53,6 +53,7 @@ export default function BoroughPageContent({
 
       <HeroSection
         backgroundImage="/images/light-circles.jpg"
+        backgroundImageAlt="Decorative light circles"
         backdropHeight="standard"
         align="center"
       >

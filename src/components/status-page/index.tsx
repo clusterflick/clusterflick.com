@@ -46,7 +46,7 @@ export default function StatusPage({
         <div className={styles.iconWrapper}>
           <Image
             src={iconSrc}
-            alt=""
+            alt={title}
             width={iconSize.width}
             height={iconSize.height}
             className={styles.icon}

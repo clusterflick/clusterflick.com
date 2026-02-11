@@ -32,12 +32,18 @@ export default function AboutPage() {
 
       <HeroSection
         backgroundImage="/images/various-movie-seats.jpg"
+        backgroundImageAlt="Rows of cinema seats"
         backdropHeight="extended"
         align="center"
         className={styles.hero}
       >
         <div className={styles.logoLarge}>
-          <Image src="/images/logo.svg" alt="" width={320} height={320} />
+          <Image
+            src="/images/logo.svg"
+            alt="Clusterflick logo"
+            width={320}
+            height={320}
+          />
         </div>
         <OutlineHeading className={styles.title}>Clusterflick</OutlineHeading>
         <p className={styles.tagline}>

@@ -50,7 +50,7 @@ export default function ContentSection({
         {icon && (
           <Image
             src={icon.src}
-            alt=""
+            alt={title}
             width={icon.width}
             height={icon.height}
             className={clsx(styles.icon, icon.className)}

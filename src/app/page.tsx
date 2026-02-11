@@ -71,7 +71,12 @@ export default async function Home() {
               friends at{" "}
               <span className={styles.textWithIcon}>
                 Clusterflick
-                <Image src="/images/icon.svg" alt="" width={20} height={20} />
+                <Image
+                  src="/images/icon.svg"
+                  alt="Clusterflick"
+                  width={20}
+                  height={20}
+                />
               </span>
             </p>
           }

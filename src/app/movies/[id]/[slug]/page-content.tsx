@@ -164,6 +164,7 @@ export default function PageContent({
             ? `https://image.tmdb.org/t/p/w500${backdropPosterPath}`
             : "/images/light-circles.jpg"
         }
+        backgroundImageAlt={`${movie.title} backdrop`}
         contentClassName={styles.heroContent}
       >
         <div className={styles.posterSection}>

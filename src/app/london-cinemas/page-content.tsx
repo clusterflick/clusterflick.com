@@ -24,6 +24,7 @@ export default function LondonCinemasPageContent({
 
       <HeroSection
         backgroundImage="/images/light-circles.jpg"
+        backgroundImageAlt="Decorative light circles"
         backdropHeight="standard"
         align="center"
       >

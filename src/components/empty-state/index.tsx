@@ -47,7 +47,7 @@ export default function EmptyState({
     <div className={clsx(styles.emptyState, variantClass)}>
       <Image
         src={icon.src}
-        alt=""
+        alt={title || ""}
         width={icon.width}
         height={icon.height}
         className={styles.icon}
