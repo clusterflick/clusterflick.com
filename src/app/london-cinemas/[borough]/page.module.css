@@ -146,7 +146,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  transition: color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .venueCard:hover .venueCardName {

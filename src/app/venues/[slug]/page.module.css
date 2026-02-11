@@ -71,7 +71,7 @@
 
 .heroSocialLink {
   color: rgba(255, 255, 255, 0.7);
-  transition: color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   padding: 8px;
@@ -161,7 +161,7 @@
 .borough a {
   color: var(--color-electric-blue);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .borough a:hover {
