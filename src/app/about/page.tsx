@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div>
+    <main id="main-content">
       <PageHeader backUrl="/" backText="Back to film list" />
 
       <HeroSection
@@ -76,9 +76,14 @@ export default function AboutPage() {
           >
             <CardGrid>
               {socialLinks.map((link) => (
-                <LinkCard key={link.name} href={link.url} variant="social">
+                <LinkCard
+                  key={link.name}
+                  href={link.url}
+                  variant="social"
+                  aria-label={`Clusterflick on ${link.name}`}
+                >
                   <CardIcon>
-                    <link.Icon />
+                    <link.Icon aria-hidden="true" />
                   </CardIcon>
                   <CardContent>{link.handle}</CardContent>
                 </LinkCard>
@@ -87,9 +92,13 @@ export default function AboutPage() {
           </ContentSection>
 
           <ContentSection title="Or Get in Touch" as="h3" align="center">
-            <LinkCard href="mailto:hello@clusterflick.com" variant="contact">
+            <LinkCard
+              href="mailto:hello@clusterflick.com"
+              variant="contact"
+              aria-label="Email Clusterflick at hello@clusterflick.com"
+            >
               <CardIcon>
-                <EmailIcon />
+                <EmailIcon aria-hidden="true" />
               </CardIcon>
               <CardContent>hello@clusterflick.com</CardContent>
             </LinkCard>
@@ -188,6 +197,6 @@ export default function AboutPage() {
           </ContentSection>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

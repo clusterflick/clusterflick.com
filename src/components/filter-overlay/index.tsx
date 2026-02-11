@@ -46,6 +46,7 @@ export default function FilterOverlay({
     hasActiveFilters,
   } = useFilterConfig();
 
+  const overlayRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const showingTitleSearchInputRef = useRef<HTMLInputElement>(null);
   const { movies, metaData } = useCinemaData();
@@ -131,6 +132,41 @@ export default function FilterOverlay({
     };
   }, [isOpen, handleClose]);
 
+  // Focus trap: keep focus within overlay when open
+  useEffect(() => {
+    if (!isOpen || !overlayRef.current) return;
+
+    const overlay = overlayRef.current;
+
+    const handleFocusTrap = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+
+      const focusableElements = overlay.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+
+      if (focusableElements.length === 0) return;
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleFocusTrap);
+    return () => document.removeEventListener("keydown", handleFocusTrap);
+  }, [isOpen]);
+
   // Share filters
   const [copied, setCopied] = useState(false);
 
@@ -149,7 +185,14 @@ export default function FilterOverlay({
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
 
   return (
-    <div className={clsx(styles.overlay, isOpen && styles.open)}>
+    <div
+      ref={overlayRef}
+      className={clsx(styles.overlay, isOpen && styles.open)}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Filter options"
+      aria-hidden={!isOpen}
+    >
       {/* Counts Section */}
       <div
         className={styles.countsSection}
@@ -177,7 +220,7 @@ export default function FilterOverlay({
           <span className={styles.countsDivider} aria-hidden="true">
             •
           </span>
-          <span className={styles.controlRight}>
+          <span className={styles.controlRight} aria-live="assertive">
             <Button
               variant="link"
               size="sm"
@@ -216,6 +259,7 @@ export default function FilterOverlay({
             id="filter-search"
             className={styles.searchInput}
             placeholder="Search event title..."
+            aria-label="Search event title"
             value={filterState.search}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -276,6 +320,7 @@ export default function FilterOverlay({
                 id="filter-showing-title-search"
                 className={styles.searchInput}
                 placeholder="Search original venue title..."
+                aria-label="Search original venue title"
                 value={filterState.showingTitleSearch}
                 onChange={(e) => setShowingTitleSearchQuery(e.target.value)}
               />

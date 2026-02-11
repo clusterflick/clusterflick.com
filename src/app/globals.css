@@ -96,6 +96,24 @@ strong {
   outline: none;
 }
 
+/* Accessibility: Skip navigation link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--color-electric-blue);
+  color: var(--color-white);
+  border-radius: 4px;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
 /* Accessibility: Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *,

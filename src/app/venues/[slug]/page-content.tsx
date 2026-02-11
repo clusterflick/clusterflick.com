@@ -110,7 +110,7 @@ export default function VenueDetailPageContent({
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
 
   return (
-    <div>
+    <main id="main-content">
       <PreloadCinemaData />
       <PageHeader backUrl="/" backText="Back to film list" />
 
@@ -366,6 +366,6 @@ export default function VenueDetailPageContent({
           )}
         </ContentSection>
       </div>
-    </div>
+    </main>
   );
 }

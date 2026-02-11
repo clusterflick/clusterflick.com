@@ -18,7 +18,7 @@ export default function LondonCinemasPageContent({
   totalBoroughs,
 }: LondonCinemasPageContentProps) {
   return (
-    <div>
+    <main id="main-content">
       <PreloadCinemaData />
       <PageHeader backUrl="/" backText="Back to film list" />
 
@@ -63,6 +63,6 @@ export default function LondonCinemasPageContent({
           ))}
         </ul>
       </div>
-    </div>
+    </main>
   );
 }

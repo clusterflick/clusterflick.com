@@ -29,7 +29,11 @@ export default function LoadingIndicator({
   className,
 }: LoadingIndicatorProps) {
   return (
-    <div className={clsx(styles.container, styles[size], className)}>
+    <div
+      className={clsx(styles.container, styles[size], className)}
+      role="status"
+      aria-live="polite"
+    >
       <Spinner size={spinnerSizes[size]} />
       {message && <span className={styles.message}>{message}</span>}
     </div>

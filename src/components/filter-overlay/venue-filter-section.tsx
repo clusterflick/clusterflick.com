@@ -197,6 +197,7 @@ export default function VenueFilterSection({
               type="text"
               className={styles.venueSearchInput}
               placeholder="Filter venues..."
+              aria-label="Filter venues"
               value={venueSearchQuery}
               onChange={(e) => setVenueSearchQuery(e.target.value)}
             />

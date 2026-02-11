@@ -82,6 +82,9 @@ export default function RootLayout({
         />
       </head>
       <body className={clsx(montserrat.variable, inter.variable)}>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <CinemaDataProvider>
           <FilterConfigProvider>
             <GeolocationProvider>{children}</GeolocationProvider>

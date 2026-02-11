@@ -17,7 +17,12 @@ export default function HeaderLogo() {
   };
 
   return (
-    <button className={styles.home} onClick={handleClick} type="button">
+    <button
+      className={styles.home}
+      onClick={handleClick}
+      type="button"
+      aria-label="Clusterflick — reset filters and return to top"
+    >
       <Image
         src="/images/icon.svg"
         alt="Clusterflick"
