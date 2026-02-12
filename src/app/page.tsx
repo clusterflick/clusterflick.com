@@ -116,7 +116,13 @@ export default async function Home() {
         <PageContent />
         <SSROnly>
           <section className={styles.staticMovies}>
-            <h2 style={{ marginTop: -48, textAlign: "left" }}>
+            <h2
+              style={{
+                marginTop: -49,
+                textAlign: "center",
+                color: "var(--color-black)",
+              }}
+            >
               Films Showing in London
             </h2>
             <div className={styles.staticGrid}>

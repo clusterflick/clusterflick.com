@@ -28,8 +28,6 @@ cult classics.
 - **UI:** [React](https://react.dev/) 19
 - **Grid Rendering:**
   [react-virtualized](https://github.com/bvaughn/react-virtualized)
-- **Data Compression:**
-  [compress-json](https://github.com/nickyout/compress-json)
 - **Styling:** CSS Modules
 - **Linting:** ESLint + Prettier
 

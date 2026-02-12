@@ -2,7 +2,6 @@
 const { existsSync, mkdirSync, writeFileSync } = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const { compress, trimUndefinedRecursively } = require("compress-json");
 const data = require("../combined-data/combined-data.json");
 const imdbReviews = require("../matched-data/imdb.json");
 const letterboxdReviews = require("../matched-data/letterboxd.json");
@@ -290,16 +289,14 @@ try {
       if (count <= MAX_PERFORMANCES_PER_BUCKET) countInBucket += count;
     });
 
-  trimUndefinedRecursively(files);
-
   const outputPath = path.join(__dirname, "..", "public", "data");
   const filenames = [];
   Object.keys(files).forEach((id) => {
-    const compressed = JSON.stringify(compress(files[id]));
+    const serialised = JSON.stringify(files[id]);
     if (!existsSync(outputPath)) mkdirSync(outputPath, { recursive: true });
-    const outputFilename = `data.${id}.${getHash(compressed)}.json`;
+    const outputFilename = `data.${id}.${getHash(serialised)}.json`;
     filenames.push(outputFilename);
-    writeFileSync(path.join(outputPath, outputFilename), compressed);
+    writeFileSync(path.join(outputPath, outputFilename), serialised);
   });
 
   const meta = {
@@ -311,9 +308,9 @@ try {
     mapping,
     filenames,
   };
-  const compressed = JSON.stringify(compress(meta));
-  const outputFilename = `data.meta.${getHash(compressed)}.json`;
-  writeFileSync(path.join(outputPath, outputFilename), compressed);
+  const metaSerialised = JSON.stringify(meta);
+  const outputFilename = `data.meta.${getHash(metaSerialised)}.json`;
+  writeFileSync(path.join(outputPath, outputFilename), metaSerialised);
 } catch (e) {
   throw e;
 }

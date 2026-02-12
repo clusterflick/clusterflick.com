@@ -10,6 +10,8 @@
   background-color: rgba(var(--color-light-gray-rgb), 0.08);
   border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
   border-radius: 8px;
+  position: relative;
+  z-index: 10;
 }
 
 .introHeader {

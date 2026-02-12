@@ -1,8 +1,7 @@
-import { decompress } from "compress-json";
 import type { MetaData, CinemaData } from "@/types";
 
 /**
- * Fetch and decompress the metadata file from public/data.
+ * Fetch the metadata file from public/data.
  * Uses the NEXT_PUBLIC_DATA_FILENAME env var set in .storybook/main.ts.
  */
 export async function fetchMetaData(): Promise<MetaData> {
@@ -12,12 +11,11 @@ export async function fetchMetaData(): Promise<MetaData> {
   }
 
   const response = await fetch(`/data/${metaFilename}`);
-  const compressed = await response.json();
-  return decompress(compressed) as MetaData;
+  return (await response.json()) as MetaData;
 }
 
 /**
- * Fetch and decompress all movie data files referenced in metadata.
+ * Fetch all movie data files referenced in metadata.
  * Returns a combined record of all movies with IDs populated.
  */
 export async function fetchAllMovies(
@@ -27,8 +25,7 @@ export async function fetchAllMovies(
 
   for (const filename of metaData.filenames) {
     const response = await fetch(`/data/${filename}`);
-    const compressed = await response.json();
-    const movies = decompress(compressed) as CinemaData["movies"];
+    const movies = (await response.json()) as CinemaData["movies"];
 
     for (const [id, movie] of Object.entries(movies)) {
       movie.id = id;

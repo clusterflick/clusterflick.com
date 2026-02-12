@@ -6,12 +6,15 @@ import type {
   Genre,
   MetaData,
 } from "@/types";
-import { type Compressed, decompress } from "compress-json";
 
-function expandAndCombine(metaData: MetaData, compressedFiles: Compressed[]) {
-  const movies = compressedFiles
-    .map(decompress)
-    .reduce((combined, data) => ({ ...combined, ...data }), {});
+function expandAndCombine(
+  metaData: MetaData,
+  chunkFiles: Record<string, unknown>[],
+) {
+  const movies = chunkFiles.reduce(
+    (combined, data) => ({ ...combined, ...data }),
+    {},
+  );
   const combinedData = { ...metaData, movies } as CinemaData;
   const keysWithIds = ["genres", "movies", "people", "venues"] as Partial<
     keyof CinemaData

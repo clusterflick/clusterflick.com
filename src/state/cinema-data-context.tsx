@@ -10,7 +10,6 @@ import {
   useRef,
 } from "react";
 import { CinemaData, MetaData } from "@/types";
-import { decompress, Compressed } from "compress-json";
 import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { pruneByPerformances } from "@/utils/prune-movies";
 
@@ -146,9 +145,9 @@ export async function getMetaData(): Promise<MetaData> {
     );
   }
 
-  let compressed: Compressed;
+  let metaData: MetaData;
   try {
-    compressed = await response.json();
+    metaData = await response.json();
   } catch (err) {
     throw new DataFetchError(
       "Data error: Failed to parse metadata response",
@@ -156,17 +155,12 @@ export async function getMetaData(): Promise<MetaData> {
     );
   }
 
-  try {
-    const metaData = decompress(compressed) as MetaData;
-    return {
-      ...metaData,
-      genres: expandData<CinemaData["genres"]>(metaData.genres),
-      people: expandData<CinemaData["people"]>(metaData.people),
-      venues: expandData<CinemaData["venues"]>(metaData.venues),
-    };
-  } catch (err) {
-    throw new DataFetchError("Data error: Failed to decompress metadata", err);
-  }
+  return {
+    ...metaData,
+    genres: expandData<CinemaData["genres"]>(metaData.genres),
+    people: expandData<CinemaData["people"]>(metaData.people),
+    venues: expandData<CinemaData["venues"]>(metaData.venues),
+  };
 }
 
 export async function getMovieData(
@@ -192,9 +186,9 @@ export async function getMovieData(
     );
   }
 
-  let compressed: Compressed;
+  let movies: CinemaData["movies"];
   try {
-    compressed = await response.json();
+    movies = await response.json();
   } catch (err) {
     throw new DataFetchError(
       `Data error: Failed to parse movie data from ${filename}`,
@@ -202,15 +196,7 @@ export async function getMovieData(
     );
   }
 
-  try {
-    const movies = decompress(compressed) as CinemaData["movies"];
-    return expandData<CinemaData["movies"]>(movies);
-  } catch (err) {
-    throw new DataFetchError(
-      `Data error: Failed to decompress movie data from ${filename}`,
-      err,
-    );
-  }
+  return expandData<CinemaData["movies"]>(movies);
 }
 
 const Context = createContext<ContextType | undefined>(undefined);

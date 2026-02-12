@@ -1,6 +1,4 @@
 import { http, HttpResponse, delay, passthrough } from "msw";
-import { compress } from "compress-json";
-
 /**
  * MSW Handlers for Storybook
  *
@@ -8,8 +6,8 @@ import { compress } from "compress-json";
  * For special scenarios (loading, error, empty), MSW intercepts and modifies responses.
  */
 
-// Empty data responses (compressed)
-const emptyMetaData = compress({
+// Empty data responses
+const emptyMetaData = {
   generatedAt: new Date().toISOString(),
   filenames: [],
   mapping: {},
@@ -17,9 +15,9 @@ const emptyMetaData = compress({
   genres: {},
   people: {},
   venues: {},
-});
+};
 
-const emptyMovieData = compress({});
+const emptyMovieData = {};
 
 // Default handlers - just pass through to real files
 export const handlers = [

@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import { decompress } from "compress-json";
 import { CinemaData } from "@/types";
 import expandAndCombine from "./expand-and-combine";
 
@@ -14,13 +13,13 @@ export async function getStaticData(): Promise<CinemaData> {
 
   const metaPath = join(publicDir, metaFilename);
   const metaContent = readFileSync(metaPath, "utf-8");
-  const metaData = decompress(JSON.parse(metaContent));
+  const metaData = JSON.parse(metaContent);
 
-  const compressedFiles = metaData.filenames.map((filename: string) => {
+  const chunkFiles = metaData.filenames.map((filename: string) => {
     const filePath = join(publicDir, filename);
     const content = readFileSync(filePath, "utf-8");
     return JSON.parse(content);
   });
 
-  return expandAndCombine(metaData, compressedFiles);
+  return expandAndCombine(metaData, chunkFiles);
 }
