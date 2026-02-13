@@ -23,7 +23,31 @@ export default function StatusSection() {
         [metaData],
       ),
     },
-    { label: "Event Platforms", value: useMemo(() => 5, []) },
+    {
+      label: "Event Sources",
+      value: useMemo(() => {
+        if (isLoading || isEmpty || !metaData) return null;
+
+        const venueIds = Object.keys(metaData.venues);
+        const externalSources = new Set<string>();
+
+        for (const movie of Object.values(movies)) {
+          for (const showingId of Object.keys(movie.showings)) {
+            // Showings scraped from venue sites have IDs starting with {venueId}-
+            if (venueIds.some((id) => showingId.startsWith(`${id}-`))) {
+              continue;
+            }
+
+            // Extract the source domain from external showing IDs
+            // Format: {sourceDomain}-{eventSpecificId}
+            const match = showingId.match(/^(.+\.[a-z]{2,})-/);
+            if (match) externalSources.add(match[1]);
+          }
+        }
+
+        return externalSources.size;
+      }, [metaData, movies, isLoading, isEmpty]),
+    },
     {
       label: "Events",
       value: useMemo(
