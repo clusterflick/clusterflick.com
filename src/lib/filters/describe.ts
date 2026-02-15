@@ -415,7 +415,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     if (categoryDesc) {
       parts.push(categoryDesc);
     } else if (allCategories) {
-      parts.push("events");
+      parts.push("Events");
     }
 
     eventsDesc = parts.join(" ");

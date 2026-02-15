@@ -77,6 +77,20 @@ export default function MobileMenu() {
             Venues
           </Link>
           <Link
+            href="/accessibility"
+            className={styles.navLink}
+            onClick={() => {
+              setIsOpen(false);
+              try {
+                sessionStorage.setItem("useBrowserBack", "true");
+              } catch {
+                // Ignore - UX optimization only
+              }
+            }}
+          >
+            Accessibility
+          </Link>
+          <Link
             href="/about"
             className={styles.navLink}
             onClick={() => {

@@ -17,6 +17,18 @@ export default function HeaderNav() {
         Venues
       </Link>
       <Link
+        href="/accessibility"
+        onClick={() => {
+          try {
+            sessionStorage.setItem("useBrowserBack", "true");
+          } catch {
+            // Ignore - UX optimization only
+          }
+        }}
+      >
+        Accessibility
+      </Link>
+      <Link
         href="/about"
         onClick={() => {
           try {

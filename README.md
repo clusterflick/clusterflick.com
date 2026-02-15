@@ -84,21 +84,22 @@ npm run process-combined-data
 
 ```
 clusterflick.com/
-├── combined-data/        # Raw combined cinema data (input)
-├── matched-data/         # Review data from external sources
-├── out/                  # Static export output
+├── combined-data/         # Raw combined cinema data (input)
+├── matched-data/          # Review data from external sources
+├── out/                   # Static export output
 ├── public/
-│   └── data/             # Processed & chunked data files
+│   └── data/              # Processed & chunked data files
 ├── scripts/
 │   └── process-combined-data.js   # Data processing script
 ├── src/
-│   ├── app/              # Next.js App Router pages
-│   │   ├── about/        # About page
-│   │   ├── movies/[id]/  # Movie detail pages
-│   │   └── page.tsx      # Home page (movie grid)
-│   ├── components/       # Reusable UI components
-│   ├── context/          # React context providers
-│   └── utils/            # Utility functions
+│   ├── app/               # Next.js App Router pages
+│   │   ├── about/         # About page
+│   │   ├── accessibility/ # Accessibility features & stats
+│   │   ├── movies/[id]/   # Movie detail pages
+│   │   └── page.tsx       # Home page (movie grid)
+│   ├── components/        # Reusable UI components
+│   ├── context/           # React context providers
+│   └── utils/             # Utility functions
 └── package.json
 ```
 

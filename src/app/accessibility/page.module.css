@@ -1,0 +1,437 @@
+/* Hero */
+.hero {
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 56px;
+  margin-bottom: 24px;
+}
+
+.tagline {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+/* Content wrapper */
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Overview ─── */
+
+.overviewSection {
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 40px;
+  color: var(--color-neon-pink);
+  margin-bottom: 16px;
+}
+
+.overviewIntro {
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 0 auto 40px;
+  color: var(--color-light-gray);
+}
+
+.overviewStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto 16px;
+}
+
+.overviewStat {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-electric-blue-rgb), 0.15) 0%,
+    rgba(var(--color-neon-pink-rgb), 0.15) 100%
+  );
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 16px;
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.overviewStatValue {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--color-neon-pink);
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.overviewStatLabel {
+  font-size: 14px;
+  color: var(--color-light-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.overviewSubtext {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 48px;
+}
+
+/* ─── Quick nav ─── */
+
+.quickNav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.quickNavLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 100px;
+  color: var(--color-light-gray);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.quickNavLink:hover {
+  background: rgba(var(--color-electric-blue-rgb), 0.12);
+  border-color: rgba(var(--color-electric-blue-rgb), 0.3);
+  color: var(--color-electric-blue);
+}
+
+/* ─── Feature sections ─── */
+
+.featuresContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.featureSection {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-dark-navy-rgb), 0.8) 0%,
+    rgba(var(--color-midnight-navy-rgb), 0.9) 100%
+  );
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 20px;
+  padding: 40px;
+  transition: border-color 0.3s ease;
+  scroll-margin-top: 100px;
+}
+
+.featureSection:hover {
+  border-color: rgba(var(--color-electric-blue-rgb), 0.2);
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.featureEmoji {
+  font-size: 36px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--color-white-rgb), 0.05);
+  border-radius: 16px;
+}
+
+.featureTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-neon-pink);
+  margin-bottom: 4px;
+}
+
+.featureShortDesc {
+  font-size: 15px;
+  color: var(--color-electric-blue);
+  font-weight: 500;
+  margin: 0;
+}
+
+.featureDescription {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  margin-bottom: 28px;
+  opacity: 0.9;
+}
+
+/* ─── Per-feature stats ─── */
+
+.featureStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.featureStatCard {
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.06);
+  border-radius: 12px;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.featureStatValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.featureStatLabel {
+  font-size: 12px;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Top movies poster grid ─── */
+
+.topMovies {
+  margin-bottom: 28px;
+}
+
+.topMoviesTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  margin-bottom: 16px;
+  font-family: var(--font-inter), sans-serif;
+}
+
+.posterGrid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
+}
+
+.posterLink {
+  flex-shrink: 0;
+  text-decoration: none;
+  border-bottom: none;
+}
+
+.posterLink:hover {
+  border-bottom: none;
+  color: inherit;
+}
+
+/* ─── Top venues list ─── */
+
+.topVenues {
+  text-align: left;
+}
+
+.topVenuesTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-neon-pink);
+  margin-bottom: 12px;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.topVenuesIntro {
+  font-size: 16px;
+  color: var(--color-muted-gray);
+  margin-bottom: 32px;
+}
+
+.venueList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  gap: 8px;
+}
+
+.venueItem {
+  list-style: none;
+}
+
+.venueLink {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border-radius: 10px;
+  border-bottom: none;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.venueLink:hover {
+  background: rgba(var(--color-white-rgb), 0.06);
+  border-bottom: none;
+}
+
+.venueRank {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  font-family: var(--font-montserrat), sans-serif;
+  min-width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.venueName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venueLink:hover .venueName {
+  color: var(--color-neon-pink);
+}
+
+.venueStats {
+  font-size: 12px;
+  color: var(--color-muted-gray);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Empty state ─── */
+
+.noScreenings {
+  font-size: 15px;
+  color: var(--color-muted-gray);
+  font-style: italic;
+  padding: 24px;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 40px;
+  }
+
+  .tagline {
+    font-size: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 32px;
+  }
+
+  .overviewStats {
+    gap: 12px;
+  }
+
+  .overviewStatValue {
+    font-size: 32px;
+  }
+
+  .overviewStat {
+    padding: 24px 12px;
+  }
+
+  .featureSection {
+    padding: 24px;
+  }
+
+  .featureEmoji {
+    font-size: 28px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .featureTitle {
+    font-size: 22px;
+  }
+
+  .featureStats {
+    gap: 8px;
+  }
+
+  .featureStatCard {
+    padding: 16px 8px;
+  }
+
+  .featureStatValue {
+    font-size: 22px;
+  }
+
+  .posterGrid {
+    gap: 12px;
+  }
+
+  .venueList {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 32px;
+  }
+
+  .overviewStatValue {
+    font-size: 24px;
+  }
+
+  .featureHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .quickNavLink {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+}
