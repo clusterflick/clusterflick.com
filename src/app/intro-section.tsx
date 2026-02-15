@@ -24,6 +24,11 @@ export default function IntroSection({
       if (localStorage.getItem(STORAGE_KEY) === "true") {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- valid: localStorage not available during SSR
         setIsExpanded(false);
+        // Notify WindowScroller after the DOM updates so it recalculates
+        // its offset (the collapsed section changes height above the grid).
+        requestAnimationFrame(() => {
+          window.dispatchEvent(new Event("resize"));
+        });
       }
     } catch {
       // Ignore - localStorage may not be available
@@ -49,6 +54,11 @@ export default function IntroSection({
             } catch {
               // Ignore
             }
+            // Notify WindowScroller to recalculate its offset, since
+            // collapsing/expanding changes the height of content above the grid.
+            requestAnimationFrame(() => {
+              window.dispatchEvent(new Event("resize"));
+            });
           }}
           aria-expanded={isExpanded}
         >
