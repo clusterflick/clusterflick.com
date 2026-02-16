@@ -4,10 +4,10 @@ function VenueBlurb() {
       <p>
         229 is an independent music venue on Great Portland Street, operated by
         International Students House. Profits from the venue go directly to the
-        charity, supporting students from low socioeconomic backgrounds. Alongside
-        its programme of live music and cultural events, 229 hosts occasional film
-        screenings and cinema events for London&apos;s diverse international
-        communities.
+        charity, supporting students from low socioeconomic backgrounds.
+        Alongside its programme of live music and cultural events, 229 hosts
+        occasional film screenings and cinema events for London&apos;s diverse
+        international communities.
       </p>
     </section>
   );

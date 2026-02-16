@@ -6,6 +6,7 @@ import PageHeader from "@/components/page-header";
 import Divider from "@/components/divider";
 import { getButtonClassName } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
+import StackedPoster from "@/components/stacked-poster";
 import { AccessibilityFeature, type Movie, type CinemaData } from "@/types";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
@@ -69,6 +70,7 @@ type FeatureStats = {
     posterPath?: string;
     performanceCount: number;
     year?: string;
+    includedMovies?: { posterPath?: string; title: string }[];
   }[];
 };
 
@@ -122,11 +124,13 @@ function computeAccessibilityStats(data: CinemaData): {
       .map(({ movie, perfCount }) => ({
         id: movie.id,
         title: movie.title,
-        posterPath:
-          movie.posterPath ||
-          movie.includedMovies?.find((m) => m.posterPath)?.posterPath,
+        posterPath: movie.posterPath,
         performanceCount: perfCount,
         year: movie.year,
+        includedMovies: movie.includedMovies?.map((m) => ({
+          posterPath: m.posterPath,
+          title: m.title,
+        })),
       }));
 
     return {
@@ -363,22 +367,50 @@ export default async function AccessibilityPage() {
                           Most Shown with {label}
                         </h4>
                         <div className={styles.posterGrid}>
-                          {featureStat.topMovies.map((movie) => (
-                            <a
-                              key={movie.id}
-                              href={`/movies/${movie.id}/${slugify(movie.title)}?accessibility=${featureStat.feature}`}
-                              className={styles.posterLink}
-                            >
-                              <MoviePoster
-                                posterPath={movie.posterPath}
-                                title={movie.title}
-                                subtitle={`${movie.performanceCount} ${movie.performanceCount === 1 ? "showing" : "showings"}`}
-                                showOverlay
-                                interactive
-                                headingLevel="h3"
-                              />
-                            </a>
-                          ))}
+                          {featureStat.topMovies.map((movie) => {
+                            const included = movie.includedMovies || [];
+                            const includedWithPosters = included.filter(
+                              (m) => m.posterPath,
+                            );
+                            const totalPosters =
+                              (movie.posterPath ? 1 : 0) +
+                              includedWithPosters.length;
+                            const useStacked =
+                              included.length > 1 && totalPosters >= 2;
+                            const subtitle = `${movie.performanceCount} ${movie.performanceCount === 1 ? "showing" : "showings"}`;
+
+                            return (
+                              <a
+                                key={movie.id}
+                                href={`/movies/${movie.id}/${slugify(movie.title)}?accessibility=${featureStat.feature}`}
+                                className={styles.posterLink}
+                              >
+                                {useStacked ? (
+                                  <StackedPoster
+                                    mainPosterPath={movie.posterPath}
+                                    mainTitle={movie.title}
+                                    includedMovies={included}
+                                    subtitle={subtitle}
+                                    showOverlay
+                                    interactive
+                                    headingLevel="h3"
+                                  />
+                                ) : (
+                                  <MoviePoster
+                                    posterPath={
+                                      movie.posterPath ||
+                                      includedWithPosters[0]?.posterPath
+                                    }
+                                    title={movie.title}
+                                    subtitle={subtitle}
+                                    showOverlay
+                                    interactive
+                                    headingLevel="h3"
+                                  />
+                                )}
+                              </a>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
