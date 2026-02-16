@@ -31,7 +31,6 @@
 
 .sectionTitle {
   font-size: 40px;
-  color: var(--color-neon-pink);
   margin-bottom: 16px;
 }
 
@@ -258,7 +257,7 @@
 /* ─── Top venues list ─── */
 
 .topVenues {
-  text-align: left;
+  text-align: center;
 }
 
 .topVenuesTitle {
@@ -279,6 +278,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  text-align: left;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(5, auto);

@@ -228,7 +228,9 @@ export default async function AccessibilityPage() {
       {/* Overview stats */}
       <section className={styles.content}>
         <div className={styles.overviewSection}>
-          <h2 className={styles.sectionTitle}>At a Glance</h2>
+          <OutlineHeading as="h2" color="blue" className={styles.sectionTitle}>
+            At a Glance
+          </OutlineHeading>
           <p className={styles.overviewIntro}>
             Accessibility features are tracked on individual screenings across
             London. Here&apos;s what&apos;s currently available.
