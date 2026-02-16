@@ -221,6 +221,20 @@ export default async function AccessibilityPage() {
           Find screenings with audio description, captions, relaxed
           environments, and more across London&apos;s 240+ venues.
         </p>
+        <p className={styles.heroNote}>
+          Our accessibility data is sourced directly from each venue and
+          cross-referenced against the{" "}
+          <span className={styles.nowrap}>UK Cinema Association&apos;s</span>{" "}
+          <a
+            href="https://accessiblescreeningsuk.co.uk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.nowrap}
+          >
+            Accessible Screenings UK
+          </a>{" "}
+          data to ensure accuracy.
+        </p>
       </HeroSection>
 
       <Divider />

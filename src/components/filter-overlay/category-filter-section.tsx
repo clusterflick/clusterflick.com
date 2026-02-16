@@ -11,6 +11,7 @@ import {
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import { EVENT_CATEGORIES } from "@/state/filter-config-context";
+import Link from "next/link";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
@@ -261,6 +262,11 @@ export default function CategoryFilterSection({
             </Button>
           </div>
         </div>
+        <p className={styles.sectionDescription}>
+          <Link href="/accessibility" className={styles.sectionLink}>
+            Learn more about accessible screenings
+          </Link>
+        </p>
         <div
           className={styles.chipGroup}
           role="group"

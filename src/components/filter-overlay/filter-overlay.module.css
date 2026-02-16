@@ -374,6 +374,10 @@
   margin-top: 20px;
 }
 
+.advancedFilterGroup > .sectionDescription {
+  margin: -8px 0 0;
+}
+
 .advancedFilterHeader {
   display: flex;
   align-items: center;
