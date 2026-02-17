@@ -22,7 +22,7 @@ function MoviePosterImage({
 }: MoviePosterImageProps) {
   const dimensions =
     size === "large"
-      ? { width: 342, height: 513 }
+      ? { width: 308, height: 462 }
       : { width: 200, height: 300 };
 
   const imageSize = size === "large" ? "w500" : "w342";

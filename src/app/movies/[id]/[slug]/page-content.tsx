@@ -240,16 +240,15 @@ export default function PageContent({
           />
 
           <PartOfSection containingEvents={containingEvents} />
+          <CastCrewSection
+            directors={movie.directors}
+            actors={movie.actors}
+            people={people}
+          />
         </div>
       </HeroSection>
 
       <div className={styles.detailsContainer}>
-        <CastCrewSection
-          directors={movie.directors}
-          actors={movie.actors}
-          people={people}
-        />
-
         <ShowingsSection
           isLoading={!isShowingsReady || !movies[movie.id]?.performances}
           performancesByDate={performancesByDate}

@@ -1,6 +1,5 @@
 import { Person } from "@/types";
 import CreditsList from "@/components/credits-list";
-import ContentSection from "@/components/content-section";
 import styles from "./cast-crew-section.module.css";
 
 interface CastCrewSectionProps {
@@ -27,36 +26,26 @@ export default function CastCrewSection({
   const actorNames = actors ? getNames(actors, people) : [];
 
   return (
-    <ContentSection
-      title="Cast & Crew"
-      icon={{
-        src: "/images/icons/neon-clapper.svg",
-        width: 38,
-        height: 38,
-        className: styles.clapperIcon,
-      }}
-    >
-      <div className={styles.creditsGrid}>
-        {hasDirectors && (
-          <CreditsList
-            role={`Director${directors.length > 1 ? "s" : ""}`}
-            names={getNames(directors, people)}
-          />
-        )}
+    <div className={styles.creditsGrid}>
+      {hasDirectors && (
+        <CreditsList
+          role={`Director${directors.length > 1 ? "s" : ""}`}
+          names={getNames(directors, people)}
+        />
+      )}
 
-        {hasActors && (
-          <>
-            {/* Mobile: Show only 2 cast members */}
-            <div className={styles.castMobile}>
-              <CreditsList role="Cast" names={actorNames} maxDisplay={2} />
-            </div>
-            {/* Desktop: Show 6 cast members */}
-            <div className={styles.castDesktop}>
-              <CreditsList role="Cast" names={actorNames} maxDisplay={6} />
-            </div>
-          </>
-        )}
-      </div>
-    </ContentSection>
+      {hasActors && (
+        <>
+          {/* Mobile: Show only 2 cast members */}
+          <div className={styles.castMobile}>
+            <CreditsList role="Cast" names={actorNames} maxDisplay={2} />
+          </div>
+          {/* Desktop: Show 6 cast members */}
+          <div className={styles.castDesktop}>
+            <CreditsList role="Cast" names={actorNames} maxDisplay={6} />
+          </div>
+        </>
+      )}
+    </div>
   );
 }

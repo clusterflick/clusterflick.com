@@ -1,8 +1,3 @@
-.clapperIcon {
-  position: relative;
-  top: -3px;
-}
-
 .creditsGrid {
   display: grid;
   grid-template-columns: fit-content(50%) 1fr;
@@ -13,10 +8,12 @@
 /* Show/hide cast lists based on screen size */
 .castMobile {
   display: none;
+  text-align: left;
 }
 
 .castDesktop {
   display: block;
+  text-align: left;
 }
 
 @media (max-width: 768px) {

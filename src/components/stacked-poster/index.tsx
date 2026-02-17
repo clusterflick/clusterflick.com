@@ -30,7 +30,7 @@ interface StackedPosterProps {
 // Dimensions for poster cards at each size
 const POSTER_DIMENSIONS = {
   small: { width: 168, height: 252 },
-  large: { width: 285, height: 428 },
+  large: { width: 257, height: 385 },
 };
 
 function PosterImage({
@@ -114,16 +114,16 @@ const POSITIONS = {
     ],
   },
   large: {
-    // Container: 342x513, Poster: 285x428, Available: 57x85
-    1: [{ top: 42, left: 28 }],
+    // Container: 308x462, Poster: 257x385, Available: 51x77
+    1: [{ top: 38, left: 25 }],
     2: [
       { top: 0, left: 0 },
-      { top: 85, left: 57 },
+      { top: 77, left: 51 },
     ],
     3: [
       { top: 0, left: 0 },
-      { top: 42, left: 28 },
-      { top: 85, left: 57 },
+      { top: 38, left: 25 },
+      { top: 77, left: 51 },
     ],
   },
 };
