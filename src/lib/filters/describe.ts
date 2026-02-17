@@ -291,10 +291,10 @@ function matchDatePreset(range: {
     return "Showing This Weekend";
   }
 
-  // All Time (~5 years)
+  // Any Time (~5 years)
   const allTimeEnd = todayMidnight + 5 * 365 * MS_PER_DAY;
   if (start === todayMidnight && end === allTimeEnd) {
-    return "Showing All Time";
+    return "Showing Any Time";
   }
 
   return null;

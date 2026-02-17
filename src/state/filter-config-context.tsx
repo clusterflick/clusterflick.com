@@ -55,7 +55,7 @@ export const DATE_OPTIONS = [
   { value: "this-week", label: "This Week" },
   { value: "next-7-days", label: "Next 7 Days" },
   { value: "this-weekend", label: "This Weekend" },
-  { value: "all-time", label: "All Time" },
+  { value: "all-time", label: "Any Time" },
 ] as const;
 
 export type DateOption = (typeof DATE_OPTIONS)[number]["value"];

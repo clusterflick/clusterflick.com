@@ -136,7 +136,7 @@ export default function DateFilterSection({
     if (start === saturdayMidnight && end === sundayMidnight)
       return "this-weekend";
 
-    // All time (~5 years)
+    // Any time (~5 years)
     const allTimeEnd = todayMidnight + 5 * 365 * MS_PER_DAY;
     if (start === todayMidnight && end === allTimeEnd) return "all-time";
 
