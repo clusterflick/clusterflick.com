@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Every Film Showing in London — Search London Cinema Listings",
   description:
     "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default async function Home() {
