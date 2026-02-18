@@ -122,6 +122,12 @@ test.describe("Smoke Tests", () => {
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
     await collapseIntroNotice(page);
 
+    // Wait for all data chunks to finish loading before scrolling,
+    // otherwise the grid can expand mid-test as later chunks arrive.
+    await expect(page.getByText("Loading movies...")).toBeHidden({
+      timeout: 30000,
+    });
+
     // Scroll to bottom
     await page.evaluate(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
@@ -241,6 +247,24 @@ test.describe("Smoke Tests", () => {
     // Wait for posters to load
     await page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
     await collapseIntroNotice(page);
+
+    // Set date filter to "Tomorrow" so every visible movie is guaranteed to
+    // have future performances (avoids flakes when today's are all in the past)
+    await page.click(FILTER_TRIGGER_SELECTOR);
+    const countsLocator = page.locator(
+      '[aria-live="polite"][aria-atomic="true"]',
+    );
+    await countsLocator.waitFor({ state: "visible", timeout: 5000 });
+    const countsBefore = await countsLocator.textContent();
+    await page.click("#chip-date-option-tomorrow");
+    await expect(countsLocator).not.toHaveText(countsBefore!, {
+      timeout: 5000,
+    });
+    await page.keyboard.press("Escape");
+    await page.waitForSelector(SEARCH_INPUT_SELECTOR, {
+      state: "hidden",
+      timeout: 2000,
+    });
 
     // Get the first movie title for verification later
     const expectedTitle = await getFirstMovieTitle(page);
