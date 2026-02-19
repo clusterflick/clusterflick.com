@@ -68,14 +68,14 @@ export default function BoroughPageContent({
         >
           {hasEvents ? (
             <p>
-              <strong>{venues.length}</strong>{" "}
+              <strong>{venues.length.toLocaleString("en-GB")}</strong>{" "}
               {venues.length === 1 ? "venue" : "venues"} &middot;{" "}
-              <strong>{totalMovies}</strong>{" "}
+              <strong>{totalMovies.toLocaleString("en-GB")}</strong>{" "}
               {totalMovies === 1 ? "film" : "films"}
             </p>
           ) : (
             <p>
-              <strong>{venues.length}</strong>{" "}
+              <strong>{venues.length.toLocaleString("en-GB")}</strong>{" "}
               {venues.length === 1 ? "venue" : "venues"} &middot; No showings
               currently listed
             </p>
@@ -99,7 +99,8 @@ export default function BoroughPageContent({
                 <>
                   Between them,{" "}
                   <strong>
-                    {totalMovies} {totalMovies === 1 ? "film is" : "films are"}
+                    {totalMovies.toLocaleString("en-GB")}{" "}
+                    {totalMovies === 1 ? "film is" : "films are"}
                   </strong>{" "}
                   currently showing. Browse the venues below to see what&apos;s
                   on, compare showtimes, and find your next screening.
@@ -157,9 +158,9 @@ export default function BoroughPageContent({
                   </div>
                   {venue.eventCount > 0 && (
                     <span className={styles.venueCardStats}>
-                      {venue.eventCount}{" "}
+                      {venue.eventCount.toLocaleString("en-GB")}{" "}
                       {venue.eventCount === 1 ? "film" : "films"} &middot;{" "}
-                      {venue.performanceCount}{" "}
+                      {venue.performanceCount.toLocaleString("en-GB")}{" "}
                       {venue.performanceCount === 1 ? "showing" : "showings"}
                     </span>
                   )}

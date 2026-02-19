@@ -169,7 +169,9 @@ export default function ShowingsSection({
               <div className={styles.filterInfo}>
                 {showingAll ? (
                   <span className={styles.filterLabel}>
-                    Showing all {unfilteredPerformanceCount} showings
+                    Showing all{" "}
+                    {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
+                    showings
                   </span>
                 ) : (
                   <>
@@ -189,8 +191,10 @@ export default function ShowingsSection({
                     </span>
                     {filteredPerformanceCount > 0 && (
                       <span className={styles.filterCount}>
-                        Showing {filteredPerformanceCount} of{" "}
-                        {unfilteredPerformanceCount} showings
+                        Showing{" "}
+                        {filteredPerformanceCount.toLocaleString("en-GB")} of{" "}
+                        {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
+                        showings
                       </span>
                     )}
                   </>
@@ -253,7 +257,9 @@ export default function ShowingsSection({
                               <>
                                 Showing{" "}
                                 <span className={styles.finishedCount}>
-                                  {pastPerformances.length}
+                                  {pastPerformances.length.toLocaleString(
+                                    "en-GB",
+                                  )}
                                 </span>{" "}
                                 {pastPerformances.length === 1
                                   ? "showing"
@@ -266,7 +272,9 @@ export default function ShowingsSection({
                               <>
                                 Hiding{" "}
                                 <span className={styles.finishedCount}>
-                                  {pastPerformances.length}
+                                  {pastPerformances.length.toLocaleString(
+                                    "en-GB",
+                                  )}
                                 </span>{" "}
                                 {pastPerformances.length === 1
                                   ? "showing"

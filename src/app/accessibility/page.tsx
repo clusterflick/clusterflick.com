@@ -224,12 +224,12 @@ export default async function AccessibilityPage() {
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and
           cross-referenced against the{" "}
-          <span className={styles.nowrap}>UK Cinema Association&apos;s</span>{" "}
+          <span className="nowrap">UK Cinema Association&apos;s</span>{" "}
           <a
             href="https://accessiblescreeningsuk.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className={styles.nowrap}
+            className="nowrap"
           >
             Accessible Screenings UK
           </a>{" "}
@@ -306,10 +306,10 @@ export default async function AccessibilityPage() {
                     <span className={styles.venueRank}>{index + 1}</span>
                     <span className={styles.venueName}>{venue.name}</span>
                     <span className={styles.venueStats}>
-                      {venue.filmCount}{" "}
+                      {venue.filmCount.toLocaleString("en-GB")}{" "}
                       {venue.filmCount === 1 ? "film" : "films"}
                       {" · "}
-                      {venue.performanceCount}{" "}
+                      {venue.performanceCount.toLocaleString("en-GB")}{" "}
                       {venue.performanceCount === 1 ? "showing" : "showings"}
                     </span>
                   </a>
@@ -393,7 +393,7 @@ export default async function AccessibilityPage() {
                               includedWithPosters.length;
                             const useStacked =
                               included.length > 1 && totalPosters >= 2;
-                            const subtitle = `${movie.performanceCount} ${movie.performanceCount === 1 ? "showing" : "showings"}`;
+                            const subtitle = `${movie.performanceCount.toLocaleString("en-GB")} ${movie.performanceCount === 1 ? "showing" : "showings"}`;
 
                             return (
                               <a

@@ -28,19 +28,22 @@ export default function VenuesPageContent({
         align="center"
       >
         <OutlineHeading className={styles.title}>Venues</OutlineHeading>
-        <p className={styles.subtitle}>{totalVenues} venues across London</p>
+        <p className={styles.subtitle}>
+          {totalVenues.toLocaleString("en-GB")} venues across London
+        </p>
       </HeroSection>
 
       <Divider />
 
       <div className={styles.content}>
         <p className={styles.intro}>
-          Clusterflick tracks film screenings from {totalVenues} venues across
-          London, from major cinema chains like Curzon, Everyman, ODEON and
-          Picturehouse to independent cinemas, arts centres, museums, cultural
-          institutes, bars and pop-up screening spaces. Whether you&apos;re
-          looking for the latest blockbusters at a multiplex or a rare 35mm
-          print at a neighbourhood arthouse, you&apos;ll find it here.
+          Clusterflick tracks film screenings from{" "}
+          {totalVenues.toLocaleString("en-GB")} venues across London, from major
+          cinema chains like Curzon, Everyman, ODEON and Picturehouse to
+          independent cinemas, arts centres, museums, cultural institutes, bars
+          and pop-up screening spaces. Whether you&apos;re looking for the
+          latest blockbusters at a multiplex or a rare 35mm print at a
+          neighbourhood arthouse, you&apos;ll find it here.
         </p>
 
         <VenueList groups={groups} />

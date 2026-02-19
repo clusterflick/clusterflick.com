@@ -148,10 +148,6 @@
   margin-bottom: 16px;
 }
 
-.nowrap {
-  white-space: nowrap;
-}
-
 .borough {
   font-size: 14px;
   color: var(--color-muted-gray);

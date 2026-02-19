@@ -205,9 +205,9 @@ export default function VenueDetailPageContent({
         >
           {hasEvents ? (
             <p>
-              <strong>{movieCount}</strong>{" "}
+              <strong>{movieCount.toLocaleString("en-GB")}</strong>{" "}
               {movieCount === 1 ? "film" : "films"} &middot;{" "}
-              <strong>{performanceCount}</strong>{" "}
+              <strong>{performanceCount.toLocaleString("en-GB")}</strong>{" "}
               {performanceCount === 1 ? "showing" : "showings"}
             </p>
           ) : (
@@ -236,7 +236,7 @@ export default function VenueDetailPageContent({
                 {venue.address.split(",").map((piece, index) => (
                   <Fragment key={index}>
                     {index === 0 ? "" : ","}{" "}
-                    <span className={styles.nowrap}>{piece}</span>
+                    <span className="nowrap">{piece}</span>
                   </Fragment>
                 ))}
               </p>

@@ -114,6 +114,11 @@ strong {
   top: 16px;
 }
 
+/* Utility: prevent line breaks */
+.nowrap {
+  white-space: nowrap;
+}
+
 /* Accessibility: Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *,

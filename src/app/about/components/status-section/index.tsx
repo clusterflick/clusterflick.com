@@ -72,10 +72,10 @@ export default function StatusSection() {
       {metaData && (
         <p className={styles.lastUpdated}>
           Data last refreshed on{" "}
-          <strong className={styles.nowrap}>
+          <strong className="nowrap">
             {formatDatePart(metaData.generatedAt)}
           </strong>{" "}
-          <strong className={styles.nowrap}>
+          <strong className="nowrap">
             at {formatTimePart(metaData.generatedAt)}
           </strong>
         </p>

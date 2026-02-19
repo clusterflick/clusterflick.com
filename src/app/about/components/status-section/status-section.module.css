@@ -8,10 +8,6 @@
   margin-bottom: 24px;
 }
 
-.nowrap {
-  white-space: nowrap;
-}
-
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

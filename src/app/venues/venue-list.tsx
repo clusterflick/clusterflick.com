@@ -77,7 +77,8 @@ export default function VenueList({ groups }: VenueListProps) {
 
       {query.trim() && (
         <p className={styles.searchResultCount}>
-          Showing {matchCount} {matchCount === 1 ? "venue" : "venues"}
+          Showing {matchCount.toLocaleString("en-GB")}{" "}
+          {matchCount === 1 ? "venue" : "venues"}
         </p>
       )}
 
@@ -94,7 +95,7 @@ export default function VenueList({ groups }: VenueListProps) {
                   <span className={styles.venueName}>{venue.displayName}</span>
                   {venue.eventCount > 0 && (
                     <span className={styles.venueEventCount}>
-                      {venue.eventCount}
+                      {venue.eventCount.toLocaleString("en-GB")}
                     </span>
                   )}
                 </Link>

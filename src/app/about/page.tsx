@@ -134,6 +134,7 @@ export default function AboutPage() {
                   href="https://themoviedb.org/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="nowrap"
                 >
                   The Movie Database
                 </a>{" "}
