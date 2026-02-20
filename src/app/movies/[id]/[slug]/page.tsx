@@ -152,8 +152,9 @@ export default async function MovieDetailPage({
     }),
     ...(movie.duration && {
       duration: (() => {
-        const h = Math.floor(movie.duration / 60);
-        const m = movie.duration % 60;
+        const totalMinutes = Math.floor(movie.duration / 1000 / 60);
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
         return h > 0 && m > 0 ? `PT${h}H${m}M` : h > 0 ? `PT${h}H` : `PT${m}M`;
       })(),
     }),
