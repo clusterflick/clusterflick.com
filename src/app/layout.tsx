@@ -76,6 +76,27 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Clusterflick",
+              url: "https://clusterflick.com",
+              logo: "https://clusterflick.com/images/logo.svg",
+              sameAs: [
+                "https://letterboxd.com/clusterflick/",
+                "https://www.instagram.com/clusterflick_/",
+                "https://www.reddit.com/user/clusterflick_/",
+                "https://www.threads.com/clusterflick_/",
+                "https://x.com/clusterflick/",
+                "https://bsky.app/profile/clusterflick.bsky.social",
+                "https://github.com/clusterflick/",
+              ],
+            }),
+          }}
+        />
+        <script
           defer
           src="https://cloud.umami.is/script.js"
           data-website-id="80a133a1-82b7-47ce-9b96-2baca324b9ea"

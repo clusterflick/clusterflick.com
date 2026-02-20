@@ -16,9 +16,7 @@ test.describe("Smoke Tests", () => {
     await home.goto();
   });
 
-  test("main page shows expected number of posters on desktop", async ({
-    page,
-  }) => {
+  test("main page shows expected number of posters on desktop", async () => {
     await expect(async () => {
       const posterCount = await home.countVisiblePosters();
       expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
@@ -27,7 +25,7 @@ test.describe("Smoke Tests", () => {
     await home.screenshot("initial-load");
   });
 
-  test("scrolling to bottom loads more posters", async ({ page }) => {
+  test("scrolling to bottom loads more posters", async () => {
     await home.scrollToBottom();
 
     await expect(async () => {
@@ -67,9 +65,7 @@ test.describe("Smoke Tests", () => {
     await home.screenshot("after-scroll-middle");
   });
 
-  test("search for first movie title shows exactly 1 match", async ({
-    page,
-  }) => {
+  test("search for first movie title shows exactly 1 match", async () => {
     const firstMovieTitle = await home.getFirstMovieTitle();
     expect(firstMovieTitle).toBeTruthy();
 
