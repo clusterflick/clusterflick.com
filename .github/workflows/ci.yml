@@ -29,7 +29,7 @@ jobs:
       - name: Download combined data
         uses: clusterflick/release-downloader@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT || github.token }}
           repository: "clusterflick/data-combined"
           latest: true
           fileName: "*"
@@ -37,7 +37,7 @@ jobs:
       - name: Download matched data
         uses: clusterflick/release-downloader@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT || github.token }}
           repository: "clusterflick/data-matched"
           latest: true
           fileName: "*"
@@ -46,6 +46,7 @@ jobs:
       # Storybook
       - run: npm run build-storybook
       - name: Publish to Chromatic
+        if: github.actor != 'dependabot[bot]'
         uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
