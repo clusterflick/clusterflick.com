@@ -31,6 +31,11 @@
   margin-bottom: 0;
   text-align: center;
   flex: 1;
+  padding: 0 2.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5ch;
+  justify-content: center;
 }
 
 .toggleButton {

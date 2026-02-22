@@ -63,11 +63,9 @@ export default async function Home() {
       <PageWrapper className={styles.page}>
         <IntroSection
           heading={
-            <h1 style={{ padding: "0 3.75rem" }}>
-              Every Film Showing in London{" "}
-              <span className="nowrap">
-                &mdash; Search London Cinema Listings
-              </span>
+            <h1>
+              <span>Every Film Showing in London</span>{" "}
+              <span>&mdash; Search London Cinema Listings</span>
             </h1>
           }
           signOff={

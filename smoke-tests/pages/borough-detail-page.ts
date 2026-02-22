@@ -7,7 +7,9 @@ export class BoroughDetailPage {
   constructor(private page: Page) {}
 
   async waitForPage(expectedBoroughName: string) {
-    await this.page.waitForURL(/\/london-cinemas\/[^/]+$/, { timeout: 10000 });
+    await this.page.waitForURL(/\/london-cinemas\/[^/]+\/?$/, {
+      timeout: 10000,
+    });
     await this.page
       .locator("h1")
       .filter({ hasText: expectedBoroughName })

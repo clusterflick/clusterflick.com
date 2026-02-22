@@ -7,7 +7,7 @@ export class FestivalDetailPage {
   constructor(private page: Page) {}
 
   async waitForPage(expectedName: string) {
-    await this.page.waitForURL(/\/festivals\/[^/]+$/, { timeout: 10000 });
+    await this.page.waitForURL(/\/festivals\/[^/]+\/?$/, { timeout: 10000 });
     await this.page
       .locator("h1")
       .filter({ hasText: expectedName })
