@@ -5,3 +5,4 @@ export { venuesFilter } from "./venues";
 export { dateRangeFilter } from "./date-range";
 export { genresFilter } from "./genres";
 export { accessibilityFilter } from "./accessibility";
+export { hideFinishedFilter } from "./hide-finished";

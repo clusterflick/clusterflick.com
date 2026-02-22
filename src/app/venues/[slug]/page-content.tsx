@@ -2,16 +2,12 @@ import { Fragment, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { VenueAttributes } from "@/utils/get-venue-attributes";
-import { getMovieUrl } from "@/utils/get-movie-url";
 import type { Movie, Venue } from "@/types";
 import PageHeader from "@/components/page-header";
-import HeroSection from "@/components/hero-section";
-import OutlineHeading from "@/components/outline-heading";
+import DetailPageHero from "@/components/detail-page-hero";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
-import MoviePoster from "@/components/movie-poster";
-import StackedPoster from "@/components/stacked-poster";
 import {
   LetterboxdIcon,
   InstagramIcon,
@@ -20,7 +16,7 @@ import {
   OutlookCalendarIcon,
   CalendarIcon,
 } from "@/components/icons";
-import EmptyState from "@/components/empty-state";
+import FilmPosterGrid from "@/components/film-poster-grid";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
@@ -104,7 +100,6 @@ export default function VenueDetailPageContent({
   nearbyVenues,
   borough,
 }: VenueDetailPageContentProps) {
-  const hasEvents = performanceCount > 0;
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
@@ -114,38 +109,13 @@ export default function VenueDetailPageContent({
       <PreloadCinemaData />
       <PageHeader backUrl="/" backText="Back to film list" />
 
-      <HeroSection
-        backgroundImage="/images/light-circles.jpg"
-        backgroundImageAlt="Decorative light circles"
-        backdropHeight="standard"
-        align="center"
-        className={styles.hero}
+      <DetailPageHero
+        name={venue.name}
+        imagePath={imagePath}
+        url={attributes?.url}
+        movieCount={movieCount}
+        performanceCount={performanceCount}
       >
-        {imagePath && (
-          <div className={styles.venueImage}>
-            <Image
-              src={imagePath}
-              alt={`${venue.name} logo`}
-              width={160}
-              height={160}
-              className={styles.venueLogo}
-            />
-          </div>
-        )}
-        <OutlineHeading className={styles.title}>{venue.name}</OutlineHeading>
-
-        {attributes && (
-          <div className={styles.heroLinks}>
-            <a
-              href={attributes.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.heroLink}
-            >
-              {attributes.url}
-            </a>
-          </div>
-        )}
         <div className={styles.heroTagRow}>
           <div className={styles.heroTagRowSide}>
             {socialLinks.map((link) => (
@@ -197,24 +167,7 @@ export default function VenueDetailPageContent({
             </a>
           </div>
         </div>
-
-        <div
-          className={
-            hasEvents ? styles.statusCardActive : styles.statusCardInactive
-          }
-        >
-          {hasEvents ? (
-            <p>
-              <strong>{movieCount.toLocaleString("en-GB")}</strong>{" "}
-              {movieCount === 1 ? "film" : "films"} &middot;{" "}
-              <strong>{performanceCount.toLocaleString("en-GB")}</strong>{" "}
-              {performanceCount === 1 ? "showing" : "showings"}
-            </p>
-          ) : (
-            <p>No showings currently listed</p>
-          )}
-        </div>
-      </HeroSection>
+      </DetailPageHero>
 
       <Divider />
 
@@ -293,77 +246,12 @@ export default function VenueDetailPageContent({
           as="h2"
           className={styles.venueFilms}
         >
-          {gridMovies.length === 0 ? (
-            <EmptyState
-              icon={{
-                src: "/images/icons/neon-ticket-ripped.svg",
-                width: 120,
-                height: 80,
-              }}
-              message="No showings currently listed"
-              hint="Check back soon — new showings are added regularly"
-            />
-          ) : (
-            <>
-              <a
-                href={`/?venues=${encodeURIComponent(venue.id)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.exploreLink}
-              >
-                Start exploring films at {venue.name}
-              </a>
-              <div
-                className={
-                  gridMoviesTruncated
-                    ? styles.filmGridFadeWrapper
-                    : styles.filmGridWrapper
-                }
-              >
-                <div className={styles.filmGrid}>
-                  {gridMovies.map(({ movie }) => {
-                    const includedMovies = movie.includedMovies;
-                    const includedWithPosters =
-                      includedMovies?.filter((m) => m.posterPath) || [];
-                    const totalPosters =
-                      (movie.posterPath ? 1 : 0) + includedWithPosters.length;
-                    const useStackedPoster =
-                      includedMovies &&
-                      includedMovies.length > 1 &&
-                      totalPosters >= 2;
-
-                    return (
-                      <Link
-                        key={movie.id}
-                        href={getMovieUrl(movie)}
-                        className={styles.filmGridLink}
-                      >
-                        {useStackedPoster ? (
-                          <StackedPoster
-                            mainPosterPath={movie.posterPath}
-                            mainTitle={movie.title}
-                            includedMovies={includedMovies}
-                            subtitle={movie.year}
-                            showOverlay
-                          />
-                        ) : (
-                          <MoviePoster
-                            posterPath={
-                              movie.posterPath ||
-                              includedWithPosters[0]?.posterPath
-                            }
-                            title={movie.title}
-                            subtitle={movie.year}
-                            showOverlay
-                          />
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
+          <FilmPosterGrid
+            movies={gridMovies}
+            truncated={gridMoviesTruncated}
+            exploreHref={`/?venues=${encodeURIComponent(venue.id)}`}
+            exploreLabel={`Start exploring films at ${venue.name}`}
+          />
         </ContentSection>
       </div>
     </main>

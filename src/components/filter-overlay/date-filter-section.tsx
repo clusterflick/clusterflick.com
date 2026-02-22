@@ -11,6 +11,7 @@ import {
   MS_PER_DAY,
 } from "@/utils/format-date";
 import Chip from "@/components/chip";
+import Switch from "@/components/switch";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
 
@@ -19,6 +20,8 @@ interface DateFilterSectionProps {
   dateRange: { start: number | null; end: number | null };
   setDateRange: (start: number | null, end: number | null) => void;
   setDateOption: (option: DateOption) => void;
+  hideFinished: boolean;
+  onToggleHideFinished: () => void;
 }
 
 export default function DateFilterSection({
@@ -26,6 +29,8 @@ export default function DateFilterSection({
   dateRange,
   setDateRange,
   setDateOption,
+  hideFinished,
+  onToggleHideFinished,
 }: DateFilterSectionProps) {
   // Calculate date range from performance data
   const { minDateStr, maxDateStr } = useMemo(() => {
@@ -145,9 +150,17 @@ export default function DateFilterSection({
 
   return (
     <section className={styles.section} aria-labelledby="dates-heading">
-      <h3 id="dates-heading" className={styles.sectionTitle}>
-        Dates
-      </h3>
+      <div className={styles.sectionHeader}>
+        <h3 id="dates-heading" className={styles.sectionTitle}>
+          Dates
+        </h3>
+        <Switch
+          id="hide-finished"
+          label="Hide past showings"
+          checked={hideFinished}
+          onChange={onToggleHideFinished}
+        />
+      </div>
       <p className={styles.sectionDescription}>When do you want to go?</p>
       <div
         className={styles.chipGroup}

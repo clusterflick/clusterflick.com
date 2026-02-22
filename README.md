@@ -1,42 +1,50 @@
-# 🍿 Clusterflick
+# Clusterflick
 
 > Every film, every cinema, one place.
 
 Clusterflick is an open-source web app that aggregates film screenings from
 across London cinemas into a single, searchable interface. Compare screenings,
-find showtimes, and discover what's on—whether you're chasing new releases or
+find showtimes, and discover what's on — whether you're chasing new releases or
 cult classics.
 
-## ✨ Features
+## Features
 
-- **Unified Cinema Listings** — Browse film screenings from dozens of London
-  cinemas in one place
+- **Unified Cinema Listings** — Browse film screenings from 240+ London cinemas
+  in one place
 - **Rich Movie Data** — View ratings and reviews from IMDb, Letterboxd,
   Metacritic, and Rotten Tomatoes
 - **Multiple Event Types** — Find movies, TV screenings, comedy, music events,
   talks, workshops, and more
-- **Accessibility Info** — Filter by accessibility features including audio
-  description, subtitles, hard of hearing support, relaxed screenings, and
-  baby-friendly showings
+- **Venues & Boroughs** — Browse all cinemas by venue or explore all 33 London
+  boroughs
+- **Festival Pages** — Dedicated pages for London film festivals with full
+  programme listings
+- **Accessibility Filters** — Filter by audio description, subtitles, hard of
+  hearing support, relaxed screenings, and baby-friendly showings
+- **Geolocation** — Sort venues by distance from your current location
+- **Shareable Filters** — Share your current filter state via URL
+- **Hide Past Showings** — Toggle to filter out screenings that have already
+  started
 - **Virtualized Grid** — Fast, smooth browsing of hundreds of movie posters with
   react-virtualized
 - **Static Export** — Fully static site for fast loading and easy deployment
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) 16 (Static Export)
 - **UI:** [React](https://react.dev/) 19
 - **Grid Rendering:**
   [react-virtualized](https://github.com/bvaughn/react-virtualized)
 - **Styling:** CSS Modules
+- **Testing:** Storybook + Vitest, Playwright (smoke tests), Chromatic (visual
+  regression)
 - **Linting:** ESLint + Prettier
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
-- npm
+- Node.js 24
 
 ### Installation
 
@@ -70,17 +78,20 @@ npm run build
 ### Other Commands
 
 ```bash
-# Lint the codebase
+# Lint the codebase (TypeScript + ESLint)
 npm run lint
 
 # Format code with Prettier
 npm run format
 
-# Process combined data into chunks for the frontend
-npm run process-combined-data
+# Run Storybook
+npm run storybook
+
+# Run Playwright smoke tests (set SITE_URL to target a specific deployment)
+npm run smoke-test
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 clusterflick.com/
@@ -89,26 +100,32 @@ clusterflick.com/
 ├── out/                   # Static export output
 ├── public/
 │   └── data/              # Processed & chunked data files
-├── scripts/
-│   └── process-combined-data.js   # Data processing script
+├── scripts/               # Build-time data processing scripts
+├── smoke-tests/           # Playwright E2E smoke tests
 ├── src/
 │   ├── app/               # Next.js App Router pages
 │   │   ├── about/         # About page
 │   │   ├── accessibility/ # Accessibility features & stats
-│   │   ├── movies/[id]/   # Movie detail pages
+│   │   ├── festivals/     # Festival list + detail pages
+│   │   ├── london-cinemas/# Borough index pages
+│   │   ├── movies/[id]/[slug]/  # Movie detail pages
+│   │   ├── venues/[slug]/ # Venue detail pages
 │   │   └── page.tsx       # Home page (movie grid)
 │   ├── components/        # Reusable UI components
-│   ├── context/           # React context providers
+│   ├── data/              # Static data (festivals, boroughs)
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Domain logic (filter system)
+│   ├── state/             # React context providers
 │   └── utils/             # Utility functions
 └── package.json
 ```
 
-## 📊 Data Pipeline
+## Data Pipeline
 
 Clusterflick's data flows through several stages:
 
 1. **Retrieved** — Cinema websites are scraped for showings data
-   ([clusterflick/data-scraped](https://github.com/clusterflick/data-retrieved))
+   ([clusterflick/data-retrieved](https://github.com/clusterflick/data-retrieved))
 2. **Transformation** — Raw data is normalized and enriched
    ([clusterflick/data-transformed](https://github.com/clusterflick/data-transformed))
 3. **Combination** — Individual venue data is merged by movie
@@ -120,7 +137,7 @@ Clusterflick's data flows through several stages:
 
 Data is refreshed automatically every morning.
 
-## 🔗 Related Repositories
+## Related Repositories
 
 | Repository                                                                        | Description                    |
 | --------------------------------------------------------------------------------- | ------------------------------ |
@@ -128,7 +145,7 @@ Data is refreshed automatically every morning.
 | [clusterflick/data-combined](https://github.com/clusterflick/data-combined)       | Combined data grouped by movie |
 | [clusterflick/data-calendar](https://github.com/clusterflick/data-calendar)       | ICS calendar files per venue   |
 
-## 📝 Data Access
+## Data Access
 
 The data is freely available in multiple formats:
 
@@ -138,6 +155,6 @@ The data is freely available in multiple formats:
 
 Visit the [About page](https://clusterflick.com/about/) for download links.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests.

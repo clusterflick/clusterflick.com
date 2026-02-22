@@ -443,7 +443,10 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   );
 
   // Build dates description
-  const datesDesc = describeDateRange(state);
+  let datesDesc = describeDateRange(state);
+  if (state.hideFinished) {
+    datesDesc += " and not finished";
+  }
 
   return {
     events: eventsDesc,

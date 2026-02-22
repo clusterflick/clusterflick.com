@@ -37,42 +37,44 @@ export default function IntroSection({
 
   return (
     <section className={styles.intro}>
-      <div className={styles.introHeader}>
-        {heading}
-        <button
-          type="button"
-          className={styles.toggleButton}
-          onClick={() => {
-            const next = !isExpanded;
-            setIsExpanded(next);
-            try {
-              if (next) {
-                localStorage.removeItem(STORAGE_KEY);
-              } else {
-                localStorage.setItem(STORAGE_KEY, "true");
+      <div className={styles.introInner}>
+        <div className={styles.introHeader}>
+          {heading}
+          <button
+            type="button"
+            className={styles.toggleButton}
+            onClick={() => {
+              const next = !isExpanded;
+              setIsExpanded(next);
+              try {
+                if (next) {
+                  localStorage.removeItem(STORAGE_KEY);
+                } else {
+                  localStorage.setItem(STORAGE_KEY, "true");
+                }
+              } catch {
+                // Ignore
               }
-            } catch {
-              // Ignore
-            }
-            // Notify WindowScroller to recalculate its offset, since
-            // collapsing/expanding changes the height of content above the grid.
-            requestAnimationFrame(() => {
-              window.dispatchEvent(new Event("resize"));
-            });
-          }}
-          aria-expanded={isExpanded}
-        >
-          {isExpanded ? "Collapse" : "Expand"}
-        </button>
-      </div>
-      {isExpanded ? (
-        <div className={styles.introBody}>{children}</div>
-      ) : (
-        <div className={styles.collapsedIndicator} aria-hidden="true">
-          ···
+              // Notify WindowScroller to recalculate its offset, since
+              // collapsing/expanding changes the height of content above the grid.
+              requestAnimationFrame(() => {
+                window.dispatchEvent(new Event("resize"));
+              });
+            }}
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? "Collapse" : "Expand"}
+          </button>
         </div>
-      )}
-      {signOff}
+        {isExpanded ? (
+          <div className={styles.introBody}>{children}</div>
+        ) : (
+          <div className={styles.collapsedIndicator} aria-hidden="true">
+            ···
+          </div>
+        )}
+        {signOff}
+      </div>
     </section>
   );
 }

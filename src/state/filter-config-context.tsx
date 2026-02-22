@@ -85,6 +85,8 @@ type FilterConfigContextType = {
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
   selectVenues: (venueIds: string[]) => void;
   clearVenues: () => void;
+  // Hide finished showings
+  toggleHideFinished: () => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -427,6 +429,17 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState((prev) => filterManager.set(prev, FilterId.Venues, null));
   }, []);
 
+  // Hide finished showings
+  const toggleHideFinished = useCallback(() => {
+    setFilterState((prev) =>
+      filterManager.set(
+        prev,
+        FilterId.HideFinished,
+        !filterManager.get(prev, FilterId.HideFinished),
+      ),
+    );
+  }, []);
+
   // General
   const resetFilters = useCallback(() => {
     setFilterState(filterManager.getDefaultState);
@@ -456,6 +469,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      toggleHideFinished,
       resetFilters,
       hasActiveFilters,
     }),
@@ -478,6 +492,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      toggleHideFinished,
       resetFilters,
       hasActiveFilters,
     ],

@@ -63,36 +63,46 @@ export default async function Home() {
       <PageWrapper className={styles.page}>
         <IntroSection
           heading={
-            <h1>
-              Every Film Showing in London &mdash; Search London Cinema Listings
+            <h1 style={{ padding: "0 3.75rem" }}>
+              Every Film Showing in London{" "}
+              <span className="nowrap">
+                &mdash; Search London Cinema Listings
+              </span>
             </h1>
           }
           signOff={
             <p className={styles.signOff}>
               We hope you enjoy the site! Any questions?{" "}
-              <Link href="/about">Please get in touch</Link> &mdash; Your
-              friends at{" "}
-              <span className={styles.textWithIcon}>
-                Clusterflick
-                <Image
-                  src="/images/icon.svg"
-                  alt="Clusterflick"
-                  width={20}
-                  height={20}
-                />
+              <Link href="/about">Please get in touch</Link>{" "}
+              <span className="nowrap">
+                &mdash; Your friends at{" "}
+                <span className={styles.textWithIcon}>
+                  Clusterflick
+                  <Image
+                    src="/images/icon.svg"
+                    alt="Clusterflick"
+                    width={20}
+                    height={20}
+                  />
+                </span>
               </span>
             </p>
           }
         >
           <p>
-            Welcome to Clusterflick 👋 &mdash; Find every film showing across
-            London, all in one place. From blockbusters at Picturehouses and
-            Everyman, to independent gems at BFI, Genesis Cinema, and Prince
-            Charles Cinema (and more, there&apos;s way too many venues to name
-            them all!)
-            <br />
+            Find every film showing across London, all in one place. From
+            blockbusters at Picturehouses and Everyman, to independent gems at{" "}
+            <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
+            <Link href="/venues/genesis-cinema">Genesis Cinema</Link>, and{" "}
+            <Link href="/venues/prince-charles-cinema">
+              Prince Charles Cinema
+            </Link>{" "}
+            (and more, there&apos;s way too many venues to name them all!)
             We&apos;re currently tracking over 1,000 films showing across{" "}
-            <Link href="/venues">London&apos;s 240+ venues</Link>.
+            <Link href="/venues" className="nowrap">
+              London&apos;s 240+ venues
+            </Link>
+            .
           </p>
           <p>
             With so much to choose from, use the menu at the top to filter for

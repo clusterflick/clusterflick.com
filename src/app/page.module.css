@@ -3,15 +3,19 @@
 }
 
 .intro {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 16px 20px;
+  margin: 0 1rem;
   margin-bottom: 32px;
   background-color: rgba(var(--color-light-gray-rgb), 0.08);
   border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
   border-radius: 8px;
   position: relative;
   z-index: 10;
+}
+
+.introInner {
+  max-width: 824px;
+  margin: 0 auto;
+  padding: 16px 20px;
 }
 
 .introHeader {
@@ -39,6 +43,9 @@
   flex-shrink: 0;
   font-family: inherit;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
 }
 
 .toggleButton:hover {
@@ -65,7 +72,7 @@
   color: var(--color-muted-gray);
   font-size: 18px;
   letter-spacing: 4px;
-  padding: 6px 0 0 0;
+  padding: 2px 0 0 0;
 }
 
 .filterHighlight {

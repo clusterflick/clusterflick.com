@@ -1,0 +1,73 @@
+.hero {
+  padding-bottom: 40px;
+}
+
+.entityImage {
+  margin: 0 auto 20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.entityLogo {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.title {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  margin-bottom: 0;
+}
+
+.heroLinks {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.heroLink {
+  color: var(--color-electric-blue);
+  text-decoration: none;
+  font-size: 15px;
+  opacity: 0.9;
+  transition:
+    opacity 0.2s,
+    color 0.2s,
+    border-bottom 0.2s;
+}
+
+.heroLink:hover {
+  opacity: 1;
+}
+
+.statusCardActive,
+.statusCardInactive {
+  margin-top: 24px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.statusCardActive {
+  background: rgba(46, 196, 134, 0.15);
+  border: 1px solid rgba(46, 196, 134, 0.4);
+  color: #5ee6a0;
+}
+
+.statusCardInactive {
+  background: rgba(250, 222, 5, 0.1);
+  border: 1px solid rgba(250, 222, 5, 0.3);
+  color: var(--color-buttery-yellow);
+}

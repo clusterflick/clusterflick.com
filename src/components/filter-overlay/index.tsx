@@ -45,6 +45,7 @@ export default function FilterOverlay({
     toggleVenue,
     selectVenues,
     clearVenues,
+    toggleHideFinished,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
@@ -405,6 +406,8 @@ export default function FilterOverlay({
             dateRange={filterState.dateRange}
             setDateRange={setDateRange}
             setDateOption={setDateOption}
+            hideFinished={filterState.hideFinished}
+            onToggleHideFinished={toggleHideFinished}
           />
         </div>
       </div>

@@ -1,0 +1,83 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-gray);
+  transition: color 0.2s ease;
+}
+
+.wrapper:hover .label {
+  color: var(--color-light-gray);
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 100px;
+  background: rgba(var(--color-white-rgb), 0.1);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wrapper:hover .track {
+  background: rgba(var(--color-white-rgb), 0.15);
+  border-color: rgba(var(--color-white-rgb), 0.25);
+}
+
+.knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-muted-gray);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Checked state */
+.input:checked ~ * {
+  /* Can't target siblings via CSS from input (input is last) — handled via :has() */
+}
+
+.wrapper:has(.input:checked) .track {
+  background: rgba(var(--color-neon-pink-rgb), 0.2);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.5);
+}
+
+.wrapper:has(.input:checked) .knob {
+  transform: translateX(16px);
+  background: var(--color-neon-pink);
+}
+
+.wrapper:has(.input:checked) .label {
+  color: var(--color-light-gray);
+}
+
+/* Focus ring on track when input is focused */
+.wrapper:has(.input:focus-visible) .track {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}

@@ -1,0 +1,28 @@
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.blurb {
+  line-height: 1.7;
+}
+
+.blurb p {
+  margin-bottom: 16px;
+}
+
+.filmsSection {
+  width: 100%;
+  padding: 0 20px 80px;
+}
+
+.festivalFilms {
+  text-align: center;
+
+  h2 {
+    justify-content: center;
+  }
+}

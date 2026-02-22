@@ -39,6 +39,7 @@ src/
   components/    — Reusable UI components (one per directory: index.tsx + .module.css)
   state/         — React Context providers (cinema-data, filter-config, geolocation)
   hooks/         — Custom React hooks
+  data/          — Static data files (festivals registry, London boroughs)
   lib/           — Domain logic (filters/)
   utils/         — Utility functions (date formatting, data loading, geo distance)
   stories/       — Page-level Storybook stories

@@ -4,6 +4,8 @@ import { getStaticData } from "@/utils/get-static-data";
 import { Movie, Venue } from "@/types";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
+import { FESTIVALS } from "@/data/festivals";
+import { getFestivalUrl } from "@/utils/get-festival-url";
 
 export const dynamic = "force-static";
 
@@ -33,6 +35,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.5,
+  }));
+
+  const festivalListPage = {
+    url: "https://clusterflick.com/festivals",
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  };
+
+  const festivalPages = FESTIVALS.map((festival) => ({
+    url: `https://clusterflick.com${getFestivalUrl(festival)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
   }));
 
   const staticPages = [
@@ -68,5 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [...staticPages, ...moviePages, ...venuePages, ...boroughPages];
+  return [
+    ...staticPages,
+    festivalListPage,
+    ...moviePages,
+    ...venuePages,
+    ...boroughPages,
+    ...festivalPages,
+  ];
 }
