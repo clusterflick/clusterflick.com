@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-const BACK_LINK_SELECTOR = 'a[href="/festivals"]';
+const BACK_LINK_SELECTOR = 'a[href="/festivals/"]';
 const STATUS_CARD_SELECTOR = '[class*="statusCard"]';
 
 export class FestivalDetailPage {

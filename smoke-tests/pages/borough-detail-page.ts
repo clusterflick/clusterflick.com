@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-const BACK_LINK_SELECTOR = 'a[href="/london-cinemas"]';
+const BACK_LINK_SELECTOR = 'a[href="/london-cinemas/"]';
 const VENUE_CARD_SELECTOR = '[class*="venueCard"]';
 
 export class BoroughDetailPage {
