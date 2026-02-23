@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { buildVenueSchema } from "@/utils/build-venue-schema";
 import type { Venue } from "@/types";
 import VenuesPageContent from "./page-content";
 
@@ -125,22 +126,19 @@ export default async function VenuesPage() {
   const totalVenues = Object.keys(data.venues).length;
 
   // JSON-LD structured data
-  const allVenues = groups.flatMap((g) => g.venues);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "London Cinema Venues",
     description:
       "All cinema venues across London tracked by Clusterflick, from major chains to independent cinemas.",
-    numberOfItems: allVenues.length,
-    itemListElement: allVenues.map((venue, index) => ({
+    numberOfItems: totalVenues,
+    itemListElement: Object.values(data.venues).map((venue, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      item: {
-        "@type": "MovieTheater",
-        name: venue.name,
-        url: `https://clusterflick.com${venue.href}`,
-      },
+      item: buildVenueSchema(venue, {
+        url: `https://clusterflick.com${getVenueUrl(venue)}`,
+      }),
     })),
   };
 

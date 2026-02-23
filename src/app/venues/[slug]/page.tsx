@@ -9,6 +9,7 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { buildVenueSchema } from "@/utils/build-venue-schema";
 import type { Movie, Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
@@ -117,6 +118,13 @@ export async function generateMetadata({
   const imagePath = getVenueImagePath(venue.id);
   const venueUrl = `https://clusterflick.com${getVenueUrl(venue)}`;
 
+  const fallbackOgImage = {
+    url: "/images/og-image.png",
+    width: 1200,
+    height: 675,
+    alt: "Clusterflick",
+  };
+
   return {
     title: venue.name,
     description,
@@ -129,20 +137,15 @@ export async function generateMetadata({
       url: venueUrl,
       siteName: "Clusterflick",
       images: imagePath
-        ? [
-            {
-              url: imagePath,
-              alt: `${venue.name} logo`,
-            },
-          ]
-        : undefined,
+        ? [{ url: imagePath, alt: `${venue.name} logo` }]
+        : [fallbackOgImage],
     },
     twitter: {
-      card: imagePath ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: `${venue.name} | Clusterflick`,
       description,
       creator: "@clusterflick",
-      images: imagePath ? [imagePath] : undefined,
+      images: [imagePath ?? "/images/og-image.png"],
     },
   };
 }
@@ -239,21 +242,10 @@ export default async function VenueDetailPage({
   const venueJsonLd = [
     {
       "@context": "https://schema.org",
-      "@type": "MovieTheater",
-      name: venue.name,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: venue.address,
-        addressLocality: "London",
-        addressCountry: "GB",
-      },
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: venue.geo.lat,
-        longitude: venue.geo.lon,
-      },
-      url: attributes?.url || venue.url,
-      image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
+      ...buildVenueSchema(venue, {
+        url: attributes?.url || venue.url,
+        image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
+      }),
     },
     {
       "@context": "https://schema.org",

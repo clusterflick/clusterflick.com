@@ -5,6 +5,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import type { Genre, Person, Venue, Movie } from "@/types";
+import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import PageContent from "./page-content";
 
 // Only allow routes from generateStaticParams, 404 for everything else
@@ -39,9 +40,20 @@ export async function generateMetadata({
     movie.overview ||
     `Find screenings for ${movie.title} at cinemas across London.`;
 
+  const genreNames = (movie.genres ?? [])
+    .map((id) => data.genres[id]?.name)
+    .filter(Boolean) as string[];
+
   return {
     title,
     description,
+    keywords: [
+      movie.title,
+      ...genreNames,
+      "London cinema",
+      "film screenings",
+      "cinema listings",
+    ],
     alternates: {
       canonical: getMovieUrl(movie),
     },
@@ -143,6 +155,7 @@ export default async function MovieDetailPage({
     "@type": "Movie",
     name: movie.title,
     url: movieUrl,
+    dateModified: data.generatedAt,
     ...(movie.overview && { description: movie.overview }),
     ...(movie.posterPath && {
       image: `https://image.tmdb.org/t/p/w500${movie.posterPath}`,
@@ -192,12 +205,27 @@ export default async function MovieDetailPage({
     ],
   };
 
+  const buildTime = new Date(data.generatedAt).getTime();
+  const screeningEvents = movie.performances
+    .filter((p) => p.time >= buildTime)
+    .sort((a, b) => a.time - b.time)
+    .slice(0, 50)
+    .map((performance) => {
+      const showing = movie.showings[performance.showingId];
+      const venue = showing ? data.venues[showing.venueId] : undefined;
+      return buildScreeningEventSchema(performance, movie, movieUrl, venue);
+    });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([movieJsonLd, breadcrumbJsonLd]),
+          __html: JSON.stringify([
+            movieJsonLd,
+            breadcrumbJsonLd,
+            ...screeningEvents,
+          ]),
         }}
       />
       <PageContent
