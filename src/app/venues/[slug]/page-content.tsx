@@ -251,6 +251,7 @@ export default function VenueDetailPageContent({
             truncated={gridMoviesTruncated}
             exploreHref={`/?venues=${encodeURIComponent(venue.id)}`}
             exploreLabel={`Start exploring films at ${venue.name}`}
+            showAll
           />
         </ContentSection>
       </div>

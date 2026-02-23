@@ -55,16 +55,23 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
     const defaultRange = getDefaultDateRange();
     const { start, end } = state.dateRange ?? defaultRange;
     if (start !== defaultRange.start || end !== defaultRange.end) {
-      if (start !== null) {
-        params.set("dateStart", timestampToLondonDateString(start));
-      }
-      if (end !== null) {
-        params.set("dateEnd", timestampToLondonDateString(end));
+      if (start === null && end === null) {
+        params.set("allDates", "true");
+      } else {
+        if (start !== null) {
+          params.set("dateStart", timestampToLondonDateString(start));
+        }
+        if (end !== null) {
+          params.set("dateEnd", timestampToLondonDateString(end));
+        }
       }
     }
   },
 
   fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("allDates")) {
+      return { start: null, end: null };
+    }
     if (!params.has("dateStart") && !params.has("dateEnd")) {
       return undefined;
     }

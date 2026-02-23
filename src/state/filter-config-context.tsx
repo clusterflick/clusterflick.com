@@ -309,6 +309,13 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   );
 
   const setDateOption = useCallback((option: DateOption) => {
+    if (option === "all-time") {
+      setFilterState((prev) =>
+        filterManager.set(prev, FilterId.DateRange, { start: null, end: null }),
+      );
+      return;
+    }
+
     // Get today's midnight in London as a timestamp
     const todayMidnight = getLondonMidnightTimestamp();
     const dayOfWeek = getLondonDayOfWeek();
@@ -357,10 +364,6 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
         end = todayMidnight + sundayOffset * MS_PER_DAY;
         break;
       }
-      case "all-time":
-        start = todayMidnight;
-        end = todayMidnight + 5 * 365 * MS_PER_DAY; // ~5 years
-        break;
       default:
         return;
     }

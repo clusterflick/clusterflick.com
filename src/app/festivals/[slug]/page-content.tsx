@@ -73,6 +73,7 @@ export default function FestivalDetailPageContent({
             truncated={gridMoviesTruncated}
             exploreHref="/"
             exploreLabel="Start exploring films"
+            showAll
           />
         </ContentSection>
       </div>

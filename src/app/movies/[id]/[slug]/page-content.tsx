@@ -1,5 +1,7 @@
 "use client";
 
+const SHOW_ALL_HASH = "#show-all";
+
 import {
   useEffect,
   useMemo,
@@ -47,7 +49,19 @@ export default function PageContent({
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState } = useFilterConfig();
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(
+    () =>
+      typeof window !== "undefined" && window.location.hash === SHOW_ALL_HASH,
+  );
+
+  // Sync showAll on back/forward navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      setShowAll(window.location.hash === SHOW_ALL_HASH);
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   // Defer showings computation to allow hero content to render first
   const [isShowingsReady, setIsShowingsReady] = useState(false);
@@ -112,8 +126,11 @@ export default function PageContent({
   }, [filterState, metaData, cinemaVenueIds]);
 
   const handleShowAllToggle = useCallback(() => {
-    setShowAll((prev) => !prev);
-  }, []);
+    const next = !showAll;
+    setShowAll(next);
+    const cleanPath = window.location.pathname + window.location.search;
+    history.replaceState(null, "", next ? SHOW_ALL_HASH : cleanPath);
+  }, [showAll]);
 
   // Check if this event has included movies for stacked posters
   const includedMovies = movie.includedMovies;

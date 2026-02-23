@@ -100,6 +100,7 @@ export default function DateFilterSection({
   // Determine current date option based on current date range (using timestamps)
   const currentDateOption: DateOption | null = useMemo(() => {
     const { start, end } = dateRange;
+    if (start === null && end === null) return "all-time";
     if (start === null || end === null) return null;
 
     const todayMidnight = getLondonMidnightTimestamp();
@@ -140,10 +141,6 @@ export default function DateFilterSection({
     const sundayMidnight = todayMidnight + sundayOffset * MS_PER_DAY;
     if (start === saturdayMidnight && end === sundayMidnight)
       return "this-weekend";
-
-    // Any time (~5 years)
-    const allTimeEnd = todayMidnight + 5 * 365 * MS_PER_DAY;
-    if (start === todayMidnight && end === allTimeEnd) return "all-time";
 
     return null;
   }, [dateRange]);

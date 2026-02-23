@@ -11,6 +11,7 @@ interface FilmPosterGridProps {
   truncated?: boolean;
   exploreHref?: string;
   exploreLabel?: string;
+  showAll?: boolean;
 }
 
 export default function FilmPosterGrid({
@@ -18,6 +19,7 @@ export default function FilmPosterGrid({
   truncated,
   exploreHref,
   exploreLabel = "Start exploring films",
+  showAll,
 }: FilmPosterGridProps) {
   if (movies.length === 0) {
     return (
@@ -63,7 +65,7 @@ export default function FilmPosterGrid({
             return (
               <Link
                 key={movie.id}
-                href={getMovieUrl(movie)}
+                href={`${getMovieUrl(movie)}${showAll ? "#show-all" : ""}`}
                 className={styles.filmGridLink}
               >
                 {useStackedPoster ? (
