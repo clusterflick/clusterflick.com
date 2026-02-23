@@ -49,13 +49,15 @@ export default function PageContent({
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState } = useFilterConfig();
-  const [showAll, setShowAll] = useState(
-    () =>
-      typeof window !== "undefined" && window.location.hash === SHOW_ALL_HASH,
-  );
+  const [showAll, setShowAll] = useState(false);
 
-  // Sync showAll on back/forward navigation
+  // Initialise from hash and sync on back/forward navigation.
+  // Must use useEffect (not a useState lazy initialiser) because Next.js App
+  // Router updates window.location after the render phase in concurrent mode,
+  // so the hash isn't readable until after the navigation commits.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShowAll(window.location.hash === SHOW_ALL_HASH);
     const handleHashChange = () => {
       setShowAll(window.location.hash === SHOW_ALL_HASH);
     };
