@@ -303,8 +303,11 @@
   outline-offset: 2px;
 }
 
-/* Showing Title Search (inside expandable section) */
+/* Extra search inputs (inside expandable section) */
 .showingTitleSearchWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding-top: 4px;
 }
 

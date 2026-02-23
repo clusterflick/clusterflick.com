@@ -65,6 +65,17 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "bfi-flare",
+    name: "BFI Flare: London LGBTQIA+ Film Festival ",
+    url: "https://whatson.bfi.org.uk/flare/Online/default.asp",
+    aliases: ["flare"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Part of the BFI Flare festival",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",

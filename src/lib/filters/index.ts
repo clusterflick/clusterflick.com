@@ -11,6 +11,7 @@ export type {
 export {
   searchFilter,
   showingTitleSearchFilter,
+  performanceNotesSearchFilter,
   categoriesFilter,
   venuesFilter,
   dateRangeFilter,

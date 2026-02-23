@@ -2,6 +2,7 @@ import { FilterId, FilterState, MoviesRecord, AnyFilterModule } from "./types";
 import {
   searchFilter,
   showingTitleSearchFilter,
+  performanceNotesSearchFilter,
   categoriesFilter,
   venuesFilter,
   dateRangeFilter,
@@ -17,6 +18,7 @@ import {
 const modules: AnyFilterModule[] = [
   searchFilter,
   showingTitleSearchFilter,
+  performanceNotesSearchFilter,
   categoriesFilter,
   venuesFilter,
   dateRangeFilter,

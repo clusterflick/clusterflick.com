@@ -10,6 +10,7 @@ import {
   startTransition,
 } from "react";
 import { Movie, MoviePerformance, Genre, Person, Venue } from "@/types";
+import type { MovieFestival } from "@/utils/get-movie-festivals";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
   useFilterConfig,
@@ -28,6 +29,7 @@ import GenresList from "./components/genres-list";
 import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
+import FestivalSection from "./components/festival-section";
 import PartOfSection from "./components/part-of-section";
 import ShowingsSection from "./components/showings-section";
 import styles from "./page.module.css";
@@ -38,6 +40,7 @@ type PageContentProps = {
   people: Record<string, Person>;
   venues: Record<string, Venue>;
   containingEvents: Omit<Movie, "performances">[];
+  festivals: MovieFestival[];
 };
 
 export default function PageContent({
@@ -46,6 +49,7 @@ export default function PageContent({
   people,
   venues,
   containingEvents,
+  festivals,
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
   const { filterState } = useFilterConfig();
@@ -258,6 +262,7 @@ export default function PageContent({
             }
           />
 
+          <FestivalSection festivals={festivals} />
           <PartOfSection containingEvents={containingEvents} />
           <CastCrewSection
             directors={movie.directors}

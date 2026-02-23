@@ -383,6 +383,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const accessibilityDesc = describeAccessibility(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
+  const performanceNotesQuery = state.performanceNotesSearch?.trim();
 
   // Check if "all events" (all categories, all genres, all accessibility)
   const allCategories = !state.categories;
@@ -402,6 +403,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
     if (showingTitleQuery) {
       eventsDesc += ` with showing title "${showingTitleQuery}"`;
+    }
+    if (performanceNotesQuery) {
+      eventsDesc += ` with notes "${performanceNotesQuery}"`;
     }
   } else {
     const parts: string[] = [];
@@ -431,6 +435,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
     if (showingTitleQuery) {
       eventsDesc += ` with showing title "${showingTitleQuery}"`;
+    }
+    if (performanceNotesQuery) {
+      eventsDesc += ` with notes "${performanceNotesQuery}"`;
     }
   }
 

@@ -33,6 +33,7 @@ export default function FilterOverlay({
     clearAllCategories,
     setSearchQuery,
     setShowingTitleSearchQuery,
+    setPerformanceNotesSearchQuery,
     toggleGenre,
     selectAllGenres,
     clearAllGenres,
@@ -53,6 +54,7 @@ export default function FilterOverlay({
   const overlayRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const showingTitleSearchInputRef = useRef<HTMLInputElement>(null);
+  const performanceNotesSearchInputRef = useRef<HTMLInputElement>(null);
   const { movies, metaData } = useCinemaData();
 
   // Geolocation context (persists across overlay open/close)
@@ -297,7 +299,10 @@ export default function FilterOverlay({
         </div>
         <ExpandableSection
           title="More Search Options"
-          defaultExpanded={filterState.showingTitleSearch.length > 0}
+          defaultExpanded={
+            filterState.showingTitleSearch.length > 0 ||
+            filterState.performanceNotesSearch.length > 0
+          }
         >
           <div className={styles.showingTitleSearchWrapper}>
             <div className={styles.searchInputWrapper}>
@@ -337,6 +342,62 @@ export default function FilterOverlay({
                     showingTitleSearchInputRef.current?.focus();
                   }}
                   aria-label="Clear showing title search"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 6L6 18M6 6L18 18"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <div className={styles.searchInputWrapper}>
+              <svg
+                className={styles.searchIcon}
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <input
+                ref={performanceNotesSearchInputRef}
+                type="text"
+                id="filter-performance-notes-search"
+                className={styles.searchInput}
+                placeholder="Search performance notes..."
+                aria-label="Search performance notes"
+                value={filterState.performanceNotesSearch}
+                onChange={(e) => setPerformanceNotesSearchQuery(e.target.value)}
+              />
+              {filterState.performanceNotesSearch && (
+                <button
+                  type="button"
+                  className={styles.searchClear}
+                  onClick={() => {
+                    setPerformanceNotesSearchQuery("");
+                    performanceNotesSearchInputRef.current?.focus();
+                  }}
+                  aria-label="Clear performance notes search"
                 >
                   <svg
                     width="16"

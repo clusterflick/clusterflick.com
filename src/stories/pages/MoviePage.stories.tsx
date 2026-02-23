@@ -137,6 +137,7 @@ function DefaultMoviePage() {
           people={data.people}
           venues={data.venues}
           containingEvents={data.containingEvents}
+          festivals={[]}
         />
       )}
     </StoryDataLoader>
@@ -202,6 +203,7 @@ export const WithIncludedMovies: Story = {
           people={data.people}
           venues={data.venues}
           containingEvents={data.containingEvents}
+          festivals={[]}
         />
       )}
     </StoryDataLoader>
