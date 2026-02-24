@@ -19,6 +19,8 @@ jobs:
   build:
     name: Build site
     runs-on: ubuntu-latest
+    outputs:
+      old_hash: ${{ steps.live_hash.outputs.old_hash }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,6 +44,12 @@ jobs:
           fileName: "*"
           out-file-path: "matched-data"
       - run: npm run process-combined-data
+      - name: Get current live hash
+        id: live_hash
+        run: |
+          OLD_HASH=$(curl -sf --retry 2 https://clusterflick.com/ | grep -oP '<!DOCTYPE html><!--\K.+?(?=-->)' || echo "")
+          echo "old_hash=$OLD_HASH" >> $GITHUB_OUTPUT
+          echo "Current live hash: ${OLD_HASH:-<none>}"
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -61,10 +69,37 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  verify-hash:
+    name: Verify deployment hash
+    runs-on: ubuntu-latest
+    needs: [build, deploy]
+    steps:
+      - name: Poll for hash change
+        env:
+          OLD_HASH: ${{ needs.build.outputs.old_hash }}
+        run: |
+          if [ -z "$OLD_HASH" ]; then
+            echo "No pre-deployment hash available, skipping hash check"
+            exit 0
+          fi
+          echo "Polling for hash change (previous: $OLD_HASH)"
+          for i in $(seq 1 12); do
+            echo "Attempt $i/12..."
+            LIVE_HASH=$(curl -sf https://clusterflick.com/ | grep -oP '<!DOCTYPE html><!--\K.+?(?=-->)' || echo "")
+            if [ -n "$LIVE_HASH" ] && [ "$LIVE_HASH" != "$OLD_HASH" ]; then
+              echo "Hash changed on attempt $i: $OLD_HASH → $LIVE_HASH. Deployment verified."
+              exit 0
+            fi
+            echo "  Found: '${LIVE_HASH:-<none>}' (unchanged)"
+            sleep 5
+          done
+          echo "Deployment hash check failed after 12 attempts"
+          exit 1
+
   smoke-tests:
     name: Run smoke tests
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: verify-hash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
