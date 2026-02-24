@@ -121,12 +121,10 @@ test.describe("Festival Pages", () => {
 
     const hasFestivals = await festivalsPage.hasFestivals();
     if (hasFestivals) {
-      await expect(
-        page.getByText(/\d+ festivals? currently showing/),
-      ).toBeVisible();
+      await expect(page.getByText(/\d+ festivals? running/)).toBeVisible();
     } else {
       await expect(
-        page.getByText("No festivals currently showing"),
+        page.getByText("No festivals currently running"),
       ).toBeVisible();
     }
 
