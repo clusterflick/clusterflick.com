@@ -9,7 +9,7 @@
     rgba(var(--color-neon-pink-rgb), 0.5) 80%,
     transparent 100%
   );
-  margin: 0 auto 90px auto;
+  margin: 0 auto 75px auto;
   z-index: 1;
   position: relative;
   max-width: 800px;

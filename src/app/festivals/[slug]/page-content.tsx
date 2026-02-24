@@ -72,7 +72,7 @@ export default function FestivalDetailPageContent({
             movies={gridMovies}
             truncated={gridMoviesTruncated}
             exploreHref="/"
-            exploreLabel="Start exploring films"
+            exploreLabel="Or start exploring all films"
             showAll
           />
         </ContentSection>

@@ -13,10 +13,12 @@ import styles from "./page.module.css";
 
 interface FestivalsPageContentProps {
   festivals: FestivalListItem[];
+  venues: { name: string; href: string }[];
 }
 
 export default function FestivalsPageContent({
   festivals,
+  venues,
 }: FestivalsPageContentProps) {
   const count = festivals.length;
 
@@ -34,14 +36,37 @@ export default function FestivalsPageContent({
         <OutlineHeading className={styles.title}>Festivals</OutlineHeading>
         <p className={styles.subtitle}>
           {count === 0
-            ? "No festivals currently showing"
-            : `${count} ${count === 1 ? "festival" : "festivals"} currently showing`}
+            ? "No festivals currently running"
+            : `${count} ${count === 1 ? "festival" : "festivals"} running`}
         </p>
       </HeroSection>
 
       <Divider />
 
       <div className={styles.content}>
+        {count > 0 && (
+          <p className={styles.intro}>
+            Clusterflick tracks film festivals happening right now across
+            London.
+            {venues.length > 0 && (
+              <>
+                {" "}
+                Current festivals are screening at{" "}
+                {venues.map((venue, i) => (
+                  <span key={venue.href}>
+                    <Link href={venue.href}>{venue.name}</Link>
+                    {i < venues.length - 2
+                      ? ", "
+                      : i === venues.length - 2
+                        ? " and "
+                        : ""}
+                  </span>
+                ))}
+                .
+              </>
+            )}
+          </p>
+        )}
         {festivals.length === 0 ? (
           <EmptyState
             icon={{
@@ -74,6 +99,12 @@ export default function FestivalsPageContent({
                     <div className={styles.festivalCardName}>
                       {festival.name}
                     </div>
+                    <p className={styles.festivalCardDescription}>
+                      {festival.seoDescription
+                        ? festival.seoDescription.charAt(0).toUpperCase() +
+                          festival.seoDescription.slice(1)
+                        : ""}
+                    </p>
                     <div className={styles.festivalCardMeta}>
                       {festival.dateFrom !== null &&
                         festival.dateTo !== null && (
@@ -81,11 +112,17 @@ export default function FestivalsPageContent({
                             <CalendarIcon size={14} />
                             {formatDateShort(new Date(festival.dateFrom), {
                               includeYearIfDifferent: true,
-                            })}{" "}
-                            &ndash;{" "}
-                            {formatDateShort(new Date(festival.dateTo), {
-                              includeYearIfDifferent: true,
                             })}
+                            {new Date(festival.dateFrom).toDateString() !==
+                              new Date(festival.dateTo).toDateString() && (
+                              <>
+                                {" "}
+                                &ndash;{" "}
+                                {formatDateShort(new Date(festival.dateTo), {
+                                  includeYearIfDifferent: true,
+                                })}
+                              </>
+                            )}
                           </span>
                         )}
                       <span className={styles.festivalCardMetaItem}>
@@ -95,11 +132,6 @@ export default function FestivalsPageContent({
                         </span>
                       </span>
                     </div>
-                  </div>
-                  <div className={styles.festivalCardFooter}>
-                    <span className={styles.festivalCardCta}>
-                      Explore festival <span aria-hidden="true">→</span>
-                    </span>
                   </div>
                 </Link>
               </li>

@@ -10,6 +10,12 @@ import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
+import { FESTIVALS } from "@/data/festivals";
+import {
+  getFestivalMovies,
+  isFestivalCurrentlyShowing,
+} from "@/utils/get-festival-movies";
+import { getFestivalUrl } from "@/utils/get-festival-url";
 import type { Movie, Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
@@ -238,6 +244,17 @@ export default async function VenueDetailPage({
     ? { name: borough.name, href: getBoroughUrl(borough) }
     : null;
 
+  // Find active festivals running at this venue
+  const activeFestivalsAtVenue = FESTIVALS.flatMap((festival) => {
+    if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
+    const festMovies = getFestivalMovies(festival, data.movies);
+    const atVenue = Object.values(festMovies).some((movie) =>
+      Object.values(movie.showings).some((s) => s.venueId === venue.id),
+    );
+    if (!atVenue) return [];
+    return [{ name: festival.name, href: getFestivalUrl(festival) }];
+  });
+
   // Build JSON-LD structured data for this venue
   const venueJsonLd = [
     {
@@ -293,6 +310,7 @@ export default async function VenueDetailPage({
         VenueBlurb={VenueBlurb}
         nearbyVenues={nearbyVenues}
         borough={boroughInfo}
+        activeFestivals={activeFestivalsAtVenue}
       />
     </>
   );

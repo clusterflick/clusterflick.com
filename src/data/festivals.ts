@@ -11,6 +11,17 @@ export type Festival = {
 
 export const FESTIVALS: Festival[] = [
   {
+    id: "bfi-flare",
+    name: "BFI Flare: London LGBTQIA+ Film Festival ",
+    url: "https://whatson.bfi.org.uk/flare/Online/default.asp",
+    aliases: ["flare"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Part of the BFI Flare festival",
+      },
+    ],
+  },
+  {
     id: "festival-of-creativity-gothic-film-festival",
     name: "Festival of Creativity: Gothic Film Festival",
     url: "https://www.stmarys.ac.uk/academic-areas/structure/fablet/school-of-theology-and-the-arts/festival-of-creativity",
@@ -61,17 +72,6 @@ export const FESTIVALS: Festival[] = [
         // Matches "LFFF: ..." showings at The Arzner
         [FilterId.ShowingTitleSearch]: "LFFF",
         [FilterId.Venues]: ["thearzner.com"],
-      },
-    ],
-  },
-  {
-    id: "bfi-flare",
-    name: "BFI Flare: London LGBTQIA+ Film Festival ",
-    url: "https://whatson.bfi.org.uk/flare/Online/default.asp",
-    aliases: ["flare"],
-    matchers: [
-      {
-        [FilterId.PerformanceNotesSearch]: "Part of the BFI Flare festival",
       },
     ],
   },

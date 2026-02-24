@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
+import { getVenueUrl } from "@/utils/get-venue-url";
 import {
   getFestivalMovies,
   getFestivalDateRange,
@@ -41,29 +42,62 @@ export type FestivalListItem = {
   movieCount: number;
   dateFrom: number | null;
   dateTo: number | null;
+  seoDescription: string | null;
 };
 
 export default async function FestivalsPage() {
   const data = await getStaticData();
 
-  const festivalItems: FestivalListItem[] = FESTIVALS.flatMap((festival) => {
-    if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
+  const festivalItems: FestivalListItem[] = await Promise.all(
+    FESTIVALS.flatMap((festival) => {
+      if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
 
+      const movies = getFestivalMovies(festival, data.movies);
+      const { dateFrom, dateTo } = getFestivalDateRange(movies);
+
+      return [
+        (async () => {
+          let seoDescription: string | null = null;
+          try {
+            const mod = await import(`@/components/festivals/${festival.id}`);
+            seoDescription = mod.seoDescription ?? null;
+          } catch {
+            // No blurb component for this festival
+          }
+          return {
+            id: festival.id,
+            name: festival.name,
+            href: getFestivalUrl(festival),
+            imagePath: getFestivalImagePath(festival.id),
+            movieCount: Object.keys(movies).length,
+            dateFrom,
+            dateTo,
+            seoDescription,
+          };
+        })(),
+      ];
+    }),
+  );
+
+  // Collect unique venue names across all active festivals
+  const venueIds = new Set<string>();
+  for (const festival of FESTIVALS) {
+    if (!isFestivalCurrentlyShowing(festival, data.movies)) continue;
     const movies = getFestivalMovies(festival, data.movies);
-    const { dateFrom, dateTo } = getFestivalDateRange(movies);
-
-    return [
-      {
-        id: festival.id,
-        name: festival.name,
-        href: getFestivalUrl(festival),
-        imagePath: getFestivalImagePath(festival.id),
-        movieCount: Object.keys(movies).length,
-        dateFrom,
-        dateTo,
-      },
-    ];
-  });
+    for (const movie of Object.values(movies)) {
+      for (const performance of movie.performances) {
+        const showing = movie.showings[performance.showingId];
+        if (showing) venueIds.add(showing.venueId);
+      }
+    }
+  }
+  const venues = [...venueIds]
+    .flatMap((id) => {
+      const venue = data.venues[id];
+      return venue ? [{ name: venue.name, href: getVenueUrl(venue) }] : [];
+    })
+    .filter((v, i, arr) => arr.findIndex((x) => x.href === v.href) === i)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -88,7 +122,7 @@ export default async function FestivalsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <FestivalsPageContent festivals={festivalItems} />
+      <FestivalsPageContent festivals={festivalItems} venues={venues} />
     </>
   );
 }

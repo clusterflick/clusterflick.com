@@ -18,7 +18,7 @@ export default function FilmPosterGrid({
   movies,
   truncated,
   exploreHref,
-  exploreLabel = "Start exploring films",
+  exploreLabel,
   showAll,
 }: FilmPosterGridProps) {
   if (movies.length === 0) {
@@ -37,7 +37,7 @@ export default function FilmPosterGrid({
 
   return (
     <>
-      {exploreHref && (
+      {exploreHref && exploreLabel && (
         <a
           href={exploreHref}
           target="_blank"

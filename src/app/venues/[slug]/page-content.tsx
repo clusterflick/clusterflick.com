@@ -85,6 +85,7 @@ export interface VenueDetailPageContentProps {
   VenueBlurb: ComponentType | null;
   nearbyVenues: NearbyVenue[];
   borough?: VenueBorough | null;
+  activeFestivals: { name: string; href: string }[];
 }
 
 export default function VenueDetailPageContent({
@@ -99,6 +100,7 @@ export default function VenueDetailPageContent({
   VenueBlurb,
   nearbyVenues,
   borough,
+  activeFestivals,
 }: VenueDetailPageContentProps) {
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
@@ -227,6 +229,17 @@ export default function VenueDetailPageContent({
                 </p>
               )}
             </ContentSection>
+            {activeFestivals.length > 0 && (
+              <ContentSection title="Festivals" as="h2">
+                <ul className={styles.festivalList}>
+                  {activeFestivals.map((festival) => (
+                    <li key={festival.href}>
+                      <Link href={festival.href}>{festival.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </ContentSection>
+            )}
           </div>
         </div>
         {nearbyVenues.length > 0 && (
