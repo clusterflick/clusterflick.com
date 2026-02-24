@@ -75,8 +75,6 @@ jobs:
         run: npx playwright install chromium --with-deps
       - name: Run smoke tests
         run: npm run smoke-test
-        env:
-          SITE_URL: ${{ needs.deploy.outputs.page_url }}
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()

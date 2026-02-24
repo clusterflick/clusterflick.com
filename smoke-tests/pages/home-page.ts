@@ -17,11 +17,28 @@ export class HomePage {
     await this.page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
     await this.collapseIntroNotice();
     await this.waitForAllDataLoaded();
+    await this.waitForFilterAvailable();
   }
 
   async waitForAllDataLoaded() {
     await expect(this.page.getByText("Loading movies...")).toBeHidden({
       timeout: 30000,
+    });
+  }
+
+  async waitForFilterAvailable() {
+    await expect(this.page.locator(FILTER_TRIGGER_SELECTOR)).toBeVisible({
+      timeout: 10000,
+    });
+    await this.page.click(FILTER_TRIGGER_SELECTOR);
+    await this.page.waitForSelector(SEARCH_INPUT_SELECTOR, {
+      state: "visible",
+      timeout: 5000,
+    });
+    await this.page.keyboard.press("Escape");
+    await this.page.waitForSelector(SEARCH_INPUT_SELECTOR, {
+      state: "hidden",
+      timeout: 2000,
     });
   }
 
