@@ -249,7 +249,9 @@ export default async function VenueDetailPage({
     if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
     const festMovies = getFestivalMovies(festival, data.movies);
     const atVenue = Object.values(festMovies).some((movie) =>
-      Object.values(movie.showings).some((s) => s.venueId === venue.id),
+      movie.performances.some(
+        (perf) => movie.showings[perf.showingId]?.venueId === venue.id,
+      ),
     );
     if (!atVenue) return [];
     return [{ name: festival.name, href: getFestivalUrl(festival) }];

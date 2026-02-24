@@ -44,7 +44,7 @@ export default async function Home() {
       );
     })
     .sort((a, b) => a.normalizedTitle.localeCompare(b.normalizedTitle))
-    .slice(0, 30);
+    .slice(0, 72);
 
   return (
     <>
