@@ -53,6 +53,7 @@ async function loadFestivalsListData(): Promise<FestivalListItem[]> {
         movieCount: Object.keys(movies).length,
         dateFrom,
         dateTo,
+        seoDescription: null,
       },
     ];
   });
@@ -64,7 +65,9 @@ function FestivalsListWithRealData() {
       loader={loadFestivalsListData}
       loadingMessage="Loading festivals..."
     >
-      {(festivals) => <FestivalsPageContent festivals={festivals} />}
+      {(festivals) => (
+        <FestivalsPageContent festivals={festivals} venues={[]} />
+      )}
     </StoryDataLoader>
   );
 }
