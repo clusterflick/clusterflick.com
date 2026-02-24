@@ -24,15 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: "npm"
       - run: npm ci
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**.[jt]s', 'src/**.[jt]sx', 'next.config.*') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Download combined data
         uses: clusterflick/release-downloader@v2
         with:
@@ -78,7 +70,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: "npm"
       - run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
