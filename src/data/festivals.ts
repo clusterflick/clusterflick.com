@@ -76,6 +76,20 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "open-city-documentary-festival",
+    name: "Open City Documentary Festival",
+    url: "https://opencitylondon.com/",
+    aliases: ["Open City Doc Fest", "Open City London"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Open City Doc Fest",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Open City Documentary Festival",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
