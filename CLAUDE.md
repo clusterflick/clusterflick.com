@@ -50,6 +50,33 @@ smoke-tests/     — Playwright E2E smoke tests
 public/data/     — Static compressed cinema data files
 ```
 
+## Component Design System
+
+Before writing any UI code, check whether an existing shared component already
+covers the need. The canonical components are:
+
+- **Layout:** `StandardPageLayout`, `HeroSection`, `ContentSection`,
+  `GroupHeader`, `Divider`, `CardGrid`
+- **Navigation / links:** `LinkGrid` (multi-column scannable lists),
+  `LinkedList` (single-column with optional detail + "show all"),
+  `LinkCard` (rich card with icon/description)
+- **Buttons:** `Button` (`<button>`), `ButtonLink` (internal `<Link>`),
+  `ButtonAnchor` (external `<a>`)
+- **Typography:** `OutlineHeading`, `Tag`
+- **Form controls:** `Chip` (checkbox/radio), `Switch`
+- **Feedback:** `EmptyState`
+
+Only create a new component when no existing one fits. When you do:
+
+1. Create `src/components/<name>/index.tsx` and
+   `src/components/<name>/<name>.module.css`.
+2. Add `src/components/<name>/<name>.stories.tsx` with `tags: ["autodocs"]`, a
+   JSDoc block on `meta` explaining when to use / not use the component, and at
+   least one story per meaningful variant. Set
+   `parameters: { backgrounds: { default: "dark" } }`.
+3. Export a named `<ComponentName>Item` type if the component accepts a list of
+   data objects (see `LinkGrid`, `LinkedList`).
+
 ## Code Conventions
 
 - **File naming:** kebab-case for files/directories, PascalCase for components

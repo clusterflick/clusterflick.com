@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MenuIcon, CloseIcon } from "@/components/icons";
+import { NAV_LINKS, setUseBrowserBack } from "@/utils/nav-links";
 import styles from "./mobile-menu.module.css";
 
 export default function MobileMenu() {
@@ -62,62 +63,19 @@ export default function MobileMenu() {
           <CloseIcon size={24} />
         </button>
         <nav className={styles.nav} aria-label="Main navigation">
-          <Link
-            href="/venues"
-            className={styles.navLink}
-            onClick={() => {
-              setIsOpen(false);
-              try {
-                sessionStorage.setItem("useBrowserBack", "true");
-              } catch {
-                // Ignore - UX optimization only
-              }
-            }}
-          >
-            Venues
-          </Link>
-          <Link
-            href="/festivals"
-            className={styles.navLink}
-            onClick={() => {
-              setIsOpen(false);
-              try {
-                sessionStorage.setItem("useBrowserBack", "true");
-              } catch {
-                // Ignore - UX optimization only
-              }
-            }}
-          >
-            Festivals
-          </Link>
-          <Link
-            href="/accessibility"
-            className={styles.navLink}
-            onClick={() => {
-              setIsOpen(false);
-              try {
-                sessionStorage.setItem("useBrowserBack", "true");
-              } catch {
-                // Ignore - UX optimization only
-              }
-            }}
-          >
-            Accessibility
-          </Link>
-          <Link
-            href="/about"
-            className={styles.navLink}
-            onClick={() => {
-              setIsOpen(false);
-              try {
-                sessionStorage.setItem("useBrowserBack", "true");
-              } catch {
-                // Ignore - UX optimization only
-              }
-            }}
-          >
-            About
-          </Link>
+          {NAV_LINKS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={styles.navLink}
+              onClick={() => {
+                setIsOpen(false);
+                setUseBrowserBack();
+              }}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
       </div>
     </>

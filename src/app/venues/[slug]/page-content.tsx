@@ -20,6 +20,7 @@ import {
   OutlookCalendarIcon,
   CalendarIcon,
 } from "@/components/icons";
+import LinkedList from "@/components/linked-list";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import VenueDistance from "./venue-distance";
@@ -241,13 +242,13 @@ export default function VenueDetailPageContent({
             </ContentSection>
             {activeFestivals.length > 0 && (
               <ContentSection title="Festivals" as="h2">
-                <ul className={styles.festivalList}>
-                  {activeFestivals.map((festival) => (
-                    <li key={festival.href}>
-                      <Link href={festival.href}>{festival.name}</Link>
-                    </li>
-                  ))}
-                </ul>
+                <LinkedList
+                  items={activeFestivals.map((festival) => ({
+                    key: festival.href,
+                    href: festival.href,
+                    label: festival.name,
+                  }))}
+                />
               </ContentSection>
             )}
             {accessibilityStats.length > 0 && (

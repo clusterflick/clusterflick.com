@@ -1,57 +1,15 @@
 import Link from "next/link";
+import { NAV_LINKS, setUseBrowserBack } from "@/utils/nav-links";
 import styles from "./header-nav.module.css";
 
 export default function HeaderNav() {
   return (
     <nav className={styles.nav} aria-label="Main navigation">
-      <Link
-        href="/venues"
-        onClick={() => {
-          try {
-            sessionStorage.setItem("useBrowserBack", "true");
-          } catch {
-            // Ignore - UX optimization only
-          }
-        }}
-      >
-        Venues
-      </Link>
-      <Link
-        href="/festivals"
-        onClick={() => {
-          try {
-            sessionStorage.setItem("useBrowserBack", "true");
-          } catch {
-            // Ignore - UX optimization only
-          }
-        }}
-      >
-        Festivals
-      </Link>
-      <Link
-        href="/accessibility"
-        onClick={() => {
-          try {
-            sessionStorage.setItem("useBrowserBack", "true");
-          } catch {
-            // Ignore - UX optimization only
-          }
-        }}
-      >
-        Accessibility
-      </Link>
-      <Link
-        href="/about"
-        onClick={() => {
-          try {
-            sessionStorage.setItem("useBrowserBack", "true");
-          } catch {
-            // Ignore - UX optimization only
-          }
-        }}
-      >
-        About
-      </Link>
+      {NAV_LINKS.map(({ href, label }) => (
+        <Link key={href} href={href} onClick={setUseBrowserBack}>
+          {label}
+        </Link>
+      ))}
     </nav>
   );
 }

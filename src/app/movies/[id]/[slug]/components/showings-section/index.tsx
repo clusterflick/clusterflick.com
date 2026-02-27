@@ -10,7 +10,7 @@ import {
   formatDaysFromNow,
   isInPast,
 } from "@/utils/format-date";
-import Button from "@/components/button";
+import Button, { ButtonAnchor } from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
@@ -91,14 +91,15 @@ function renderPerformanceCard(
         <div className={styles.soldOutBadge}>Sold Out</div>
       )}
       {!isPast && !isSoldOut && (
-        <a
+        <ButtonAnchor
           href={hydrateUrl(performance.bookingUrl)}
           target="_blank"
           rel="noopener noreferrer"
+          size="sm"
           className={styles.bookingButton}
         >
           Book
-        </a>
+        </ButtonAnchor>
       )}
     </div>
   );

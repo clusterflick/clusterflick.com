@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from "react";
+import { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import Link from "next/link";
 import styles from "./button.module.css";
 
@@ -20,7 +20,7 @@ const sizeStyles: Record<Size, string> = {
  * Get the combined className for button styling.
  * Useful when you need button styles on a custom element.
  */
-export function getButtonClassName(
+function getButtonClassName(
   variant: Variant = "primary",
   size: Size = "md",
   className?: string,
@@ -53,6 +53,30 @@ interface ButtonLinkProps {
   size?: Size;
   className?: string;
   children: React.ReactNode;
+}
+
+interface ButtonAnchorProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  variant?: Variant;
+  size?: Size;
+}
+
+/**
+ * An anchor (`<a>`) styled as a button. Use for external links that open in a
+ * new tab — pass `target="_blank"` and `rel="noopener noreferrer"` as needed.
+ * For internal navigation use `ButtonLink` instead.
+ */
+export function ButtonAnchor({
+  variant = "primary",
+  size = "md",
+  className,
+  children,
+  ...props
+}: ButtonAnchorProps) {
+  return (
+    <a className={getButtonClassName(variant, size, className)} {...props}>
+      {children}
+    </a>
+  );
 }
 
 /**

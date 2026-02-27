@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { IncludedMovie, Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { formatDuration } from "@/utils/format-date";
+import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
 import ContentSection from "@/components/content-section";
 import styles from "./included-films-section.module.css";
@@ -47,12 +47,13 @@ export default function IncludedFilmsSection({
                   interactive={false}
                 />
                 {hasStandalonePage && standaloneMovie && (
-                  <Link
+                  <ButtonLink
                     href={getMovieUrl(standaloneMovie)}
+                    size="sm"
                     className={styles.soloButton}
                   >
                     Single Showing
-                  </Link>
+                  </ButtonLink>
                 )}
               </div>
               <div className={styles.filmInfo}>

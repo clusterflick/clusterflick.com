@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Button from "@/components/button";
 import styles from "./linked-list.module.css";
 
 export type LinkedListItem = {
@@ -46,9 +47,9 @@ export default function LinkedList({
         ))}
       </ul>
       {hasMore && (
-        <button className={styles.toggle} onClick={() => setShowAll(!showAll)}>
+        <Button variant="link" onClick={() => setShowAll(!showAll)}>
           {showAll ? "Show fewer" : showAllLabel || `Show all ${items.length}`}
-        </button>
+        </Button>
       )}
     </>
   );

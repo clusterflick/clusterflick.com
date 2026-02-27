@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
-import Link from "next/link";
 import type { VenueGroupData } from "./page";
 import { normalizeForSearch } from "@/lib/filters/normalize";
+import LinkGrid from "@/components/link-grid";
 import styles from "./page.module.css";
 
 interface VenueListProps {
@@ -88,20 +88,17 @@ export default function VenueList({ groups }: VenueListProps) {
             {group.label}
             <span className={styles.groupCount}>{group.venues.length}</span>
           </h2>
-          <ul className={styles.venueList}>
-            {group.venues.map((venue) => (
-              <li key={venue.href}>
-                <Link href={venue.href} className={styles.venueLink}>
-                  <span className={styles.venueName}>{venue.displayName}</span>
-                  {venue.eventCount > 0 && (
-                    <span className={styles.venueEventCount}>
-                      {venue.eventCount.toLocaleString("en-GB")}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <LinkGrid
+            items={group.venues.map((venue) => ({
+              key: venue.href,
+              href: venue.href,
+              label: venue.displayName,
+              count:
+                venue.eventCount > 0
+                  ? venue.eventCount.toLocaleString("en-GB")
+                  : undefined,
+            }))}
+          />
         </section>
       ))}
 

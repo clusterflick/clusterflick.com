@@ -22,6 +22,7 @@ import { formatDuration, formatDateLong } from "@/utils/format-date";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
+import { ButtonAnchor } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import { PlayIcon } from "@/components/icons";
@@ -249,7 +250,7 @@ export default function PageContent({
             rottenTomatoes={movie.rottenTomatoes}
             extraItem={
               movie.youtubeTrailer ? (
-                <a
+                <ButtonAnchor
                   href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -257,7 +258,7 @@ export default function PageContent({
                 >
                   <PlayIcon />
                   Watch Trailer
-                </a>
+                </ButtonAnchor>
               ) : undefined
             }
           />

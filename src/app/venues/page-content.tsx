@@ -1,9 +1,5 @@
 import Link from "next/link";
-import PageHeader from "@/components/page-header";
-import HeroSection from "@/components/hero-section";
-import OutlineHeading from "@/components/outline-heading";
-import Divider from "@/components/divider";
-import PreloadCinemaData from "@/components/preload-cinema-data";
+import StandardPageLayout from "@/components/standard-page-layout";
 import VenueList from "./venue-list";
 import type { VenueGroupData } from "./page";
 import styles from "./page.module.css";
@@ -18,38 +14,24 @@ export default function VenuesPageContent({
   totalVenues,
 }: VenuesPageContentProps) {
   return (
-    <main id="main-content">
-      <PreloadCinemaData />
-      <PageHeader backUrl="/" backText="Back to film list" />
+    <StandardPageLayout
+      title="Venues"
+      subtitle={`${totalVenues.toLocaleString("en-GB")} venues across London`}
+      backUrl="/"
+      backText="Back to film list"
+    >
+      <p className={styles.intro}>
+        Clusterflick tracks film screenings from{" "}
+        {totalVenues.toLocaleString("en-GB")} venues across{" "}
+        <Link href="/london-cinemas">all 33 boroughs of London</Link>, from
+        major cinema chains like Curzon, Everyman, ODEON and Picturehouse to
+        independent cinemas, arts centres, museums, cultural institutes, bars
+        and pop-up screening spaces. Whether you&apos;re looking for the latest
+        blockbusters at a multiplex or a rare 35mm print at a neighbourhood
+        arthouse, you&apos;ll find it here.
+      </p>
 
-      <HeroSection
-        backgroundImage="/images/light-circles.jpg"
-        backgroundImageAlt="Decorative light circles"
-        backdropHeight="standard"
-        align="center"
-      >
-        <OutlineHeading className={styles.title}>Venues</OutlineHeading>
-        <p className={styles.subtitle}>
-          {totalVenues.toLocaleString("en-GB")} venues across London
-        </p>
-      </HeroSection>
-
-      <Divider />
-
-      <div className={styles.content}>
-        <p className={styles.intro}>
-          Clusterflick tracks film screenings from{" "}
-          {totalVenues.toLocaleString("en-GB")} venues across{" "}
-          <Link href="/london-cinemas">all 33 boroughs of London</Link>, from
-          major cinema chains like Curzon, Everyman, ODEON and Picturehouse to
-          independent cinemas, arts centres, museums, cultural institutes, bars
-          and pop-up screening spaces. Whether you&apos;re looking for the
-          latest blockbusters at a multiplex or a rare 35mm print at a
-          neighbourhood arthouse, you&apos;ll find it here.
-        </p>
-
-        <VenueList groups={groups} />
-      </div>
-    </main>
+      <VenueList groups={groups} />
+    </StandardPageLayout>
   );
 }

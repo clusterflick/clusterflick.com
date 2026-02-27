@@ -75,21 +75,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  background: linear-gradient(
-    135deg,
-    var(--color-electric-blue) 0%,
-    rgba(var(--color-electric-blue-rgb), 0.8) 100%
-  );
-  border: none;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-white);
-  text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  cursor: pointer;
   opacity: 0;
   transform: translateY(-4px);
   transition: all 0.2s ease;
@@ -102,13 +89,7 @@
 }
 
 .soloButton:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(var(--color-neon-pink-rgb), 0.9) 0%,
-    var(--color-neon-pink) 100%
-  );
-  box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
-  color: var(--color-white);
+  transform: translateY(0); /* Override Button primary's lift */
 }
 
 @media (max-width: 768px) {

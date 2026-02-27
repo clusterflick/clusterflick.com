@@ -1,0 +1,20 @@
+/* Hero heading – applied to the OutlineHeading rendered inside the hero */
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 12px;
+}
+
+/* Optional subtitle paragraph rendered below the heading */
+.subtitle {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+/* Main content area below the hero + divider */
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  position: relative;
+  z-index: 1;
+}

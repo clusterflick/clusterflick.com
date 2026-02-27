@@ -54,31 +54,12 @@
 .trailerButton {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  padding: 14px 28px;
-  background-color: var(--color-neon-pink);
-  color: var(--color-midnight-navy);
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(var(--color-neon-pink-rgb), 0.4);
-  white-space: nowrap;
-  height: 50px;
   align-self: center;
+  white-space: nowrap;
 
   & svg {
     flex-shrink: 0;
-  }
-
-  &:hover {
-    background-color: var(--color-electric-blue);
-    color: var(--color-midnight-navy);
-    box-shadow: 0 4px 15px rgba(var(--color-electric-blue-rgb), 0.5);
   }
 }
 

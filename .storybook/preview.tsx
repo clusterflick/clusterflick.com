@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { handlers } from "./msw/handlers";
 import "../src/app/globals.css";
 import "react-virtualized/styles.css";
+import "./preview.css";
 
 // Load Google Fonts with Next.js optimization
 const montserrat = Montserrat({
@@ -24,6 +25,13 @@ initialize({
 });
 
 const preview: Preview = {
+  // initialGlobals sets the active background value used by the backgrounds
+  // addon in all rendering contexts — including inline story previews on
+  // autodocs pages (where toolbar state doesn't propagate).
+  initialGlobals: {
+    backgrounds: { value: "#010013" },
+  },
+
   parameters: {
     controls: {
       matchers: {
