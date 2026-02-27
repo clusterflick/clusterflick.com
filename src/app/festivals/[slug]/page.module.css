@@ -19,6 +19,35 @@
   padding: 0 20px 80px;
 }
 
+.columns {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (min-width: 768px) {
+  .columns {
+    flex-direction: row;
+    gap: 60px;
+  }
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar {
+  flex: 1;
+  min-width: 0;
+}
+
+.venueGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
 .festivalFilms {
   text-align: center;
 

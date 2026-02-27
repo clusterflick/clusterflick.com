@@ -10,7 +10,10 @@ import StackedPoster from "@/components/stacked-poster";
 import { AccessibilityFeature, type Movie, type CinemaData } from "@/types";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
-import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import {
+  ACCESSIBILITY_LABELS,
+  ACCESSIBILITY_EMOJIS,
+} from "@/utils/accessibility-labels";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -25,34 +28,29 @@ export const metadata: Metadata = {
  */
 const FEATURE_CONFIG: Record<
   AccessibilityFeature,
-  { emoji: string; description: string; shortDescription: string }
+  { description: string; shortDescription: string }
 > = {
   [AccessibilityFeature.AudioDescription]: {
-    emoji: "🔊",
     description:
       "Screenings with a supplementary audio track that describes visual elements — actions, expressions, and scene changes — for blind or visually impaired viewers.",
     shortDescription: "For blind or visually impaired viewers",
   },
   [AccessibilityFeature.BabyFriendly]: {
-    emoji: "👶",
     description:
       "Screenings designed to welcome parents or carers with babies and young children. Typically includes lower volume, lights slightly raised, and pram parking. Also covers kids club and family programming.",
     shortDescription: "For parents and carers with young children",
   },
   [AccessibilityFeature.HardOfHearing]: {
-    emoji: "👂",
     description:
       "Screenings with captions or other support for deaf or hard-of-hearing viewers. This covers open captions, closed captions, SDH (Subtitles for the Deaf and Hard of Hearing), and BSL (British Sign Language) interpreted screenings.",
     shortDescription: "For deaf or hard-of-hearing viewers",
   },
   [AccessibilityFeature.Relaxed]: {
-    emoji: "🧘",
     description:
       "Screenings with adjustments for neurodiverse audiences, including autistic viewers and people with learning disabilities or sensory sensitivities. Features lower sound, slightly raised lights, no trailers, and a calm, tolerant atmosphere.",
     shortDescription: "For neurodiverse audiences",
   },
   [AccessibilityFeature.Subtitled]: {
-    emoji: "💬",
     description:
       "Screenings with subtitles translating dialogue into another language (typically English). This is for language accessibility — making foreign-language films accessible to a broader audience.",
     shortDescription: "For language accessibility",
@@ -282,7 +280,7 @@ export default async function AccessibilityPage() {
               href={`#${f.feature}`}
               className={styles.quickNavLink}
             >
-              <span aria-hidden="true">{FEATURE_CONFIG[f.feature].emoji}</span>
+              <span aria-hidden="true">{ACCESSIBILITY_EMOJIS[f.feature]}</span>
               {ACCESSIBILITY_LABELS[f.feature]}
             </a>
           ))}
@@ -338,7 +336,7 @@ export default async function AccessibilityPage() {
               >
                 <div className={styles.featureHeader}>
                   <span className={styles.featureEmoji} aria-hidden="true">
-                    {config.emoji}
+                    {ACCESSIBILITY_EMOJIS[featureStat.feature]}
                   </span>
                   <div>
                     <h3 className={styles.featureTitle}>{label}</h3>

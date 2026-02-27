@@ -12,6 +12,14 @@ export const ACCESSIBILITY_LABELS: Record<AccessibilityFeature, string> = {
   [AccessibilityFeature.Subtitled]: "Subtitles",
 };
 
+export const ACCESSIBILITY_EMOJIS: Record<AccessibilityFeature, string> = {
+  [AccessibilityFeature.AudioDescription]: "🔊",
+  [AccessibilityFeature.BabyFriendly]: "👶",
+  [AccessibilityFeature.HardOfHearing]: "👂",
+  [AccessibilityFeature.Relaxed]: "🧘",
+  [AccessibilityFeature.Subtitled]: "💬",
+};
+
 /**
  * Gets the label for an accessibility feature.
  * Returns the feature key as fallback if not found in the mapping.

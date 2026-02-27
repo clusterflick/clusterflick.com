@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import NavCard from "@/components/nav-card";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
@@ -81,7 +82,7 @@ export default function FestivalsPageContent({
           <ul className={styles.festivalGrid}>
             {festivals.map((festival) => (
               <li key={festival.id}>
-                <Link href={festival.href} className={styles.festivalCard}>
+                <NavCard href={festival.href} className={styles.festivalCard}>
                   <div className={styles.festivalCardLogo}>
                     {festival.imagePath ? (
                       <Image
@@ -133,7 +134,7 @@ export default function FestivalsPageContent({
                       </span>
                     </div>
                   </div>
-                </Link>
+                </NavCard>
               </li>
             ))}
           </ul>

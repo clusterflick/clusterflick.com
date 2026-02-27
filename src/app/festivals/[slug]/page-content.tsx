@@ -6,9 +6,20 @@ import DetailPageHero from "@/components/detail-page-hero";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import FilmPosterGrid from "@/components/film-poster-grid";
+import VenueCard from "@/components/venue-card";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import FestivalRedirect from "./festival-redirect";
 import styles from "./page.module.css";
+
+export type FestivalVenueItem = {
+  id: string;
+  name: string;
+  href: string;
+  type: string;
+  imagePath: string | null;
+  filmCount: number;
+  performanceCount: number;
+};
 
 export interface FestivalDetailPageContentProps {
   festival: Festival;
@@ -20,6 +31,7 @@ export interface FestivalDetailPageContentProps {
   FestivalBlurb: ComponentType | null;
   isAlias: boolean;
   canonicalUrl: string;
+  venues: FestivalVenueItem[];
 }
 
 export default function FestivalDetailPageContent({
@@ -32,6 +44,7 @@ export default function FestivalDetailPageContent({
   FestivalBlurb,
   isAlias,
   canonicalUrl,
+  venues,
 }: FestivalDetailPageContentProps) {
   return (
     <main id="main-content">
@@ -49,14 +62,39 @@ export default function FestivalDetailPageContent({
 
       <Divider />
 
-      {FestivalBlurb && (
+      {(FestivalBlurb || venues.length > 0) && (
         <>
           <div className={styles.content}>
-            <ContentSection title="About" as="h2">
-              <div className={styles.blurb}>
-                <FestivalBlurb />
-              </div>
-            </ContentSection>
+            <div className={styles.columns}>
+              {FestivalBlurb && (
+                <div className={styles.main}>
+                  <ContentSection title="About" as="h2">
+                    <div className={styles.blurb}>
+                      <FestivalBlurb />
+                    </div>
+                  </ContentSection>
+                </div>
+              )}
+              {venues.length > 0 && (
+                <div className={styles.sidebar}>
+                  <ContentSection title="Cinemas" as="h2">
+                    <div className={styles.venueGrid}>
+                      {venues.map((venue) => (
+                        <VenueCard
+                          key={venue.id}
+                          href={venue.href}
+                          name={venue.name}
+                          type={venue.type}
+                          imagePath={venue.imagePath}
+                          filmCount={venue.filmCount}
+                          performanceCount={venue.performanceCount}
+                        />
+                      ))}
+                    </div>
+                  </ContentSection>
+                </div>
+              )}
+            </div>
           </div>
           <Divider />
         </>

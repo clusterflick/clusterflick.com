@@ -65,6 +65,9 @@ public/data/     — Static compressed cinema data files
   and shared functions
 - **CSS:** Mobile-first responsive design with CSS Modules; variant mappings via
   `Record<Variant, string>` objects
+- **Links:** Do not add custom CSS classes to plain `<a>` or `<Link>` elements
+  just to replicate global link styles. The global stylesheet already styles
+  links correctly — custom overrides are usually unnecessary and worse.
 
 ## Testing
 

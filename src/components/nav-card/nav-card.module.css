@@ -1,0 +1,18 @@
+.card {
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  text-decoration: none;
+  color: var(--color-white);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  background: rgba(var(--color-white-rgb), 0.07);
+  border-color: var(--color-electric-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(49, 158, 219, 0.15);
+}

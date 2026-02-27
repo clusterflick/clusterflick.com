@@ -1,11 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
-import Tag from "@/components/tag";
+import VenueCard from "@/components/venue-card";
 import LinkedList from "@/components/linked-list";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import styles from "./page.module.css";
@@ -127,45 +126,15 @@ export default function BoroughPageContent({
         <ContentSection title={`Cinema Venues in ${boroughName}`} as="h2">
           <div className={styles.venueGrid}>
             {venues.map((venue) => (
-              <Link
+              <VenueCard
                 key={venue.id}
                 href={venue.href}
-                className={styles.venueCard}
-              >
-                <div className={styles.venueCardLogo}>
-                  {venue.imagePath ? (
-                    <Image
-                      src={venue.imagePath}
-                      alt={`${venue.name} logo`}
-                      width={48}
-                      height={48}
-                      className={styles.venueCardImage}
-                    />
-                  ) : (
-                    <span className={styles.venueCardInitial}>
-                      {venue.name.charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <div className={styles.venueCardBody}>
-                  <span className={styles.venueCardName}>{venue.name}</span>
-                  <div className={styles.venueCardMeta}>
-                    <Tag color="blue" size="sm">
-                      {venue.type.toLowerCase() === "unknown"
-                        ? "Other"
-                        : venue.type}
-                    </Tag>
-                  </div>
-                  {venue.eventCount > 0 && (
-                    <span className={styles.venueCardStats}>
-                      {venue.eventCount.toLocaleString("en-GB")}{" "}
-                      {venue.eventCount === 1 ? "film" : "films"} &middot;{" "}
-                      {venue.performanceCount.toLocaleString("en-GB")}{" "}
-                      {venue.performanceCount === 1 ? "showing" : "showings"}
-                    </span>
-                  )}
-                </div>
-              </Link>
+                name={venue.name}
+                type={venue.type}
+                imagePath={venue.imagePath}
+                filmCount={venue.eventCount}
+                performanceCount={venue.performanceCount}
+              />
             ))}
           </div>
         </ContentSection>

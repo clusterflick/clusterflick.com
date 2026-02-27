@@ -5,6 +5,8 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
+import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FESTIVALS, type Festival } from "@/data/festivals";
 import type { Movie } from "@/types";
 import FestivalDetailPageContent from "./page-content";
@@ -153,6 +155,37 @@ export default async function FestivalDetailPage({
     return a.movie.title.localeCompare(b.movie.title);
   });
 
+  // Collect the venues showing this festival
+  const venueFilmSets = new Map<string, Set<string>>();
+  const venuePerfCounts = new Map<string, number>();
+
+  for (const movie of Object.values(festivalMovies)) {
+    for (const perf of movie.performances) {
+      const showing = movie.showings[perf.showingId];
+      if (showing) {
+        const { venueId } = showing;
+        if (!venueFilmSets.has(venueId)) venueFilmSets.set(venueId, new Set());
+        venueFilmSets.get(venueId)!.add(movie.id);
+        venuePerfCounts.set(venueId, (venuePerfCounts.get(venueId) ?? 0) + 1);
+      }
+    }
+  }
+
+  const festivalVenues = [...venueFilmSets.entries()]
+    .map(([venueId, films]) => {
+      const venue = data.venues[venueId];
+      return {
+        id: venueId,
+        name: venue?.name ?? venueId,
+        href: venue ? getVenueUrl(venue) : "#",
+        type: venue?.type ?? "Unknown",
+        imagePath: getVenueImagePath(venueId),
+        filmCount: films.size,
+        performanceCount: venuePerfCounts.get(venueId) ?? 0,
+      };
+    })
+    .sort((a, b) => b.filmCount - a.filmCount || a.name.localeCompare(b.name));
+
   const GRID_MOVIE_LIMIT = 72;
   const gridMovies = festivalMovieList.slice(0, GRID_MOVIE_LIMIT);
   const gridMoviesTruncated = festivalMovieList.length > GRID_MOVIE_LIMIT;
@@ -220,6 +253,7 @@ export default async function FestivalDetailPage({
         FestivalBlurb={FestivalBlurb}
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
+        venues={festivalVenues}
       />
     </>
   );

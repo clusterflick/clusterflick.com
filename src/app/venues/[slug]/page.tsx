@@ -16,7 +16,7 @@ import {
   isFestivalCurrentlyShowing,
 } from "@/utils/get-festival-movies";
 import { getFestivalUrl } from "@/utils/get-festival-url";
-import type { Movie, Venue } from "@/types";
+import { AccessibilityFeature, type Movie, type Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
 export const dynamicParams = false;
@@ -178,6 +178,14 @@ export default async function VenueDetailPage({
   let performanceCount = 0;
   const venueMovies: { movie: Movie; performanceCount: number }[] = [];
 
+  const accessibilityFeatures = Object.values(AccessibilityFeature);
+  const accessibilityFilmSets = new Map(
+    accessibilityFeatures.map((f) => [f, new Set<string>()]),
+  );
+  const accessibilityPerfCounts = new Map(
+    accessibilityFeatures.map((f) => [f, 0]),
+  );
+
   for (const movie of Object.values(data.movies)) {
     const venueShowingIds = new Set<string>();
     for (const [showingId, showing] of Object.entries(movie.showings)) {
@@ -192,11 +200,28 @@ export default async function VenueDetailPage({
         if (venueShowingIds.has(perf.showingId)) {
           performanceCount++;
           moviePerfCount++;
+          for (const feature of accessibilityFeatures) {
+            if (perf.accessibility?.[feature]) {
+              accessibilityFilmSets.get(feature)!.add(movie.id);
+              accessibilityPerfCounts.set(
+                feature,
+                (accessibilityPerfCounts.get(feature) ?? 0) + 1,
+              );
+            }
+          }
         }
       }
       venueMovies.push({ movie, performanceCount: moviePerfCount });
     }
   }
+
+  const venueAccessibilityStats = accessibilityFeatures
+    .map((feature) => ({
+      feature,
+      filmCount: accessibilityFilmSets.get(feature)!.size,
+      performanceCount: accessibilityPerfCounts.get(feature) ?? 0,
+    }))
+    .filter((s) => s.filmCount > 0);
 
   // Sort by number of performances (most showings first), then alphabetically
   venueMovies.sort((a, b) => {
@@ -313,6 +338,7 @@ export default async function VenueDetailPage({
         nearbyVenues={nearbyVenues}
         borough={boroughInfo}
         activeFestivals={activeFestivalsAtVenue}
+        accessibilityStats={venueAccessibilityStats}
       />
     </>
   );

@@ -2,7 +2,11 @@ import { Fragment, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { VenueAttributes } from "@/utils/get-venue-attributes";
-import type { Movie, Venue } from "@/types";
+import { AccessibilityFeature, type Movie, type Venue } from "@/types";
+import {
+  ACCESSIBILITY_LABELS,
+  ACCESSIBILITY_EMOJIS,
+} from "@/utils/accessibility-labels";
 import PageHeader from "@/components/page-header";
 import DetailPageHero from "@/components/detail-page-hero";
 import ContentSection from "@/components/content-section";
@@ -86,6 +90,11 @@ export interface VenueDetailPageContentProps {
   nearbyVenues: NearbyVenue[];
   borough?: VenueBorough | null;
   activeFestivals: { name: string; href: string }[];
+  accessibilityStats: {
+    feature: AccessibilityFeature;
+    filmCount: number;
+    performanceCount: number;
+  }[];
 }
 
 export default function VenueDetailPageContent({
@@ -101,6 +110,7 @@ export default function VenueDetailPageContent({
   nearbyVenues,
   borough,
   activeFestivals,
+  accessibilityStats,
 }: VenueDetailPageContentProps) {
   const socialLinks = attributes ? buildSocialLinks(attributes) : [];
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
@@ -235,6 +245,42 @@ export default function VenueDetailPageContent({
                   {activeFestivals.map((festival) => (
                     <li key={festival.href}>
                       <Link href={festival.href}>{festival.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </ContentSection>
+            )}
+            {accessibilityStats.length > 0 && (
+              <ContentSection
+                title="Accessibility"
+                as="h2"
+                className={styles.accessibilitySection}
+                intro={
+                  <Link href="/accessibility">
+                    Learn more about accessible screenings →
+                  </Link>
+                }
+              >
+                <ul className={styles.accessibilityList}>
+                  {accessibilityStats.map(({ feature, filmCount }) => (
+                    <li key={feature}>
+                      <a
+                        href={`/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`}
+                        className={styles.accessibilityItem}
+                      >
+                        <span
+                          className={styles.accessibilityEmoji}
+                          aria-hidden="true"
+                        >
+                          {ACCESSIBILITY_EMOJIS[feature]}
+                        </span>
+                        <span className={styles.accessibilityFeatureName}>
+                          {ACCESSIBILITY_LABELS[feature]}
+                        </span>
+                        <span className={styles.accessibilityCount}>
+                          {filmCount} {filmCount === 1 ? "film" : "films"}
+                        </span>
+                      </a>
                     </li>
                   ))}
                 </ul>

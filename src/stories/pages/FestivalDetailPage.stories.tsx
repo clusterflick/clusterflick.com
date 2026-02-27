@@ -63,6 +63,7 @@ async function loadFestivalDetailData(): Promise<FestivalDetailData | null> {
     gridMoviesTruncated,
     isAlias: false,
     canonicalUrl: getFestivalUrl(festival),
+    venues: [],
   };
 }
 

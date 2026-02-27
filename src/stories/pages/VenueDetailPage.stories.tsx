@@ -102,6 +102,7 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     gridMoviesTruncated,
     nearbyVenues: [],
     activeFestivals: [],
+    accessibilityStats: [],
   };
 }
 
