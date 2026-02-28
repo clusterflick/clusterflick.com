@@ -1,5 +1,4 @@
 .card {
-  display: block;
   background: rgba(var(--color-white-rgb), 0.04);
   border: 1px solid rgba(var(--color-white-rgb), 0.1);
   text-decoration: none;

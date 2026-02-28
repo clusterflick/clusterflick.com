@@ -9,7 +9,7 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FESTIVALS, type Festival } from "@/data/festivals";
 import type { Movie } from "@/types";
-import FestivalDetailPageContent from "./page-content";
+import EventDetailPageContent from "@/components/event-detail-page-content";
 
 export const dynamicParams = false;
 
@@ -243,14 +243,17 @@ export default async function FestivalDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(festivalJsonLd) }}
       />
-      <FestivalDetailPageContent
-        festival={festival}
+      <EventDetailPageContent
+        name={festival.name}
+        url={festival.url}
         imagePath={imagePath}
         movieCount={movieCount}
         performanceCount={performanceCount}
+        backUrl="/festivals"
+        backText="All festivals"
         gridMovies={gridMovies}
         gridMoviesTruncated={gridMoviesTruncated}
-        FestivalBlurb={FestivalBlurb}
+        Blurb={FestivalBlurb}
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
         venues={festivalVenues}

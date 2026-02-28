@@ -1,6 +1,5 @@
 import { type ComponentType } from "react";
 import type { Movie } from "@/types";
-import type { Festival } from "@/data/festivals";
 import PageHeader from "@/components/page-header";
 import DetailPageHero from "@/components/detail-page-hero";
 import ContentSection from "@/components/content-section";
@@ -8,10 +7,10 @@ import Divider from "@/components/divider";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import VenueCard from "@/components/venue-card";
 import PreloadCinemaData from "@/components/preload-cinema-data";
-import FestivalRedirect from "./festival-redirect";
-import styles from "./page.module.css";
+import CanonicalRedirect from "@/components/canonical-redirect";
+import styles from "./event-detail-page-content.module.css";
 
-export type FestivalVenueItem = {
+export type EventVenueItem = {
   id: string;
   name: string;
   href: string;
@@ -21,56 +20,73 @@ export type FestivalVenueItem = {
   performanceCount: number;
 };
 
-export interface FestivalDetailPageContentProps {
-  festival: Festival;
+export interface EventDetailPageContentProps {
+  name: string;
+  url: string;
   imagePath: string | null;
   movieCount: number;
   performanceCount: number;
+  backUrl: string;
+  backText: string;
   gridMovies: { movie: Movie; performanceCount: number }[];
   gridMoviesTruncated?: boolean;
-  FestivalBlurb: ComponentType | null;
+  Blurb: ComponentType | null;
   isAlias: boolean;
   canonicalUrl: string;
-  venues: FestivalVenueItem[];
+  venues: EventVenueItem[];
 }
 
-export default function FestivalDetailPageContent({
-  festival,
+/**
+ * Shared detail page layout for curated film programmes (festivals, film clubs, etc.).
+ * Renders the hero, optional about blurb + cinemas sidebar, and the film grid.
+ *
+ * **When to use:**
+ * - Detail pages for festivals, film clubs, or any named film programme.
+ *
+ * **When NOT to use:**
+ * - Venue detail pages — those have their own layout.
+ * - Movie detail pages.
+ */
+export default function EventDetailPageContent({
+  name,
+  url,
   imagePath,
   movieCount,
   performanceCount,
+  backUrl,
+  backText,
   gridMovies,
   gridMoviesTruncated,
-  FestivalBlurb,
+  Blurb,
   isAlias,
   canonicalUrl,
   venues,
-}: FestivalDetailPageContentProps) {
+}: EventDetailPageContentProps) {
   return (
     <main id="main-content">
       <PreloadCinemaData />
-      {isAlias && <FestivalRedirect canonicalUrl={canonicalUrl} />}
-      <PageHeader backUrl="/festivals" backText="All festivals" />
+      {isAlias && <CanonicalRedirect canonicalUrl={canonicalUrl} />}
+      <PageHeader backUrl={backUrl} backText={backText} />
 
       <DetailPageHero
-        name={festival.name}
+        name={name}
         imagePath={imagePath}
-        url={festival.url}
+        url={url}
         movieCount={movieCount}
         performanceCount={performanceCount}
       />
 
       <Divider />
 
-      {(FestivalBlurb || venues.length > 0) && (
+      {(Blurb || venues.length > 0) && (
         <>
           <div className={styles.content}>
             <div className={styles.columns}>
-              {FestivalBlurb && (
+              {Blurb && (
                 <div className={styles.main}>
                   <ContentSection title="About" as="h2">
                     <div className={styles.blurb}>
-                      <FestivalBlurb />
+                      <Blurb />
                     </div>
                   </ContentSection>
                 </div>
@@ -102,9 +118,9 @@ export default function FestivalDetailPageContent({
 
       <div className={styles.filmsSection}>
         <ContentSection
-          title={`Films at ${festival.name}`}
+          title={`Films at ${name}`}
           as="h2"
-          className={styles.festivalFilms}
+          className={styles.films}
         >
           <FilmPosterGrid
             movies={gridMovies}

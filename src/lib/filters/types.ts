@@ -6,6 +6,7 @@ import { AccessibilityFilterValue, Category, Movie } from "@/types";
 export enum FilterId {
   Search = "search",
   ShowingTitleSearch = "showingTitleSearch",
+  ShowingUrlSearch = "showingUrlSearch",
   PerformanceNotesSearch = "performanceNotesSearch",
   Categories = "categories",
   Venues = "venues",
@@ -23,6 +24,7 @@ export enum FilterId {
 export type FilterState = {
   [FilterId.Search]: string;
   [FilterId.ShowingTitleSearch]: string;
+  [FilterId.ShowingUrlSearch]: string;
   [FilterId.PerformanceNotesSearch]: string;
   [FilterId.Categories]: Category[] | null;
   [FilterId.Venues]: string[] | null;
@@ -83,6 +85,7 @@ export interface FilterModule<K extends FilterId> {
 export type AnyFilterModule =
   | FilterModule<FilterId.Search>
   | FilterModule<FilterId.ShowingTitleSearch>
+  | FilterModule<FilterId.ShowingUrlSearch>
   | FilterModule<FilterId.PerformanceNotesSearch>
   | FilterModule<FilterId.Categories>
   | FilterModule<FilterId.Venues>

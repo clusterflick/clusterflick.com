@@ -47,19 +47,32 @@ export const showingTitleSearchFilter: FilterModule<FilterId.ShowingTitleSearch>
       const result: MoviesRecord = {};
 
       for (const [id, movie] of Object.entries(movies)) {
-        // Check if any showing title matches the query.
+        // Keep only showings whose title matches the query.
         // showing.title is only set when it differs from the movie title,
         // so fall back to movie.title when absent.
-        const showingTitleMatch = Object.values(movie.showings).some(
-          (showing) => {
-            const title = showing.title || movie.title;
-            return normalizeForSearch(title).includes(query);
-          },
+        const filteredShowings: typeof movie.showings = {};
+
+        for (const [showingId, showing] of Object.entries(movie.showings)) {
+          const title = showing.title || movie.title;
+          if (normalizeForSearch(title).includes(query)) {
+            filteredShowings[showingId] = showing;
+          }
+        }
+
+        if (Object.keys(filteredShowings).length === 0) continue;
+
+        const validShowingIds = new Set(Object.keys(filteredShowings));
+        const filteredPerformances = movie.performances.filter((p) =>
+          validShowingIds.has(p.showingId),
         );
 
-        if (showingTitleMatch) {
-          result[id] = movie;
-        }
+        if (filteredPerformances.length === 0) continue;
+
+        result[id] = {
+          ...movie,
+          showings: filteredShowings,
+          performances: filteredPerformances,
+        };
       }
 
       return result;

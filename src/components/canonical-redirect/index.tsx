@@ -3,13 +3,17 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-interface FestivalRedirectProps {
+interface CanonicalRedirectProps {
   canonicalUrl: string;
 }
 
-export default function FestivalRedirect({
+/**
+ * Client component that redirects an alias URL to its canonical equivalent.
+ * Rendered only when the current route is a non-canonical alias.
+ */
+export default function CanonicalRedirect({
   canonicalUrl,
-}: FestivalRedirectProps) {
+}: CanonicalRedirectProps) {
   const router = useRouter();
 
   useEffect(() => {

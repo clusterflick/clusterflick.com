@@ -31,7 +31,7 @@
   gap: 8px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .filter {
     flex: 1;
     padding: 0 60px;
