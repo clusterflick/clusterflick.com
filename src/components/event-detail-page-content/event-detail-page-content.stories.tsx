@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import EventDetailPageContent from "@/components/event-detail-page-content";
+import { CinemaDataProvider } from "@/state/cinema-data-context";
+import { FilterConfigProvider } from "@/state/filter-config-context";
+import { GeolocationProvider } from "@/state/geolocation-context";
 
 /**
  * `EventDetailPageContent` is the shared detail page layout for curated film
@@ -21,8 +24,20 @@ const meta = {
   parameters: {
     layout: "fullscreen",
     backgrounds: { default: "dark" },
+    nextjs: { appDirectory: true },
   },
   tags: ["autodocs"],
+  decorators: [
+    (Story) => (
+      <CinemaDataProvider>
+        <FilterConfigProvider>
+          <GeolocationProvider>
+            <Story />
+          </GeolocationProvider>
+        </FilterConfigProvider>
+      </CinemaDataProvider>
+    ),
+  ],
 } satisfies Meta<typeof EventDetailPageContent>;
 
 export default meta;
