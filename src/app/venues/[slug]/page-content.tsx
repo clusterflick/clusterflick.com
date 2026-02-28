@@ -262,29 +262,14 @@ export default function VenueDetailPageContent({
                   </Link>
                 }
               >
-                <ul className={styles.accessibilityList}>
-                  {accessibilityStats.map(({ feature, filmCount }) => (
-                    <li key={feature}>
-                      <a
-                        href={`/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`}
-                        className={styles.accessibilityItem}
-                      >
-                        <span
-                          className={styles.accessibilityEmoji}
-                          aria-hidden="true"
-                        >
-                          {ACCESSIBILITY_EMOJIS[feature]}
-                        </span>
-                        <span className={styles.accessibilityFeatureName}>
-                          {ACCESSIBILITY_LABELS[feature]}
-                        </span>
-                        <span className={styles.accessibilityCount}>
-                          {filmCount} {filmCount === 1 ? "film" : "films"}
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <LinkedList
+                  items={accessibilityStats.map(({ feature, filmCount }) => ({
+                    key: feature,
+                    href: `/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
+                    label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
+                    detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
+                  }))}
+                />
               </ContentSection>
             )}
           </div>

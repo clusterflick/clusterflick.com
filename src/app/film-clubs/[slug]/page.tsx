@@ -11,7 +11,7 @@ import {
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FILM_CLUBS, type FilmClub } from "@/data/film-clubs";
-import type { Movie } from "@/types";
+import { AccessibilityFeature, type Movie } from "@/types";
 import EventDetailPageContent from "@/components/event-detail-page-content";
 
 export const dynamicParams = false;
@@ -192,6 +192,36 @@ export default async function FilmClubDetailPage({
     })
     .sort((a, b) => b.filmCount - a.filmCount || a.name.localeCompare(b.name));
 
+  const accessibilityFeatures = Object.values(AccessibilityFeature);
+  const accessibilityFilmSets = new Map(
+    accessibilityFeatures.map((f) => [f, new Set<string>()]),
+  );
+  const accessibilityPerfCounts = new Map(
+    accessibilityFeatures.map((f) => [f, 0]),
+  );
+
+  for (const movie of Object.values(currentMovies)) {
+    for (const perf of movie.performances) {
+      for (const feature of accessibilityFeatures) {
+        if (perf.accessibility?.[feature]) {
+          accessibilityFilmSets.get(feature)!.add(movie.id);
+          accessibilityPerfCounts.set(
+            feature,
+            (accessibilityPerfCounts.get(feature) ?? 0) + 1,
+          );
+        }
+      }
+    }
+  }
+
+  const clubAccessibilityStats = accessibilityFeatures
+    .map((feature) => ({
+      feature,
+      filmCount: accessibilityFilmSets.get(feature)!.size,
+      performanceCount: accessibilityPerfCounts.get(feature) ?? 0,
+    }))
+    .filter((s) => s.filmCount > 0);
+
   const GRID_MOVIE_LIMIT = 72;
   const gridMovies = clubMovieList.slice(0, GRID_MOVIE_LIMIT);
   const gridMoviesTruncated = clubMovieList.length > GRID_MOVIE_LIMIT;
@@ -268,6 +298,7 @@ export default async function FilmClubDetailPage({
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
         venues={clubVenues}
+        accessibilityStats={clubAccessibilityStats}
       />
     </>
   );

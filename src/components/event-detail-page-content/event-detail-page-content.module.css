@@ -48,6 +48,15 @@
   gap: 16px;
 }
 
+.accessibilitySection h2 {
+  margin-bottom: 8px;
+}
+
+.accessibilitySection p {
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
 .films {
   text-align: center;
 

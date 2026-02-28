@@ -118,46 +118,6 @@
   margin-bottom: 28px;
 }
 
-.accessibilityList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.accessibilityItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: inherit;
-  text-decoration: none;
-  padding: 4px 0;
-  transition: color 0.2s;
-}
-
-.accessibilityItem:hover {
-  color: var(--color-electric-blue);
-}
-
-.accessibilityEmoji {
-  flex-shrink: 0;
-  width: 20px;
-  text-align: center;
-}
-
-.accessibilityFeatureName {
-  flex: 1;
-}
-
-.accessibilityCount {
-  font-size: 13px;
-  color: var(--color-muted-gray);
-  flex-shrink: 0;
-}
-
 .venueFilms {
   text-align: center;
 

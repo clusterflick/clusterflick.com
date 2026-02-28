@@ -1,11 +1,17 @@
 import { type ComponentType } from "react";
-import type { Movie } from "@/types";
+import Link from "next/link";
+import type { Movie, AccessibilityFeature } from "@/types";
+import {
+  ACCESSIBILITY_LABELS,
+  ACCESSIBILITY_EMOJIS,
+} from "@/utils/accessibility-labels";
 import PageHeader from "@/components/page-header";
 import DetailPageHero from "@/components/detail-page-hero";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import VenueCard from "@/components/venue-card";
+import LinkedList from "@/components/linked-list";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import CanonicalRedirect from "@/components/canonical-redirect";
 import styles from "./event-detail-page-content.module.css";
@@ -16,6 +22,12 @@ export type EventVenueItem = {
   href: string;
   type: string;
   imagePath: string | null;
+  filmCount: number;
+  performanceCount: number;
+};
+
+export type AccessibilityStat = {
+  feature: AccessibilityFeature;
   filmCount: number;
   performanceCount: number;
 };
@@ -34,6 +46,7 @@ export interface EventDetailPageContentProps {
   isAlias: boolean;
   canonicalUrl: string;
   venues: EventVenueItem[];
+  accessibilityStats?: AccessibilityStat[];
 }
 
 /**
@@ -61,6 +74,7 @@ export default function EventDetailPageContent({
   isAlias,
   canonicalUrl,
   venues,
+  accessibilityStats = [],
 }: EventDetailPageContentProps) {
   return (
     <main id="main-content">
@@ -78,7 +92,7 @@ export default function EventDetailPageContent({
 
       <Divider />
 
-      {(Blurb || venues.length > 0) && (
+      {(Blurb || venues.length > 0 || accessibilityStats.length > 0) && (
         <>
           <div className={styles.content}>
             <div className={styles.columns}>
@@ -91,23 +105,48 @@ export default function EventDetailPageContent({
                   </ContentSection>
                 </div>
               )}
-              {venues.length > 0 && (
+              {(venues.length > 0 || accessibilityStats.length > 0) && (
                 <div className={styles.sidebar}>
-                  <ContentSection title="Cinemas" as="h2">
-                    <div className={styles.venueGrid}>
-                      {venues.map((venue) => (
-                        <VenueCard
-                          key={venue.id}
-                          href={venue.href}
-                          name={venue.name}
-                          type={venue.type}
-                          imagePath={venue.imagePath}
-                          filmCount={venue.filmCount}
-                          performanceCount={venue.performanceCount}
-                        />
-                      ))}
-                    </div>
-                  </ContentSection>
+                  {venues.length > 0 && (
+                    <ContentSection title="Cinemas" as="h2">
+                      <div className={styles.venueGrid}>
+                        {venues.map((venue) => (
+                          <VenueCard
+                            key={venue.id}
+                            href={venue.href}
+                            name={venue.name}
+                            type={venue.type}
+                            imagePath={venue.imagePath}
+                            filmCount={venue.filmCount}
+                            performanceCount={venue.performanceCount}
+                          />
+                        ))}
+                      </div>
+                    </ContentSection>
+                  )}
+                  {accessibilityStats.length > 0 && (
+                    <ContentSection
+                      title="Accessibility"
+                      as="h2"
+                      className={styles.accessibilitySection}
+                      intro={
+                        <Link href="/accessibility">
+                          Learn more about accessible screenings →
+                        </Link>
+                      }
+                    >
+                      <LinkedList
+                        items={accessibilityStats.map(
+                          ({ feature, filmCount }) => ({
+                            key: feature,
+                            href: `/accessibility/#${feature}`,
+                            label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
+                            detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
+                          }),
+                        )}
+                      />
+                    </ContentSection>
+                  )}
                 </div>
               )}
             </div>
