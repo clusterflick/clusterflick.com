@@ -51,7 +51,7 @@ const meta = {
   title: "Components/LinkCard",
   component: LinkCard,
   parameters: {
-    layout: "centered",
+    layout: "padded",
     backgrounds: { default: "dark" },
   },
   tags: ["autodocs"],
@@ -67,22 +67,80 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Rating card as used to show Letterboxd, IMDb, Rotten Tomatoes, and
- * Metacritic scores on the movie detail page.
+ * Single rating card — the building block for the ratings row. On the movie
+ * detail page these are rendered in a flex container with `min-width: 160px`.
  */
 export const Rating: Story = {
-  args: {
-    href: "https://letterboxd.com",
-    variant: "rating",
-    "aria-label": "Letterboxd rating: 4.1 / 5",
-    children: (
-      <>
+  render: () => (
+    <div style={{ display: "flex", gap: 16, width: "fit-content" }}>
+      <LinkCard
+        href="https://letterboxd.com"
+        variant="rating"
+        aria-label="Letterboxd rating: 4.1 / 5"
+      >
         <CardLabel>Letterboxd</CardLabel>
         <CardValue>4.1</CardValue>
         <CardSubtext>/ 5</CardSubtext>
-      </>
-    ),
-  },
+      </LinkCard>
+    </div>
+  ),
+};
+
+/**
+ * All three rating sources as they appear on the movie detail page — IMDb,
+ * Letterboxd, and Rotten Tomatoes side by side.
+ */
+export const RatingRow: Story = {
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        flexWrap: "wrap",
+        width: "fit-content",
+      }}
+    >
+      <LinkCard
+        href="https://imdb.com"
+        variant="rating"
+        aria-label="IMDb: 8.3 / 10"
+      >
+        <CardLabel>IMDb</CardLabel>
+        <CardValue>
+          8.3
+          <span style={{ fontSize: 16, fontWeight: 500, opacity: 0.6 }}>
+            {" "}
+            /10
+          </span>
+        </CardValue>
+        <CardSubtext>567,891 reviews</CardSubtext>
+      </LinkCard>
+      <LinkCard
+        href="https://letterboxd.com"
+        variant="rating"
+        aria-label="Letterboxd: 4.1 / 5"
+      >
+        <CardLabel>Letterboxd</CardLabel>
+        <CardValue>
+          4.1
+          <span style={{ fontSize: 16, fontWeight: 500, opacity: 0.6 }}>
+            {" "}
+            /5
+          </span>
+        </CardValue>
+        <CardSubtext>123,456 reviews</CardSubtext>
+      </LinkCard>
+      <LinkCard
+        href="https://rottentomatoes.com"
+        variant="rating"
+        aria-label="Rotten Tomatoes: 87% critics"
+      >
+        <CardLabel>Rotten Tomatoes</CardLabel>
+        <CardValue>87%</CardValue>
+        <CardSubtext>Critics</CardSubtext>
+      </LinkCard>
+    </div>
+  ),
 };
 
 /**

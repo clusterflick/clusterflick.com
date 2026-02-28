@@ -120,7 +120,7 @@ export const CalendarIcons: Story = {
   render: () => (
     <div style={galleryStyle}>
       {[
-        { label: "Google Calendar", icon: <GoogleCalendarIcon size={24} /> },
+        { label: "GoogleCalendar", icon: <GoogleCalendarIcon size={24} /> },
         { label: "Outlook", icon: <OutlookCalendarIcon size={24} /> },
       ].map(({ label, icon }) => (
         <div key={label} style={iconStyle}>

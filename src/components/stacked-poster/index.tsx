@@ -139,13 +139,11 @@ export default function StackedPoster({
   priority,
   headingLevel: HeadingTag = "h2",
 }: StackedPosterProps) {
-  // Only use movies that have poster paths
+  // Only render posters for movies that have a TMDB poster path.
   const moviesWithPosters = includedMovies.filter((m) => m.posterPath);
-
-  // Build the list of all posters to render (background + main)
   const allPosters: Array<{ posterPath: string; title: string }> = [];
 
-  // Add background posters first
+  // Add background posters first (up to 2)
   const backgroundMovies = mainPosterPath
     ? moviesWithPosters.slice(0, 2)
     : moviesWithPosters.slice(1, 3);
@@ -167,7 +165,7 @@ export default function StackedPoster({
   const sizePositions = POSITIONS[size];
   const positions = sizePositions[posterCount] || sizePositions[1];
 
-  // If no posters available, always show the overlay so users know what the event is
+  // Show overlay without hover when there are no posters to display
   const alwaysShowOverlay = allPosters.length === 0;
 
   const containerClass = clsx(

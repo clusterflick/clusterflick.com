@@ -37,6 +37,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Poster with a real TMDB image — the default rendering path. */
+export const WithPoster: Story = {
+  args: {
+    title: "Spirited Away",
+    posterPath: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    showOverlay: true,
+  },
+};
+
+/** Large size with a real poster, as used on the movie detail page hero. */
+export const WithPosterLarge: Story = {
+  args: {
+    title: "Moonlight",
+    posterPath: "/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg",
+    size: "large",
+    showOverlay: true,
+  },
+};
+
 /**
  * Text-pattern fallback — rendered when no TMDB poster path is provided.
  * The title is repeated in a diagonal pattern using a colour derived from the

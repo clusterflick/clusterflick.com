@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import StatusPage, { StatusPageLoading } from "@/components/status-page";
 import { ButtonLink } from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
+import { CinemaDataProvider } from "@/state/cinema-data-context";
+import { emptyHandlers } from "../../../.storybook/msw/handlers";
 
 /**
  * `StatusPage` is a reusable full-page layout for error, not-found, and similar
@@ -26,7 +28,16 @@ const meta = {
   parameters: {
     layout: "fullscreen",
     backgrounds: { default: "dark" },
+    msw: { handlers: emptyHandlers },
+    nextjs: { appDirectory: true },
   },
+  decorators: [
+    (Story) => (
+      <CinemaDataProvider>
+        <Story />
+      </CinemaDataProvider>
+    ),
+  ],
   tags: ["autodocs"],
 } satisfies Meta<typeof StatusPage>;
 

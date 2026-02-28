@@ -4,7 +4,8 @@ import StackedPoster from "@/components/stacked-poster";
 /**
  * `StackedPoster` renders a multi-film event as a fanned stack of poster cards.
  * Up to three posters are shown (background films + main film on top). When no
- * poster images are available, a text-pattern fallback is shown for each card.
+ * TMDB poster images are available, each card falls back to a text-pattern
+ * placeholder derived from the movie title.
  *
  * **When to use:**
  * - Double bills, triple bills, and programme events that group multiple films
@@ -38,27 +39,44 @@ type Story = StoryObj<typeof meta>;
  */
 export const SingleFilm: Story = {
   args: {
-    mainTitle: "Oppenheimer",
-    includedMovies: [{ title: "A Short Film" }],
+    mainTitle: "Everything Everywhere All at Once",
+    showOverlay: true,
+    includedMovies: [
+      {
+        title: "Everything Everywhere All at Once",
+        posterPath: "/u68AjlvlutfEIcpmbYpKcdi09ut.jpg",
+      },
+    ],
   },
 };
 
-/** Two films — the background card is offset to show the stack. */
+/** Two films — the background card is offset to reveal the stack depth. */
 export const TwoFilms: Story = {
   args: {
-    mainTitle: "Dune: Part Two",
-    includedMovies: [{ title: "Dune: Part One" }, { title: "Behind the Dune" }],
+    mainTitle: "Forrest Gump",
+    showOverlay: true,
+    includedMovies: [
+      { title: "Forrest Gump", posterPath: "/saHP97rTPS5eLmrLQEcANmKrsFl.jpg" },
+      {
+        title: "North by Northwest",
+        posterPath: "/kNOFPQrel9YFCVzI0DF8FnCEpCw.jpg",
+      },
+    ],
   },
 };
 
 /** Three films — two background cards plus the main film on top. */
 export const ThreeFilms: Story = {
   args: {
-    mainTitle: "Poor Things",
+    mainTitle: "Moonlight",
+    showOverlay: true,
     includedMovies: [
-      { title: "Kinds of Kindness" },
-      { title: "The Favourite" },
-      { title: "The Lobster" },
+      { title: "Moonlight", posterPath: "/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg" },
+      { title: "The Birds", posterPath: "/eClg8QPg8mwB6INIC4pyR5pAbDr.jpg" },
+      {
+        title: "North by Northwest",
+        posterPath: "/kNOFPQrel9YFCVzI0DF8FnCEpCw.jpg",
+      },
     ],
   },
 };
@@ -66,18 +84,31 @@ export const ThreeFilms: Story = {
 /** Large size as used on detail page heroes. */
 export const Large: Story = {
   args: {
-    mainTitle: "Past Lives",
+    mainTitle: "Everything Everywhere All at Once",
     size: "large",
-    includedMovies: [{ title: "Aftersun" }, { title: "A24 Shorts" }],
+    showOverlay: true,
+    includedMovies: [
+      {
+        title: "Everything Everywhere All at Once",
+        posterPath: "/u68AjlvlutfEIcpmbYpKcdi09ut.jpg",
+      },
+      {
+        title: "Space Cadet",
+        posterPath: "/qhaxr8KrT8z8RMd3Z3KGLYaB9tN.jpg",
+      },
+    ],
   },
 };
 
-/** With overlay — title and subtitle shown on hover. */
-export const WithOverlay: Story = {
+/** With a subtitle shown below the title in the overlay. */
+export const WithSubtitle: Story = {
   args: {
-    mainTitle: "The Zone of Interest",
+    mainTitle: "Forrest Gump",
     subtitle: "3 showings this week",
     showOverlay: true,
-    includedMovies: [{ title: "Short Documentary" }],
+    includedMovies: [
+      { title: "Forrest Gump", posterPath: "/saHP97rTPS5eLmrLQEcANmKrsFl.jpg" },
+      { title: "Moonlight", posterPath: "/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg" },
+    ],
   },
 };
