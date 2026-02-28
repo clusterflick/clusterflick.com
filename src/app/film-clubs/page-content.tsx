@@ -1,5 +1,4 @@
-import Image from "next/image";
-import NavCard from "@/components/nav-card";
+import EventCard from "@/components/event-card";
 import StandardPageLayout from "@/components/standard-page-layout";
 import type { FilmClubListItem } from "./page";
 import styles from "./page.module.css";
@@ -9,44 +8,6 @@ interface FilmClubsPageContentProps {
   inactiveClubs: FilmClubListItem[];
   activeCount: number;
   totalCount: number;
-}
-
-function ClubCard({ club }: { club: FilmClubListItem }) {
-  return (
-    <NavCard href={club.href} className={styles.clubCard}>
-      <div className={styles.clubCardLogo}>
-        {club.imagePath ? (
-          <Image
-            src={club.imagePath}
-            alt={`${club.name} logo`}
-            width={96}
-            height={96}
-            className={styles.clubLogo}
-          />
-        ) : (
-          <div className={styles.clubLogoPlaceholder} />
-        )}
-      </div>
-      <div className={styles.clubCardBody}>
-        <div className={styles.clubCardName}>{club.name}</div>
-        <p className={styles.clubCardDescription}>
-          {club.seoDescription
-            ? club.seoDescription.charAt(0).toUpperCase() +
-              club.seoDescription.slice(1)
-            : ""}
-        </p>
-        <div className={styles.clubCardMeta}>
-          {club.movieCount > 0 ? (
-            <span className={styles.clubFilmCount}>
-              {club.movieCount} {club.movieCount === 1 ? "film" : "films"}
-            </span>
-          ) : (
-            <span className={styles.clubNoFilms}>No films currently showing</span>
-          )}
-        </div>
-      </div>
-    </NavCard>
-  );
 }
 
 export default function FilmClubsPageContent({
@@ -79,7 +40,18 @@ export default function FilmClubsPageContent({
           <ul className={styles.clubGrid}>
             {activeClubs.map((club) => (
               <li key={club.id}>
-                <ClubCard club={club} />
+                <EventCard
+                  href={club.href}
+                  name={club.name}
+                  imagePath={club.imagePath}
+                  description={club.seoDescription}
+                  meta={
+                    <span className={styles.filmCount}>
+                      {club.movieCount}{" "}
+                      {club.movieCount === 1 ? "film" : "films"}
+                    </span>
+                  }
+                />
               </li>
             ))}
           </ul>
@@ -94,7 +66,17 @@ export default function FilmClubsPageContent({
           <ul className={styles.clubGrid}>
             {inactiveClubs.map((club) => (
               <li key={club.id}>
-                <ClubCard club={club} />
+                <EventCard
+                  href={club.href}
+                  name={club.name}
+                  imagePath={club.imagePath}
+                  description={club.seoDescription}
+                  meta={
+                    <span className={styles.noFilms}>
+                      No films currently showing
+                    </span>
+                  }
+                />
               </li>
             ))}
           </ul>

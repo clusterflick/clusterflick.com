@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import NavCard from "@/components/nav-card";
+import EventCard from "@/components/event-card";
 import StandardPageLayout from "@/components/standard-page-layout";
 import EmptyState from "@/components/empty-state";
 import { CalendarIcon } from "@/components/icons";
@@ -67,31 +66,15 @@ export default function FestivalsPageContent({
         <ul className={styles.festivalGrid}>
           {festivals.map((festival) => (
             <li key={festival.id}>
-              <NavCard href={festival.href} className={styles.festivalCard}>
-                <div className={styles.festivalCardLogo}>
-                  {festival.imagePath ? (
-                    <Image
-                      src={festival.imagePath}
-                      alt={`${festival.name} logo`}
-                      width={96}
-                      height={96}
-                      className={styles.festivalLogo}
-                    />
-                  ) : (
-                    <div className={styles.festivalLogoPlaceholder} />
-                  )}
-                </div>
-                <div className={styles.festivalCardBody}>
-                  <div className={styles.festivalCardName}>{festival.name}</div>
-                  <p className={styles.festivalCardDescription}>
-                    {festival.seoDescription
-                      ? festival.seoDescription.charAt(0).toUpperCase() +
-                        festival.seoDescription.slice(1)
-                      : ""}
-                  </p>
-                  <div className={styles.festivalCardMeta}>
+              <EventCard
+                href={festival.href}
+                name={festival.name}
+                imagePath={festival.imagePath}
+                description={festival.seoDescription}
+                meta={
+                  <>
                     {festival.dateFrom !== null && festival.dateTo !== null && (
-                      <span className={styles.festivalCardMetaItem}>
+                      <span className={styles.metaItem}>
                         <CalendarIcon size={14} />
                         {formatDateShort(new Date(festival.dateFrom), {
                           includeYearIfDifferent: true,
@@ -108,15 +91,15 @@ export default function FestivalsPageContent({
                         )}
                       </span>
                     )}
-                    <span className={styles.festivalCardMetaItem}>
-                      <span className={styles.festivalFilmCount}>
+                    <span className={styles.metaItem}>
+                      <span className={styles.filmCount}>
                         {festival.movieCount}{" "}
                         {festival.movieCount === 1 ? "film" : "films"}
                       </span>
                     </span>
-                  </div>
-                </div>
-              </NavCard>
+                  </>
+                }
+              />
             </li>
           ))}
         </ul>

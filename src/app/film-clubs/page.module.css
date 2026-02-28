@@ -43,95 +43,9 @@
   }
 }
 
-/* Club card */
+/* Meta row items passed to EventCard */
 
-.clubCard {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 28px 24px;
-  border-radius: 16px;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-/* Logo */
-
-.clubCardLogo {
-  width: 96px;
-  height: 96px;
-  margin: 0 auto;
-  border-radius: 12px;
-  overflow: hidden;
-  background: rgba(var(--color-white-rgb), 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  flex-shrink: 0;
-}
-
-.clubLogo {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-}
-
-.clubLogoPlaceholder {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: rgba(var(--color-white-rgb), 0.12);
-}
-
-/* Card body */
-
-.clubCardBody {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-align: center;
-}
-
-.clubCardName {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.3;
-  height: calc(1.3em * 2);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  color: var(--color-electric-blue);
-  transition: color 0.2s ease;
-}
-
-.clubCard:hover .clubCardName {
-  color: var(--color-neon-pink);
-}
-
-.clubCardDescription {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.5;
-  margin: 0;
-  height: calc(1.5em * 3);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.clubCardMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  margin: 8px 0;
-}
-
-.clubFilmCount {
+.filmCount {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-electric-blue);
@@ -140,7 +54,7 @@
   border-radius: 20px;
 }
 
-.clubNoFilms {
+.noFilms {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.35);
 }

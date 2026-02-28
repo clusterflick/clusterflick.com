@@ -12,7 +12,7 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FILM_CLUBS, type FilmClub } from "@/data/film-clubs";
 import type { Movie } from "@/types";
-import FilmClubDetailPageContent from "./page-content";
+import EventDetailPageContent from "@/components/event-detail-page-content";
 
 export const dynamicParams = false;
 
@@ -254,14 +254,17 @@ export default async function FilmClubDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(clubJsonLd) }}
       />
-      <FilmClubDetailPageContent
-        club={club}
+      <EventDetailPageContent
+        name={club.name}
+        url={club.url}
         imagePath={imagePath}
         movieCount={heroMovieCount}
         performanceCount={performanceCount}
+        backUrl="/film-clubs"
+        backText="All film clubs"
         gridMovies={gridMovies}
         gridMoviesTruncated={gridMoviesTruncated}
-        FilmClubBlurb={FilmClubBlurb}
+        Blurb={FilmClubBlurb}
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
         venues={clubVenues}
