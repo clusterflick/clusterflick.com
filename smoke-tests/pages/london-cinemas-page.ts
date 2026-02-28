@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 const BOROUGH_LINK_SELECTOR = 'a[href^="/london-cinemas/"]';
-const BOROUGH_NAME_SELECTOR = '[class*="boroughName"]';
+const BOROUGH_NAME_SELECTOR = 'a[href^="/london-cinemas/"] [class*="label"]';
 
 export class LondonCinemasPage {
   constructor(private page: Page) {}

@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 const VENUE_LINK_SELECTOR = 'a[href^="/venues/"]';
-const VENUE_NAME_SELECTOR = '[class*="venueName"]';
+const VENUE_NAME_SELECTOR = 'a[href^="/venues/"] [class*="label"]';
 const SEARCH_INPUT_SELECTOR = 'input[placeholder="Filter venues..."]';
 
 export class VenuesPage {
