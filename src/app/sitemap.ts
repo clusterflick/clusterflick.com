@@ -6,6 +6,8 @@ import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { FESTIVALS } from "@/data/festivals";
 import { getFestivalUrl } from "@/utils/get-festival-url";
+import { FILM_CLUBS } from "@/data/film-clubs";
+import { getFilmClubUrl } from "@/utils/get-film-club-url";
 
 export const dynamic = "force-static";
 
@@ -51,6 +53,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const filmClubListPage = {
+    url: "https://clusterflick.com/film-clubs",
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  };
+
+  const filmClubPages = FILM_CLUBS.map((club) => ({
+    url: `https://clusterflick.com${getFilmClubUrl(club)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
   const staticPages = [
     {
       url: "https://clusterflick.com",
@@ -87,9 +103,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     festivalListPage,
+    filmClubListPage,
     ...moviePages,
     ...venuePages,
     ...boroughPages,
     ...festivalPages,
+    ...filmClubPages,
   ];
 }

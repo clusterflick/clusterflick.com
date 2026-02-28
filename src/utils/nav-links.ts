@@ -2,6 +2,7 @@
 export const NAV_LINKS = [
   { href: "/venues", label: "Venues" },
   { href: "/festivals", label: "Festivals" },
+  { href: "/film-clubs", label: "Film Clubs" },
   { href: "/accessibility", label: "Accessibility" },
   { href: "/about", label: "About" },
 ] as const;
