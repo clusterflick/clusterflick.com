@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import FestivalDetailPageContent from "@/app/festivals/[slug]/page-content";
-import type { FestivalDetailPageContentProps } from "@/app/festivals/[slug]/page-content";
+import EventDetailPageContent from "@/components/event-detail-page-content";
+import type { EventDetailPageContentProps } from "@/components/event-detail-page-content";
 import FestivalBlurb from "@/components/festivals/london-soundtrack-festival";
 import { FESTIVALS } from "@/data/festivals";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
@@ -21,7 +21,7 @@ import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
 const FESTIVAL_ID = "london-soundtrack-festival";
 const FESTIVAL_IMAGE_PATH = `/images/festivals/${FESTIVAL_ID}.jpg`;
 
-type FestivalDetailData = Omit<FestivalDetailPageContentProps, "FestivalBlurb">;
+type FestivalDetailData = Omit<EventDetailPageContentProps, "Blurb">;
 
 async function loadFestivalDetailData(): Promise<FestivalDetailData | null> {
   const festival = FESTIVALS.find((f) => f.id === FESTIVAL_ID);
@@ -55,10 +55,13 @@ async function loadFestivalDetailData(): Promise<FestivalDetailData | null> {
   const gridMoviesTruncated = festivalMovieList.length > GRID_MOVIE_LIMIT;
 
   return {
-    festival,
+    name: festival.name,
+    url: festival.url,
     imagePath: FESTIVAL_IMAGE_PATH,
     movieCount,
     performanceCount,
+    backUrl: "/festivals",
+    backText: "All festivals",
     gridMovies,
     gridMoviesTruncated,
     isAlias: false,
@@ -73,9 +76,7 @@ function FestivalDetailWithRealData() {
       loader={loadFestivalDetailData}
       loadingMessage="Loading festival data..."
     >
-      {(data) => (
-        <FestivalDetailPageContent {...data} FestivalBlurb={FestivalBlurb} />
-      )}
+      {(data) => <EventDetailPageContent {...data} Blurb={FestivalBlurb} />}
     </StoryDataLoader>
   );
 }

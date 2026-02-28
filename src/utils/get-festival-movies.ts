@@ -10,6 +10,7 @@ function buildPermissiveBase(): FilterState {
   return {
     [FilterId.Search]: "",
     [FilterId.ShowingTitleSearch]: "",
+    [FilterId.ShowingUrlSearch]: "",
     [FilterId.PerformanceNotesSearch]: "",
     [FilterId.Categories]: null,
     [FilterId.Venues]: null,
