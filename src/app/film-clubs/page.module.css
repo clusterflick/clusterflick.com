@@ -7,6 +7,25 @@
   margin-bottom: 32px;
 }
 
+/* Sections */
+
+.section {
+  margin-bottom: 48px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionHeading {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 20px;
+}
+
 /* Club grid */
 
 .clubGrid {

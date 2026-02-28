@@ -57,12 +57,31 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "bloody-mary-film-club",
+    name: "Bloody Mary Film Club",
+    url: "",
+    aliases: ["bloody-mary"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Bloody Mary Film Club" },
+      { [FilterId.ShowingTitleSearch]: "Bloody Mary" },
+    ],
+  },
+  {
     id: "bar-trash",
     name: "Bar Trash",
     url: "",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bar Trash" },
+    ],
+  },
+  {
+    id: "cinebug",
+    name: "Cinebug",
+    url: "",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Cinebug" },
     ],
   },
   {
@@ -158,6 +177,16 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "queer-horror-nights",
+    name: "Queer Horror Nights",
+    url: "",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Queer Horror Nights" },
+      { [FilterId.ShowingTitleSearch]: "Queer Horror" },
+    ],
+  },
+  {
     id: "pitchblack-playback",
     name: "Pitchblack Playback",
     url: "",
@@ -165,6 +194,28 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Pitchblack Playback" },
       { [FilterId.ShowingTitleSearch]: "Pitchblack" },
+    ],
+  },
+  {
+    id: "rebel-reel",
+    name: "Rebel Reel",
+    url: "",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Rebel Reel" },
+    ],
+  },
+  {
+    id: "rio-feminist-film-group",
+    name: "Rio Feminist Film Group",
+    url: "",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Rio Feminist Film" },
+      {
+        [FilterId.ShowingTitleSearch]: "Feminist Film",
+        [FilterId.Venues]: ["riocinema.org.uk"],
+      },
     ],
   },
   {

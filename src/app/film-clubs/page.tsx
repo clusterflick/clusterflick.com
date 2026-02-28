@@ -64,7 +64,13 @@ export default async function FilmClubsPage() {
     }),
   );
 
-  const activeCount = filmClubItems.filter((c) => c.movieCount > 0).length;
+  const activeClubs = filmClubItems
+    .filter((c) => c.movieCount > 0)
+    .sort((a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name));
+  const inactiveClubs = filmClubItems
+    .filter((c) => c.movieCount === 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const activeCount = activeClubs.length;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -90,8 +96,10 @@ export default async function FilmClubsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <FilmClubsPageContent
-        filmClubs={filmClubItems}
+        activeClubs={activeClubs}
+        inactiveClubs={inactiveClubs}
         activeCount={activeCount}
+        totalCount={filmClubItems.length}
       />
     </>
   );
