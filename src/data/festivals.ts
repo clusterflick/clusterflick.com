@@ -9,6 +9,58 @@ export type Festival = {
   matchers: Partial<FilterState>[];
 };
 
+// https://kinoteka.org.uk/programme
+const kinotekaTitles = [
+  "THE SOLIDARITY TRILOGY: MAN OF MARBLE",
+  "ROUGH TREATMENT",
+  "THE PROMISED LAND",
+  "THE CONDUCTOR",
+  "THE SOLIDARITY TRILOGY: MAN OF IRON",
+  "CHOPIN, A SONATA IN PARIS",
+  "MAN OF HOPE",
+  "KORCZAK",
+  "IN MEMORIAM: MARCEL ŁOZIŃSKI",
+  "FRANZ",
+  "HOME SWEET HOME",
+  "KATYN",
+  "FRAMES OF FREEDOM",
+  "MAN OF IRON",
+  "POSSESSION",
+  "THE DOG WHO TRAVELLED BY TRAIN 2",
+  "The Travelling Dog 2",
+  "DANTON",
+  "A SHORT FILM ABOUT KILLING",
+  "MR. OLBRYCHSKI",
+  "THE GOOD BOY",
+  "AFTERIMAGE",
+  "KIEŚLOWSKI DOCU-SHORTS",
+  "THE DOUBLE LIFE OF VERONIQUE",
+  "THE POSSESSED",
+  "THE PUBLIC WOMAN",
+  "A GENERATION",
+  "A SHORT FILM ABOUT LOVE",
+  "TRAINS",
+  "KANAL",
+  "ASHES AND DIAMONDS",
+  "LARP: LOVE, TROLLS AND OTHER QUESTS",
+  "PILATE AND THE OTHERS",
+  "Pilate and Others",
+  "LETTERS FROM WOLF STREET",
+  "LOVE IN GERMANY",
+  "THE IN-LAWS 3",
+  "BROTHER",
+];
+
+const kinotekaVenues = [
+  "bfi.org.uk-southbank",
+  "bfi.org.uk-imax",
+  "institut-francais.org.uk",
+  "ica.art",
+  "curzon.com-bloomsbury",
+  "barbican.org.uk",
+  "bbk.ac.uk-cinema",
+];
+
 export const FESTIVALS: Festival[] = [
   {
     id: "bfi-flare",
@@ -87,6 +139,34 @@ export const FESTIVALS: Festival[] = [
       {
         [FilterId.ShowingTitleSearch]: "Open City Documentary Festival",
       },
+    ],
+  },
+  {
+    id: "kinoteka",
+    name: "Kinoteka",
+    url: "https://kinoteka.org.uk",
+    aliases: ["Polish Film Festival"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Kinoteka",
+        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
+        [FilterId.Venues]: kinotekaVenues,
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "PHOTOSENSITIVE",
+        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
+        [FilterId.Venues]: ["thegardencinema.co.uk"],
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "ANNIVERSARY",
+        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
+        [FilterId.Venues]: ["thegardencinema.co.uk"],
+      },
+      ...kinotekaTitles.map((title) => ({
+        [FilterId.ShowingTitleSearch]: title,
+        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
+        [FilterId.Venues]: kinotekaVenues,
+      })),
     ],
   },
   {
