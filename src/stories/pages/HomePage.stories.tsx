@@ -134,6 +134,7 @@ export const EmptyData: Story = {
  * Shows the "No events found" message with suggestion to adjust filters.
  */
 export const NoFilterResults: Story = {
+  args: {},
   render: () => <HomePageWithNoMatchingFilter />,
   parameters: {
     msw: {

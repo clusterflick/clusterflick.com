@@ -74,6 +74,7 @@ const galleryStyle = {
 
 /** All UI icons used for navigation and interactive controls. */
 export const UIIcons: Story = {
+  args: {},
   render: () => (
     <div style={galleryStyle}>
       {[
@@ -95,6 +96,7 @@ export const UIIcons: Story = {
 
 /** Social platform icons used on venue and festival profile pages. */
 export const SocialIcons: Story = {
+  args: {},
   render: () => (
     <div style={galleryStyle}>
       {[
@@ -117,6 +119,7 @@ export const SocialIcons: Story = {
 
 /** Calendar export icons used in the "Add to calendar" feature. */
 export const CalendarIcons: Story = {
+  args: {},
   render: () => (
     <div style={galleryStyle}>
       {[
@@ -134,6 +137,7 @@ export const CalendarIcons: Story = {
 
 /** Size variations for a single icon. */
 export const Sizes: Story = {
+  args: {},
   render: () => (
     <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
       {[16, 20, 24, 32, 40, 48].map((size) => (

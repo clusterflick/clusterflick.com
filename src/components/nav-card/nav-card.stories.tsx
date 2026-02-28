@@ -32,6 +32,7 @@ type Story = StoryObj<typeof meta>;
 
 /** Basic card with a text label. Hover to see the lift-and-glow animation. */
 export const Default: Story = {
+  args: { href: "/venues", children: null },
   render: () => (
     <NavCard href="/venues">
       <div style={{ padding: "16px 20px", fontWeight: 600 }}>Browse Venues</div>
@@ -41,6 +42,7 @@ export const Default: Story = {
 
 /** Card with a title and supporting detail — a typical real-world usage. */
 export const WithContent: Story = {
+  args: { href: "/festivals", children: null },
   render: () => (
     <NavCard href="/festivals">
       <div
@@ -62,6 +64,7 @@ export const WithContent: Story = {
 
 /** Multiple cards side by side — shows consistent hover behaviour across a grid. */
 export const CardGrid: Story = {
+  args: { href: "#", children: null },
   render: () => (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
       {[

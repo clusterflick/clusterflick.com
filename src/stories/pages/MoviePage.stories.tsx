@@ -191,6 +191,7 @@ export const Loaded: Story = {
  * showing stacked posters and included films.
  */
 export const WithIncludedMovies: Story = {
+  args: {},
   render: () => (
     <StoryDataLoader<MoviePageData>
       loader={loadEventWithIncludedMoviesData}

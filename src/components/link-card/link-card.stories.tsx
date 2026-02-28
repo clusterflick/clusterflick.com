@@ -71,6 +71,7 @@ type Story = StoryObj<typeof meta>;
  * detail page these are rendered in a flex container with `min-width: 160px`.
  */
 export const Rating: Story = {
+  args: { href: "https://letterboxd.com", children: null },
   render: () => (
     <div style={{ display: "flex", gap: 16, width: "fit-content" }}>
       <LinkCard
@@ -91,6 +92,7 @@ export const Rating: Story = {
  * Letterboxd, and Rotten Tomatoes side by side.
  */
 export const RatingRow: Story = {
+  args: { href: "https://letterboxd.com", children: null },
   render: () => (
     <div
       style={{

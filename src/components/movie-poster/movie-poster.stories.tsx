@@ -94,6 +94,7 @@ export const NonInteractive: Story = {
 
 /** A range of titles showing the colour variety from `getPosterColor`. */
 export const ColorVariety: Story = {
+  args: { title: "Oppenheimer" },
   render: () => (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
       {[

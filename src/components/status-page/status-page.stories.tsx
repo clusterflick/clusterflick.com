@@ -86,6 +86,7 @@ export const NoBackLink: Story = {
  * `StatusPageLoading` rather than the main `StatusPage` component.
  */
 export const Loading: Story = {
+  args: { iconSrc: "", title: "", message: null },
   render: () => (
     <StatusPageLoading>
       <LoadingIndicator message="Loading cinema data..." size="lg" />

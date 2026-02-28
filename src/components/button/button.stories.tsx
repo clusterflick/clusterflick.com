@@ -91,6 +91,7 @@ export const Disabled: Story = {
  * for client-side navigation. Use for CTAs that navigate to a new route.
  */
 export const AsLink: Story = {
+  args: { children: "Browse venues" },
   render: () => (
     <ButtonLink href="/venues" variant="primary">
       Browse venues

@@ -66,6 +66,7 @@ export const InitialFallback: Story = {
 
 /** Multiple cards in a grid — shows consistent layout across a card set. */
 export const CardGridExample: Story = {
+  args: { href: "#", name: "BFI Southbank", type: "Cinema", imagePath: null },
   render: () => (
     <div
       style={{
