@@ -63,6 +63,7 @@ export default function DetailPageHero({
         className={
           hasEvents ? styles.statusCardActive : styles.statusCardInactive
         }
+        data-testid="status-card"
       >
         {hasEvents ? (
           <p>

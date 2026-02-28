@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 
 const BACK_LINK_SELECTOR = 'a[href="/festivals/"]';
-const STATUS_CARD_SELECTOR = '[class*="statusCard"]';
+const STATUS_CARD_SELECTOR = '[data-testid="status-card"]';
 
 export class FestivalDetailPage {
   constructor(private page: Page) {}

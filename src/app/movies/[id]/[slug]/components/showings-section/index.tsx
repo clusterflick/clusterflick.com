@@ -38,6 +38,7 @@ function renderPerformanceCard(
         isPast && styles.past,
         !isPast && isSoldOut && styles.soldOut,
       )}
+      data-testid="performance-card"
     >
       {/* Card overlay link - covers the whole card */}
       <a

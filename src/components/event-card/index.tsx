@@ -49,7 +49,9 @@ export default function EventCard({
         )}
       </div>
       <div className={styles.body}>
-        <div className={styles.name}>{name}</div>
+        <div className={styles.name} data-testid="event-card-name">
+          {name}
+        </div>
         <p className={styles.description}>
           {description
             ? description.charAt(0).toUpperCase() + description.slice(1)

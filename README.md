@@ -89,8 +89,12 @@ npm run format
 # Run Storybook
 npm run storybook
 
-# Run Playwright smoke tests (set SITE_URL to target a specific deployment)
+# Run Playwright smoke tests against the deployed site
 npm run smoke-test
+
+# Run smoke tests against a local build
+npm run build && npm start
+SITE_URL=http://localhost:3000 npm run smoke-test
 ```
 
 ## Project Structure

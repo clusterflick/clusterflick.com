@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 const FESTIVAL_CARD_SELECTOR = 'a[href^="/festivals/"]';
-const FESTIVAL_CARD_NAME_SELECTOR = '[class*="festivalCardName"]';
+const FESTIVAL_CARD_NAME_SELECTOR = '[data-testid="event-card-name"]';
 
 export class FestivalsPage {
   constructor(private page: Page) {}

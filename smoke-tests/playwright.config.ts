@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
-  timeout: 60000,
+  timeout: process.env.CI ? 60000 : 10000,
   outputDir: "../test-results",
 
   use: {

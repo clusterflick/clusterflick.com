@@ -16,7 +16,7 @@ Pages at clusterflick.com.
 - `npm run format` — Prettier format all files
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
-- `npm run smoke-test` — Run Playwright smoke tests against deployed site
+- `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
 

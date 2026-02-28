@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 
-const PERFORMANCE_CARD_SELECTOR = '[class*="performanceCard"]';
+const PERFORMANCE_CARD_SELECTOR = '[data-testid="performance-card"]';
 
 export class MovieDetailsPage {
   constructor(private page: Page) {}

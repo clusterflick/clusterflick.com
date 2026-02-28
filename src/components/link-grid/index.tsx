@@ -47,7 +47,9 @@ export default function LinkGrid({ items, minItemWidth = 220 }: LinkGridProps) {
       {items.map((item) => (
         <li key={item.key}>
           <Link href={item.href} className={styles.link}>
-            <span className={styles.label}>{item.label}</span>
+            <span className={styles.label} data-testid="link-grid-label">
+              {item.label}
+            </span>
             {item.count != null && item.count !== 0 && (
               <span className={styles.count}>{item.count}</span>
             )}

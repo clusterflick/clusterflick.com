@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-const STATUS_CARD_SELECTOR = '[class*="statusCard"]';
+const STATUS_CARD_SELECTOR = '[data-testid="status-card"]';
 
 export class VenueDetailPage {
   constructor(private page: Page) {}
