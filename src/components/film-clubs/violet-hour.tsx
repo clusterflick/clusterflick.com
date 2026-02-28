@@ -2,17 +2,17 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Violet Hour is a late-night cinema club for night owls and lovers of
-        after-dark cinema. Taking its name from the liminal hour between
-        afternoon and evening, Violet Hour programmes films that suit the night
-        — atmospheric, sensual, uncanny, or simply best appreciated when the
-        world has quietened down.
+        Violet Hour is a film club dedicated to the dark, transgressive, and
+        enigmatic side of the screen — screening works that unsettle, challenge,
+        and explore the stranger corners of human experience. Thematic
+        programmes have included paranormal horror and surveillance cinema,
+        often in collaboration with fellow collectives such as Distorted Frame.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "late-night and after-dark cinema for night owls";
+  "dark, transgressive, and enigmatic cinema — thematic screenings in London";
 
 export default FilmClubBlurb;

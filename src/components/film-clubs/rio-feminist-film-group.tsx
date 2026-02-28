@@ -2,18 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Rio Feminist Film Group runs feminist film screenings and discussions at
-        the Rio Cinema in Hackney. Programming films that centre women&apos;s
-        stories, challenge patriarchal narratives, and explore feminist
-        filmmaking across history and cultures, the group pairs each screening
-        with lively post-film conversation — making it as much a discussion
-        space as a cinema night.
+        Rio Feminist Film Group revives and continues a long tradition of
+        feminist film programming at the Rio Cinema in Dalston. Founded by Sarah
+        Chorley, Helen de Witt, Selina Robertson, and Corinna Antrobus, the
+        group was inspired by the Rio&apos;s feminist cinema history of the late
+        1970s and 1980s — including the Women&apos;s Media Resource Project,
+        which ran from 1983. Screenings centring women&apos;s stories and
+        challenging patriarchal narratives are paired with post-film discussion.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "feminist film screenings and discussion at the Rio Cinema, Hackney";
+  "feminist film screenings continuing the Rio Cinema's feminist programming tradition since the 1970s";
 
 export default FilmClubBlurb;

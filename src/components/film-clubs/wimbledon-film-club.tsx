@@ -2,17 +2,20 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Wimbledon Film Club is a community cinema club bringing quality film to
-        South West London. Screening a thoughtfully chosen programme of art
-        house, world cinema, and crowd-pleasing classics, the club serves
-        Wimbledon and the surrounding area with a warm, welcoming atmosphere and
-        a passion for great storytelling on screen.
+        Wimbledon Film Club is a registered charity and community cinema club
+        celebrating its twentieth year of screenings. Run entirely by
+        volunteers, the club screens world cinema, British films, and
+        independent features on selected Tuesday evenings from September to June
+        — most recently at the Odeon Wimbledon. Since 2008 it has run a
+        dedicated Black History Month programme, and over twenty seasons it has
+        amassed nearly 400 screenings spanning languages, decades, and
+        continents.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "a community film club bringing great cinema to Wimbledon and South West London";
+  "a volunteer-run charity screening world cinema in Wimbledon since 2004";
 
 export default FilmClubBlurb;

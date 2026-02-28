@@ -2,18 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Queer Horror Nights is a London screening club dedicated to horror
-        through a queer lens — celebrating the fear, the camp, the subversion,
-        and the unexpected joy of LGBTQ+ horror cinema. From queer readings of
-        genre classics to contemporary films that centre queer characters and
-        stories, Queer Horror Nights creates a community for people who find
-        something deeply personal in the dark.
+        Queer Horror Nights is an 18+ horror screening series run by Token Homo
+        and Last Frame Club, celebrating horror through a queer lens — the fear,
+        the camp, the subversion, and the transgressive joy of the genre.
+        Costume, kink, and fetish-friendly, the nights have featured live shadow
+        casts, drag performances, and annual Halloween Monsters Balls at the Rio
+        Cinema. Past screenings include <em>Frankenstein</em>, <em>Carrie</em>,{" "}
+        <em>Nightbreed</em>, and <em>The Rocky Horror Picture Show</em>.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "LGBTQ+ horror screenings celebrating queer fear, camp, and subversion";
+  "18+ queer horror nights with live shadow casts, drag, and Halloween Monsters Balls";
 
 export default FilmClubBlurb;

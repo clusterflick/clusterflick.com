@@ -2,16 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Bounce Cinema brings the big screen to unexpected and vibrant London
-        spaces. A pop-up cinema experience that prizes atmosphere and fun,
-        Bounce Cinema takes film out of traditional multiplex settings and into
-        venues where the event itself is part of the joy.
+        Bounce Cinema champions emerging filmmakers alongside curated film
+        screenings. Collaborating with venues including Curzon, Everyman, Rich
+        Mix, and The Hoxton, Bounce combines screening events with educational
+        programming through its Bounce Film School and runs dedicated screenings
+        for under-25s. More than a film club, it is a creative ecosystem for
+        independent talent — accepting film submissions and offering direct
+        pathways to audiences.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "pop-up cinema events in unexpected and vibrant London spaces";
+  "a film club championing emerging filmmakers with screenings, education, and industry connections";
 
 export default FilmClubBlurb;

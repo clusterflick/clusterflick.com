@@ -2,17 +2,18 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Japanese Film Club is dedicated to the rich and varied tradition of
-        Japanese cinema. From the golden age of Kurosawa and Ozu to the
-        contemporary masters of J-horror, anime, and beyond, the club brings
-        a wide range of Japanese films to London screens — celebrating one of
-        the most influential national cinemas in the world.
+        Japanese Film Club brings audiences together to watch Japanese cinema on
+        the big screen at the Rio Cinema in Dalston. Founded in 2025 by Will —
+        who spent eight years living in Japan and runs the documentary
+        distribution company MadeGood — the club spans classic and contemporary
+        Japanese film. Both inaugural screenings, of <em>Tampopo</em> and the
+        documentary <em>Gaea Girls</em>, sold out immediately.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "dedicated to the rich and varied tradition of Japanese cinema";
+  "Japanese cinema on the big screen at the Rio Cinema, Dalston";
 
 export default FilmClubBlurb;

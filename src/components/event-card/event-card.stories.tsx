@@ -67,7 +67,8 @@ export const WithoutLogo: Story = {
     href: "/film-clubs/ghibliotheque",
     name: "Ghibliotheque",
     imagePath: null,
-    description: "a celebration of Studio Ghibli and the films of Hayao Miyazaki",
+    description:
+      "a celebration of Studio Ghibli and the films of Hayao Miyazaki",
     meta: filmCountMeta,
   },
 };
@@ -78,7 +79,8 @@ export const NoFilms: Story = {
     href: "/film-clubs/lost-reels",
     name: "Lost Reels",
     imagePath: null,
-    description: "rare, forgotten, and overlooked films brought back to the big screen",
+    description:
+      "rare, forgotten, and overlooked films brought back to the big screen",
     meta: noFilmsMeta,
   },
 };
@@ -101,9 +103,26 @@ export const Grid: Story = {
       }}
     >
       {[
-        { href: "/festivals/bfi-flare", name: "BFI Flare", description: "the UK's longest-running LGBTQIA+ film festival", meta: filmCountMeta },
-        { href: "/film-clubs/ghibliotheque", name: "Ghibliotheque", description: "a celebration of Studio Ghibli and the films of Hayao Miyazaki", meta: filmCountMeta },
-        { href: "/film-clubs/lost-reels", name: "Lost Reels", description: "rare, forgotten, and overlooked films brought back to the big screen", meta: noFilmsMeta },
+        {
+          href: "/festivals/bfi-flare",
+          name: "BFI Flare",
+          description: "the UK's longest-running LGBTQIA+ film festival",
+          meta: filmCountMeta,
+        },
+        {
+          href: "/film-clubs/ghibliotheque",
+          name: "Ghibliotheque",
+          description:
+            "a celebration of Studio Ghibli and the films of Hayao Miyazaki",
+          meta: filmCountMeta,
+        },
+        {
+          href: "/film-clubs/lost-reels",
+          name: "Lost Reels",
+          description:
+            "rare, forgotten, and overlooked films brought back to the big screen",
+          meta: noFilmsMeta,
+        },
       ].map((item) => (
         <EventCard key={item.href} {...item} imagePath={null} />
       ))}

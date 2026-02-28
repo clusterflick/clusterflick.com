@@ -1,5 +1,6 @@
 export { searchFilter } from "./search";
 export { showingTitleSearchFilter } from "./showing-title-search";
+export { showingUrlSearchFilter } from "./showing-url-search";
 export { performanceNotesSearchFilter } from "./performance-notes-search";
 export { categoriesFilter, getPrimaryCategory } from "./categories";
 export { venuesFilter } from "./venues";

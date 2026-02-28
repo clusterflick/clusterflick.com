@@ -13,13 +13,9 @@ interface FilmClubsPageContentProps {
 export default function FilmClubsPageContent({
   activeClubs,
   inactiveClubs,
-  activeCount,
   totalCount,
 }: FilmClubsPageContentProps) {
-  const subtitle =
-    activeCount === 0
-      ? `${totalCount} clubs`
-      : `${totalCount} clubs · ${activeCount} currently showing`;
+  const subtitle = `${totalCount} film clubs`;
 
   return (
     <StandardPageLayout

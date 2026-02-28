@@ -2,17 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Arabic Cinema Club is dedicated to showcasing the richness and diversity
-        of film from the Arab world. From Egyptian classics and Lebanese art
-        cinema to contemporary voices from across North Africa and the Middle
-        East, the club brings Arabic-language film to London audiences and
-        celebrates one of the world&apos;s most vibrant cinematic traditions.
+        The Arab Film Club is a community of film lovers and podcast dedicated
+        to exploring and celebrating cinema from across the Arab world. Founded
+        and curated by Sarah Agha, the club presents screenings of films written
+        and directed by Arab filmmakers — from Egyptian classics to contemporary
+        voices from Lebanon, Palestine, North Africa, and beyond. Events have
+        sold out at the Southbank Centre, the Garden Cinema, and the Prince
+        Charles Cinema, accompanied by an active podcast series.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "showcasing films from the Arab world and Arabic-language cinema";
+  "a film club and podcast celebrating cinema from across the Arab world, curated by Sarah Agha";
 
 export default FilmClubBlurb;

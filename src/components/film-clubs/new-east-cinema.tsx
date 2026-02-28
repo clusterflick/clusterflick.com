@@ -2,17 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        New East Cinema is a London screening club dedicated to films from
-        Eastern Europe, Central Asia, Russia, and the wider post-Soviet world.
-        Championing contemporary directors alongside the great masters of Soviet
-        and Eastern European cinema, New East Cinema opens a window onto some of
-        the most vital and underscreened national cinemas of our time.
+        New East Cinema is a curatorial collective founded in 2014, dedicated to
+        auteur-driven cinema from Eastern Europe, Russia, the Balkans, and
+        Central Asia. Operating as an alternative distribution platform, the
+        collective brings some of the most vital and underscreened films from
+        the region to UK audiences — regularly partnering with the Barbican and
+        publishing a bi-monthly newsletter of news, recommendations, and
+        opportunities from across the New East.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "films from Eastern Europe, Central Asia, and the post-Soviet world";
+  "auteur cinema from Eastern Europe, Russia, and Central Asia — a curatorial collective since 2014";
 
 export default FilmClubBlurb;

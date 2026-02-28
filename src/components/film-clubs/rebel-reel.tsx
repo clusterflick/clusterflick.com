@@ -2,18 +2,19 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Rebel Reel is a film club for audiences who want more from cinema —
-        screening independent, activist, and politically engaged films that
-        challenge the mainstream and spark conversation. With a commitment to
-        bold storytelling and films that refuse to play it safe, Rebel Reel
-        brings together audiences who believe cinema can change how we see the
-        world.
+        Rebel Reel Cine Club is a pop-up cinema founded by Chris McGill,
+        screening timeless classics and cutting-edge films — many from
+        counterculture or that challenge mainstream sensibilities. Events are
+        held at venues including the Rio Cinema in Dalston, the 100 Club on
+        Oxford Street, and outdoor locations in Kent. Chris makes a unique
+        handmade badge for every screening, and regulars travel miles to events
+        they otherwise might have missed.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "independent and activist cinema for audiences who want more from film";
+  "a pop-up cinema screening classics and counterculture films, with a badge for every show";
 
 export default FilmClubBlurb;

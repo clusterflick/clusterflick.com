@@ -96,6 +96,31 @@ Only create a new component when no existing one fits. When you do:
   just to replicate global link styles. The global stylesheet already styles
   links correctly — custom overrides are usually unnecessary and worse.
 
+## Film Clubs
+
+Film clubs are defined in `src/data/film-clubs.ts`. Each club has a `matchers` array of
+`Partial<FilterState>` objects used to identify its showings in the combined dataset.
+
+**Matcher semantics:**
+
+- Matchers are **OR'd** — a movie matches if it satisfies any one matcher object
+- Filter keys within a single matcher are **AND'd** — all keys must match simultaneously
+
+**Available matcher filter IDs** (use `FilterId.*` from `@/lib/filters/types`):
+
+- `ShowingTitleSearch` — substring match on `showing.title` (falls back to `movie.title` when absent)
+- `ShowingUrlSearch` — substring match on `showing.url`; internal-only (no UI, no URL params)
+- `PerformanceNotesSearch` — substring match on `performance.notes`
+- `Venues` — restrict to specific venue IDs (string array)
+
+All of these filters prune at **showing level**: only matching showings (and their performances) are
+returned. A movie screening at three venues will only surface the venue(s) whose showing matched —
+not the full set. This is critical for correctness when a film screens at both a film club venue
+and regular cinemas simultaneously.
+
+Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
+named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.
+
 ## Testing
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with

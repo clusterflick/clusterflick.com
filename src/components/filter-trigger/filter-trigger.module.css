@@ -29,7 +29,7 @@
     max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .trigger {
     max-width: calc(100vw - 200px);
   }

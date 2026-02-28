@@ -55,8 +55,8 @@ export const WithBlurb: Story = {
     Blurb: () => (
       <section>
         <p>
-          Ghibliotheque is a celebration of Studio Ghibli and the films of
-          Hayao Miyazaki.
+          Ghibliotheque is a celebration of Studio Ghibli and the films of Hayao
+          Miyazaki.
         </p>
       </section>
     ),

@@ -13,53 +13,21 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "acton-film-club",
     name: "Acton Film Club",
-    url: "",
+    url: "https://actonfilmclub.com",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Acton Film Club" },
-    ],
-  },
-  {
-    id: "all-out-of-bubblegum",
-    name: "All Out of Bubblegum Film Club",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "All Out of Bubblegum" },
-    ],
-  },
-  {
-    id: "anime-girls-online",
-    name: "AnimeGirlsOnline",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "AnimeGirlsOnline" },
-      { [FilterId.ShowingTitleSearch]: "Anime Girls Online" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Acton Film Club" }],
   },
   {
     id: "arabic-cinema-club",
     name: "Arabic Cinema Club",
-    url: "",
+    url: "https://www.instagram.com/thearabfilmclub/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Arabic Cinema Club" },
-    ],
-  },
-  {
-    id: "arcana",
-    name: "Arcana",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Arcana" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Arabic Cinema Club" }],
   },
   {
     id: "bloody-mary-film-club",
     name: "Bloody Mary Film Club",
-    url: "",
+    url: "https://www.facebook.com/thebmfc",
     aliases: ["bloody-mary"],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bloody Mary Film Club" },
@@ -69,61 +37,45 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "bar-trash",
     name: "Bar Trash",
-    url: "",
+    url: "https://tokenhomo.com/bar-trash/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Bar Trash" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Bar Trash" }],
   },
   {
     id: "cinebug",
     name: "Cinebug",
-    url: "",
+    url: "https://www.instagram.com/cinebugldn/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Cinebug" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Cinebug" }],
   },
   {
     id: "bounce-cinema",
     name: "Bounce Cinema",
-    url: "",
+    url: "https://www.bouncecinema.com",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bounce Cinema" },
+      { [FilterId.ShowingTitleSearch]: "Bounce Short Film" },
     ],
   },
   {
     id: "distorted-frame",
     name: "Distorted Frame",
-    url: "",
+    url: "https://www.instagram.com/distortedframefilmclub/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Distorted Frame" },
-    ],
-  },
-  {
-    id: "electric-scream",
-    name: "Electric Scream!",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Electric Scream" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Distorted Frame" }],
   },
   {
     id: "ghibliotheque",
     name: "Ghibliotheque",
-    url: "",
+    url: "https://linktr.ee/ghibliotheque",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Ghibliotheque" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Ghibliotheque" }],
   },
   {
     id: "gothique-film-society",
     name: "Gothique Film Society",
-    url: "",
+    url: "http://www.thegothiquefilmsociety.org.uk/",
     aliases: ["gothique"],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Gothique Film Society" },
@@ -133,53 +85,38 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "japanese-film-club",
     name: "Japanese Film Club",
-    url: "",
+    url: "https://japanesefilm.club",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Japanese Film Club" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Japanese Film Club" }],
   },
   {
     id: "kung-fu-cinema",
     name: "Kung Fu Cinema / Drunken Scorpion",
-    url: "",
-    aliases: ["drunken-scorpion"],
+    url: "https://www.instagram.com/kungfucinema/",
+    aliases: ["Kung Fu Cinema", "Drunken Scorpion"],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Kung Fu Cinema" },
       { [FilterId.ShowingTitleSearch]: "Drunken Scorpion" },
     ],
   },
   {
-    id: "liberated-film-club",
-    name: "Liberated Film Club",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Liberated Film Club" },
-    ],
-  },
-  {
     id: "lost-reels",
     name: "Lost Reels",
-    url: "",
+    url: "https://lostreels.co.uk/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Lost Reels" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Lost Reels" }],
   },
   {
     id: "new-east-cinema",
     name: "New East Cinema",
-    url: "",
+    url: "https://neweastcinema.co.uk",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "New East Cinema" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "New East Cinema" }],
   },
   {
     id: "queer-horror-nights",
     name: "Queer Horror Nights",
-    url: "",
+    url: "https://tokenhomo.com/queer-horror-nights/",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Queer Horror Nights" },
@@ -189,7 +126,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "pitchblack-playback",
     name: "Pitchblack Playback",
-    url: "",
+    url: "https://pitchblackplayback.com",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Pitchblack Playback" },
@@ -199,16 +136,14 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "rebel-reel",
     name: "Rebel Reel",
-    url: "",
+    url: "https://www.rebelreelcineclub.com/",
     aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Rebel Reel" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Rebel Reel" }],
   },
   {
     id: "rio-feminist-film-group",
     name: "Rio Feminist Film Group",
-    url: "",
+    url: "https://www.instagram.com/riofeminists/",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Rio Feminist Film" },
@@ -221,46 +156,42 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "richmond-film-society",
     name: "Richmond Film Society",
-    url: "",
+    url: "https://www.richmondfilmsoc.org.uk/",
     aliases: ["richmond"],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Richmond Film Society" },
-    ],
-  },
-  {
-    id: "skateboard-film-club",
-    name: "Skateboard Film Club",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Skateboard Film Club" },
-    ],
-  },
-  {
-    id: "thrill-seekers",
-    name: "Thrill Seekers",
-    url: "",
-    aliases: [],
-    matchers: [
-      { [FilterId.ShowingTitleSearch]: "Thrill Seekers" },
-    ],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Richmond Film Society" }],
   },
   {
     id: "violet-hour",
     name: "Violet Hour",
-    url: "",
+    url: "https://www.instagram.com/violethour.cinema/",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Violet Hour" },
+      { [FilterId.PerformanceNotesSearch]: "Violet Hour" },
     ],
   },
   {
     id: "wimbledon-film-club",
     name: "Wimbledon Film Club",
-    url: "",
+    url: "https://wimbledonfilmclub.co.uk",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Wimbledon Film Club" },
+      { [FilterId.ShowingUrlSearch]: "wimbledonfilmclub" },
     ],
+  },
+  {
+    id: "category-h-film-club",
+    name: "Category H Film Club",
+    url: "https://www.instagram.com/categoryhfilms/",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Category H" }],
+  },
+  {
+    id: "supakino",
+    name: "Supakino",
+    url: "https://www.supakino.com",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Supakino" }],
   },
 ];

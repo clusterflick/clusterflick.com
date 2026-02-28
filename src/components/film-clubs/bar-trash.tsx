@@ -2,18 +2,20 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Bar Trash is London&apos;s home for cult, trash, and midnight movie
-        screenings. Taking over bars and unconventional spaces across the city,
-        Bar Trash creates rowdy, irreverent cinema nights built around the
-        gloriously bad, the gloriously weird, and the gloriously underappreciated
-        — films best enjoyed with a drink in hand and a crowd who&apos;s in on
-        the joke.
+        Bar Trash is a weekly film night celebrating overlooked, cult, and
+        glorious B-movies — the films mainstream cinema left behind. Running
+        since 2022 under the Token Homo umbrella, Bar Trash curates thematic
+        seasons exploring everything from synthetic flesh to banned films to
+        vintage VHS discoveries, all served with themed drinks and prize
+        giveaways. Starting at Genesis Cinema and now touring venues across
+        North London, Time Out named it one of the city&apos;s essential
+        affordable nights out.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "cult, trash, and midnight movie screenings in London bars";
+  "a weekly cult and B-movie film night with themed drinks, from the Token Homo collective";
 
 export default FilmClubBlurb;

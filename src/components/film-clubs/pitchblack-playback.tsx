@@ -2,17 +2,20 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Pitchblack Playback is an immersive cinema experience unlike any other:
-        films screened in complete darkness. Stripped of all visual distraction,
-        audiences experience sound design, score, and performance at maximum
-        intensity — a radically different way to encounter cinema that heightens
-        every scene and transforms the act of watching.
+        Pitchblack Playback is an immersive listening experience created by
+        London DJ and producer Ben Gomori in 2006. Audiences sit in cinema
+        seats, pull on an eye mask as the lights go out, and hear classic
+        albums, pre-release premieres, and bespoke mixes on powerful cinema
+        sound systems — in complete darkness. Artists featured have included
+        Radiohead, Nick Cave, Floating Points, and Tame Impala. Sessions have
+        appeared at the BFI London Film Festival alongside complementary film
+        screenings.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "immersive cinema screenings held in complete darkness";
+  "immersive album listening sessions in complete darkness at cinema venues";
 
 export default FilmClubBlurb;

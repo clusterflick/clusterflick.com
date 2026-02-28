@@ -66,7 +66,9 @@ export default async function FilmClubsPage() {
 
   const activeClubs = filmClubItems
     .filter((c) => c.movieCount > 0)
-    .sort((a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name));
+    .sort(
+      (a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name),
+    );
   const inactiveClubs = filmClubItems
     .filter((c) => c.movieCount === 0)
     .sort((a, b) => a.name.localeCompare(b.name));

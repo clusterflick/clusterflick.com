@@ -2,17 +2,20 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Gothique Film Society celebrates gothic, horror, and dark fantasy cinema
-        in all its forms. From the atmospheric dread of German Expressionism to
-        the lush excess of Hammer Horror and the psychological complexities of
-        contemporary arthouse horror, Gothique creates a devoted space for
-        lovers of the macabre and the mysterious.
+        The Gothique Film Society is London&apos;s only specialist horror and
+        fantasy film club — and one of the longest running in the world, founded
+        in September 1966. Presenting double bills for the connoisseur of the
+        macabre, the Society specialises in obscure and rarely seen horror and
+        fantasy films from the 1930s to the 1970s. Its illustrious history
+        includes honorary presidents Christopher Lee and Hammer director Terence
+        Fisher. Today it screens at the Cinema Museum in Kennington, running
+        from October to March each season.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "celebrating gothic, horror, and dark fantasy cinema in all its forms";
+  "London's oldest specialist horror and fantasy film society, founded in 1966";
 
 export default FilmClubBlurb;
