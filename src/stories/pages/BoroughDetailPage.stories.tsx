@@ -3,6 +3,9 @@ import BoroughPageContent from "@/app/london-cinemas/[borough]/page-content";
 import type {
   BoroughVenueItem,
   NeighborBorough,
+  BoroughFilmClub,
+  BoroughFestival,
+  BoroughAccessibilityStat,
 } from "@/app/london-cinemas/[borough]/page-content";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { getDistanceInMiles } from "@/utils/geo-distance";
@@ -32,6 +35,9 @@ type BoroughDetailData = {
   venues: BoroughVenueItem[];
   totalMovies: number;
   neighborBoroughs: NeighborBorough[];
+  filmClubs: BoroughFilmClub[];
+  festivals: BoroughFestival[];
+  accessibilityStats: BoroughAccessibilityStat[];
 };
 
 async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
@@ -118,6 +124,9 @@ async function loadBoroughDetailData(): Promise<BoroughDetailData | null> {
     venues: venueItems,
     totalMovies: boroughMovieIds.size,
     neighborBoroughs,
+    filmClubs: [],
+    festivals: [],
+    accessibilityStats: [],
   };
 }
 
@@ -135,6 +144,9 @@ function BoroughDetailWithRealData() {
           venues={data.venues}
           totalMovies={data.totalMovies}
           neighborBoroughs={data.neighborBoroughs}
+          filmClubs={data.filmClubs}
+          festivals={data.festivals}
+          accessibilityStats={data.accessibilityStats}
         />
       )}
     </StoryDataLoader>

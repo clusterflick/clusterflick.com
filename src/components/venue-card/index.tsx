@@ -42,16 +42,20 @@ export default function VenueCard({
             {type.toLowerCase() === "unknown" ? "Other" : type}
           </Tag>
         </div>
-        {filmCount !== undefined &&
-          filmCount > 0 &&
-          performanceCount !== undefined && (
-            <span className={styles.stats}>
-              {filmCount.toLocaleString("en-GB")}{" "}
-              {filmCount === 1 ? "film" : "films"} &middot;{" "}
-              {performanceCount.toLocaleString("en-GB")}{" "}
-              {performanceCount === 1 ? "showing" : "showings"}
-            </span>
-          )}
+        {filmCount !== undefined && performanceCount !== undefined && (
+          <span className={styles.stats}>
+            {filmCount > 0 ? (
+              <>
+                {filmCount.toLocaleString("en-GB")}{" "}
+                {filmCount === 1 ? "film" : "films"} &middot;{" "}
+                {performanceCount.toLocaleString("en-GB")}{" "}
+                {performanceCount === 1 ? "showing" : "showings"}
+              </>
+            ) : (
+              "No showings currently listed"
+            )}
+          </span>
+        )}
       </div>
     </NavCard>
   );

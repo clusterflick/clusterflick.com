@@ -36,29 +36,6 @@
   z-index: 1;
 }
 
-.columns {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-@media (min-width: 768px) {
-  .columns {
-    flex-direction: row;
-    gap: 60px;
-  }
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
-}
-
-.sidebar {
-  flex: 1;
-  min-width: 0;
-}
-
 .blurb {
   line-height: 1.7;
 }

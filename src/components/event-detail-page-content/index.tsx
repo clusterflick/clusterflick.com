@@ -7,6 +7,7 @@ import {
 } from "@/utils/accessibility-labels";
 import PageHeader from "@/components/page-header";
 import DetailPageHero from "@/components/detail-page-hero";
+import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import FilmPosterGrid from "@/components/film-poster-grid";
@@ -95,61 +96,63 @@ export default function EventDetailPageContent({
       {(Blurb || venues.length > 0 || accessibilityStats.length > 0) && (
         <>
           <div className={styles.content}>
-            <div className={styles.columns}>
-              {Blurb && (
-                <div className={styles.main}>
+            <ColumnsLayout
+              main={
+                Blurb ? (
                   <ContentSection title="About" as="h2">
                     <div className={styles.blurb}>
                       <Blurb />
                     </div>
                   </ContentSection>
-                </div>
-              )}
-              {(venues.length > 0 || accessibilityStats.length > 0) && (
-                <div className={styles.sidebar}>
-                  {venues.length > 0 && (
-                    <ContentSection title="Cinemas" as="h2">
-                      <div className={styles.venueGrid}>
-                        {venues.map((venue) => (
-                          <VenueCard
-                            key={venue.id}
-                            href={venue.href}
-                            name={venue.name}
-                            type={venue.type}
-                            imagePath={venue.imagePath}
-                            filmCount={venue.filmCount}
-                            performanceCount={venue.performanceCount}
-                          />
-                        ))}
-                      </div>
-                    </ContentSection>
-                  )}
-                  {accessibilityStats.length > 0 && (
-                    <ContentSection
-                      title="Accessibility"
-                      as="h2"
-                      className={styles.accessibilitySection}
-                      intro={
-                        <Link href="/accessibility">
-                          Learn more about accessible screenings →
-                        </Link>
-                      }
-                    >
-                      <LinkedList
-                        items={accessibilityStats.map(
-                          ({ feature, filmCount }) => ({
-                            key: feature,
-                            href: `/accessibility/#${feature}`,
-                            label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
-                            detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
-                          }),
-                        )}
-                      />
-                    </ContentSection>
-                  )}
-                </div>
-              )}
-            </div>
+                ) : null
+              }
+              sidebar={
+                venues.length > 0 || accessibilityStats.length > 0 ? (
+                  <>
+                    {venues.length > 0 && (
+                      <ContentSection title="Cinemas" as="h2">
+                        <div className={styles.venueGrid}>
+                          {venues.map((venue) => (
+                            <VenueCard
+                              key={venue.id}
+                              href={venue.href}
+                              name={venue.name}
+                              type={venue.type}
+                              imagePath={venue.imagePath}
+                              filmCount={venue.filmCount}
+                              performanceCount={venue.performanceCount}
+                            />
+                          ))}
+                        </div>
+                      </ContentSection>
+                    )}
+                    {accessibilityStats.length > 0 && (
+                      <ContentSection
+                        title="Accessibility"
+                        as="h2"
+                        className={styles.accessibilitySection}
+                        intro={
+                          <Link href="/accessibility">
+                            Learn more about accessible screenings
+                          </Link>
+                        }
+                      >
+                        <LinkedList
+                          items={accessibilityStats.map(
+                            ({ feature, filmCount }) => ({
+                              key: feature,
+                              href: `/accessibility/#${feature}`,
+                              label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
+                              detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
+                            }),
+                          )}
+                        />
+                      </ContentSection>
+                    )}
+                  </>
+                ) : null
+              }
+            />
           </div>
           <Divider />
         </>

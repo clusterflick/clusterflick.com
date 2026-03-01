@@ -4,10 +4,21 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getFilmClubUrl } from "@/utils/get-film-club-url";
+import { getFilmClubImagePath } from "@/utils/get-film-club-image";
+import { getFilmClubCurrentMovies } from "@/utils/get-film-club-movies";
+import { getFestivalUrl } from "@/utils/get-festival-url";
+import {
+  getFestivalMovies,
+  getFestivalDateRange,
+  isFestivalCurrentlyShowing,
+} from "@/utils/get-festival-movies";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
+import { FILM_CLUBS } from "@/data/film-clubs";
+import { FESTIVALS } from "@/data/festivals";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
-import type { Venue } from "@/types";
+import { AccessibilityFeature, type Venue } from "@/types";
 import BoroughPageContent from "./page-content";
 
 export const dynamicParams = false;
@@ -147,6 +158,98 @@ export default async function BoroughPage({
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
+  // Film clubs with current showings at borough venues
+  const boroughFilmClubs = (
+    await Promise.all(
+      FILM_CLUBS.map(async (club) => {
+        const currentMovies = getFilmClubCurrentMovies(club, data.movies);
+        const clubVenueIds = new Set<string>();
+        for (const movie of Object.values(currentMovies)) {
+          for (const perf of movie.performances) {
+            const showing = movie.showings[perf.showingId];
+            if (showing && boroughVenueIds.has(showing.venueId)) {
+              clubVenueIds.add(showing.venueId);
+            }
+          }
+        }
+        if (clubVenueIds.size === 0) return null;
+
+        let seoDescription: string | null = null;
+        try {
+          const mod = await import(`@/components/film-clubs/${club.id}`);
+          seoDescription = mod.seoDescription ?? null;
+        } catch {
+          // No blurb component
+        }
+
+        return {
+          id: club.id,
+          name: club.name,
+          href: getFilmClubUrl(club),
+          imagePath: getFilmClubImagePath(club.id),
+          seoDescription,
+          movieCount: Object.keys(currentMovies).length,
+        };
+      }),
+    )
+  ).filter((c) => c !== null);
+
+  // Festivals currently showing at borough venues
+  const boroughFestivals = FESTIVALS.flatMap((festival) => {
+    if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
+    const movies = getFestivalMovies(festival, data.movies);
+    const hasVenueInBorough = Object.values(movies).some((movie) =>
+      movie.performances.some((perf) => {
+        const showing = movie.showings[perf.showingId];
+        return showing && boroughVenueIds.has(showing.venueId);
+      }),
+    );
+    if (!hasVenueInBorough) return [];
+
+    const { dateFrom, dateTo } = getFestivalDateRange(movies);
+    return [
+      {
+        id: festival.id,
+        name: festival.name,
+        href: getFestivalUrl(festival),
+        movieCount: Object.keys(movies).length,
+        dateFrom,
+        dateTo,
+      },
+    ];
+  });
+
+  // Accessibility features available at borough venues
+  const allFeatures = Object.values(AccessibilityFeature);
+  const accessibilityFilmSets = new Map(
+    allFeatures.map((f) => [f, new Set<string>()]),
+  );
+  const accessibilityPerfCounts = new Map(allFeatures.map((f) => [f, 0]));
+
+  for (const movie of Object.values(data.movies)) {
+    for (const perf of movie.performances) {
+      const showing = movie.showings[perf.showingId];
+      if (!showing || !boroughVenueIds.has(showing.venueId)) continue;
+      for (const feature of allFeatures) {
+        if (perf.accessibility?.[feature]) {
+          accessibilityFilmSets.get(feature)!.add(movie.id);
+          accessibilityPerfCounts.set(
+            feature,
+            (accessibilityPerfCounts.get(feature) ?? 0) + 1,
+          );
+        }
+      }
+    }
+  }
+
+  const boroughAccessibilityStats = allFeatures
+    .map((feature) => ({
+      feature,
+      filmCount: accessibilityFilmSets.get(feature)!.size,
+      performanceCount: accessibilityPerfCounts.get(feature) ?? 0,
+    }))
+    .filter((s) => s.filmCount > 0);
+
   // JSON-LD structured data
   const jsonLd = [
     {
@@ -204,6 +307,9 @@ export default async function BoroughPage({
         venues={venueItems}
         totalMovies={boroughMovieIds.size}
         neighborBoroughs={neighborBoroughs}
+        filmClubs={boroughFilmClubs}
+        festivals={boroughFestivals}
+        accessibilityStats={boroughAccessibilityStats}
       />
     </>
   );

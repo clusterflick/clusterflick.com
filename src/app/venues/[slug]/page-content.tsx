@@ -9,6 +9,7 @@ import {
 } from "@/utils/accessibility-labels";
 import PageHeader from "@/components/page-header";
 import DetailPageHero from "@/components/detail-page-hero";
+import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
@@ -117,6 +118,44 @@ export default function VenueDetailPageContent({
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
 
+  const hasFestivals = activeFestivals.length > 0;
+  const hasAccessibility = accessibilityStats.length > 0;
+  const hasBoth = hasFestivals && hasAccessibility;
+
+  const festivalsSection = hasFestivals ? (
+    <ContentSection title="Festivals" as="h2">
+      <LinkedList
+        items={activeFestivals.map((festival) => ({
+          key: festival.href,
+          href: festival.href,
+          label: festival.name,
+        }))}
+      />
+    </ContentSection>
+  ) : null;
+
+  const accessibilitySection = hasAccessibility ? (
+    <ContentSection
+      title="Accessibility"
+      as="h2"
+      className={styles.accessibilitySection}
+      intro={
+        <Link href="/accessibility">
+          Learn more about accessible screenings
+        </Link>
+      }
+    >
+      <LinkedList
+        items={accessibilityStats.map(({ feature, filmCount }) => ({
+          key: feature,
+          href: `/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
+          label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
+          detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
+        }))}
+      />
+    </ContentSection>
+  ) : null;
+
   return (
     <main id="main-content">
       <PreloadCinemaData />
@@ -185,95 +224,72 @@ export default function VenueDetailPageContent({
       <Divider />
 
       <div className={styles.content}>
-        <div className={styles.columns}>
-          {VenueBlurb && (
-            <div className={styles.main}>
+        <ColumnsLayout
+          main={
+            VenueBlurb ? (
               <ContentSection title="About" as="h2">
                 <div className={styles.blurb}>
                   <VenueBlurb />
                 </div>
               </ContentSection>
-            </div>
-          )}
-
-          <div className={styles.sidebar}>
-            <ContentSection title="Address" as="h2">
-              <p className={styles.address}>
-                {venue.address.split(",").map((piece, index) => (
-                  <Fragment key={index}>
-                    {index === 0 ? "" : ","}{" "}
-                    <span className="nowrap">{piece}</span>
-                  </Fragment>
-                ))}
-              </p>
-              {borough ? (
-                <p className={styles.borough}>
-                  Located in <Link href={borough.href}>{borough.name}</Link>
+            ) : null
+          }
+          sidebar={
+            <>
+              <ContentSection title="Address" as="h2">
+                <p className={styles.address}>
+                  {venue.address.split(",").map((piece, index) => (
+                    <Fragment key={index}>
+                      {index === 0 ? "" : ","}{" "}
+                      <span className="nowrap">{piece}</span>
+                    </Fragment>
+                  ))}
+                </p>
+                {borough ? (
+                  <p className={styles.borough}>
+                    Located in <Link href={borough.href}>{borough.name}</Link>
+                    <VenueDistance
+                      venueLat={venue.geo.lat}
+                      venueLon={venue.geo.lon}
+                      parenthesized
+                    />
+                  </p>
+                ) : (
                   <VenueDistance
                     venueLat={venue.geo.lat}
                     venueLon={venue.geo.lon}
-                    parenthesized
+                    className={styles.distance}
                   />
-                </p>
-              ) : (
-                <VenueDistance
-                  venueLat={venue.geo.lat}
-                  venueLon={venue.geo.lon}
-                  className={styles.distance}
-                />
-              )}
-              {mapImagePath && (
-                <p>
-                  <a
-                    href={`https://www.google.com/maps?q=${venue.geo.lat},${venue.geo.lon}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Image
-                      src={mapImagePath}
-                      alt={`Map showing location of ${venue.name}`}
-                      width={600}
-                      height={400}
-                      className={styles.mapImage}
-                    />
-                  </a>
-                </p>
-              )}
-            </ContentSection>
-            {activeFestivals.length > 0 && (
-              <ContentSection title="Festivals" as="h2">
-                <LinkedList
-                  items={activeFestivals.map((festival) => ({
-                    key: festival.href,
-                    href: festival.href,
-                    label: festival.name,
-                  }))}
-                />
+                )}
+                {mapImagePath && (
+                  <p>
+                    <a
+                      href={`https://www.google.com/maps?q=${venue.geo.lat},${venue.geo.lon}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image
+                        src={mapImagePath}
+                        alt={`Map showing location of ${venue.name}`}
+                        width={600}
+                        height={400}
+                        className={styles.mapImage}
+                      />
+                    </a>
+                  </p>
+                )}
               </ContentSection>
-            )}
-            {accessibilityStats.length > 0 && (
-              <ContentSection
-                title="Accessibility"
-                as="h2"
-                className={styles.accessibilitySection}
-                intro={
-                  <Link href="/accessibility">
-                    Learn more about accessible screenings →
-                  </Link>
-                }
-              >
-                <LinkedList
-                  items={accessibilityStats.map(({ feature, filmCount }) => ({
-                    key: feature,
-                    href: `/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
-                    label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
-                    detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
-                  }))}
-                />
-              </ContentSection>
-            )}
-          </div>
-        </div>
+              {!hasBoth && festivalsSection}
+              {!hasBoth && accessibilitySection}
+            </>
+          }
+        />
+        {hasBoth && (
+          <ColumnsLayout
+            main={festivalsSection}
+            sidebar={accessibilitySection}
+          />
+        )}
         {nearbyVenues.length > 0 && (
           <div>
             <ContentSection title={`Cinemas Near ${venue.name}`} as="h2">

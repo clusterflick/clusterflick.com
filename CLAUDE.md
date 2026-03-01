@@ -139,3 +139,7 @@ named `seoDescription` string), and an optional logo at `public/images/film-club
 - **Deploy (generate_site.yml):** Triggered by manual dispatch or data release
   events — builds and deploys to GitHub Pages, then runs smoke tests
 - **Node version:** 24.13.0 (from `.node-version`)
+
+## Communication
+
+- If the user's intent is unclear, ask for clarification rather than guessing.

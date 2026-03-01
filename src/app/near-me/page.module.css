@@ -1,0 +1,218 @@
+/* Hero meta area (explore links + change location) */
+
+.heroMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.exploreLinks {
+  font-size: 15px;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.changeLocationButton {
+  font-size: 14px;
+}
+
+/* Location prompt */
+
+.locationPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 40px 0;
+}
+
+.errorMessage {
+  font-size: 14px;
+  color: var(--color-neon-pink);
+  opacity: 0.8;
+}
+
+/* Borough picker */
+
+.boroughPickerSection {
+  padding-bottom: 24px;
+}
+
+.boroughPickerTitle {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.boroughGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .boroughGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .boroughGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .boroughGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.boroughCard {
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  color: var(--color-white);
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.boroughCard:hover {
+  background: rgba(var(--color-white-rgb), 0.07);
+  border-color: var(--color-electric-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(49, 158, 219, 0.15);
+}
+
+.boroughMapImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+}
+
+.boroughCardBody {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boroughName {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.boroughVenueCount {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Venue grid (results) */
+
+.venueGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .venueGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.venueItem {
+  position: relative;
+}
+
+.distance {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+  background: rgba(1, 0, 19, 0.85);
+  padding: 3px 8px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+/* Event grid (film clubs, festivals) */
+
+.eventGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .eventGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Meta items inside EventCard */
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.filmCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-electric-blue);
+  background: rgba(49, 158, 219, 0.12);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+/* Accessibility section intro link */
+
+.accessibilitySection h2 {
+  margin-bottom: 8px;
+}
+
+.accessibilitySection p {
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+/* No results */
+
+.noResults {
+  text-align: center;
+  padding: 60px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.noResults p {
+  font-size: 16px;
+  opacity: 0.7;
+}
