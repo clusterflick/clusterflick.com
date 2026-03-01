@@ -207,22 +207,6 @@ export default function BoroughPageContent({
         <ColumnsLayout main={festivalsSection} sidebar={accessibilitySection} />
       )}
 
-      <ContentSection title={`Cinema Venues in ${boroughName}`} as="h2">
-        <div className={styles.venueGrid}>
-          {venues.map((venue) => (
-            <VenueCard
-              key={venue.id}
-              href={venue.href}
-              name={venue.name}
-              type={venue.type}
-              imagePath={venue.imagePath}
-              filmCount={venue.eventCount}
-              performanceCount={venue.performanceCount}
-            />
-          ))}
-        </div>
-      </ContentSection>
-
       {filmClubs.length > 0 && (
         <ContentSection title={`Film Clubs in ${boroughName}`} as="h2">
           <ul className={styles.clubGrid}>
@@ -245,6 +229,22 @@ export default function BoroughPageContent({
           </ul>
         </ContentSection>
       )}
+
+      <ContentSection title={`Cinema Venues in ${boroughName}`} as="h2">
+        <div className={styles.venueGrid}>
+          {venues.map((venue) => (
+            <VenueCard
+              key={venue.id}
+              href={venue.href}
+              name={venue.name}
+              type={venue.type}
+              imagePath={venue.imagePath}
+              filmCount={venue.eventCount}
+              performanceCount={venue.performanceCount}
+            />
+          ))}
+        </div>
+      </ContentSection>
 
       {neighborBoroughs.length > 0 && (
         <ContentSection title="Nearby Boroughs" as="h2">
