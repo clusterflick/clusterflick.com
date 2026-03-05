@@ -4,7 +4,7 @@ function FilmClubBlurb() {
       <p>
         Sincerely Camp is a monthly film club dedicated to cult and camp cinema.
         Celebrating the gloriously over-the-top, the kitsch, and the
-        unapologetically outrageous, it's a night for lovers of films that
+        unapologetically outrageous, it&apos;s a night for lovers of films that
         commit fully to the bit.
       </p>
     </section>

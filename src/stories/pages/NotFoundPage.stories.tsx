@@ -24,9 +24,6 @@ const meta = {
     layout: "fullscreen",
     nextjs: {
       appDirectory: true,
-      navigation: {
-        pathname: "/some-invalid-path",
-      },
     },
     chromatic: { disableSnapshot: true },
   },
@@ -35,8 +32,37 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Standard 404 page shown when a route doesn't exist.
- * Displays a friendly message with a link back to the home page.
- */
-export const Default: Story = {};
+/** Generic 404 — shown for any path that doesn't match a known section. */
+export const Generic: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/some-invalid-path" } },
+  },
+};
+
+/** Shown when a /movies/ URL can't be resolved to a film. */
+export const Movie: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/movies/tt9999999/some-old-slug" } },
+  },
+};
+
+/** Shown when a /festivals/ URL doesn't match any festival. */
+export const Festival: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/festivals/unknown-festival" } },
+  },
+};
+
+/** Shown when a /film-clubs/ URL doesn't match any film club. */
+export const FilmClub: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/film-clubs/unknown-club" } },
+  },
+};
+
+/** Shown when a /london-cinemas/ or /venues/ URL doesn't match any cinema. */
+export const Venue: Story = {
+  parameters: {
+    nextjs: { navigation: { pathname: "/london-cinemas/unknown-cinema" } },
+  },
+};

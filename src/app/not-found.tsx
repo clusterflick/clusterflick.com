@@ -9,20 +9,59 @@ import LoadingIndicator from "@/components/loading-indicator";
 import StatusPage, { StatusPageLoading } from "@/components/status-page";
 import slugify from "@sindresorhus/slugify";
 
-export default function NotFound() {
-  const pathname = usePathname();
+function GenericNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-ticket-ripped.svg"
+      title="Page Not Found"
+      message="We couldn't find that page. It may have been moved or removed."
+      backLink={{ url: "/", text: "Back to film list" }}
+      actions={<ButtonLink href="/">Back to film list</ButtonLink>}
+    />
+  );
+}
+
+function FestivalNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-clapper.svg"
+      title="Festival Not Found"
+      message="We couldn't find that festival. It may have ended or the link may have changed."
+      backLink={{ url: "/festivals/", text: "Back to festivals" }}
+      actions={<ButtonLink href="/festivals/">Back to festivals</ButtonLink>}
+    />
+  );
+}
+
+function FilmClubNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-3d-glasses.svg"
+      title="Film Club Not Found"
+      message="We couldn't find that film club. It may have moved or the link may have changed."
+      backLink={{ url: "/film-clubs/", text: "Back to film clubs" }}
+      actions={<ButtonLink href="/film-clubs/">Back to film clubs</ButtonLink>}
+    />
+  );
+}
+
+function VenueNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-projector.svg"
+      title="Cinema Not Found"
+      message="We couldn't find that cinema. It may have closed or the link may have changed."
+      backLink={{ url: "/london-cinemas/", text: "Back to London cinemas" }}
+      actions={
+        <ButtonLink href="/london-cinemas/">Back to London cinemas</ButtonLink>
+      }
+    />
+  );
+}
+
+function MovieNotFound({ pathname }: { pathname: string }) {
   const router = useRouter();
   const { movies, isLoading, getData } = useCinemaData();
-
-  // The static 404 page is pre-rendered at build time with no knowledge of the
-  // runtime URL. On hydration, usePathname() returns the real URL, which can
-  // produce a different render tree (loading vs not-found). We defer pathname
-  // reading until after mount so the initial client render matches the static HTML.
-  const [hasMounted, setHasMounted] = useState(false);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setHasMounted(true), []);
-
-  // Use refs to track state that shouldn't trigger re-renders
   const isRedirectingRef = useRef(false);
 
   const isWaitingForData = useMemo(
@@ -31,18 +70,13 @@ export default function NotFound() {
   );
 
   // Grab the piece of the URL after `/movies` which should be an ID
-  const movieIdMatch = hasMounted
-    ? pathname?.match(/^\/movies\/([^/]+)\/?/i)
-    : null;
+  const movieIdMatch = pathname.match(/^\/movies\/([^/]+)\/?/i);
   const movieId = movieIdMatch?.[1];
-  // Grab the piece of the URL after `/movies` which should be an ID and a slug
-  // This will used as a fallback if the ID doesn't match any movies
-  const movieSlugMatch = hasMounted
-    ? pathname?.match(/^\/movies\/([^/]+)\/([^/]+)\/?/i)
-    : null;
+  // Grab the piece of the URL after `/movies` which should be an ID and a slug.
+  // Used as a fallback if the ID doesn't match any movies.
+  const movieSlugMatch = pathname.match(/^\/movies\/([^/]+)\/([^/]+)\/?/i);
   const movieSlug = movieSlugMatch?.[2];
 
-  // Compute derived state from movies data
   const movieCheckResult = useMemo(() => {
     if (!movieId || !movieSlug) {
       return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
@@ -71,14 +105,10 @@ export default function NotFound() {
     return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
   }, [movieId, movieSlug, movies, isWaitingForData]);
 
-  // Fetch data if we have a movieId
   useEffect(() => {
-    if (movieId) {
-      getData();
-    }
+    if (movieId) getData();
   }, [movieId, getData]);
 
-  // Handle redirect when needed
   useEffect(() => {
     if (
       movieCheckResult.shouldRedirect &&
@@ -90,12 +120,7 @@ export default function NotFound() {
     }
   }, [movieCheckResult, router]);
 
-  // Show loading state while checking for redirect
-  const showLoading =
-    movieId &&
-    (!movieCheckResult.hasChecked || movieCheckResult.shouldRedirect);
-
-  if (showLoading) {
+  if (!movieCheckResult.hasChecked || movieCheckResult.shouldRedirect) {
     return (
       <StatusPageLoading>
         <LoadingIndicator
@@ -113,16 +138,33 @@ export default function NotFound() {
   return (
     <StatusPage
       iconSrc="/images/icons/neon-ticket-ripped.svg"
-      title="Show Not Found"
-      message={
-        <>
-          We couldn&apos;t find that page.
-          <br />
-          It may have been moved or no longer exists.
-        </>
-      }
+      title="Film Not Found"
+      message="We couldn't find that film. It may no longer be showing or the link may have changed."
       backLink={{ url: "/", text: "Back to film list" }}
-      actions={<ButtonLink href="/">Back to Film List</ButtonLink>}
+      actions={<ButtonLink href="/">Back to film list</ButtonLink>}
     />
   );
+}
+
+export default function NotFound() {
+  const pathname = usePathname();
+
+  // The static 404 page is pre-rendered at build time with no knowledge of the
+  // runtime URL. On hydration, usePathname() returns the real URL, which can
+  // produce a different render tree. We defer pathname reading until after mount
+  // so the initial client render matches the static HTML.
+  const [hasMounted, setHasMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setHasMounted(true), []);
+
+  const mountedPathname = hasMounted ? pathname : null;
+
+  if (!mountedPathname) return <GenericNotFound />;
+  if (/^\/movies\//i.test(mountedPathname))
+    return <MovieNotFound pathname={mountedPathname} />;
+  if (/^\/festivals\//i.test(mountedPathname)) return <FestivalNotFound />;
+  if (/^\/film-clubs\//i.test(mountedPathname)) return <FilmClubNotFound />;
+  if (/^\/(london-cinemas|venues)\//i.test(mountedPathname))
+    return <VenueNotFound />;
+  return <GenericNotFound />;
 }
