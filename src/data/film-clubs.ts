@@ -188,6 +188,54 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [{ [FilterId.ShowingTitleSearch]: "Category H" }],
   },
   {
+    id: "sapphic-cinema",
+    name: "Sapphic Cinema",
+    url: "https://16collective.org",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Sapphic Cinema" }],
+  },
+  {
+    id: "cine-real",
+    name: "Cine Real",
+    url: "https://www.cine-real.com",
+    aliases: ["Cine-Real"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Cine Real" },
+      { [FilterId.ShowingTitleSearch]: "Cine-Real" },
+    ],
+  },
+  {
+    id: "pink-palace",
+    name: "Pink Palace",
+    url: "https://www.riocinema.org.uk/pink-palace/",
+    aliases: [],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Pink Palace",
+        [FilterId.Venues]: ["riocinema.org.uk"],
+      },
+    ],
+  },
+  {
+    id: "funeral-parade",
+    name: "Funeral Parade",
+    url: "https://www.instagram.com/funeralparadepresents/",
+    aliases: ["Funeral Parade Presents"],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Funeral Parade" }],
+  },
+  {
+    id: "lexi-seniors-film-club",
+    name: "Lexi Seniors' Film Club",
+    url: "https://thelexicinema.co.uk",
+    aliases: [],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Senior",
+        [FilterId.Venues]: ["thelexicinema.co.uk"],
+      },
+    ],
+  },
+  {
     id: "supakino",
     name: "Supakino",
     url: "https://www.supakino.com",

@@ -170,6 +170,38 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "docn-roll-film-festival",
+    name: "Doc'n Roll Film Festival",
+    url: "https://www.docnrollfestival.com/",
+    aliases: ["Doc'n Roll"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Doc'n Roll",
+      },
+    ],
+  },
+  {
+    id: "picture-east-film-festival",
+    name: "PictureEast Film Festival",
+    url: "https://www.tnbfc.co.uk/peff26",
+    aliases: ["PEFF"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "PictureEast" },
+      { [FilterId.ShowingTitleSearch]: "Picture East" },
+    ],
+  },
+  {
+    id: "women-without-borders-film-festival",
+    name: "Women Without Borders Film Festival",
+    url: "https://wwbfilm.com",
+    aliases: ["WWBFF"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Women Without Borders",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
