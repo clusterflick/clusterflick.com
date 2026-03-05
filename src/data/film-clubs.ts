@@ -242,4 +242,25 @@ export const FILM_CLUBS: FilmClub[] = [
     aliases: [],
     matchers: [{ [FilterId.ShowingTitleSearch]: "Supakino" }],
   },
+  {
+    id: "sick-girl-films",
+    name: "Sick Girl Films",
+    url: "https://www.instagram.com/sickgirlfilms",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Sick Girl" }],
+  },
+  {
+    id: "sincerely-camp",
+    name: "Sincerely Camp",
+    url: "https://www.instagram.com/sincerelycamp",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Sincerely Camp" }],
+  },
+  {
+    id: "offbeat-folk-film-club",
+    name: "OffBeat Folk Film Club",
+    url: "https://offbeat.film/",
+    aliases: ["OffBeat"],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "OffBeat" }],
+  },
 ];
