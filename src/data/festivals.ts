@@ -134,10 +134,16 @@ export const FESTIVALS: Festival[] = [
     aliases: ["Open City Doc Fest", "Open City London"],
     matchers: [
       {
-        [FilterId.ShowingTitleSearch]: "Open City Doc Fest",
+        [FilterId.ShowingTitleSearch]: "OCDF:",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "OCDF x ",
       },
       {
         [FilterId.ShowingTitleSearch]: "Open City Documentary Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Open City Doc Fest",
       },
     ],
   },

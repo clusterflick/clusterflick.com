@@ -263,4 +263,21 @@ export const FILM_CLUBS: FilmClub[] = [
     aliases: ["OffBeat"],
     matchers: [{ [FilterId.ShowingTitleSearch]: "OffBeat" }],
   },
+  {
+    id: "transmissions",
+    name: "Transmissions",
+    url: "https://www.instagram.com/wearetransmissions",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Transmissions presents" },
+      { [FilterId.ShowingTitleSearch]: " x Transmissions" },
+    ],
+  },
+  {
+    id: "video-bazaar",
+    name: "Video Bazaar",
+    url: "https://www.instagram.com/videobazaarpresents",
+    aliases: [],
+    matchers: [{ [FilterId.ShowingTitleSearch]: "Video Bazaar" }],
+  },
 ];
