@@ -10,7 +10,8 @@
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --stats-json",
-    "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts"
+    "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts",
+    "lighthouse": "node scripts/lighthouse-cache-test.js"
   },
   "dependencies": {
     "@sindresorhus/slugify": "^3.0.0",
@@ -40,9 +41,11 @@
     "@vitest/browser-playwright": "^4.0.18",
     "@vitest/coverage-v8": "^4.0.18",
     "chromatic": "^15.0.0",
+    "chrome-launcher": "^1.2.1",
     "critters": "^0.0.23",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "lighthouse": "^13.0.3",
     "msw": "^2.12.8",
     "msw-storybook-addon": "^2.0.6",
     "playwright": "^1.58.1",

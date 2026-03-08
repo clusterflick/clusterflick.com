@@ -264,21 +264,17 @@ try {
   const files = {};
   const mapping = {};
   let bucket = 0;
-  let countInBucket = 0;
-  const MAX_PERFORMANCES_PER_BUCKET = 1000;
+  let bytesInBucket = 0;
+  const TARGET_BYTES_PER_BUCKET = 400_000;
 
   Object.entries(movies)
     .sort(([, a], [, b]) => a.normalizedTitle.localeCompare(b.normalizedTitle))
     .forEach(([id, movie]) => {
-      const count = Object.keys(movie.performances).length;
+      const movieBytes = Buffer.byteLength(JSON.stringify(movie), "utf8");
 
-      if (
-        count > MAX_PERFORMANCES_PER_BUCKET ||
-        (countInBucket > 0 &&
-          countInBucket + count > MAX_PERFORMANCES_PER_BUCKET)
-      ) {
+      if (bytesInBucket > 0 && bytesInBucket + movieBytes > TARGET_BYTES_PER_BUCKET) {
         bucket++;
-        countInBucket = 0;
+        bytesInBucket = 0;
       }
 
       files[bucket] = files[bucket] || {};
@@ -286,7 +282,7 @@ try {
       mapping[bucket] = mapping[bucket] || [];
       mapping[bucket].push(id);
 
-      if (count <= MAX_PERFORMANCES_PER_BUCKET) countInBucket += count;
+      bytesInBucket += movieBytes;
     });
 
   const outputPath = path.join(__dirname, "..", "public", "data");
