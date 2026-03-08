@@ -272,7 +272,10 @@ try {
     .forEach(([id, movie]) => {
       const movieBytes = Buffer.byteLength(JSON.stringify(movie), "utf8");
 
-      if (bytesInBucket > 0 && bytesInBucket + movieBytes > TARGET_BYTES_PER_BUCKET) {
+      if (
+        bytesInBucket > 0 &&
+        bytesInBucket + movieBytes > TARGET_BYTES_PER_BUCKET
+      ) {
         bucket++;
         bytesInBucket = 0;
       }

@@ -70,7 +70,8 @@ const clr = (colorName, text) => `${C[colorName]}${text}${C.reset}`;
 // Format helpers
 // ---------------------------------------------------------------------------
 
-const fmtMs = (v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}s` : `${Math.round(v)}ms`);
+const fmtMs = (v) =>
+  v >= 1000 ? `${(v / 1000).toFixed(1)}s` : `${Math.round(v)}ms`;
 const fmtKB = (v) => (v >= 1024 ? `${(v / 1024).toFixed(1)} MB` : `${v} KB`);
 const scoreColor = (s) => (s >= 90 ? "green" : s >= 50 ? "yellow" : "red");
 
@@ -160,10 +161,13 @@ function extractMetrics(lhr) {
   const ms = (id) => Math.round(audit(id)?.numericValue ?? 0);
 
   const requests = audit("network-requests")?.details?.items ?? [];
-  const totalTransferBytes = requests.reduce((sum, r) => sum + (r.transferSize ?? 0), 0);
+  const totalTransferBytes = requests.reduce(
+    (sum, r) => sum + (r.transferSize ?? 0),
+    0,
+  );
   // A request is "from cache" if the server sent 0 bytes (304 / memory/disk cache)
   const cachedRequests = requests.filter(
-    (r) => r.statusCode !== -1 && (r.transferSize ?? 0) === 0
+    (r) => r.statusCode !== -1 && (r.transferSize ?? 0) === 0,
   ).length;
 
   return {
@@ -171,7 +175,9 @@ function extractMetrics(lhr) {
     fcp: ms("first-contentful-paint"),
     lcp: ms("largest-contentful-paint"),
     tbt: ms("total-blocking-time"),
-    cls: parseFloat((audit("cumulative-layout-shift")?.numericValue ?? 0).toFixed(3)),
+    cls: parseFloat(
+      (audit("cumulative-layout-shift")?.numericValue ?? 0).toFixed(3),
+    ),
     si: ms("speed-index"),
     tti: ms("interactive"),
     transferKB: Math.round(totalTransferBytes / 1024),
@@ -185,9 +191,11 @@ function average(list) {
     Object.keys(list[0]).map((k) => [
       k,
       k === "cls"
-        ? parseFloat((list.reduce((a, m) => a + m[k], 0) / list.length).toFixed(3))
+        ? parseFloat(
+            (list.reduce((a, m) => a + m[k], 0) / list.length).toFixed(3),
+          )
         : Math.round(list.reduce((a, m) => a + m[k], 0) / list.length),
-    ])
+    ]),
   );
 }
 
@@ -200,8 +208,18 @@ function printDashboard(cold, warm) {
 
   console.log("");
   console.log(clr("cyan", clr("bold", "═".repeat(W))));
-  console.log(clr("cyan", clr("bold", "  CLUSTERFLICK — LIGHTHOUSE CACHE COMPARISON")));
-  console.log(clr("cyan", clr("bold", `  ${TARGET_URL}  ·  ${PRESET}  ·  ${RUNS} run${RUNS > 1 ? "s" : ""} averaged`)));
+  console.log(
+    clr("cyan", clr("bold", "  CLUSTERFLICK — LIGHTHOUSE CACHE COMPARISON")),
+  );
+  console.log(
+    clr(
+      "cyan",
+      clr(
+        "bold",
+        `  ${TARGET_URL}  ·  ${PRESET}  ·  ${RUNS} run${RUNS > 1 ? "s" : ""} averaged`,
+      ),
+    ),
+  );
   console.log(clr("cyan", clr("bold", "═".repeat(W))));
   console.log("");
 
@@ -212,8 +230,8 @@ function printDashboard(cold, warm) {
   console.log(
     clr(
       "bold",
-      `  ${"Metric".padEnd(LW)}  ${"Cold Cache".padEnd(VW)}  ${"Warm Cache".padEnd(VW)}  Change`
-    )
+      `  ${"Metric".padEnd(LW)}  ${"Cold Cache".padEnd(VW)}  ${"Warm Cache".padEnd(VW)}  Change`,
+    ),
   );
   console.log(`  ${"─".repeat(W - 2)}`);
 
@@ -223,10 +241,10 @@ function printDashboard(cold, warm) {
     scoreDiff > 0
       ? clr("green", `+${scoreDiff} pts`)
       : scoreDiff < 0
-      ? clr("red", `${scoreDiff} pts`)
-      : clr("gray", "—");
+        ? clr("red", `${scoreDiff} pts`)
+        : clr("gray", "—");
   console.log(
-    `  ${"Performance Score".padEnd(LW)}  ${colorPad(cold.score, scoreColor(cold.score), VW)}  ${colorPad(warm.score, scoreColor(warm.score), VW)}  ${scoreDiffStr}`
+    `  ${"Performance Score".padEnd(LW)}  ${colorPad(cold.score, scoreColor(cold.score), VW)}  ${colorPad(warm.score, scoreColor(warm.score), VW)}  ${scoreDiffStr}`,
   );
 
   console.log(`  ${"·".repeat(W - 2)}`);
@@ -234,7 +252,9 @@ function printDashboard(cold, warm) {
   function row(label, coldVal, warmVal, fmt, lowerBetter = true) {
     const coldStr = fmt(coldVal);
     const warmStr = fmt(warmVal);
-    const pct = coldVal ? ((lowerBetter ? coldVal - warmVal : warmVal - coldVal) / coldVal) * 100 : null;
+    const pct = coldVal
+      ? ((lowerBetter ? coldVal - warmVal : warmVal - coldVal) / coldVal) * 100
+      : null;
     let changeStr;
     if (pct === null) {
       changeStr = clr("gray", "—");
@@ -246,7 +266,7 @@ function printDashboard(cold, warm) {
       changeStr = clr("red", `▼ ${Math.round(Math.abs(pct))}%`);
     }
     console.log(
-      `  ${label.padEnd(LW)}  ${coldStr.padEnd(VW)}  ${warmStr.padEnd(VW)}  ${changeStr}`
+      `  ${label.padEnd(LW)}  ${coldStr.padEnd(VW)}  ${warmStr.padEnd(VW)}  ${changeStr}`,
     );
   }
 
@@ -263,7 +283,7 @@ function printDashboard(cold, warm) {
   row("Total Requests", cold.requests, warm.requests, String);
   // Cached requests is warm-only; show as a plain info line
   console.log(
-    `  ${"Served from Cache".padEnd(LW)}  ${"—".padEnd(VW)}  ${`${warm.cachedRequests} / ${warm.requests} requests`.padEnd(VW)}`
+    `  ${"Served from Cache".padEnd(LW)}  ${"—".padEnd(VW)}  ${`${warm.cachedRequests} / ${warm.requests} requests`.padEnd(VW)}`,
   );
 
   console.log(`  ${"─".repeat(W - 2)}`);
@@ -276,7 +296,9 @@ function printDashboard(cold, warm) {
 
 function generateBlogSummary(cold, warm) {
   const savedKB = cold.transferKB - warm.transferKB;
-  const savedPct = cold.transferKB ? Math.round((savedKB / cold.transferKB) * 100) : 0;
+  const savedPct = cold.transferKB
+    ? Math.round((savedKB / cold.transferKB) * 100)
+    : 0;
   const scoreDiff = warm.score - cold.score;
   const dateStr = new Date().toLocaleDateString("en-GB", { dateStyle: "long" });
 
@@ -329,7 +351,12 @@ function generateBlogSummary(cold, warm) {
 async function main() {
   console.log("");
   console.log(clr("bold", clr("cyan", "Clusterflick Lighthouse Cache Test")));
-  console.log(clr("gray", `  ${TARGET_URL}  ·  ${PRESET}  ·  ${RUNS} run${RUNS > 1 ? "s" : ""} per condition`));
+  console.log(
+    clr(
+      "gray",
+      `  ${TARGET_URL}  ·  ${PRESET}  ·  ${RUNS} run${RUNS > 1 ? "s" : ""} per condition`,
+    ),
+  );
   console.log("");
 
   const chromePath = getChromePath();
@@ -346,25 +373,37 @@ async function main() {
   try {
     // Cold runs — lighthouse clears cache before each run (disableStorageReset: false)
     for (let i = 0; i < RUNS; i++) {
-      process.stdout.write(`${clr("bold", `[Cold ${i + 1}/${RUNS}]`)} Running...`);
-      const result = await runLighthouse(TARGET_URL, { warm: false, userDataDir, chromePath });
+      process.stdout.write(
+        `${clr("bold", `[Cold ${i + 1}/${RUNS}]`)} Running...`,
+      );
+      const result = await runLighthouse(TARGET_URL, {
+        warm: false,
+        userDataDir,
+        chromePath,
+      });
       const m = extractMetrics(result.lhr);
       coldMetrics.push(m);
       lastColdResult = result;
       console.log(
-        `  score: ${clr(scoreColor(m.score), m.score)}  LCP: ${fmtMs(m.lcp)}  TBT: ${fmtMs(m.tbt)}  transfer: ${fmtKB(m.transferKB)}`
+        `  score: ${clr(scoreColor(m.score), m.score)}  LCP: ${fmtMs(m.lcp)}  TBT: ${fmtMs(m.tbt)}  transfer: ${fmtKB(m.transferKB)}`,
       );
     }
 
     // Warm runs — cache preserved from the last cold run (disableStorageReset: true)
     for (let i = 0; i < RUNS; i++) {
-      process.stdout.write(`${clr("bold", `[Warm ${i + 1}/${RUNS}]`)} Running...`);
-      const result = await runLighthouse(TARGET_URL, { warm: true, userDataDir, chromePath });
+      process.stdout.write(
+        `${clr("bold", `[Warm ${i + 1}/${RUNS}]`)} Running...`,
+      );
+      const result = await runLighthouse(TARGET_URL, {
+        warm: true,
+        userDataDir,
+        chromePath,
+      });
       const m = extractMetrics(result.lhr);
       warmMetrics.push(m);
       lastWarmResult = result;
       console.log(
-        `  score: ${clr(scoreColor(m.score), m.score)}  LCP: ${fmtMs(m.lcp)}  TBT: ${fmtMs(m.tbt)}  transfer: ${fmtKB(m.transferKB)}`
+        `  score: ${clr(scoreColor(m.score), m.score)}  LCP: ${fmtMs(m.lcp)}  TBT: ${fmtMs(m.tbt)}  transfer: ${fmtKB(m.transferKB)}`,
       );
     }
   } finally {
@@ -409,13 +448,15 @@ async function main() {
           ttiMs: cold.tti - warm.tti,
           transferSavedKB: cold.transferKB - warm.transferKB,
           transferSavedPct: cold.transferKB
-            ? Math.round(((cold.transferKB - warm.transferKB) / cold.transferKB) * 100)
+            ? Math.round(
+                ((cold.transferKB - warm.transferKB) / cold.transferKB) * 100,
+              )
             : 0,
         },
       },
       null,
-      2
-    )
+      2,
+    ),
   );
   console.log(`${clr("green", "✓")} ${jsonPath}`);
 
