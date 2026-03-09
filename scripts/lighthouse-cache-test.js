@@ -21,6 +21,7 @@
 
 "use strict";
 
+/* eslint @typescript-eslint/no-require-imports: 0 */
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
