@@ -280,4 +280,15 @@ export const FILM_CLUBS: FilmClub[] = [
     aliases: [],
     matchers: [{ [FilterId.ShowingTitleSearch]: "Video Bazaar" }],
   },
+  {
+    id: "jellied-reels",
+    name: "Jellied Reels",
+    url: "https://www.instagram.com/jelliedreels/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "presented by Jellied Reels" },
+      { [FilterId.ShowingTitleSearch]: "Jellied Reels presents" },
+      { [FilterId.PerformanceNotesSearch]: "Jellied Reels" },
+    ],
+  },
 ];
