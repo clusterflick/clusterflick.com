@@ -22,8 +22,8 @@ jobs:
     outputs:
       old_hash: ${{ steps.live_hash.outputs.old_hash }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
       - run: npm ci
@@ -101,8 +101,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: verify-hash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
       - run: npm ci
@@ -111,7 +111,7 @@ jobs:
       - name: Run smoke tests
         run: npm run smoke-test
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: smoke-test-results
