@@ -10,7 +10,7 @@ function VenueBlurb() {
         describes as a radically inclusive welcome to the local area.
       </p>
       <p>
-        Film screenings take place as part of the venue's Arts on the Green
+        Film screenings take place as part of the venue&apos;s Arts on the Green
         programme, with a programme weighted toward art-house, European, and
         world cinema. Past titles have included films by Zvyagintsev,
         Kiarostami, and François Ozon, and occasional screenings have featured
