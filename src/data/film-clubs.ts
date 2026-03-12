@@ -15,14 +15,20 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Acton Film Club",
     url: "https://actonfilmclub.com",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Acton Film Club" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Acton Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Acton Film Club" },
+    ],
   },
   {
     id: "arabic-cinema-club",
     name: "Arabic Cinema Club",
     url: "https://www.instagram.com/thearabfilmclub/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Arabic Cinema Club" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Arabic Cinema Club" },
+      { [FilterId.PerformanceNotesSearch]: "Arabic Cinema Club" },
+    ],
   },
   {
     id: "bloody-mary-film-club",
@@ -32,6 +38,7 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bloody Mary Film Club" },
       { [FilterId.ShowingTitleSearch]: "Bloody Mary" },
+      { [FilterId.PerformanceNotesSearch]: "Bloody Mary Film Club" },
     ],
   },
   {
@@ -39,14 +46,20 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Bar Trash",
     url: "https://tokenhomo.com/bar-trash/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Bar Trash" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Bar Trash" },
+      { [FilterId.PerformanceNotesSearch]: "Bar Trash" },
+    ],
   },
   {
     id: "cinebug",
     name: "Cinebug",
     url: "https://www.instagram.com/cinebugldn/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Cinebug" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Cinebug" },
+      { [FilterId.PerformanceNotesSearch]: "Cinebug" },
+    ],
   },
   {
     id: "bounce-cinema",
@@ -56,6 +69,7 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bounce Cinema" },
       { [FilterId.ShowingTitleSearch]: "Bounce Short Film" },
+      { [FilterId.PerformanceNotesSearch]: "Bounce Cinema" },
     ],
   },
   {
@@ -63,14 +77,20 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Distorted Frame",
     url: "https://www.instagram.com/distortedframefilmclub/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Distorted Frame" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Distorted Frame" },
+      { [FilterId.PerformanceNotesSearch]: "Distorted Frame" },
+    ],
   },
   {
     id: "ghibliotheque",
     name: "Ghibliotheque",
     url: "https://linktr.ee/ghibliotheque",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Ghibliotheque" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Ghibliotheque" },
+      { [FilterId.PerformanceNotesSearch]: "Ghibliotheque" },
+    ],
   },
   {
     id: "gothique-film-society",
@@ -79,7 +99,7 @@ export const FILM_CLUBS: FilmClub[] = [
     aliases: ["gothique"],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Gothique Film Society" },
-      { [FilterId.ShowingTitleSearch]: "Gothique" },
+      { [FilterId.PerformanceNotesSearch]: "Gothique Film Society" },
     ],
   },
   {
@@ -87,7 +107,10 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Japanese Film Club",
     url: "https://japanesefilm.club",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Japanese Film Club" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Japanese Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Japanese Film Club" },
+    ],
   },
   {
     id: "kung-fu-cinema",
@@ -97,6 +120,7 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Kung Fu Cinema" },
       { [FilterId.ShowingTitleSearch]: "Drunken Scorpion" },
+      { [FilterId.PerformanceNotesSearch]: "Drunken Scorpion" },
     ],
   },
   {
@@ -104,14 +128,20 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Lost Reels",
     url: "https://lostreels.co.uk/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Lost Reels" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Lost Reels" },
+      { [FilterId.PerformanceNotesSearch]: "Lost Reels" },
+    ],
   },
   {
     id: "new-east-cinema",
     name: "New East Cinema",
     url: "https://neweastcinema.co.uk",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "New East Cinema" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "New East Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "New East Cinema" },
+    ],
   },
   {
     id: "queer-horror-nights",
@@ -130,7 +160,10 @@ export const FILM_CLUBS: FilmClub[] = [
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Pitchblack Playback" },
-      { [FilterId.ShowingTitleSearch]: "Pitchblack" },
+      { [FilterId.ShowingTitleSearch]: "Pitchblack Premiere" },
+      { [FilterId.ShowingTitleSearch]: "Pitchblack Mixtapes" },
+      { [FilterId.ShowingTitleSearch]: "Pitchblack Pictures" },
+      { [FilterId.PerformanceNotesSearch]: "Pitchblack Playback" },
     ],
   },
   {
@@ -138,7 +171,10 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Rebel Reel",
     url: "https://www.rebelreelcineclub.com/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Rebel Reel" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Rebel Reel" },
+      { [FilterId.PerformanceNotesSearch]: "Rebel Reel" },
+    ],
   },
   {
     id: "rio-feminist-film-group",
@@ -158,7 +194,10 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Richmond Film Society",
     url: "https://www.richmondfilmsoc.org.uk/",
     aliases: ["richmond"],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Richmond Film Society" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Richmond Film Society" },
+      { [FilterId.PerformanceNotesSearch]: "Richmond Film Society" },
+    ],
   },
   {
     id: "violet-hour",
@@ -178,6 +217,7 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Wimbledon Film Club" },
       { [FilterId.ShowingUrlSearch]: "wimbledonfilmclub" },
+      { [FilterId.PerformanceNotesSearch]: "Wimbledon Film Club" },
     ],
   },
   {
@@ -185,14 +225,20 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Category H Film Club",
     url: "https://www.instagram.com/categoryhfilms/",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Category H" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Category H" },
+      { [FilterId.PerformanceNotesSearch]: "Category H Film Club" },
+    ],
   },
   {
     id: "sapphic-cinema",
     name: "Sapphic Cinema",
     url: "https://16collective.org",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Sapphic Cinema" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Sapphic Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Sapphic Cinema" },
+    ],
   },
   {
     id: "cine-real",
@@ -202,6 +248,8 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Cine Real" },
       { [FilterId.ShowingTitleSearch]: "Cine-Real" },
+      { [FilterId.PerformanceNotesSearch]: "Cine Real" },
+      { [FilterId.PerformanceNotesSearch]: "Cine-Real" },
     ],
   },
   {
@@ -214,6 +262,7 @@ export const FILM_CLUBS: FilmClub[] = [
         [FilterId.ShowingTitleSearch]: "Pink Palace",
         [FilterId.Venues]: ["riocinema.org.uk"],
       },
+      { [FilterId.PerformanceNotesSearch]: "Pink Palace" },
     ],
   },
   {
@@ -221,7 +270,10 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Funeral Parade",
     url: "https://www.instagram.com/funeralparadepresents/",
     aliases: ["Funeral Parade Presents"],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Funeral Parade" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Funeral Parade" },
+      { [FilterId.PerformanceNotesSearch]: "Funeral Parade" },
+    ],
   },
   {
     id: "lexi-seniors-film-club",
@@ -240,28 +292,41 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Supakino",
     url: "https://www.supakino.com",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Supakino" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Supakino" },
+      { [FilterId.PerformanceNotesSearch]: "Supakino" },
+    ],
   },
   {
     id: "sick-girl-films",
     name: "Sick Girl Films",
     url: "https://www.instagram.com/sickgirlfilms",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Sick Girl" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Sick Girl Films" },
+      { [FilterId.PerformanceNotesSearch]: "Sick Girl Films" },
+    ],
   },
   {
     id: "sincerely-camp",
     name: "Sincerely Camp",
     url: "https://www.instagram.com/sincerelycamp",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Sincerely Camp" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Sincerely Camp" },
+      { [FilterId.PerformanceNotesSearch]: "Sincerely Camp" },
+    ],
   },
   {
     id: "offbeat-folk-film-club",
     name: "OffBeat Folk Film Club",
     url: "https://offbeat.film/",
     aliases: ["OffBeat"],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "OffBeat" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "OffBeat Presents" },
+      { [FilterId.ShowingTitleSearch]: "OffBeat:" },
+      { [FilterId.PerformanceNotesSearch]: "OffBeat Folk Film Club" },
+    ],
   },
   {
     id: "transmissions",
@@ -278,7 +343,10 @@ export const FILM_CLUBS: FilmClub[] = [
     name: "Video Bazaar",
     url: "https://www.instagram.com/videobazaarpresents",
     aliases: [],
-    matchers: [{ [FilterId.ShowingTitleSearch]: "Video Bazaar" }],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Video Bazaar" },
+      { [FilterId.PerformanceNotesSearch]: "Video Bazaar" },
+    ],
   },
   {
     id: "jellied-reels",
