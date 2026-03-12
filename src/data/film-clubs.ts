@@ -359,4 +359,24 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Jellied Reels" },
     ],
   },
+  {
+    id: "frame-by-frame",
+    name: "Frame By Frame",
+    url: "https://www.instagram.com/frame_by_frame_cinema/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Frame By Frame" },
+      { [FilterId.PerformanceNotesSearch]: "Frame By Frame" },
+    ],
+  },
+  {
+    id: "trash-film-club",
+    name: "Trash Film Club",
+    url: "https://www.instagram.com/trash.film.club/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Trash Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Trash Film Club" },
+    ],
+  },
 ];
