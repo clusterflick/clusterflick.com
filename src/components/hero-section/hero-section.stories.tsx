@@ -60,7 +60,7 @@ export const Standard: Story = {
     children: (
       <>
         <OutlineHeading>Venues</OutlineHeading>
-        <p style={{ fontSize: 18, opacity: 0.8 }}>240 venues across London</p>
+        <p style={{ fontSize: 18, opacity: 0.8 }}>250 venues across London</p>
       </>
     ),
   },

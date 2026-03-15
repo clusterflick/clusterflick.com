@@ -68,7 +68,7 @@ export const CardGrid: Story = {
   render: () => (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
       {[
-        { href: "/venues", label: "Venues", detail: "240 venues" },
+        { href: "/venues", label: "Venues", detail: "250 venues" },
         { href: "/festivals", label: "Festivals", detail: "8 showing" },
         { href: "/london-cinemas", label: "By Borough", detail: "32 boroughs" },
         { href: "/about", label: "About", detail: "Learn more" },

@@ -11,7 +11,7 @@ cult classics.
 
 ## Features
 
-- **Unified Cinema Listings** — Browse film screenings from 240+ London cinemas
+- **Unified Cinema Listings** — Browse film screenings from 250+ London cinemas
   in one place
 - **Rich Movie Data** — View ratings and reviews from IMDb, Letterboxd,
   Metacritic, and Rotten Tomatoes

@@ -19,7 +19,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Accessible Cinema",
   description:
-    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 240+ cinemas.",
+    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 250+ cinemas.",
 };
 
 /**
@@ -217,7 +217,7 @@ export default async function AccessibilityPage() {
           <strong>Cinema for everyone.</strong>
           <br />
           Find screenings with audio description, captions, relaxed
-          environments, and more across London&apos;s 240+ venues.
+          environments, and more across London&apos;s 250+ venues.
         </p>
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and

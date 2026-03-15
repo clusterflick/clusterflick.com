@@ -98,7 +98,7 @@ export default async function Home() {
             (and more, there&apos;s way too many venues to name them all!)
             We&apos;re currently tracking over 1,000 films showing across{" "}
             <Link href="/venues" className="nowrap">
-              London&apos;s 240+ venues
+              London&apos;s 250+ venues
             </Link>
             .
           </p>

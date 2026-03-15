@@ -62,7 +62,7 @@ type Story = StoryObj<typeof meta>;
 export const WithSubtitle: Story = {
   args: {
     title: "Venues",
-    subtitle: "240 venues across London",
+    subtitle: "250 venues across London",
     backUrl: "/",
     backText: "Back to film list",
     children: (
