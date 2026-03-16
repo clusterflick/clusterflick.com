@@ -83,6 +83,21 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "double-wonderful-events",
+    name: "Double Wonderful Events",
+    url: "https://www.instagram.com/doublewonderfulevents/",
+    aliases: ["double-wonderful"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Double Wonderful" },
+      { [FilterId.PerformanceNotesSearch]: "Double Wonderful" },
+      // One-off event at Hypha Studios, April 2026
+      {
+        [FilterId.ShowingTitleSearch]: "24 Hour Cinema",
+        [FilterId.Venues]: ["hyphastudios.com-kentish-town"],
+      },
+    ],
+  },
+  {
     id: "ghibliotheque",
     name: "Ghibliotheque",
     url: "https://linktr.ee/ghibliotheque",
