@@ -28,7 +28,7 @@ jobs:
           node-version-file: .node-version
       - run: npm ci
       - name: Download combined data
-        uses: clusterflick/release-downloader@v2
+        uses: clusterflick/release-downloader@v3
         with:
           token: ${{ secrets.PAT }}
           repository: "clusterflick/data-combined"
@@ -36,7 +36,7 @@ jobs:
           fileName: "*"
           out-file-path: "combined-data"
       - name: Download matched data
-        uses: clusterflick/release-downloader@v2
+        uses: clusterflick/release-downloader@v3
         with:
           token: ${{ secrets.PAT }}
           repository: "clusterflick/data-matched"

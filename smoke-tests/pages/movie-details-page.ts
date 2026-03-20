@@ -6,7 +6,7 @@ export class MovieDetailsPage {
   constructor(private page: Page) {}
 
   async waitForPage(expectedTitle: string) {
-    await this.page.waitForURL(/\/movies\/\d+\//, { timeout: 10000 });
+    await this.page.waitForURL(/\/movies\/[\w]+\//, { timeout: 10000 });
     await expect(this.page.locator("h1").first()).toContainText(expectedTitle, {
       timeout: 5000,
     });
