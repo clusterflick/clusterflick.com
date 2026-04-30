@@ -112,6 +112,19 @@ export default async function FestivalsPage() {
         "@type": "Festival",
         name: festival.name,
         url: `https://clusterflick.com${festival.href}`,
+        location: { "@type": "City", name: "London", addressCountry: "GB" },
+        ...(festival.dateFrom && {
+          startDate: new Date(festival.dateFrom).toISOString().split("T")[0],
+        }),
+        ...(festival.dateTo && {
+          endDate: new Date(festival.dateTo).toISOString().split("T")[0],
+        }),
+        ...(festival.imagePath && {
+          image: `https://clusterflick.com${festival.imagePath}`,
+        }),
+        ...(festival.seoDescription && {
+          description: festival.seoDescription,
+        }),
       },
     })),
   };

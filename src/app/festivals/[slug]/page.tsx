@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
-import { getFestivalMovies } from "@/utils/get-festival-movies";
+import {
+  getFestivalMovies,
+  getFestivalDateRange,
+} from "@/utils/get-festival-movies";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FESTIVALS, type Festival } from "@/data/festivals";
@@ -191,12 +194,16 @@ export default async function FestivalDetailPage({
   const gridMoviesTruncated = festivalMovieList.length > GRID_MOVIE_LIMIT;
 
   let FestivalBlurb: ComponentType | null = null;
+  let festivalSeoDescription: string | undefined;
   try {
     const mod = await import(`@/components/festivals/${festival.id}`);
     FestivalBlurb = mod.default;
+    festivalSeoDescription = mod.seoDescription;
   } catch {
     // No blurb component for this festival
   }
+
+  const { dateFrom, dateTo } = getFestivalDateRange(festivalMovies);
 
   const festivalJsonLd = [
     {
@@ -209,7 +216,14 @@ export default async function FestivalDetailPage({
         addressCountry: "GB",
       },
       url: `https://clusterflick.com${canonicalUrl}`,
-      image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
+      ...(imagePath && { image: `https://clusterflick.com${imagePath}` }),
+      ...(dateFrom && {
+        startDate: new Date(dateFrom).toISOString().split("T")[0],
+      }),
+      ...(dateTo && {
+        endDate: new Date(dateTo).toISOString().split("T")[0],
+      }),
+      ...(festivalSeoDescription && { description: festivalSeoDescription }),
     },
     {
       "@context": "https://schema.org",
