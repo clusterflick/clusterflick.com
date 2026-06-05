@@ -53,7 +53,7 @@ export default function PageContent({
   festivals,
 }: PageContentProps) {
   const { movies, metaData, getDataWithPriority } = useCinemaData();
-  const { filterState } = useFilterConfig();
+  const { filterState, applyUrlParams } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
 
   // Initialise from hash and sync on back/forward navigation.
@@ -69,6 +69,12 @@ export default function PageContent({
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
+
+  // Apply any URL params on mount — FilterConfigProvider stays mounted across
+  // client-side navigations so its useState initialiser never re-reads URL params.
+  useEffect(() => {
+    applyUrlParams();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Defer showings computation to allow hero content to render first
   const [isShowingsReady, setIsShowingsReady] = useState(false);

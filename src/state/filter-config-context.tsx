@@ -91,6 +91,7 @@ type FilterConfigContextType = {
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
+  applyUrlParams: () => void;
 };
 
 const Context = createContext<FilterConfigContextType | undefined>(undefined);
@@ -455,6 +456,13 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState(filterManager.getDefaultState);
   }, []);
 
+  const applyUrlParams = useCallback(() => {
+    const overrides = filterManager.parseUrlParams(window.location.search);
+    if (!overrides) return;
+    setFilterState((prev) => ({ ...prev, ...overrides }));
+    window.history.replaceState({}, "", window.location.pathname);
+  }, []);
+
   const hasActiveFilters = useMemo(() => {
     return filterManager.hasActiveFilters(filterState);
   }, [filterState]);
@@ -483,6 +491,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleHideFinished,
       resetFilters,
       hasActiveFilters,
+      applyUrlParams,
     }),
     [
       filterState,
@@ -507,6 +516,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleHideFinished,
       resetFilters,
       hasActiveFilters,
+      applyUrlParams,
     ],
   );
 
