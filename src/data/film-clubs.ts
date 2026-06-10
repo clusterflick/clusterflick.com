@@ -243,6 +243,7 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Category H" },
       { [FilterId.PerformanceNotesSearch]: "Category H Film Club" },
+      { [FilterId.ShowingTitleSearch]: "RIO FOREVER / NEVER EVER" },
     ],
   },
   {
