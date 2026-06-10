@@ -73,12 +73,17 @@ export const categoriesFilter: FilterModule<FilterId.Categories> = {
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const categories = state.categories;
-    if (categories) {
+    if (categories === null) {
+      params.set("allCategories", "true");
+    } else if (categories) {
       params.set("categories", categories.join(","));
     }
   },
 
   fromUrlParams: (params: URLSearchParams) => {
+    if (params.has("allCategories")) {
+      return null;
+    }
     if (params.has("categories")) {
       const values = params
         .get("categories")!

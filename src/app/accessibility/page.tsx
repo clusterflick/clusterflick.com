@@ -396,7 +396,7 @@ export default async function AccessibilityPage() {
                             return (
                               <a
                                 key={movie.id}
-                                href={`/movies/${movie.id}/${slugify(movie.title)}?accessibility=${featureStat.feature}&allDates=true`}
+                                href={`/movies/${movie.id}/${slugify(movie.title)}?accessibility=${featureStat.feature}&allDates=true&allCategories=true`}
                                 className={styles.posterLink}
                               >
                                 {useStacked ? (
