@@ -223,13 +223,10 @@ export default async function VenueDetailPage({
     }))
     .filter((s) => s.filmCount > 0);
 
-  // Sort by number of performances (most showings first), then alphabetically
-  venueMovies.sort((a, b) => {
-    if (b.performanceCount !== a.performanceCount) {
-      return b.performanceCount - a.performanceCount;
-    }
-    return a.movie.title.localeCompare(b.movie.title);
-  });
+  // Sort alphabetically by normalized title to match the main page ordering
+  venueMovies.sort((a, b) =>
+    a.movie.normalizedTitle.localeCompare(b.movie.normalizedTitle),
+  );
 
   const GRID_MOVIE_LIMIT = 72;
   const gridMovies = venueMovies.slice(0, GRID_MOVIE_LIMIT);
