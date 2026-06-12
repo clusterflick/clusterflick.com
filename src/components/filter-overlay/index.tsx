@@ -7,7 +7,7 @@ import { filterManager, buildFilterUrl } from "@/lib/filters";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
-import { getDistanceInMiles, NEARBY_RADIUS_MILES } from "@/utils/geo-distance";
+import { getNearbyVenueIds } from "@/utils/geo-distance";
 import Button from "@/components/button";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
@@ -107,12 +107,10 @@ export default function FilterOverlay({
     // Request location and calculate nearby venues
     const position = await requestLocation();
     if (position && metaData?.venues) {
-      const nearby = Object.values(metaData.venues)
-        .filter((venue) => {
-          const distance = getDistanceInMiles(position, venue.geo);
-          return distance <= NEARBY_RADIUS_MILES;
-        })
-        .map((v) => v.id);
+      const nearby = getNearbyVenueIds(
+        position,
+        Object.values(metaData.venues),
+      );
       setVenueOption("nearby", nearby);
     }
   }, [userPosition, nearbyVenueIds, metaData, setVenueOption, requestLocation]);

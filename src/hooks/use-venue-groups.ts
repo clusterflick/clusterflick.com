@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { CinemaData, MetaData, Position } from "@/types";
-import { getDistanceInMiles, NEARBY_RADIUS_MILES } from "@/utils/geo-distance";
+import { getNearbyVenueIds } from "@/utils/geo-distance";
 import {
   getCinemaVenueIds,
   getSmallScreeningVenueIds,
@@ -114,15 +114,11 @@ export function useVenueGroups(
     return getSmallScreeningVenueIds(metaData?.venues);
   }, [metaData]);
 
-  // Nearby venue IDs (venues within NEARBY_RADIUS_MILES of user's location)
+  // Nearby venue IDs: an adaptive radius around the user's location that grows
+  // until a minimum number of venues are in range (see getNearbyVenueIds).
   const nearbyVenueIds = useMemo(() => {
     if (!metaData?.venues || !userPosition) return [];
-    return Object.values(metaData.venues)
-      .filter((venue) => {
-        const distance = getDistanceInMiles(userPosition, venue.geo);
-        return distance <= NEARBY_RADIUS_MILES;
-      })
-      .map((v) => v.id);
+    return getNearbyVenueIds(userPosition, Object.values(metaData.venues));
   }, [metaData, userPosition]);
 
   return {
