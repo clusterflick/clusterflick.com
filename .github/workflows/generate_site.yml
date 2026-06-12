@@ -9,20 +9,21 @@ concurrency:
   group: build-site
   cancel-in-progress: true
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# Deny all by default; each job below grants only the scopes it needs.
+permissions: {}
 
 jobs:
   build:
     name: Build site
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       old_hash: ${{ steps.live_hash.outputs.old_hash }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
@@ -61,6 +62,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     needs: build
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
@@ -72,6 +76,7 @@ jobs:
   verify-hash:
     name: Verify deployment hash
     runs-on: ubuntu-latest
+    permissions: {}
     needs: [build, deploy]
     steps:
       - name: Poll for hash change
@@ -99,9 +104,13 @@ jobs:
   smoke-tests:
     name: Run smoke tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: verify-hash
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
