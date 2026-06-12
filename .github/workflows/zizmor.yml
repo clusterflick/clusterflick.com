@@ -1,0 +1,17 @@
+name: zizmor
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: Audit workflows
+    uses: clusterflick/.github/.github/workflows/zizmor.yml@main
+    permissions:
+      contents: read
