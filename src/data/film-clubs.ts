@@ -395,4 +395,15 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Trash Film Club" },
     ],
   },
+  {
+    id: "club-des-femmes",
+    name: "Club des Femmes",
+    url: "https://clubdesfemmes.com",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "CDF x " },
+      { [FilterId.ShowingTitleSearch]: "Club des Femmes" },
+      { [FilterId.PerformanceNotesSearch]: "Club des Femmes" },
+    ],
+  },
 ];

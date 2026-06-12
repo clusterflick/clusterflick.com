@@ -5,8 +5,8 @@ function VenueBlurb() {
         Canary Wharf Summer Screens is a free open-air cinema held in Canada
         Square Park each summer, running from June to September. Two large
         screens show a curated mix of blockbusters, cult classics, Bollywood
-        favourites, and new releases, with family films on Saturday mornings
-        and regular screenings on Tuesdays and Sundays throughout the season.
+        favourites, and new releases, with family films on Saturday mornings and
+        regular screenings on Tuesdays and Sundays throughout the season.
       </p>
       <p>
         No tickets are needed — just bring a blanket and find a spot on the
