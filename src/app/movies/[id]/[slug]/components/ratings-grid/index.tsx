@@ -27,14 +27,17 @@ export default function RatingsGrid({
   extraItem,
 }: RatingsGridProps) {
   const { hydrateUrl } = useCinemaData();
+  // Treat a 0 score as "no score" — Metacritic returns 0 for the user score
+  // when there are too few audience reviews to be meaningful.
+  const hasMetacriticCritics = Boolean(metacritic?.critics?.rating);
+  const hasMetacriticAudience = Boolean(metacritic?.audience?.rating);
   const hasRatings =
     (imdb && imdb.rating !== null) ||
     (letterboxd && letterboxd.rating) ||
     (moviedb && moviedb.reviews > 0) ||
     (rottenTomatoes && rottenTomatoes.critics.all?.score) ||
-    (metacritic &&
-      (metacritic.critics?.rating != null ||
-        metacritic.audience?.rating != null));
+    hasMetacriticCritics ||
+    hasMetacriticAudience;
 
   if (!hasRatings) {
     return null;
@@ -105,33 +108,35 @@ export default function RatingsGrid({
             </LinkCard>
           )}
 
-          {metacritic &&
-            (metacritic.critics?.rating != null ||
-              metacritic.audience?.rating != null) && (
-              <LinkCard href={hydrateUrl(metacritic.url)} variant="rating">
-                <CardLabel>Metacritic</CardLabel>
-                <CardValue>
-                  <div className={styles.ratingsSpacing}>
-                    {metacritic.critics?.rating != null && (
-                      <span>{metacritic.critics.rating}</span>
-                    )}
-                    {metacritic.audience?.rating != null && (
-                      <span className={styles.audienceRatingsScore}>
-                        {metacritic.audience.rating.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                </CardValue>
-                <CardSubtext>
-                  <div className={styles.ratingsSpacing}>
-                    {metacritic.critics?.rating != null && <span>Critics</span>}
-                    {metacritic.audience?.rating != null && (
-                      <span>Audience</span>
-                    )}
-                  </div>
-                </CardSubtext>
-              </LinkCard>
-            )}
+          {metacritic && (hasMetacriticCritics || hasMetacriticAudience) && (
+            <LinkCard href={hydrateUrl(metacritic.url)} variant="rating">
+              <CardLabel>Metacritic</CardLabel>
+              <CardValue>
+                <div className={styles.ratingsSpacing}>
+                  {metacritic.critics.rating ? (
+                    <span>{metacritic.critics.rating}</span>
+                  ) : null}
+                  {metacritic.audience.rating ? (
+                    <span
+                      className={
+                        hasMetacriticCritics
+                          ? styles.audienceRatingsScore
+                          : undefined
+                      }
+                    >
+                      {metacritic.audience.rating.toFixed(1)}
+                    </span>
+                  ) : null}
+                </div>
+              </CardValue>
+              <CardSubtext>
+                <div className={styles.ratingsSpacing}>
+                  {hasMetacriticCritics && <span>Critics</span>}
+                  {hasMetacriticAudience && <span>Audience</span>}
+                </div>
+              </CardSubtext>
+            </LinkCard>
+          )}
         </CardGrid>
       </div>
 
