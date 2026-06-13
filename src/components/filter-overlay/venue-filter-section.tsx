@@ -7,6 +7,7 @@ import { VenueGroup } from "@/hooks/use-venue-groups";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
+import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import styles from "./filter-overlay.module.css";
 
 interface VenueFilterSectionProps {
@@ -313,19 +314,12 @@ export default function VenueFilterSection({
                 </div>
                 <div className={styles.chipGroup} role="group">
                   {group.venues.map((venue) => {
-                    // For group-structured venues, remove the group name prefix if present
+                    // For group-structured venues, strip the redundant group
+                    // name (and any configured extra) prefix from the name.
                     const isGroupStructured = group.id.startsWith("group-");
-                    let displayName = venue.name;
-                    if (isGroupStructured) {
-                      // Remove group label from the start of the name
-                      const prefixPattern = new RegExp(
-                        `^${group.label}\\s*`,
-                        "i",
-                      );
-                      displayName =
-                        venue.name.replace(prefixPattern, "").trim() ||
-                        venue.name;
-                    }
+                    const displayName = isGroupStructured
+                      ? getVenueDisplayName(venue.name, group.label)
+                      : venue.name;
                     return (
                       <Chip
                         key={venue.id}

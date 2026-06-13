@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import type { Venue } from "@/types";
 import VenuesPageContent from "./page-content";
@@ -71,11 +72,9 @@ function buildVenueGroups(
     }
 
     const isGroupStructured = groupKey.startsWith("group-");
-    let displayName = venue.name;
-    if (isGroupStructured) {
-      const prefixPattern = new RegExp(`^${groupLabel}\\s*`, "i");
-      displayName = venue.name.replace(prefixPattern, "").trim() || venue.name;
-    }
+    const displayName = isGroupStructured
+      ? getVenueDisplayName(venue.name, groupLabel)
+      : venue.name;
 
     groupMap.get(groupKey)!.venues.push({
       ...venue,

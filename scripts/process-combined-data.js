@@ -3,11 +3,24 @@ const { existsSync, mkdirSync, writeFileSync } = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const data = require("../combined-data/combined-data.json");
-const imdbReviews = require("../matched-data/imdb.json");
-const letterboxdReviews = require("../matched-data/letterboxd.json");
-const metacriticReviews = require("../matched-data/metacritic.json");
-const moviedbReviews = require("../matched-data/moviedb.json");
-const rottentomatoesReviews = require("../matched-data/rottentomatoes.json");
+// Optional review sources: default to {} when the data file isn't present yet
+// so the site can still be built and deployed without them.
+const optionalReviews = (file) => {
+  try {
+    return require(file);
+  } catch (error) {
+    if (error.code !== "MODULE_NOT_FOUND") throw error;
+    console.warn(`Optional review data not found, skipping: ${file}`);
+    return {};
+  }
+};
+const imdbReviews = optionalReviews("../matched-data/imdb.json");
+const letterboxdReviews = optionalReviews("../matched-data/letterboxd.json");
+const metacriticReviews = optionalReviews("../matched-data/metacritic.json");
+const moviedbReviews = optionalReviews("../matched-data/moviedb.json");
+const rottentomatoesReviews = optionalReviews(
+  "../matched-data/rottentomatoes.json",
+);
 
 const simplifySorting = (value) =>
   value

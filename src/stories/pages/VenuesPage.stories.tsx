@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenuesPageContent from "@/app/venues/page-content";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import type { VenueGroupData } from "@/app/venues/page";
 import type { Venue } from "@/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
@@ -51,11 +52,9 @@ function buildVenueGroups(
     }
 
     const isGroupStructured = groupKey.startsWith("group-");
-    let displayName = venue.name;
-    if (isGroupStructured) {
-      const prefixPattern = new RegExp(`^${groupLabel}\\s*`, "i");
-      displayName = venue.name.replace(prefixPattern, "").trim() || venue.name;
-    }
+    const displayName = isGroupStructured
+      ? getVenueDisplayName(venue.name, groupLabel)
+      : venue.name;
 
     groupMap.get(groupKey)!.venues.push({
       ...venue,

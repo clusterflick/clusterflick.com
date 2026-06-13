@@ -158,13 +158,15 @@
 .poster:hover .overlay,
 .noPoster:hover .overlay,
 .overlayVisible {
-  transform: translateY(0);
+  /* Overlap the bottom edge by 2px so subpixel rounding can't leave a gap
+     where the poster shows through underneath. */
+  transform: translateY(2px);
 }
 
 /* Always show overlay on mobile/touch devices */
 @media (max-width: 768px) {
   .overlay {
-    transform: translateY(0);
+    transform: translateY(2px);
   }
 }
 

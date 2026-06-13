@@ -137,13 +137,15 @@
 .stackContainer:hover .overlay,
 .stackContainerLarge:hover .overlay,
 .overlayVisible {
-  transform: translateY(0);
+  /* Overlap the bottom edge by 2px so subpixel rounding can't leave a gap
+     where the poster shows through underneath. */
+  transform: translateY(2px);
 }
 
 /* Always show overlay on mobile/touch devices, disable hover animations */
 @media (max-width: 768px) {
   .overlay {
-    transform: translateY(0);
+    transform: translateY(2px);
   }
 
   .posterWrapper {
