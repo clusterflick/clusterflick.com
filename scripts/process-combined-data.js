@@ -6,6 +6,7 @@ const data = require("../combined-data/combined-data.json");
 const imdbReviews = require("../matched-data/imdb.json");
 const letterboxdReviews = require("../matched-data/letterboxd.json");
 const metacriticReviews = require("../matched-data/metacritic.json");
+const moviedbReviews = require("../matched-data/moviedb.json");
 const rottentomatoesReviews = require("../matched-data/rottentomatoes.json");
 
 const simplifySorting = (value) =>
@@ -95,6 +96,9 @@ function generateUrlPrefixes(data, minPrefixLength = 20) {
   Object.values(metacriticReviews).forEach((review) => {
     if (review?.url) urls.push(review.url);
   });
+  Object.values(moviedbReviews).forEach((review) => {
+    if (review?.url) urls.push(review.url);
+  });
   Object.values(rottentomatoesReviews).forEach((review) => {
     if (review?.url) urls.push(review.url);
   });
@@ -176,6 +180,7 @@ function extractCommonUrlPrefix(data) {
     movie.imdb = imdbReviews[movie.id];
     movie.letterboxd = letterboxdReviews[movie.id];
     movie.metacritic = metacriticReviews[movie.id];
+    movie.moviedb = moviedbReviews[movie.id];
     movie.rottenTomatoes = rottentomatoesReviews[movie.id];
 
     if (movie.rottenTomatoes) {

@@ -5,6 +5,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
+import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import PageContent from "./page-content";
@@ -151,8 +152,11 @@ export default async function MovieDetailPage({
     movie.imdb?.url,
     movie.letterboxd?.url,
     movie.metacritic?.url,
+    movie.moviedb?.url,
     movie.rottenTomatoes?.url,
-  ].filter(Boolean);
+  ]
+    .filter((url): url is string => Boolean(url))
+    .map((url) => hydrateUrl(url, data.urlPrefixes));
 
   const movieJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",

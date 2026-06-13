@@ -253,7 +253,9 @@ export default function PageContent({
           <RatingsGrid
             imdb={movie.imdb}
             letterboxd={movie.letterboxd}
+            moviedb={movie.moviedb}
             rottenTomatoes={movie.rottenTomatoes}
+            metacritic={movie.metacritic}
             extraItem={
               movie.youtubeTrailer ? (
                 <ButtonAnchor

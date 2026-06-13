@@ -139,6 +139,13 @@ type Letterboxd = {
   unweightedRating?: number | null;
 };
 
+type MovieDb = {
+  id: string;
+  url: string;
+  rating: number;
+  reviews: number;
+};
+
 type MetacriticScore = {
   dislikes?: number | null;
   likes?: number | null;
@@ -197,6 +204,7 @@ export type Movie = {
   imdb?: Imdb;
   letterboxd?: Letterboxd;
   metacritic?: Metacritic;
+  moviedb?: MovieDb;
   rottenTomatoes?: RottenTomatoes;
 };
 

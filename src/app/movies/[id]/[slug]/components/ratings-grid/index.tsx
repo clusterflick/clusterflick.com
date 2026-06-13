@@ -12,21 +12,29 @@ import styles from "./ratings-grid.module.css";
 interface RatingsGridProps {
   imdb: Movie["imdb"];
   letterboxd: Movie["letterboxd"];
+  moviedb: Movie["moviedb"];
   rottenTomatoes: Movie["rottenTomatoes"];
+  metacritic: Movie["metacritic"];
   extraItem?: ReactNode;
 }
 
 export default function RatingsGrid({
   imdb,
   letterboxd,
+  moviedb,
   rottenTomatoes,
+  metacritic,
   extraItem,
 }: RatingsGridProps) {
   const { hydrateUrl } = useCinemaData();
   const hasRatings =
     (imdb && imdb.rating !== null) ||
     (letterboxd && letterboxd.rating) ||
-    (rottenTomatoes && rottenTomatoes.critics.all?.score);
+    (moviedb && moviedb.reviews > 0) ||
+    (rottenTomatoes && rottenTomatoes.critics.all?.score) ||
+    (metacritic &&
+      (metacritic.critics?.rating != null ||
+        metacritic.audience?.rating != null));
 
   if (!hasRatings) {
     return null;
@@ -62,6 +70,19 @@ export default function RatingsGrid({
             </LinkCard>
           )}
 
+          {moviedb && moviedb.reviews > 0 && (
+            <LinkCard href={hydrateUrl(moviedb.url)} variant="rating">
+              <CardLabel>TMDB</CardLabel>
+              <CardValue>
+                {Math.round(moviedb.rating * 10)}
+                <span className={styles.suffix}>%</span>
+              </CardValue>
+              <CardSubtext>
+                {moviedb.reviews.toLocaleString("en-GB")} reviews
+              </CardSubtext>
+            </LinkCard>
+          )}
+
           {rottenTomatoes && rottenTomatoes.critics.all?.score && (
             <LinkCard href={hydrateUrl(rottenTomatoes.url)} variant="rating">
               <CardLabel>Rotten Tomatoes</CardLabel>
@@ -83,6 +104,34 @@ export default function RatingsGrid({
               </CardSubtext>
             </LinkCard>
           )}
+
+          {metacritic &&
+            (metacritic.critics?.rating != null ||
+              metacritic.audience?.rating != null) && (
+              <LinkCard href={hydrateUrl(metacritic.url)} variant="rating">
+                <CardLabel>Metacritic</CardLabel>
+                <CardValue>
+                  <div className={styles.ratingsSpacing}>
+                    {metacritic.critics?.rating != null && (
+                      <span>{metacritic.critics.rating}</span>
+                    )}
+                    {metacritic.audience?.rating != null && (
+                      <span className={styles.audienceRatingsScore}>
+                        {metacritic.audience.rating.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                </CardValue>
+                <CardSubtext>
+                  <div className={styles.ratingsSpacing}>
+                    {metacritic.critics?.rating != null && <span>Critics</span>}
+                    {metacritic.audience?.rating != null && (
+                      <span>Audience</span>
+                    )}
+                  </div>
+                </CardSubtext>
+              </LinkCard>
+            )}
         </CardGrid>
       </div>
 

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { CinemaData, MetaData } from "@/types";
 import { getLondonMidnightTimestamp } from "@/utils/format-date";
+import { hydrateUrl as hydrateUrlWithPrefixes } from "@/utils/hydrate-url";
 import { pruneByPerformances } from "@/utils/prune-movies";
 
 /**
@@ -215,11 +216,8 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
 
   const hydrateUrl = useCallback(
     (truncatedUrl: string) => {
-      if (!truncatedUrl) return truncatedUrl;
-      const match = truncatedUrl.match(/^{(\d+)}/);
-      if (!match || !metaData) return truncatedUrl;
-      const index = parseInt(match[1], 10);
-      return truncatedUrl.replace(`{${index}}`, metaData.urlPrefixes[index]);
+      if (!metaData) return truncatedUrl;
+      return hydrateUrlWithPrefixes(truncatedUrl, metaData.urlPrefixes);
     },
     [metaData],
   );
