@@ -3,7 +3,7 @@ import { expect, Page } from "@playwright/test";
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 
 const POSTER_SELECTOR = 'a[href^="/movies/"]';
-const POSTER_IMAGE_SELECTOR = `${POSTER_SELECTOR} img`;
+const POSTER_TITLE_SELECTOR = `${POSTER_SELECTOR} h2`;
 const FILTER_TRIGGER_SELECTOR = 'button[aria-label*="filter options"]';
 const SEARCH_INPUT_SELECTOR = "#filter-search";
 const COLLAPSE_BUTTON_SELECTOR = 'button[aria-expanded="true"]';
@@ -47,8 +47,12 @@ export class HomePage {
   }
 
   async getFirstMovieTitle(): Promise<string | null> {
-    const firstImage = this.page.locator(POSTER_IMAGE_SELECTOR).first();
-    return await firstImage.getAttribute("alt");
+    // Read the title from the first poster's overlay heading rather than an
+    // <img> alt: posters for movies without a TMDB image render a text-pattern
+    // placeholder with no <img>, so an image-based lookup would skip them and
+    // return a different movie than the one clickFirstPoster() clicks.
+    const firstTitle = this.page.locator(POSTER_TITLE_SELECTOR).first();
+    return (await firstTitle.textContent())?.trim() ?? null;
   }
 
   async clickFirstPoster() {
