@@ -6,7 +6,7 @@ The pipeline starts with two data sources pulled from separate repos as GitHub
 release assets:
 
 1. **`combined-data.json`** — the main cinema dataset from
-   `clusterflick/data-combined`, containing all 240+ London cinemas, their
+   `clusterflick/data-combined`, containing all 300+ London cinemas, their
    movies, showings, and individual performances in one monolithic JSON file.
 2. **Four review files** from `clusterflick/data-matched` — `imdb.json`,
    `letterboxd.json`, `metacritic.json`, `rottentomatoes.json`.
@@ -27,7 +27,7 @@ The combined data has this top-level shape:
 
 The `movies` object is the heavyweight — each movie contains all its showings
 (which cinema is showing it, with what URL) and all its performances (every
-individual screening time across every cinema). With 240+ cinemas and
+individual screening time across every cinema). With 300+ cinemas and
 potentially thousands of films, this is an enormous object.
 
 ## Phase 1: Data Reduction
