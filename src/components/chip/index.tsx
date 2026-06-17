@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import clsx from "clsx";
 import styles from "./chip.module.css";
 
@@ -39,8 +40,10 @@ export default function Chip(props: ChipProps) {
     }
   };
 
-  const value = props.type === "radio" ? props.value : label;
-  const inputId = `chip-${name}-${value}`.toLowerCase().replace(/\s+/g, "-");
+  // Use a per-instance unique id so labels never collide. Deriving the id from
+  // the label breaks when two chips share a label (e.g. "Greenwich" for both an
+  // ODEON and a Picturehouse venue), making one label toggle the other's input.
+  const inputId = useId();
 
   return (
     <label

@@ -131,7 +131,10 @@ export class HomePage {
     const countsLocator = this.page.locator(FILTER_COUNTS_SELECTOR);
     await countsLocator.waitFor({ state: "visible", timeout: 5000 });
     const countsBefore = await countsLocator.textContent();
-    await this.page.click('label[for="chip-date-option-tomorrow"]');
+    await this.page
+      .locator("label", { hasText: "Tomorrow" })
+      .filter({ has: this.page.locator('input[name="date-option"]') })
+      .click();
     await expect(countsLocator).not.toHaveText(countsBefore!, {
       timeout: 5000,
     });
