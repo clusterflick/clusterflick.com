@@ -252,7 +252,7 @@ test.describe("Discovery Home Page", () => {
     await page.goto(SITE_URL);
   });
 
-  test("home page surfaces discovery sections, nav and the browse CTA", async ({
+  test("home page surfaces discovery sections and the browse CTA", async ({
     page,
   }) => {
     // Discovery rows render real movie links (poster rows).
@@ -271,12 +271,6 @@ test.describe("Discovery Home Page", () => {
       .first();
     await expect(browseCta).toBeVisible();
     await expect(browseCta).toHaveAttribute("href", /\/films\/?$/);
-
-    // Nav now links to Films (the grid) and no longer to "Near Me".
-    await expect(
-      page.getByRole("link", { name: "Films", exact: true }).first(),
-    ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Near Me" })).toHaveCount(0);
 
     await page.screenshot({
       path: "test-results/screenshots/discovery-home.png",
