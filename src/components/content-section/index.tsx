@@ -23,6 +23,8 @@ interface ContentSectionProps {
   as?: HeadingLevel;
   /** Text alignment (default: "left") */
   align?: "left" | "center";
+  /** Optional action (e.g. a "see all" link) rendered top-right of the title */
+  action?: ReactNode;
   /** Section content */
   children?: ReactNode;
   /** Optional className for the section container */
@@ -39,25 +41,37 @@ export default function ContentSection({
   intro,
   as: Heading = "h2",
   align = "left",
+  action,
   children,
   className = "",
 }: ContentSectionProps) {
   const alignmentClass = align === "center" ? styles.centered : "";
 
+  const heading = (
+    <Heading className={styles.title}>
+      {icon && (
+        <Image
+          src={icon.src}
+          alt={title}
+          width={icon.width}
+          height={icon.height}
+          className={clsx(styles.icon, icon.className)}
+        />
+      )}
+      {title}
+    </Heading>
+  );
+
   return (
     <section className={clsx(styles.section, alignmentClass, className)}>
-      <Heading className={styles.title}>
-        {icon && (
-          <Image
-            src={icon.src}
-            alt={title}
-            width={icon.width}
-            height={icon.height}
-            className={clsx(styles.icon, icon.className)}
-          />
-        )}
-        {title}
-      </Heading>
+      {action ? (
+        <div className={styles.titleRow}>
+          {heading}
+          <div className={styles.action}>{action}</div>
+        </div>
+      ) : (
+        heading
+      )}
       {intro && <p className={styles.intro}>{intro}</p>}
       {children}
     </section>

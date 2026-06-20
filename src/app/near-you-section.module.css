@@ -1,0 +1,75 @@
+.prompt {
+  max-width: 824px;
+  margin: 0 auto 64px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  background-color: rgba(var(--color-light-gray-rgb), 0.06);
+  border: 1px solid rgba(var(--color-light-gray-rgb), 0.18);
+  border-radius: 8px;
+}
+
+.promptTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.promptText {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  margin: 0 0 4px;
+}
+
+.error {
+  font-size: 14px;
+  color: var(--color-neon-pink);
+  opacity: 0.85;
+}
+
+.results {
+  margin-bottom: 48px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.venueGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .venueGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .venueGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.venueItem {
+  position: relative;
+}
+
+.distance {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+  background: rgba(1, 0, 19, 0.85);
+  padding: 3px 8px;
+  border-radius: 20px;
+  pointer-events: none;
+}

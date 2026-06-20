@@ -6,7 +6,7 @@ import styles from "./venue-card.module.css";
 interface VenueCardProps {
   href: string;
   name: string;
-  type: string;
+  type?: string;
   imagePath: string | null;
   filmCount?: number;
   performanceCount?: number;
@@ -37,11 +37,13 @@ export default function VenueCard({
       </div>
       <div className={styles.body}>
         <span className={styles.name}>{name}</span>
-        <div className={styles.meta}>
-          <Tag color="blue" size="sm">
-            {type.toLowerCase() === "unknown" ? "Other" : type}
-          </Tag>
-        </div>
+        {type && (
+          <div className={styles.meta}>
+            <Tag color="blue" size="sm">
+              {type.toLowerCase() === "unknown" ? "Other" : type}
+            </Tag>
+          </div>
+        )}
         {filmCount !== undefined && performanceCount !== undefined && (
           <span className={styles.stats}>
             {filmCount > 0 ? (

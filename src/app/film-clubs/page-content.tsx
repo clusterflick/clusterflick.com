@@ -21,7 +21,7 @@ export default function FilmClubsPageContent({
     <StandardPageLayout
       title="Film Clubs"
       subtitle={subtitle}
-      backUrl="/"
+      backUrl="/films"
       backText="Back to film list"
     >
       <p className={styles.intro}>

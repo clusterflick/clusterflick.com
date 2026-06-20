@@ -8,6 +8,8 @@
     "lint": "tsc --noEmit && eslint",
     "format": "prettier --write --ignore-path .gitignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
+    "generate-summary": "node ./scripts/generate-summary.mjs",
+    "test": "vitest run --project unit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --stats-json",
     "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts",

@@ -6,16 +6,22 @@ const POSTER_SELECTOR = 'a[href^="/movies/"]';
 const POSTER_TITLE_SELECTOR = `${POSTER_SELECTOR} h2`;
 const FILTER_TRIGGER_SELECTOR = 'button[aria-label*="filter options"]';
 const SEARCH_INPUT_SELECTOR = "#filter-search";
-const COLLAPSE_BUTTON_SELECTOR = 'button[aria-expanded="true"]';
 const FILTER_COUNTS_SELECTOR = '[aria-live="polite"][aria-atomic="true"]';
 
-export class HomePage {
+/** The browse/filter grid, which now lives at /films (the home page is discovery). */
+export class FilmsPage {
   constructor(private page: Page) {}
 
   async goto() {
+    // Enter via the real journey: land on the discovery home page, then click
+    // through to the films grid.
     await this.page.goto(SITE_URL);
+    await this.page
+      .getByRole("link", { name: /Browse all films/i })
+      .first()
+      .click();
+    await this.page.waitForURL(/\/films\/?$/);
     await this.page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
-    await this.collapseIntroNotice();
     await this.waitForAllDataLoaded();
     await this.waitForFilterAvailable();
   }
@@ -155,16 +161,6 @@ export class HomePage {
       await this.page.waitForLoadState("networkidle", { timeout: 5000 });
     } catch {
       // Don't fail if timeout - images may still be loading from slow CDN
-    }
-  }
-
-  private async collapseIntroNotice() {
-    const collapseButton = this.page.locator(COLLAPSE_BUTTON_SELECTOR);
-    if (await collapseButton.isVisible({ timeout: 2000 })) {
-      await collapseButton.click();
-      await this.page.waitForSelector('button[aria-expanded="false"]', {
-        timeout: 2000,
-      });
     }
   }
 }

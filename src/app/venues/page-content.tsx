@@ -17,7 +17,7 @@ export default function VenuesPageContent({
     <StandardPageLayout
       title="Venues"
       subtitle={`${totalVenues.toLocaleString("en-GB")} venues across London`}
-      backUrl="/"
+      backUrl="/films"
       backText="Back to film list"
     >
       <p className={styles.intro}>

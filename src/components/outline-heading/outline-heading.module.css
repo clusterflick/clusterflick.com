@@ -5,22 +5,27 @@
   z-index: 0;
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 900;
+  --outline-color: var(--color-neon-pink);
 }
 
-.overlap {
+/* The outlined duplicate behind the solid text. Drawn from data-text via a
+   pseudo-element so the heading text isn't repeated in the DOM. */
+.heading::before {
+  content: attr(data-text);
   position: absolute;
   left: 0;
   z-index: -1;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 4px;
+  -webkit-text-stroke: 4px var(--outline-color);
   user-select: none;
+  pointer-events: none;
 }
 
-/* Color variants */
+/* Color variants — set the stroke colour of the outlined duplicate. */
 .pink {
-  color: var(--color-neon-pink);
+  --outline-color: var(--color-neon-pink);
 }
 
 .blue {
-  color: var(--color-electric-blue);
+  --outline-color: var(--color-electric-blue);
 }

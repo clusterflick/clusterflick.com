@@ -21,14 +21,14 @@ export default function OutlineHeading({
   as: Component = "h1",
   color = "pink",
 }: OutlineHeadingProps) {
+  // The outlined duplicate is drawn with a ::before pseudo-element sourced from
+  // `data-text`, not a second text node, so the heading's text content — and
+  // what search engines read — appears only once. Requires `children: string`.
   return (
-    <Component className={clsx(styles.heading, className)}>
-      <span
-        className={clsx(styles.overlap, colorStyles[color])}
-        aria-hidden="true"
-      >
-        {children}
-      </span>
+    <Component
+      className={clsx(styles.heading, colorStyles[color], className)}
+      data-text={children}
+    >
       {children}
     </Component>
   );

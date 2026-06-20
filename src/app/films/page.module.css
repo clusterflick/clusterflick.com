@@ -1,0 +1,75 @@
+.page {
+  margin-top: 100px;
+}
+
+/* Override padding for loading footer at bottom of page */
+.loadingFooter {
+  padding: 40px 20px 60px;
+}
+
+/* Static movie grid for SSR — hidden once JS loads */
+.staticMovies {
+  padding: 0 20px;
+}
+
+.staticMovies h1 {
+  font-size: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* Pull the SSR heading up under the (JS-hidden) filter bar's reserved space. */
+.staticHeading {
+  margin-top: -49px;
+  text-align: center;
+  color: var(--color-black);
+}
+
+.staticGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.staticMovieLink {
+  display: block;
+  width: 200px;
+  height: 300px;
+  text-decoration: none;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
+}
+
+.staticPoster {
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.staticTitle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-white);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85) 70%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+}
+
+.staticYear {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-electric-blue);
+}

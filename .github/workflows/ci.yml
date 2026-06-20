@@ -45,6 +45,9 @@ jobs:
           fileName: "*"
           out-file-path: "matched-data"
       - run: npm run process-combined-data
+      - run: npm run generate-summary
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       - run: npm run build-storybook
       - name: Publish to Chromatic
         if: github.actor != 'dependabot[bot]'

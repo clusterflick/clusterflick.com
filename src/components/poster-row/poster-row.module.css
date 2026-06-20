@@ -1,0 +1,61 @@
+.row {
+  margin-bottom: 36px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Tighter gap when an intro line follows the title. */
+.headerTight {
+  margin-bottom: 4px;
+}
+
+.intro {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: 0 0 16px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+h3.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  font-family: var(--font-inter), sans-serif;
+}
+
+.seeAll {
+  flex-shrink: 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.posterScroller {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
+}
+
+.posterLink {
+  flex-shrink: 0;
+  text-decoration: none;
+  border-bottom: none;
+}
+
+.posterLink:hover {
+  border-bottom: none;
+  color: inherit;
+}

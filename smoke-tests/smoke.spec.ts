@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { HomePage } from "./pages/home-page";
+import { FilmsPage } from "./pages/films-page";
 import { MovieDetailsPage } from "./pages/movie-details-page";
 import { FestivalsPage } from "./pages/festivals-page";
 import { FestivalDetailPage } from "./pages/festival-detail-page";
@@ -8,51 +8,53 @@ import { VenueDetailPage } from "./pages/venue-detail-page";
 import { LondonCinemasPage } from "./pages/london-cinemas-page";
 import { BoroughDetailPage } from "./pages/borough-detail-page";
 
+const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
+
 // With virtualization, the visible count stays roughly constant
 const EXPECTED_MIN_POSTERS = 6 * 3;
 // At the bottom, there may be fewer items (end of list)
 const EXPECTED_MIN_POSTERS_AT_BOTTOM = 6 * 2 + 1;
 
-let home: HomePage;
+let filmsPage: FilmsPage;
 
-test.describe("Smoke Tests", () => {
+test.describe("Films Grid (browse & filter)", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    home = new HomePage(page);
-    await home.goto();
+    filmsPage = new FilmsPage(page);
+    await filmsPage.goto();
   });
 
-  test("main page shows expected number of posters on desktop", async () => {
+  test("films page shows expected number of posters on desktop", async () => {
     await expect(async () => {
-      const posterCount = await home.countVisiblePosters();
+      const posterCount = await filmsPage.countVisiblePosters();
       expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
     }).toPass({ timeout: 5000 });
 
-    await home.screenshot("initial-load");
+    await filmsPage.screenshot("initial-load");
   });
 
   test("scrolling to bottom loads more posters", async () => {
-    await home.scrollToBottom();
+    await filmsPage.scrollToBottom();
 
     await expect(async () => {
-      const posterCount = await home.countVisiblePosters();
+      const posterCount = await filmsPage.countVisiblePosters();
       expect(posterCount).toBeGreaterThanOrEqual(
         EXPECTED_MIN_POSTERS_AT_BOTTOM,
       );
     }).toPass({ timeout: 5000 });
 
-    await home.screenshot("after-scroll-bottom");
+    await filmsPage.screenshot("after-scroll-bottom");
   });
 
   test("scrolling back to middle maintains expected poster count", async ({
     page,
   }) => {
-    await home.scrollToBottom();
-    await home.scrollToMiddle();
+    await filmsPage.scrollToBottom();
+    await filmsPage.scrollToMiddle();
 
     try {
       await expect(async () => {
-        const posterCount = await home.countVisiblePosters();
+        const posterCount = await filmsPage.countVisiblePosters();
         expect(posterCount).toBeGreaterThanOrEqual(EXPECTED_MIN_POSTERS);
       }).toPass({ timeout: 5000 });
     } catch (e) {
@@ -68,32 +70,32 @@ test.describe("Smoke Tests", () => {
       );
     }
 
-    await home.screenshot("after-scroll-middle");
+    await filmsPage.screenshot("after-scroll-middle");
   });
 
   test("search for first movie title shows exactly 1 match", async () => {
-    const firstMovieTitle = await home.getFirstMovieTitle();
+    const firstMovieTitle = await filmsPage.getFirstMovieTitle();
     expect(firstMovieTitle).toBeTruthy();
 
-    await home.searchForMovie(firstMovieTitle!);
+    await filmsPage.searchForMovie(firstMovieTitle!);
 
     await expect(async () => {
-      const searchResultCount = await home.countVisiblePosters();
+      const searchResultCount = await filmsPage.countVisiblePosters();
       expect(searchResultCount).toBe(1);
     }).toPass({ timeout: 5000 });
 
-    await home.screenshot("after-search");
+    await filmsPage.screenshot("after-search");
   });
 
   test("clicking first poster loads movie details with at least one performance", async ({
     page,
   }) => {
-    await home.setDateFilterToTomorrow();
+    await filmsPage.setDateFilterToTomorrow();
 
-    const expectedTitle = await home.getFirstMovieTitle();
+    const expectedTitle = await filmsPage.getFirstMovieTitle();
     expect(expectedTitle).toBeTruthy();
 
-    await home.clickFirstPoster();
+    await filmsPage.clickFirstPoster();
 
     const movieDetails = new MovieDetailsPage(page);
     await movieDetails.waitForPage(expectedTitle!);
@@ -241,5 +243,43 @@ test.describe("London Cinemas Pages", () => {
     expect(venueCount).toBeGreaterThanOrEqual(1);
 
     await boroughPage.screenshot("borough-detail");
+  });
+});
+
+test.describe("Discovery Home Page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(SITE_URL);
+  });
+
+  test("home page surfaces discovery sections, nav and the browse CTA", async ({
+    page,
+  }) => {
+    // Discovery rows render real movie links (poster rows).
+    await expect(page.locator('a[href^="/movies/"]').first()).toBeVisible({
+      timeout: 10000,
+    });
+
+    // The "Showing Across London" popularity row is the first discovery section.
+    await expect(
+      page.getByRole("heading", { name: "Showing Across London" }),
+    ).toBeVisible();
+
+    // Prominent CTA into the full grid at /films.
+    const browseCta = page
+      .getByRole("link", { name: /Browse all films/i })
+      .first();
+    await expect(browseCta).toBeVisible();
+    await expect(browseCta).toHaveAttribute("href", /\/films\/?$/);
+
+    // Nav now links to Films (the grid) and no longer to "Near Me".
+    await expect(
+      page.getByRole("link", { name: "Films", exact: true }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Near Me" })).toHaveCount(0);
+
+    await page.screenshot({
+      path: "test-results/screenshots/discovery-home.png",
+    });
   });
 });

@@ -17,7 +17,7 @@ export default function LondonCinemasPageContent({
     <StandardPageLayout
       title="London Cinemas"
       subtitle={`Find screening venues across ${totalBoroughs} London boroughs — from independent picture houses to major multiplex chains`}
-      backUrl="/"
+      backUrl="/films"
       backText="Back to film list"
     >
       <ContentSection title="Browse Cinemas by London Borough" as="h2">

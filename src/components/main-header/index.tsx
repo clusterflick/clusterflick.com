@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from "next/dynamic";
 import HeaderLogo from "@/components/header-logo";
 import HeaderNav from "@/components/header-nav";
@@ -12,21 +14,29 @@ export default function MainHeader({
   isFilterOverlayOpen,
   onFilterClick,
   onFilterTextHeightChange,
+  showFilters = true,
 }: {
-  isFilterOverlayOpen: boolean;
-  onFilterClick: () => void;
+  isFilterOverlayOpen?: boolean;
+  onFilterClick?: () => void;
   onFilterTextHeightChange?: (height: number) => void;
+  /**
+   * Whether to render the filter trigger. The discovery home page reuses this
+   * header for branding + navigation only, so passes `false`.
+   */
+  showFilters?: boolean;
 }) {
   return (
     <header className={styles.header}>
       <HeaderLogo />
-      <div className={styles.filter}>
-        <FilterTrigger
-          onClick={onFilterClick}
-          isOverlayOpen={isFilterOverlayOpen}
-          onTextHeightChange={onFilterTextHeightChange}
-        />
-      </div>
+      {showFilters && onFilterClick && (
+        <div className={styles.filter}>
+          <FilterTrigger
+            onClick={onFilterClick}
+            isOverlayOpen={isFilterOverlayOpen ?? false}
+            onTextHeightChange={onFilterTextHeightChange}
+          />
+        </div>
+      )}
       <HeaderNav />
       <MobileMenu />
     </header>

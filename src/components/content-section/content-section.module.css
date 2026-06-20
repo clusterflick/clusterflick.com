@@ -17,6 +17,19 @@
   flex-shrink: 0;
 }
 
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.action {
+  flex-shrink: 0;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
 .intro {
   font-size: 18px;
   margin-bottom: 32px;

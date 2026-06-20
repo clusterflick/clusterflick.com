@@ -201,7 +201,7 @@ export default async function AccessibilityPage() {
 
   return (
     <main id="main-content">
-      <PageHeader backUrl="/" backText="Back to film list" />
+      <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
         backgroundImage="/images/various-movie-seats.jpg"
@@ -326,7 +326,7 @@ export default async function AccessibilityPage() {
           {features.map((featureStat) => {
             const config = FEATURE_CONFIG[featureStat.feature];
             const label = ACCESSIBILITY_LABELS[featureStat.feature];
-            const filterUrl = `/?accessibility=${featureStat.feature}`;
+            const filterUrl = `/films?accessibility=${featureStat.feature}`;
 
             return (
               <section

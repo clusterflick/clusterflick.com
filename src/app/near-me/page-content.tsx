@@ -254,7 +254,7 @@ export default function NearMePageContent({
       title="Near You"
       subtitle={subtitle}
       heroExtra={heroExtra}
-      backUrl="/"
+      backUrl="/films"
       backText="Back to film list"
     >
       {!showResults && boroughPicker}

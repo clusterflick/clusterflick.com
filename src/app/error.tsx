@@ -45,7 +45,7 @@ export default function Error({ error, reset }: ErrorProps) {
           <Button onClick={reset}>Try Again</Button>
           <Button
             variant="secondary"
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = "/films")}
           >
             Go Home
           </Button>

@@ -3,165 +3,65 @@
 }
 
 .intro {
-  margin: 0 1rem;
-  margin-bottom: 32px;
-  background-color: rgba(var(--color-light-gray-rgb), 0.08);
-  border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
-  border-radius: 8px;
-  position: relative;
-  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 8px 20px 0;
+  text-align: center;
 }
 
-.introInner {
-  max-width: 824px;
+.introTitle {
+  font-size: clamp(30px, 6vw, 46px);
+  margin: 0 0 28px;
+}
+
+.introLead {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-light-gray);
+  margin: 0 auto 28px auto;
+}
+
+.summary {
+  margin: 24px auto 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--color-white);
+  text-align: left;
+}
+
+.summary p {
+  margin: 0 0 14px;
+  text-wrap: pretty;
+}
+
+.summary p:last-child {
+  margin-bottom: 0;
+}
+
+.sections {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 20px;
-}
-
-.introHeader {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.introHeader h1 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 0;
-  text-align: center;
-  flex: 1;
-  padding: 0 2.75rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5ch;
-  justify-content: center;
-}
-
-.toggleButton {
-  font-size: 13px;
-  color: var(--color-muted-gray);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px 0;
-  flex-shrink: 0;
-  font-family: inherit;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: absolute;
-  right: 1rem;
-  top: 0.5rem;
-}
-
-.toggleButton:hover {
-  color: var(--color-light-gray);
-}
-
-.introBody {
-  margin: 12px 0;
-}
-
-.introBody p {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-light-gray);
-  margin-bottom: 12px;
-}
-
-.introBody p:last-child {
-  margin-bottom: 0;
-}
-
-.collapsedIndicator {
-  text-align: center;
-  color: var(--color-muted-gray);
-  font-size: 18px;
-  letter-spacing: 4px;
-  padding: 2px 0 0 0;
-}
-
-.filterHighlight {
-  color: var(--color-electric-blue);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.signOff {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-light-gray);
-  text-align: center;
-  margin-bottom: 0;
-}
-
-/* Override padding for loading footer at bottom of page */
-.loadingFooter {
-  padding: 40px 20px 60px;
-}
-
-.textWithIcon {
-  white-space: nowrap;
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-}
-
-/* Static movie grid for SSR — hidden once JS loads */
-.staticMovies {
   padding: 0 20px;
 }
 
-.staticMovies h2 {
-  font-size: 20px;
-  margin-bottom: 24px;
-  text-align: center;
+.group {
+  margin-bottom: 36px;
 }
 
-.staticGrid {
+.groupTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.groupIntro {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: 0 0 20px;
+}
+
+.browseCta {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-}
-
-.staticMovieLink {
-  display: block;
-  width: 200px;
-  height: 300px;
-  text-decoration: none;
-  border: none;
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
-}
-
-.staticPoster {
-  width: 200px;
-  height: 300px;
-  object-fit: cover;
-  display: block;
-}
-
-.staticTitle {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-white);
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85) 70%);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: flex;
-  flex-direction: column;
-}
-
-.staticYear {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--color-electric-blue);
+  margin: 8px 0 64px;
 }

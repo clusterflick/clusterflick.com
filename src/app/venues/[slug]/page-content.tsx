@@ -148,7 +148,7 @@ export default function VenueDetailPageContent({
       <LinkedList
         items={accessibilityStats.map(({ feature, filmCount }) => ({
           key: feature,
-          href: `/?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
+          href: `/films?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
           label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
           detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
         }))}
@@ -159,7 +159,7 @@ export default function VenueDetailPageContent({
   return (
     <main id="main-content">
       <PreloadCinemaData />
-      <PageHeader backUrl="/" backText="Back to film list" />
+      <PageHeader backUrl="/films" backText="Back to film list" />
 
       <DetailPageHero
         name={venue.name}
@@ -310,7 +310,7 @@ export default function VenueDetailPageContent({
           <FilmPosterGrid
             movies={gridMovies}
             truncated={gridMoviesTruncated}
-            exploreHref={`/?venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
+            exploreHref={`/films?venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
             exploreLabel={`Start exploring films at ${venue.name}`}
             movieUrlParams={`venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
           />

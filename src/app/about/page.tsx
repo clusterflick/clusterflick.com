@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main id="main-content">
-      <PageHeader backUrl="/" backText="Back to film list" />
+      <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
         backgroundImage="/images/various-movie-seats.jpg"

@@ -7,7 +7,7 @@ import EmptyState from "@/components/empty-state";
 import styles from "./film-poster-grid.module.css";
 
 interface FilmPosterGridProps {
-  movies: { movie: Movie; performanceCount: number }[];
+  movies: { movie: Movie; performanceCount: number; subtitle?: string }[];
   truncated?: boolean;
   exploreHref?: string;
   exploreLabel?: string;
@@ -55,7 +55,7 @@ export default function FilmPosterGrid({
         }
       >
         <div className={styles.filmGrid}>
-          {movies.map(({ movie }) => {
+          {movies.map(({ movie, subtitle }) => {
             const includedMovies = movie.includedMovies;
             const includedWithPosters =
               includedMovies?.filter((m) => m.posterPath) || [];
@@ -63,6 +63,7 @@ export default function FilmPosterGrid({
               (movie.posterPath ? 1 : 0) + includedWithPosters.length;
             const useStackedPoster =
               includedMovies && includedMovies.length > 1 && totalPosters >= 2;
+            const posterSubtitle = subtitle ?? movie.year;
 
             return (
               <Link
@@ -75,7 +76,7 @@ export default function FilmPosterGrid({
                     mainPosterPath={movie.posterPath}
                     mainTitle={movie.title}
                     includedMovies={includedMovies}
-                    subtitle={movie.year}
+                    subtitle={posterSubtitle}
                     showOverlay
                   />
                 ) : (
@@ -84,7 +85,7 @@ export default function FilmPosterGrid({
                       movie.posterPath || includedWithPosters[0]?.posterPath
                     }
                     title={movie.title}
-                    subtitle={movie.year}
+                    subtitle={posterSubtitle}
                     showOverlay
                   />
                 )}

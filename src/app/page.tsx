@@ -1,21 +1,32 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import slugify from "@sindresorhus/slugify";
 import PageWrapper from "@/components/page-wrapper";
+import MainHeader from "@/components/main-header";
+import OutlineHeading from "@/components/outline-heading";
+import Divider from "@/components/divider";
+import { ButtonLink } from "@/components/button";
 import { getStaticData } from "@/utils/get-static-data";
-import { getPrimaryCategory } from "@/lib/filters/modules/categories";
-import { Category } from "@/types";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
-import IntroSection from "./intro-section";
-import PageContent from "./page-content";
-import SSROnly from "./ssr-only";
+import { computeDiscoveryRows } from "@/utils/get-discovery-movies";
+import { getEditorialSummary } from "@/utils/get-editorial-summary";
+import { getNearMeVenues, getNearMeFilmClubs } from "@/utils/get-near-me-data";
+import {
+  linkifySummary,
+  type SummaryLinkTarget,
+} from "@/utils/linkify-summary";
+import { getMovieUrl } from "@/utils/get-movie-url";
+import { getVenueUrl } from "@/utils/get-venue-url";
+import DiscoverySections from "./discovery-sections";
+import DiscoveryRowsView from "./discovery-rows-view";
+import NearYouSection from "./near-you-section";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Every Film Showing in London — Search London Cinema Listings",
+  // The root page shares a segment with the layout that defines the title
+  // template, so the "| Clusterflick" suffix isn't applied automatically here.
+  title:
+    "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
   description:
-    "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+    "Discover what's worth seeing across London's 250+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
   alternates: {
     canonical: "/",
   },
@@ -23,28 +34,33 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const data = await getStaticData();
+  const summary = getEditorialSummary();
 
-  // Apply the same default filters as the client so SSR output matches hydrated content
-  const defaultCategories = new Set([
-    Category.Movie,
-    Category.MultipleMovies,
-    Category.Shorts,
-  ]);
-  const todayMidnight = getLondonMidnightTimestamp();
-  const rangeStart = todayMidnight;
-  const rangeEnd = todayMidnight + 8 * MS_PER_DAY; // 7-day range, end is exclusive (midnight + 1 day)
-
-  const staticMovies = Object.values(data.movies)
-    .filter((movie) => {
-      // Category filter: only default categories
-      if (!defaultCategories.has(getPrimaryCategory(movie))) return false;
-      // Date range filter: must have at least one performance in range
-      return movie.performances.some(
-        (p) => p.time >= rangeStart && p.time < rangeEnd,
-      );
+  // Resolve the summary's known entities to canonical hrefs so the prose can be
+  // linkified at render — the AI text never carries URLs of its own.
+  const summaryTargets: SummaryLinkTarget[] = (summary?.links ?? [])
+    .map((link) => {
+      if (link.movieId) {
+        const movie = data.movies[link.movieId];
+        return movie ? { phrase: link.phrase, href: getMovieUrl(movie) } : null;
+      }
+      if (link.venueId) {
+        const venue = data.venues[link.venueId];
+        return venue ? { phrase: link.phrase, href: getVenueUrl(venue) } : null;
+      }
+      return null;
     })
-    .sort((a, b) => a.normalizedTitle.localeCompare(b.normalizedTitle))
-    .slice(0, 72);
+    .filter((target): target is SummaryLinkTarget => target !== null);
+
+  // Build-time snapshot of the rows for SSR / no-JS / slow connections. The
+  // client re-computes these against view-time data once it loads (see
+  // DiscoverySections), so lapsed showings drop out.
+  const serverRows = computeDiscoveryRows(data.movies);
+
+  const nearMeVenues = getNearMeVenues(data);
+  // Count all of a club's current films (matching the club page), not just this
+  // week's — otherwise the tile count differs from the club page on click-through.
+  const nearMeFilmClubs = await getNearMeFilmClubs(data);
 
   return (
     <>
@@ -60,114 +76,54 @@ export default async function Home() {
           }),
         }}
       />
+      <MainHeader showFilters={false} />
       <PageWrapper className={styles.page}>
-        <IntroSection
-          heading={
-            <h1>
-              <span>Every Film Showing in London</span>{" "}
-              <span>&mdash; Search London Cinema Listings</span>
-            </h1>
-          }
-          signOff={
-            <p className={styles.signOff}>
-              We hope you enjoy the site! Any questions?{" "}
-              <Link href="/about">Please get in touch</Link>{" "}
-              <span className="nowrap">
-                &mdash; Your friends at{" "}
-                <span className={styles.textWithIcon}>
-                  Clusterflick
-                  <Image
-                    src="/images/icon.svg"
-                    alt="Clusterflick"
-                    width={20}
-                    height={20}
-                  />
-                </span>
-              </span>
-            </p>
-          }
-        >
-          <p>
-            Find every film showing across London, all in one place. From
-            blockbusters at Picturehouses and Everyman, to independent gems at{" "}
-            <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
-            <Link href="/venues/genesis-cinema">Genesis Cinema</Link>, and{" "}
-            <Link href="/venues/prince-charles-cinema">
-              Prince Charles Cinema
-            </Link>{" "}
-            (and more, there&apos;s way too many venues to name them all!)
-            We&apos;re currently tracking over 1,000 films showing across{" "}
-            <Link href="/venues" className="nowrap">
-              London&apos;s 250+ venues
-            </Link>
-            .
+        <header className={styles.intro}>
+          <OutlineHeading as="h1" className={styles.introTitle}>
+            What&apos;s On at London Cinemas
+          </OutlineHeading>
+          <p className={styles.introLead}>
+            Clusterflick brings every film screening across 300+ London venues
+            into one place.
+            <br />
+            From blockbusters at Picturehouses and Everyman to independent gems
+            at the <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
+            <Link href="/venues/genesis-cinema">Genesis</Link> and the{" "}
+            <Link href="/venues/prince-charles-cinema">Prince Charles</Link>{" "}
+            cinemas.
           </p>
-          <p>
-            With so much to choose from, use the menu at the top to filter for
-            the showings you&apos;re looking for. We&apos;ve started you off
-            with{" "}
-            <span className={styles.filterHighlight}>
-              Films, Multiple Films & Short Film
-            </span>
-            {" • "}
-            <span className={styles.filterHighlight}>At all Venues</span>
-            {" • "}
-            <span className={styles.filterHighlight}>
-              Showing in Next 7 Days
-            </span>{" "}
-            but that&apos;s just the start of your discovery journey. Jump in!
-            🍿
-          </p>
-          <p>
-            Compare showtimes, find screenings, discover late-night films, and
-            book tickets all from one page. No more checking dozens of cinema
-            websites ❤️
-          </p>
-        </IntroSection>
-        <PageContent />
-        <SSROnly>
-          <section className={styles.staticMovies}>
-            <h2
-              style={{
-                marginTop: -49,
-                textAlign: "center",
-                color: "var(--color-black)",
-              }}
-            >
-              Films Showing in London
-            </h2>
-            <div className={styles.staticGrid}>
-              {staticMovies.map((movie) => {
-                const posterPath =
-                  movie.posterPath ||
-                  movie.includedMovies?.find((m) => m.posterPath)?.posterPath;
-                return (
-                  <Link
-                    key={movie.id}
-                    href={`/movies/${movie.id}/${slugify(movie.title)}`}
-                    className={styles.staticMovieLink}
-                  >
-                    {posterPath && (
-                      <Image
-                        src={`https://image.tmdb.org/t/p/w200${posterPath}`}
-                        alt={movie.title}
-                        width={150}
-                        height={225}
-                        className={styles.staticPoster}
-                      />
-                    )}
-                    <span className={styles.staticTitle}>
-                      {movie.title}
-                      {movie.year && (
-                        <span className={styles.staticYear}>{movie.year}</span>
-                      )}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        </SSROnly>
+          {summary && (
+            <>
+              <Divider />
+              <div className={styles.summary} data-source={summary.source}>
+                {summary.text
+                  .split(/\n+/)
+                  .filter((para) => para.trim().length > 0)
+                  .map((para, index) => (
+                    <p key={index}>{linkifySummary(para, summaryTargets)}</p>
+                  ))}
+              </div>
+            </>
+          )}
+        </header>
+
+        <div className={styles.sections}>
+          <div className={styles.browseCta}>
+            <ButtonLink href="/films">Browse all films →</ButtonLink>
+          </div>
+
+          <DiscoverySections
+            fallback={<DiscoveryRowsView rows={serverRows} />}
+          />
+
+          <div className={styles.browseCta}>
+            <ButtonLink href="/films">Browse all films →</ButtonLink>
+          </div>
+
+          <Divider />
+
+          <NearYouSection venues={nearMeVenues} filmClubs={nearMeFilmClubs} />
+        </div>
       </PageWrapper>
     </>
   );

@@ -1,28 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import clsx from "clsx";
 import OutlineHeading from "@/components/outline-heading";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { useFilterConfig } from "@/state/filter-config-context";
 import styles from "./header-logo.module.css";
 
 export default function HeaderLogo() {
   const { isLoading } = useCinemaData();
-  const { resetFilters } = useFilterConfig();
-
-  const handleClick = () => {
-    resetFilters();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
-    <button
-      className={styles.home}
-      onClick={handleClick}
-      type="button"
-      aria-label="Clusterflick — reset filters and return to top"
-    >
+    <Link className={styles.home} href="/" aria-label="Clusterflick — home">
       <Image
         src="/images/icon.svg"
         alt="Clusterflick"
@@ -31,6 +20,6 @@ export default function HeaderLogo() {
         className={clsx(styles.logo, isLoading && styles.spinning)}
       />
       <OutlineHeading as="div">Clusterflick</OutlineHeading>
-    </button>
+    </Link>
   );
 }

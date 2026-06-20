@@ -2,9 +2,11 @@ import { Category, Movie } from "@/types";
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
 
 /**
- * Default categories: Films, Multiple Films, Short Films
+ * Default categories shown on the films grid and the discovery home page:
+ * Films, Multiple Films, Short Films. Single source of truth — reused by the
+ * client filter default, the `/films` SSR snapshot, and the discovery helpers.
  */
-const DEFAULT_CATEGORIES: Category[] = [
+export const DEFAULT_CATEGORIES: Category[] = [
   Category.Movie,
   Category.MultipleMovies,
   Category.Shorts,

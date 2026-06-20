@@ -27,7 +27,7 @@ export default function FestivalsPageContent({
     <StandardPageLayout
       title="Festivals"
       subtitle={subtitle}
-      backUrl="/"
+      backUrl="/films"
       backText="Back to film list"
     >
       {count > 0 && (

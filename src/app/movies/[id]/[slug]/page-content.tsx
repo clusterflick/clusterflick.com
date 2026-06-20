@@ -186,7 +186,7 @@ export default function PageContent({
 
   return (
     <main id="main-content" className={styles.page}>
-      <PageHeader backUrl="/" backText="Back to film list" />
+      <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
         backgroundImage={

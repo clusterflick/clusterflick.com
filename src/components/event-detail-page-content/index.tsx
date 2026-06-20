@@ -167,7 +167,7 @@ export default function EventDetailPageContent({
           <FilmPosterGrid
             movies={gridMovies}
             truncated={gridMoviesTruncated}
-            exploreHref="/"
+            exploreHref="/films"
             exploreLabel="Or start exploring all films"
             showAll
           />
