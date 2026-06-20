@@ -597,7 +597,7 @@ function buildPrompt(signals) {
     ...new Set(signals.links.filter((l) => l.movieId).map((l) => l.phrase)),
   ];
 
-  return `Write the editorial note for the top of Clusterflick's discovery page, using ONLY the data below (this week's London screenings). It is the reader's lead-in to the page, so you have room — one or two short paragraphs, whatever the data justifies. Don't pad.
+  return `Write the editorial note for the top of Clusterflick's discovery page, using ONLY the data below (this week's London screenings). It is the reader's lead-in to the page, so you have room — write two paragraphs of three or four sentences each, spreading your picks across them. Give each pick enough context to be useful, but don't pad.
 
 What to surface, in priority order — lead with the most special thing actually present, then work down. Use only categories that have data; silently skip any that are missing:
 1. The unmissable thing — a special format or event (a 70mm/35mm print, a premiere, a Q&A or guest in attendance).
@@ -698,10 +698,10 @@ async function generateAiSummary(signals) {
     model: MODEL,
     systemInstruction: SYSTEM_INSTRUCTION,
     generationConfig: {
-      // Kept low: this is a grounded, factual note, so we want the model to
-      // stick to the supplied data rather than embellish (a higher temperature
-      // is what produced fabricated directors/titles).
-      temperature: 0.2,
+      // Moderate: enough warmth for natural, two-paragraph editorial prose.
+      // Accuracy is enforced by grounding the prompt in the candidate data and
+      // validating filmsMentioned/directorsMentioned, not by a low temperature.
+      temperature: 0.4,
       maxOutputTokens: 700,
       responseMimeType: "application/json",
       responseSchema: {
