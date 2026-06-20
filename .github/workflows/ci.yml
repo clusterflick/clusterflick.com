@@ -45,9 +45,11 @@ jobs:
           fileName: "*"
           out-file-path: "matched-data"
       - run: npm run process-combined-data
+      # No GEMINI_API_KEY here: CI never deploys, so generating a paid AI summary
+      # per push/PR would be wasted. The script falls back to a deterministic
+      # template, which still validates the script and is stable for Chromatic.
+      # The real AI summary is generated in generate_site.yml at deploy time.
       - run: npm run generate-summary
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       - run: npm run build-storybook
       - name: Publish to Chromatic
         if: github.actor != 'dependabot[bot]'
