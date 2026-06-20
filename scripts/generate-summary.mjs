@@ -23,6 +23,11 @@ import {
   getRating,
   EVERGREEN_MAX_FUTURE,
 } from "../src/utils/movie-ratings.mjs";
+import {
+  getAllowedFilmTitles,
+  findUnknownFilms,
+  findUnknownDirectors,
+} from "../src/utils/validate-summary.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "..", "public", "data");
@@ -152,6 +157,13 @@ function venueType(meta, venueId) {
   return meta.venues?.[venueId]?.type ?? null;
 }
 
+/** Resolve a movie's director IDs to names via the meta people map. */
+function directorNames(meta, movie) {
+  return (movie.directors ?? [])
+    .map((id) => meta.people?.[id]?.name)
+    .filter(Boolean);
+}
+
 function formatWhen(time) {
   return new Date(time).toLocaleDateString("en-GB", {
     weekday: "short",
@@ -232,6 +244,7 @@ function computeSignals(meta, movies, now) {
     }
 
     const rating = getRating(movie);
+    const directors = directorNames(meta, movie);
     const venueCount = venueIds.size;
     const allFuture = (movie.performances ?? []).filter((p) => p.time >= now);
     // Evergreen = a permanent, continuously-running fixture (e.g. a museum IMAX
@@ -255,6 +268,7 @@ function computeSignals(meta, movies, now) {
       eventCandidates.push({
         id,
         title: movie.title,
+        directors,
         hook: event.hook,
         weight: event.weight,
         venue: venueName(meta, event.showing?.venueId),
@@ -275,6 +289,7 @@ function computeSignals(meta, movies, now) {
         unusualCandidates.push({
           id,
           title: movie.title,
+          directors,
           venue: venueName(meta, unusual.showing?.venueId),
           venueId: unusual.showing?.venueId ?? null,
           venueType: venueType(meta, unusual.showing?.venueId),
@@ -291,6 +306,7 @@ function computeSignals(meta, movies, now) {
       oneOffCandidates.push({
         id,
         title: movie.title,
+        directors,
         venue: venueName(meta, only?.showing?.venueId),
         venueId: only?.showing?.venueId ?? null,
         when: formatWhen(allFuture[0].time),
@@ -315,6 +331,7 @@ function computeSignals(meta, movies, now) {
           endingCandidates.push({
             id,
             title: movie.title,
+            directors,
             finalWhen: formatWhen(finalTime),
             venueCount,
             venue: venueName(meta, finalShowing?.venueId),
@@ -336,6 +353,7 @@ function computeSignals(meta, movies, now) {
       gemCandidates.push({
         id,
         title: movie.title,
+        directors,
         rating: rating.text,
         norm: rating.norm,
         venues: venueCount,
@@ -359,6 +377,7 @@ function computeSignals(meta, movies, now) {
       newlyAddedCandidates.push({
         id,
         title: movie.title,
+        directors,
         kind,
         year: new Date(releaseTime).getUTCFullYear(),
         rating: rating?.text ?? null,
@@ -371,6 +390,7 @@ function computeSignals(meta, movies, now) {
       popularCandidates.push({
         id,
         title: movie.title,
+        directors,
         venueCount,
         score: venueCount * 3 + upcoming.length,
       });
@@ -463,6 +483,28 @@ function computeSignals(meta, movies, now) {
     if (c.venueId) addLink(c.venue, { venueId: c.venueId });
   }
 
+  // Every director name we hand the model, deduped — the set a credited director
+  // is validated against, so a fabricated name (or one from another film) is
+  // rejected before it ships.
+  const allowedDirectors = [];
+  const seenDirector = new Set();
+  for (const c of [
+    ...events,
+    ...oneOffs,
+    ...endingSoon,
+    ...unusualVenues,
+    ...acclaimedGems,
+    ...newlyAdded,
+    ...popular,
+  ]) {
+    for (const name of c.directors ?? []) {
+      const key = name.toLowerCase();
+      if (seenDirector.has(key)) continue;
+      seenDirector.add(key);
+      allowedDirectors.push(name);
+    }
+  }
+
   return {
     events,
     oneOffs,
@@ -477,14 +519,20 @@ function computeSignals(meta, movies, now) {
       celluloidShowings: celluloidPerfs,
     },
     links,
+    allowedDirectors,
   };
 }
 
 function buildPromptData(signals) {
   const clean = (arr, fn) => (arr.length ? arr.map(fn) : undefined);
+  // A single director string for the prompt; undefined when none is known, so
+  // the model has nothing to credit (and the "leave it out" rule applies).
+  const dir = (c) =>
+    c.directors?.length ? c.directors.join(" & ") : undefined;
   return {
     specialEventsAndFormats: clean(signals.events, (e) => ({
       film: e.title,
+      director: dir(e),
       hook: e.hook,
       venue: e.venue,
       when: e.when,
@@ -492,18 +540,21 @@ function buildPromptData(signals) {
     })),
     oneOffScreenings: clean(signals.oneOffs, (o) => ({
       film: o.title,
+      director: dir(o),
       venue: o.venue,
       when: o.when,
       rating: o.rating,
     })),
     endingSoon: clean(signals.endingSoon, (e) => ({
       film: e.title,
+      director: dir(e),
       finalShowing: e.finalWhen,
       venue: e.venue,
       rating: e.rating,
     })),
     atUnconventionalVenues: clean(signals.unusualVenues, (u) => ({
       film: u.title,
+      director: dir(u),
       venue: u.venue,
       venueKind: u.venueType,
       when: u.when,
@@ -511,6 +562,7 @@ function buildPromptData(signals) {
     })),
     acclaimedButLowProfile: clean(signals.acclaimedGems, (g) => ({
       film: g.title,
+      director: dir(g),
       rating: g.rating,
       venues: g.venues,
       venue: g.venue,
@@ -518,12 +570,14 @@ function buildPromptData(signals) {
     })),
     newlyAdded: clean(signals.newlyAdded, (n) => ({
       film: n.title,
+      director: dir(n),
       what: n.kind,
       year: n.year,
       rating: n.rating,
     })),
     showingMostWidely: clean(signals.popular, (p) => ({
       film: p.title,
+      director: dir(p),
       venues: p.venueCount,
     })),
     weekShape: {
@@ -539,6 +593,9 @@ const SYSTEM_INSTRUCTION =
 
 function buildPrompt(signals) {
   const data = buildPromptData(signals);
+  const allowedTitles = [
+    ...new Set(signals.links.filter((l) => l.movieId).map((l) => l.phrase)),
+  ];
 
   return `Write the editorial note for the top of Clusterflick's discovery page, using ONLY the data below (this week's London screenings). It is the reader's lead-in to the page, so you have room — one or two short paragraphs, whatever the data justifies. Don't pad.
 
@@ -551,11 +608,16 @@ What to surface, in priority order — lead with the most special thing actually
 
 Always name films concretely and give each a real hook — the venue, the date, the format, the rating, or why it matters. If only popular/shape data is present, still give a useful one- or two-sentence orientation naming a couple of films.
 
-CRITICAL — accuracy. Every fact must come from the data. A film's venue and date may ONLY be the ones listed inside that same film's own entry. Never attach a venue, date, format or rating taken from a different film's entry. If an entry has no venue or date, do not state one for that film — describe it without (e.g. "showing at a single venue"). Never invent or guess titles, venues, dates or ratings.
+CRITICAL — accuracy. Every fact must come from the data. A film's venue and date may ONLY be the ones listed inside that same film's own entry. Never attach a venue, date, format or rating taken from a different film's entry. If an entry has no venue or date, do not state one for that film — describe it without (e.g. "showing at a single venue"). Never invent or guess titles, venues, dates or ratings. You may credit a film's director, but ONLY using the exact name in that same film's "director" field — never a name from memory or from another film, and never a cast member or any other fact not present in the entry. If a film has no "director" field, do not name its director.
 
 Spread your picks across different cinemas where the data allows — don't centre the whole note on one venue, even if it has several entries. Aim to mention two or three different cinemas.
 
-Style: plain prose, British English, calm and understated. No greetings or openers like "Right then" or "This week, London film fans". No exclamation marks, no hype, no markdown, no headings, no emoji, no lists.
+Style (applies to "note"): plain prose, British English, calm and understated. No greetings or openers like "Right then" or "This week, London film fans". No exclamation marks, no hype, no markdown, no headings, no emoji, no lists.
+
+You may name films ONLY from this allowed list — never any other title, however well it would fit:
+${allowedTitles.map((t) => `- ${t}`).join("\n")}
+
+Output: respond with a single JSON object of the form { "note": string, "filmsMentioned": string[], "directorsMentioned": string[] }. "note" is the editorial prose described above. "filmsMentioned" must list every film title you named in "note", copied verbatim and exactly as written in the allowed list above — no more, no fewer. "directorsMentioned" must list every director you named in "note", each exactly as written in that film's "director" field (use [] if you credited none).
 
 Data:
 ${JSON.stringify(data, null, 2)}`;
@@ -635,18 +697,57 @@ async function generateAiSummary(signals) {
   const model = genAI.getGenerativeModel({
     model: MODEL,
     systemInstruction: SYSTEM_INSTRUCTION,
-    generationConfig: { temperature: 0.4, maxOutputTokens: 700 },
+    generationConfig: {
+      // Kept low: this is a grounded, factual note, so we want the model to
+      // stick to the supplied data rather than embellish (a higher temperature
+      // is what produced fabricated directors/titles).
+      temperature: 0.2,
+      maxOutputTokens: 700,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "object",
+        properties: {
+          note: { type: "string" },
+          filmsMentioned: { type: "array", items: { type: "string" } },
+          directorsMentioned: { type: "array", items: { type: "string" } },
+        },
+        required: ["note", "filmsMentioned", "directorsMentioned"],
+      },
+    },
   });
   const prompt = buildPrompt(signals);
+  const allowedTitles = getAllowedFilmTitles(signals.links);
 
   // Gemini occasionally 503s under load; retry a few times before giving up so
-  // a transient hiccup doesn't drop us to the template.
+  // a transient hiccup doesn't drop us to the template. A response that names a
+  // film outside the candidate data (a hallucination) is treated as a failure
+  // too, so the retry/template path catches it rather than shipping it.
   let lastError;
   for (let attempt = 1; attempt <= AI_MAX_ATTEMPTS; attempt++) {
     try {
       const result = await model.generateContent(prompt);
-      const text = sanitize(result.response.text().trim());
+      const parsed = JSON.parse(result.response.text());
+      const text = sanitize((parsed.note ?? "").trim());
       if (!text) throw new Error("Empty response from Gemini");
+
+      const unknownFilms = findUnknownFilms(
+        parsed.filmsMentioned,
+        allowedTitles,
+      );
+      if (unknownFilms.length > 0) {
+        throw new Error(
+          `Summary named films not in the data: ${unknownFilms.join(", ")}`,
+        );
+      }
+      const unknownDirectors = findUnknownDirectors(
+        parsed.directorsMentioned,
+        signals.allowedDirectors,
+      );
+      if (unknownDirectors.length > 0) {
+        throw new Error(
+          `Summary credited directors not in the data: ${unknownDirectors.join(", ")}`,
+        );
+      }
       return text;
     } catch (error) {
       lastError = error;
