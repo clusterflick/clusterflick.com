@@ -53,30 +53,46 @@ function nameTokens(name) {
 }
 
 /**
+ * Split a credited string that may name several directors into individual names.
+ * Co-directed films are supplied as one joined field ("Lilly Wachowski & Lana
+ * Wachowski"), and the model echoes that back as a single entry, so we split on
+ * "&", "and" and commas before matching each name on its own.
+ */
+function splitDirectorNames(value) {
+  return value
+    .split(/\s*(?:&|,|\band\b)\s*/i)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+/**
  * Returns the directors the model claims it credited that don't match any
  * director we actually supplied — i.e. fabricated names. Matching is by word
  * tokens so an editorial surname ("Kubrick") still matches the supplied full
  * name ("Stanley Kubrick"): a mention is valid when all its words appear in some
- * allowed director's name. Guards against wholesale invention, not surname
- * disambiguation.
+ * allowed director's name. Multi-director credits are split first, so a correct
+ * co-director pair isn't rejected just for being joined. Guards against
+ * wholesale invention, not surname disambiguation.
  *
  * @param {string[] | null | undefined} directorsMentioned
  * @param {string[] | null | undefined} allowedDirectors  full names as supplied
- * @returns {string[]}
+ * @returns {string[]}  the individual unmatched names
  */
 export function findUnknownDirectors(directorsMentioned, allowedDirectors) {
   const allowedTokenSets = (allowedDirectors ?? []).map(
     (name) => new Set(nameTokens(name)),
   );
   const unknown = [];
-  for (const name of directorsMentioned ?? []) {
-    if (typeof name !== "string") continue;
-    const tokens = nameTokens(name);
-    if (tokens.length === 0) continue;
-    const matches = allowedTokenSets.some((set) =>
-      tokens.every((token) => set.has(token)),
-    );
-    if (!matches) unknown.push(name);
+  for (const credit of directorsMentioned ?? []) {
+    if (typeof credit !== "string") continue;
+    for (const name of splitDirectorNames(credit)) {
+      const tokens = nameTokens(name);
+      if (tokens.length === 0) continue;
+      const matches = allowedTokenSets.some((set) =>
+        tokens.every((token) => set.has(token)),
+      );
+      if (!matches) unknown.push(name);
+    }
   }
   return unknown;
 }

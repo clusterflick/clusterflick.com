@@ -77,6 +77,24 @@ describe("findUnknownDirectors", () => {
     expect(findUnknownDirectors(["stanley kubrick"], allowed)).toEqual([]);
   });
 
+  it("accepts a correct co-director credit supplied as one joined string", () => {
+    // Co-directed films are supplied joined ("A & B") and echoed back as one
+    // entry; both names are valid even though the allowed set lists them apart.
+    const coDirected = ["Lilly Wachowski", "Lana Wachowski"];
+    expect(
+      findUnknownDirectors(["Lilly Wachowski & Lana Wachowski"], coDirected),
+    ).toEqual([]);
+    expect(
+      findUnknownDirectors(["Lana Wachowski and Lilly Wachowski"], coDirected),
+    ).toEqual([]);
+  });
+
+  it("flags only the fabricated half of a joined credit", () => {
+    expect(
+      findUnknownDirectors(["Stanley Kubrick & Arthur H. Vance"], allowed),
+    ).toEqual(["Arthur H. Vance"]);
+  });
+
   it("returns [] for empty/missing input", () => {
     expect(findUnknownDirectors([], allowed)).toEqual([]);
     expect(findUnknownDirectors(undefined, allowed)).toEqual([]);

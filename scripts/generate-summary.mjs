@@ -12,8 +12,11 @@
  * If no GEMINI_API_KEY is set (e.g. PR CI) or the call fails, a deterministic
  * template walks the same ladder so the build always produces a valid file.
  *
- * Uses the same model + key as the Clusterflick data-pipeline scripts
- * (@google/generative-ai, gemini-2.5-flash-lite, GEMINI_API_KEY).
+ * Uses the same SDK + key as the Clusterflick data-pipeline scripts
+ * (@google/generative-ai, GEMINI_API_KEY) but a stronger model: this runs only
+ * a couple of times a day and produces a single, prominent, user-facing note, so
+ * output quality matters far more than the per-call cost that drives the
+ * pipeline's flash-lite choice.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -36,9 +39,9 @@ const DATA_DIR = path.join(__dirname, "..", "public", "data");
 // not shipped. Kept in sync with src/utils/get-editorial-summary.ts.
 const OUTPUT_PATH = path.join(__dirname, "..", "editorial-summary.json");
 
-const MODEL = "gemini-2.5-flash-lite";
+const MODEL = "gemini-3.5-flash";
 // Retry Gemini a few times (it 503s under load) before falling back to template.
-const AI_MAX_ATTEMPTS = 3;
+const AI_MAX_ATTEMPTS = 5;
 const AI_RETRY_DELAY_MS = 30_000;
 const DAY = 86_400_000;
 const WINDOW_DAYS = 7;
@@ -164,7 +167,32 @@ function directorNames(meta, movie) {
     .filter(Boolean);
 }
 
-function formatWhen(time) {
+/**
+ * A ready-to-use date phrase relative to `now`, e.g. "today", "tomorrow", "on
+ * Friday", "next Monday". The summary is a build-time snapshot of "this week",
+ * so relative phrasing reads more naturally than absolute dates — but note it is
+ * anchored to BUILD time and not refreshed client-side, so it is only as fresh
+ * as the last deploy (fine here: deploys are triggered by data releases). Days
+ * 2–6 ahead are an unambiguous weekday ("on Friday"); day 7+ needs "next" to
+ * disambiguate from today's weekday; beyond a fortnight we fall back to an
+ * absolute date (defensive — candidates are always within this week's window).
+ */
+function formatWhen(time, now = Date.now()) {
+  const londonYMD = (ts) =>
+    new Date(ts).toLocaleDateString("en-CA", { timeZone: LONDON_TZ });
+  const dayStart = (ymd) => Date.parse(`${ymd}T00:00:00Z`);
+  const diffDays = Math.round(
+    (dayStart(londonYMD(time)) - dayStart(londonYMD(now))) / DAY,
+  );
+  const weekday = new Date(time).toLocaleDateString("en-GB", {
+    weekday: "long",
+    timeZone: LONDON_TZ,
+  });
+
+  if (diffDays === 0) return "today";
+  if (diffDays === 1) return "tomorrow";
+  if (diffDays >= 2 && diffDays <= 6) return `on ${weekday}`;
+  if (diffDays >= 7 && diffDays <= 13) return `next ${weekday}`;
   return new Date(time).toLocaleDateString("en-GB", {
     weekday: "short",
     day: "numeric",
@@ -260,7 +288,7 @@ function computeSignals(meta, movies, now) {
     const rep = sortedUpcoming[0];
     const repVenue = venueName(meta, rep?.showing?.venueId);
     const repVenueId = rep?.showing?.venueId ?? null;
-    const repWhen = rep ? formatWhen(rep.perf.time) : null;
+    const repWhen = rep ? formatWhen(rep.perf.time, now) : null;
 
     // Special format / event (permanent attractions excluded).
     const event = isEvergreen ? null : detectEvent(movie, upcoming);
@@ -273,7 +301,7 @@ function computeSignals(meta, movies, now) {
         weight: event.weight,
         venue: venueName(meta, event.showing?.venueId),
         venueId: event.showing?.venueId ?? null,
-        when: formatWhen(event.perf.time),
+        when: formatWhen(event.perf.time, now),
         rating: rating?.text ?? null,
       });
     }
@@ -293,7 +321,7 @@ function computeSignals(meta, movies, now) {
           venue: venueName(meta, unusual.showing?.venueId),
           venueId: unusual.showing?.venueId ?? null,
           venueType: venueType(meta, unusual.showing?.venueId),
-          when: formatWhen(unusual.perf.time),
+          when: formatWhen(unusual.perf.time, now),
           rating: rating.text,
           norm: rating.norm,
         });
@@ -309,7 +337,7 @@ function computeSignals(meta, movies, now) {
         directors,
         venue: venueName(meta, only?.showing?.venueId),
         venueId: only?.showing?.venueId ?? null,
-        when: formatWhen(allFuture[0].time),
+        when: formatWhen(allFuture[0].time, now),
         rating: rating?.text ?? null,
         norm: rating?.norm ?? 0,
       });
@@ -332,7 +360,7 @@ function computeSignals(meta, movies, now) {
             id,
             title: movie.title,
             directors,
-            finalWhen: formatWhen(finalTime),
+            finalWhen: formatWhen(finalTime, now),
             venueCount,
             venue: venueName(meta, finalShowing?.venueId),
             venueId: finalShowing?.venueId ?? null,
@@ -392,6 +420,7 @@ function computeSignals(meta, movies, now) {
         title: movie.title,
         directors,
         venueCount,
+        rating: rating?.text ?? null,
         score: venueCount * 3 + upcoming.length,
       });
     }
@@ -579,6 +608,7 @@ function buildPromptData(signals) {
       film: p.title,
       director: dir(p),
       venues: p.venueCount,
+      rating: p.rating,
     })),
     weekShape: {
       venuesShowing: signals.shape.venues,
@@ -599,16 +629,23 @@ function buildPrompt(signals) {
 
   return `Write the editorial note for the top of Clusterflick's discovery page, using ONLY the data below (this week's London screenings). It is the reader's lead-in to the page, so you have room — write two paragraphs of three or four sentences each, spreading your picks across them. Give each pick enough context to be useful, but don't pad.
 
-What to surface, in priority order — lead with the most special thing actually present, then work down. Use only categories that have data; silently skip any that are missing:
-1. The unmissable thing — a special format or event (a 70mm/35mm print, a premiere, a Q&A or guest in attendance).
-2. A discovery — a critically-loved film that isn't showing everywhere (from acclaimedButLowProfile), with why it's worth it.
-3. Scarcity — a genuine one-off screening, or a film whose run ends in the next couple of days.
-4. Somewhere unexpected — if atUnconventionalVenues has a worthwhile entry, you may highlight a screening at a non-cinema space (a bar, gallery, cultural institute, museum), noting the kind of venue.
-5. A light sense of the week's shape — only if genuinely notable (e.g. a strong week for celluloid). Never a bare statistic.
+What to surface — give a varied, rounded picture of the week, like a knowledgeable friend's rundown rather than a single theme. Draw picks from ACROSS these angles rather than leaning on any one; use only those with data:
+- A discovery — a critically-loved film that isn't showing everywhere (acclaimedButLowProfile), with why it's worth it.
+- A film to catch while it's the talk of the town — something showing widely this week (showingMostWidely), especially if it's also well-reviewed.
+- A new arrival — a notable film newly added this week (newlyAdded).
+- Scarcity — a genuine one-off (oneOffScreenings), or a film whose run ends in the next couple of days (endingSoon).
+- A special event — a premiere, a Q&A or guest in attendance, a restoration, or a notable print (specialEventsAndFormats).
+- Somewhere unexpected — a screening at a non-cinema space such as a bar, gallery or museum (atUnconventionalVenues), noting the kind of venue.
 
-Always name films concretely and give each a real hook — the venue, the date, the format, the rating, or why it matters. If only popular/shape data is present, still give a useful one- or two-sentence orientation naming a couple of films.
+Balance is the point. Cover four to six different films spanning several of these angles and several cinemas. Lead with whatever is genuinely the most interesting thing this week — not automatically the rarest format. Do NOT let film prints dominate: mention 70mm/35mm for at most one pick; it is one angle among many, never the theme of the note.
+
+Always give each film a real hook — why it matters, the venue, the date, or the occasion. Don't relegate the non-format picks to a single throwaway line; give them as much care as the headline pick.
+
+Use ratings sparingly. Quote a numeric rating for at most one or two picks, and only where the film's acclaim is genuinely the reason to see it — not for every film. The numbers are clustered and quoting one each time reads as filler; convey quality through the writing instead ("a critical favourite", "widely loved"). Never quote a rating below 4.0/5 as a selling point.
 
 CRITICAL — accuracy. Every fact must come from the data. A film's venue and date may ONLY be the ones listed inside that same film's own entry. Never attach a venue, date, format or rating taken from a different film's entry. If an entry has no venue or date, do not state one for that film — describe it without (e.g. "showing at a single venue"). Never invent or guess titles, venues, dates or ratings. You may credit a film's director, but ONLY using the exact name in that same film's "director" field — never a name from memory or from another film, and never a cast member or any other fact not present in the entry. If a film has no "director" field, do not name its director.
+
+Dates: the "when" and "finalShowing" values are ready-to-use phrases relative to now — "today", "tomorrow", "on Friday", "next Monday". Drop them in as written (e.g. "screening today", "showing on Friday") — do not add "on"/"this" in front, and never convert them to a calendar date.
 
 Spread your picks across different cinemas where the data allows — don't centre the whole note on one venue, even if it has several entries. Aim to mention two or three different cinemas.
 
@@ -628,7 +665,9 @@ function buildTemplateSummary(signals) {
 
   const event = signals.events[0];
   if (event) {
-    const where = [event.venue, event.when].filter(Boolean).join(" on ");
+    // `when` is already a phrase ("today", "on Friday"), so it's appended, not
+    // joined with "on".
+    const where = [event.venue, event.when].filter(Boolean).join(" ");
     sentences.push(
       `The week's pick is ${event.hook} of ${event.title}${where ? ` at ${where}` : ""}.`,
     );
@@ -648,7 +687,7 @@ function buildTemplateSummary(signals) {
   const unusual = signals.unusualVenues.find((u) => !taken.has(u.title));
   if (unusual) {
     taken.add(unusual.title);
-    const when = unusual.when ? ` on ${unusual.when}` : "";
+    const when = unusual.when ? ` ${unusual.when}` : "";
     sentences.push(
       `Somewhere different, ${unusual.title} is showing at ${unusual.venue}${when}.`,
     );
@@ -657,7 +696,7 @@ function buildTemplateSummary(signals) {
   const oneOff = signals.oneOffs.find((o) => !taken.has(o.title));
   const ending = signals.endingSoon.find((e) => !taken.has(e.title));
   if (oneOff) {
-    const where = [oneOff.venue, oneOff.when].filter(Boolean).join(" on ");
+    const where = [oneOff.venue, oneOff.when].filter(Boolean).join(" ");
     sentences.push(
       `${oneOff.title} screens just once this week${where ? `, at ${where}` : ""}.`,
     );
@@ -702,7 +741,11 @@ async function generateAiSummary(signals) {
       // Accuracy is enforced by grounding the prompt in the candidate data and
       // validating filmsMentioned/directorsMentioned, not by a low temperature.
       temperature: 0.4,
-      maxOutputTokens: 700,
+      // Generous cap: Gemini 3.x "thinking" tokens count against this budget, so
+      // a tight limit (e.g. 700) gets consumed by reasoning and truncates the
+      // JSON. We only pay for tokens actually generated, and the note itself is
+      // short, so the headroom is effectively free.
+      maxOutputTokens: 8192,
       responseMimeType: "application/json",
       responseSchema: {
         type: "object",
