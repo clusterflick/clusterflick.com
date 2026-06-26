@@ -723,6 +723,7 @@ function buildTemplateSummary(signals) {
 /** Strip any stray markdown the model adds despite instructions. */
 function sanitize(text) {
   return text
+    .replace(/\\r\\n|\\n|\\r/g, "\n") // un-escape literal "\n" the model sometimes emits for line breaks
     .replace(/[*`]/g, "") // bold/italic/code markers
     .replace(/^#+\s*/gm, "") // heading markers
     .replace(/\n{3,}/g, "\n\n") // collapse extra blank lines

@@ -97,7 +97,7 @@ export default async function Home() {
               <Divider />
               <div className={styles.summary} data-source={summary.source}>
                 {summary.text
-                  .split(/\n+/)
+                  .split(/(?:\\n|\n)+/)
                   .filter((para) => para.trim().length > 0)
                   .map((para, index) => (
                     <p key={index}>{linkifySummary(para, summaryTargets)}</p>
