@@ -208,6 +208,20 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "london-indian-film-festival",
+    name: "London Indian Film Festival",
+    url: "https://londonindianfilmfestival.co.uk/",
+    aliases: ["liff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "London Indian Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LIFF Opening",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
