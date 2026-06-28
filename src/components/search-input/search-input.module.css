@@ -1,0 +1,90 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 48px;
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+/* Extra right space so a trailing control doesn't crowd the pill edge */
+.hasTrailing {
+  padding-right: 18px;
+}
+
+.wrapper:hover {
+  background: rgba(var(--color-white-rgb), 0.08);
+  border-color: rgba(var(--color-white-rgb), 0.25);
+}
+
+.wrapper:focus-within {
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: var(--color-neon-pink);
+  box-shadow: 0 0 0 3px rgba(var(--color-neon-pink-rgb), 0.15);
+}
+
+.icon {
+  position: absolute;
+  left: 16px;
+  color: var(--color-muted-gray);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.wrapper:focus-within .icon {
+  color: var(--color-neon-pink);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: var(--color-light-gray);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-muted-gray);
+}
+
+/* Trailing controls (clear button + optional slot) inside the pill */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(var(--color-white-rgb), 0.1);
+  border: none;
+  border-radius: 50%;
+  color: var(--color-muted-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear:hover {
+  background: rgba(var(--color-neon-pink-rgb), 0.2);
+  color: var(--color-neon-pink);
+}
+
+.clear:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}

@@ -2,6 +2,17 @@
   margin-top: 100px;
 }
 
+/* Inline search + filter controls above the movie grid */
+.controls {
+  max-width: 720px;
+  margin: 0 auto 24px;
+  padding: 0 20px;
+}
+
+.controlsSearch {
+  width: 100%;
+}
+
 /* Override padding for loading footer at bottom of page */
 .loadingFooter {
   padding: 40px 20px 60px;

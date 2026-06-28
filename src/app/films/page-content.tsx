@@ -6,6 +6,7 @@ import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
+import SearchInput from "@/components/search-input";
 import MovieCell from "@/components/movie-cell";
 import MainHeader from "@/components/main-header";
 import LoadingIndicator from "@/components/loading-indicator";
@@ -31,7 +32,7 @@ export default function PageContent() {
     getData,
     retry,
   } = useCinemaData();
-  const { filterState, hasActiveFilters } = useFilterConfig();
+  const { filterState, setSearchQuery, hasActiveFilters } = useFilterConfig();
 
   // Fetch data once on mount. Empty deps are intentional: all movie data is loaded
   // into global context once, and getData returns early if data already exists.
@@ -182,6 +183,27 @@ export default function PageContent() {
         onClose={() => setIsFilterOverlayOpen(false)}
         filterTextHeight={filterTextHeight}
       />
+      {hasAttemptedLoad && !error && !isEmpty && (
+        <div className={styles.controls}>
+          <SearchInput
+            id="films-search"
+            className={styles.controlsSearch}
+            placeholder="Search event title..."
+            ariaLabel="Search event title"
+            value={filterState.search}
+            onChange={setSearchQuery}
+            trailing={
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsFilterOverlayOpen(true)}
+              >
+                More Filters
+              </Button>
+            }
+          />
+        </div>
+      )}
       {renderEmptyState()}
       <WindowScroller>
         {({ height, isScrolling, registerChild, onChildScroll, scrollTop }) => (
