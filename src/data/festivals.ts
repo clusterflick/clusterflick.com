@@ -217,7 +217,24 @@ export const FESTIVALS: Festival[] = [
         [FilterId.ShowingTitleSearch]: "London Indian Film Festival",
       },
       {
+        [FilterId.PerformanceNotesSearch]: "London Indian Film Festival",
+      },
+      {
         [FilterId.ShowingTitleSearch]: "LIFF Opening",
+      },
+    ],
+  },
+  {
+    id: "london-australian-film-festival",
+    name: "London Australian Film Festival",
+    url: "https://www.londonaustfilm.com/festival",
+    aliases: ["laff"],
+    matchers: [
+      {
+        // Matches "LAFF 2026: ..." showings (and the short film showcase
+        // movie title) at Picturehouse Finsbury Park, running July 16–19 2026
+        [FilterId.ShowingTitleSearch]: "LAFF 2026",
+        [FilterId.Venues]: ["picturehouses.com-finsbury-park"],
       },
     ],
   },
