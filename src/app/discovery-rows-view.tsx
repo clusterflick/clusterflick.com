@@ -27,12 +27,14 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         title="Critics' Picks"
         intro="Highly rated films worth seeking out this week."
         movies={criticsPicks}
+        showAll
       />
 
       <PosterRow
         title="Marathons & Double Bills"
         intro="Multi-film events and double bills showing this week."
         movies={marathons}
+        showAll
       />
 
       {hasNewAdditions && (
@@ -66,6 +68,7 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         title="Last Chance"
         intro="Films with their final showing coming up soon!"
         movies={lastChance}
+        showAll
       />
     </>
   );

@@ -52,7 +52,13 @@ export default function PageContent({
   containingEvents,
   festivals,
 }: PageContentProps) {
-  const { movies, metaData, getDataWithPriority } = useCinemaData();
+  const {
+    movies,
+    metaData,
+    getDataWithPriority,
+    isLoading: isDataLoading,
+    hasAttemptedLoad,
+  } = useCinemaData();
   const { filterState, applyUrlParams } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
 
@@ -283,7 +289,11 @@ export default function PageContent({
 
       <div className={styles.detailsContainer}>
         <ShowingsSection
-          isLoading={!isShowingsReady || !movies[movie.id]?.performances}
+          isLoading={
+            !isShowingsReady ||
+            !hasAttemptedLoad ||
+            (isDataLoading && !movies[movie.id]?.performances)
+          }
           performancesByDate={performancesByDate}
           showings={filteredShowings}
           venues={venues}
