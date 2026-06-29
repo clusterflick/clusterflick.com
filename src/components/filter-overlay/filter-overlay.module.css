@@ -475,76 +475,7 @@
 
 /* Venue Search Filter */
 .venueSearchWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
   margin-bottom: 8px;
-}
-
-.venueSearchIcon {
-  position: absolute;
-  left: 12px;
-  color: var(--color-muted-gray);
-  pointer-events: none;
-  transition: color 0.2s ease;
-}
-
-.venueSearchInput {
-  width: 100%;
-  padding: 10px 36px;
-  background: rgba(var(--color-white-rgb), 0.05);
-  border: 1px solid rgba(var(--color-white-rgb), 0.15);
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--color-light-gray);
-  transition: all 0.2s ease;
-}
-
-.venueSearchInput::placeholder {
-  color: var(--color-muted-gray);
-}
-
-.venueSearchInput:hover {
-  background: rgba(var(--color-white-rgb), 0.08);
-  border-color: rgba(var(--color-white-rgb), 0.25);
-}
-
-.venueSearchInput:focus {
-  outline: none;
-  background: rgba(var(--color-white-rgb), 0.1);
-  border-color: var(--color-neon-pink);
-  box-shadow: 0 0 0 2px rgba(var(--color-neon-pink-rgb), 0.15);
-}
-
-.venueSearchWrapper:focus-within .venueSearchIcon {
-  color: var(--color-neon-pink);
-}
-
-.venueSearchClear {
-  position: absolute;
-  right: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  background: rgba(var(--color-white-rgb), 0.1);
-  border: none;
-  border-radius: 50%;
-  color: var(--color-muted-gray);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.venueSearchClear:hover {
-  background: rgba(var(--color-neon-pink-rgb), 0.2);
-  color: var(--color-neon-pink);
-}
-
-.venueSearchClear:focus-visible {
-  outline: 2px solid var(--color-electric-blue);
-  outline-offset: 2px;
 }
 
 /* Year Range Inputs */

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import type { VenueGroupData } from "./page";
 import { normalizeForSearch } from "@/lib/filters/normalize";
 import LinkGrid from "@/components/link-grid";
+import SearchInput from "@/components/search-input";
 import styles from "./page.module.css";
 
 interface VenueListProps {
@@ -11,7 +12,6 @@ interface VenueListProps {
 }
 
 export default function VenueList({ groups }: VenueListProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
 
   const filteredGroups = useMemo(() => {
@@ -35,45 +35,14 @@ export default function VenueList({ groups }: VenueListProps) {
 
   return (
     <>
-      <div className={styles.searchWrapper}>
-        <svg
-          className={styles.searchIcon}
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-          <path
-            d="m21 21-4.35-4.35"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-        <input
-          ref={inputRef}
-          type="text"
-          className={styles.searchInput}
-          placeholder="Filter venues..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        {query && (
-          <button
-            type="button"
-            className={styles.searchClear}
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
-            aria-label="Clear filter"
-          >
-            &times;
-          </button>
-        )}
-      </div>
+      <SearchInput
+        id="venues-search"
+        className={styles.searchWrapper}
+        placeholder="Filter venues..."
+        ariaLabel="Filter venues"
+        value={query}
+        onChange={setQuery}
+      />
 
       {query.trim() && (
         <p className={styles.searchResultCount}>

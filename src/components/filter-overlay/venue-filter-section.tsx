@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { VenueOption, VENUE_OPTIONS } from "@/state/filter-config-context";
 import { VenueGroup } from "@/hooks/use-venue-groups";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
+import SearchInput from "@/components/search-input";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import styles from "./filter-overlay.module.css";
 
@@ -41,7 +42,6 @@ export default function VenueFilterSection({
   selectVenues,
   clearVenues,
 }: VenueFilterSectionProps) {
-  const venueSearchInputRef = useRef<HTMLInputElement>(null);
   const [venueSearchQuery, setVenueSearchQuery] = useState("");
 
   // Filter venue groups based on search query
@@ -182,61 +182,14 @@ export default function VenueFilterSection({
       <ExpandableSection title="Select Specific Venues">
         <div className={styles.advancedFilters}>
           {/* Venue search filter */}
-          <div className={styles.venueSearchWrapper}>
-            <svg
-              className={styles.venueSearchIcon}
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <input
-              ref={venueSearchInputRef}
-              type="text"
-              className={styles.venueSearchInput}
-              placeholder="Filter venues..."
-              aria-label="Filter venues"
-              value={venueSearchQuery}
-              onChange={(e) => setVenueSearchQuery(e.target.value)}
-            />
-            {venueSearchQuery && (
-              <button
-                type="button"
-                className={styles.venueSearchClear}
-                onClick={() => {
-                  setVenueSearchQuery("");
-                  venueSearchInputRef.current?.focus();
-                }}
-                aria-label="Clear venue filter"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M18 6L6 18M6 6L18 18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
-          </div>
+          <SearchInput
+            id="venue-filter-search"
+            className={styles.venueSearchWrapper}
+            placeholder="Filter venues..."
+            ariaLabel="Filter venues"
+            value={venueSearchQuery}
+            onChange={setVenueSearchQuery}
+          />
 
           {filteredVenueGroups.map((group) => {
             const groupVenueIds = group.venues.map((v) => v.id);
