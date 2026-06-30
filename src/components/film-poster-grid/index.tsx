@@ -60,7 +60,9 @@ export default function FilmPosterGrid({
             />
           ) : (
             <MoviePoster
-              posterPath={movie.posterPath || includedWithPosters[0]?.posterPath}
+              posterPath={
+                movie.posterPath || includedWithPosters[0]?.posterPath
+              }
               title={movie.title}
               subtitle={posterSubtitle}
               showOverlay

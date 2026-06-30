@@ -59,12 +59,12 @@ export default function IncludedFilmsSection({
               <div className={styles.filmInfo}>
                 <h3 className={styles.filmTitle}>{movie.title}</h3>
                 <div className={styles.filmMeta}>
-                  {movie.year && <span>{movie.year}</span>}
-                  {movie.duration && (
+                  {movie.year ? <span>{movie.year}</span> : null}
+                  {movie.duration ? (
                     <span>
                       {formatDuration(movie.duration, { compact: true })}
                     </span>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
