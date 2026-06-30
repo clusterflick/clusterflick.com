@@ -239,6 +239,23 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "the-final-film-festival",
+    name: "The Final Film Festival",
+    url: "https://www.tfffestival.co.uk/",
+    aliases: ["tfff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "The Final Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "TFFF:",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "- TFFF",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
