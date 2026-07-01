@@ -91,17 +91,17 @@ jobs:
             exit 0
           fi
           echo "Polling for hash change (previous: $OLD_HASH)"
-          for i in $(seq 1 12); do
-            echo "Attempt $i/12..."
+          for i in $(seq 1 30); do
+            echo "Attempt $i/30..."
             LIVE_HASH=$(curl -sf https://clusterflick.com/ | grep -oP '<!DOCTYPE html><!--\K.+?(?=-->)' || echo "")
             if [ -n "$LIVE_HASH" ] && [ "$LIVE_HASH" != "$OLD_HASH" ]; then
               echo "Hash changed on attempt $i: $OLD_HASH → $LIVE_HASH. Deployment verified."
               exit 0
             fi
             echo "  Found: '${LIVE_HASH:-<none>}' (unchanged)"
-            sleep 5
+            sleep 10
           done
-          echo "Deployment hash check failed after 12 attempts"
+          echo "Deployment hash check failed after 30 attempts"
           exit 1
 
   smoke-tests:
