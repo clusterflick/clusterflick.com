@@ -38,6 +38,7 @@ export type FestivalListItem = {
   id: string;
   name: string;
   href: string;
+  externalUrl?: string;
   imagePath: string | null;
   movieCount: number;
   dateFrom: number | null;
@@ -68,6 +69,7 @@ export default async function FestivalsPage() {
             id: festival.id,
             name: festival.name,
             href: getFestivalUrl(festival),
+            externalUrl: festival.url,
             imagePath: getFestivalImagePath(festival.id),
             movieCount: Object.keys(movies).length,
             dateFrom,
@@ -112,7 +114,23 @@ export default async function FestivalsPage() {
         "@type": "Festival",
         name: festival.name,
         url: `https://clusterflick.com${festival.href}`,
-        location: { "@type": "City", name: "London", addressCountry: "GB" },
+        eventStatus: "https://schema.org/EventScheduled",
+        location: {
+          "@type": "Place",
+          name: "London",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "London",
+            addressCountry: "GB",
+          },
+        },
+        ...(festival.externalUrl && {
+          organizer: {
+            "@type": "Organization",
+            name: festival.name,
+            url: festival.externalUrl,
+          },
+        }),
         ...(festival.dateFrom && {
           startDate: new Date(festival.dateFrom).toISOString().split("T")[0],
         }),

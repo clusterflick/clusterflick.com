@@ -244,9 +244,13 @@ export default async function FilmClubDetailPage({
       "@type": "Organization",
       name: club.name,
       location: {
-        "@type": "City",
+        "@type": "Place",
         name: "London",
-        addressCountry: "GB",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "London",
+          addressCountry: "GB",
+        },
       },
       url: `https://clusterflick.com${canonicalUrl}`,
       image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,

@@ -7,6 +7,7 @@ export function buildScreeningEventSchema(
   movieUrl: string,
   venue?: Venue,
 ): Record<string, unknown> {
+  const offerUrl = performance.bookingUrl || venue?.url;
   return {
     "@context": "https://schema.org",
     "@type": "ScreeningEvent",
@@ -25,9 +26,16 @@ export function buildScreeningEventSchema(
     },
     ...(venue && {
       location: buildVenueSchema(venue),
+      organizer: {
+        "@type": "Organization",
+        name: venue.name,
+        url: venue.url,
+      },
+    }),
+    ...(offerUrl && {
       offers: {
         "@type": "Offer",
-        url: venue.url,
+        url: offerUrl,
         availability: performance.status?.soldOut
           ? "https://schema.org/SoldOut"
           : "https://schema.org/InStock",

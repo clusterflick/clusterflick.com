@@ -217,12 +217,17 @@ export default async function MovieDetailPage({
   const screeningEvents = movie.performances
     .filter((p) => p.time >= buildTime)
     .sort((a, b) => a.time - b.time)
-    .slice(0, 50)
-    .map((performance) => {
+    .flatMap((performance) => {
       const showing = movie.showings[performance.showingId];
       const venue = showing ? data.venues[showing.venueId] : undefined;
-      return buildScreeningEventSchema(performance, movie, movieUrl, venue);
-    });
+      // A ScreeningEvent without a resolvable venue would omit the required
+      // `location` field, so skip it rather than emit invalid structured data.
+      return venue ? [{ performance, venue }] : [];
+    })
+    .slice(0, 50)
+    .map(({ performance, venue }) =>
+      buildScreeningEventSchema(performance, movie, movieUrl, venue),
+    );
 
   return (
     <>

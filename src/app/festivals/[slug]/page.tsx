@@ -210,11 +210,23 @@ export default async function FestivalDetailPage({
       "@context": "https://schema.org",
       "@type": "Festival",
       name: festival.name,
+      eventStatus: "https://schema.org/EventScheduled",
       location: {
-        "@type": "City",
+        "@type": "Place",
         name: "London",
-        addressCountry: "GB",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "London",
+          addressCountry: "GB",
+        },
       },
+      ...(festival.url && {
+        organizer: {
+          "@type": "Organization",
+          name: festival.name,
+          url: festival.url,
+        },
+      }),
       url: `https://clusterflick.com${canonicalUrl}`,
       ...(imagePath && { image: `https://clusterflick.com${imagePath}` }),
       ...(dateFrom && {

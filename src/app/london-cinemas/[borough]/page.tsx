@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
+import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
@@ -258,15 +259,15 @@ export default async function BoroughPage({
       name: `Cinemas in ${borough.name}, London`,
       description: `Cinema and screening venues in ${borough.name}, London`,
       numberOfItems: venueItems.length,
-      itemListElement: venueItems.map((venue, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        item: {
-          "@type": "MovieTheater",
-          name: venue.name,
-          url: `https://clusterflick.com${venue.href}`,
-        },
-      })),
+      itemListElement: [...boroughVenues]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((venue, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: buildVenueSchema(venue, {
+            url: `https://clusterflick.com${getVenueUrl(venue)}`,
+          }),
+        })),
     },
     {
       "@context": "https://schema.org",
