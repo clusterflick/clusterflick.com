@@ -16,7 +16,7 @@ export default function PartOfSection({
   }
 
   return (
-    <div className={styles.container}>
+    <div>
       <h3 className={styles.label}>Also showing as part of:</h3>
       <div className={styles.cardList}>
         {containingEvents.map((event) => (

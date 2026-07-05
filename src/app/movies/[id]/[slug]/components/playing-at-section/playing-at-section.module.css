@@ -1,0 +1,10 @@
+.section {
+  margin-top: 32px;
+  text-align: left;
+}
+
+.meta {
+  color: var(--color-muted-gray);
+  font-size: 13px;
+  white-space: nowrap;
+}

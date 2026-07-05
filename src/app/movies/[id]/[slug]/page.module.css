@@ -17,6 +17,18 @@
   flex-shrink: 0;
 }
 
+/* "Also showing as part of" lives under the poster on desktop and moves under
+   Playing at on mobile (see the two instances in page-content). */
+.partOfDesktop {
+  display: block;
+  margin-top: 24px;
+}
+
+.partOfMobile {
+  display: none;
+  margin-top: 32px;
+}
+
 .mainInfo {
   flex: 1;
   min-width: 0;
@@ -80,6 +92,14 @@
   .posterSection {
     display: flex;
     justify-content: center;
+  }
+
+  .partOfDesktop {
+    display: none;
+  }
+
+  .partOfMobile {
+    display: block;
   }
 
   .mainInfo {

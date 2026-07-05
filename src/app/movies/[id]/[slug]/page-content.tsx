@@ -32,6 +32,9 @@ import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
 import FestivalSection from "./components/festival-section";
 import PartOfSection from "./components/part-of-section";
+import PlayingAtSection, {
+  type VenuePlayCount,
+} from "./components/playing-at-section";
 import ShowingsSection from "./components/showings-section";
 import styles from "./page.module.css";
 
@@ -40,6 +43,7 @@ type PageContentProps = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
+  venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
 };
@@ -49,6 +53,7 @@ export default function PageContent({
   genres,
   people,
   venues,
+  venueCounts,
   containingEvents,
   festivals,
 }: PageContentProps) {
@@ -221,6 +226,9 @@ export default function PageContent({
               size="large"
             />
           )}
+          <div className={styles.partOfDesktop}>
+            <PartOfSection containingEvents={containingEvents} />
+          </div>
         </div>
 
         <div className={styles.mainInfo}>
@@ -278,12 +286,15 @@ export default function PageContent({
           />
 
           <FestivalSection festivals={festivals} />
-          <PartOfSection containingEvents={containingEvents} />
           <CastCrewSection
             directors={movie.directors}
             actors={movie.actors}
             people={people}
           />
+          <PlayingAtSection venueCounts={venueCounts} venues={venues} />
+          <div className={styles.partOfMobile}>
+            <PartOfSection containingEvents={containingEvents} />
+          </div>
         </div>
       </HeroSection>
 

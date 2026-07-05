@@ -3,25 +3,5 @@
   grid-template-columns: fit-content(50%) 1fr;
   gap: 40px;
   align-items: start;
-}
-
-/* Show/hide cast lists based on screen size */
-.castMobile {
-  display: none;
   text-align: left;
-}
-
-.castDesktop {
-  display: block;
-  text-align: left;
-}
-
-@media (max-width: 768px) {
-  .castMobile {
-    display: block;
-  }
-
-  .castDesktop {
-    display: none;
-  }
 }

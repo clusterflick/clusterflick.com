@@ -9,6 +9,7 @@ import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import PageContent from "./page-content";
+import type { VenuePlayCount } from "./components/playing-at-section";
 
 // Only allow routes from generateStaticParams, 404 for everything else
 export const dynamicParams = false;
@@ -113,6 +114,20 @@ export default async function MovieDetailPage({
       venues[showing.venueId] = data.venues[showing.venueId];
     }
   }
+
+  // Precompute per-venue screening counts at build time so the "Playing at"
+  // summary renders statically without shipping full performance data. Deliberately
+  // unfiltered — it's a stable overview of every venue the film screens at.
+  const venuePlayCountsMap = new Map<string, number>();
+  for (const performance of movie.performances) {
+    const venueId = movie.showings[performance.showingId]?.venueId;
+    if (!venueId) continue;
+    venuePlayCountsMap.set(venueId, (venuePlayCountsMap.get(venueId) ?? 0) + 1);
+  }
+  const venueCounts: VenuePlayCount[] = Array.from(
+    venuePlayCountsMap,
+    ([venueId, count]) => ({ venueId, count }),
+  );
 
   // Find multi-movie events that include this film
   const containingEvents = getContainingEvents(movie.id, data.movies);
@@ -246,6 +261,7 @@ export default async function MovieDetailPage({
         genres={genres}
         people={people}
         venues={venues}
+        venueCounts={venueCounts}
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
       />

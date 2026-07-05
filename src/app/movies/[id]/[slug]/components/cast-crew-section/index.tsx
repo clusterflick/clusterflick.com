@@ -1,5 +1,5 @@
 import { Person } from "@/types";
-import CreditsList from "@/components/credits-list";
+import PillList from "@/components/pill-list";
 import styles from "./cast-crew-section.module.css";
 
 interface CastCrewSectionProps {
@@ -28,23 +28,19 @@ export default function CastCrewSection({
   return (
     <div className={styles.creditsGrid}>
       {hasDirectors && (
-        <CreditsList
-          role={`Director${directors.length > 1 ? "s" : ""}`}
-          names={getNames(directors, people)}
+        <PillList
+          title={`Director${directors.length > 1 ? "s" : ""}`}
+          items={getNames(directors, people)}
         />
       )}
 
       {hasActors && (
-        <>
-          {/* Mobile: Show only 2 cast members */}
-          <div className={styles.castMobile}>
-            <CreditsList role="Cast" names={actorNames} maxDisplay={2} />
-          </div>
-          {/* Desktop: Show 6 cast members */}
-          <div className={styles.castDesktop}>
-            <CreditsList role="Cast" names={actorNames} maxDisplay={6} />
-          </div>
-        </>
+        <PillList
+          title="Cast"
+          items={actorNames}
+          maxVisible={6}
+          maxVisibleMobile={2}
+        />
       )}
     </div>
   );

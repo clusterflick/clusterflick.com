@@ -12,7 +12,7 @@ import ExpandableSection from "@/components/expandable-section";
  * - Any block of content that benefits from progressive disclosure.
  *
  * **When NOT to use:**
- * - For a "show more / show less" on a list of names — use `CreditsList`.
+ * - For a "show more / show less" on a list of pills/names — use `PillList`.
  * - For a list of links with a toggle — use `LinkedList` with `initialCount`.
  */
 const meta = {

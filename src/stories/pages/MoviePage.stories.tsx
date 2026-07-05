@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import PageContent from "@/app/movies/[id]/[slug]/page-content";
+import type { VenuePlayCount } from "@/app/movies/[id]/[slug]/components/playing-at-section";
 import { Category } from "@/types";
 import type {
   Movie,
@@ -25,6 +26,7 @@ type MoviePageData = {
   genres: Record<string, Genre>;
   people: Record<string, Person>;
   venues: Record<string, Venue>;
+  venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
 };
 
@@ -79,6 +81,18 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     }
   }
 
+  // Precompute per-venue screening counts (mirrors the server component)
+  const venuePlayCountsMap = new Map<string, number>();
+  for (const performance of movie.performances) {
+    const venueId = movie.showings[performance.showingId]?.venueId;
+    if (!venueId) continue;
+    venuePlayCountsMap.set(venueId, (venuePlayCountsMap.get(venueId) ?? 0) + 1);
+  }
+  const venueCounts: VenuePlayCount[] = Array.from(
+    venuePlayCountsMap,
+    ([venueId, count]) => ({ venueId, count }),
+  );
+
   // Exclude performances for the movie prop
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
@@ -88,6 +102,7 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     genres,
     people,
     venues,
+    venueCounts,
     containingEvents: [],
   };
 }
@@ -136,6 +151,7 @@ function DefaultMoviePage() {
           genres={data.genres}
           people={data.people}
           venues={data.venues}
+          venueCounts={data.venueCounts}
           containingEvents={data.containingEvents}
           festivals={[]}
         />
@@ -203,6 +219,7 @@ export const WithIncludedMovies: Story = {
           genres={data.genres}
           people={data.people}
           venues={data.venues}
+          venueCounts={data.venueCounts}
           containingEvents={data.containingEvents}
           festivals={[]}
         />
