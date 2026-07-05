@@ -8,6 +8,7 @@ import { useFilterConfig } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
 import { getNearbyVenueIds } from "@/utils/geo-distance";
+import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import CategoryFilterSection from "./category-filter-section";
@@ -108,10 +109,18 @@ export default function FilterOverlay({
       const nearby = getNearbyVenueIds(
         position,
         Object.values(metaData.venues),
+        getVenueIdsWithShowings(movies),
       );
       setVenueOption("nearby", nearby);
     }
-  }, [userPosition, nearbyVenueIds, metaData, setVenueOption, requestLocation]);
+  }, [
+    userPosition,
+    nearbyVenueIds,
+    metaData,
+    movies,
+    setVenueOption,
+    requestLocation,
+  ]);
 
   const handleClose = useCallback(() => {
     onClose();

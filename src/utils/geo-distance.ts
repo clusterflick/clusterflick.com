@@ -59,18 +59,29 @@ export const NEARBY_RADIUS_STEP_MILES = 0.1;
 /**
  * Compute the set of venue IDs considered "nearby" the given position.
  *
+ * Only venues that actually have showings (see {@link venueIdsWithShowings})
+ * are ever considered — a nearby bar with nothing on is useless as a filter, so
+ * it neither counts toward the floor nor appears in the result.
+ *
  * Starts at {@link NEARBY_BASE_RADIUS_MILES} and grows the radius in steps of
  * {@link NEARBY_RADIUS_STEP_MILES} until at least {@link NEARBY_MIN_VENUES}
- * venues are within range, or the radius reaches {@link NEARBY_MAX_RADIUS_MILES}.
- * All venues within the final radius are returned (so the result may exceed the
- * floor), keeping the boundary geographically honest rather than slicing a
- * sorted list.
+ * venues-with-showings are within range, or the radius reaches
+ * {@link NEARBY_MAX_RADIUS_MILES}. All qualifying venues within the final radius
+ * are returned (so the result may exceed the floor), keeping the boundary
+ * geographically honest rather than slicing a sorted list. If nothing with
+ * showings falls within the ceiling, the result is empty.
  */
-export function getNearbyVenueIds(from: Position, venues: Venue[]): string[] {
-  const distances = venues.map((venue) => ({
-    id: venue.id,
-    distance: getDistanceInMiles(from, venue.geo),
-  }));
+export function getNearbyVenueIds(
+  from: Position,
+  venues: Venue[],
+  venueIdsWithShowings: Set<string>,
+): string[] {
+  const distances = venues
+    .filter((venue) => venueIdsWithShowings.has(venue.id))
+    .map((venue) => ({
+      id: venue.id,
+      distance: getDistanceInMiles(from, venue.geo),
+    }));
 
   let radius = NEARBY_BASE_RADIUS_MILES;
   let withinRadius = distances.filter((v) => v.distance <= radius);

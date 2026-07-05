@@ -7,6 +7,7 @@ import {
   getCinemaVenueIds,
   getSmallScreeningVenueIds,
 } from "@/utils/get-cinema-venue-ids";
+import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
 
 export type VenueGroup = {
   id: string;
@@ -115,11 +116,17 @@ export function useVenueGroups(
   }, [metaData]);
 
   // Nearby venue IDs: an adaptive radius around the user's location that grows
-  // until a minimum number of venues are in range (see getNearbyVenueIds).
+  // until a minimum number of venues-with-showings are in range (see
+  // getNearbyVenueIds). Venues with no showings are ignored regardless of the
+  // active filter state.
   const nearbyVenueIds = useMemo(() => {
     if (!metaData?.venues || !userPosition) return [];
-    return getNearbyVenueIds(userPosition, Object.values(metaData.venues));
-  }, [metaData, userPosition]);
+    return getNearbyVenueIds(
+      userPosition,
+      Object.values(metaData.venues),
+      getVenueIdsWithShowings(movies),
+    );
+  }, [metaData, userPosition, movies]);
 
   return {
     venueGroups,
