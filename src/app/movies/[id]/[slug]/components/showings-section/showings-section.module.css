@@ -33,7 +33,7 @@
 
 .filterCount {
   font-size: 12px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
   white-space: nowrap;
 }
 
@@ -52,7 +52,7 @@
 
 .finishedLabel {
   font-size: 13px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
   line-height: 1.4;
 }
 
@@ -144,7 +144,7 @@
 
 .showingTitle {
   font-size: 12px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
   font-style: italic;
 }
 

@@ -30,7 +30,7 @@
 
 .hint {
   font-size: 14px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
   margin: 8px 0 0 0;
   opacity: 0.8;
 }

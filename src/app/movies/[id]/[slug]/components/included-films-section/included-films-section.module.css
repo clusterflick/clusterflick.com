@@ -53,7 +53,7 @@
   display: flex;
   gap: 8px;
   font-size: 12px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
 }
 
 .filmMeta span {
@@ -64,7 +64,7 @@
 .filmMeta span:not(:last-child)::after {
   content: "·";
   margin-left: 8px;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
 }
 
 .soloButton {
@@ -108,7 +108,7 @@
 .inlineLabel {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-soft-gray);
+  color: var(--color-muted-gray);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 16px 0;
@@ -118,7 +118,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0;
-  overflow-x: scroll;
+  overflow-x: auto;
   padding-right: 25px;
 }
 
@@ -150,6 +150,18 @@
 }
 .filmsGridInline .filmCardWrapper:nth-child(6) {
   z-index: 6;
+}
+.filmsGridInline .filmCardWrapper:nth-child(7) {
+  z-index: 7;
+}
+.filmsGridInline .filmCardWrapper:nth-child(8) {
+  z-index: 8;
+}
+.filmsGridInline .filmCardWrapper:nth-child(9) {
+  z-index: 9;
+}
+.filmsGridInline .filmCardWrapper:nth-child(10) {
+  z-index: 10;
 }
 
 /* Add subtle shadow for depth when overlapping */
@@ -198,5 +210,12 @@
 @media (max-width: 900px) {
   .inlineLabel {
     text-align: center;
+  }
+
+  /* Centre the row when the films fit; "safe" falls back to start-alignment
+     when they overflow, so the first poster stays reachable when scrolling.
+     Desktop keeps the default left alignment. */
+  .filmsGridInline {
+    justify-content: safe center;
   }
 }
