@@ -96,11 +96,13 @@ export default function RootLayout({
             }),
           }}
         />
-        <script
-          defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="80a133a1-82b7-47ce-9b96-2baca324b9ea"
-        />
+        {process.env.NODE_ENV === "production" && (
+          <script
+            defer
+            src="https://cloud.umami.is/script.js"
+            data-website-id="80a133a1-82b7-47ce-9b96-2baca324b9ea"
+          />
+        )}
       </head>
       <body className={clsx(montserrat.variable, inter.variable)}>
         <a href="#main-content" className="skip-link">

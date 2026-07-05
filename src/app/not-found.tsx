@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
+import { trackEvent } from "@/utils/track-event";
 import { ButtonLink } from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import StatusPage, { StatusPageLoading } from "@/components/status-page";
@@ -146,6 +147,14 @@ function MovieNotFound({ pathname }: { pathname: string }) {
   );
 }
 
+function getNotFoundType(pathname: string): string {
+  if (/^\/movies\//i.test(pathname)) return "movie";
+  if (/^\/festivals\//i.test(pathname)) return "festival";
+  if (/^\/film-clubs\//i.test(pathname)) return "film-club";
+  if (/^\/(london-cinemas|venues)\//i.test(pathname)) return "venue";
+  return "generic";
+}
+
 export default function NotFound() {
   const pathname = usePathname();
 
@@ -158,6 +167,14 @@ export default function NotFound() {
   useEffect(() => setHasMounted(true), []);
 
   const mountedPathname = hasMounted ? pathname : null;
+
+  useEffect(() => {
+    if (!mountedPathname) return;
+    trackEvent("not-found", {
+      type: getNotFoundType(mountedPathname),
+      pathname: mountedPathname,
+    });
+  }, [mountedPathname]);
 
   if (!mountedPathname) return <GenericNotFound />;
   if (/^\/movies\//i.test(mountedPathname))
