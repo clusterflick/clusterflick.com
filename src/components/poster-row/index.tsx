@@ -4,6 +4,7 @@ import type { Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
+import PosterScroller from "./scroller";
 import styles from "./poster-row.module.css";
 
 export interface PosterRowItem {
@@ -57,7 +58,7 @@ export default function PosterRow({
         )}
       </div>
       {intro && <p className={styles.intro}>{intro}</p>}
-      <div className={styles.posterScroller}>
+      <PosterScroller>
         {movies.map(({ movie, subtitle }) => {
           const includedMovies = movie.includedMovies;
           const includedWithPosters =
@@ -99,7 +100,7 @@ export default function PosterRow({
             </Link>
           );
         })}
-      </div>
+      </PosterScroller>
     </section>
   );
 }

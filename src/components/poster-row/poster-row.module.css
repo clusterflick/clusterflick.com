@@ -40,15 +40,6 @@ h3.title {
   white-space: nowrap;
 }
 
-.posterScroller {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
-}
-
 .posterLink {
   flex-shrink: 0;
   text-decoration: none;

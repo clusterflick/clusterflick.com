@@ -1,0 +1,142 @@
+/* Registering the fade widths as typed custom properties makes them animatable,
+   so toggling the data attributes transitions the fade in/out instead of
+   snapping. */
+@property --pr-fade-left {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --pr-fade-right {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.posterScroller {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
+
+  /* Directional edge fade: the scroller reports which sides have off-screen
+     content via data-scroll-left / data-scroll-right (set in scroller.tsx) and
+     the mask fades only those edges — a device-independent scroll affordance.
+     The stops approximate a gamma-0.5 (square-root) ease-out curve rather than a
+     straight alpha ramp: a linear alpha fade over a dark background perceptually
+     bunches its darkness at the transparent edge, so alpha climbs quickly just
+     off the edge and then eases gently inward — keeping the fully-dark sliver
+     thin and spreading the subtle part of the fade further into the poster.
+     (Curve and widths were tuned in the fade sandbox.) */
+  --pr-fade-left: 0px;
+  --pr-fade-right: 0px;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    rgba(0, 0, 0, 0.25) calc(var(--pr-fade-left) * 0.063),
+    rgba(0, 0, 0, 0.354) calc(var(--pr-fade-left) * 0.125),
+    rgba(0, 0, 0, 0.433) calc(var(--pr-fade-left) * 0.188),
+    rgba(0, 0, 0, 0.5) calc(var(--pr-fade-left) * 0.25),
+    rgba(0, 0, 0, 0.559) calc(var(--pr-fade-left) * 0.313),
+    rgba(0, 0, 0, 0.612) calc(var(--pr-fade-left) * 0.375),
+    rgba(0, 0, 0, 0.661) calc(var(--pr-fade-left) * 0.438),
+    rgba(0, 0, 0, 0.707) calc(var(--pr-fade-left) * 0.5),
+    rgba(0, 0, 0, 0.75) calc(var(--pr-fade-left) * 0.563),
+    rgba(0, 0, 0, 0.791) calc(var(--pr-fade-left) * 0.625),
+    rgba(0, 0, 0, 0.829) calc(var(--pr-fade-left) * 0.688),
+    rgba(0, 0, 0, 0.866) calc(var(--pr-fade-left) * 0.75),
+    rgba(0, 0, 0, 0.901) calc(var(--pr-fade-left) * 0.813),
+    rgba(0, 0, 0, 0.935) calc(var(--pr-fade-left) * 0.875),
+    rgba(0, 0, 0, 0.968) calc(var(--pr-fade-left) * 0.938),
+    #000 var(--pr-fade-left),
+    #000 calc(100% - var(--pr-fade-right)),
+    rgba(0, 0, 0, 0.968) calc(100% - var(--pr-fade-right) * 0.938),
+    rgba(0, 0, 0, 0.935) calc(100% - var(--pr-fade-right) * 0.875),
+    rgba(0, 0, 0, 0.901) calc(100% - var(--pr-fade-right) * 0.813),
+    rgba(0, 0, 0, 0.866) calc(100% - var(--pr-fade-right) * 0.75),
+    rgba(0, 0, 0, 0.829) calc(100% - var(--pr-fade-right) * 0.688),
+    rgba(0, 0, 0, 0.791) calc(100% - var(--pr-fade-right) * 0.625),
+    rgba(0, 0, 0, 0.75) calc(100% - var(--pr-fade-right) * 0.563),
+    rgba(0, 0, 0, 0.707) calc(100% - var(--pr-fade-right) * 0.5),
+    rgba(0, 0, 0, 0.661) calc(100% - var(--pr-fade-right) * 0.438),
+    rgba(0, 0, 0, 0.612) calc(100% - var(--pr-fade-right) * 0.375),
+    rgba(0, 0, 0, 0.559) calc(100% - var(--pr-fade-right) * 0.313),
+    rgba(0, 0, 0, 0.5) calc(100% - var(--pr-fade-right) * 0.25),
+    rgba(0, 0, 0, 0.433) calc(100% - var(--pr-fade-right) * 0.188),
+    rgba(0, 0, 0, 0.354) calc(100% - var(--pr-fade-right) * 0.125),
+    rgba(0, 0, 0, 0.25) calc(100% - var(--pr-fade-right) * 0.063),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    rgba(0, 0, 0, 0.25) calc(var(--pr-fade-left) * 0.063),
+    rgba(0, 0, 0, 0.354) calc(var(--pr-fade-left) * 0.125),
+    rgba(0, 0, 0, 0.433) calc(var(--pr-fade-left) * 0.188),
+    rgba(0, 0, 0, 0.5) calc(var(--pr-fade-left) * 0.25),
+    rgba(0, 0, 0, 0.559) calc(var(--pr-fade-left) * 0.313),
+    rgba(0, 0, 0, 0.612) calc(var(--pr-fade-left) * 0.375),
+    rgba(0, 0, 0, 0.661) calc(var(--pr-fade-left) * 0.438),
+    rgba(0, 0, 0, 0.707) calc(var(--pr-fade-left) * 0.5),
+    rgba(0, 0, 0, 0.75) calc(var(--pr-fade-left) * 0.563),
+    rgba(0, 0, 0, 0.791) calc(var(--pr-fade-left) * 0.625),
+    rgba(0, 0, 0, 0.829) calc(var(--pr-fade-left) * 0.688),
+    rgba(0, 0, 0, 0.866) calc(var(--pr-fade-left) * 0.75),
+    rgba(0, 0, 0, 0.901) calc(var(--pr-fade-left) * 0.813),
+    rgba(0, 0, 0, 0.935) calc(var(--pr-fade-left) * 0.875),
+    rgba(0, 0, 0, 0.968) calc(var(--pr-fade-left) * 0.938),
+    #000 var(--pr-fade-left),
+    #000 calc(100% - var(--pr-fade-right)),
+    rgba(0, 0, 0, 0.968) calc(100% - var(--pr-fade-right) * 0.938),
+    rgba(0, 0, 0, 0.935) calc(100% - var(--pr-fade-right) * 0.875),
+    rgba(0, 0, 0, 0.901) calc(100% - var(--pr-fade-right) * 0.813),
+    rgba(0, 0, 0, 0.866) calc(100% - var(--pr-fade-right) * 0.75),
+    rgba(0, 0, 0, 0.829) calc(100% - var(--pr-fade-right) * 0.688),
+    rgba(0, 0, 0, 0.791) calc(100% - var(--pr-fade-right) * 0.625),
+    rgba(0, 0, 0, 0.75) calc(100% - var(--pr-fade-right) * 0.563),
+    rgba(0, 0, 0, 0.707) calc(100% - var(--pr-fade-right) * 0.5),
+    rgba(0, 0, 0, 0.661) calc(100% - var(--pr-fade-right) * 0.438),
+    rgba(0, 0, 0, 0.612) calc(100% - var(--pr-fade-right) * 0.375),
+    rgba(0, 0, 0, 0.559) calc(100% - var(--pr-fade-right) * 0.313),
+    rgba(0, 0, 0, 0.5) calc(100% - var(--pr-fade-right) * 0.25),
+    rgba(0, 0, 0, 0.433) calc(100% - var(--pr-fade-right) * 0.188),
+    rgba(0, 0, 0, 0.354) calc(100% - var(--pr-fade-right) * 0.125),
+    rgba(0, 0, 0, 0.25) calc(100% - var(--pr-fade-right) * 0.063),
+    transparent 100%
+  );
+  transition:
+    --pr-fade-left 0.3s ease,
+    --pr-fade-right 0.3s ease;
+}
+
+.posterScroller[data-scroll-left="true"] {
+  --pr-fade-left: 55px;
+}
+
+.posterScroller[data-scroll-right="true"] {
+  --pr-fade-right: 65px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posterScroller {
+    transition: none;
+  }
+}
+
+/* Below the content max-width (1200px) the page container is full-width with
+   just a gutter, so break the scroller out to the full viewport width. Posters
+   are then clipped at the screen edge (where content is expected to run off)
+   rather than at an internal content margin — that internal clip line is what
+   reads as a hard "bar". The calc pair is gutter-agnostic: margin pulls each
+   edge out to the viewport, padding re-insets the first/last poster by the same
+   amount so they stay aligned with the surrounding content. Above 1200px the
+   container is centred with whitespace, where full-bleed would look wrong. */
+@media (max-width: 1200px) {
+  .posterScroller {
+    margin-inline: calc(50% - 50vw);
+    padding-inline: calc(50vw - 50%);
+    scroll-padding-inline: calc(50vw - 50%);
+  }
+}
