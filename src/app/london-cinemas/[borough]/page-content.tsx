@@ -80,6 +80,11 @@ export default function BoroughPageContent({
   const hasEvents = totalMovies > 0;
   const mapImagePath = `/images/boroughs/${boroughSlug}.png`;
 
+  // Link to the film list pre-filtered to this borough's venues.
+  const filmsHref = `/films?venues=${venues
+    .map((venue) => encodeURIComponent(venue.id))
+    .join(",")}&allDates=true&allCategories=true`;
+
   const hasFestivals = festivals.length > 0;
   const hasAccessibility = accessibilityStats.length > 0;
   const hasBoth = hasFestivals && hasAccessibility;
@@ -171,12 +176,15 @@ export default function BoroughPageContent({
               {totalMovies > 0 ? (
                 <>
                   Between them,{" "}
-                  <strong>
-                    {totalMovies.toLocaleString("en-GB")}{" "}
-                    {totalMovies === 1 ? "film is" : "films are"}
-                  </strong>{" "}
-                  currently showing. Browse the venues below to see what&apos;s
-                  on, compare showtimes, and find your next screening.
+                  <Link href={filmsHref}>
+                    <strong>
+                      {totalMovies.toLocaleString("en-GB")}{" "}
+                      {totalMovies === 1 ? "film" : "films"}
+                    </strong>
+                  </Link>{" "}
+                  {totalMovies === 1 ? "is" : "are"} currently showing. Browse
+                  the venues below to see what&apos;s on, compare showtimes, and
+                  find your next screening.
                 </>
               ) : (
                 <>

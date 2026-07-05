@@ -8,6 +8,9 @@ import { FESTIVALS } from "@/data/festivals";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { FILM_CLUBS } from "@/data/film-clubs";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
+import { VENUE_GROUPS } from "@/data/venue-groups";
+import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
+import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
 
 export const dynamic = "force-static";
 
@@ -67,6 +70,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const cinemaGroupListPage = {
+    url: "https://clusterflick.com/cinema-groups",
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  };
+
+  const venuesByGroup = groupVenuesByGroup(data.venues);
+
+  const cinemaGroupPages = VENUE_GROUPS.filter((group) =>
+    venuesByGroup.has(group.slug),
+  ).map((group) => ({
+    url: `https://clusterflick.com${getVenueGroupUrl(group)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
   const staticPages = [
     {
       url: "https://clusterflick.com",
@@ -110,10 +131,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     festivalListPage,
     filmClubListPage,
+    cinemaGroupListPage,
     ...moviePages,
     ...venuePages,
     ...boroughPages,
     ...festivalPages,
     ...filmClubPages,
+    ...cinemaGroupPages,
   ];
 }

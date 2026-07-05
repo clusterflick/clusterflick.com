@@ -1,11 +1,20 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import type { VenueGroupData } from "./page";
 import { normalizeForSearch } from "@/lib/filters/normalize";
+import { VENUE_GROUPS } from "@/data/venue-groups";
+import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
 import SearchInput from "@/components/search-input";
 import styles from "./page.module.css";
+
+// Chains that have a dedicated /cinema-groups page, keyed by the group label
+// used in the venue list (which equals `venue.groupName`).
+const GROUP_SLUG_BY_LABEL = new Map(
+  VENUE_GROUPS.map((group) => [group.groupName, group.slug]),
+);
 
 interface VenueListProps {
   groups: VenueGroupData[];
@@ -51,25 +60,36 @@ export default function VenueList({ groups }: VenueListProps) {
         </p>
       )}
 
-      {filteredGroups.map((group) => (
-        <section key={group.id} className={styles.group}>
-          <h2 className={styles.groupTitle}>
-            {group.label}
-            <span className={styles.groupCount}>{group.venues.length}</span>
-          </h2>
-          <LinkGrid
-            items={group.venues.map((venue) => ({
-              key: venue.href,
-              href: venue.href,
-              label: venue.displayName,
-              count:
-                venue.eventCount > 0
-                  ? venue.eventCount.toLocaleString("en-GB")
-                  : undefined,
-            }))}
-          />
-        </section>
-      ))}
+      {filteredGroups.map((group) => {
+        const groupSlug = GROUP_SLUG_BY_LABEL.get(group.label);
+        return (
+          <section key={group.id} className={styles.group}>
+            <h2 className={styles.groupTitle}>
+              {group.label}
+              <span className={styles.groupCount}>{group.venues.length}</span>
+              {groupSlug && (
+                <Link
+                  href={getVenueGroupUrl({ slug: groupSlug })}
+                  className={styles.groupLink}
+                >
+                  Group page →
+                </Link>
+              )}
+            </h2>
+            <LinkGrid
+              items={group.venues.map((venue) => ({
+                key: venue.href,
+                href: venue.href,
+                label: venue.displayName,
+                count:
+                  venue.eventCount > 0
+                    ? venue.eventCount.toLocaleString("en-GB")
+                    : undefined,
+              }))}
+            />
+          </section>
+        );
+      })}
 
       {filteredGroups.length === 0 && (
         <p className={styles.noResults}>

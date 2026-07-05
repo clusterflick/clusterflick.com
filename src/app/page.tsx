@@ -86,8 +86,12 @@ export default async function Home() {
             Clusterflick brings every film screening across 300+ London venues
             into one place.
             <br />
-            From blockbusters at Picturehouses and Everyman to independent gems
-            at the <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
+            From blockbusters at{" "}
+            <Link href="/cinema-groups/picturehouse">
+              Picturehouses
+            </Link> and <Link href="/cinema-groups/everyman">Everyman</Link> to
+            independent gems at the{" "}
+            <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
             <Link href="/venues/genesis-cinema">Genesis</Link> and the{" "}
             <Link href="/venues/prince-charles-cinema">Prince Charles</Link>{" "}
             cinemas.

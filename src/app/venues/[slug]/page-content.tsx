@@ -14,9 +14,6 @@ import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
 import {
-  LetterboxdIcon,
-  InstagramIcon,
-  XIcon,
   GoogleCalendarIcon,
   OutlookCalendarIcon,
   CalendarIcon,
@@ -24,49 +21,10 @@ import {
 import LinkedList from "@/components/linked-list";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import PreloadCinemaData from "@/components/preload-cinema-data";
+import SocialLinks from "@/components/social-links";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
 import styles from "./page.module.css";
-
-type SocialLink = {
-  Icon: ComponentType<{ size?: number }>;
-  name: string;
-  url: string;
-  handle: string;
-};
-
-function buildSocialLinks(attributes: VenueAttributes): SocialLink[] {
-  const links: SocialLink[] = [];
-
-  if (!attributes.socials) return links;
-
-  if (attributes.socials.letterboxd) {
-    links.push({
-      Icon: LetterboxdIcon,
-      name: "Letterboxd",
-      url: `https://letterboxd.com/${attributes.socials.letterboxd}/`,
-      handle: attributes.socials.letterboxd,
-    });
-  }
-  if (attributes.socials.instagram) {
-    links.push({
-      Icon: InstagramIcon,
-      name: "Instagram",
-      url: `https://www.instagram.com/${attributes.socials.instagram}/`,
-      handle: attributes.socials.instagram,
-    });
-  }
-  if (attributes.socials.twitter) {
-    links.push({
-      Icon: XIcon,
-      name: "X / Twitter",
-      url: `https://x.com/${attributes.socials.twitter}/`,
-      handle: attributes.socials.twitter,
-    });
-  }
-
-  return links;
-}
 
 export type NearbyVenue = {
   venue: Venue;
@@ -75,6 +33,11 @@ export type NearbyVenue = {
 };
 
 export type VenueBorough = {
+  name: string;
+  href: string;
+};
+
+export type VenueGroupLink = {
   name: string;
   href: string;
 };
@@ -91,6 +54,7 @@ export interface VenueDetailPageContentProps {
   VenueBlurb: ComponentType | null;
   nearbyVenues: NearbyVenue[];
   borough?: VenueBorough | null;
+  group?: VenueGroupLink | null;
   activeFestivals: { name: string; href: string }[];
   accessibilityStats: {
     feature: AccessibilityFeature;
@@ -111,10 +75,10 @@ export default function VenueDetailPageContent({
   VenueBlurb,
   nearbyVenues,
   borough,
+  group,
   activeFestivals,
   accessibilityStats,
 }: VenueDetailPageContentProps) {
-  const socialLinks = attributes ? buildSocialLinks(attributes) : [];
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
 
@@ -170,18 +134,7 @@ export default function VenueDetailPageContent({
       >
         <div className={styles.heroTagRow}>
           <div className={styles.heroTagRowSide}>
-            {socialLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.heroSocialLink}
-                title={link.name}
-              >
-                <link.Icon size={20} />
-              </a>
-            ))}
+            <SocialLinks socials={attributes?.socials} />
           </div>
           <div>
             <Tag color="blue">
@@ -226,11 +179,19 @@ export default function VenueDetailPageContent({
       <div className={styles.content}>
         <ColumnsLayout
           main={
-            VenueBlurb ? (
+            VenueBlurb || group ? (
               <ContentSection title="About" as="h2">
-                <div className={styles.blurb}>
-                  <VenueBlurb />
-                </div>
+                {VenueBlurb && (
+                  <div className={styles.blurb}>
+                    <VenueBlurb />
+                  </div>
+                )}
+                {group && (
+                  <p className={styles.groupNote}>
+                    Part of the{" "}
+                    <Link href={group.href}>{group.name} group</Link>.
+                  </p>
+                )}
               </ContentSection>
             ) : null
           }

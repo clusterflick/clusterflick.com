@@ -1,0 +1,17 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link:hover {
+  color: var(--color-electric-blue);
+}

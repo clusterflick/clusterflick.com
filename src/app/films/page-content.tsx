@@ -32,7 +32,16 @@ export default function PageContent() {
     getData,
     retry,
   } = useCinemaData();
-  const { filterState, setSearchQuery, hasActiveFilters } = useFilterConfig();
+  const { filterState, setSearchQuery, hasActiveFilters, applyUrlParams } =
+    useFilterConfig();
+
+  // Apply any URL params on mount — FilterConfigProvider stays mounted across
+  // client-side navigations, so its useState initialiser never re-reads URL
+  // params. Without this, navigating to /films?venues=… via a client-side link
+  // would leave the filter unapplied until a full refresh.
+  useEffect(() => {
+    applyUrlParams();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch data once on mount. Empty deps are intentional: all movie data is loaded
   // into global context once, and getData returns early if data already exists.

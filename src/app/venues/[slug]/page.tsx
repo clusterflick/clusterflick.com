@@ -9,6 +9,11 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import {
+  getVenueGroupUrl,
+  getVenueGroupProseName,
+} from "@/utils/get-venue-group-url";
+import { VENUE_GROUPS } from "@/data/venue-groups";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { FESTIVALS } from "@/data/festivals";
 import {
@@ -266,6 +271,19 @@ export default async function VenueDetailPage({
     ? { name: borough.name, href: getBoroughUrl(borough) }
     : null;
 
+  // Link to the venue's cinema group page, if it belongs to one of the
+  // registered chains (see /cinema-groups).
+  const venueGroup =
+    venue.structure === "group" && venue.groupName
+      ? VENUE_GROUPS.find((g) => g.groupName === venue.groupName)
+      : undefined;
+  const groupInfo = venueGroup
+    ? {
+        name: getVenueGroupProseName(venueGroup),
+        href: getVenueGroupUrl(venueGroup),
+      }
+    : null;
+
   // Find active festivals running at this venue
   const activeFestivalsAtVenue = FESTIVALS.flatMap((festival) => {
     if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
@@ -334,6 +352,7 @@ export default async function VenueDetailPage({
         VenueBlurb={VenueBlurb}
         nearbyVenues={nearbyVenues}
         borough={boroughInfo}
+        group={groupInfo}
         activeFestivals={activeFestivalsAtVenue}
         accessibilityStats={venueAccessibilityStats}
       />

@@ -19,6 +19,7 @@ import { FILM_CLUBS } from "@/data/film-clubs";
 import { FESTIVALS } from "@/data/festivals";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { getBoroughMapPath } from "@/utils/get-borough-image";
 import { AccessibilityFeature, type Venue } from "@/types";
 import BoroughPageContent from "./page-content";
 
@@ -58,6 +59,21 @@ export async function generateMetadata({
   const venueWord = venueCount === 1 ? "cinema" : "cinemas";
   const description = `Discover ${venueCount} ${venueWord} in ${borough.name}, London. Browse showtimes, compare screenings and find independent, arthouse and multiplex venues across the borough.`;
 
+  const mapPath = getBoroughMapPath(slug);
+  const ogImage = mapPath
+    ? {
+        url: mapPath,
+        width: 1200,
+        height: 800,
+        alt: `Map of cinemas in ${borough.name}, London`,
+      }
+    : {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 675,
+        alt: "Clusterflick",
+      };
+
   return {
     title: `Cinemas in ${borough.name}, London`,
     description,
@@ -69,12 +85,14 @@ export async function generateMetadata({
       description,
       url: `https://clusterflick.com${getBoroughUrl(borough)}`,
       siteName: "Clusterflick",
+      images: [ogImage],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `Cinemas in ${borough.name}, London | Clusterflick`,
       description,
       creator: "@clusterflick",
+      images: [ogImage.url],
     },
   };
 }

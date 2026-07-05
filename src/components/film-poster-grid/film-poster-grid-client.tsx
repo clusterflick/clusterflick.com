@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
+import Link from "next/link";
 import { useCinemaData } from "@/state/cinema-data-context";
 import EmptyState from "@/components/empty-state";
 import styles from "./film-poster-grid.module.css";
@@ -67,14 +68,9 @@ export default function FilmPosterGridClient({
   return (
     <>
       {exploreHref && exploreLabel && (
-        <a
-          href={exploreHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.exploreLink}
-        >
+        <Link href={exploreHref} className={styles.exploreLink}>
           {exploreLabel}
-        </a>
+        </Link>
       )}
       <div
         className={
