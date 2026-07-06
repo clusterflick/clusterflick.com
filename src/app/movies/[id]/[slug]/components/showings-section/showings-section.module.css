@@ -37,6 +37,12 @@
   white-space: nowrap;
 }
 
+/* Wrapper around a virtualised finished-banner row. Vertical spacing lives on
+   the wrapper (not a margin on the banner) so virtuoso measures it correctly. */
+.bannerRow {
+  padding-top: 16px;
+}
+
 .finishedBanner {
   display: flex;
   flex-wrap: wrap;
@@ -44,7 +50,6 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  margin-bottom: 20px;
   background-color: rgba(var(--color-light-gray-rgb), 0.08);
   border: 1px solid rgba(var(--color-light-gray-rgb), 0.2);
   border-radius: 8px;
@@ -61,22 +66,25 @@
   font-weight: 600;
 }
 
+/* Stickiness is applied by the virtuoso group wrapper (StickyGroup), which
+   offsets the stick point below the fixed 63px PageHeader. This element only
+   carries the visual styling. The opaque background must cover cards scrolling
+   underneath the stuck header. */
 .dateHeader {
   font-size: 20px;
   font-weight: 700;
   color: var(--color-electric-blue);
-  margin-bottom: 16px;
   padding-top: 12px;
   padding-bottom: 8px;
   border-bottom: 2px solid rgba(var(--color-electric-blue-rgb), 0.3);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  /* Sticky positioning below fixed header */
-  position: sticky;
-  top: 63px;
-  z-index: 10;
   background: var(--color-midnight-navy);
+  /* Reset the <h3> default block margins so virtuoso measures the row height
+     accurately and spacing stays controlled by the row padding. */
+  margin-top: 0;
+  margin-bottom: 0;
   /* Extend to edges of detailsContainer (which has 20px padding) */
   margin-left: -20px;
   margin-right: -20px;
@@ -91,11 +99,23 @@
   opacity: 0.9;
 }
 
-.performancesList {
+/* One virtualised row of up to N cards. N (--cols) is computed from the
+   container width to replicate the old auto-fill grid. Cards stretch to equal
+   height per row. Vertical spacing is padding (measured by virtuoso), not
+   margin. */
+.performancesRow {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+  align-items: stretch;
   gap: 16px;
-  margin-bottom: 32px;
+  padding-top: 16px;
+}
+
+/* The last row of each day carries the inter-day separation as bottom padding
+   (measured by virtuoso and part of the scroll flow, so it pushes the next day
+   down without affecting the sticky header). */
+.lastInGroup {
+  padding-bottom: 32px;
 }
 
 .performanceCard {

@@ -1,5 +1,15 @@
-import { Fragment, useState } from "react";
+import {
+  Fragment,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+  type CSSProperties,
+} from "react";
 import clsx from "clsx";
+import { GroupedVirtuoso } from "react-virtuoso";
 import { MoviePerformance, Showing, Venue } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { titlesDiffer } from "@/utils/title-differs";
@@ -8,6 +18,7 @@ import { FilterDescription } from "@/lib/filters";
 import {
   getDaysFromNow,
   formatDaysFromNow,
+  formatShowingTime,
   isInPast,
 } from "@/utils/format-date";
 import Button, { ButtonAnchor } from "@/components/button";
@@ -16,6 +27,65 @@ import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
 import Tag from "@/components/tag";
 import styles from "./showings-section.module.css";
+
+// Card grid sizing — kept in sync with .performancesRow gap in the CSS module.
+// Mirrors the previous `repeat(auto-fill, minmax(280px, 1fr))` layout so the
+// virtualised chunked rows look identical to the old single grid.
+const CARD_MIN_WIDTH = 280;
+const CARD_GAP = 16;
+// Offset so sticky day headers rest below the fixed 63px PageHeader.
+const STICKY_TOP = 63;
+
+function getColumns(width: number) {
+  if (width <= 0) return 1;
+  return Math.max(
+    1,
+    Math.floor((width + CARD_GAP) / (CARD_MIN_WIDTH + CARD_GAP)),
+  );
+}
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    out.push(items.slice(i, i + size));
+  }
+  return out;
+}
+
+interface GroupMeta {
+  date: string;
+  daysFromNow: number | null;
+  hasFinished: boolean;
+  pastCount: number;
+}
+
+type Row =
+  | { kind: "finished-banner"; groupIndex: number; lastInGroup: boolean }
+  | { kind: "cards"; performances: MoviePerformance[]; lastInGroup: boolean };
+
+// Push virtuoso's sticky day headers below the fixed 63px PageHeader. Virtuoso
+// pins the active header via a `TopItemList` wrapper (sticky at top:0) and also
+// makes the in-flow group elements sticky; both must be offset so the header
+// never slides under the page header.
+const StickyGroup = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  function StickyGroup(props, ref) {
+    return (
+      <div
+        {...props}
+        ref={ref}
+        style={{ ...props.style, top: STICKY_TOP, zIndex: 10 }}
+      />
+    );
+  },
+);
+
+const StickyTopItemList = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  function StickyTopItemList(props, ref) {
+    return (
+      <div {...props} ref={ref} style={{ ...props.style, top: STICKY_TOP }} />
+    );
+  },
+);
 
 function renderPerformanceCard(
   performance: MoviePerformance,
@@ -49,11 +119,7 @@ function renderPerformanceCard(
         aria-label={`View ${venue?.name || "venue"} listing`}
       />
       <div className={styles.performanceTime}>
-        {new Date(performance.time).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          timeZone: "Europe/London",
-        })}
+        {formatShowingTime(performance.time)}
       </div>
       {venue && <div className={styles.performanceVenue}>{venue.name}</div>}
       {showing?.title && titlesDiffer(movieTitle, showing.title) && (
@@ -135,6 +201,72 @@ export default function ShowingsSection({
   const { hydrateUrl, error, retry } = useCinemaData();
   const hasPerformances = Object.keys(performancesByDate).length > 0;
   const [showFinished, setShowFinished] = useState(false);
+
+  // Measure the list container to derive the responsive column count (N),
+  // replicating the old CSS auto-fill grid. When N changes the model re-chunks
+  // and virtuoso re-measures.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [columns, setColumns] = useState(1);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      setColumns(getColumns(width));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasPerformances]);
+
+  // Flatten the day-grouped performances into virtuoso's grouped model: one
+  // GroupMeta + groupCount per day, and a flat list of rows where each row is
+  // either the per-day "finished" banner or a chunk of up to N cards.
+  const { groups, rows, groupCounts } = useMemo(() => {
+    const groups: GroupMeta[] = [];
+    const rows: Row[] = [];
+    const groupCounts: number[] = [];
+
+    Object.entries(performancesByDate).forEach(([date, datePerformances]) => {
+      const daysFromNow = getDaysFromNow(datePerformances[0].time);
+      const pastPerformances = datePerformances.filter((p) => isInPast(p.time));
+      const upcomingPerformances = datePerformances.filter(
+        (p) => !isInPast(p.time),
+      );
+      const hasFinished = pastPerformances.length > 0;
+      const visiblePerformances = showFinished
+        ? datePerformances
+        : upcomingPerformances;
+
+      const groupIndex = groups.length;
+      groups.push({
+        date,
+        daysFromNow,
+        hasFinished,
+        pastCount: pastPerformances.length,
+      });
+
+      let count = 0;
+      if (hasFinished) {
+        rows.push({ kind: "finished-banner", groupIndex, lastInGroup: false });
+        count += 1;
+      }
+      for (const performanceChunk of chunk(visiblePerformances, columns)) {
+        rows.push({
+          kind: "cards",
+          performances: performanceChunk,
+          lastInGroup: false,
+        });
+        count += 1;
+      }
+      // A finished-only day with hidden finished still shows its banner, so
+      // every group has at least one row. Tag the last row so it can carry the
+      // inter-day bottom spacing (in scroll flow, below the sticky header).
+      rows[rows.length - 1].lastInGroup = true;
+      groupCounts.push(count);
+    });
+
+    return { groups, rows, groupCounts };
+  }, [performancesByDate, showFinished, columns]);
 
   // Show filter info banner when filters are reducing results (including defaults)
   const filtersReducedResults =
@@ -232,63 +364,59 @@ export default function ShowingsSection({
               }
             />
           ) : (
-            <div>
-              {Object.entries(performancesByDate).map(
-                ([date, datePerformances]) => {
-                  const daysFromNow = getDaysFromNow(datePerformances[0].time);
-                  const pastPerformances = datePerformances.filter((p) =>
-                    isInPast(p.time),
-                  );
-                  const upcomingPerformances = datePerformances.filter(
-                    (p) => !isInPast(p.time),
-                  );
-                  const hasFinished = pastPerformances.length > 0;
-                  const hasUpcoming = upcomingPerformances.length > 0;
-                  const visiblePerformances = showFinished
-                    ? datePerformances
-                    : upcomingPerformances;
-
+            <div ref={containerRef}>
+              <GroupedVirtuoso
+                useWindowScroll
+                increaseViewportBy={600}
+                groupCounts={groupCounts}
+                components={{
+                  Group: StickyGroup,
+                  TopItemList: StickyTopItemList,
+                }}
+                groupContent={(index) => {
+                  const group = groups[index];
                   return (
-                    <Fragment key={date}>
-                      <h3 className={styles.dateHeader}>
-                        {date}
-                        {daysFromNow !== null && (
-                          <span className={styles.daysFromNow}>
-                            {formatDaysFromNow(daysFromNow)}
-                          </span>
+                    <h3 className={styles.dateHeader}>
+                      {group.date}
+                      {group.daysFromNow !== null && (
+                        <span className={styles.daysFromNow}>
+                          {formatDaysFromNow(group.daysFromNow)}
+                        </span>
+                      )}
+                    </h3>
+                  );
+                }}
+                itemContent={(index) => {
+                  const row = rows[index];
+                  if (row.kind === "finished-banner") {
+                    const group = groups[row.groupIndex];
+                    return (
+                      <div
+                        className={clsx(
+                          styles.bannerRow,
+                          row.lastInGroup && styles.lastInGroup,
                         )}
-                      </h3>
-                      {hasFinished && (
+                      >
                         <div className={styles.finishedBanner}>
                           <span className={styles.finishedLabel}>
                             {showFinished ? (
                               <>
                                 Showing{" "}
                                 <span className={styles.finishedCount}>
-                                  {pastPerformances.length.toLocaleString(
-                                    "en-GB",
-                                  )}
+                                  {group.pastCount.toLocaleString("en-GB")}
                                 </span>{" "}
-                                {pastPerformances.length === 1
-                                  ? "showing"
-                                  : "showings"}{" "}
-                                which{" "}
-                                {pastPerformances.length === 1 ? "has" : "have"}{" "}
+                                {group.pastCount === 1 ? "showing" : "showings"}{" "}
+                                which {group.pastCount === 1 ? "has" : "have"}{" "}
                                 already finished
                               </>
                             ) : (
                               <>
                                 Hiding{" "}
                                 <span className={styles.finishedCount}>
-                                  {pastPerformances.length.toLocaleString(
-                                    "en-GB",
-                                  )}
+                                  {group.pastCount.toLocaleString("en-GB")}
                                 </span>{" "}
-                                {pastPerformances.length === 1
-                                  ? "showing"
-                                  : "showings"}{" "}
-                                which{" "}
-                                {pastPerformances.length === 1 ? "has" : "have"}{" "}
+                                {group.pastCount === 1 ? "showing" : "showings"}{" "}
+                                which {group.pastCount === 1 ? "has" : "have"}{" "}
                                 already finished
                               </>
                             )}
@@ -296,33 +424,37 @@ export default function ShowingsSection({
                           <Button
                             variant="secondary"
                             size="sm"
-                            onClick={() => setShowFinished(!showFinished)}
+                            onClick={() => setShowFinished((v) => !v)}
                           >
                             {showFinished ? "Hide" : "Show"}
                           </Button>
                         </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      className={clsx(
+                        styles.performancesRow,
+                        row.lastInGroup && styles.lastInGroup,
                       )}
-                      {visiblePerformances.length > 0 && (
-                        <div className={styles.performancesList}>
-                          {visiblePerformances.map((performance, index) =>
-                            renderPerformanceCard(
-                              performance,
-                              index,
-                              showings,
-                              venues,
-                              movieTitle,
-                              hydrateUrl,
-                            ),
-                          )}
-                        </div>
+                      style={{ "--cols": columns } as CSSProperties}
+                    >
+                      {row.performances.map((performance, cardIndex) =>
+                        renderPerformanceCard(
+                          performance,
+                          cardIndex,
+                          showings,
+                          venues,
+                          movieTitle,
+                          hydrateUrl,
+                        ),
                       )}
-                      {!hasUpcoming && !hasFinished && (
-                        <div className={styles.performancesList} />
-                      )}
-                    </Fragment>
+                    </div>
                   );
-                },
-              )}
+                }}
+              />
             </div>
           )}
         </>

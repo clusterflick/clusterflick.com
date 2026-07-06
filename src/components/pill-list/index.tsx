@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import Button from "@/components/button";
 import styles from "./pill-list.module.css";
 
@@ -32,6 +32,20 @@ export default function PillList<T = string>({
 }: PillListProps<T>) {
   const [isExpanded, setIsExpanded] = useState(false);
   const noun = itemNoun ?? title.toLowerCase();
+
+  // Expanding/collapsing changes the page height. A window-scrolled virtualised
+  // list below this component (the movie showings list) caches its document
+  // offset and only recomputes on scroll/resize — so without a nudge it renders
+  // stale items and leaves a blank band until the next scroll. Dispatch a resize
+  // after the toggle commits so it recalculates immediately.
+  const isInitialRender = useRef(true);
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+    window.dispatchEvent(new Event("resize"));
+  }, [isExpanded]);
 
   const renderList = (max: number | undefined) => {
     const shouldTruncate = max != null && items.length > max;
