@@ -140,7 +140,7 @@ export default function ShowingsSection({
   const filtersReducedResults =
     unfilteredPerformanceCount > 0 &&
     filteredPerformanceCount < unfilteredPerformanceCount;
-  const showFilterBanner = !isLoading && (filtersReducedResults || showingAll);
+  const showFilterBanner = !isLoading && filtersReducedResults;
 
   return (
     <ContentSection
@@ -172,8 +172,8 @@ export default function ShowingsSection({
                 {showingAll ? (
                   <span className={styles.filterLabel}>
                     Showing all{" "}
-                    {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
-                    showings
+                    {unfilteredPerformanceCount.toLocaleString("en-GB")} showing
+                    {unfilteredPerformanceCount === 1 ? "" : "s"}
                   </span>
                 ) : (
                   <>
@@ -191,12 +191,18 @@ export default function ShowingsSection({
                         {filterDescription.dates}
                       </span>
                     </span>
-                    {filteredPerformanceCount > 0 && (
+                    {filteredPerformanceCount > 0 ? (
                       <span className={styles.filterCount}>
                         Showing{" "}
                         {filteredPerformanceCount.toLocaleString("en-GB")} of{" "}
                         {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
-                        showings
+                        showing{unfilteredPerformanceCount === 1 ? "" : "s"}
+                      </span>
+                    ) : (
+                      <span className={styles.filterCount}>
+                        Hiding all{" "}
+                        {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
+                        showing{unfilteredPerformanceCount === 1 ? "" : "s"}
                       </span>
                     )}
                   </>

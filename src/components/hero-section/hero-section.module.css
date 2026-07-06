@@ -16,6 +16,7 @@
 
 .backdropImage {
   object-fit: cover;
+  object-position: middle;
 }
 
 .backdropOverlay {
@@ -24,11 +25,15 @@
   left: 0;
   right: 0;
   bottom: 0;
+  /* Pin the fade to the top in px so content-height changes don't slide the
+     gradient band. The gradient holds its final navy colour past the last stop,
+     so anything below is solid navy. min(px, %) keeps short heroes fading to
+     their own bottom exactly as before, while tall heroes stay pinned. */
   background: linear-gradient(
     to bottom,
-    rgba(var(--color-midnight-navy-rgb), 0.7) 0%,
-    rgba(var(--color-midnight-navy-rgb), 0.9) 50%,
-    var(--color-midnight-navy) 100%
+    rgba(var(--color-midnight-navy-rgb), 0.7) 0,
+    rgba(var(--color-midnight-navy-rgb), 0.9) min(420px, 50%),
+    var(--color-midnight-navy) min(840px, 100%)
   );
 }
 
@@ -41,6 +46,10 @@
 /* Backdrop height variants */
 .heightStandard {
   height: 100%;
+  /* Set a max height on the background image which aligns with the bottom of the
+     poster, so content-height changes don't cause the slice of background image
+     to shift. */
+  max-height: 700px;
 }
 
 .heightExtended {
