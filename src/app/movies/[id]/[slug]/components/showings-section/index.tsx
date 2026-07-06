@@ -1,7 +1,7 @@
 import {
   Fragment,
   forwardRef,
-  useEffect,
+  useCallback,
   useMemo,
   useRef,
   useState,
@@ -202,21 +202,35 @@ export default function ShowingsSection({
   const hasPerformances = Object.keys(performancesByDate).length > 0;
   const [showFinished, setShowFinished] = useState(false);
 
-  // Measure the list container to derive the responsive column count (N),
+  // Derive the responsive column count (N) from the list container width,
   // replicating the old CSS auto-fill grid. When N changes the model re-chunks
   // and virtuoso re-measures.
-  const containerRef = useRef<HTMLDivElement>(null);
+  //
+  // We bind via a callback ref (not useEffect) so the observer attaches exactly
+  // when the container mounts, and measure synchronously with
+  // getBoundingClientRect on mount rather than waiting for the async first
+  // ResizeObserver callback. On client-side navigation (e.g. home -> movie via
+  // #show-all) the container can mount out of step with an effect keyed on
+  // loading/filter state, which previously left columns stuck at the initial 1.
   const [columns, setColumns] = useState(1);
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? 0;
-      setColumns(getColumns(width));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasPerformances]);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const measureColumns = useCallback((width: number) => {
+    if (width > 0) setColumns(getColumns(width));
+  }, []);
+  const containerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
+      if (!node) return;
+      measureColumns(node.getBoundingClientRect().width);
+      const observer = new ResizeObserver((entries) => {
+        measureColumns(entries[0]?.contentRect.width ?? 0);
+      });
+      observer.observe(node);
+      resizeObserverRef.current = observer;
+    },
+    [measureColumns],
+  );
 
   // Flatten the day-grouped performances into virtuoso's grouped model: one
   // GroupMeta + groupCount per day, and a flat list of rows where each row is
