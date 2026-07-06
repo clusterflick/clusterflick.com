@@ -1,4 +1,4 @@
-import { type ComponentType } from "react";
+import { type ComponentType, type ReactNode } from "react";
 import Link from "next/link";
 import type { Movie, AccessibilityFeature } from "@/types";
 import {
@@ -47,7 +47,28 @@ export interface EventDetailPageContentProps {
   isAlias: boolean;
   canonicalUrl: string;
   venues: EventVenueItem[];
+  /** Heading for the cinemas section. Defaults to `Cinemas`. */
+  cinemasSectionTitle?: string;
   accessibilityStats?: AccessibilityStat[];
+  /** Heading for the films grid. Defaults to `Films at {name}`. */
+  filmsSectionTitle?: string;
+  /** Href for the "explore" link below the films grid. Defaults to `/films`. */
+  filmsExploreHref?: string;
+  /** Label for the "explore" link below the films grid. */
+  filmsExploreLabel?: string;
+  /** Background image for the hero. Defaults to the decorative light circles. */
+  heroBackgroundImage?: string;
+  /** Alt text for a custom hero background image. */
+  heroBackgroundImageAlt?: string;
+  /** Content rendered inside the hero, below the title (e.g. an about blurb).
+   *  Fills the hero so a photographic backdrop reads without a forced height. */
+  heroChildren?: ReactNode;
+  /**
+   * How the cinemas/accessibility block is laid out:
+   * - "sidebar" (default): alongside the "About" blurb in a two-column layout.
+   * - "grid": full-width below the hero (use when the blurb is in the hero).
+   */
+  venuesLayout?: "sidebar" | "grid";
 }
 
 /**
@@ -75,8 +96,61 @@ export default function EventDetailPageContent({
   isAlias,
   canonicalUrl,
   venues,
+  cinemasSectionTitle = "Cinemas",
   accessibilityStats = [],
+  filmsSectionTitle,
+  filmsExploreHref = "/films",
+  filmsExploreLabel = "Or start exploring all films",
+  heroBackgroundImage,
+  heroBackgroundImageAlt,
+  heroChildren,
+  venuesLayout = "sidebar",
 }: EventDetailPageContentProps) {
+  const cinemasSection =
+    venues.length > 0 ? (
+      <ContentSection title={cinemasSectionTitle} as="h2">
+        <div className={styles.venueGrid}>
+          {venues.map((venue) => (
+            <VenueCard
+              key={venue.id}
+              href={venue.href}
+              name={venue.name}
+              type={venue.type}
+              imagePath={venue.imagePath}
+              filmCount={venue.filmCount}
+              performanceCount={venue.performanceCount}
+            />
+          ))}
+        </div>
+      </ContentSection>
+    ) : null;
+
+  const accessibilitySection =
+    accessibilityStats.length > 0 ? (
+      <ContentSection
+        title="Accessibility"
+        as="h2"
+        className={styles.accessibilitySection}
+        intro={
+          <Link href="/accessibility">
+            Learn more about accessible screenings
+          </Link>
+        }
+      >
+        <LinkedList
+          items={accessibilityStats.map(({ feature, filmCount }) => ({
+            key: feature,
+            href: `/accessibility/#${feature}`,
+            label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
+            detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
+          }))}
+        />
+      </ContentSection>
+    ) : null;
+
+  const hasSecondaryContent =
+    Boolean(Blurb) || Boolean(cinemasSection) || Boolean(accessibilitySection);
+
   return (
     <main id="main-content">
       <PreloadCinemaData />
@@ -89,86 +163,62 @@ export default function EventDetailPageContent({
         url={url}
         movieCount={movieCount}
         performanceCount={performanceCount}
-      />
+        backgroundImage={heroBackgroundImage}
+        backgroundImageAlt={heroBackgroundImageAlt}
+      >
+        {heroChildren}
+      </DetailPageHero>
 
       <Divider />
 
-      {(Blurb || venues.length > 0 || accessibilityStats.length > 0) && (
-        <>
-          <div className={styles.content}>
-            <ColumnsLayout
-              main={
-                Blurb ? (
-                  <ContentSection title="About" as="h2">
-                    <div className={styles.blurb}>
-                      <Blurb />
-                    </div>
-                  </ContentSection>
-                ) : null
-              }
-              sidebar={
-                venues.length > 0 || accessibilityStats.length > 0 ? (
-                  <>
-                    {venues.length > 0 && (
-                      <ContentSection title="Cinemas" as="h2">
-                        <div className={styles.venueGrid}>
-                          {venues.map((venue) => (
-                            <VenueCard
-                              key={venue.id}
-                              href={venue.href}
-                              name={venue.name}
-                              type={venue.type}
-                              imagePath={venue.imagePath}
-                              filmCount={venue.filmCount}
-                              performanceCount={venue.performanceCount}
-                            />
-                          ))}
+      {venuesLayout === "grid"
+        ? (cinemasSection || accessibilitySection) && (
+            <>
+              <div className={styles.content}>
+                {cinemasSection}
+                {accessibilitySection}
+              </div>
+              <Divider />
+            </>
+          )
+        : hasSecondaryContent && (
+            <>
+              <div className={styles.content}>
+                <ColumnsLayout
+                  main={
+                    Blurb ? (
+                      <ContentSection title="About" as="h2">
+                        <div className={styles.blurb}>
+                          <Blurb />
                         </div>
                       </ContentSection>
-                    )}
-                    {accessibilityStats.length > 0 && (
-                      <ContentSection
-                        title="Accessibility"
-                        as="h2"
-                        className={styles.accessibilitySection}
-                        intro={
-                          <Link href="/accessibility">
-                            Learn more about accessible screenings
-                          </Link>
-                        }
-                      >
-                        <LinkedList
-                          items={accessibilityStats.map(
-                            ({ feature, filmCount }) => ({
-                              key: feature,
-                              href: `/accessibility/#${feature}`,
-                              label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
-                              detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
-                            }),
-                          )}
-                        />
-                      </ContentSection>
-                    )}
-                  </>
-                ) : null
-              }
-            />
-          </div>
-          <Divider />
-        </>
-      )}
+                    ) : null
+                  }
+                  sidebar={
+                    cinemasSection || accessibilitySection ? (
+                      <>
+                        {cinemasSection}
+                        {accessibilitySection}
+                      </>
+                    ) : null
+                  }
+                />
+              </div>
+              <Divider />
+            </>
+          )}
 
       <div className={styles.filmsSection}>
         <ContentSection
-          title={`Films at ${name}`}
+          title={filmsSectionTitle ?? `Films at ${name}`}
           as="h2"
           className={styles.films}
         >
           <FilmPosterGrid
             movies={gridMovies}
             truncated={gridMoviesTruncated}
-            exploreHref="/films"
-            exploreLabel="Or start exploring all films"
+            exploreHref={filmsExploreHref}
+            exploreLabel={filmsExploreLabel}
             showAll
           />
         </ContentSection>

@@ -311,6 +311,11 @@ export default function CategoryFilterSection({
                 </Button>
               </div>
             </div>
+            <p className={styles.sectionDescription}>
+              <Link href="/genres" className={styles.sectionLink}>
+                See a list of all genres
+              </Link>
+            </p>
             <div className={styles.chipGroup} role="group">
               {availableGenres.map((genre) => (
                 <Chip

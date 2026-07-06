@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
   description:
-    "Discover what's worth seeing across London's 250+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
+    "Discover what's worth seeing across London's 300+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
   alternates: {
     canonical: "/",
   },

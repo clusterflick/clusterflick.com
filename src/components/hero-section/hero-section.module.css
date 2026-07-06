@@ -16,7 +16,6 @@
 
 .backdropImage {
   object-fit: cover;
-  object-position: middle;
 }
 
 .backdropOverlay {

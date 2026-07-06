@@ -1,0 +1,35 @@
+/* Intro blurb */
+
+.intro {
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+/* Genre grid */
+
+.genreGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .genreGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Meta row passed to EventCard */
+
+.filmCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-electric-blue);
+  background: rgba(49, 158, 219, 0.12);
+  padding: 2px 10px;
+  border-radius: 20px;
+}

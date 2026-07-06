@@ -1,6 +1,7 @@
 /** Navigation links shared across HeaderNav and MobileMenu. */
 export const NAV_LINKS = [
   { href: "/films", label: "Films" },
+  { href: "/genres", label: "Genres" },
   { href: "/venues", label: "Venues" },
   { href: "/festivals", label: "Festivals" },
   { href: "/film-clubs", label: "Film Clubs" },

@@ -185,7 +185,9 @@ const longDateFormatter = new Intl.DateTimeFormat("en-GB", {
 export function formatDateLong(date: Date | string | number): string {
   // Intl.DateTimeFormat.format accepts a timestamp or Date directly; only
   // strings need parsing.
-  return longDateFormatter.format(typeof date === "string" ? new Date(date) : date);
+  return longDateFormatter.format(
+    typeof date === "string" ? new Date(date) : date,
+  );
 }
 
 /**

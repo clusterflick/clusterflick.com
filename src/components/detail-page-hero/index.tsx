@@ -11,6 +11,10 @@ interface DetailPageHeroProps {
   url?: string;
   movieCount: number;
   performanceCount: number;
+  /** Background image for the hero. Defaults to the decorative light circles. */
+  backgroundImage?: string;
+  /** Alt text for a custom background image. */
+  backgroundImageAlt?: string;
   /** Optional content rendered between the URL link and the status card, e.g. a tag/social row */
   children?: ReactNode;
 }
@@ -22,14 +26,16 @@ export default function DetailPageHero({
   url,
   movieCount,
   performanceCount,
+  backgroundImage = "/images/light-circles.jpg",
+  backgroundImageAlt = "Decorative light circles",
   children,
 }: DetailPageHeroProps) {
   const hasEvents = performanceCount > 0;
 
   return (
     <HeroSection
-      backgroundImage="/images/light-circles.jpg"
-      backgroundImageAlt="Decorative light circles"
+      backgroundImage={backgroundImage}
+      backgroundImageAlt={backgroundImageAlt}
       backdropHeight="standard"
       align="center"
       className={styles.hero}

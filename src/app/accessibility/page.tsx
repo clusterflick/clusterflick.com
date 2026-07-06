@@ -19,7 +19,10 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Accessible Cinema",
   description:
-    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 250+ cinemas.",
+    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 300+ cinemas.",
+  alternates: {
+    canonical: "/accessibility",
+  },
 };
 
 /**
@@ -199,8 +202,66 @@ export default async function AccessibilityPage() {
   const data = await getStaticData();
   const { overall, features, topVenues } = computeAccessibilityStats(data);
 
+  // FAQ answers mirror content visible on this page (the hero note and each
+  // feature's description) — a requirement for valid FAQPage structured data.
+  const faqs = [
+    {
+      question: "What accessibility features can I find screenings for?",
+      answer:
+        "Clusterflick tracks audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings across London's 300+ cinemas.",
+    },
+    {
+      question: "Where does the accessibility data come from?",
+      answer:
+        "Our accessibility data is sourced directly from each venue and cross-referenced against the UK Cinema Association's Accessible Screenings UK data to ensure accuracy.",
+    },
+    ...Object.values(AccessibilityFeature).map((feature) => ({
+      question: `What does a "${ACCESSIBILITY_LABELS[feature]}" screening mean?`,
+      answer: FEATURE_CONFIG[feature].description,
+    })),
+  ];
+
+  const accessibilityJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://clusterflick.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Accessible Cinema",
+          item: "https://clusterflick.com/accessibility",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    },
+  ];
+
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(accessibilityJsonLd),
+        }}
+      />
       <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
@@ -217,7 +278,7 @@ export default async function AccessibilityPage() {
           <strong>Cinema for everyone.</strong>
           <br />
           Find screenings with audio description, captions, relaxed
-          environments, and more across London&apos;s 250+ venues.
+          environments, and more across London&apos;s 300+ venues.
         </p>
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and

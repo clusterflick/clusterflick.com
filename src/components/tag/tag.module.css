@@ -5,6 +5,21 @@
   font-weight: 500;
 }
 
+/* Link variant — keeps the pill look, no underline, subtle hover */
+.link {
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration: none;
+  filter: brightness(1.25);
+}
+
 /* Size variants */
 .md {
   padding: 6px 14px;

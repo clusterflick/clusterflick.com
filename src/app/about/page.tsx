@@ -23,11 +23,76 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Learn more about Clusterflick – the open source project helping you find film screenings across London cinemas.",
+  alternates: {
+    canonical: "/about",
+  },
 };
+
+// Answers mirror content visible on this page — a requirement for valid
+// FAQPage structured data.
+const faqs = [
+  {
+    question: "What is Clusterflick?",
+    answer:
+      "Clusterflick is a free site that brings together film screenings from across London's 300+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
+  },
+  {
+    question: "Where does Clusterflick's film data come from?",
+    answer:
+      "Clusterflick gets showing details directly from each venue and event source. The film-related metadata (including actor, director, synopses, release dates, trailers and poster art) is supplied by The Movie Database (TMDB). Clusterflick uses the TMDB API but is not endorsed or certified by TMDB.",
+  },
+  {
+    question: "How often is the showing data updated?",
+    answer:
+      "The showing data is refreshed from each venue and event source daily.",
+  },
+  {
+    question: "Is Clusterflick open source?",
+    answer:
+      "Yes, the code for the Clusterflick website, the processing pipeline, and the data generated is all open source and available on GitHub.",
+  },
+];
+
+const aboutJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://clusterflick.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "About",
+        item: "https://clusterflick.com/about",
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  },
+];
 
 export default function AboutPage() {
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
+      />
       <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
