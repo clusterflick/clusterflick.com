@@ -245,7 +245,7 @@ export const FESTIVALS: Festival[] = [
     aliases: ["tfff"],
     matchers: [
       {
-        [FilterId.ShowingTitleSearch]: "The Final Film Festival",
+        [FilterId.ShowingTitleSearch]: "Final Film Festival",
       },
       {
         [FilterId.ShowingTitleSearch]: "TFFF:",
