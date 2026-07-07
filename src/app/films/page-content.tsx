@@ -1,7 +1,14 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  forwardRef,
+  type ComponentProps,
+} from "react";
+import clsx from "clsx";
 import dynamic from "next/dynamic";
-import { Grid, WindowScroller, GridCellProps } from "react-virtualized";
+import { VirtuosoGrid } from "react-virtuoso";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { filterManager } from "@/lib/filters";
@@ -11,7 +18,6 @@ import MovieCell from "@/components/movie-cell";
 import MainHeader from "@/components/main-header";
 import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
-import "react-virtualized/styles.css";
 import styles from "./page.module.css";
 
 const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
@@ -21,6 +27,30 @@ const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
 const POSTER_WIDTH = 200;
 const POSTER_HEIGHT = 300;
 const GAP = 8;
+
+// Number of initial rows to eagerly load images for (above the fold)
+const PRIORITY_ROWS = 2;
+
+// VirtuosoGrid wrappers. The flex list lays out and centres the fixed-size
+// posters; the roles give the grid list/listitem semantics.
+const GridList = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  function GridList({ className, ...props }, ref) {
+    return (
+      <div
+        {...props}
+        ref={ref}
+        role="list"
+        className={clsx(styles.gridList, className)}
+      />
+    );
+  },
+);
+
+const GridItem = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  function GridItem({ className, ...props }, ref) {
+    return <div {...props} ref={ref} role="listitem" className={className} />;
+  },
+);
 
 export default function PageContent() {
   const {
@@ -49,10 +79,16 @@ export default function PageContent() {
     getData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: POSTER_WIDTH * 1.5,
-    height: POSTER_HEIGHT * 1.5,
-  }); // Default values for SSR to render one placeholder poster
+  // Client viewport width, driving the priority-image count and the reserved
+  // grid height below. Read synchronously via a lazy initialiser so the very
+  // first client render — including a back-navigation remount — already has the
+  // real width; that's what lets us reserve the full height during render,
+  // before paint (see reservedHeight). Falls back to one poster wide during SSR
+  // where window is unavailable, which is harmless: the grid is gated on
+  // client-loaded data and never renders server-side.
+  const [windowWidth, setWindowWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : POSTER_WIDTH,
+  );
   const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
   const [filterTextHeight, setFilterTextHeight] = useState(0);
 
@@ -64,53 +100,28 @@ export default function PageContent() {
     );
   }, [isEmpty, movies, filterState]);
 
-  const columnsForWindow = Math.floor(
-    (windowDimensions.width + GAP) / (POSTER_WIDTH + GAP),
-  );
-  // Limit columns to the number of movies so they stay centered when there are few items
+  // Approximate the number of columns the grid will lay out. Layout itself is
+  // handled by the CSS grid, not this value; we use it to eagerly load images
+  // for the first PRIORITY_ROWS rows and to reserve the grid height below.
   const columnCount = Math.max(
     1,
-    Math.min(columnsForWindow, moviesList.length || 1),
+    Math.floor((windowWidth + GAP) / (POSTER_WIDTH + GAP)),
   );
-  const rowCount = Math.ceil(moviesList.length / columnCount);
-  const gridWidth = columnCount * (POSTER_WIDTH + GAP);
+  const priorityCount = columnCount * PRIORITY_ROWS;
 
-  // Number of initial rows to eagerly load images for (above the fold)
-  const priorityRows = 2;
-
-  const cellRenderer = useCallback(
-    ({ columnIndex, key, rowIndex, style }: GridCellProps) => {
-      const index = rowIndex * columnCount + columnIndex;
-      const movie = moviesList[index];
-      if (!movie) return null;
-      return (
-        <MovieCell
-          key={key}
-          movie={movie}
-          style={style}
-          priority={rowIndex < priorityRows}
-        />
-      );
-    },
-    [moviesList, columnCount],
-  );
+  // VirtuosoGrid only establishes its scroll height after measuring on mount —
+  // one paint too late for browser/Next scroll restoration on back-navigation,
+  // which then lands on a too-short page. The posters are a fixed 200x300, so we
+  // reserve the full height up front instead. Columns come from the window width
+  // (>= the grid's own width), so this estimate stays at or below virtuoso's
+  // real height and can't leave a blank strip once virtuoso measures.
+  const reservedHeight =
+    Math.ceil(moviesList.length / columnCount) * (POSTER_HEIGHT + GAP);
 
   useEffect(() => {
-    // Set initial dimensions on mount - must be done in effect as window
-    // is not available during SSR. This is a valid use of setState in effect.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- valid: window not available during SSR
-    setWindowDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
+    // Keep the width current on resize; the initial value comes from the lazy
+    // initialiser above.
+    const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -214,34 +225,22 @@ export default function PageContent() {
         </div>
       )}
       {renderEmptyState()}
-      <WindowScroller>
-        {({ height, isScrolling, registerChild, onChildScroll, scrollTop }) => (
-          <div
-            ref={registerChild}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Grid
-              autoHeight
-              cellRenderer={cellRenderer}
-              columnCount={columnCount}
-              columnWidth={POSTER_WIDTH + GAP}
-              height={height}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              rowCount={rowCount}
-              rowHeight={POSTER_HEIGHT + GAP}
-              scrollTop={scrollTop}
-              width={gridWidth}
-              overscanRowCount={3}
-              role="list"
-              containerRole="presentation"
-            />
-          </div>
-        )}
-      </WindowScroller>
+      {moviesList.length > 0 && (
+        <div className={styles.gridWrapper} style={{ minHeight: reservedHeight }}>
+          <VirtuosoGrid
+            useWindowScroll
+            increaseViewportBy={900}
+            totalCount={moviesList.length}
+            components={{ List: GridList, Item: GridItem }}
+            itemContent={(index) => (
+              <MovieCell
+                movie={moviesList[index]}
+                priority={index < priorityCount}
+              />
+            )}
+          />
+        </div>
+      )}
       {isLoading && (
         <LoadingIndicator
           message="Loading movies..."

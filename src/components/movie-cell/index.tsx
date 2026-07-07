@@ -1,6 +1,5 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import type { Movie } from "@/types";
 import Link from "next/link";
 import { formatCategory } from "@/app/utils";
@@ -12,11 +11,9 @@ import styles from "./movie-cell.module.css";
 
 export default function MovieCell({
   movie,
-  style,
   priority,
 }: {
   movie: Movie;
-  style: CSSProperties;
   priority?: boolean;
 }) {
   const href = getMovieUrl(movie);
@@ -32,37 +29,35 @@ export default function MovieCell({
     includedMovies && includedMovies.length > 1 && totalPosters >= 2;
 
   return (
-    <div style={style} role="listitem">
-      <Link
-        href={href}
-        className={styles.movieLink}
-        onClick={() => {
-          try {
-            sessionStorage.setItem("useBrowserBack", "true");
-          } catch {
-            // Ignore - UX optimization only
-          }
-        }}
-      >
-        {useStackedPoster ? (
-          <StackedPoster
-            mainPosterPath={movie.posterPath}
-            mainTitle={movie.title}
-            includedMovies={includedMovies}
-            subtitle={subtitle}
-            showOverlay
-            priority={priority}
-          />
-        ) : (
-          <MoviePoster
-            posterPath={movie.posterPath || includedWithPosters[0]?.posterPath}
-            title={movie.title}
-            subtitle={subtitle}
-            showOverlay
-            priority={priority}
-          />
-        )}
-      </Link>
-    </div>
+    <Link
+      href={href}
+      className={styles.movieLink}
+      onClick={() => {
+        try {
+          sessionStorage.setItem("useBrowserBack", "true");
+        } catch {
+          // Ignore - UX optimization only
+        }
+      }}
+    >
+      {useStackedPoster ? (
+        <StackedPoster
+          mainPosterPath={movie.posterPath}
+          mainTitle={movie.title}
+          includedMovies={includedMovies}
+          subtitle={subtitle}
+          showOverlay
+          priority={priority}
+        />
+      ) : (
+        <MoviePoster
+          posterPath={movie.posterPath || includedWithPosters[0]?.posterPath}
+          title={movie.title}
+          subtitle={subtitle}
+          showOverlay
+          priority={priority}
+        />
+      )}
+    </Link>
   );
 }

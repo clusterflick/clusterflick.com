@@ -13,6 +13,24 @@
   width: 100%;
 }
 
+/* Virtualised movie grid (react-virtuoso VirtuosoGrid). A CSS grid fits as many
+   fixed 200px poster columns as the width allows and centres them. auto-fit
+   collapses any column with no item in it, so a single short row centres in the
+   viewport; with multiple rows every column is occupied (nothing collapses) so
+   the block stays centred and a partial last row aligns to the left columns. */
+.gridList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 200px);
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Breathing room below the last poster row — the grid gap only applies between
+   rows, so without this the final row sits flush against the page bottom. */
+.gridWrapper {
+  padding-bottom: 40px;
+}
+
 /* Override padding for loading footer at bottom of page */
 .loadingFooter {
   padding: 40px 20px 60px;
