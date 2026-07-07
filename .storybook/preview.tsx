@@ -5,7 +5,6 @@ import { Montserrat, Inter } from "next/font/google";
 import clsx from "clsx";
 import { handlers } from "./msw/handlers";
 import "../src/app/globals.css";
-import "react-virtualized/styles.css";
 import "./preview.css";
 
 // Load Google Fonts with Next.js optimization
