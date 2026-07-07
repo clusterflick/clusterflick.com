@@ -1,5 +1,5 @@
 import type { StorybookConfig } from "@storybook/nextjs-vite";
-import { mergeConfig } from "vite";
+import { mergeConfig, type Rollup } from "vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -28,6 +28,25 @@ const config: StorybookConfig = {
       build: {
         // Suppress sourcemap warnings for Next.js app directory files
         sourcemap: false,
+        rollupOptions: {
+          // Next.js App Router components carry a "use client" directive that
+          // is meaningless to Rollup, which warns that it stripped it (plus a
+          // noisy secondary warning about failing to resolve its sourcemap
+          // location). Both are harmless — silence them.
+          onwarn(
+            warning: Rollup.RollupLog,
+            defaultHandler: Rollup.LoggingFunction,
+          ) {
+            if (warning.code === "MODULE_LEVEL_DIRECTIVE") return;
+            if (
+              warning.code === "SOURCEMAP_ERROR" &&
+              warning.message.includes("Can't resolve original location")
+            ) {
+              return;
+            }
+            defaultHandler(warning);
+          },
+        },
       },
     });
   },
