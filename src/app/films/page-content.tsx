@@ -226,7 +226,10 @@ export default function PageContent() {
       )}
       {renderEmptyState()}
       {moviesList.length > 0 && (
-        <div className={styles.gridWrapper} style={{ minHeight: reservedHeight }}>
+        <div
+          className={styles.gridWrapper}
+          style={{ minHeight: reservedHeight }}
+        >
           <VirtuosoGrid
             useWindowScroll
             increaseViewportBy={900}

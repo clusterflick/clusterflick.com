@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
   startTransition,
+  type ReactNode,
 } from "react";
 import { Movie, MoviePerformance, Genre, Person, Venue } from "@/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
@@ -46,6 +47,7 @@ type PageContentProps = {
   venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
+  showingsStaticContent?: ReactNode;
 };
 
 export default function PageContent({
@@ -56,6 +58,7 @@ export default function PageContent({
   venueCounts,
   containingEvents,
   festivals,
+  showingsStaticContent,
 }: PageContentProps) {
   const {
     movies,
@@ -314,6 +317,7 @@ export default function PageContent({
           onShowAllToggle={handleShowAllToggle}
           unfilteredPerformanceCount={unfilteredPerformances.length}
           filteredPerformanceCount={filteredMovie?.performances?.length || 0}
+          staticContent={showingsStaticContent}
         />
       </div>
     </main>

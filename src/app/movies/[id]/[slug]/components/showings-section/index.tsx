@@ -1,5 +1,4 @@
 import {
-  Fragment,
   forwardRef,
   useCallback,
   useMemo,
@@ -7,25 +6,24 @@ import {
   useState,
   type ComponentProps,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import clsx from "clsx";
 import { GroupedVirtuoso } from "react-virtuoso";
 import { MoviePerformance, Showing, Venue } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { titlesDiffer } from "@/utils/title-differs";
-import { getAccessibilityLabel } from "@/utils/accessibility-labels";
 import { FilterDescription } from "@/lib/filters";
 import {
   getDaysFromNow,
   formatDaysFromNow,
-  formatShowingTime,
   isInPast,
 } from "@/utils/format-date";
 import Button, { ButtonAnchor } from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import Tag from "@/components/tag";
+import PerformanceCard from "./performance-card";
 import styles from "./showings-section.module.css";
 
 // Card grid sizing — kept in sync with .performancesRow gap in the CSS module.
@@ -99,16 +97,24 @@ function renderPerformanceCard(
   const venue = venues[showing?.venueId];
   const isPast = isInPast(performance.time);
   const isSoldOut = performance.status?.soldOut;
+  const showingTitle =
+    showing?.title && titlesDiffer(movieTitle, showing.title)
+      ? showing.title
+      : undefined;
 
   return (
-    <div
+    <PerformanceCard
       key={`${performance.showingId}-${index}`}
+      time={performance.time}
+      venueName={venue?.name}
+      showingTitle={showingTitle}
+      screen={performance.screen}
+      accessibility={performance.accessibility}
+      notes={performance.notes}
       className={clsx(
-        styles.performanceCard,
         isPast && styles.past,
         !isPast && isSoldOut && styles.soldOut,
       )}
-      data-testid="performance-card"
     >
       {/* Card overlay link - covers the whole card */}
       <a
@@ -118,41 +124,6 @@ function renderPerformanceCard(
         className={styles.cardLink}
         aria-label={`View ${venue?.name || "venue"} listing`}
       />
-      <div className={styles.performanceTime}>
-        {formatShowingTime(performance.time)}
-      </div>
-      {venue && <div className={styles.performanceVenue}>{venue.name}</div>}
-      {showing?.title && titlesDiffer(movieTitle, showing.title) && (
-        <div className={styles.showingTitle}>{showing.title}</div>
-      )}
-      {performance.screen && (
-        <div className={styles.performanceScreen}>
-          {performance.screen.length > 3
-            ? performance.screen
-            : "Screen " + performance.screen}
-        </div>
-      )}
-      {performance.accessibility && (
-        <div className={styles.performanceAccessibility}>
-          {Object.entries(performance.accessibility)
-            .filter(([, enabled]) => enabled)
-            .map(([feature]) => (
-              <Tag key={feature} color="blue" size="sm">
-                {getAccessibilityLabel(feature)}
-              </Tag>
-            ))}
-        </div>
-      )}
-      {performance.notes && (
-        <div className={styles.performanceNotes}>
-          {performance.notes.split("\n").map((note, noteIndex) => (
-            <Fragment key={noteIndex}>
-              {note}
-              <br />
-            </Fragment>
-          ))}
-        </div>
-      )}
       {isPast && <div className={styles.finishedBadge}>Finished</div>}
       {isSoldOut && !isPast && (
         <div className={styles.soldOutBadge}>Sold Out</div>
@@ -168,7 +139,7 @@ function renderPerformanceCard(
           Book
         </ButtonAnchor>
       )}
-    </div>
+    </PerformanceCard>
   );
 }
 
@@ -184,6 +155,11 @@ interface ShowingsSectionProps {
   onShowAllToggle: () => void;
   unfilteredPerformanceCount: number;
   filteredPerformanceCount: number;
+  /**
+   * SSR-only static list of upcoming showings, server-rendered and shown until
+   * the component hydrates, at which point the interactive list takes over.
+   */
+  staticContent?: ReactNode;
 }
 
 export default function ShowingsSection({
@@ -197,6 +173,7 @@ export default function ShowingsSection({
   onShowAllToggle,
   unfilteredPerformanceCount,
   filteredPerformanceCount,
+  staticContent,
 }: ShowingsSectionProps) {
   const { hydrateUrl, error, retry } = useCinemaData();
   const hasPerformances = Object.keys(performancesByDate).length > 0;
@@ -309,7 +286,11 @@ export default function ShowingsSection({
           actions={<Button onClick={retry}>Try Again</Button>}
         />
       ) : isLoading ? (
-        <LoadingIndicator message="Loading showings..." />
+        // Before the client fetch resolves, show the server-rendered static
+        // list (guaranteed on the server + first client render, since isLoading
+        // starts true), so crawlers and no-JS users see real showings. Falls
+        // back to the spinner when there's no static content to show.
+        (staticContent ?? <LoadingIndicator message="Loading showings..." />)
       ) : (
         <>
           {showFilterBanner && filterDescription && (

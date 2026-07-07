@@ -10,6 +10,7 @@ import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import PageContent from "./page-content";
 import type { VenuePlayCount } from "./components/playing-at-section";
+import StaticShowingsList from "./components/static-showings-list";
 
 // Only allow routes from generateStaticParams, 404 for everything else
 export const dynamicParams = false;
@@ -146,6 +147,8 @@ export default async function MovieDetailPage({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
 
+  const buildTime = new Date(data.generatedAt).getTime();
+
   const movieUrl = `https://clusterflick.com${getMovieUrl(movie)}`;
 
   const genreNames = (movie.genres ?? [])
@@ -228,7 +231,6 @@ export default async function MovieDetailPage({
     ],
   };
 
-  const buildTime = new Date(data.generatedAt).getTime();
   const screeningEvents = movie.performances
     .filter((p) => p.time >= buildTime)
     .sort((a, b) => a.time - b.time)
@@ -264,6 +266,15 @@ export default async function MovieDetailPage({
         venueCounts={venueCounts}
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
+        showingsStaticContent={
+          <StaticShowingsList
+            performances={movie.performances}
+            showings={movie.showings}
+            venues={venues}
+            movieTitle={movie.title}
+            buildTime={buildTime}
+          />
+        }
       />
     </>
   );

@@ -118,6 +118,19 @@
   padding-bottom: 32px;
 }
 
+/* Non-virtualised grid for the SSR-only StaticShowingsList. Mirrors the
+   auto-fill layout the virtualised .performancesRow replicates per-row, but
+   lays out all cards at once since the static list is capped and never
+   re-measured. Cards and headers reuse the shared classes below. */
+.staticPerformancesRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-items: stretch;
+  gap: 16px;
+  padding-top: 16px;
+  padding-bottom: 32px;
+}
+
 .performanceCard {
   background-color: rgba(var(--color-dark-navy-rgb), 0.6);
   border: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
