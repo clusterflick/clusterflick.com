@@ -7,7 +7,7 @@ import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
-import PageHeader from "@/components/page-header";
+import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
@@ -20,7 +20,6 @@ import {
 } from "@/components/icons";
 import LinkedList from "@/components/linked-list";
 import FilmPosterGrid from "@/components/film-poster-grid";
-import PreloadCinemaData from "@/components/preload-cinema-data";
 import SocialLinks from "@/components/social-links";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
@@ -121,163 +120,158 @@ export default function VenueDetailPageContent({
   ) : null;
 
   return (
-    <main id="main-content">
-      <PreloadCinemaData />
-      <PageHeader backUrl="/films" backText="Back to film list" />
-
-      <DetailPageHero
-        name={venue.name}
-        imagePath={imagePath}
-        url={attributes?.url}
-        movieCount={movieCount}
-        performanceCount={performanceCount}
-      >
-        <div className={styles.heroTagRow}>
-          <div className={styles.heroTagRowSide}>
-            <SocialLinks socials={attributes?.socials} />
+    <StandardPageLayout
+      backUrl="/films"
+      backText="Back to film list"
+      hero={
+        <DetailPageHero
+          name={venue.name}
+          imagePath={imagePath}
+          url={attributes?.url}
+          movieCount={movieCount}
+          performanceCount={performanceCount}
+        >
+          <div className={styles.heroTagRow}>
+            <div className={styles.heroTagRowSide}>
+              <SocialLinks socials={attributes?.socials} />
+            </div>
+            <div>
+              <Tag color="blue">
+                {venue.type.toLowerCase().trim() === "unknown"
+                  ? "Other"
+                  : venue.type}
+              </Tag>
+            </div>
+            <div className={styles.heroTagRowSide}>
+              <a
+                href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.heroSocialLink}
+                title="Add to Google Calendar"
+              >
+                <GoogleCalendarIcon size={20} />
+              </a>
+              <a
+                href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venue.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.heroSocialLink}
+                style={{ padding: 4 }}
+                title="Add to Outlook Calendar"
+              >
+                <OutlookCalendarIcon size={28} />
+              </a>
+              <a
+                href={webcalUrl}
+                className={styles.heroSocialLink}
+                title="Subscribe to calendar"
+              >
+                <CalendarIcon size={20} />
+              </a>
+            </div>
           </div>
-          <div>
-            <Tag color="blue">
-              {venue.type.toLowerCase().trim() === "unknown"
-                ? "Other"
-                : venue.type}
-            </Tag>
+        </DetailPageHero>
+      }
+      afterContent={
+        <>
+          <Divider />
+          <div className={styles.filmsSection}>
+            <ContentSection
+              title={`Films showing at ${venue.name}`}
+              as="h2"
+              className={styles.venueFilms}
+            >
+              <FilmPosterGrid
+                movies={gridMovies}
+                truncated={gridMoviesTruncated}
+                venueId={venue.id}
+                exploreHref={`/films?venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
+                exploreLabel={`Start exploring films at ${venue.name}`}
+                movieUrlParams={`venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
+              />
+            </ContentSection>
           </div>
-          <div className={styles.heroTagRowSide}>
-            <a
-              href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.heroSocialLink}
-              title="Add to Google Calendar"
-            >
-              <GoogleCalendarIcon size={20} />
-            </a>
-            <a
-              href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venue.name)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.heroSocialLink}
-              style={{ padding: 4 }}
-              title="Add to Outlook Calendar"
-            >
-              <OutlookCalendarIcon size={28} />
-            </a>
-            <a
-              href={webcalUrl}
-              className={styles.heroSocialLink}
-              title="Subscribe to calendar"
-            >
-              <CalendarIcon size={20} />
-            </a>
-          </div>
-        </div>
-      </DetailPageHero>
-
-      <Divider />
-
-      <div className={styles.content}>
-        <ColumnsLayout
-          main={
-            VenueBlurb || group ? (
-              <ContentSection title="About" as="h2">
-                {VenueBlurb && (
-                  <div className={styles.blurb}>
-                    <VenueBlurb />
-                  </div>
-                )}
-                {group && (
-                  <p className={styles.groupNote}>
-                    Part of the{" "}
-                    <Link href={group.href}>{group.name} group</Link>.
-                  </p>
-                )}
-              </ContentSection>
-            ) : null
-          }
-          sidebar={
-            <>
-              <ContentSection title="Address" as="h2">
-                <p className={styles.address}>
-                  {venue.address.split(",").map((piece, index) => (
-                    <Fragment key={index}>
-                      {index === 0 ? "" : ","}{" "}
-                      <span className="nowrap">{piece}</span>
-                    </Fragment>
-                  ))}
+        </>
+      }
+    >
+      <ColumnsLayout
+        main={
+          VenueBlurb || group ? (
+            <ContentSection title="About" as="h2">
+              {VenueBlurb && (
+                <div className={styles.blurb}>
+                  <VenueBlurb />
+                </div>
+              )}
+              {group && (
+                <p className={styles.groupNote}>
+                  Part of the <Link href={group.href}>{group.name} group</Link>.
                 </p>
-                {borough ? (
-                  <p className={styles.borough}>
-                    Located in <Link href={borough.href}>{borough.name}</Link>
-                    <VenueDistance
-                      venueLat={venue.geo.lat}
-                      venueLon={venue.geo.lon}
-                      parenthesized
-                    />
-                  </p>
-                ) : (
+              )}
+            </ContentSection>
+          ) : null
+        }
+        sidebar={
+          <>
+            <ContentSection title="Address" as="h2">
+              <p className={styles.address}>
+                {venue.address.split(",").map((piece, index) => (
+                  <Fragment key={index}>
+                    {index === 0 ? "" : ","}{" "}
+                    <span className="nowrap">{piece}</span>
+                  </Fragment>
+                ))}
+              </p>
+              {borough ? (
+                <p className={styles.borough}>
+                  Located in <Link href={borough.href}>{borough.name}</Link>
                   <VenueDistance
                     venueLat={venue.geo.lat}
                     venueLon={venue.geo.lon}
-                    className={styles.distance}
+                    parenthesized
                   />
-                )}
-                {mapImagePath && (
-                  <p>
-                    <a
-                      href={`https://www.google.com/maps?q=${venue.geo.lat},${venue.geo.lon}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Image
-                        src={mapImagePath}
-                        alt={`Map showing location of ${venue.name}`}
-                        width={600}
-                        height={400}
-                        className={styles.mapImage}
-                      />
-                    </a>
-                  </p>
-                )}
-              </ContentSection>
-              {!hasBoth && festivalsSection}
-              {!hasBoth && accessibilitySection}
-            </>
-          }
-        />
-        {hasBoth && (
-          <ColumnsLayout
-            main={festivalsSection}
-            sidebar={accessibilitySection}
-          />
-        )}
-        {nearbyVenues.length > 0 && (
-          <div>
-            <ContentSection title={`Cinemas Near ${venue.name}`} as="h2">
-              <NearbyVenues venues={nearbyVenues} />
+                </p>
+              ) : (
+                <VenueDistance
+                  venueLat={venue.geo.lat}
+                  venueLon={venue.geo.lon}
+                  className={styles.distance}
+                />
+              )}
+              {mapImagePath && (
+                <p>
+                  <a
+                    href={`https://www.google.com/maps?q=${venue.geo.lat},${venue.geo.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image
+                      src={mapImagePath}
+                      alt={`Map showing location of ${venue.name}`}
+                      width={600}
+                      height={400}
+                      className={styles.mapImage}
+                    />
+                  </a>
+                </p>
+              )}
             </ContentSection>
-          </div>
-        )}
-      </div>
-
-      <Divider />
-
-      <div className={styles.filmsSection}>
-        <ContentSection
-          title={`Films showing at ${venue.name}`}
-          as="h2"
-          className={styles.venueFilms}
-        >
-          <FilmPosterGrid
-            movies={gridMovies}
-            truncated={gridMoviesTruncated}
-            venueId={venue.id}
-            exploreHref={`/films?venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
-            exploreLabel={`Start exploring films at ${venue.name}`}
-            movieUrlParams={`venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
-          />
-        </ContentSection>
-      </div>
-    </main>
+            {!hasBoth && festivalsSection}
+            {!hasBoth && accessibilitySection}
+          </>
+        }
+      />
+      {hasBoth && (
+        <ColumnsLayout main={festivalsSection} sidebar={accessibilitySection} />
+      )}
+      {nearbyVenues.length > 0 && (
+        <div>
+          <ContentSection title={`Cinemas Near ${venue.name}`} as="h2">
+            <NearbyVenues venues={nearbyVenues} />
+          </ContentSection>
+        </div>
+      )}
+    </StandardPageLayout>
   );
 }

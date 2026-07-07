@@ -28,14 +28,6 @@
   color: var(--color-electric-blue);
 }
 
-.content {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 1;
-}
-
 .blurb {
   line-height: 1.7;
 }

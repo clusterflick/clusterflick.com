@@ -17,10 +17,11 @@ interface FilmPosterGridProps {
   movieUrlParams?: string;
   /**
    * When set, the grid prunes any movie that no longer has a current performance
-   * at this venue once the client data loads (the static HTML still ships the
-   * full build-time list). Leave unset to render the list as-is.
+   * at this venue (or, given an array, any of these venues) once the client data
+   * loads (the static HTML still ships the full build-time list). Leave unset to
+   * render the list as-is.
    */
-  venueId?: string;
+  venueId?: string | string[];
 }
 
 export default function FilmPosterGrid({

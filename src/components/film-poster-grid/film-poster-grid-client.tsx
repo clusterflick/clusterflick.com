@@ -18,10 +18,11 @@ interface FilmPosterGridClientProps {
   exploreLabel?: string;
   /**
    * When set, prune any grid item that no longer has a current performance at
-   * this venue once the client cinema data has loaded. The static HTML ships the
-   * full (build-time) list, then stale entries disappear after hydration.
+   * this venue (or, given an array, any of these venues) once the client cinema
+   * data has loaded. The static HTML ships the full (build-time) list, then
+   * stale entries disappear after hydration.
    */
-  venueId?: string;
+  venueId?: string | string[];
 }
 
 export default function FilmPosterGridClient({
@@ -38,15 +39,20 @@ export default function FilmPosterGridClient({
   // static list rather than hiding everything.
   const ready = hasAttemptedLoad && !isLoading && !error;
 
+  const venueIds =
+    venueId === undefined
+      ? null
+      : new Set(Array.isArray(venueId) ? venueId : [venueId]);
+
   const visibleItems = ready
     ? items.filter(({ id }) => {
         const movie = movies[id];
         // Movie pruned entirely (all performances in the past) → hide it.
         if (!movie) return false;
-        if (!venueId) return true;
-        // Keep only if a remaining (future) performance is at this venue.
-        return movie.performances.some(
-          (perf) => movie.showings[perf.showingId]?.venueId === venueId,
+        if (!venueIds) return true;
+        // Keep only if a remaining (future) performance is at one of these venues.
+        return movie.performances.some((perf) =>
+          venueIds.has(movie.showings[perf.showingId]?.venueId ?? ""),
         );
       })
     : items;

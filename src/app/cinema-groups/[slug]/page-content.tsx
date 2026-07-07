@@ -2,11 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { getVenueGroupTitle } from "@/utils/get-venue-group-url";
 import type { SocialHandles } from "@/utils/build-social-links";
+import type { Movie } from "@/types";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
+import Divider from "@/components/divider";
 import VenueCard from "@/components/venue-card";
 import SocialLinks from "@/components/social-links";
+import FilmPosterGrid from "@/components/film-poster-grid";
 import styles from "./page.module.css";
 
 export type GroupVenueItem = {
@@ -27,6 +30,9 @@ interface GroupPageContentProps {
   socials: SocialHandles;
   venues: GroupVenueItem[];
   totalMovies: number;
+  gridMovies: { movie: Movie; performanceCount: number }[];
+  gridMoviesTruncated?: boolean;
+  venueIds: string[];
 }
 
 export default function GroupPageContent({
@@ -37,14 +43,17 @@ export default function GroupPageContent({
   socials,
   venues,
   totalMovies,
+  gridMovies,
+  gridMoviesTruncated,
+  venueIds,
 }: GroupPageContentProps) {
   const hasEvents = totalMovies > 0;
   const mapImagePath = `/images/venue-groups/${slug}.png`;
 
   // Link to the film list pre-filtered to this group's venues.
-  const filmsHref = `/films?venues=${venues
-    .map((venue) => encodeURIComponent(venue.id))
-    .join(",")}&allDates=true&allCategories=true`;
+  const venuesParam = venueIds.map((id) => encodeURIComponent(id)).join(",");
+  const filmsQuery = `venues=${venuesParam}&allDates=true&allCategories=true`;
+  const filmsHref = `/films?${filmsQuery}`;
 
   return (
     <StandardPageLayout
@@ -87,6 +96,29 @@ export default function GroupPageContent({
       }
       backUrl="/cinema-groups"
       backText="All cinema groups"
+      afterContent={
+        hasEvents ? (
+          <>
+            <Divider />
+            <div className={styles.filmsSection}>
+              <ContentSection
+                title={`Films showing at ${name}`}
+                as="h2"
+                className={styles.groupFilms}
+              >
+                <FilmPosterGrid
+                  movies={gridMovies}
+                  truncated={gridMoviesTruncated}
+                  venueId={venueIds}
+                  exploreHref={filmsHref}
+                  exploreLabel={`Start exploring films at ${name}`}
+                  movieUrlParams={filmsQuery}
+                />
+              </ContentSection>
+            </div>
+          </>
+        ) : null
+      }
     >
       <ColumnsLayout
         main={

@@ -13,7 +13,7 @@ import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
 import { getGroupCorporateSocials } from "@/utils/get-group-socials";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { VENUE_GROUPS } from "@/data/venue-groups";
-import type { Venue } from "@/types";
+import type { Movie, Venue } from "@/types";
 import GroupPageContent from "./page-content";
 
 export const dynamicParams = false;
@@ -155,17 +155,33 @@ export default async function CinemaGroupPage({
     instagram: group.socials?.instagram ?? detectedSocials?.instagram ?? null,
   };
 
-  // Count total unique movies currently showing across the group's venues
+  // Count total unique movies currently showing across the group's venues, and
+  // collect them (with per-group performance counts) for the poster grid.
   const groupVenueIds = new Set(groupVenues.map((v) => v.id));
-  const groupMovieIds = new Set<string>();
+  const groupMovies: { movie: Movie; performanceCount: number }[] = [];
   for (const movie of Object.values(data.movies)) {
-    for (const showing of Object.values(movie.showings)) {
+    const groupShowingIds = new Set<string>();
+    for (const [showingId, showing] of Object.entries(movie.showings)) {
       if (groupVenueIds.has(showing.venueId)) {
-        groupMovieIds.add(movie.id);
-        break;
+        groupShowingIds.add(showingId);
       }
     }
+    if (groupShowingIds.size === 0) continue;
+    let moviePerfCount = 0;
+    for (const perf of movie.performances) {
+      if (groupShowingIds.has(perf.showingId)) moviePerfCount++;
+    }
+    groupMovies.push({ movie, performanceCount: moviePerfCount });
   }
+
+  // Sort alphabetically by normalized title to match the main page ordering
+  groupMovies.sort((a, b) =>
+    a.movie.normalizedTitle.localeCompare(b.movie.normalizedTitle),
+  );
+
+  const GRID_MOVIE_LIMIT = 72;
+  const gridMovies = groupMovies.slice(0, GRID_MOVIE_LIMIT);
+  const gridMoviesTruncated = groupMovies.length > GRID_MOVIE_LIMIT;
 
   // JSON-LD structured data
   const groupUrl = `https://clusterflick.com${getVenueGroupUrl(group)}`;
@@ -225,7 +241,10 @@ export default async function CinemaGroupPage({
         logoPath={getVenueImagePath(group.slug)}
         socials={socials}
         venues={venueItems}
-        totalMovies={groupMovieIds.size}
+        totalMovies={groupMovies.length}
+        gridMovies={gridMovies}
+        gridMoviesTruncated={gridMoviesTruncated}
+        venueIds={groupVenues.map((v) => v.id)}
       />
     </>
   );

@@ -72,3 +72,16 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
+
+.filmsSection {
+  width: 100%;
+  padding: 0 20px 80px;
+}
+
+.groupFilms {
+  text-align: center;
+
+  h2 {
+    justify-content: center;
+  }
+}

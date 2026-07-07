@@ -5,7 +5,7 @@ import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
-import PageHeader from "@/components/page-header";
+import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
@@ -13,7 +13,6 @@ import Divider from "@/components/divider";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import VenueCard from "@/components/venue-card";
 import LinkedList from "@/components/linked-list";
-import PreloadCinemaData from "@/components/preload-cinema-data";
 import CanonicalRedirect from "@/components/canonical-redirect";
 import styles from "./event-detail-page-content.module.css";
 
@@ -151,78 +150,81 @@ export default function EventDetailPageContent({
   const hasSecondaryContent =
     Boolean(Blurb) || Boolean(cinemasSection) || Boolean(accessibilitySection);
 
-  return (
-    <main id="main-content">
-      <PreloadCinemaData />
-      {isAlias && <CanonicalRedirect canonicalUrl={canonicalUrl} />}
-      <PageHeader backUrl={backUrl} backText={backText} />
-
-      <DetailPageHero
-        name={name}
-        imagePath={imagePath}
-        url={url}
-        movieCount={movieCount}
-        performanceCount={performanceCount}
-        backgroundImage={heroBackgroundImage}
-        backgroundImageAlt={heroBackgroundImageAlt}
-      >
-        {heroChildren}
-      </DetailPageHero>
-
-      <Divider />
-
-      {venuesLayout === "grid"
-        ? (cinemasSection || accessibilitySection) && (
-            <>
-              <div className={styles.content}>
-                {cinemasSection}
-                {accessibilitySection}
-              </div>
-              <Divider />
-            </>
-          )
-        : hasSecondaryContent && (
-            <>
-              <div className={styles.content}>
-                <ColumnsLayout
-                  main={
-                    Blurb ? (
-                      <ContentSection title="About" as="h2">
-                        <div className={styles.blurb}>
-                          <Blurb />
-                        </div>
-                      </ContentSection>
-                    ) : null
-                  }
-                  sidebar={
-                    cinemasSection || accessibilitySection ? (
-                      <>
-                        {cinemasSection}
-                        {accessibilitySection}
-                      </>
-                    ) : null
-                  }
-                />
-              </div>
-              <Divider />
-            </>
-          )}
-
-      <div className={styles.filmsSection}>
-        <ContentSection
-          title={filmsSectionTitle ?? `Films at ${name}`}
-          as="h2"
-          className={styles.films}
-        >
-          <FilmPosterGrid
-            movies={gridMovies}
-            truncated={gridMoviesTruncated}
-            exploreHref={filmsExploreHref}
-            exploreLabel={filmsExploreLabel}
-            showAll
+  // Secondary content rendered inside the constrained content wrapper, between
+  // the hero and the films grid. Null when there's nothing to show (in which
+  // case StandardPageLayout omits the wrapper and its divider entirely).
+  const middleContent =
+    venuesLayout === "grid"
+      ? (cinemasSection || accessibilitySection) && (
+          <>
+            {cinemasSection}
+            {accessibilitySection}
+          </>
+        )
+      : hasSecondaryContent && (
+          <ColumnsLayout
+            main={
+              Blurb ? (
+                <ContentSection title="About" as="h2">
+                  <div className={styles.blurb}>
+                    <Blurb />
+                  </div>
+                </ContentSection>
+              ) : null
+            }
+            sidebar={
+              cinemasSection || accessibilitySection ? (
+                <>
+                  {cinemasSection}
+                  {accessibilitySection}
+                </>
+              ) : null
+            }
           />
-        </ContentSection>
-      </div>
-    </main>
+        );
+
+  return (
+    <>
+      {isAlias && <CanonicalRedirect canonicalUrl={canonicalUrl} />}
+      <StandardPageLayout
+        backUrl={backUrl}
+        backText={backText}
+        hero={
+          <DetailPageHero
+            name={name}
+            imagePath={imagePath}
+            url={url}
+            movieCount={movieCount}
+            performanceCount={performanceCount}
+            backgroundImage={heroBackgroundImage}
+            backgroundImageAlt={heroBackgroundImageAlt}
+          >
+            {heroChildren}
+          </DetailPageHero>
+        }
+        afterContent={
+          <>
+            {middleContent && <Divider />}
+            <div className={styles.filmsSection}>
+              <ContentSection
+                title={filmsSectionTitle ?? `Films at ${name}`}
+                as="h2"
+                className={styles.films}
+              >
+                <FilmPosterGrid
+                  movies={gridMovies}
+                  truncated={gridMoviesTruncated}
+                  exploreHref={filmsExploreHref}
+                  exploreLabel={filmsExploreLabel}
+                  showAll
+                />
+              </ContentSection>
+            </div>
+          </>
+        }
+      >
+        {middleContent || null}
+      </StandardPageLayout>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import StandardPageLayout from "@/components/standard-page-layout";
+import DetailPageHero from "@/components/detail-page-hero";
 import { handlers } from "../../../.storybook/msw/handlers";
 
 /**
@@ -23,6 +24,11 @@ import { handlers } from "../../../.storybook/msw/handlers";
  * - `heroExtra` — optional `ReactNode` rendered inside the hero after the
  *   subtitle; use for structured elements like status badges that cannot be
  *   expressed as plain text (e.g. the borough status card).
+ * - `hero` — optional fully-rendered hero (e.g. `DetailPageHero`) that replaces
+ *   the default title-based hero; pass EITHER `title` OR `hero`, not both. Used
+ *   by the venue/event detail pages.
+ * - `afterContent` — optional full-width content rendered below the constrained
+ *   wrapper (e.g. an edge-to-edge poster grid).
  * - `backUrl` / `backText` — forwarded to `PageHeader`.
  * - `children` — page body rendered inside the constrained content wrapper.
  *
@@ -119,6 +125,31 @@ export const WithHeroExtra: Story = {
     children: (
       <p style={{ color: "rgba(255,255,255,0.7)" }}>
         Borough content goes here.
+      </p>
+    ),
+  },
+};
+
+/**
+ * Entity page with a custom `hero` — here a `DetailPageHero` — instead of the
+ * default title-based hero. Used by the venue and event detail pages, which
+ * need a logo, an external link and a film/showing status card in the hero.
+ */
+export const WithCustomHero: Story = {
+  args: {
+    hero: (
+      <DetailPageHero
+        name="Prince Charles Cinema"
+        url="https://princecharlescinema.com"
+        movieCount={42}
+        performanceCount={128}
+      />
+    ),
+    backUrl: "/films",
+    backText: "Back to film list",
+    children: (
+      <p style={{ color: "rgba(255,255,255,0.7)" }}>
+        Venue detail content goes here, below the custom hero.
       </p>
     ),
   },
