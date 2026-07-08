@@ -35,6 +35,25 @@
   gap: 8px;
 }
 
+/* Clickable stat cards (rendered as <a> or <button>) */
+a.statCard,
+button.statCard {
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+a.statCard:hover,
+button.statCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.5);
+}
+
 .statValue {
   font-size: 36px;
   font-weight: 700;
