@@ -70,6 +70,23 @@ export const socialLinks = [
   },
 ];
 
+export const partnerSites = [
+  {
+    name: "CultureCity.London",
+    description:
+      "A comprehensive guide to London's vast and diverse cultural events scene.",
+    url: "https://culturecity.london",
+    logo: "/images/partners/culturecity.jpg",
+  },
+  {
+    name: "FilmHose",
+    description:
+      "Showtimes for art house films and repertory screenings across London's independent cinema scene.",
+    url: "https://filmhose.uk",
+    logo: "/images/partners/filmhose.svg",
+  },
+];
+
 export const dataFormats = [
   {
     name: "Data file per venue",

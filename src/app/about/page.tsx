@@ -16,7 +16,7 @@ import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
 import StatusSection from "./components/status-section";
-import { socialLinks, dataFormats } from "./data";
+import { socialLinks, partnerSites, dataFormats } from "./data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -242,10 +242,43 @@ export default function AboutPage() {
           />
 
           <ContentSection
+            title="Built with Clusterflick"
+            as="h3"
+            align="center"
+            intro="There's a growing community of independent sites that are building on top of our open data:"
+          >
+            <CardGrid>
+              {partnerSites.map((site) => (
+                <LinkCard
+                  key={site.name}
+                  href={site.url}
+                  variant="social"
+                  aria-label={`Visit ${site.name}`}
+                >
+                  <span className={styles.partnerLogo}>
+                    <Image
+                      src={site.logo}
+                      alt={`${site.name} logo`}
+                      width={48}
+                      height={48}
+                    />
+                  </span>
+                  <CardContent>
+                    <strong>{site.name}</strong>
+                    <span className={styles.partnerDescription}>
+                      {site.description}
+                    </span>
+                  </CardContent>
+                </LinkCard>
+              ))}
+            </CardGrid>
+          </ContentSection>
+
+          <ContentSection
             title="Showing Data"
             as="h3"
             align="center"
-            intro="The showing data is refreshed early every morning and available in different formats:"
+            intro="The showing data is refreshed daily and available in different formats:"
           >
             <CardGrid>
               {dataFormats.map((format) => (
