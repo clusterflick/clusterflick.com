@@ -62,8 +62,13 @@ export default function PageContent() {
     getData,
     retry,
   } = useCinemaData();
-  const { filterState, setSearchQuery, hasActiveFilters, applyUrlParams } =
-    useFilterConfig();
+  const {
+    filterState,
+    setSearchQuery,
+    resetFilters,
+    hasActiveFilters,
+    applyUrlParams,
+  } = useFilterConfig();
 
   // Apply any URL params on mount — FilterConfigProvider stays mounted across
   // client-side navigations, so its useState initialiser never re-reads URL
@@ -205,6 +210,9 @@ export default function PageContent() {
       />
       {hasAttemptedLoad && !error && !isEmpty && (
         <div className={styles.controls}>
+          {/* Spacer matches the Reset button width so the search bar stays
+              centred between the two. */}
+          <div className={styles.controlsSpacer} aria-hidden="true" />
           <SearchInput
             id="films-search"
             className={styles.controlsSearch}
@@ -222,6 +230,16 @@ export default function PageContent() {
               </Button>
             }
           />
+          <Button
+            variant="secondary"
+            size="sm"
+            className={styles.controlsReset}
+            onClick={resetFilters}
+            disabled={!hasActiveFilters}
+            aria-label="Reset all filters to defaults"
+          >
+            Reset
+          </Button>
         </div>
       )}
       {renderEmptyState()}

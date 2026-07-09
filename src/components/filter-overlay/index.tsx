@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import clsx from "clsx";
+import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { filterManager, buildFilterUrl } from "@/lib/filters";
 import { useFilterConfig } from "@/state/filter-config-context";
@@ -11,6 +12,7 @@ import { getNearbyVenueIds } from "@/utils/geo-distance";
 import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
+import QuickFiltersSection from "./quick-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import DateFilterSection from "./date-filter-section";
@@ -49,6 +51,7 @@ export default function FilterOverlay({
     selectVenues,
     clearVenues,
     toggleHideFinished,
+    applyQuickFilter,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
@@ -121,6 +124,70 @@ export default function FilterOverlay({
     setVenueOption,
     requestLocation,
   ]);
+
+  // Event types shared by the film-focused quick filters
+  const FILM_CATEGORIES = useMemo(
+    () => [Category.Movie, Category.Shorts, Category.MultipleMovies],
+    [],
+  );
+
+  // Quick filter: what's on near me today. Resolves the user's nearby venues
+  // (requesting location if needed) then applies the preset and closes.
+  const handleNearMeToday = useCallback(async () => {
+    let nearby = nearbyVenueIds;
+    if (!(userPosition && nearby.length > 0)) {
+      const position = await requestLocation();
+      if (position && metaData?.venues) {
+        nearby = getNearbyVenueIds(
+          position,
+          Object.values(metaData.venues),
+          getVenueIdsWithShowings(movies),
+        );
+      }
+    }
+    // Location unavailable (denied/failed) — the venue section surfaces the
+    // geolocation error; don't apply a preset with no venues.
+    if (nearby.length === 0) return;
+
+    applyQuickFilter({
+      categories: FILM_CATEGORIES,
+      venues: nearby,
+      dateOption: "today",
+      hideFinished: true,
+    });
+    onClose();
+  }, [
+    userPosition,
+    nearbyVenueIds,
+    metaData,
+    movies,
+    requestLocation,
+    applyQuickFilter,
+    FILM_CATEGORIES,
+    onClose,
+  ]);
+
+  // Quick filter: what's on this week, all venues.
+  const handleThisWeek = useCallback(() => {
+    applyQuickFilter({
+      categories: FILM_CATEGORIES,
+      venues: null,
+      dateOption: "this-week",
+      hideFinished: false,
+    });
+    onClose();
+  }, [applyQuickFilter, FILM_CATEGORIES, onClose]);
+
+  // Quick filter: show me everything (all event types, all venues, any time).
+  const handleEverything = useCallback(() => {
+    applyQuickFilter({
+      categories: null,
+      venues: null,
+      dateOption: "all-time",
+      hideFinished: false,
+    });
+    onClose();
+  }, [applyQuickFilter, onClose]);
 
   const handleClose = useCallback(() => {
     onClose();
@@ -243,6 +310,14 @@ export default function FilterOverlay({
           </span>
         </div>
       </div>
+
+      {/* Quick Filters */}
+      <QuickFiltersSection
+        onNearMeToday={handleNearMeToday}
+        onThisWeek={handleThisWeek}
+        onEverything={handleEverything}
+        geoLoading={geoLoading}
+      />
 
       {/* Search Section */}
       <div className={styles.searchSection}>

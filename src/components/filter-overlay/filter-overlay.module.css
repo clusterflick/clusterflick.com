@@ -100,12 +100,7 @@
   width: 100%;
   max-width: 1800px;
   padding: 0 48px;
-  margin-bottom: 78px;
-}
-
-.quickTitle {
-  text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 39px;
 }
 
 .quickGrid {
@@ -117,10 +112,12 @@
 
 .quickCard {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   min-width: 140px;
+  max-width: 320px;
   padding: 16px 24px;
   background: rgba(var(--color-white-rgb), 0.04);
   border: 1px solid rgba(var(--color-white-rgb), 0.1);
@@ -609,7 +606,7 @@
   }
 
   .quickSection {
-    margin-bottom: 48px;
+    margin-bottom: 24px;
   }
 
   .content {
@@ -642,7 +639,7 @@
   }
 
   .quickSection {
-    margin-bottom: 36px;
+    margin-bottom: 18px;
   }
 
   .quickGrid {

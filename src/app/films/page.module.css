@@ -4,13 +4,33 @@
 
 /* Inline search + filter controls above the movie grid */
 .controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   max-width: 720px;
   margin: 0 auto 24px;
   padding: 0 20px;
 }
 
 .controlsSearch {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The Reset button and the left spacer share a fixed width so the search bar
+   sits centred between them. */
+.controlsReset,
+.controlsSpacer {
+  flex: 0 0 52px;
+}
+
+/* Trim the button's default horizontal padding so "Reset" fits the 52px width.
+   The descendant selector raises specificity above the button's own `.sm`
+   padding, which would otherwise win and push the width back to ~64px. */
+.controls .controlsReset {
+  min-width: 0;
+  padding: 6px 8px;
+  text-align: center;
 }
 
 /* Virtualised movie grid (react-virtuoso VirtuosoGrid). A CSS grid fits as many

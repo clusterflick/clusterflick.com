@@ -60,6 +60,77 @@ export const DATE_OPTIONS = [
 
 export type DateOption = (typeof DATE_OPTIONS)[number]["value"];
 
+/**
+ * Convert a date quick-select option into a concrete date range (timestamps at
+ * midnight London time). "all-time" clears the range. Shared by setDateOption
+ * and applyQuickFilter so both stay in sync.
+ */
+function computeDateRange(option: DateOption): {
+  start: number | null;
+  end: number | null;
+} {
+  if (option === "all-time") {
+    return { start: null, end: null };
+  }
+
+  const todayMidnight = getLondonMidnightTimestamp();
+  const dayOfWeek = getLondonDayOfWeek();
+
+  switch (option) {
+    case "today":
+      return { start: todayMidnight, end: todayMidnight };
+    case "tomorrow":
+      return {
+        start: todayMidnight + MS_PER_DAY,
+        end: todayMidnight + MS_PER_DAY,
+      };
+    case "this-week": {
+      // Start from today, end on Sunday (London time)
+      const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+      return {
+        start: todayMidnight,
+        end: todayMidnight + daysUntilSunday * MS_PER_DAY,
+      };
+    }
+    case "next-7-days":
+      return { start: todayMidnight, end: todayMidnight + 7 * MS_PER_DAY };
+    case "this-weekend": {
+      // Saturday and Sunday of this week (London time)
+      let saturdayOffset: number;
+      let sundayOffset: number;
+      if (dayOfWeek === 0) {
+        // Today is Sunday in London
+        saturdayOffset = -1;
+        sundayOffset = 0;
+      } else if (dayOfWeek === 6) {
+        // Today is Saturday in London
+        saturdayOffset = 0;
+        sundayOffset = 1;
+      } else {
+        // Weekday - find upcoming weekend
+        saturdayOffset = 6 - dayOfWeek;
+        sundayOffset = 7 - dayOfWeek;
+      }
+      return {
+        start: todayMidnight + saturdayOffset * MS_PER_DAY,
+        end: todayMidnight + sundayOffset * MS_PER_DAY,
+      };
+    }
+  }
+}
+
+/**
+ * A one-tap preset applied atomically. Starts from a clean default state and
+ * overrides only the event categories, venues, date range, and hide-finished
+ * toggle, so results are always predictable regardless of prior filters.
+ */
+export type QuickFilter = {
+  categories: Category[] | null;
+  venues: string[] | null;
+  dateOption: DateOption;
+  hideFinished: boolean;
+};
+
 type FilterConfigContextType = {
   filterState: FilterState;
   // Search
@@ -88,6 +159,8 @@ type FilterConfigContextType = {
   clearVenues: () => void;
   // Hide finished showings
   toggleHideFinished: () => void;
+  // Quick filters (one-tap presets)
+  applyQuickFilter: (quickFilter: QuickFilter) => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -317,67 +390,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   );
 
   const setDateOption = useCallback((option: DateOption) => {
-    if (option === "all-time") {
-      setFilterState((prev) =>
-        filterManager.set(prev, FilterId.DateRange, { start: null, end: null }),
-      );
-      return;
-    }
-
-    // Get today's midnight in London as a timestamp
-    const todayMidnight = getLondonMidnightTimestamp();
-    const dayOfWeek = getLondonDayOfWeek();
-
-    let start: number;
-    let end: number;
-
-    switch (option) {
-      case "today":
-        start = todayMidnight;
-        end = todayMidnight;
-        break;
-      case "tomorrow":
-        start = todayMidnight + MS_PER_DAY;
-        end = todayMidnight + MS_PER_DAY;
-        break;
-      case "this-week": {
-        // Start from today, end on Sunday (London time)
-        const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-        start = todayMidnight;
-        end = todayMidnight + daysUntilSunday * MS_PER_DAY;
-        break;
-      }
-      case "next-7-days":
-        start = todayMidnight;
-        end = todayMidnight + 7 * MS_PER_DAY;
-        break;
-      case "this-weekend": {
-        // Saturday and Sunday of this week (London time)
-        let saturdayOffset: number;
-        let sundayOffset: number;
-        if (dayOfWeek === 0) {
-          // Today is Sunday in London
-          saturdayOffset = -1;
-          sundayOffset = 0;
-        } else if (dayOfWeek === 6) {
-          // Today is Saturday in London
-          saturdayOffset = 0;
-          sundayOffset = 1;
-        } else {
-          // Weekday - find upcoming weekend
-          saturdayOffset = 6 - dayOfWeek;
-          sundayOffset = 7 - dayOfWeek;
-        }
-        start = todayMidnight + saturdayOffset * MS_PER_DAY;
-        end = todayMidnight + sundayOffset * MS_PER_DAY;
-        break;
-      }
-      default:
-        return;
-    }
-
     setFilterState((prev) =>
-      filterManager.set(prev, FilterId.DateRange, { start, end }),
+      filterManager.set(prev, FilterId.DateRange, computeDateRange(option)),
     );
   }, []);
 
@@ -451,6 +465,25 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Quick filters — apply a preset atomically on top of a clean default state
+  // so results never depend on whatever filters were previously set.
+  const applyQuickFilter = useCallback((quickFilter: QuickFilter) => {
+    let next = filterManager.getDefaultState();
+    next = filterManager.set(next, FilterId.Categories, quickFilter.categories);
+    next = filterManager.set(next, FilterId.Venues, quickFilter.venues);
+    next = filterManager.set(
+      next,
+      FilterId.DateRange,
+      computeDateRange(quickFilter.dateOption),
+    );
+    next = filterManager.set(
+      next,
+      FilterId.HideFinished,
+      quickFilter.hideFinished,
+    );
+    setFilterState(next);
+  }, []);
+
   // General
   const resetFilters = useCallback(() => {
     setFilterState(filterManager.getDefaultState);
@@ -489,6 +522,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       selectVenues,
       clearVenues,
       toggleHideFinished,
+      applyQuickFilter,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
@@ -514,6 +548,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       selectVenues,
       clearVenues,
       toggleHideFinished,
+      applyQuickFilter,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
