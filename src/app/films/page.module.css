@@ -33,6 +33,14 @@
   text-align: center;
 }
 
+/* On small screens drop the balancing spacer so the search bar reclaims the
+   full width; the Reset button stays on the right. */
+@media (max-width: 768px) {
+  .controlsSpacer {
+    display: none;
+  }
+}
+
 /* Virtualised movie grid (react-virtuoso VirtuosoGrid). A CSS grid fits as many
    fixed 200px poster columns as the width allows and centres them. auto-fit
    collapses any column with no item in it, so a single short row centres in the
