@@ -110,6 +110,7 @@ function renderPerformanceCard(
       showingTitle={showingTitle}
       screen={performance.screen}
       accessibility={performance.accessibility}
+      format={performance.format}
       notes={performance.notes}
       className={clsx(
         isPast && styles.past,

@@ -89,6 +89,7 @@ export default function StaticShowingsList({
                     showingTitle={showingTitle}
                     screen={performance.screen}
                     accessibility={performance.accessibility}
+                    format={performance.format}
                     notes={performance.notes}
                   />
                 );

@@ -99,6 +99,7 @@ type MoviePerformanceAccessibility = Partial<
  * the default (Digital source, Normal presentation, 2D dimension).
  */
 export enum FormatSource {
+  Digital = "digital",
   SeventyMm = "70mm",
   ThirtyFiveMm = "35mm",
   SixteenMm = "16mm",

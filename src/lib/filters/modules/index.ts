@@ -14,9 +14,5 @@ export {
   FORMAT_GROUPS,
   getEffectiveFormatValue,
 } from "./format";
-export type {
-  FormatFilterId,
-  FormatGroupConfig,
-  FormatOption,
-} from "./format";
+export type { FormatFilterId, FormatGroupConfig, FormatOption } from "./format";
 export { hideFinishedFilter } from "./hide-finished";
