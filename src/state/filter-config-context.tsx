@@ -15,7 +15,12 @@ import {
   ACCESSIBILITY_NONE,
   Category,
 } from "@/types";
-import { FilterState, FilterId, filterManager } from "@/lib/filters";
+import {
+  FilterState,
+  FilterId,
+  FormatFilterId,
+  filterManager,
+} from "@/lib/filters";
 import {
   getLondonMidnightTimestamp,
   getLondonDayOfWeek,
@@ -149,6 +154,14 @@ type FilterConfigContextType = {
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
   clearAllAccessibility: () => void;
+  // Format (source / presentation / dimension) — keyed by filter id
+  toggleFormat: (
+    filterId: FormatFilterId,
+    value: string,
+    allValues: string[],
+  ) => void;
+  selectAllFormat: (filterId: FormatFilterId) => void;
+  clearAllFormat: (filterId: FormatFilterId) => void;
   // Date range (timestamps representing midnight London time)
   setDateRange: (start: number | null, end: number | null) => void;
   setDateOption: (option: DateOption) => void;
@@ -379,6 +392,47 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Format groups — null means all selected (no filter), [] means none,
+  // [...] means specific values. Shared toggle keyed by the group's filter id.
+  const toggleFormat = useCallback(
+    (filterId: FormatFilterId, value: string, allValues: string[]) => {
+      setFilterState((prev) => {
+        const current = filterManager.get(prev, filterId);
+        if (current === null) {
+          // All selected, remove this one (select all except this)
+          return filterManager.set(
+            prev,
+            filterId,
+            allValues.filter((v) => v !== value),
+          );
+        }
+        if (current.includes(value)) {
+          // Remove
+          return filterManager.set(
+            prev,
+            filterId,
+            current.filter((v) => v !== value),
+          );
+        }
+        // Add — if all now selected, collapse to null (no filter)
+        const updated = [...current, value];
+        if (updated.length === allValues.length) {
+          return filterManager.set(prev, filterId, null);
+        }
+        return filterManager.set(prev, filterId, updated);
+      });
+    },
+    [],
+  );
+
+  const selectAllFormat = useCallback((filterId: FormatFilterId) => {
+    setFilterState((prev) => filterManager.set(prev, filterId, null));
+  }, []);
+
+  const clearAllFormat = useCallback((filterId: FormatFilterId) => {
+    setFilterState((prev) => filterManager.set(prev, filterId, []));
+  }, []);
+
   // Date range (all timestamps represent midnight London time)
   const setDateRange = useCallback(
     (start: number | null, end: number | null) => {
@@ -515,6 +569,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
+      toggleFormat,
+      selectAllFormat,
+      clearAllFormat,
       setDateRange,
       setDateOption,
       setVenueOption,
@@ -541,6 +598,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
+      toggleFormat,
+      selectAllFormat,
+      clearAllFormat,
       setDateRange,
       setDateOption,
       setVenueOption,

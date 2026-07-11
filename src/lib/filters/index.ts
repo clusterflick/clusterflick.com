@@ -16,7 +16,17 @@ export {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
+  FORMAT_GROUPS,
+  getEffectiveFormatValue,
   getPrimaryCategory,
+} from "./modules";
+export type {
+  FormatFilterId,
+  FormatGroupConfig,
+  FormatOption,
 } from "./modules";
 
 // Manager functions and object

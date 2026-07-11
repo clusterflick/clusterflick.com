@@ -6,6 +6,7 @@ import {
   Venue,
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import { FORMAT_GROUPS } from "./modules";
 import {
   formatDateShort,
   getLondonMidnightTimestamp,
@@ -369,6 +370,38 @@ function describeAccessibility(state: FilterState): string | null | "none" {
 }
 
 /**
+ * Describes the format filters (source / presentation / dimension).
+ * - `emptyTitle`: title of the first group with nothing selected (no matches)
+ * - `labels`: selected option labels across all active groups
+ */
+function describeFormats(state: FilterState): {
+  emptyTitle: string | null;
+  labels: string[];
+} {
+  let emptyTitle: string | null = null;
+  const labels: string[] = [];
+
+  for (const group of FORMAT_GROUPS) {
+    const value = state[group.filterId];
+    // null means all selected (no filter)
+    if (!value) continue;
+    // Empty array means nothing selected — no performances match
+    if (value.length === 0) {
+      if (!emptyTitle) emptyTitle = group.title;
+      continue;
+    }
+    for (const selectedValue of value) {
+      const label = group.options.find(
+        (option) => option.value === selectedValue,
+      )?.label;
+      if (label) labels.push(label);
+    }
+  }
+
+  return { emptyTitle, labels };
+}
+
+/**
  * Generates a human-readable description of the current filter state.
  */
 export function describeFilters(options: DescribeOptions): FilterDescription {
@@ -381,22 +414,27 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const categoryDesc = describeCategories(state, categories);
   const genreDesc = describeGenres(state, genres);
   const accessibilityDesc = describeAccessibility(state);
+  const { emptyTitle: formatEmptyTitle, labels: formatLabels } =
+    describeFormats(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
 
-  // Check if "all events" (all categories, all genres, all accessibility)
+  // Check if "all events" (all categories, genres, accessibility, and formats)
   const allCategories = !state.categories;
   const allGenres = !state.genres;
   const allAccessibility = !state.accessibility;
+  const allFormats = FORMAT_GROUPS.every((group) => !state[group.filterId]);
 
-  // Handle no genres or no accessibility selected case
+  // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
     eventsDesc = "No genres selected";
   } else if (accessibilityDesc === "none") {
     eventsDesc = "No accessibility features selected";
-  } else if (allCategories && allGenres && allAccessibility) {
-    // All categories, all genres, and all accessibility selected
+  } else if (formatEmptyTitle) {
+    eventsDesc = `No ${formatEmptyTitle} selected`;
+  } else if (allCategories && allGenres && allAccessibility && allFormats) {
+    // All categories, genres, accessibility, and formats selected
     eventsDesc = "All events";
     if (searchQuery) {
       eventsDesc += ` matching "${searchQuery}"`;
@@ -427,6 +465,11 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     // Add accessibility suffix if specific features selected
     if (accessibilityDesc && accessibilityDesc !== "none") {
       eventsDesc += ` with ${accessibilityDesc}`;
+    }
+
+    // Add format suffix if specific formats selected
+    if (formatLabels.length > 0) {
+      eventsDesc += ` in ${formatList(formatLabels, 3)}`;
     }
 
     // Add search suffix

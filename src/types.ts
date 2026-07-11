@@ -93,6 +93,38 @@ type MoviePerformanceAccessibility = Partial<
   Record<AccessibilityFeature, boolean>
 >;
 
+/**
+ * Physical/technical format of a performance. Each field is only present when
+ * the performance is something other than the default — an absent field means
+ * the default (Digital source, Normal presentation, 2D dimension).
+ */
+export enum FormatSource {
+  SeventyMm = "70mm",
+  ThirtyFiveMm = "35mm",
+  SixteenMm = "16mm",
+  Vhs = "vhs",
+  Laserdisc = "laserdisc",
+  Nitrate = "nitrate",
+}
+
+export enum FormatPresentation {
+  Imax = "imax",
+  FourDx = "4dx",
+  ScreenX = "screenx",
+  DolbyCinema = "dolby-cinema",
+}
+
+export enum FormatDimension {
+  TwoD = "2d",
+  ThreeD = "3d",
+}
+
+export type MoviePerformanceFormat = {
+  source?: FormatSource;
+  presentation?: FormatPresentation;
+  dimension?: FormatDimension;
+};
+
 export type MoviePerformance = {
   bookingUrl: string;
   showingId: string;
@@ -101,6 +133,7 @@ export type MoviePerformance = {
   screen?: string;
   status?: MoviePerformanceStatus;
   accessibility?: MoviePerformanceAccessibility;
+  format?: MoviePerformanceFormat;
 };
 
 export enum Classification {

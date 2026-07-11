@@ -7,4 +7,16 @@ export { venuesFilter } from "./venues";
 export { dateRangeFilter } from "./date-range";
 export { genresFilter } from "./genres";
 export { accessibilityFilter } from "./accessibility";
+export {
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
+  FORMAT_GROUPS,
+  getEffectiveFormatValue,
+} from "./format";
+export type {
+  FormatFilterId,
+  FormatGroupConfig,
+  FormatOption,
+} from "./format";
 export { hideFinishedFilter } from "./hide-finished";

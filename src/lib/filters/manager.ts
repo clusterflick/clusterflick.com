@@ -9,6 +9,9 @@ import {
   dateRangeFilter,
   genresFilter,
   accessibilityFilter,
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
   hideFinishedFilter,
 } from "./modules";
 
@@ -27,6 +30,9 @@ const modules: AnyFilterModule[] = [
   hideFinishedFilter,
   genresFilter,
   accessibilityFilter,
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
 ];
 
 /**

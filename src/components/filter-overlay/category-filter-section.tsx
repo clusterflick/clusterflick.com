@@ -10,6 +10,11 @@ import {
   Genre,
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import {
+  FORMAT_GROUPS,
+  FormatFilterId,
+  getEffectiveFormatValue,
+} from "@/lib/filters";
 import { EVENT_CATEGORIES } from "@/state/filter-config-context";
 import Link from "next/link";
 import Button from "@/components/button";
@@ -39,6 +44,7 @@ interface CategoryFilterSectionProps {
     categories: Category[] | null;
     genres: string[] | null;
     accessibility: AccessibilityFilterValue[] | null;
+    formats: Record<FormatFilterId, string[] | null>;
   };
   toggleCategory: (category: Category) => void;
   selectAllCategories: () => void;
@@ -49,6 +55,13 @@ interface CategoryFilterSectionProps {
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
   clearAllAccessibility: () => void;
+  toggleFormat: (
+    filterId: FormatFilterId,
+    value: string,
+    allValues: string[],
+  ) => void;
+  selectAllFormat: (filterId: FormatFilterId) => void;
+  clearAllFormat: (filterId: FormatFilterId) => void;
 }
 
 export default function CategoryFilterSection({
@@ -64,6 +77,9 @@ export default function CategoryFilterSection({
   toggleAccessibility,
   selectAllAccessibility,
   clearAllAccessibility,
+  toggleFormat,
+  selectAllFormat,
+  clearAllFormat,
 }: CategoryFilterSectionProps) {
   // Count movies by category
   const categoryCounts = useMemo(() => {
@@ -179,6 +195,44 @@ export default function CategoryFilterSection({
     return filterState.accessibility.includes(value);
   };
 
+  // Count movies by format value, per group. A movie is counted for a value if
+  // any of its performances resolves to that value (absent field = default).
+  const formatCounts = useMemo(() => {
+    const counts: Record<FormatFilterId, Map<string, number>> = {} as Record<
+      FormatFilterId,
+      Map<string, number>
+    >;
+    FORMAT_GROUPS.forEach((group) => {
+      counts[group.filterId] = new Map(
+        group.options.map(({ value }) => [value, 0]),
+      );
+    });
+
+    Object.values(movies).forEach((movie) => {
+      FORMAT_GROUPS.forEach((group) => {
+        const valuesInMovie = new Set<string>();
+        movie.performances.forEach((perf) => {
+          valuesInMovie.add(
+            getEffectiveFormatValue(perf, group.key, group.defaultValue),
+          );
+        });
+        const groupCounts = counts[group.filterId];
+        valuesInMovie.forEach((value) => {
+          groupCounts.set(value, (groupCounts.get(value) || 0) + 1);
+        });
+      });
+    });
+
+    return counts;
+  }, [movies]);
+
+  // Helper to check if a format value is selected within its group
+  const isFormatSelected = (filterId: FormatFilterId, value: string) => {
+    const selected = filterState.formats[filterId];
+    if (selected === null) return true;
+    return selected.includes(value);
+  };
+
   const allGenresSelected = filterState.genres === null;
   const noGenresSelected =
     filterState.genres !== null && filterState.genres.length === 0;
@@ -287,6 +341,58 @@ export default function CategoryFilterSection({
       </div>
       <ExpandableSection title="More Event Options">
         <div className={styles.advancedFilters}>
+          {/* Format Filters — Source / Presentation / Dimension */}
+          {FORMAT_GROUPS.map((group) => {
+            const selected = filterState.formats[group.filterId];
+            const allValues = group.options.map((o) => o.value);
+            const allSelected = selected === null;
+            const noneSelected = selected !== null && selected.length === 0;
+            return (
+              <div className={styles.advancedFilterGroup} key={group.filterId}>
+                <div className={styles.advancedFilterHeader}>
+                  <h4 className={styles.advancedFilterTitle}>{group.title}</h4>
+                  <div className={styles.selectionControls}>
+                    <Button
+                      variant="link"
+                      onClick={() => selectAllFormat(group.filterId)}
+                      disabled={allSelected}
+                      aria-label={`Select all ${group.title} options`}
+                    >
+                      Select All
+                    </Button>
+                    <span className={styles.controlDivider}>/</span>
+                    <Button
+                      variant="link"
+                      onClick={() => clearAllFormat(group.filterId)}
+                      disabled={noneSelected}
+                      aria-label={`Clear all ${group.title} options`}
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                </div>
+                <div
+                  className={styles.chipGroup}
+                  role="group"
+                  aria-label={`${group.title} filters`}
+                >
+                  {group.options.map((option) => (
+                    <Chip
+                      key={option.value}
+                      type="checkbox"
+                      name={group.filterId}
+                      label={option.label}
+                      count={formatCounts[group.filterId].get(option.value)}
+                      checked={isFormatSelected(group.filterId, option.value)}
+                      onChange={() =>
+                        toggleFormat(group.filterId, option.value, allValues)
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
           {/* Genre Filter */}
           <div className={styles.advancedFilterGroup}>
             <div className={styles.advancedFilterHeader}>

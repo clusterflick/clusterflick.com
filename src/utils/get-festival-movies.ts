@@ -3,22 +3,13 @@ import {
   type FilterState,
   type MoviesRecord,
 } from "@/lib/filters/types";
-import { apply } from "@/lib/filters/manager";
+import { apply, getDefaultState } from "@/lib/filters/manager";
 import type { Festival } from "@/data/festivals";
 
+// A no-filter base state that matchers are layered on top of. Delegates to the
+// manager so newly-added filters default to "no filter" automatically.
 function buildPermissiveBase(): FilterState {
-  return {
-    [FilterId.Search]: "",
-    [FilterId.ShowingTitleSearch]: "",
-    [FilterId.ShowingUrlSearch]: "",
-    [FilterId.PerformanceNotesSearch]: "",
-    [FilterId.Categories]: null,
-    [FilterId.Venues]: null,
-    [FilterId.DateRange]: { start: null, end: null },
-    [FilterId.Genres]: null,
-    [FilterId.Accessibility]: null,
-    [FilterId.HideFinished]: false,
-  };
+  return getDefaultState();
 }
 
 /**

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import clsx from "clsx";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { filterManager, buildFilterUrl } from "@/lib/filters";
+import { filterManager, buildFilterUrl, FilterId } from "@/lib/filters";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
@@ -44,6 +44,9 @@ export default function FilterOverlay({
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
+    toggleFormat,
+    selectAllFormat,
+    clearAllFormat,
     setDateRange,
     setDateOption,
     setVenueOption,
@@ -363,6 +366,11 @@ export default function FilterOverlay({
               categories: filterState.categories,
               genres: filterState.genres,
               accessibility: filterState.accessibility,
+              formats: {
+                [FilterId.FormatSource]: filterState.formatSource,
+                [FilterId.FormatPresentation]: filterState.formatPresentation,
+                [FilterId.FormatDimension]: filterState.formatDimension,
+              },
             }}
             toggleCategory={toggleCategory}
             selectAllCategories={selectAllCategories}
@@ -373,6 +381,9 @@ export default function FilterOverlay({
             toggleAccessibility={toggleAccessibility}
             selectAllAccessibility={selectAllAccessibility}
             clearAllAccessibility={clearAllAccessibility}
+            toggleFormat={toggleFormat}
+            selectAllFormat={selectAllFormat}
+            clearAllFormat={clearAllFormat}
           />
         </div>
 
