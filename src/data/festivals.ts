@@ -256,6 +256,23 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "london-colombian-film-festival",
+    name: "London Colombian Film Festival",
+    url: "https://www.thelondoncolombianfilmfestival.com",
+    aliases: ["lcff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "LCFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LCFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Colombian Film Festival",
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
