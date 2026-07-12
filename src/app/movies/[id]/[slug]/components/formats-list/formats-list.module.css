@@ -1,0 +1,11 @@
+/* Desktop heading, matching "Also showing as part of:" (part-of-section .label)
+   so the two blocks under the poster read as a set. */
+.labelPoster {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 16px 0;
+  text-align: center;
+}

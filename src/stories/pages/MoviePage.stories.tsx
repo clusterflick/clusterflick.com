@@ -10,6 +10,8 @@ import type {
   MetaData,
   CinemaData,
 } from "@/types";
+import type { FormatDefinition } from "@/data/formats";
+import { getMovieFormats } from "@/utils/get-movie-formats";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
@@ -28,6 +30,7 @@ type MoviePageData = {
   venues: Record<string, Venue>;
   venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
+  formats: FormatDefinition[];
 };
 
 // Find a movie matching criteria
@@ -93,6 +96,10 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     ([venueId, count]) => ({ venueId, count }),
   );
 
+  // Non-default screening formats (mirrors the server component). Stories have
+  // no fixed "now", so include every format across all performances.
+  const formats = getMovieFormats(movie.performances, 0);
+
   // Exclude performances for the movie prop
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { performances: _performances, ...movieWithoutPerformances } = movie;
@@ -104,6 +111,7 @@ function extractMoviePageData(movie: Movie, metaData: MetaData): MoviePageData {
     venues,
     venueCounts,
     containingEvents: [],
+    formats,
   };
 }
 
@@ -153,6 +161,7 @@ function DefaultMoviePage() {
           venues={data.venues}
           venueCounts={data.venueCounts}
           containingEvents={data.containingEvents}
+          formats={data.formats}
           festivals={[]}
         />
       )}
@@ -221,6 +230,7 @@ export const WithIncludedMovies: Story = {
           venues={data.venues}
           venueCounts={data.venueCounts}
           containingEvents={data.containingEvents}
+          formats={data.formats}
           festivals={[]}
         />
       )}

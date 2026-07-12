@@ -5,6 +5,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
+import { getMovieFormats } from "@/utils/get-movie-formats";
 import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
@@ -136,6 +137,13 @@ export default async function MovieDetailPage({
   // Find festivals this movie is part of
   const festivals = getMovieFestivals(movie.id, data.movies);
 
+  // Non-default screening formats (70mm, IMAX, 3D, …) across upcoming
+  // performances, for the format tags below the poster.
+  const formats = getMovieFormats(
+    movie.performances,
+    new Date(data.generatedAt).getTime(),
+  );
+
   // Exclude performances from containing events to reduce data size
   const containingEventsWithoutPerformances = containingEvents.map((event) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -266,6 +274,7 @@ export default async function MovieDetailPage({
         venueCounts={venueCounts}
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
+        formats={formats}
         showingsStaticContent={
           <StaticShowingsList
             performances={movie.performances}

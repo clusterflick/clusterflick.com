@@ -1,0 +1,15 @@
+/* About blurb shown inside the format hero. Constrained for readability and
+   centred to match the centre-aligned hero. */
+.heroBlurb {
+  max-width: 620px;
+  margin: 20px auto 0;
+  line-height: 1.7;
+}
+
+.heroBlurb p {
+  margin: 0 0 12px;
+}
+
+.heroBlurb p:last-child {
+  margin-bottom: 0;
+}

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { Movie, MoviePerformance, Genre, Person, Venue } from "@/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
+import type { FormatDefinition } from "@/data/formats";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
   useFilterConfig,
@@ -32,6 +33,7 @@ import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
 import FestivalSection from "./components/festival-section";
+import FormatsList from "./components/formats-list";
 import PartOfSection from "./components/part-of-section";
 import PlayingAtSection, {
   type VenuePlayCount,
@@ -47,6 +49,7 @@ type PageContentProps = {
   venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
+  formats: FormatDefinition[];
   showingsStaticContent?: ReactNode;
 };
 
@@ -58,6 +61,7 @@ export default function PageContent({
   venueCounts,
   containingEvents,
   festivals,
+  formats,
   showingsStaticContent,
 }: PageContentProps) {
   const {
@@ -229,6 +233,11 @@ export default function PageContent({
               size="large"
             />
           )}
+          {formats.length > 0 && (
+            <div className={styles.formatsDesktop}>
+              <FormatsList formats={formats} variant="poster" />
+            </div>
+          )}
           <div className={styles.partOfDesktop}>
             <PartOfSection containingEvents={containingEvents} />
           </div>
@@ -295,6 +304,11 @@ export default function PageContent({
             people={people}
           />
           <PlayingAtSection venueCounts={venueCounts} venues={venues} />
+          {formats.length > 0 && (
+            <div className={styles.formatsMobile}>
+              <FormatsList formats={formats} variant="inline" />
+            </div>
+          )}
           <div className={styles.partOfMobile}>
             <PartOfSection containingEvents={containingEvents} />
           </div>

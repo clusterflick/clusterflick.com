@@ -393,6 +393,11 @@ export default function CategoryFilterSection({
               </div>
             );
           })}
+          <p className={styles.sectionDescription}>
+            <Link href="/formats" className={styles.sectionLink}>
+              See a list of all formats
+            </Link>
+          </p>
           {/* Genre Filter */}
           <div className={styles.advancedFilterGroup}>
             <div className={styles.advancedFilterHeader}>

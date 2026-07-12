@@ -1,6 +1,10 @@
 import { Fragment, type ReactNode } from "react";
 import clsx from "clsx";
-import { FormatDimension, FormatSource, type MoviePerformance } from "@/types";
+import {
+  FormatDimension,
+  FormatSourceDefault,
+  type MoviePerformance,
+} from "@/types";
 import { getAccessibilityLabel } from "@/utils/accessibility-labels";
 import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
@@ -68,9 +72,9 @@ export default function PerformanceCard({
                 </Tag>
               ))
           : null}
-        {format && format.source && format.source !== FormatSource.Digital ? (
+        {format && format.source && format.source !== FormatSourceDefault ? (
           <Tag key={format.source} color="blue" size="sm">
-            {getFormatLabels(format?.source || FormatSource.Digital)}
+            {getFormatLabels(format?.source || FormatSourceDefault)}
           </Tag>
         ) : null}
         {format && format.presentation ? (

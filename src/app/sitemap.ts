@@ -13,6 +13,8 @@ import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
 import { GENRES } from "@/data/genres";
 import { getGenreUrl } from "@/utils/get-genre-url";
+import { FORMATS } from "@/data/formats";
+import { getFormatUrl } from "@/utils/get-format-url";
 
 export const dynamic = "force-static";
 
@@ -93,6 +95,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const formatListPage = {
+    url: "https://clusterflick.com/formats",
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  };
+
+  const formatPages = FORMATS.map((format) => ({
+    url: `https://clusterflick.com${getFormatUrl(format)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.6,
+  }));
+
   const venuesByGroup = groupVenuesByGroup(data.venues);
 
   const cinemaGroupPages = VENUE_GROUPS.filter((group) =>
@@ -150,6 +166,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     cinemaGroupListPage,
     genreListPage,
     ...genrePages,
+    formatListPage,
+    ...formatPages,
     ...moviePages,
     ...venuePages,
     ...boroughPages,

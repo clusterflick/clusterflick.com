@@ -14,6 +14,10 @@
   align-items: center;
 }
 
+.centerList {
+  justify-content: center;
+}
+
 .pill {
   display: inline-flex;
   align-items: baseline;

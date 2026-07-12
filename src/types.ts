@@ -120,6 +120,10 @@ export enum FormatDimension {
   ThreeD = "3d",
 }
 
+export const FormatSourceDefault = FormatSource.Digital;
+
+export const FormatDimensionDefault = FormatDimension.TwoD;
+
 export type MoviePerformanceFormat = {
   source?: FormatSource;
   presentation?: FormatPresentation;

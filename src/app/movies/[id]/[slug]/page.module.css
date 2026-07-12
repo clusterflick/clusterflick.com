@@ -29,6 +29,21 @@
   margin-top: 32px;
 }
 
+/* Format tags ("Screening in 70mm, …") sit under the poster on desktop and
+   move under Playing at on mobile — same split as "Also showing as part of".
+   Desktop centres its heading + pills internally; mobile matches "Playing at"
+   by aligning left (overriding the mobile mainInfo centre). */
+.formatsDesktop {
+  display: block;
+  margin-top: 24px;
+}
+
+.formatsMobile {
+  display: none;
+  margin-top: 32px;
+  text-align: left;
+}
+
 .mainInfo {
   flex: 1;
   min-width: 0;
@@ -99,6 +114,14 @@
   }
 
   .partOfMobile {
+    display: block;
+  }
+
+  .formatsDesktop {
+    display: none;
+  }
+
+  .formatsMobile {
     display: block;
   }
 

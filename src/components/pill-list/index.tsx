@@ -7,6 +7,9 @@ import styles from "./pill-list.module.css";
 interface PillListProps<T> {
   /** Small uppercase heading above the list (e.g. "Cast", "Playing at"). */
   title: string;
+  /** Overrides the default title styling entirely (e.g. to match a neighbouring
+   *  section's heading). When omitted, the standard PillList title style is used. */
+  titleClassName?: string;
   /** Items to render as pills. */
   items: T[];
   /** Max pills shown on desktop before a "+N more" toggle. Omit to show all. */
@@ -20,15 +23,19 @@ interface PillListProps<T> {
   renderItem?: (item: T) => ReactNode;
   /** Plural noun used in the toggle's aria-label. Defaults to the lowercased title. */
   itemNoun?: string;
+  /** Horizontal alignment of the pills. Defaults to "start". */
+  align?: "start" | "center";
 }
 
 export default function PillList<T = string>({
   title,
+  titleClassName,
   items,
   maxVisible,
   maxVisibleMobile,
   renderItem = (item) => item as ReactNode,
   itemNoun,
+  align = "start",
 }: PillListProps<T>) {
   const [isExpanded, setIsExpanded] = useState(false);
   const noun = itemNoun ?? title.toLowerCase();
@@ -54,7 +61,13 @@ export default function PillList<T = string>({
     const remainingCount = max != null ? items.length - max : 0;
 
     return (
-      <div className={styles.list}>
+      <div
+        className={
+          align === "center"
+            ? `${styles.list} ${styles.centerList}`
+            : styles.list
+        }
+      >
         {visibleItems.map((item, index) => (
           <span key={index} className={styles.pill}>
             {renderItem(item)}
@@ -86,7 +99,7 @@ export default function PillList<T = string>({
 
   return (
     <div>
-      <h3 className={styles.title}>{title}</h3>
+      <h3 className={titleClassName ?? styles.title}>{title}</h3>
       {maxVisibleMobile == null ? (
         renderList(maxVisible)
       ) : (
