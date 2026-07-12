@@ -24,9 +24,14 @@ export function generateStaticParams() {
   ]);
 }
 
+/** Query string (no leading `?`) that filters to this format's performances. */
+function formatFilterParams(format: FormatDefinition): string {
+  return `${format.kind}=${format.id}&allDates=true&allCategories=true`;
+}
+
 /** Deep link into the live, filtered film list for this format. */
 function browseHref(format: FormatDefinition): string {
-  return `/films?${format.kind}=${format.id}&allDates=true&allCategories=true`;
+  return `/films?${formatFilterParams(format)}`;
 }
 
 export async function generateMetadata({
@@ -235,6 +240,7 @@ export default async function FormatDetailPage({
         backText="All formats"
         gridMovies={gridMovies}
         gridMoviesTruncated={gridMoviesTruncated}
+        movieUrlParams={formatFilterParams(format)}
         Blurb={null}
         heroChildren={heroBlurb}
         venuesLayout="grid"

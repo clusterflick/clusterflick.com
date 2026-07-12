@@ -55,6 +55,12 @@ export interface EventDetailPageContentProps {
   filmsExploreHref?: string;
   /** Label for the "explore" link below the films grid. */
   filmsExploreLabel?: string;
+  /**
+   * Query string (no leading `?`) appended to each poster's movie link so the
+   * movie page opens pre-filtered to this programme's performances (e.g. a
+   * format). When set, the "show all" hash is omitted so the filter applies.
+   */
+  movieUrlParams?: string;
   /** Background image for the hero. Defaults to the decorative light circles. */
   heroBackgroundImage?: string;
   /** Alt text for a custom hero background image. */
@@ -100,6 +106,7 @@ export default function EventDetailPageContent({
   filmsSectionTitle,
   filmsExploreHref = "/films",
   filmsExploreLabel = "Or start exploring all films",
+  movieUrlParams,
   heroBackgroundImage,
   heroBackgroundImageAlt,
   heroChildren,
@@ -216,7 +223,8 @@ export default function EventDetailPageContent({
                   truncated={gridMoviesTruncated}
                   exploreHref={filmsExploreHref}
                   exploreLabel={filmsExploreLabel}
-                  showAll
+                  movieUrlParams={movieUrlParams}
+                  showAll={!movieUrlParams}
                 />
               </ContentSection>
             </div>
