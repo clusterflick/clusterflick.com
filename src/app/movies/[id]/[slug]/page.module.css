@@ -15,6 +15,9 @@
 
 .posterSection {
   flex-shrink: 0;
+  /* Pin to the large poster width so the format tags below wrap within the
+     column instead of widening it (which would squeeze the details column). */
+  width: 308px;
 }
 
 /* "Also showing as part of" lives under the poster on desktop and moves under
@@ -107,6 +110,7 @@
   .posterSection {
     display: flex;
     justify-content: center;
+    width: auto;
   }
 
   .partOfDesktop {
