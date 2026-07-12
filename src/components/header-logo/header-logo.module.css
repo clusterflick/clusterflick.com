@@ -39,10 +39,17 @@
   }
 }
 
-@media (max-width: 1280px) {
-  .home {
-    top: 19px;
-    left: 16px;
+/*
+ * Only pages with the filter summary compete for header space, so only there do
+ * we drop the wordmark once the filter expands (~1536px). The home page has no
+ * filter, so it keeps the wordmark.
+ */
+@media (max-width: 1536px) {
+  .home.withFilter {
+    img {
+      position: relative;
+      top: 2.5px;
+    }
 
     div {
       display: none;

@@ -27,18 +27,21 @@ export default function MainHeader({
 }) {
   return (
     <header className={styles.header}>
-      <HeaderLogo />
-      {showFilters && onFilterClick && (
-        <div className={styles.filter}>
+      <HeaderLogo hasFilter={showFilters && !!onFilterClick} />
+      {showFilters && !!onFilterClick && (
+        <div className={styles.filter} data-filter-summary>
           <FilterTrigger
+            // hasFilter guarantees onFilterClick is defined here.
             onClick={onFilterClick}
             isOverlayOpen={isFilterOverlayOpen ?? false}
             onTextHeightChange={onFilterTextHeightChange}
           />
         </div>
       )}
-      <HeaderNav />
-      <MobileMenu />
+      <div className={styles.navGroup}>
+        <HeaderNav />
+        <MobileMenu />
+      </div>
     </header>
   );
 }

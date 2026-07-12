@@ -1,14 +1,10 @@
+/*
+ * The hamburger is always visible: it exposes the full navigation list at every
+ * screen size, alongside the inline primary links (which show on wider screens).
+ */
 .mobileMenu {
-  display: none;
-}
-
-@media (max-width: 1536px) {
-  .mobileMenu {
-    display: block;
-    position: absolute;
-    top: 19px;
-    right: 16px;
-  }
+  display: flex;
+  align-items: center;
 }
 
 .menuButton {

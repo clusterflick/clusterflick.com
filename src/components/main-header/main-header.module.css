@@ -31,7 +31,29 @@
   gap: 8px;
 }
 
-@media (max-width: 1536px) {
+/* Right-aligned group holding the inline primary nav + the hamburger menu. */
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  top: 22px;
+  right: 20px;
+}
+
+@media (max-width: 1280px) {
+  .navGroup {
+    top: 19px;
+    right: 16px;
+  }
+}
+
+/*
+ * Once the inline primary nav is hidden (only the hamburger remains) the filter
+ * can grow to fill the row. Kept in sync with the header-nav breakpoint so the
+ * expanded filter never sits beneath the inline links.
+ */
+@media (max-width: 1180px) {
   .filter {
     flex: 1;
     padding: 0 60px;
