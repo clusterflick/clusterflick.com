@@ -3,19 +3,14 @@ import {
   type FilterState,
   type MoviesRecord,
 } from "@/lib/filters/types";
-import { apply, getDefaultState } from "@/lib/filters/manager";
+import { apply, getPermissiveState } from "@/lib/filters/manager";
 import type { Festival } from "@/data/festivals";
 
-// A no-filter base state that matchers are layered on top of. Delegates to the
-// manager so newly-added filters default to "no filter" automatically.
-function buildPermissiveBase(): FilterState {
-  return getDefaultState();
-}
-
 /**
- * Returns the subset of movies matching the festival's matchers.
- * Matchers are OR'd together (union of results).
- * Used for the festival detail page.
+ * Returns the festival's currently-showing movies — those matching its matchers
+ * with at least one upcoming performance. Matchers are OR'd together (union of
+ * results), and finished performances are pruned so pages only surface what you
+ * can still go and see. Used for the festival detail page.
  */
 export function getFestivalMovies(
   festival: Festival,
@@ -25,8 +20,9 @@ export function getFestivalMovies(
 
   for (const matcher of festival.matchers) {
     const state: FilterState = {
-      ...buildPermissiveBase(),
+      ...getPermissiveState(),
       ...matcher,
+      [FilterId.HideFinished]: true,
     };
     const filtered = apply(movies, state);
     for (const [id, movie] of Object.entries(filtered)) {
@@ -71,7 +67,7 @@ export function isFestivalCurrentlyShowing(
 ): boolean {
   for (const matcher of festival.matchers) {
     const state: FilterState = {
-      ...buildPermissiveBase(),
+      ...getPermissiveState(),
       ...matcher,
       [FilterId.HideFinished]: true,
     };

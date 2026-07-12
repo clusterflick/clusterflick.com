@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import FilmClubsPageContent from "@/app/film-clubs/page-content";
 import type { FilmClubListItem } from "@/app/film-clubs/page";
 import { FILM_CLUBS } from "@/data/film-clubs";
-import { getFilmClubCurrentMovies } from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
@@ -58,7 +58,7 @@ async function loadFilmClubsListData(): Promise<FilmClubsListData> {
   const allMovies = await fetchAllMovies(metaData);
 
   const filmClubItems: FilmClubListItem[] = FILM_CLUBS.map((club) => {
-    const currentMovies = getFilmClubCurrentMovies(club, allMovies);
+    const currentMovies = getFilmClubMovies(club, allMovies);
     return {
       id: club.id,
       name: club.name,

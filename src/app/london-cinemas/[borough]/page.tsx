@@ -7,7 +7,7 @@ import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
-import { getFilmClubCurrentMovies } from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import {
   getFestivalMovies,
@@ -181,7 +181,7 @@ export default async function BoroughPage({
   const boroughFilmClubs = (
     await Promise.all(
       FILM_CLUBS.map(async (club) => {
-        const currentMovies = getFilmClubCurrentMovies(club, data.movies);
+        const currentMovies = getFilmClubMovies(club, data.movies);
         const clubVenueIds = new Set<string>();
         for (const movie of Object.values(currentMovies)) {
           for (const perf of movie.performances) {

@@ -33,6 +33,7 @@ export type {
 export {
   filterManager,
   getDefaultState,
+  getPermissiveState,
   get,
   set,
   hasActiveFilters,

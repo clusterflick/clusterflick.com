@@ -3,7 +3,7 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
-import { getFilmClubCurrentMovies } from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { FILM_CLUBS } from "@/data/film-clubs";
 
@@ -96,7 +96,7 @@ export async function getNearMeFilmClubs(
 ): Promise<NearMeFilmClub[]> {
   return Promise.all(
     FILM_CLUBS.map(async (club) => {
-      const currentMovies = getFilmClubCurrentMovies(club, data.movies);
+      const currentMovies = getFilmClubMovies(club, data.movies);
       const movieCount = Object.keys(currentMovies).length;
 
       const venueIdSet = new Set<string>();

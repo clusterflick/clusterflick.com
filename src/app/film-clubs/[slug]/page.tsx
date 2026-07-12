@@ -4,10 +4,7 @@ import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
-import {
-  getFilmClubMovies,
-  getFilmClubCurrentMovies,
-} from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FILM_CLUBS, type FilmClub } from "@/data/film-clubs";
@@ -72,7 +69,7 @@ export async function generateMetadata({
 
   const { club } = resolved;
   const data = await getStaticData();
-  const currentMovies = getFilmClubCurrentMovies(club, data.movies);
+  const currentMovies = getFilmClubMovies(club, data.movies);
   const movieCount = Object.keys(currentMovies).length;
 
   let seoDescription: string | undefined;
@@ -139,9 +136,7 @@ export default async function FilmClubDetailPage({
   const imagePath = getFilmClubImagePath(club.id);
 
   // Show only currently-showing films in the grid
-  const currentMovies = getFilmClubCurrentMovies(club, data.movies);
-  // Also fetch all-time films for the hero stats
-  const allClubMovies = getFilmClubMovies(club, data.movies);
+  const currentMovies = getFilmClubMovies(club, data.movies);
 
   let movieCount = 0;
   let performanceCount = 0;
@@ -226,10 +221,6 @@ export default async function FilmClubDetailPage({
   const gridMovies = clubMovieList.slice(0, GRID_MOVIE_LIMIT);
   const gridMoviesTruncated = clubMovieList.length > GRID_MOVIE_LIMIT;
 
-  // Use all-time total for hero count when nothing is currently showing
-  const heroMovieCount =
-    movieCount > 0 ? movieCount : Object.keys(allClubMovies).length;
-
   let FilmClubBlurb: ComponentType | null = null;
   try {
     const mod = await import(`@/components/film-clubs/${club.id}`);
@@ -292,7 +283,7 @@ export default async function FilmClubDetailPage({
         name={club.name}
         url={club.url}
         imagePath={imagePath}
-        movieCount={heroMovieCount}
+        movieCount={movieCount}
         performanceCount={performanceCount}
         backUrl="/film-clubs"
         backText="All film clubs"

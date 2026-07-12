@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
-import { getFilmClubCurrentMovies } from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { FILM_CLUBS } from "@/data/film-clubs";
 import FilmClubsPageContent from "./page-content";
 
@@ -43,7 +43,7 @@ export default async function FilmClubsPage() {
 
   const filmClubItems: FilmClubListItem[] = await Promise.all(
     FILM_CLUBS.map(async (club) => {
-      const currentMovies = getFilmClubCurrentMovies(club, data.movies);
+      const currentMovies = getFilmClubMovies(club, data.movies);
 
       let seoDescription: string | null = null;
       try {

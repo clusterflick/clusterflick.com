@@ -3,10 +3,7 @@ import EventDetailPageContent from "@/components/event-detail-page-content";
 import type { EventDetailPageContentProps } from "@/components/event-detail-page-content";
 import FilmClubBlurb from "@/components/film-clubs/ghibliotheque";
 import { FILM_CLUBS } from "@/data/film-clubs";
-import {
-  getFilmClubCurrentMovies,
-  getFilmClubMovies,
-} from "@/utils/get-film-club-movies";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import type { Movie } from "@/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
@@ -33,8 +30,7 @@ async function loadFilmClubDetailData(): Promise<FilmClubDetailData | null> {
   const metaData = await fetchMetaData();
   const allMovies = await fetchAllMovies(metaData);
 
-  const currentMovies = getFilmClubCurrentMovies(club, allMovies);
-  const allClubMovies = getFilmClubMovies(club, allMovies);
+  const currentMovies = getFilmClubMovies(club, allMovies);
 
   let movieCount = 0;
   let performanceCount = 0;
@@ -58,14 +54,11 @@ async function loadFilmClubDetailData(): Promise<FilmClubDetailData | null> {
   const gridMovies = clubMovieList.slice(0, GRID_MOVIE_LIMIT);
   const gridMoviesTruncated = clubMovieList.length > GRID_MOVIE_LIMIT;
 
-  const heroMovieCount =
-    movieCount > 0 ? movieCount : Object.keys(allClubMovies).length;
-
   return {
     name: club.name,
     url: club.url,
     imagePath: FILM_CLUB_IMAGE_PATH,
-    movieCount: heroMovieCount,
+    movieCount,
     performanceCount,
     backUrl: "/film-clubs",
     backText: "All film clubs",

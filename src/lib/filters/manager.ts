@@ -59,6 +59,23 @@ export function getDefaultState(): FilterState {
 }
 
 /**
+ * Creates a fully permissive ("all") filter state where every filter is a no-op.
+ *
+ * Unlike getDefaultState(), which reflects the `/films` browsing defaults
+ * (Films/Multiple/Shorts categories and a today→+7d window), this overrides the
+ * two restrictive modules with their true no-filter sentinels. Used as the base
+ * for club/festival matchers, where only the matcher itself should constrain
+ * results.
+ */
+export function getPermissiveState(): FilterState {
+  return {
+    ...getDefaultState(),
+    [FilterId.Categories]: null, // all categories, including Events
+    [FilterId.DateRange]: { start: null, end: null }, // all dates
+  };
+}
+
+/**
  * Sanitises an unknown object into a valid FilterState.
  * Any missing or corrupt keys are replaced with their module defaults.
  * This protects against stale session storage, malformed URL params,
@@ -185,6 +202,7 @@ export function buildFilterUrl(state: FilterState): string {
  */
 export const filterManager = {
   getDefaultState,
+  getPermissiveState,
   sanitizeFilterState,
   get,
   set,
