@@ -55,25 +55,3 @@ export function getFestivalDateRange(movies: MoviesRecord): {
 
   return { dateFrom, dateTo };
 }
-
-/**
- * Returns true if the festival has any currently-showing films
- * (i.e. at least one future performance matches the festival's matchers).
- * Used on the festival list page to filter out past festivals.
- */
-export function isFestivalCurrentlyShowing(
-  festival: Festival,
-  movies: MoviesRecord,
-): boolean {
-  for (const matcher of festival.matchers) {
-    const state: FilterState = {
-      ...getPermissiveState(),
-      ...matcher,
-      [FilterId.HideFinished]: true,
-    };
-    if (Object.keys(apply(movies, state)).length > 0) {
-      return true;
-    }
-  }
-  return false;
-}

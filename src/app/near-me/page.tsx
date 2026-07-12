@@ -11,7 +11,6 @@ import { getFestivalImagePath } from "@/utils/get-festival-image";
 import {
   getFestivalMovies,
   getFestivalDateRange,
-  isFestivalCurrentlyShowing,
 } from "@/utils/get-festival-movies";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
@@ -75,9 +74,9 @@ export default async function NearMePage() {
   // Pre-compute festival data
   const festivals: NearMeFestival[] = await Promise.all(
     FESTIVALS.flatMap((festival) => {
-      if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
-
       const movies = getFestivalMovies(festival, data.movies);
+      if (Object.keys(movies).length === 0) return [];
+
       const { dateFrom, dateTo } = getFestivalDateRange(movies);
 
       const venueIdSet = new Set<string>();

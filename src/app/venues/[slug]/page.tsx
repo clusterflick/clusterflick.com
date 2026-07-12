@@ -16,10 +16,7 @@ import {
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { FESTIVALS } from "@/data/festivals";
-import {
-  getFestivalMovies,
-  isFestivalCurrentlyShowing,
-} from "@/utils/get-festival-movies";
+import { getFestivalMovies } from "@/utils/get-festival-movies";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { AccessibilityFeature, type Movie, type Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
@@ -286,8 +283,8 @@ export default async function VenueDetailPage({
 
   // Find active festivals running at this venue
   const activeFestivalsAtVenue = FESTIVALS.flatMap((festival) => {
-    if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
     const festMovies = getFestivalMovies(festival, data.movies);
+    if (Object.keys(festMovies).length === 0) return [];
     const atVenue = Object.values(festMovies).some((movie) =>
       movie.performances.some(
         (perf) => movie.showings[perf.showingId]?.venueId === venue.id,

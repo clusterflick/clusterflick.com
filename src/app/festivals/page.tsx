@@ -6,7 +6,6 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import {
   getFestivalMovies,
   getFestivalDateRange,
-  isFestivalCurrentlyShowing,
 } from "@/utils/get-festival-movies";
 import { FESTIVALS } from "@/data/festivals";
 import FestivalsPageContent from "./page-content";
@@ -51,9 +50,9 @@ export default async function FestivalsPage() {
 
   const festivalItems: FestivalListItem[] = await Promise.all(
     FESTIVALS.flatMap((festival) => {
-      if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
-
       const movies = getFestivalMovies(festival, data.movies);
+      if (Object.keys(movies).length === 0) return [];
+
       const { dateFrom, dateTo } = getFestivalDateRange(movies);
 
       return [
@@ -84,8 +83,8 @@ export default async function FestivalsPage() {
   // Collect unique venue names across all active festivals
   const venueIds = new Set<string>();
   for (const festival of FESTIVALS) {
-    if (!isFestivalCurrentlyShowing(festival, data.movies)) continue;
     const movies = getFestivalMovies(festival, data.movies);
+    if (Object.keys(movies).length === 0) continue;
     for (const movie of Object.values(movies)) {
       for (const performance of movie.performances) {
         const showing = movie.showings[performance.showingId];

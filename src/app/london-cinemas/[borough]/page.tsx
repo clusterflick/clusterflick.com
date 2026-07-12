@@ -12,7 +12,6 @@ import { getFestivalUrl } from "@/utils/get-festival-url";
 import {
   getFestivalMovies,
   getFestivalDateRange,
-  isFestivalCurrentlyShowing,
 } from "@/utils/get-festival-movies";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { FILM_CLUBS } from "@/data/film-clubs";
@@ -215,8 +214,8 @@ export default async function BoroughPage({
 
   // Festivals currently showing at borough venues
   const boroughFestivals = FESTIVALS.flatMap((festival) => {
-    if (!isFestivalCurrentlyShowing(festival, data.movies)) return [];
     const movies = getFestivalMovies(festival, data.movies);
+    if (Object.keys(movies).length === 0) return [];
     const hasVenueInBorough = Object.values(movies).some((movie) =>
       movie.performances.some((perf) => {
         const showing = movie.showings[perf.showingId];
