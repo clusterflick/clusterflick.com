@@ -15,6 +15,8 @@ import {
 } from "@/utils/linkify-summary";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getFormatUrl } from "@/utils/get-format-url";
+import { FORMATS } from "@/data/formats";
 import DiscoverySections from "./discovery-sections";
 import DiscoveryRowsView from "./discovery-rows-view";
 import NearYouSection from "./near-you-section";
@@ -38,7 +40,7 @@ export default async function Home() {
 
   // Resolve the summary's known entities to canonical hrefs so the prose can be
   // linkified at render — the AI text never carries URLs of its own.
-  const summaryTargets: SummaryLinkTarget[] = (summary?.links ?? [])
+  const summaryEntityTargets: SummaryLinkTarget[] = (summary?.links ?? [])
     .map((link) => {
       if (link.movieId) {
         const movie = data.movies[link.movieId];
@@ -51,6 +53,19 @@ export default async function Home() {
       return null;
     })
     .filter((target): target is SummaryLinkTarget => target !== null);
+
+  // Format terms (e.g. "35mm", "IMAX", "3D") appear in the AI prose but aren't
+  // in the summary's links. Every format has a permanent landing page, so link
+  // each one by its display name wherever it's mentioned.
+  const formatTargets: SummaryLinkTarget[] = FORMATS.map((format) => ({
+    phrase: format.name,
+    href: getFormatUrl(format),
+  }));
+
+  const summaryTargets: SummaryLinkTarget[] = [
+    ...summaryEntityTargets,
+    ...formatTargets,
+  ];
 
   // Build-time snapshot of the rows for SSR / no-JS / slow connections. The
   // client re-computes these against view-time data once it loads (see
