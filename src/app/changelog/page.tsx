@@ -92,7 +92,7 @@ export default async function ChangelogPage() {
 
   return (
     <main id="main-content">
-      <PageHeader backUrl="/films" backText="Back to film list" />
+      <PageHeader backUrl="/about" backText="Back to about" />
 
       <HeroSection
         backgroundImage="/images/light-circles.jpg"

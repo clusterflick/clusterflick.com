@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import HeroSection from "@/components/hero-section";
 import LinkCard, {
   CardArrow,
@@ -236,7 +237,10 @@ export default function AboutPage() {
                 >
                   available on GitHub
                 </a>
-                .
+                . To see what&apos;s new on Clusterflick, see{" "}
+                <Link href="/changelog">the Changelog</Link>, which details new
+                venues, sources and festivals, as well as features and
+                improvements across the site and its data.
               </>
             }
           />
