@@ -69,6 +69,33 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-13",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The <Link href="/venues">venues page</Link> now opens with an
+            interactive map of every London cinema. Filtering the list narrows
+            the map with it, each pin links through to the venue, and if
+            you&apos;ve shared your location a marker shows where you are.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The <Link href="/near-me">near you</Link> page now leads with a map
+            of the cinemas within two miles, drawn with 1- and 2-mile distance
+            rings around your location so you can see what&apos;s genuinely
+            close.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-12",
     changes: [
       {
