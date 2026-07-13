@@ -21,11 +21,13 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
-    id: "arabic-cinema-club",
-    name: "Arabic Cinema Club",
+    id: "arab-film-club",
+    name: "THe Arab Film Club",
     url: "https://www.instagram.com/thearabfilmclub/",
-    aliases: [],
+    aliases: ["arabic-cinema-club"],
     matchers: [
+      { [FilterId.ShowingTitleSearch]: "Arab Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Arab Film Club" },
       { [FilterId.ShowingTitleSearch]: "Arabic Cinema Club" },
       { [FilterId.PerformanceNotesSearch]: "Arabic Cinema Club" },
     ],
