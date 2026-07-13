@@ -104,6 +104,50 @@ jobs:
           echo "Deployment hash check failed after 30 attempts"
           exit 1
 
+  indexnow:
+    name: Notify IndexNow
+    runs-on: ubuntu-latest
+    permissions: {}
+    needs: verify-hash
+    steps:
+      - name: Submit changed index pages to IndexNow
+        env:
+          INDEXNOW_KEY: 7c20decee9cd497aa4328f06a339998c
+        run: |
+          # Notify IndexNow (Bing, Yandex, etc.) that the daily-changing index
+          # pages have updated so they recrawl sooner. Only the high-value index
+          # pages are submitted, not the full sitemap — IndexNow expects changed
+          # URLs, and blasting every movie/venue URL each deploy invites throttling.
+          RESPONSE=$(curl -sS -w '\n%{http_code}' -X POST 'https://api.indexnow.org/indexnow' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d @- <<JSON
+          {
+            "host": "clusterflick.com",
+            "key": "${INDEXNOW_KEY}",
+            "keyLocation": "https://clusterflick.com/${INDEXNOW_KEY}.txt",
+            "urlList": [
+              "https://clusterflick.com/",
+              "https://clusterflick.com/films",
+              "https://clusterflick.com/festivals",
+              "https://clusterflick.com/film-clubs",
+              "https://clusterflick.com/cinema-groups",
+              "https://clusterflick.com/genres",
+              "https://clusterflick.com/formats",
+              "https://clusterflick.com/venues",
+              "https://clusterflick.com/london-cinemas"
+            ]
+          }
+          JSON
+          )
+          STATUS=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "IndexNow response ($STATUS): ${BODY:-<empty>}"
+          # 200 = accepted, 202 = accepted (validation pending). Anything else is a failure.
+          case "$STATUS" in
+            200|202) echo "IndexNow submission accepted." ;;
+            *) echo "IndexNow submission failed with status $STATUS"; exit 1 ;;
+          esac
+
   smoke-tests:
     name: Run smoke tests
     runs-on: ubuntu-latest
