@@ -8,6 +8,7 @@ import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
 import SearchInput from "@/components/search-input";
+import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
 import styles from "./page.module.css";
 
 // Chains that have a dedicated /cinema-groups page, keyed by the group label
@@ -16,26 +17,41 @@ const GROUP_SLUG_BY_LABEL = new Map(
   VENUE_GROUPS.map((group) => [group.groupName, group.slug]),
 );
 
-interface VenueListProps {
+interface VenuesExplorerProps {
   groups: VenueGroupData[];
+  mapVenues: VenueMapVenue[];
+  boundary?: GeoJSON.GeoJsonObject;
 }
 
-export default function VenueList({ groups }: VenueListProps) {
+export default function VenuesExplorer({
+  groups,
+  mapVenues,
+  boundary,
+}: VenuesExplorerProps) {
   const [query, setQuery] = useState("");
 
-  const filteredGroups = useMemo(() => {
-    if (!query.trim()) return groups;
+  const normalizedQuery = query.trim() ? normalizeForSearch(query) : "";
 
-    const q = normalizeForSearch(query);
+  // The same filter drives both the map markers and the list below it.
+  const filteredMapVenues = useMemo(() => {
+    if (!normalizedQuery) return mapVenues;
+    return mapVenues.filter((v) =>
+      normalizeForSearch(v.name).includes(normalizedQuery),
+    );
+  }, [mapVenues, normalizedQuery]);
+
+  const filteredGroups = useMemo(() => {
+    if (!normalizedQuery) return groups;
+
     return groups
       .map((group) => ({
         ...group,
         venues: group.venues.filter((v) =>
-          normalizeForSearch(v.name).includes(q),
+          normalizeForSearch(v.name).includes(normalizedQuery),
         ),
       }))
       .filter((group) => group.venues.length > 0);
-  }, [groups, query]);
+  }, [groups, normalizedQuery]);
 
   const matchCount = filteredGroups.reduce(
     (sum, g) => sum + g.venues.length,
@@ -44,6 +60,10 @@ export default function VenueList({ groups }: VenueListProps) {
 
   return (
     <>
+      <div className={styles.mapSection}>
+        <VenueMap venues={filteredMapVenues} boundary={boundary} />
+      </div>
+
       <SearchInput
         id="venues-search"
         className={styles.searchWrapper}

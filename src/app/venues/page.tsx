@@ -3,6 +3,8 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
+import { getNearMeVenues } from "@/utils/get-near-me-data";
+import { getLondonBoundary } from "@/utils/get-london-boundary";
 import type { Venue } from "@/types";
 import VenuesPageContent from "./page-content";
 
@@ -124,6 +126,19 @@ export default async function VenuesPage() {
   const groups = buildVenueGroups(data.venues, eventCounts);
   const totalVenues = Object.keys(data.venues).length;
 
+  // Minimal per-venue payload for the map markers (reuses the near-me precompute).
+  const mapVenues = getNearMeVenues(data).map(
+    ({ id, name, href, type, lat, lon, filmCount }) => ({
+      id,
+      name,
+      href,
+      type,
+      lat,
+      lon,
+      filmCount,
+    }),
+  );
+
   // JSON-LD structured data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -147,7 +162,12 @@ export default async function VenuesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <VenuesPageContent groups={groups} totalVenues={totalVenues} />
+      <VenuesPageContent
+        groups={groups}
+        totalVenues={totalVenues}
+        mapVenues={mapVenues}
+        boundary={getLondonBoundary()}
+      />
     </>
   );
 }

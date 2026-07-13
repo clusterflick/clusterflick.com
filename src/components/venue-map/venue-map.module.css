@@ -1,0 +1,211 @@
+.wrapper,
+.skeleton {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+@media (min-width: 768px) {
+  .wrapper,
+  .skeleton {
+    height: 540px;
+  }
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  background: var(--color-deep-navy);
+}
+
+/* Loading placeholder — matches the map footprint to avoid layout shift. */
+.skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-deep-navy);
+}
+
+.skeletonLabel {
+  color: var(--color-muted-gray);
+  font-size: 0.9rem;
+}
+
+/* --- Controls overlay --- */
+.controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+}
+
+.error {
+  position: absolute;
+  left: 12px;
+  bottom: 24px;
+  z-index: 1000;
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(var(--color-midnight-navy-rgb), 0.9);
+  color: var(--color-neon-pink);
+  font-size: 0.8rem;
+  max-width: calc(100% - 24px);
+}
+
+/* --- Venue pins --- */
+/* Neutralise Leaflet's default white div-icon chrome (scoped to this map). */
+.wrapper :global(.leaflet-div-icon) {
+  background: transparent;
+  border: 0;
+}
+
+.venuePin {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-neon-pink);
+  border: 2px solid var(--color-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* --- User location dot --- */
+.userDot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-electric-blue);
+  border: 3px solid var(--color-white);
+  box-shadow: 0 0 0 rgba(var(--color-electric-blue-rgb), 0.6);
+  animation: userPulse 2s ease-out infinite;
+}
+
+@keyframes userPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--color-electric-blue-rgb), 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(var(--color-electric-blue-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-electric-blue-rgb), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .userDot {
+    animation: none;
+  }
+}
+
+/* --- Cluster bubbles --- */
+.cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 0.8rem;
+  background: rgba(var(--color-neon-pink-rgb), 0.85);
+  border: 2px solid var(--color-white);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.cluster.small {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+.cluster.medium {
+  width: 40px;
+  height: 40px;
+}
+
+.cluster.large {
+  width: 50px;
+  height: 50px;
+  font-size: 0.9rem;
+  margin: -5px;
+}
+
+/* --- Popups (themed dark) --- */
+.wrapper :global(.leaflet-popup-content-wrapper) {
+  background: var(--color-dark-navy);
+  color: var(--color-light-gray);
+  border-radius: 8px;
+}
+
+.wrapper :global(.leaflet-popup-tip) {
+  background: var(--color-dark-navy);
+}
+
+.wrapper :global(.leaflet-popup-content) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Venue name is itself the link — icon + name, card-like header. */
+.popupTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-electric-blue) !important;
+  text-align: center;
+}
+
+.popupIcon {
+  flex-shrink: 0;
+  margin-top: -2px;
+}
+
+.popupHeading {
+  font-weight: 700;
+  color: var(--color-white);
+  text-align: center;
+}
+
+.popupMeta {
+  font-size: 0.8rem;
+  color: var(--color-muted-gray);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* --- Leaflet chrome (zoom control + attribution) themed for dark --- */
+.wrapper :global(.leaflet-bar a) {
+  background: var(--color-dark-navy);
+  color: var(--color-light-gray);
+  border-bottom-color: rgba(var(--color-white-rgb), 0.1);
+}
+
+.wrapper :global(.leaflet-bar a:hover) {
+  background: var(--color-midnight-navy);
+}
+
+/* Leaflet ships `.leaflet-container .leaflet-control-attribution` (specificity
+   0,2,0); nest under .leaflet-container here so the dark theme reliably wins
+   regardless of stylesheet order. */
+.wrapper :global(.leaflet-container .leaflet-control-attribution) {
+  background: rgba(var(--color-midnight-navy-rgb), 0.8);
+  color: var(--color-muted-gray);
+}
+
+/* Plain links in the attribution bar — drop the global link underline/hover
+   border so the copyright line stays understated. */
+.wrapper :global(.leaflet-container .leaflet-control-attribution a),
+.wrapper :global(.leaflet-container .leaflet-control-attribution a:hover) {
+  color: var(--color-electric-blue);
+  border-bottom: none;
+}

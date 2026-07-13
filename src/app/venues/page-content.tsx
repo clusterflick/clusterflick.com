@@ -1,17 +1,22 @@
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
-import VenueList from "./venue-list";
+import type { VenueMapVenue } from "@/components/venue-map";
+import VenuesExplorer from "./venues-explorer";
 import type { VenueGroupData } from "./page";
 import styles from "./page.module.css";
 
 interface VenuesPageContentProps {
   groups: VenueGroupData[];
   totalVenues: number;
+  mapVenues: VenueMapVenue[];
+  boundary?: GeoJSON.GeoJsonObject;
 }
 
 export default function VenuesPageContent({
   groups,
   totalVenues,
+  mapVenues,
+  boundary,
 }: VenuesPageContentProps) {
   return (
     <StandardPageLayout
@@ -35,7 +40,11 @@ export default function VenuesPageContent({
         arthouse, you&apos;ll find it here.
       </p>
 
-      <VenueList groups={groups} />
+      <VenuesExplorer
+        groups={groups}
+        mapVenues={mapVenues}
+        boundary={boundary}
+      />
     </StandardPageLayout>
   );
 }

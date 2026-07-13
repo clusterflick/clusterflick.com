@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenuesPageContent from "@/app/venues/page-content";
+import type { VenueMapVenue } from "@/components/venue-map";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import type { VenueGroupData } from "@/app/venues/page";
@@ -18,6 +19,7 @@ import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
 type VenuesPageData = {
   groups: VenueGroupData[];
   totalVenues: number;
+  mapVenues: VenueMapVenue[];
 };
 
 function buildVenueGroups(
@@ -110,7 +112,17 @@ async function loadVenuesData(): Promise<VenuesPageData | null> {
   const groups = buildVenueGroups(venues, eventCounts);
   const totalVenues = Object.keys(venues).length;
 
-  return { groups, totalVenues };
+  const mapVenues: VenueMapVenue[] = Object.values(venues).map((venue) => ({
+    id: venue.id,
+    name: venue.name,
+    href: getVenueUrl(venue),
+    type: venue.type,
+    lat: venue.geo.lat,
+    lon: venue.geo.lon,
+    filmCount: eventCounts.get(venue.id) || 0,
+  }));
+
+  return { groups, totalVenues, mapVenues };
 }
 
 function VenuesPageWithRealData() {
@@ -123,6 +135,7 @@ function VenuesPageWithRealData() {
         <VenuesPageContent
           groups={data.groups}
           totalVenues={data.totalVenues}
+          mapVenues={data.mapVenues}
         />
       )}
     </StoryDataLoader>

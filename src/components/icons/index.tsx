@@ -330,3 +330,26 @@ export function MenuIcon({ size = 24, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function MapPinIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      {...props}
+    >
+      <path
+        d="M12 21s6-5.686 6-10A6 6 0 0 0 6 11c0 4.314 6 10 6 10z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="11" r="2.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
