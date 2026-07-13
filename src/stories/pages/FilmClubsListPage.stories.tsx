@@ -23,7 +23,7 @@ import {
 // Hardcoded image paths (normally resolved from filesystem at build time)
 const FILM_CLUB_IMAGE_PATHS: Record<string, string> = {
   "acton-film-club": "/images/film-clubs/acton-film-club.jpg",
-  "arabic-cinema-club": "/images/film-clubs/arabic-cinema-club.jpg",
+  "arab-film-club": "/images/film-clubs/arab-film-club.jpg",
   "bar-trash": "/images/film-clubs/bar-trash.jpg",
   "bloody-mary-film-club": "/images/film-clubs/bloody-mary-film-club.png",
   "bounce-cinema": "/images/film-clubs/bounce-cinema.png",
