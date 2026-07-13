@@ -20,8 +20,19 @@ export type { VenueMapVenue };
 interface VenueMapProps {
   venues: VenueMapVenue[];
   boundary?: GeoJSON.GeoJsonObject;
+  distanceRingsMiles?: number[];
 }
 
-export default function VenueMap({ venues, boundary }: VenueMapProps) {
-  return <LeafletVenueMap venues={venues} boundary={boundary} />;
+export default function VenueMap({
+  venues,
+  boundary,
+  distanceRingsMiles,
+}: VenueMapProps) {
+  return (
+    <LeafletVenueMap
+      venues={venues}
+      boundary={boundary}
+      distanceRingsMiles={distanceRingsMiles}
+    />
+  );
 }

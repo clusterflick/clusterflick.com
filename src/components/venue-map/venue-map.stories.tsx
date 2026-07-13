@@ -9,6 +9,12 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  * page. If the visitor has already granted geolocation permission — or presses
  * "Locate me" — a pulsing electric-blue dot marks their position.
  *
+ * Two overlay modes: pass `boundary` (a GeoJSON object) to trace the Greater
+ * London outline behind the pins (the `/venues` page), or `distanceRingsMiles`
+ * (e.g. `[1, 2]`) to draw dashed distance rings around the user and frame them
+ * instead of the venues (the `/near-me` page — rings only appear once a position
+ * is known).
+ *
  * **When to use:** for a spatial, browse-by-location overview of many venues.
  *
  * **When not to use:** for a small, fixed set of places, or where a plain text

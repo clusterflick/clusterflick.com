@@ -103,6 +103,23 @@
   }
 }
 
+/* --- Distance ring labels (near-me) --- */
+.ringLabelMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringLabel {
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: rgba(var(--color-midnight-navy-rgb), 0.85);
+  color: var(--color-electric-blue);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* --- Cluster bubbles --- */
 .cluster {
   display: flex;

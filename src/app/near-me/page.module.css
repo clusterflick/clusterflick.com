@@ -122,6 +122,12 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* Map (results) */
+
+.mapSection {
+  margin-bottom: 32px;
+}
+
 /* Venue grid (results) */
 
 .venueGrid {

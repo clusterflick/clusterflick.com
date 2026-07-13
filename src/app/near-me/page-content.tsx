@@ -14,6 +14,7 @@ import type { Position, AccessibilityFeature } from "@/types";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import VenueCard from "@/components/venue-card";
+import VenueMap from "@/components/venue-map";
 import EventCard from "@/components/event-card";
 import LinkedList from "@/components/linked-list";
 import Button from "@/components/button";
@@ -99,6 +100,21 @@ export default function NearMePageContent({
 
   const nearbyVenueIds = useMemo(
     () => new Set(nearbyVenues.map((v) => v.id)),
+    [nearbyVenues],
+  );
+
+  // Minimal marker shape for the map (same nearby set as the list below).
+  const nearbyMapVenues = useMemo(
+    () =>
+      nearbyVenues.map((v) => ({
+        id: v.id,
+        name: v.name,
+        href: v.href,
+        type: v.type,
+        lat: v.lat,
+        lon: v.lon,
+        filmCount: v.filmCount,
+      })),
     [nearbyVenues],
   );
 
@@ -261,6 +277,10 @@ export default function NearMePageContent({
 
       {showResults && (
         <>
+          <div className={styles.mapSection}>
+            <VenueMap venues={nearbyMapVenues} distanceRingsMiles={[1, 2]} />
+          </div>
+
           {nearbyVenues.length > 0 ? (
             <>
               {nearbyFilmClubs.length > 0 && (

@@ -7,6 +7,7 @@ import {
   Marker,
   Popup,
   GeoJSON,
+  Circle,
   useMap,
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -51,6 +52,29 @@ const BOUNDARY_STYLE = {
   interactive: false,
 };
 
+// Distance rings drawn around the user (near-me page). Dashed electric-blue so
+// they read as "range from you" and contrast with the pink venue pins.
+const MILES_TO_METRES = 1609.344;
+// 1 degree of latitude ≈ 69 miles — used to place ring labels at the north edge.
+const MILES_PER_DEGREE_LAT = 69;
+const RING_STYLE = {
+  color: "#319edb", // --color-electric-blue
+  weight: 1.5,
+  opacity: 0.5,
+  dashArray: "5 6",
+  fill: false,
+  interactive: false,
+};
+
+function ringLabelIcon(label: string) {
+  return L.divIcon({
+    className: styles.ringLabelMarker,
+    html: `<span class="${styles.ringLabel}">${label}</span>`,
+    iconSize: [64, 18],
+    iconAnchor: [32, 9],
+  });
+}
+
 // Icons are created once at module scope. This file is only ever imported on
 // the client (via a dynamic `ssr: false` wrapper), so `L` is safe to touch here.
 const venueIcon = L.divIcon({
@@ -91,17 +115,26 @@ function MapRefBridge({ onMap }: { onMap: (map: L.Map) => void }) {
 interface LeafletVenueMapProps {
   venues: VenueMapVenue[];
   boundary?: GeoJSON.GeoJsonObject;
+  /**
+   * Radii (in miles) to draw as distance rings around the user's position, e.g.
+   * `[1, 2]`. When set (and a position is known) the map frames the largest ring
+   * instead of the venue bounds. Used by the near-me page.
+   */
+  distanceRingsMiles?: number[];
 }
 
 export default function LeafletVenueMap({
   venues,
   boundary,
+  distanceRingsMiles,
 }: LeafletVenueMapProps) {
   const { position, loading, error, requestLocation } = useGeolocationContext();
   const [map, setMap] = useState<L.Map | null>(null);
   const didFit = useRef(false);
 
-  const bounds = useMemo(
+  const showRings = !!distanceRingsMiles?.length && !!position;
+
+  const venuesBounds = useMemo(
     () =>
       venues.length > 0
         ? L.latLngBounds(venues.map((v) => [v.lat, v.lon] as [number, number]))
@@ -109,21 +142,36 @@ export default function LeafletVenueMap({
     [venues],
   );
 
-  // Frame the current venues. The first fit (on mount) is instant; afterwards,
-  // as the filter narrows the set, markers drop out live but the map only
-  // re-frames once typing settles — a debounced, animated fly to the remaining
-  // matches so people can see where they are, without lurching per keystroke.
+  // Square that encloses the outermost ring, so both rings + the user dot are
+  // always framed regardless of where the nearby venues happen to fall.
+  const ringsBounds = useMemo(() => {
+    if (!showRings || !position) return null;
+    const maxRadius = Math.max(...distanceRingsMiles!) * MILES_TO_METRES;
+    return L.latLng(position.lat, position.lon).toBounds(2 * maxRadius);
+  }, [showRings, position, distanceRingsMiles]);
+
+  // In rings mode we frame the rings; otherwise the venues. Keeping these two
+  // memos separate means geolocation resolving on the venues page can't nudge
+  // the venue-framed view.
+  const fitTarget = useMemo(
+    () => ringsBounds ?? venuesBounds,
+    [ringsBounds, venuesBounds],
+  );
+
+  // The first fit (on mount) is instant; afterwards, as the venues-page filter
+  // narrows the set, markers drop out live but the map only re-frames once typing
+  // settles — a debounced, animated fly to the matches, without lurching per key.
   useEffect(() => {
-    if (!map || !bounds) return;
+    if (!map || !fitTarget) return;
 
     if (!didFit.current) {
-      map.fitBounds(bounds, { padding: FIT_PADDING });
+      map.fitBounds(fitTarget, { padding: FIT_PADDING });
       didFit.current = true;
       return;
     }
 
     const timer = setTimeout(() => {
-      map.flyToBounds(bounds, {
+      map.flyToBounds(fitTarget, {
         padding: FIT_PADDING,
         maxZoom: REFIT_MAX_ZOOM,
         duration: 0.6,
@@ -131,7 +179,7 @@ export default function LeafletVenueMap({
     }, REFIT_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [map, bounds]);
+  }, [map, fitTarget]);
 
   const handleLocate = useCallback(async () => {
     const pos = await requestLocation();
@@ -156,6 +204,30 @@ export default function LeafletVenueMap({
         />
         <MapRefBridge onMap={setMap} />
         {boundary && <GeoJSON data={boundary} style={() => BOUNDARY_STYLE} />}
+        {showRings &&
+          position &&
+          distanceRingsMiles!.map((miles) => (
+            <Circle
+              key={`ring-${miles}`}
+              center={[position.lat, position.lon]}
+              radius={miles * MILES_TO_METRES}
+              pathOptions={RING_STYLE}
+            />
+          ))}
+        {showRings &&
+          position &&
+          distanceRingsMiles!.map((miles) => (
+            <Marker
+              key={`ring-label-${miles}`}
+              position={[
+                position.lat + miles / MILES_PER_DEGREE_LAT,
+                position.lon,
+              ]}
+              icon={ringLabelIcon(`${miles} ${miles === 1 ? "mile" : "miles"}`)}
+              interactive={false}
+              keyboard={false}
+            />
+          ))}
         <MarkerClusterGroup
           iconCreateFunction={createClusterIcon}
           showCoverageOnHover={false}
