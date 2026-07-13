@@ -284,8 +284,16 @@ export default function NearMePageContent({
           {nearbyVenues.length > 0 ? (
             <>
               {nearbyFilmClubs.length > 0 && (
-                <ContentSection title="Film Clubs Near You" as="h2">
-                  <ul className={styles.eventGrid}>
+                <ContentSection
+                  title="Film Clubs Near You"
+                  as="h2"
+                  titleBadge={
+                    <span className={styles.countBadge}>
+                      {nearbyFilmClubs.length}
+                    </span>
+                  }
+                >
+                  <ul className={styles.eventScroller}>
                     {nearbyFilmClubs.map((club) => (
                       <li key={club.id}>
                         <EventCard
@@ -307,8 +315,16 @@ export default function NearMePageContent({
               )}
 
               {nearbyFestivals.length > 0 && (
-                <ContentSection title="Festivals Near You" as="h2">
-                  <ul className={styles.eventGrid}>
+                <ContentSection
+                  title="Festivals Near You"
+                  as="h2"
+                  titleBadge={
+                    <span className={styles.countBadge}>
+                      {nearbyFestivals.length}
+                    </span>
+                  }
+                >
+                  <ul className={styles.eventScroller}>
                     {nearbyFestivals.map((festival) => (
                       <li key={festival.id}>
                         <EventCard

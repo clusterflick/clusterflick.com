@@ -159,21 +159,34 @@
   pointer-events: none;
 }
 
-/* Event grid (film clubs, festivals) */
+/* Event scroller (film clubs, festivals) — horizontal to save vertical space */
 
-.eventGrid {
+.eventScroller {
   list-style: none;
-  padding: 0;
+  padding: 12px;
   margin: 0;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
   gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
-@media (min-width: 600px) {
-  .eventGrid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
+.eventScroller > li {
+  flex: 0 0 auto;
+  width: 280px;
+  scroll-snap-align: start;
+}
+
+.countBadge {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+  background: rgba(49, 158, 219, 0.12);
+  padding: 2px 12px;
+  border-radius: 20px;
+  line-height: 1.5;
 }
 
 /* Meta items inside EventCard */

@@ -15,6 +15,8 @@ interface IconProps {
 interface ContentSectionProps {
   /** Section title */
   title: string;
+  /** Optional badge (e.g. a count) rendered inline after the title text */
+  titleBadge?: ReactNode;
   /** Optional icon displayed next to the title */
   icon?: IconProps;
   /** Optional intro text displayed below the title */
@@ -37,6 +39,7 @@ interface ContentSectionProps {
  */
 export default function ContentSection({
   title,
+  titleBadge,
   icon,
   intro,
   as: Heading = "h2",
@@ -59,6 +62,7 @@ export default function ContentSection({
         />
       )}
       {title}
+      {titleBadge}
     </Heading>
   );
 
