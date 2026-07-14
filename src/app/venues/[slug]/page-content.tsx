@@ -215,7 +215,7 @@ export default function VenueDetailPageContent({
             <VenueScheduleBoard
               days={scheduleDays}
               seeAllHref={allVenueFilmsHref}
-              movieUrlParams={venueMovieParams}
+              movieUrlParams={`${venueMovieParams}&allCategories=true`}
             />
           </CollapsibleBoard>
         </ContentSection>
