@@ -63,6 +63,8 @@
     -8px 0 60px rgba(var(--color-neon-pink-rgb), 0.1);
   z-index: 301;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
   animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -87,7 +89,7 @@
   border-radius: 8px;
   color: var(--color-electric-blue);
   cursor: pointer;
-  margin-left: auto;
+  align-self: flex-end;
   transition: all 0.2s ease;
 
   &:hover {
@@ -101,6 +103,11 @@
   flex-direction: column;
   gap: 8px;
   margin-top: 40px;
+  /* Let the link list scroll when it's taller than the viewport, keeping the
+     close button pinned at the top of the panel. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .navLink {
