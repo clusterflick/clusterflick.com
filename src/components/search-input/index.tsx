@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useRef } from "react";
+import { ComponentPropsWithoutRef, ReactNode, Ref, useRef } from "react";
 import clsx from "clsx";
 import styles from "./search-input.module.css";
 
@@ -22,6 +22,18 @@ interface SearchInputProps {
    * Filters" button). The clear button automatically sits to its left.
    */
   trailing?: ReactNode;
+  /**
+   * Optional external ref to the underlying `<input>`. Merged with the
+   * internal ref (used for clear-to-refocus), so both are honoured. Useful for
+   * headless controllers like Downshift that need their own ref.
+   */
+  inputRef?: Ref<HTMLInputElement>;
+  /**
+   * Props spread onto the `<input>` last, so they override the defaults set by
+   * this component (e.g. the result of Downshift's `getInputProps()`, with its
+   * `ref` passed separately via `inputRef`).
+   */
+  inputProps?: ComponentPropsWithoutRef<"input">;
 }
 
 const SearchIcon = () => (
@@ -76,8 +88,25 @@ export default function SearchInput({
   ariaLabel,
   className,
   trailing,
+  inputRef: externalRef,
+  inputProps,
 }: SearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Merge the internal ref (used for clear-to-refocus) with an optional
+  // external ref, so a headless controller can attach its own without
+  // clobbering ours. Writing `.current` on the passed ref object is the
+  // standard mergeRefs pattern — the ref is an intentional sink, not shared
+  // state, so the immutability lint doesn't apply.
+  const setInputRef = (node: HTMLInputElement | null) => {
+    inputRef.current = node;
+    if (typeof externalRef === "function") {
+      externalRef(node);
+    } else if (externalRef) {
+      // eslint-disable-next-line react-hooks/immutability
+      externalRef.current = node;
+    }
+  };
 
   return (
     <div
@@ -89,7 +118,7 @@ export default function SearchInput({
     >
       <SearchIcon />
       <input
-        ref={inputRef}
+        ref={setInputRef}
         type="text"
         id={id}
         className={styles.input}
@@ -97,6 +126,7 @@ export default function SearchInput({
         aria-label={ariaLabel}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        {...inputProps}
       />
       {(value || trailing) && (
         <div className={styles.controls}>

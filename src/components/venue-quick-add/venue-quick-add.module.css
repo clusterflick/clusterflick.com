@@ -1,0 +1,92 @@
+.quickAdd {
+  width: 100%;
+  margin: 16px 0;
+}
+
+/* Positioning context for the absolutely-positioned suggestion menu. */
+.control {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgb(var(--color-midnight-navy-rgb));
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  /* Collapsed by default; getMenuProps element must always be rendered. */
+  display: none;
+}
+
+.menuOpen {
+  display: block;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--color-light-gray);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Downshift drives highlight via keyboard/hover through highlightedIndex. */
+.highlighted {
+  background: rgba(var(--color-white-rgb), 0.08);
+}
+
+.itemSelected {
+  color: var(--color-neon-pink);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-neon-pink);
+}
+
+.itemName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.itemCount {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

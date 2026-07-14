@@ -50,6 +50,7 @@ export const VENUE_OPTIONS = [
   { value: "nearby", label: "Venues Near Me" },
   { value: "cinemas", label: "Cinemas" },
   { value: "small", label: "Screening Spaces" },
+  { value: "custom", label: "Custom" },
 ] as const;
 
 export type VenueOption = (typeof VENUE_OPTIONS)[number]["value"];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { VenueOption, VENUE_OPTIONS } from "@/state/filter-config-context";
 import { VenueGroup } from "@/hooks/use-venue-groups";
@@ -8,6 +8,9 @@ import Button from "@/components/button";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
 import SearchInput from "@/components/search-input";
+import VenueQuickAdd, {
+  VenueQuickAddHandle,
+} from "@/components/venue-quick-add";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import styles from "./filter-overlay.module.css";
 
@@ -43,6 +46,14 @@ export default function VenueFilterSection({
   clearVenues,
 }: VenueFilterSectionProps) {
   const [venueSearchQuery, setVenueSearchQuery] = useState("");
+  const quickAddRef = useRef<VenueQuickAddHandle>(null);
+
+  // Focus the quick-add input on the next frame. Deferring past the current
+  // click lets the tapped radio settle first, so focus reliably lands on the
+  // input rather than being reclaimed by the pill.
+  const focusQuickAdd = () => {
+    requestAnimationFrame(() => quickAddRef.current?.focus());
+  };
 
   // Filter venue groups based on search query
   const filteredVenueGroups = useMemo(() => {
@@ -61,6 +72,21 @@ export default function VenueFilterSection({
 
   const hasVenueSearchFilter = venueSearchQuery.trim().length > 0;
 
+  // Flat list of every venue (full names) for the quick-add combobox. Unlike
+  // the grouped chips, names are kept intact so near-duplicates stay
+  // distinguishable in a flat suggestion list.
+  const allVenues = useMemo(
+    () =>
+      venueGroups.flatMap((group) =>
+        group.venues.map((venue) => ({
+          id: venue.id,
+          name: venue.name,
+          count: venue.count,
+        })),
+      ),
+    [venueGroups],
+  );
+
   // Get count for a venue option chip
   const getVenueOptionCount = (option: VenueOption): number | undefined => {
     const counts: Record<VenueOption, number | undefined> = {
@@ -68,6 +94,8 @@ export default function VenueFilterSection({
       cinemas: cinemaVenueIds.length,
       small: smallScreeningVenueIds.length,
       nearby: nearbyVenueIds.length > 0 ? nearbyVenueIds.length : undefined,
+      // No count badge — "custom" is a bespoke selection, not a fixed set.
+      custom: undefined,
     };
     return counts[option];
   };
@@ -78,8 +106,10 @@ export default function VenueFilterSection({
     return selectedVenues.includes(venueId);
   };
 
-  // Determine current venue option
-  const currentVenueOption: VenueOption | null = useMemo(() => {
+  // Determine current venue option. Falls back to "custom" when the selection
+  // matches none of the presets (including a hand-picked or empty selection),
+  // so the pill row always reflects an active option instead of a dead state.
+  const currentVenueOption: VenueOption = useMemo(() => {
     // All venues selected (null means no filter = all)
     if (selectedVenues === null) return "all";
     // Check if current selection matches cinema venues exactly
@@ -106,7 +136,7 @@ export default function VenueFilterSection({
     ) {
       return "nearby";
     }
-    return null;
+    return "custom";
   }, [selectedVenues, cinemaVenueIds, smallScreeningVenueIds, nearbyVenueIds]);
 
   return (
@@ -169,8 +199,22 @@ export default function VenueFilterSection({
                 onVenueOptionChange(option, smallScreeningVenueIds);
               } else if (option === "nearby") {
                 onNearbyClick();
+              } else if (option === "custom") {
+                // onChange only fires when switching *into* Custom from a
+                // preset, so this clear is never destructive to an existing
+                // custom selection. Focus is handled by onClick (which also
+                // fires when Custom is already active).
+                selectVenues([]);
               }
             }}
+            onClick={
+              value === "custom"
+                ? // Fires on every tap of the Custom pill — including when it's
+                  // already active — so the quick-add input is focused whether
+                  // or not the selection just changed.
+                  focusQuickAdd
+                : undefined
+            }
           />
         ))}
       </div>
@@ -179,6 +223,12 @@ export default function VenueFilterSection({
           {geoError}
         </p>
       )}
+      <VenueQuickAdd
+        ref={quickAddRef}
+        venues={allVenues}
+        isVenueSelected={isVenueSelected}
+        onToggleVenue={(venueId) => toggleVenue(venueId, allVenueIds)}
+      />
       <ExpandableSection title="Select Specific Venues">
         <div className={styles.advancedFilters}>
           {/* Venue search filter */}

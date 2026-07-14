@@ -10,6 +10,12 @@ interface ChipBaseProps {
   count?: number;
   disabled?: boolean;
   name: string;
+  /**
+   * Fires on every click, including when an already-checked radio is tapped
+   * (which does not fire `onChange`). Useful for side effects that should run
+   * regardless of whether the selection changed.
+   */
+  onClick?: () => void;
 }
 
 interface ChipCheckboxProps extends ChipBaseProps {
@@ -26,7 +32,7 @@ interface ChipRadioProps extends ChipBaseProps {
 type ChipProps = ChipCheckboxProps | ChipRadioProps;
 
 export default function Chip(props: ChipProps) {
-  const { type, label, checked, count, disabled, name } = props;
+  const { type, label, checked, count, disabled, name, onClick } = props;
 
   // Use `props.type` (not destructured `type`) when accessing type-specific
   // props like `props.value` or `props.onChange` — TypeScript only narrows
@@ -61,6 +67,7 @@ export default function Chip(props: ChipProps) {
         value={props.type === "radio" ? props.value : undefined}
         checked={checked}
         onChange={handleChange}
+        onClick={disabled ? undefined : onClick}
         disabled={disabled}
         className={styles.input}
       />
