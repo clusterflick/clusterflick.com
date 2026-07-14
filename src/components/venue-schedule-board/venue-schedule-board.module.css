@@ -1,0 +1,150 @@
+.board {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem 2.5rem;
+}
+
+@media (min-width: 700px) {
+  .board {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.day {
+  min-width: 0;
+}
+
+.dayHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(var(--color-light-gray-rgb), 0.15);
+}
+
+.dayLabel {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-light-gray);
+}
+
+.dayDate {
+  font-size: 0.85rem;
+  color: var(--color-muted-gray);
+}
+
+.dayEmpty {
+  margin: 0;
+  color: var(--color-muted-gray);
+  font-style: italic;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entry {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.4rem 0;
+  align-items: baseline;
+}
+
+.entry + .entry {
+  border-top: 1px solid rgba(var(--color-light-gray-rgb), 0.08);
+}
+
+.time {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: rgba(var(--color-buttery-yellow-rgb), 0.75);
+  min-width: 3ch;
+}
+
+/* Showings whose start time has already passed (marked client-side). */
+.time.past {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.6rem;
+  min-width: 0;
+}
+
+.filmLink {
+  font-weight: 500;
+}
+
+.markers {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.marker {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.25rem;
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-light-gray-rgb), 0.08);
+  white-space: nowrap;
+}
+
+.soldOut {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(var(--color-neon-pink-rgb), 0.7);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-muted-gray);
+}
+
+.collapsibleRoot {
+  /* Offset the "hide" scroll-to-top so the board heading clears a sticky header. */
+  scroll-margin-top: 80px;
+}
+
+.collapsibleContent {
+  transition: max-height 0.5s;
+  max-height: 10000px;
+  position: relative;
+  overflow: hidden;
+}
+
+.fade {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--color-midnight-navy-rgb), 0) 0%,
+    rgba(var(--color-midnight-navy-rgb), 0.6) 40%,
+    rgba(var(--color-midnight-navy-rgb), 1) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.toggleRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}

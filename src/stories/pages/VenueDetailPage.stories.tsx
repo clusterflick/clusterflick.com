@@ -4,6 +4,8 @@ import type { VenueDetailPageContentProps } from "@/app/venues/[slug]/page-conte
 import VenueBlurb from "@/components/venues/princecharlescinema.com";
 import type { VenueAttributes } from "@/utils/get-venue-attributes";
 import type { Movie, Venue } from "@/types";
+import { getVenueSchedule } from "@/utils/get-venue-schedule";
+import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
@@ -100,6 +102,8 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     performanceCount,
     gridMovies,
     gridMoviesTruncated,
+    scheduleDays: getVenueSchedule(allMovies, VENUE_ID),
+    justAdded: getVenueNewAdditions(allMovies, VENUE_ID),
     nearbyVenues: [],
     activeFestivals: [],
     accessibilityStats: [],

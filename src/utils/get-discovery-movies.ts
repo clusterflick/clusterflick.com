@@ -270,6 +270,51 @@ export function getNewAdditions(
   return result;
 }
 
+/**
+ * Venue-scoped "just added": matched films with a showing at this venue first
+ * seen within the last week that still has at least one upcoming performance at
+ * the venue (so the link isn't dead). One flat, newest-added-first row — the
+ * per-venue analogue of {@link getNewAdditions}, without the age buckets, for the
+ * "Just added" poster row on the venue page. Recency is conveyed by the row
+ * itself, so the poster subtitle falls back to the film's year.
+ */
+export function getVenueNewAdditions(
+  movies: MoviesRecord,
+  venueId: string,
+  now: number = Date.now(),
+  window: DiscoveryWindow = getDiscoveryWindow(),
+  limit: number = DEFAULT_LIMIT,
+): ScoredMovie[] {
+  const cutoff = now - NEW_ADDITION_LOOKBACK_DAYS * MS_PER_DAY;
+
+  return Object.values(movies)
+    .filter((movie) => isDiscoverable(movie) && isMatched(movie))
+    .map((movie) => {
+      const venueShowingIds = new Set<string>();
+      let earliestSeen = Infinity;
+      for (const [showingId, showing] of Object.entries(movie.showings)) {
+        if (showing.venueId !== venueId) continue;
+        venueShowingIds.add(showingId);
+        if (typeof showing.seen === "number" && showing.seen < earliestSeen) {
+          earliestSeen = showing.seen;
+        }
+      }
+      const performanceCount = movie.performances.filter(
+        (p) => venueShowingIds.has(p.showingId) && p.time >= window.rangeStart,
+      ).length;
+      return { movie, earliestSeen, performanceCount };
+    })
+    .filter(
+      (s) =>
+        s.earliestSeen !== Infinity &&
+        s.earliestSeen >= cutoff &&
+        s.performanceCount > 0,
+    )
+    .sort((a, b) => b.earliestSeen - a.earliestSeen)
+    .slice(0, limit)
+    .map(({ movie, performanceCount }) => ({ movie, performanceCount }));
+}
+
 function formatLastShowing(time: number): string {
   const label = new Date(time).toLocaleDateString("en-GB", {
     weekday: "short",

@@ -20,6 +20,11 @@ import {
 } from "@/components/icons";
 import LinkedList from "@/components/linked-list";
 import FilmPosterGrid from "@/components/film-poster-grid";
+import PosterRow from "@/components/poster-row";
+import VenueScheduleBoard from "@/components/venue-schedule-board";
+import CollapsibleBoard from "@/components/venue-schedule-board/collapsible-board";
+import type { VenueScheduleDay } from "@/utils/get-venue-schedule";
+import type { ScoredMovie } from "@/utils/get-discovery-movies";
 import SocialLinks from "@/components/social-links";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
@@ -50,6 +55,8 @@ export interface VenueDetailPageContentProps {
   performanceCount: number;
   gridMovies: { movie: Movie; performanceCount: number }[];
   gridMoviesTruncated?: boolean;
+  scheduleDays: VenueScheduleDay[];
+  justAdded: ScoredMovie[];
   VenueBlurb: ComponentType | null;
   nearbyVenues: NearbyVenue[];
   borough?: VenueBorough | null;
@@ -71,6 +78,8 @@ export default function VenueDetailPageContent({
   performanceCount,
   gridMovies,
   gridMoviesTruncated,
+  scheduleDays,
+  justAdded,
   VenueBlurb,
   nearbyVenues,
   borough,
@@ -80,6 +89,11 @@ export default function VenueDetailPageContent({
 }: VenueDetailPageContentProps) {
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
+
+  const venueMovieParams = `venues=${encodeURIComponent(venue.id)}`;
+  const allVenueMovieParams = `${venueMovieParams}&allDates=true&allCategories=true`;
+  const allVenueFilmsHref = `/films?${allVenueMovieParams}`;
+  const hasJustAdded = justAdded.length > 0;
 
   const hasFestivals = activeFestivals.length > 0;
   const hasAccessibility = accessibilityStats.length > 0;
@@ -195,6 +209,29 @@ export default function VenueDetailPageContent({
         </>
       }
     >
+      {movieCount > 0 && (
+        <ContentSection title={`On now at ${venue.name}`} as="h2">
+          <CollapsibleBoard>
+            <VenueScheduleBoard
+              days={scheduleDays}
+              seeAllHref={allVenueFilmsHref}
+              movieUrlParams={venueMovieParams}
+            />
+          </CollapsibleBoard>
+        </ContentSection>
+      )}
+      {hasJustAdded && (
+        <div className={styles.justAddedRow}>
+          <PosterRow
+            title={`Just added to ${venue.name}`}
+            intro="Screenings added here in the past week."
+            movies={justAdded}
+            movieUrlParams={allVenueMovieParams}
+            showAll
+          />
+        </div>
+      )}
+      {movieCount > 0 && <Divider />}
       <ColumnsLayout
         main={
           VenueBlurb || group ? (

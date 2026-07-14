@@ -18,6 +18,8 @@ import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { FESTIVALS } from "@/data/festivals";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
 import { getFestivalUrl } from "@/utils/get-festival-url";
+import { getVenueSchedule } from "@/utils/get-venue-schedule";
+import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
 import { AccessibilityFeature, type Movie, type Venue } from "@/types";
 import VenueDetailPageContent from "./page-content";
 
@@ -234,6 +236,10 @@ export default async function VenueDetailPage({
   const gridMovies = venueMovies.slice(0, GRID_MOVIE_LIMIT);
   const gridMoviesTruncated = venueMovies.length > GRID_MOVIE_LIMIT;
 
+  // "On now" board (today + tomorrow) and the venue-scoped "Just added" row.
+  const scheduleDays = getVenueSchedule(data.movies, venue.id);
+  const justAdded = getVenueNewAdditions(data.movies, venue.id);
+
   let VenueBlurb: ComponentType | null = null;
   try {
     const mod = await import(`@/components/venues/${venue.id}`);
@@ -346,6 +352,8 @@ export default async function VenueDetailPage({
         performanceCount={performanceCount}
         gridMovies={gridMovies}
         gridMoviesTruncated={gridMoviesTruncated}
+        scheduleDays={scheduleDays}
+        justAdded={justAdded}
         VenueBlurb={VenueBlurb}
         nearbyVenues={nearbyVenues}
         borough={boroughInfo}

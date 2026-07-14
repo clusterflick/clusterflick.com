@@ -81,6 +81,10 @@
   display: block;
 }
 
+.justAddedRow {
+  margin-bottom: 75px;
+}
+
 .accessibilitySection h2 {
   margin-bottom: 8px;
 }

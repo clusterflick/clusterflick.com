@@ -29,6 +29,11 @@ interface PosterRowProps {
    * is the full schedule, not just what's upcoming.
    */
   showAll?: boolean;
+  /**
+   * Query string (without `?`) appended to each poster link, e.g. to scope the
+   * film page to a venue (`venues=<id>`). Placed before any `#show-all` hash.
+   */
+  movieUrlParams?: string;
 }
 
 /**
@@ -44,8 +49,11 @@ export default function PosterRow({
   seeAllHref,
   seeAllLabel = "See all",
   showAll = false,
+  movieUrlParams,
 }: PosterRowProps) {
   if (movies.length === 0) return null;
+
+  const query = movieUrlParams ? `?${movieUrlParams}` : "";
 
   return (
     <section className={styles.row}>
@@ -72,7 +80,7 @@ export default function PosterRow({
           return (
             <Link
               key={movie.id}
-              href={`${getMovieUrl(movie)}${showAll ? "#show-all" : ""}`}
+              href={`${getMovieUrl(movie)}${query}${showAll ? "#show-all" : ""}`}
               className={styles.posterLink}
             >
               {useStackedPoster ? (
