@@ -11,6 +11,7 @@ export enum FilterId {
   Categories = "categories",
   Venues = "venues",
   DateRange = "dateRange",
+  TimeRange = "timeRange",
   Genres = "genres",
   Accessibility = "accessibility",
   FormatSource = "formatSource",
@@ -32,6 +33,7 @@ export type FilterState = {
   [FilterId.Categories]: Category[] | null;
   [FilterId.Venues]: string[] | null;
   [FilterId.DateRange]: { start: number | null; end: number | null };
+  [FilterId.TimeRange]: { start: number; end: number };
   [FilterId.Genres]: string[] | null;
   [FilterId.Accessibility]: AccessibilityFilterValue[] | null;
   [FilterId.FormatSource]: string[] | null;
@@ -96,6 +98,7 @@ export type AnyFilterModule =
   | FilterModule<FilterId.Categories>
   | FilterModule<FilterId.Venues>
   | FilterModule<FilterId.DateRange>
+  | FilterModule<FilterId.TimeRange>
   | FilterModule<FilterId.Genres>
   | FilterModule<FilterId.Accessibility>
   | FilterModule<FilterId.FormatSource>

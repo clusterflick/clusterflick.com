@@ -74,6 +74,12 @@
   color: var(--color-muted-gray);
 }
 
+/* Second question within a section (e.g. "What time of day?"), needs breathing
+   room above it to separate it from the preceding chip group. */
+.sectionSubDescription {
+  margin-top: 28px;
+}
+
 /* ==========================================================================
    Selection Controls (Select All / Clear All)
    ========================================================================== */

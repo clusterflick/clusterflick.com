@@ -49,6 +49,8 @@ export default function FilterOverlay({
     clearAllFormat,
     setDateRange,
     setDateOption,
+    setTimeRange,
+    setTimeOption,
     setVenueOption,
     toggleVenue,
     selectVenues,
@@ -411,6 +413,9 @@ export default function FilterOverlay({
             dateRange={filterState.dateRange}
             setDateRange={setDateRange}
             setDateOption={setDateOption}
+            timeRange={filterState.timeRange}
+            setTimeRange={setTimeRange}
+            setTimeOption={setTimeOption}
             hideFinished={filterState.hideFinished}
             onToggleHideFinished={toggleHideFinished}
           />

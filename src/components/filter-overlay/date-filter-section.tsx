@@ -2,12 +2,20 @@
 
 import { useMemo } from "react";
 import { CinemaData } from "@/types";
-import { DateOption, DATE_OPTIONS } from "@/state/filter-config-context";
+import {
+  DateOption,
+  DATE_OPTIONS,
+  TimeOption,
+  TIME_OPTIONS,
+} from "@/state/filter-config-context";
+import { DAY_START_MINUTES, DAY_END_MINUTES } from "@/lib/filters/modules";
 import {
   getLondonMidnightTimestamp,
   getLondonDayOfWeek,
   timestampToLondonDateString,
   dateStringToLondonTimestamp,
+  minutesToTimeString,
+  timeStringToMinutes,
   MS_PER_DAY,
 } from "@/utils/format-date";
 import Chip from "@/components/chip";
@@ -20,6 +28,9 @@ interface DateFilterSectionProps {
   dateRange: { start: number | null; end: number | null };
   setDateRange: (start: number | null, end: number | null) => void;
   setDateOption: (option: DateOption) => void;
+  timeRange: { start: number; end: number };
+  setTimeRange: (start: number, end: number) => void;
+  setTimeOption: (option: TimeOption) => void;
   hideFinished: boolean;
   onToggleHideFinished: () => void;
 }
@@ -29,6 +40,9 @@ export default function DateFilterSection({
   dateRange,
   setDateRange,
   setDateOption,
+  timeRange,
+  setTimeRange,
+  setTimeOption,
   hideFinished,
   onToggleHideFinished,
 }: DateFilterSectionProps) {
@@ -145,6 +159,40 @@ export default function DateFilterSection({
     return null;
   }, [dateRange]);
 
+  // Time-of-day input values (24-hour "HH:MM")
+  const startTimeStr = minutesToTimeString(timeRange.start);
+  const endTimeStr = minutesToTimeString(timeRange.end);
+
+  // Highlight the matching time preset chip, if the range is exactly one
+  const currentTimeOption: TimeOption | null = useMemo(() => {
+    const match = TIME_OPTIONS.find(
+      (o) => o.start === timeRange.start && o.end === timeRange.end,
+    );
+    return match ? match.value : null;
+  }, [timeRange]);
+
+  // Time input changes. No midnight wrap: keep start <= end, mirroring dates.
+  const handleTimeStartChange = (value: string) => {
+    const newStart =
+      value === "" ? DAY_START_MINUTES : timeStringToMinutes(value);
+    if (isNaN(newStart)) return;
+    if (newStart > timeRange.end) {
+      setTimeRange(newStart, newStart);
+    } else {
+      setTimeRange(newStart, timeRange.end);
+    }
+  };
+
+  const handleTimeEndChange = (value: string) => {
+    const newEnd = value === "" ? DAY_END_MINUTES : timeStringToMinutes(value);
+    if (isNaN(newEnd)) return;
+    if (newEnd < timeRange.start) {
+      setTimeRange(newEnd, newEnd);
+    } else {
+      setTimeRange(timeRange.start, newEnd);
+    }
+  };
+
   return (
     <section className={styles.section} aria-labelledby="dates-heading">
       <div className={styles.sectionHeader}>
@@ -176,13 +224,35 @@ export default function DateFilterSection({
           />
         ))}
       </div>
-      <ExpandableSection title="Select Specific Dates">
+      <p
+        className={`${styles.sectionDescription} ${styles.sectionSubDescription}`}
+      >
+        What time of day?
+      </p>
+      <div
+        className={styles.chipGroup}
+        role="radiogroup"
+        aria-label="Time of day quick filters"
+      >
+        {TIME_OPTIONS.map(({ value, label }) => (
+          <Chip
+            key={value}
+            type="radio"
+            name="time-option"
+            label={label}
+            value={value}
+            checked={currentTimeOption === value}
+            onChange={(v) => setTimeOption(v as TimeOption)}
+          />
+        ))}
+      </div>
+      <ExpandableSection title="Select Specific Dates &amp; Times">
         <div className={styles.advancedFilters}>
           <div className={styles.advancedFilterGroup}>
             <div className={styles.dateRangeInputs}>
               <div className={styles.dateInputWrapper}>
                 <label htmlFor="date-start" className={styles.dateLabel}>
-                  From
+                  From date
                 </label>
                 <input
                   type="date"
@@ -197,7 +267,7 @@ export default function DateFilterSection({
               <span className={styles.dateRangeSeparator}>–</span>
               <div className={styles.dateInputWrapper}>
                 <label htmlFor="date-end" className={styles.dateLabel}>
-                  To
+                  To date
                 </label>
                 <input
                   type="date"
@@ -207,6 +277,33 @@ export default function DateFilterSection({
                   max={maxDateStr}
                   value={endDateStr}
                   onChange={(e) => handleDateEndChange(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className={styles.dateRangeInputs}>
+              <div className={styles.dateInputWrapper}>
+                <label htmlFor="time-start" className={styles.dateLabel}>
+                  From time
+                </label>
+                <input
+                  type="time"
+                  id="time-start"
+                  className={styles.dateInput}
+                  value={startTimeStr}
+                  onChange={(e) => handleTimeStartChange(e.target.value)}
+                />
+              </div>
+              <span className={styles.dateRangeSeparator}>–</span>
+              <div className={styles.dateInputWrapper}>
+                <label htmlFor="time-end" className={styles.dateLabel}>
+                  To time
+                </label>
+                <input
+                  type="time"
+                  id="time-end"
+                  className={styles.dateInput}
+                  value={endTimeStr}
+                  onChange={(e) => handleTimeEndChange(e.target.value)}
                 />
               </div>
             </div>

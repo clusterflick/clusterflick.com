@@ -6,12 +6,13 @@ import {
   Venue,
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
-import { FORMAT_GROUPS } from "./modules";
+import { FORMAT_GROUPS, DAY_START_MINUTES, DAY_END_MINUTES } from "./modules";
 import {
   formatDateShort,
   getLondonMidnightTimestamp,
   getLondonDayOfWeek,
   timestampToLondonDateString,
+  minutesToShortTime,
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { FilterState } from "./types";
@@ -341,6 +342,28 @@ function describeDateRange(state: FilterState): string {
 }
 
 /**
+ * Describes the time-of-day part of the filter.
+ * Returns null when no time filter is applied (the full day).
+ */
+function describeTimeRange(state: FilterState): string | null {
+  const range = state.timeRange;
+  if (!range) return null;
+
+  const { start, end } = range;
+  if (start === DAY_START_MINUTES && end === DAY_END_MINUTES) {
+    return null;
+  }
+
+  if (start === DAY_START_MINUTES) {
+    return `before ${minutesToShortTime(end)}`;
+  }
+  if (end === DAY_END_MINUTES) {
+    return `after ${minutesToShortTime(start)}`;
+  }
+  return `${minutesToShortTime(start)} to ${minutesToShortTime(end)}`;
+}
+
+/**
  * Describes the accessibility part of the filter.
  * Returns:
  * - null if no filter applied (all included)
@@ -494,6 +517,10 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
 
   // Build dates description
   let datesDesc = describeDateRange(state);
+  const timeDesc = describeTimeRange(state);
+  if (timeDesc) {
+    datesDesc += `, ${timeDesc}`;
+  }
   if (state.hideFinished) {
     datesDesc += " and not finished";
   }

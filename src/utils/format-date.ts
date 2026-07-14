@@ -210,6 +210,69 @@ export function formatShowingTime(timestamp: number): string {
 }
 
 /**
+ * Cached formatter for extracting the London hour/minute of a timestamp.
+ * Uses the h23 hour cycle so midnight is "00" (never "24"), and formatToParts
+ * so we read the numeric fields directly without string parsing. Cached for the
+ * same bulk-performance reason as {@link formatShowingTime} — the time-of-day
+ * filter calls this once per performance.
+ */
+const londonHourMinuteFormatter = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+  timeZone: LONDON_TIMEZONE,
+});
+
+/**
+ * Get a timestamp's time-of-day as minutes since midnight (0–1439) in London
+ * time. Used by the time-of-day filter for fast numeric comparison.
+ */
+export function getLondonMinutesOfDay(timestamp: number): number {
+  const parts = londonHourMinuteFormatter.formatToParts(timestamp);
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+  return hour * 60 + minute;
+}
+
+/**
+ * Convert minutes-since-midnight (0–1439) to a 24-hour "HH:MM" string, as used
+ * by `<input type="time">` values and time URL params.
+ */
+export function minutesToTimeString(minutes: number): string {
+  const hour = Math.floor(minutes / 60);
+  const minute = minutes % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+/**
+ * Format minutes-since-midnight as a compact 12-hour label for prose, e.g.
+ * "midnight", "noon", "5pm", "9:30pm". Used in filter descriptions.
+ */
+export function minutesToShortTime(minutes: number): string {
+  if (minutes === 0) return "midnight";
+  if (minutes === 720) return "noon";
+
+  const hour24 = Math.floor(minutes / 60);
+  const minute = minutes % 60;
+  const period = hour24 < 12 ? "am" : "pm";
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  const minuteStr = minute === 0 ? "" : `:${String(minute).padStart(2, "0")}`;
+  return `${hour12}${minuteStr}${period}`;
+}
+
+/**
+ * Convert a 24-hour "HH:MM" string to minutes since midnight (0–1439).
+ * Returns NaN if the string is malformed.
+ */
+export function timeStringToMinutes(value: string): number {
+  const [hourStr, minuteStr] = value.split(":");
+  const hour = Number(hourStr);
+  const minute = Number(minuteStr);
+  if (isNaN(hour) || isNaN(minute)) return NaN;
+  return hour * 60 + minute;
+}
+
+/**
  * Format a date in short form.
  * Used for date range display in filters.
  * @param date - Date to format

@@ -26,6 +26,7 @@ import {
   getLondonDayOfWeek,
   MS_PER_DAY,
 } from "@/utils/format-date";
+import { DAY_START_MINUTES, DAY_END_MINUTES } from "@/lib/filters/modules";
 
 const SESSION_STORAGE_KEY = "clusterflick-filters";
 
@@ -60,10 +61,40 @@ export const DATE_OPTIONS = [
   { value: "this-week", label: "This Week" },
   { value: "next-7-days", label: "Next 7 Days" },
   { value: "this-weekend", label: "This Weekend" },
-  { value: "all-time", label: "Any Time" },
+  { value: "all-time", label: "All Dates" },
 ] as const;
 
 export type DateOption = (typeof DATE_OPTIONS)[number]["value"];
+
+// Time-of-day quick-select options. Bands are cinema-weighted. Boundaries are
+// shared (inclusive on both ends), so a showing exactly on a boundary — e.g.
+// noon — falls into both adjacent bands. This keeps the labels clean ("before
+// noon", "noon to 5pm") at the cost of a 1-minute overlap.
+export const TIME_OPTIONS = [
+  {
+    value: "any",
+    label: "Any Time",
+    start: DAY_START_MINUTES,
+    end: DAY_END_MINUTES,
+  },
+  { value: "morning", label: "Morning", start: 0, end: 720 }, // before noon
+  { value: "afternoon", label: "Afternoon", start: 720, end: 1020 }, // noon–5pm
+  { value: "evening", label: "Evening", start: 1020, end: 1260 }, // 5pm–9pm
+  { value: "late", label: "Late", start: 1260, end: DAY_END_MINUTES }, // after 9pm
+] as const;
+
+export type TimeOption = (typeof TIME_OPTIONS)[number]["value"];
+
+/**
+ * Convert a time quick-select option into a concrete time-of-day range (minutes
+ * since midnight). Shared by setTimeOption so presets and inputs stay in sync.
+ */
+function computeTimeRange(option: TimeOption): { start: number; end: number } {
+  const preset = TIME_OPTIONS.find((o) => o.value === option);
+  return preset
+    ? { start: preset.start, end: preset.end }
+    : { start: DAY_START_MINUTES, end: DAY_END_MINUTES };
+}
 
 /**
  * Convert a date quick-select option into a concrete date range (timestamps at
@@ -165,6 +196,9 @@ type FilterConfigContextType = {
   // Date range (timestamps representing midnight London time)
   setDateRange: (start: number | null, end: number | null) => void;
   setDateOption: (option: DateOption) => void;
+  // Time of day (minutes since midnight, 0–1439)
+  setTimeRange: (start: number, end: number) => void;
+  setTimeOption: (option: TimeOption) => void;
   // Venues
   setVenueOption: (option: VenueOption, venueIds: string[]) => void;
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
@@ -449,6 +483,19 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Time of day (minutes since midnight)
+  const setTimeRange = useCallback((start: number, end: number) => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.TimeRange, { start, end }),
+    );
+  }, []);
+
+  const setTimeOption = useCallback((option: TimeOption) => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.TimeRange, computeTimeRange(option)),
+    );
+  }, []);
+
   // Venues
   const setVenueOption = useCallback(
     (option: VenueOption, venueIds: string[]) => {
@@ -574,6 +621,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearAllFormat,
       setDateRange,
       setDateOption,
+      setTimeRange,
+      setTimeOption,
       setVenueOption,
       toggleVenue,
       selectVenues,
@@ -603,6 +652,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearAllFormat,
       setDateRange,
       setDateOption,
+      setTimeRange,
+      setTimeOption,
       setVenueOption,
       toggleVenue,
       selectVenues,

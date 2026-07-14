@@ -5,6 +5,11 @@ export { performanceNotesSearchFilter } from "./performance-notes-search";
 export { categoriesFilter, getPrimaryCategory } from "./categories";
 export { venuesFilter } from "./venues";
 export { dateRangeFilter } from "./date-range";
+export {
+  timeRangeFilter,
+  DAY_START_MINUTES,
+  DAY_END_MINUTES,
+} from "./time-range";
 export { genresFilter } from "./genres";
 export { accessibilityFilter } from "./accessibility";
 export {
