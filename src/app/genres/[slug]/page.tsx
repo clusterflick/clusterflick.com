@@ -21,7 +21,7 @@ export function generateStaticParams() {
 }
 
 function pageTitle(genre: GenreDefinition): string {
-  return `${genre.name} Films Showing in London`;
+  return `${genre.name} Films Showing in London`;
 }
 
 export async function generateMetadata({
@@ -259,9 +259,9 @@ export default async function GenreDetailPage({
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
         venues={genreVenues}
-        cinemasSectionTitle={`Cinemas showing ${genre.name} films`}
+        cinemasSectionTitle={`Cinemas showing ${genre.name} films`}
         accessibilityStats={genreAccessibilityStats}
-        filmsSectionTitle={`${genre.name} Films Showing in London`}
+        filmsSectionTitle={`${genre.name} Films Showing in London`}
         filmsExploreHref={`/films?genres=${genre.id}&allDates=true&allCategories=true`}
         filmsExploreLabel={`Start exploring ${genre.name.toLowerCase()} films`}
         heroBackgroundImage={heroBackgroundImage}

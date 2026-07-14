@@ -47,7 +47,7 @@ export function getFormatCollectionName(feature: FormatTypes): string {
  * e.g. "70mm Films Showing in London".
  */
 export function getFormatPageTitle(feature: FormatTypes): string {
-  return `${getFormatLabels(feature)} Films Showing in London`;
+  return `${getFormatLabels(feature)} Films Showing in London`;
 }
 
 /**
@@ -55,5 +55,5 @@ export function getFormatPageTitle(feature: FormatTypes): string {
  * e.g. "Cinemas showing 70mm films".
  */
 export function getFormatCinemasTitle(feature: FormatTypes): string {
-  return `Cinemas showing ${getFormatLabels(feature)} films`;
+  return `Cinemas showing ${getFormatLabels(feature)} films`;
 }
