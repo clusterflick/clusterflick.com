@@ -200,24 +200,82 @@ export function apply(movies: MoviesRecord, state: FilterState): MoviesRecord {
 }
 
 /**
- * Parse URL search params into a partial FilterState.
- * Only recognised params with valid values are included.
- * Returns null if no filter-related params are present.
+ * The starting point a URL's filter params are applied on top of, chosen by the
+ * `base` query param:
+ * - `default` (or absent) — the `/films` browsing defaults (Films/Multiple/
+ *   Shorts, today→+7d). A deep link is self-contained: dimensions it doesn't
+ *   mention fall back to these defaults, never to whatever was in session.
+ * - `all` — fully permissive (all categories, all dates); every other dimension
+ *   is already permissive by default. Use for "explore everything at X" links.
+ * - `patch` — the caller's current state; unmentioned dimensions are preserved.
+ *   The one opt-in that amends session state instead of replacing it.
  */
-export function parseUrlParams(search: string): Partial<FilterState> | null {
-  const params = new URLSearchParams(search);
-  const result: Partial<FilterState> = {};
-  let hasAny = false;
+export type FilterBase = "default" | "all" | "patch";
 
+function isFilterBase(value: string | null): value is FilterBase {
+  return value === "default" || value === "all" || value === "patch";
+}
+
+function getBaseState(
+  base: FilterBase,
+  currentState: FilterState,
+): FilterState {
+  switch (base) {
+    case "all":
+      return getPermissiveState();
+    case "patch":
+      return currentState;
+    default:
+      return getDefaultState();
+  }
+}
+
+/**
+ * Whether the URL carries anything that should drive filter state — a valid
+ * `base` or any recognised filter param. Used to decide whether to strip the
+ * query string on mount.
+ */
+export function hasUrlFilterParams(search: string): boolean {
+  const params = new URLSearchParams(search);
+  if (isFilterBase(params.get("base"))) return true;
+  return modules.some((m) => m.fromUrlParams(params) !== undefined);
+}
+
+/**
+ * Resolve a URL's search params into a full FilterState.
+ *
+ * The `base` param selects the starting state (see {@link FilterBase}); each
+ * recognised filter param then overrides its own dimension on top. Because the
+ * base sets *every* dimension to a known value, dimensions the URL doesn't
+ * mention are reset to the base rather than inherited from session storage.
+ *
+ * Returns null when the URL carries nothing filter-related, so callers can leave
+ * the existing (session) state untouched.
+ */
+export function resolveFilterStateFromUrl(
+  search: string,
+  currentState: FilterState,
+): FilterState | null {
+  const params = new URLSearchParams(search);
+  const baseParam = params.get("base");
+  const hasBase = isFilterBase(baseParam);
+
+  const overrides: Partial<FilterState> = {};
+  let hasOverride = false;
   for (const filterModule of modules) {
     const value = filterModule.fromUrlParams(params);
     if (value !== undefined) {
-      (result as Record<string, unknown>)[filterModule.id] = value;
-      hasAny = true;
+      (overrides as Record<string, unknown>)[filterModule.id] = value;
+      hasOverride = true;
     }
   }
 
-  return hasAny ? result : null;
+  if (!hasBase && !hasOverride) {
+    return null;
+  }
+
+  const base = hasBase ? baseParam : "default";
+  return { ...getBaseState(base, currentState), ...overrides };
 }
 
 /**
@@ -250,6 +308,7 @@ export const filterManager = {
   hasActiveFilters,
   statesEqual,
   apply,
-  parseUrlParams,
+  resolveFilterStateFromUrl,
+  hasUrlFilterParams,
   buildFilterUrl,
 };

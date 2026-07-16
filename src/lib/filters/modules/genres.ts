@@ -26,20 +26,26 @@ export const genresFilter: FilterModule<FilterId.Genres> = {
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const genres = state.genres;
-    if (genres) {
+    if (genres === null) {
+      params.set("genres", "all");
+    } else if (genres.length === 0) {
+      params.set("genres", "none");
+    } else {
       params.set("genres", genres.join(","));
     }
   },
 
   fromUrlParams: (params: URLSearchParams) => {
-    if (params.has("genres")) {
-      return params
-        .get("genres")!
-        .split(",")
-        .map((v) => v.trim())
-        .filter(Boolean);
+    if (!params.has("genres")) {
+      return undefined;
     }
-    return undefined;
+    const raw = params.get("genres")!.trim();
+    if (raw === "all") return null;
+    if (raw === "none") return [];
+    return raw
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
   },
 
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {

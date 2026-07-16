@@ -264,11 +264,17 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       // Silently ignore — will use defaults
     }
 
-    // Merge URL params on top (highest priority)
+    // Resolve URL params on top (highest priority). The `base` param picks the
+    // starting point (default / all / patch); params then override individual
+    // dimensions on top of it, so a deep link is self-contained rather than
+    // inheriting whatever was left in session storage.
     try {
-      const urlOverrides = filterManager.parseUrlParams(window.location.search);
-      if (urlOverrides) {
-        state = { ...state, ...urlOverrides };
+      const resolved = filterManager.resolveFilterStateFromUrl(
+        window.location.search,
+        state,
+      );
+      if (resolved) {
+        state = resolved;
       }
     } catch {
       // Malformed URL params — ignore
@@ -292,7 +298,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
 
   // Strip URL params on mount so a refresh uses session storage.
   useEffect(() => {
-    if (filterManager.parseUrlParams(window.location.search)) {
+    if (filterManager.hasUrlFilterParams(window.location.search)) {
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
@@ -614,9 +620,12 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const applyUrlParams = useCallback(() => {
-    const overrides = filterManager.parseUrlParams(window.location.search);
-    if (!overrides) return;
-    setFilterState((prev) => ({ ...prev, ...overrides }));
+    if (!filterManager.hasUrlFilterParams(window.location.search)) return;
+    setFilterState(
+      (prev) =>
+        filterManager.resolveFilterStateFromUrl(window.location.search, prev) ??
+        prev,
+    );
     window.history.replaceState({}, "", window.location.pathname);
   }, []);
 

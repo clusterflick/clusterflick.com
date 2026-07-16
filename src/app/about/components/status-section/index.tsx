@@ -9,7 +9,7 @@ import SourcesPopup from "./sources-popup";
 import styles from "./status-section.module.css";
 
 // Shows every event on the films page: all categories, all dates, all venues.
-const ALL_EVENTS_HREF = "/films?allCategories=true&allDates=true";
+const ALL_EVENTS_HREF = "/films?base=all";
 
 export default function StatusSection() {
   const { metaData, movies, isLoading, isEmpty, getData } = useCinemaData();

@@ -52,7 +52,7 @@ export default function GroupPageContent({
 
   // Link to the film list pre-filtered to this group's venues.
   const venuesParam = venueIds.map((id) => encodeURIComponent(id)).join(",");
-  const filmsQuery = `venues=${venuesParam}&allDates=true&allCategories=true`;
+  const filmsQuery = `base=all&venues=${venuesParam}`;
   const filmsHref = `/films?${filmsQuery}`;
 
   return (

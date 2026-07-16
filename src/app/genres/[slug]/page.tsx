@@ -178,7 +178,7 @@ export default async function GenreDetailPage({
     <div className={styles.heroBlurb}>
       <p>{genre.seoDescription}</p>
       <p>
-        <a href={`/films?genres=${genre.id}&allDates=true&allCategories=true`}>
+        <a href={`/films?base=all&genres=${genre.id}`}>
           Browse all {genre.name.toLowerCase()} films →
         </a>
       </p>
@@ -262,7 +262,7 @@ export default async function GenreDetailPage({
         cinemasSectionTitle={`Cinemas showing ${genre.name} films`}
         accessibilityStats={genreAccessibilityStats}
         filmsSectionTitle={`${genre.name} Films Showing in London`}
-        filmsExploreHref={`/films?genres=${genre.id}&allDates=true&allCategories=true`}
+        filmsExploreHref={`/films?base=all&genres=${genre.id}`}
         filmsExploreLabel={`Start exploring ${genre.name.toLowerCase()} films`}
         heroBackgroundImage={heroBackgroundImage}
         heroBackgroundImageAlt={`${genre.name} films showing in London`}

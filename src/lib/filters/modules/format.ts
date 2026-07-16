@@ -131,20 +131,26 @@ function createFormatFilter<K extends FormatFilterId>(
 
     toUrlParams: (state: FilterState, params: URLSearchParams) => {
       const value = state[config.filterId];
-      if (value) {
+      if (value === null) {
+        params.set(config.urlParam, "all");
+      } else if (value.length === 0) {
+        params.set(config.urlParam, "none");
+      } else {
         params.set(config.urlParam, value.join(","));
       }
     },
 
     fromUrlParams: (params: URLSearchParams) => {
-      if (params.has(config.urlParam)) {
-        return params
-          .get(config.urlParam)!
-          .split(",")
-          .map((v) => v.trim())
-          .filter((v) => validValues.has(v));
+      if (!params.has(config.urlParam)) {
+        return undefined;
       }
-      return undefined;
+      const raw = params.get(config.urlParam)!.trim();
+      if (raw === "all") return null;
+      if (raw === "none") return [];
+      return raw
+        .split(",")
+        .map((v) => v.trim())
+        .filter((v) => validValues.has(v));
     },
 
     apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {

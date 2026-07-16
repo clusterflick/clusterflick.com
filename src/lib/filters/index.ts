@@ -39,9 +39,11 @@ export {
   hasActiveFilters,
   getActiveFilterIds,
   apply,
-  parseUrlParams,
+  resolveFilterStateFromUrl,
+  hasUrlFilterParams,
   buildFilterUrl,
 } from "./manager";
+export type { FilterBase } from "./manager";
 
 // Description utilities
 export { describeFilters } from "./describe";

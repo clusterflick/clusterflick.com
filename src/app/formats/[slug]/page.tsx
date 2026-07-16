@@ -26,7 +26,9 @@ export function generateStaticParams() {
 
 /** Query string (no leading `?`) that filters to this format's performances. */
 function formatFilterParams(format: FormatDefinition): string {
-  return `${format.kind}=${format.id}&allDates=true&allCategories=true`;
+  // `base=all` clears every other dimension (dates, categories, venues, …) so
+  // only this format constrains results.
+  return `base=all&${format.kind}=${format.id}`;
 }
 
 /** Deep link into the live, filtered film list for this format. */

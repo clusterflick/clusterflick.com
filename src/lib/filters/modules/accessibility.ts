@@ -54,21 +54,26 @@ export const accessibilityFilter: FilterModule<FilterId.Accessibility> = {
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const accessibility = state.accessibility;
-    if (accessibility) {
+    if (accessibility === null) {
+      params.set("accessibility", "all");
+    } else if (accessibility.length === 0) {
+      params.set("accessibility", "none");
+    } else {
       params.set("accessibility", accessibility.join(","));
     }
   },
 
   fromUrlParams: (params: URLSearchParams) => {
-    if (params.has("accessibility")) {
-      const values = params
-        .get("accessibility")!
-        .split(",")
-        .map((v) => v.trim())
-        .filter((v): v is AccessibilityFilterValue => VALID_VALUES.has(v));
-      return values;
+    if (!params.has("accessibility")) {
+      return undefined;
     }
-    return undefined;
+    const raw = params.get("accessibility")!.trim();
+    if (raw === "all") return null;
+    if (raw === "none") return [];
+    return raw
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v): v is AccessibilityFilterValue => VALID_VALUES.has(v));
   },
 
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {

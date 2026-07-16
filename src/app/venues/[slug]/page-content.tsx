@@ -91,7 +91,9 @@ export default function VenueDetailPageContent({
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
 
   const venueMovieParams = `venues=${encodeURIComponent(venue.id)}`;
-  const allVenueMovieParams = `${venueMovieParams}&allDates=true&allCategories=true`;
+  // `base=all` starts from a fully permissive state (all dates, all categories)
+  // so only the venue constrains results.
+  const allVenueMovieParams = `base=all&${venueMovieParams}`;
   const allVenueFilmsHref = `/films?${allVenueMovieParams}`;
   const hasJustAdded = justAdded.length > 0;
 
@@ -125,7 +127,7 @@ export default function VenueDetailPageContent({
       <LinkedList
         items={accessibilityStats.map(({ feature, filmCount }) => ({
           key: feature,
-          href: `/films?venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
+          href: `/films?base=all&venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
           label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
           detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
         }))}
@@ -200,9 +202,9 @@ export default function VenueDetailPageContent({
                 movies={gridMovies}
                 truncated={gridMoviesTruncated}
                 venueId={venue.id}
-                exploreHref={`/films?venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
+                exploreHref={allVenueFilmsHref}
                 exploreLabel={`Start exploring films at ${venue.name}`}
-                movieUrlParams={`venues=${encodeURIComponent(venue.id)}&allDates=true&allCategories=true`}
+                movieUrlParams={allVenueMovieParams}
               />
             </ContentSection>
           </div>
@@ -215,7 +217,7 @@ export default function VenueDetailPageContent({
             <VenueScheduleBoard
               days={scheduleDays}
               seeAllHref={allVenueFilmsHref}
-              movieUrlParams={`${venueMovieParams}&allCategories=true`}
+              movieUrlParams={`${venueMovieParams}&categories=all`}
             />
           </CollapsibleBoard>
         </ContentSection>

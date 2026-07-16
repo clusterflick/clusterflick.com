@@ -58,8 +58,10 @@ export const timeRangeFilter: FilterModule<FilterId.TimeRange> = {
   },
 
   fromUrlParams: (params: URLSearchParams) => {
-    // An explicit time band always wins, so a deliberately-shared "all dates,
-    // evenings only" link (allDates=true + timeStart/timeEnd) round-trips.
+    // An explicit time band round-trips (e.g. a shared "evenings only" link).
+    // When no time param is present we return undefined and let the resolved
+    // base state supply the value — `base=all`/`base=default` both reset the
+    // band to the full day, so "browse everything" links open it up too.
     if (params.has("timeStart") || params.has("timeEnd")) {
       const startStr = params.get("timeStart");
       const endStr = params.get("timeEnd");
@@ -73,13 +75,6 @@ export const timeRangeFilter: FilterModule<FilterId.TimeRange> = {
         return undefined;
       }
       return { start, end };
-    }
-
-    // Otherwise wire into `allDates` the same way the date range does: the
-    // "browse everything" links (allDates=true, no time param) open up the
-    // time-of-day dimension too, resetting any active band back to the full day.
-    if (params.has("allDates")) {
-      return { start: DAY_START_MINUTES, end: DAY_END_MINUTES };
     }
 
     return undefined;

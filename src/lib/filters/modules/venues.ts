@@ -25,20 +25,26 @@ export const venuesFilter: FilterModule<FilterId.Venues> = {
 
   toUrlParams: (state: FilterState, params: URLSearchParams) => {
     const venues = state.venues;
-    if (venues) {
+    if (venues === null) {
+      params.set("venues", "all");
+    } else if (venues.length === 0) {
+      params.set("venues", "none");
+    } else {
       params.set("venues", venues.join(","));
     }
   },
 
   fromUrlParams: (params: URLSearchParams) => {
-    if (params.has("venues")) {
-      return params
-        .get("venues")!
-        .split(",")
-        .map((v) => v.trim())
-        .filter(Boolean);
+    if (!params.has("venues")) {
+      return undefined;
     }
-    return undefined;
+    const raw = params.get("venues")!.trim();
+    if (raw === "all") return null;
+    if (raw === "none") return [];
+    return raw
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
   },
 
   apply: (movies: MoviesRecord, state: FilterState): MoviesRecord => {
