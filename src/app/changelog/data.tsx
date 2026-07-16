@@ -69,6 +69,54 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-14",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Every <Link href="/venues">venue page</Link> now opens with a
+            timetable of today&apos;s and tomorrow&apos;s screenings, listed by
+            start time like a cinema&apos;s lobby board, so you can see
+            what&apos;s on right now without hunting through a grid of posters.
+            Venues that have added screenings in the past week also get a
+            &ldquo;just added&rdquo; row highlighting what&apos;s new.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            You can now filter by time of day as well as by date — morning,
+            afternoon, evening, late, or a specific range you choose. It
+            combines with the date filter, so &ldquo;mornings over the next
+            week&rdquo; is now a single search.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added a quick venue search to the filters, so you can type a
+            cinema&apos;s name and toggle it on or off without scrolling the
+            full list of London venues.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The side menu now scrolls on shorter screens, so its lower entries
+            stay reachable on smaller phones.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-13",
     changes: [
       {
@@ -90,6 +138,17 @@ export const CHANGELOG: ChangelogDay[] = [
             of the cinemas within two miles, drawn with 1- and 2-mile distance
             rings around your location so you can see what&apos;s genuinely
             close.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            Each deploy now pings{" "}
+            <Ext href="https://www.indexnow.org/">IndexNow</Ext> with the pages
+            that changed, so search engines pick up new listings sooner rather
+            than waiting to recrawl.
           </>
         ),
       },
