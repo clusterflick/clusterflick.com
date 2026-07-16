@@ -132,9 +132,14 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.quickCard:hover {
+.quickCard:hover,
+.quickCardActive,
+.quickCardActive:hover {
   background: rgba(var(--color-neon-pink-rgb), 0.1);
   border-color: rgba(var(--color-neon-pink-rgb), 0.4);
+}
+
+.quickCard:hover {
   transform: translateY(-2px);
 }
 

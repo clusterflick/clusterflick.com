@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import styles from "./filter-overlay.module.css";
 
 interface QuickFiltersSectionProps {
@@ -11,6 +12,12 @@ interface QuickFiltersSectionProps {
   onEverything: () => void;
   /** True while the browser is resolving the user's location for "near me". */
   geoLoading: boolean;
+  /** True when the current filters match the "near me today" preset. */
+  nearMeTodayActive?: boolean;
+  /** True when the current filters match the "this week" preset. */
+  thisWeekActive?: boolean;
+  /** True when the current filters match the "everything" preset. */
+  everythingActive?: boolean;
 }
 
 /**
@@ -23,15 +30,22 @@ export default function QuickFiltersSection({
   onThisWeek,
   onEverything,
   geoLoading,
+  nearMeTodayActive = false,
+  thisWeekActive = false,
+  everythingActive = false,
 }: QuickFiltersSectionProps) {
   return (
     <section className={styles.quickSection} aria-label="Quick filters">
       <div className={styles.quickGrid}>
         <button
           type="button"
-          className={styles.quickCard}
+          className={clsx(
+            styles.quickCard,
+            nearMeTodayActive && styles.quickCardActive,
+          )}
           onClick={onNearMeToday}
           disabled={geoLoading}
+          aria-pressed={nearMeTodayActive}
         >
           <span className={styles.quickIcon} aria-hidden="true">
             📍
@@ -44,7 +58,15 @@ export default function QuickFiltersSection({
           </span>
         </button>
 
-        <button type="button" className={styles.quickCard} onClick={onThisWeek}>
+        <button
+          type="button"
+          className={clsx(
+            styles.quickCard,
+            thisWeekActive && styles.quickCardActive,
+          )}
+          onClick={onThisWeek}
+          aria-pressed={thisWeekActive}
+        >
           <span className={styles.quickIcon} aria-hidden="true">
             🗓️
           </span>
@@ -56,8 +78,12 @@ export default function QuickFiltersSection({
 
         <button
           type="button"
-          className={styles.quickCard}
+          className={clsx(
+            styles.quickCard,
+            everythingActive && styles.quickCardActive,
+          )}
           onClick={onEverything}
+          aria-pressed={everythingActive}
         >
           <span className={styles.quickIcon} aria-hidden="true">
             🎬

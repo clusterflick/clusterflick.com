@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { filterManager, buildFilterUrl, FilterId } from "@/lib/filters";
-import { useFilterConfig } from "@/state/filter-config-context";
+import { useFilterConfig, QuickFilter } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
 import { getNearbyVenueIds } from "@/utils/geo-distance";
@@ -57,6 +57,7 @@ export default function FilterOverlay({
     clearVenues,
     toggleHideFinished,
     applyQuickFilter,
+    isQuickFilterActive,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
@@ -136,6 +137,40 @@ export default function FilterOverlay({
     [],
   );
 
+  // Preset definitions, shared by the click handlers (to apply the preset) and
+  // the active checks (to show the matching card as selected). "Near me today"
+  // uses the currently-resolved nearby venues; before a location is known it has
+  // no venues and so is never marked active.
+  const nearMeTodayPreset = useMemo<QuickFilter>(
+    () => ({
+      categories: FILM_CATEGORIES,
+      venues: nearbyVenueIds,
+      dateOption: "today",
+      hideFinished: true,
+    }),
+    [FILM_CATEGORIES, nearbyVenueIds],
+  );
+
+  const thisWeekPreset = useMemo<QuickFilter>(
+    () => ({
+      categories: FILM_CATEGORIES,
+      venues: null,
+      dateOption: "this-week",
+      hideFinished: false,
+    }),
+    [FILM_CATEGORIES],
+  );
+
+  const everythingPreset = useMemo<QuickFilter>(
+    () => ({
+      categories: null,
+      venues: null,
+      dateOption: "all-time",
+      hideFinished: false,
+    }),
+    [],
+  );
+
   // Quick filter: what's on near me today. Resolves the user's nearby venues
   // (requesting location if needed) then applies the preset and closes.
   const handleNearMeToday = useCallback(async () => {
@@ -154,12 +189,7 @@ export default function FilterOverlay({
     // geolocation error; don't apply a preset with no venues.
     if (nearby.length === 0) return;
 
-    applyQuickFilter({
-      categories: FILM_CATEGORIES,
-      venues: nearby,
-      dateOption: "today",
-      hideFinished: true,
-    });
+    applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
     onClose();
   }, [
     userPosition,
@@ -168,31 +198,28 @@ export default function FilterOverlay({
     movies,
     requestLocation,
     applyQuickFilter,
-    FILM_CATEGORIES,
+    nearMeTodayPreset,
     onClose,
   ]);
 
   // Quick filter: what's on this week, all venues.
   const handleThisWeek = useCallback(() => {
-    applyQuickFilter({
-      categories: FILM_CATEGORIES,
-      venues: null,
-      dateOption: "this-week",
-      hideFinished: false,
-    });
+    applyQuickFilter(thisWeekPreset);
     onClose();
-  }, [applyQuickFilter, FILM_CATEGORIES, onClose]);
+  }, [applyQuickFilter, thisWeekPreset, onClose]);
 
   // Quick filter: show me everything (all event types, all venues, any time).
   const handleEverything = useCallback(() => {
-    applyQuickFilter({
-      categories: null,
-      venues: null,
-      dateOption: "all-time",
-      hideFinished: false,
-    });
+    applyQuickFilter(everythingPreset);
     onClose();
-  }, [applyQuickFilter, onClose]);
+  }, [applyQuickFilter, everythingPreset, onClose]);
+
+  // Which preset (if any) the current filter state matches, so its card can be
+  // shown as selected.
+  const nearMeTodayActive =
+    nearbyVenueIds.length > 0 && isQuickFilterActive(nearMeTodayPreset);
+  const thisWeekActive = isQuickFilterActive(thisWeekPreset);
+  const everythingActive = isQuickFilterActive(everythingPreset);
 
   const handleClose = useCallback(() => {
     onClose();
@@ -322,6 +349,9 @@ export default function FilterOverlay({
         onThisWeek={handleThisWeek}
         onEverything={handleEverything}
         geoLoading={geoLoading}
+        nearMeTodayActive={nearMeTodayActive}
+        thisWeekActive={thisWeekActive}
+        everythingActive={everythingActive}
       />
 
       {/* Search Section */}

@@ -137,6 +137,45 @@ export function hasActiveFilters(state: FilterState): boolean {
 }
 
 /**
+ * Structural equality for two filter values. Handles the shapes filter modules
+ * store: primitives, `T[] | null` (compared order-independently, since a set of
+ * selected categories/venues is the same filter regardless of toggle order),
+ * and `{ start, end }` range objects.
+ */
+function valuesEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    const seen = new Set(a);
+    return b.every((value) => seen.has(value));
+  }
+  if (
+    a !== null &&
+    b !== null &&
+    typeof a === "object" &&
+    typeof b === "object"
+  ) {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    return [...keys].every((key) =>
+      valuesEqual(
+        (a as Record<string, unknown>)[key],
+        (b as Record<string, unknown>)[key],
+      ),
+    );
+  }
+  return false;
+}
+
+/**
+ * Whether two filter states are equivalent — i.e. would produce the same
+ * results. Compares every registered module's value, so it stays correct as
+ * filters are added without any per-key maintenance.
+ */
+export function statesEqual(a: FilterState, b: FilterState): boolean {
+  return modules.every((module) => valuesEqual(module.get(a), module.get(b)));
+}
+
+/**
  * Gets the IDs of all active filters.
  */
 export function getActiveFilterIds(state: FilterState): FilterId[] {
@@ -209,6 +248,7 @@ export const filterManager = {
   get,
   set,
   hasActiveFilters,
+  statesEqual,
   apply,
   parseUrlParams,
   buildFilterUrl,

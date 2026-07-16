@@ -168,6 +168,29 @@ export type QuickFilter = {
   hideFinished: boolean;
 };
 
+/**
+ * Build the full filter state a quick filter produces. Starts from a clean
+ * default and overrides only the four preset dimensions — shared by
+ * applyQuickFilter (to apply it) and isQuickFilterActive (to detect it), so the
+ * two never drift apart.
+ */
+function buildQuickFilterState(quickFilter: QuickFilter): FilterState {
+  let next = filterManager.getDefaultState();
+  next = filterManager.set(next, FilterId.Categories, quickFilter.categories);
+  next = filterManager.set(next, FilterId.Venues, quickFilter.venues);
+  next = filterManager.set(
+    next,
+    FilterId.DateRange,
+    computeDateRange(quickFilter.dateOption),
+  );
+  next = filterManager.set(
+    next,
+    FilterId.HideFinished,
+    quickFilter.hideFinished,
+  );
+  return next;
+}
+
 type FilterConfigContextType = {
   filterState: FilterState;
   // Search
@@ -209,6 +232,7 @@ type FilterConfigContextType = {
   toggleHideFinished: () => void;
   // Quick filters (one-tap presets)
   applyQuickFilter: (quickFilter: QuickFilter) => void;
+  isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -570,21 +594,19 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   // Quick filters — apply a preset atomically on top of a clean default state
   // so results never depend on whatever filters were previously set.
   const applyQuickFilter = useCallback((quickFilter: QuickFilter) => {
-    let next = filterManager.getDefaultState();
-    next = filterManager.set(next, FilterId.Categories, quickFilter.categories);
-    next = filterManager.set(next, FilterId.Venues, quickFilter.venues);
-    next = filterManager.set(
-      next,
-      FilterId.DateRange,
-      computeDateRange(quickFilter.dateOption),
-    );
-    next = filterManager.set(
-      next,
-      FilterId.HideFinished,
-      quickFilter.hideFinished,
-    );
-    setFilterState(next);
+    setFilterState(buildQuickFilterState(quickFilter));
   }, []);
+
+  // True when the current filter state exactly matches what applying this quick
+  // filter would produce — used to show the preset card as selected.
+  const isQuickFilterActive = useCallback(
+    (quickFilter: QuickFilter) =>
+      filterManager.statesEqual(
+        filterState,
+        buildQuickFilterState(quickFilter),
+      ),
+    [filterState],
+  );
 
   // General
   const resetFilters = useCallback(() => {
@@ -630,6 +652,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearVenues,
       toggleHideFinished,
       applyQuickFilter,
+      isQuickFilterActive,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
@@ -661,6 +684,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearVenues,
       toggleHideFinished,
       applyQuickFilter,
+      isQuickFilterActive,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
