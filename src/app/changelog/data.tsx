@@ -69,6 +69,36 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-16",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Jumping into the film catalogue list from a{" "}
+            <Link href="/formats">format</Link>,{" "}
+            <Link href="/genres">genre</Link> or{" "}
+            <Link href="/venues">venue</Link> page now starts from a clean
+            slate. Before, a filter picked up on an earlier page could quietly
+            stick, so exploring — say — 35mm films just after browsing a single
+            venue could leave you staring at an empty list.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The one-tap quick filters — &ldquo;what&apos;s on near me
+            today&rdquo;, &ldquo;what&apos;s on this week&rdquo; and &ldquo;show
+            me everything&rdquo; — now highlight when the current view matches
+            one, so it&apos;s clear at a glance which you&apos;ve got applied.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-14",
     changes: [
       {
