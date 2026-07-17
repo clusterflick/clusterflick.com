@@ -69,6 +69,51 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-17",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Angel Community Centre",
+                  url: "https://www.enfield.gov.uk/services/leisure-and-culture/community-halls/angel-community-centre",
+                },
+                {
+                  name: "Bernie Grant Arts Centre",
+                  url: "https://www.berniegrantcentre.co.uk",
+                },
+                {
+                  name: "The Brookmill",
+                  url: "https://www.thebrookmill.co.uk",
+                },
+                {
+                  name: "Camouflage Cafe",
+                  url: "https://camouflagecafe.co.uk",
+                },
+                { name: "Conway Hall", url: "https://www.conwayhall.org.uk" },
+                { name: "EartH", url: "https://earthackney.co.uk" },
+                {
+                  name: "Greenford Quay",
+                  url: "https://www.greenfordquay.com/events",
+                },
+                {
+                  name: "Harris Institute of Teaching and Leadership",
+                  url: "https://www.harrisinstitute.org.uk",
+                },
+                { name: "Ladbroke Hall", url: "https://ladbrokehall.com" },
+              ]}
+            />
+            .
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-16",
     changes: [
       {
