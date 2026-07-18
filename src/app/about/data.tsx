@@ -85,6 +85,13 @@ export const partnerSites = [
     url: "https://filmhose.uk",
     logo: "/images/partners/filmhose.svg",
   },
+  {
+    name: "Every Cinema London",
+    description:
+      "London showtimes in one place, browsable by film or pivoted by venue and date.",
+    url: "https://everycinema.london",
+    logo: "/images/partners/everycinema.svg",
+  },
 ];
 
 export const dataFormats = [
