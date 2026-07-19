@@ -69,6 +69,28 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-19",
+    changes: [
+      {
+        tag: "Under the hood",
+        body: ({ Venue }) => (
+          <>
+            Screenings at{" "}
+            <Venue
+              name="BFI Southbank"
+              url="https://www.bfi.org.uk/bfi-southbank"
+            />{" "}
+            and <Venue name="BFI IMAX" url="https://www.bfi.org.uk/bfi-imax" />{" "}
+            now come through more completely. Malformed links on BFI&apos;s own
+            site caused some performances to be dropped. BFI Southbank data is
+            now pulled from two of BFI&apos;s listing sources at once; anything
+            omitted on one is caught by the other.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-17",
     changes: [
       {
