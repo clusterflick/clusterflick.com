@@ -69,6 +69,36 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-25",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            <Link href="/formats/imax-70mm">IMAX 70mm</Link> is now tracked as a
+            format in its own right, separate from{" "}
+            <Link href="/formats/70mm">70mm</Link>. The 15-perf print running
+            sideways through the projector is a different beast to a standard
+            70mm one, so the two are no longer lumped together — and you can
+            filter for either on its own.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/formats">formats page</Link> is now split into what
+            a screening is played from and how it&apos;s presented, so it&apos;s
+            clearer that an IMAX ticket tells you about the auditorium rather
+            than what&apos;s in the projector. Closely related formats also link
+            across to each other now, in case you landed on the wrong one.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-19",
     changes: [
       {
