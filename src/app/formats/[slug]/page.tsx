@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
-import { FORMATS, resolveFormat, type FormatDefinition } from "@/data/formats";
+import {
+  FORMATS,
+  resolveFormat,
+  getRelatedFormats,
+  type FormatDefinition,
+} from "@/data/formats";
+import Link from "next/link";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { getFormatMovies } from "@/utils/get-format-movies";
 import {
@@ -162,15 +168,29 @@ export default async function FormatDetailPage({
   const collectionName = getFormatCollectionName(format.id);
 
   // The "About" blurb lives inside the hero so it fills the space and lets the
-  // poster backdrop read. A paragraph of unique copy plus a deep link into the
-  // live, filtered film list — a plain <a> forces a full navigation so the
-  // filter provider re-reads the format URL params (same pattern as /genres).
+  // poster backdrop read: a paragraph of unique copy, plus a deep link into the
+  // live, filtered film list.
+  //
+  // Near-neighbour formats (70mm ↔ IMAX 70mm) are distinct values in the data,
+  // so a visitor on one page may well have wanted the other.
+  const relatedFormats = getRelatedFormats(format);
   const heroBlurb = (
     <div className={styles.heroBlurb}>
       <p>{format.seoDescription}</p>
       <p>
-        <a href={browseHref(format)}>Browse all {format.name} films →</a>
+        <Link href={browseHref(format)}>Browse all {format.name} films →</Link>
       </p>
+      {relatedFormats.length > 0 && (
+        <p className={styles.relatedFormats}>
+          See also:{" "}
+          {relatedFormats.map((related, index) => (
+            <span key={related.id}>
+              {index > 0 && ", "}
+              <Link href={getFormatUrl(related)}>{related.name}</Link>
+            </span>
+          ))}
+        </p>
+      )}
     </div>
   );
 

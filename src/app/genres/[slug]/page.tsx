@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
 import { GENRES, resolveGenre, type GenreDefinition } from "@/data/genres";
@@ -172,15 +173,14 @@ export default async function GenreDetailPage({
 
   // The "About" blurb lives inside the hero so it fills the space and lets the
   // poster backdrop read. A paragraph of unique copy plus a deep link into the
-  // live, filtered film list — a plain <a> forces a full navigation so the
-  // filter provider re-reads the genre URL param (same pattern as /accessibility).
+  // live, filtered film list.
   const heroBlurb = (
     <div className={styles.heroBlurb}>
       <p>{genre.seoDescription}</p>
       <p>
-        <a href={`/films?base=all&genres=${genre.id}`}>
+        <Link href={`/films?base=all&genres=${genre.id}`}>
           Browse all {genre.name.toLowerCase()} films →
-        </a>
+        </Link>
       </p>
     </div>
   );

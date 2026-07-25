@@ -1,15 +1,20 @@
 import Link from "next/link";
 import EventCard from "@/components/event-card";
+import ContentSection from "@/components/content-section";
 import StandardPageLayout from "@/components/standard-page-layout";
-import type { FormatListItem } from "./page";
+import type { FormatListItem, FormatSection } from "./page";
 import styles from "./page.module.css";
 
 interface FormatsPageContentProps {
+  /** Every format, flat, for the intro's ranking and inline links. */
   formats: FormatListItem[];
+  /** The same formats grouped by kind, in display order. */
+  sections: FormatSection[];
 }
 
 export default function FormatsPageContent({
   formats,
+  sections,
 }: FormatsPageContentProps) {
   const showingCount = formats.filter((f) => f.movieCount > 0).length;
 
@@ -37,8 +42,8 @@ export default function FormatsPageContent({
       backText="Back to film list"
     >
       <p className={styles.intro}>
-        Some films are best seen in a specific format — the depth of{" "}
-        {formatLink("70mm")}, the grain of {formatLink("35mm")}, or the
+        Some films are best seen in a specific format, whether that&apos;s the
+        depth of {formatLink("70mm")}, the grain of {formatLink("35mm")} or the
         immersion of {formatLink("IMAX")}.
         {hasShowings && (
           <>
@@ -57,29 +62,38 @@ export default function FormatsPageContent({
             .
           </>
         )}{" "}
-        Pick a format to see what&apos;s currently screening and where.
+        Below they&apos;re grouped by the <strong>source</strong> a screening
+        plays from, and the <strong>presentation</strong> it&apos;s shown in.
       </p>
-      <ul className={styles.formatGrid}>
-        {formats.map((format) => (
-          <li key={format.id}>
-            <EventCard
-              href={format.href}
-              name={`${format.name} Films`}
-              imagePath={format.imagePath}
-              description={format.seoDescription}
-              meta={
-                <span className={styles.filmCount}>
-                  {format.movieCount > 0
-                    ? `${format.movieCount.toLocaleString("en-GB")} ${
-                        format.movieCount === 1 ? "film" : "films"
-                      } showing`
-                    : "Nothing showing right now"}
-                </span>
-              }
-            />
-          </li>
-        ))}
-      </ul>
+      {sections.map((section) => (
+        <ContentSection
+          key={section.id}
+          title={section.title}
+          intro={section.intro}
+        >
+          <ul className={styles.formatGrid}>
+            {section.formats.map((format) => (
+              <li key={format.id}>
+                <EventCard
+                  href={format.href}
+                  name={`${format.name} Films`}
+                  imagePath={format.imagePath}
+                  description={format.seoDescription}
+                  meta={
+                    <span className={styles.filmCount}>
+                      {format.movieCount > 0
+                        ? `${format.movieCount.toLocaleString("en-GB")} ${
+                            format.movieCount === 1 ? "film" : "films"
+                          } showing`
+                        : "Nothing showing right now"}
+                    </span>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </ContentSection>
+      ))}
     </StandardPageLayout>
   );
 }

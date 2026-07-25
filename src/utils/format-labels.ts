@@ -14,6 +14,7 @@ type FormatTypes = FormatSource | FormatPresentation | FormatDimension;
 export const FORMAT_LABELS: Record<FormatTypes, string> = {
   [FormatSourceDefault]: "Digital",
   [FormatSource.SeventyMm]: "70mm",
+  [FormatSource.ImaxSeventyMm]: "IMAX 70mm",
   [FormatSource.ThirtyFiveMm]: "35mm",
   [FormatSource.SixteenMm]: "16mm",
   [FormatSource.Vhs]: "VHS",

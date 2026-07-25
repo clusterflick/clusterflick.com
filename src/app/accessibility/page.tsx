@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import slugify from "@sindresorhus/slugify";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
 import Divider from "@/components/divider";
-import { ButtonAnchor } from "@/components/button";
+import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import { AccessibilityFeature, type Movie, type CinemaData } from "@/types";
@@ -455,7 +456,7 @@ export default async function AccessibilityPage() {
                             const subtitle = `${movie.performanceCount.toLocaleString("en-GB")} ${movie.performanceCount === 1 ? "showing" : "showings"}`;
 
                             return (
-                              <a
+                              <Link
                                 key={movie.id}
                                 href={`/movies/${movie.id}/${slugify(movie.title)}?base=all&accessibility=${featureStat.feature}`}
                                 className={styles.posterLink}
@@ -483,19 +484,16 @@ export default async function AccessibilityPage() {
                                     headingLevel="h3"
                                   />
                                 )}
-                              </a>
+                              </Link>
                             );
                           })}
                         </div>
                       </div>
                     )}
 
-                    {/* Plain <a> instead of <Link> to force full page load,
-                        ensuring FilterConfigProvider re-initialises and
-                        picks up the ?accessibility= URL param */}
-                    <ButtonAnchor href={filterUrl}>
+                    <ButtonLink href={filterUrl}>
                       Browse {label} screenings →
-                    </ButtonAnchor>
+                    </ButtonLink>
                   </>
                 ) : (
                   <p className={styles.noScreenings}>

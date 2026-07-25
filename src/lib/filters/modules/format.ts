@@ -58,6 +58,7 @@ export const FORMAT_GROUPS: FormatGroupConfig[] = [
     options: [
       { value: "digital", label: "Digital" },
       { value: FormatSource.SeventyMm, label: "70mm" },
+      { value: FormatSource.ImaxSeventyMm, label: "IMAX 70mm" },
       { value: FormatSource.ThirtyFiveMm, label: "35mm" },
       { value: FormatSource.SixteenMm, label: "16mm" },
       { value: FormatSource.Vhs, label: "VHS" },

@@ -101,6 +101,10 @@ type MoviePerformanceAccessibility = Partial<
 export enum FormatSource {
   Digital = "digital",
   SeventyMm = "70mm",
+  // A 15/70 (horizontal) IMAX print — a different film geometry from a standard
+  // 5/70 70mm print, so it is its own source rather than a 70mm variant. The
+  // "IMAX" here names the print, not the screen; presentation still records that.
+  ImaxSeventyMm = "imax-70mm",
   ThirtyFiveMm = "35mm",
   SixteenMm = "16mm",
   Vhs = "vhs",

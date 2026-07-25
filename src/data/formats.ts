@@ -26,6 +26,45 @@ export type FormatKind = "source" | "presentation" | "dimension";
 
 export type FormatValue = FormatSource | FormatPresentation | FormatDimension;
 
+export type FormatSectionDefinition = {
+  /** Stable key for React and for the section anchor. */
+  id: string;
+  /** The kinds gathered under this heading, in display order. */
+  kinds: FormatKind[];
+  title: string;
+  intro: string;
+};
+
+/**
+ * How the formats index is grouped into sections, in display order.
+ *
+ * A section can span several kinds, so this is a presentation choice rather
+ * than a restatement of `FormatKind`. Dimension rides along with presentation:
+ * on its own it is a heading over the single 3D page, and 2D-vs-3D is part of
+ * how a film is put on screen rather than a separate idea worth its own block.
+ *
+ * The source/presentation split is the one visitors get wrong. An IMAX ticket
+ * says which auditorium you are sitting in, not what the projector is fed, and
+ * these intros exist to head that off before someone opens the IMAX page
+ * expecting every screening on it to be an IMAX 70mm print.
+ */
+export const FORMAT_SECTIONS: FormatSectionDefinition[] = [
+  {
+    id: "source",
+    kinds: ["source"],
+    title: "Source",
+    intro:
+      "What the projector is actually playing. This is where a film's texture comes from, whether that's the grain of a celluloid print or the cleanliness of a digital master.",
+  },
+  {
+    id: "presentation",
+    kinds: ["presentation", "dimension"],
+    title: "Presentation",
+    intro:
+      "The auditorium and its equipment: the screen, the projection system, the sound, and whether the film is shown flat or in 3D.",
+  },
+];
+
 export type FormatDefinition = {
   /** The `performance.format[kind]` value this page represents. */
   id: FormatValue;
@@ -37,6 +76,12 @@ export type FormatDefinition = {
   slug: string;
   /** Alternate slugs that redirect to the canonical page. */
   aliases?: string[];
+  /**
+   * Other formats worth linking from this one's page, for near-neighbours a
+   * visitor might have meant instead (70mm ↔ IMAX 70mm). Cross-links are not
+   * inferred, so each side must list the other.
+   */
+  related?: FormatValue[];
   /** One or two sentences of unique copy for the meta description, hero blurb,
    *  and JSON-LD description. Kept human-written to avoid thin/duplicate content. */
   seoDescription: string;
@@ -54,8 +99,18 @@ const SOURCE_FORMATS: FormatSeed[] = [
     id: FormatSource.SeventyMm,
     kind: "source",
     slug: "70mm",
+    related: [FormatSource.ImaxSeventyMm],
     seoDescription:
       "Large-format 70mm prints deliver exceptional depth, clarity and scale on the big screen. Find 70mm screenings across London's cinemas, from restored classics to blockbuster revivals.",
+  },
+  {
+    id: FormatSource.ImaxSeventyMm,
+    kind: "source",
+    slug: "imax-70mm",
+    aliases: ["imax70mm", "15-70"],
+    related: [FormatSource.SeventyMm, FormatPresentation.Imax],
+    seoDescription:
+      "The largest film format in commercial exhibition: 15-perforation 70mm running horizontally through the projector, for roughly ten times the negative area of a standard 35mm frame.",
   },
   {
     id: FormatSource.ThirtyFiveMm,
@@ -100,6 +155,7 @@ const PRESENTATION_FORMATS: FormatSeed[] = [
     id: FormatPresentation.Imax,
     kind: "presentation",
     slug: "imax",
+    related: [FormatSource.ImaxSeventyMm],
     seoDescription:
       "The largest screens and highest resolution for maximum immersion. Find IMAX screenings across London's cinemas.",
   },
@@ -151,6 +207,35 @@ const EXCLUDED_DEFAULTS: FormatValue[] = [
 ];
 if (FORMATS.some((f) => EXCLUDED_DEFAULTS.includes(f.id))) {
   throw new Error("A default format value must not have a landing page.");
+}
+
+/** The formats listed in `related`, in canonical `FORMATS` order. */
+export function getRelatedFormats(
+  format: FormatDefinition,
+): FormatDefinition[] {
+  if (!format.related?.length) return [];
+  const related = new Set(format.related);
+  return FORMATS.filter((f) => related.has(f.id));
+}
+
+// A `related` entry that doesn't resolve would silently drop a cross-link, so
+// fail the build instead.
+for (const format of FORMATS) {
+  const resolved = getRelatedFormats(format).length;
+  if (resolved !== (format.related?.length ?? 0)) {
+    throw new Error(`Format "${format.slug}" lists an unknown related format.`);
+  }
+}
+
+// Every kind must land in exactly one section, otherwise a new format could be
+// dropped from the index (no section claims it) or listed twice.
+for (const format of FORMATS) {
+  const claiming = FORMAT_SECTIONS.filter((s) => s.kinds.includes(format.kind));
+  if (claiming.length !== 1) {
+    throw new Error(
+      `Format kind "${format.kind}" is claimed by ${claiming.length} sections; expected exactly 1.`,
+    );
+  }
 }
 
 /**

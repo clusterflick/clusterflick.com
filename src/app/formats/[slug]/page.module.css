@@ -13,3 +13,10 @@
 .heroBlurb p:last-child {
   margin-bottom: 0;
 }
+
+/* Cross-links to near-neighbour formats — a secondary aside under the main
+   call to action, so it reads quieter than the browse link above it. */
+.relatedFormats {
+  font-size: 0.9em;
+  opacity: 0.85;
+}

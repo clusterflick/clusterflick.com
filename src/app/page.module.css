@@ -15,7 +15,7 @@
 }
 
 .introLead {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.7;
   color: var(--color-light-gray);
   margin: 0 auto 28px auto;
@@ -23,7 +23,7 @@
 
 .summary {
   margin: 24px auto 0;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.7;
   color: var(--color-white);
   text-align: left;

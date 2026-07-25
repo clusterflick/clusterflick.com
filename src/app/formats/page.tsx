@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { FORMATS } from "@/data/formats";
+import { FORMATS, FORMAT_SECTIONS, type FormatKind } from "@/data/formats";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { getFormatImagePath } from "@/utils/get-format-image";
 import { getFormatMovies } from "@/utils/get-format-movies";
@@ -9,14 +9,14 @@ import FormatsPageContent from "./page-content";
 export const metadata: Metadata = {
   title: "Browse Films by Format in London",
   description:
-    "Browse London cinema listings by format — 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across London's 300+ cinemas.",
+    "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across London's 300+ cinemas.",
   alternates: {
     canonical: "/formats",
   },
   openGraph: {
     title: "Browse Films by Format in London | Clusterflick",
     description:
-      "Browse London cinema listings by format — 70mm, 35mm, 16mm, IMAX, 3D and more.",
+      "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more.",
     url: "https://clusterflick.com/formats",
     siteName: "Clusterflick",
   },
@@ -24,18 +24,27 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Browse Films by Format in London | Clusterflick",
     description:
-      "Browse London cinema listings by format — 70mm, 35mm, 16mm, IMAX, 3D and more.",
+      "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more.",
     creator: "@clusterflick",
   },
 };
 
 export type FormatListItem = {
   id: string;
+  kind: FormatKind;
   name: string;
   href: string;
   imagePath: string | null;
   seoDescription: string;
   movieCount: number;
+};
+
+/** One rendered section of the index: a heading, its intro and its formats. */
+export type FormatSection = {
+  id: string;
+  title: string;
+  intro: string;
+  formats: FormatListItem[];
 };
 
 export default async function FormatsPage() {
@@ -45,12 +54,26 @@ export default async function FormatsPage() {
 
   const formats: FormatListItem[] = FORMATS.map((format) => ({
     id: format.id,
+    kind: format.kind,
     name: format.name,
     href: getFormatUrl(format),
     imagePath: getFormatImagePath(format.slug),
     seoDescription: format.seoDescription,
     movieCount: getFormatMovies(format, data.movies, nowTs).length,
   }));
+
+  // Group into sections so source and presentation read as separate ideas
+  // rather than one undifferentiated list. Formats keep their FORMATS order
+  // within a section, and empty sections are dropped so the page never renders
+  // a heading over nothing.
+  const sections: FormatSection[] = FORMAT_SECTIONS.map(
+    ({ id, title, intro, kinds }) => ({
+      id,
+      title,
+      intro,
+      formats: formats.filter((format) => kinds.includes(format.kind)),
+    }),
+  ).filter((section) => section.formats.length > 0);
 
   const jsonLd = [
     {
@@ -97,7 +120,7 @@ export default async function FormatsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <FormatsPageContent formats={formats} />
+      <FormatsPageContent formats={formats} sections={sections} />
     </>
   );
 }
