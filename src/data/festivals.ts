@@ -248,6 +248,9 @@ export const FESTIVALS: Festival[] = [
         [FilterId.ShowingTitleSearch]: "Final Film Festival",
       },
       {
+        [FilterId.PerformanceNotesSearch]: "Final Film Festival",
+      },
+      {
         [FilterId.ShowingTitleSearch]: "TFFF:",
       },
       {
