@@ -69,6 +69,52 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-27",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            There&apos;s now an <Link href="/updates">updates page</Link>,
+            showing what&apos;s just landed in the listings — films appearing
+            for the first time, extra showings for ones already playing, and
+            newly added venues. It&apos;s grouped by each refresh, so you can
+            see what changed and exactly when.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The updates page has an{" "}
+            <a href="/updates/feed.xml" target="_blank">
+              RSS feed
+            </a>
+            , if you&apos;d rather hear about new screenings without visiting
+            the site. Each entry in the feed matches a section on the page.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            Every refresh of the listings now{" "}
+            <a
+              href="https://github.com/clusterflick/data-diffed/"
+              target="_blank"
+            >
+              publishes a record of what changed in it
+            </a>
+            , alongside the listings themselves. That&apos;s what the updates
+            page and its feed are built from.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-25",
     changes: [
       {
