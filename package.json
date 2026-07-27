@@ -8,6 +8,7 @@
     "lint": "tsc --noEmit && eslint",
     "format": "prettier --write --ignore-path .gitignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
+    "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",
     "test": "vitest run --project unit",
     "storybook": "storybook dev -p 6006",

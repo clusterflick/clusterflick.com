@@ -21,5 +21,7 @@ do
     wget "$f" --quiet -P ./matched-data/
 done
 
+npm run fetch-diffed-data
+
 rm -rf ./public/data
 npm run process-combined-data

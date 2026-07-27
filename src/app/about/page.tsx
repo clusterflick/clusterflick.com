@@ -175,7 +175,7 @@ export default function AboutPage() {
       <Divider />
 
       <div className={styles.content}>
-        <div className={styles.technicalGroup}>
+        <div id="behind-the-scenes" className={styles.technicalGroup}>
           <GroupHeader
             icon="/images/icons/neon-projector.svg"
             iconWidth={80}

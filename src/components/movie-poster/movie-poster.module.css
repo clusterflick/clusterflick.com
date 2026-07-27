@@ -12,6 +12,18 @@
   padding: 16px;
   text-align: center;
 
+  /* Unlike the fixed sizes, xsmall fills its column up to 160px so dense grids
+     can pack tighter on narrow screens instead of leaving a dead column. */
+  &.xsmall {
+    width: 100%;
+    max-width: 160px;
+    height: auto;
+    aspect-ratio: 2 / 3;
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
   &.small {
     width: 200px;
     height: 300px;
@@ -37,8 +49,14 @@
 }
 
 .poster {
-  &.small.interactive:hover img {
+  &.small.interactive:hover img,
+  &.xsmall.interactive:hover img {
     transform: scale(1.05);
+  }
+
+  &.xsmall img {
+    width: 100%;
+    height: 100%;
   }
 
   &.large {
@@ -92,7 +110,20 @@
 }
 
 /* Zoom effect on hover for interactive placeholder posters */
-.noPoster.small.interactive:hover .textPattern {
+.noPoster.small.interactive:hover .textPattern,
+.noPoster.xsmall.interactive:hover .textPattern {
+  transform: rotate(-31deg) scale(1.05);
+}
+
+/* Hovering an enclosing link animates the artwork too, so a tile that wraps the
+   whole card in a single link reacts as one target wherever the pointer sits —
+   and reacts the same whether or not the film has a poster. Limited to xsmall
+   because only the updates feed wraps posters this way. */
+a:hover .poster.xsmall img {
+  transform: scale(1.05);
+}
+
+a:hover .noPoster.xsmall .textPattern {
   transform: rotate(-31deg) scale(1.05);
 }
 
@@ -119,6 +150,15 @@
 }
 
 .noPoster.large .textRow.filled {
+  -webkit-text-stroke: 0;
+}
+
+.noPoster.xsmall .textRow {
+  font-size: 14px;
+  -webkit-text-stroke: 1px var(--pattern-color);
+}
+
+.noPoster.xsmall .textRow.filled {
   -webkit-text-stroke: 0;
 }
 

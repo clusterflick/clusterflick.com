@@ -15,6 +15,7 @@ interface NavLink {
 
 export const NAV_LINKS: readonly NavLink[] = [
   { href: "/films", label: "Films", primary: true },
+  { href: "/updates", label: "Updates", primary: true },
   { href: "/formats", label: "Formats", primary: true },
   { href: "/genres", label: "Genres" },
   { href: "/venues", label: "Venues", primary: true },

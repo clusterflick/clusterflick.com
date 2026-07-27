@@ -7,6 +7,8 @@ import MoviePoster from "@/components/movie-poster";
  * always-visible when no poster image is provided.
  *
  * **Sizes:**
+ * - `"xsmall"` (up to 160×240px) — dense listings where many films appear at once,
+ *   such as the updates feed.
  * - `"small"` (default, 200×300px) — used in the poster grid.
  * - `"large"` (308×462px) — used on the movie detail page hero.
  *
@@ -29,7 +31,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["small", "large"],
+      options: ["xsmall", "small", "large"],
     },
   },
 } satisfies Meta<typeof MoviePoster>;
@@ -109,4 +111,24 @@ export const ColorVariety: Story = {
       ))}
     </div>
   ),
+};
+
+/**
+ * Extra-small size, used where many films are listed together and the poster is
+ * a visual anchor rather than the main content — the updates feed.
+ */
+export const WithPosterExtraSmall: Story = {
+  args: {
+    title: "Spirited Away",
+    posterPath: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    size: "xsmall",
+  },
+};
+
+/** Extra-small text-pattern fallback, for an event with no TMDB match. */
+export const NoPosterExtraSmall: Story = {
+  args: {
+    title: "Pub Film Quiz",
+    size: "xsmall",
+  },
 };

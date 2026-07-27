@@ -44,6 +44,11 @@ jobs:
           latest: true
           fileName: "*"
           out-file-path: "matched-data"
+      # A window of releases rather than just the latest, so the updates feed
+      # covers more than a single pipeline run
+      - run: npm run fetch-diffed-data
+        env:
+          PAT: ${{ secrets.PAT }}
       - run: npm run process-combined-data
       - run: npm run generate-summary
         env:

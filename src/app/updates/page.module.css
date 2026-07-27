@@ -1,0 +1,196 @@
+.heroNote {
+  margin: 12px 0 0;
+  font-size: 15px;
+  opacity: 0.75;
+}
+
+/* The feed is a plain <a> rather than a Link: it's a static file, not a route,
+   so Next's client router must not try to handle it. */
+.feedLink {
+  white-space: nowrap;
+}
+
+/* ─── Timeline: one entry per pipeline run ─── */
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.release {
+  list-style: none;
+  scroll-margin-top: 80px;
+}
+
+.release + .release {
+  margin-top: 48px;
+  padding-top: 48px;
+}
+
+.releaseHeading {
+  font-size: 26px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.releaseSummary {
+  margin: 0 0 24px;
+  padding-bottom: 10px;
+  font-size: 14px;
+  opacity: 0.6;
+  border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+/* ─── Sections within a run ─── */
+
+.section + .section {
+  margin-top: 28px;
+}
+
+.sectionHeading {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0 0 14px;
+}
+
+.prose {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── New films: dense poster tiles ─── */
+
+.tiles {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  /* Flexible tracks rather than fixed ones: six across the 960px content area,
+     dropping to two on a phone, with the poster filling whatever it lands in */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px 16px;
+  justify-content: start;
+}
+
+.tile {
+  min-width: 0;
+}
+
+/* The whole tile is the link, so it carries none of the global anchor styling
+   and drives the hover state for everything inside it. */
+.tileLink {
+  display: block;
+  border-bottom: none;
+  color: inherit;
+  font-weight: inherit;
+}
+
+.tileLink:hover {
+  color: inherit;
+}
+
+.tileLink:hover .tileTitle {
+  color: var(--color-neon-pink);
+}
+
+/* The artwork's own hover response to an enclosing link lives in MoviePoster,
+   so it covers the placeholder as well as a real poster. */
+
+.tileLink:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.tileTitle {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 10px 0 2px;
+  color: var(--color-electric-blue);
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Two lines keeps every tile the same height without truncating most titles */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Wraps rather than truncating — at this width an ellipsis would eat the venue
+   name that makes the entry useful. */
+.tileVenue,
+.tileMeta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+}
+
+.tileVenue {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tileMeta {
+  opacity: 0.55;
+}
+
+/* ─── More showings: text only, already dense ─── */
+
+.showings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.showing {
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+
+/* Venue names sit in white with the underline left blue. A run can name a dozen
+   venues, and styling them as full links turned the section into a wall of
+   blue — the film title stays the blue link, so it still leads. */
+.venueLinks a {
+  font-weight: normal;
+  color: var(--color-light-gray);
+  border-bottom: 2px solid rgba(var(--color-electric-blue-rgb), 0.5);
+}
+
+.venueLinks a:hover {
+  color: var(--color-neon-pink);
+  border-bottom: 2px solid var(--color-neon-pink);
+}
+
+.showing::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(var(--color-neon-pink-rgb), 0.8);
+}
+
+@media (min-width: 700px) {
+  .releaseHeading {
+    font-size: 32px;
+  }
+}

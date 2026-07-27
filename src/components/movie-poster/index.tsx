@@ -3,9 +3,24 @@ import clsx from "clsx";
 import { getPosterColor } from "@/utils/get-poster-color";
 import styles from "./movie-poster.module.css";
 
+/**
+ * `xsmall` is for dense listings where many films appear at once (the updates
+ * feed), `small` for standard grids and rows, `large` for detail pages.
+ */
+export type PosterSize = "xsmall" | "small" | "large";
+
+const POSTER_DIMENSIONS: Record<
+  PosterSize,
+  { width: number; height: number; imageSize: string }
+> = {
+  xsmall: { width: 160, height: 240, imageSize: "w342" },
+  small: { width: 200, height: 300, imageSize: "w342" },
+  large: { width: 308, height: 462, imageSize: "w500" },
+};
+
 interface MoviePosterImageProps {
   title: string;
-  size: "small" | "large";
+  size: PosterSize;
   posterPath: string;
   overlay: React.ReactNode | null;
   interactive: boolean;
@@ -20,12 +35,7 @@ function MoviePosterImage({
   interactive,
   priority,
 }: MoviePosterImageProps) {
-  const dimensions =
-    size === "large"
-      ? { width: 308, height: 462 }
-      : { width: 200, height: 300 };
-
-  const imageSize = size === "large" ? "w500" : "w342";
+  const { imageSize, ...dimensions } = POSTER_DIMENSIONS[size];
   const isPriority = priority ?? size === "large";
 
   return (
@@ -50,7 +60,7 @@ function MoviePosterImage({
 
 interface TextPatternPosterProps {
   title: string;
-  size: "small" | "large";
+  size: PosterSize;
   overlay: React.ReactNode | null;
   interactive: boolean;
 }
@@ -63,8 +73,8 @@ function TextPatternPoster({
 }: TextPatternPosterProps) {
   const color = getPosterColor(title);
   const displayTitle = title.toUpperCase();
-  const rowCount = size === "large" ? 24 : 18;
-  const offsetStep = size === "large" ? 20 : 15;
+  const rowCount = { large: 24, small: 18, xsmall: 14 }[size];
+  const offsetStep = { large: 20, small: 15, xsmall: 12 }[size];
 
   // Create the repeating text for each row
   const repeatedText = `${displayTitle} `.repeat(8);
@@ -101,7 +111,7 @@ interface MoviePosterProps {
   posterPath?: string;
   title: string;
   subtitle?: string;
-  size?: "small" | "large";
+  size?: PosterSize;
   showOverlay?: boolean;
   /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
   interactive?: boolean;

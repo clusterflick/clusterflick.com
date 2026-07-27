@@ -263,3 +263,70 @@ export type CinemaData = {
 export type MetaData = Omit<CinemaData, "movies"> & {
   mapping: Record<string, string[]>;
 };
+
+/**
+ * A single pipeline run's changes, as published by `clusterflick/data-diffed`.
+ * One release per run; the updates feed reads a window of them.
+ *
+ * Only the fields the site uses are typed here — the blob also carries removals
+ * and TMDB match changes, which the feed deliberately ignores.
+ */
+export type DiffShowing = {
+  showingId: string;
+  title: string;
+  url: string;
+  category: Category;
+  seen?: number;
+  themoviedb?: DiffMovieMatch;
+  themoviedbs?: DiffMovieMatch[];
+  /** Present on added showings only: future performance times, ascending. */
+  performances?: number[];
+  futurePerformanceCount: number;
+  nextPerformance: number | null;
+};
+
+export type DiffMovieMatch = {
+  id: number;
+  title: string;
+  releaseDate: string;
+};
+
+export type DiffModifiedShowing = {
+  showingId: string;
+  title: string;
+  url: string;
+  category: Category;
+  themoviedb?: DiffMovieMatch;
+  themoviedbs?: DiffMovieMatch[];
+  performances: {
+    previousCount: number;
+    currentCount: number;
+    /** Newly scheduled performance times. */
+    added: number[];
+    removed: number[];
+    rescheduled: number;
+  };
+};
+
+export type DiffVenue = {
+  name: string | null;
+  venueAdded: boolean;
+  venueRemoved: boolean;
+  venueEmpty: boolean;
+  showings: {
+    added: DiffShowing[];
+    removed: DiffShowing[];
+    modified: DiffModifiedShowing[];
+  };
+};
+
+export type DiffBlob = {
+  metadata: {
+    currentRelease: string;
+    previousRelease: string;
+    /** When the compared release was published — what the diff is anchored to. */
+    asOf: string;
+    venueCount: number;
+  };
+  venues: Record<string, DiffVenue>;
+};

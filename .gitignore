@@ -47,6 +47,7 @@ next-env.d.ts
 # Clusterflick
 /combined-data/
 /matched-data/
+/diffed-data/
 /public/data/
 
 # Storybook

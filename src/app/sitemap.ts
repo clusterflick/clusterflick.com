@@ -134,6 +134,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: "https://clusterflick.com/updates",
+      lastModified: data.generatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    },
+    {
       url: "https://clusterflick.com/about",
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,
