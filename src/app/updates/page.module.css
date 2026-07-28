@@ -178,6 +178,32 @@
   border-bottom: 2px solid var(--color-neon-pink);
 }
 
+/* Sits at the end of the venue sentence, so it takes the surrounding text's
+   metrics and reads as blue against the white venue names it reveals. */
+.moreToggle {
+  font: inherit;
+  padding: 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid rgba(var(--color-electric-blue-rgb), 0.5);
+  color: var(--color-electric-blue);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.moreToggle:hover {
+  color: var(--color-neon-pink);
+  border-bottom-color: var(--color-neon-pink);
+}
+
+.moreToggle:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .showing::before {
   content: "";
   position: absolute;

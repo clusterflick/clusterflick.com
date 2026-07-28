@@ -11,8 +11,9 @@ import {
   readDiffBlobs,
   summariseRelease,
 } from "@/utils/get-updates";
-import type { UpdateFilm, UpdateVenue } from "@/utils/get-updates";
+import type { UpdateFilm } from "@/utils/get-updates";
 import { formatDateLong, formatShowingTime } from "@/utils/format-date";
+import VenueList from "./venue-list";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -44,31 +45,6 @@ export const metadata: Metadata = {
     creator: "@clusterflick",
   },
 };
-
-/** "A", "A and B", "A, B and C" — venues link where the venue page exists. */
-function VenueList({
-  venues,
-  className,
-}: {
-  venues: UpdateVenue[];
-  className?: string;
-}) {
-  return (
-    <span className={className}>
-      {venues.map((venue, index) => (
-        <span key={venue.id}>
-          {venue.href ? (
-            <Link href={venue.href}>{venue.name}</Link>
-          ) : (
-            venue.name
-          )}
-          {index < venues.length - 2 ? ", " : null}
-          {index === venues.length - 2 ? " and " : null}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 /**
  * A compact poster tile. Venues collapse to a count past the first so a season
@@ -211,10 +187,13 @@ export default async function UpdatesPage() {
                             film.title
                           )}
                           {" — "}
-                          {pluralise(
-                            film.performanceCount,
-                            "new showing",
-                          )} at{" "}
+                          {pluralise(film.performanceCount, "new showing")}
+                          {" at "}
+                          {/* One venue names itself; more than one leads with
+                              the count, so the reach is clear before the list */}
+                          {film.venues.length > 1 && (
+                            <>{pluralise(film.venues.length, "venue")}: </>
+                          )}
                           <VenueList
                             venues={film.venues}
                             className={styles.venueLinks}

@@ -1,7 +1,5 @@
 "use client";
 
-const SHOW_ALL_HASH = "#show-all";
-
 import {
   useEffect,
   useMemo,
@@ -20,6 +18,7 @@ import {
 } from "@/state/filter-config-context";
 import { filterManager, describeFilters } from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
+import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";

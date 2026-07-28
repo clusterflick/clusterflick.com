@@ -7,7 +7,7 @@ import type {
   DiffShowing,
   Movie,
 } from "@/types";
-import { getMovieUrl } from "./get-movie-url";
+import { getMovieUrl, SHOW_ALL_HASH } from "./get-movie-url";
 import { getVenueUrl } from "./get-venue-url";
 
 /** A venue a film newly appeared at, or gained dates at, in a given run. */
@@ -22,7 +22,11 @@ export type UpdateFilm = {
   /** Stable within a run; the movie id when matched, else the title. */
   key: string;
   title: string;
-  /** Link to the film's page, when it is still in the current dataset. */
+  /**
+   * Link to the film's page, when it is still in the current dataset. Carries
+   * the show-all hash: an update names showings the reader's own filters would
+   * often hide, so arriving to an empty schedule would make the entry a lie.
+   */
   href: string | null;
   posterPath?: string;
   year?: string;
@@ -57,9 +61,13 @@ export type UpdateRelease = {
   newVenues: UpdateVenueAddition[];
 };
 
-/** "1 film", "3 films" — the site counts performance times as showings. */
+/**
+ * "1 film", "10,293 showings" — the site counts performance times as showings.
+ * A busy run reaches five figures, so counts are grouped as the rest of the
+ * site groups them.
+ */
 export function pluralise(count: number, word: string): string {
-  return `${count} ${word}${count === 1 ? "" : "s"}`;
+  return `${count.toLocaleString("en-GB")} ${word}${count === 1 ? "" : "s"}`;
 }
 
 /**
@@ -215,7 +223,7 @@ function accumulate(
       film: {
         key,
         title: movie?.title ?? showing.title,
-        href: movie ? getMovieUrl(movie) : null,
+        href: movie ? `${getMovieUrl(movie)}${SHOW_ALL_HASH}` : null,
         posterPath: movie?.posterPath,
         year: movie?.year,
         classification: movie?.classification,

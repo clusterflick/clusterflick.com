@@ -55,7 +55,13 @@ function filmLine(film: UpdateFilm, showingWord: string): string {
     .join(", ");
 
   const count = pluralise(film.performanceCount, showingWord);
-  return `<li>${title} — ${count} at ${venues}</li>`;
+  // As on the page, a single venue names itself and more than one leads with
+  // the count. The feed never truncates the list — an item is read once.
+  const at =
+    film.venues.length > 1
+      ? `${escapeXml(pluralise(film.venues.length, "venue"))}: ${venues}`
+      : venues;
+  return `<li>${title} — ${count} at ${at}</li>`;
 }
 
 /**

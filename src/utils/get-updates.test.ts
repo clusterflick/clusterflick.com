@@ -133,7 +133,7 @@ describe("buildUpdates", () => {
     expect(result[0].newFilms[0]).toMatchObject({
       key: "550",
       title: "Fight Club",
-      href: "/movies/550/fight-club",
+      href: "/movies/550/fight-club#show-all",
       posterPath: "/550.jpg",
       performanceCount: 1,
       nextPerformance: JUL_25 + DAY,
@@ -362,7 +362,7 @@ describe("buildUpdates", () => {
 
     expect(result[0].newFilms[0]).toMatchObject({
       key: "550",
-      href: "/movies/550/fight-club",
+      href: "/movies/550/fight-club#show-all",
     });
   });
 
