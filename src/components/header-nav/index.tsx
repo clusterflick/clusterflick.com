@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 import { PRIMARY_NAV_LINKS, setUseBrowserBack } from "@/utils/nav-links";
 import styles from "./header-nav.module.css";
 
@@ -17,13 +18,19 @@ const NEIGHBOUR_MARGIN = 24;
  * reachable via the always-visible hamburger menu. On filter pages that
  * neighbour is the centred filter summary (which grows as its text does); on
  * the home page there's no filter, so the wordmark logo is the neighbour.
+ *
+ * Until the first measurement the nav is laid out but not painted, so narrow
+ * screens never flash a full set of links overlapping the header before the
+ * overflowing ones are trimmed.
  */
 export default function HeaderNav() {
   const navRef = useRef<HTMLElement>(null);
   // Natural widths (incl. gap) of each link, cached from live measurements so
   // hidden links don't report 0. Text is static, so these are stable.
   const linkWidths = useRef<number[]>([]);
-  const [visibleCount, setVisibleCount] = useState(PRIMARY_NAV_LINKS.length);
+  // `null` until the first measurement: every link still takes up layout (so it
+  // can be measured) but the nav as a whole is invisible.
+  const [visibleCount, setVisibleCount] = useState<number | null>(null);
 
   const recompute = useCallback(() => {
     const nav = navRef.current;
@@ -89,13 +96,17 @@ export default function HeaderNav() {
   }, [recompute]);
 
   return (
-    <nav ref={navRef} className={styles.nav} aria-label="Main navigation">
+    <nav
+      ref={navRef}
+      className={clsx(styles.nav, visibleCount === null && styles.measuring)}
+      aria-label="Main navigation"
+    >
       {PRIMARY_NAV_LINKS.map(({ href, label }, i) => (
         <Link
           key={href}
           href={href}
           onClick={setUseBrowserBack}
-          hidden={i >= visibleCount}
+          hidden={visibleCount !== null && i >= visibleCount}
         >
           {label}
         </Link>

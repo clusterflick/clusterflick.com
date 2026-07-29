@@ -3,3 +3,12 @@
   align-items: center;
   gap: 12px;
 }
+
+/*
+ * Pre-measurement state: links keep their layout box (so their widths can be
+ * read) but paint nothing, so the full set never flashes over the header on
+ * narrow screens.
+ */
+.measuring {
+  visibility: hidden;
+}

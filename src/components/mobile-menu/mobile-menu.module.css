@@ -27,14 +27,89 @@
   }
 }
 
-.overlay {
+/*
+ * The popover itself covers the whole viewport, holding the dismiss overlay and
+ * the sliding panel. The browser paints it in the top layer, so no z-index is
+ * needed. `width`/`height` must be stated explicitly: the UA stylesheet's
+ * `[popover]` rule sets them to `fit-content`, which would otherwise collapse
+ * this to its content.
+ */
+.menuLayer {
   position: fixed;
   inset: 0;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  padding: 0;
+  /*
+   * The panel animates in from `translateX(100%)`, i.e. from outside this
+   * layer's bounds. Without clipping, that overflow raises scrollbars for the
+   * duration of the slide. `clip` rather than `hidden`: no scroll container,
+   * no effect on layout.
+   */
+  overflow: clip;
+}
+
+/*
+ * `display` is set only while open, deliberately: the UA stylesheet hides a
+ * closed popover with `display: none`, and any author `display` declaration on
+ * the base selector would override that and leave the menu permanently open.
+ */
+.menuLayer:popover-open {
+  display: block;
+}
+
+/*
+ * Fail closed rather than open: a browser without popover support ignores the
+ * attribute and would otherwise paint the menu permanently over the page. The
+ * menu is unreachable there, which is the accepted trade-off — popover is
+ * Baseline 2024 (Chrome 114, Safari 17, Firefox 125).
+ */
+@supports not selector(:popover-open) {
+  .menuLayer {
+    display: none;
+  }
+}
+
+/* Dimmed page behind the panel; also the click-to-dismiss target. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  cursor: default;
   background: rgba(var(--color-black-rgb), 0.8);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 300;
   animation: fadeIn 0.2s ease;
+}
+
+.menuPanel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(320px, 85vw);
+  background: linear-gradient(
+    180deg,
+    var(--color-dark-navy) 0%,
+    var(--color-midnight-navy) 100%
+  );
+  border: none;
+  border-left: 1px solid var(--color-neon-pink);
+  box-shadow:
+    -4px 0 30px rgba(var(--color-neon-pink-rgb), 0.2),
+    -8px 0 60px rgba(var(--color-neon-pink-rgb), 0.1);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Replaces the JS body-scroll lock that ran while the menu was open. */
+:global(body):has(.menuLayer:popover-open) {
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -44,28 +119,6 @@
   to {
     opacity: 1;
   }
-}
-
-.menuPanel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(320px, 85vw);
-  background: linear-gradient(
-    180deg,
-    var(--color-dark-navy) 0%,
-    var(--color-midnight-navy) 100%
-  );
-  border-left: 1px solid var(--color-neon-pink);
-  box-shadow:
-    -4px 0 30px rgba(var(--color-neon-pink-rgb), 0.2),
-    -8px 0 60px rgba(var(--color-neon-pink-rgb), 0.1);
-  z-index: 301;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideIn {

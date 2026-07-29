@@ -1,101 +1,69 @@
-"use client";
-
-import { useState, useEffect, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
-import Link from "next/link";
 import { MenuIcon, CloseIcon } from "@/components/icons";
-import { NAV_LINKS, setUseBrowserBack } from "@/utils/nav-links";
+import { NAV_LINKS } from "@/utils/nav-links";
+import MenuLink from "./menu-link";
+import { MENU_ID } from "./menu-id";
 import styles from "./mobile-menu.module.css";
 
+/**
+ * The always-visible hamburger menu, exposing the full navigation list at every
+ * screen size.
+ *
+ * Open/close is driven entirely by the HTML Popover API — no JS — so the menu
+ * works before hydration and with JS disabled. The browser also provides light
+ * dismiss (Escape and click-outside) and the `aria-expanded` mapping on the
+ * invoker, so none of that is hand-rolled here.
+ *
+ * The panel is promoted to the top layer when open, which is what lets it live
+ * inside the header despite the header's `backdrop-filter` (a filter otherwise
+ * makes an element the containing block for its fixed-position descendants) and
+ * its `z-index` stacking context.
+ */
 export default function MobileMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-
-  const closeMenu = useCallback(() => {
-    setIsOpen(false);
-    menuButtonRef.current?.focus();
-  }, []);
-
-  // Track if component is mounted (for SSR-safe portal rendering).
-  // This causes an extra render on mount, but is necessary for hydration safety.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: need re-render after mount for SSR-safe portal
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
-  // Close menu on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeMenu();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      // Prevent body scroll when menu is open
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, closeMenu]);
-
-  const menuContent = isOpen && (
-    <>
-      <div className={styles.overlay} onClick={closeMenu} aria-hidden="true" />
-      <div
-        className={styles.menuPanel}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation menu"
-      >
-        <button
-          type="button"
-          className={styles.closeButton}
-          onClick={closeMenu}
-          aria-label="Close menu"
-        >
-          <CloseIcon size={24} />
-        </button>
-        <nav className={styles.nav} aria-label="Main navigation">
-          {NAV_LINKS.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={styles.navLink}
-              onClick={() => {
-                setIsOpen(false);
-                setUseBrowserBack();
-              }}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </>
-  );
-
   return (
-    <>
-      <div className={styles.mobileMenu}>
+    <div className={styles.mobileMenu}>
+      <button
+        type="button"
+        className={styles.menuButton}
+        popoverTarget={MENU_ID}
+        popoverTargetAction="show"
+        aria-label="Open menu"
+      >
+        <MenuIcon size={24} />
+      </button>
+      <div id={MENU_ID} popover="auto" className={styles.menuLayer}>
+        {/*
+         * The dimmed page behind the panel. A real button rather than a styled
+         * ::backdrop: pseudo-elements aren't hit-testable, so the browser's own
+         * click-outside dismissal lets the click land on whatever is underneath
+         * and follows the link you happened to dim. This absorbs the click and
+         * hides the menu instead. Not focusable — Escape and the close button
+         * are the keyboard routes out.
+         */}
         <button
-          ref={menuButtonRef}
           type="button"
-          className={styles.menuButton}
-          onClick={() => setIsOpen(true)}
-          aria-label="Open menu"
-          aria-expanded={isOpen}
-        >
-          <MenuIcon size={24} />
-        </button>
+          className={styles.overlay}
+          popoverTarget={MENU_ID}
+          popoverTargetAction="hide"
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+        <div className={styles.menuPanel}>
+          <button
+            type="button"
+            className={styles.closeButton}
+            popoverTarget={MENU_ID}
+            popoverTargetAction="hide"
+            aria-label="Close menu"
+          >
+            <CloseIcon size={24} />
+          </button>
+          <nav className={styles.nav} aria-label="All pages">
+            {NAV_LINKS.map(({ href, label }) => (
+              <MenuLink key={href} href={href} label={label} />
+            ))}
+          </nav>
+        </div>
       </div>
-      {mounted && createPortal(menuContent, document.body)}
-    </>
+    </div>
   );
 }
