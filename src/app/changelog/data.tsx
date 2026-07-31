@@ -69,6 +69,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-07-31",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Search is much less fussy about how you type a title. &ldquo;Pomp
+            and Circumstance&rdquo; now finds &ldquo;Pomp &amp;
+            Circumstance&rdquo;, &ldquo;The Godfather Part 2&rdquo; finds
+            &ldquo;Part II&rdquo;, and &ldquo;101 Dalmatians&rdquo; and
+            &ldquo;One Hundred and One Dalmatians&rdquo; each turn up the other.
+            Ampersands, roman numerals, spelled-out numbers, fractions like
+            8&frac12;, abbreviations like Dr and Doctor, and any stray brackets
+            or punctuation sitting in a title are all handled now.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-07-27",
     changes: [
       {
