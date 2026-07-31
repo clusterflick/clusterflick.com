@@ -5,6 +5,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
+import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
@@ -135,7 +136,11 @@ export default async function MovieDetailPage({
   const containingEvents = getContainingEvents(movie.id, data.movies);
 
   // Find festivals this movie is part of
-  const festivals = getMovieFestivals(movie.id, data.movies);
+  const festivals = getMovieFestivals(
+    movie.id,
+    data.movies,
+    getFestivalImagePath,
+  );
 
   // Non-default screening formats (70mm, IMAX, 3D, …) across upcoming
   // performances, for the format tags below the poster.

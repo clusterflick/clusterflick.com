@@ -2,20 +2,23 @@ import type { Meta, StoryObj } from "@storybook/react";
 import VenueCard from "@/components/venue-card";
 
 /**
- * `VenueCard` is a navigation card for a single venue. It shows a logo (or
- * initial-letter fallback), the venue name, a type tag, and an optional
- * film/showing count.
+ * `VenueCard` is a horizontal navigation card for a single venue. It shows a
+ * logo (or initial-letter fallback), the name, a type tag, and an optional
+ * stats line combining a leading `detail` string with film/showing counts.
  *
  * It wraps `NavCard` and inherits the standard lift-and-glow hover animation.
  *
  * **When to use:**
  * - Venue listings on the home page and London Cinemas page where cards are
  *   arranged in a `CardGrid`.
+ * - Any single-line entity link that wants the same horizontal card — the movie
+ *   page's "Screening as part of" festival card uses it with `detail` set to
+ *   the festival's date range.
  *
  * **When NOT to use:**
  * - For plain link lists of venues — use `LinkGrid` instead.
- * - For non-venue entities (festivals, boroughs) — use `NavCard` directly with
- *   custom interior layout.
+ * - For festival/film-club *listing* pages — use `EventCard`, which has room
+ *   for a description.
  */
 const meta = {
   title: "Components/VenueCard",
@@ -49,6 +52,19 @@ export const WithoutCounts: Story = {
     name: "Rio Cinema",
     type: "Cinema",
     imagePath: null,
+  },
+};
+
+/** Card with a leading detail on the stats line — used for festival date ranges. */
+export const WithDetail: Story = {
+  args: {
+    href: "/festivals/kinoteka",
+    name: "Kinoteka Polish Film Festival",
+    type: "Festival",
+    imagePath: null,
+    detail: "24 Feb – 5 Mar",
+    filmCount: 18,
+    performanceCount: 42,
   },
 };
 

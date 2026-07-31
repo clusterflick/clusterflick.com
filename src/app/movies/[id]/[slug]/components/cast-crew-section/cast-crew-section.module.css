@@ -5,3 +5,10 @@
   align-items: start;
   text-align: left;
 }
+
+@media (max-width: 768px) {
+  .creditsGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

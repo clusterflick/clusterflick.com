@@ -10,6 +10,8 @@ interface VenueCardProps {
   imagePath: string | null;
   filmCount?: number;
   performanceCount?: number;
+  /** Leading item on the stats line, before the counts (e.g. a date range) */
+  detail?: string;
 }
 
 export default function VenueCard({
@@ -19,7 +21,16 @@ export default function VenueCard({
   imagePath,
   filmCount,
   performanceCount,
+  detail,
 }: VenueCardProps) {
+  const hasCounts = filmCount !== undefined && performanceCount !== undefined;
+  const countText = !hasCounts
+    ? null
+    : filmCount > 0
+      ? `${filmCount.toLocaleString("en-GB")} ${filmCount === 1 ? "film" : "films"} · ${performanceCount.toLocaleString("en-GB")} ${performanceCount === 1 ? "showing" : "showings"}`
+      : "No showings currently listed";
+  const stats = [detail, countText].filter(Boolean).join(" · ");
+
   return (
     <NavCard href={href} className={styles.card}>
       <div className={styles.logo}>
@@ -44,20 +55,7 @@ export default function VenueCard({
             </Tag>
           </div>
         )}
-        {filmCount !== undefined && performanceCount !== undefined && (
-          <span className={styles.stats}>
-            {filmCount > 0 ? (
-              <>
-                {filmCount.toLocaleString("en-GB")}{" "}
-                {filmCount === 1 ? "film" : "films"} &middot;{" "}
-                {performanceCount.toLocaleString("en-GB")}{" "}
-                {performanceCount === 1 ? "showing" : "showings"}
-              </>
-            ) : (
-              "No showings currently listed"
-            )}
-          </span>
-        )}
+        {stats && <span className={styles.stats}>{stats}</span>}
       </div>
     </NavCard>
   );

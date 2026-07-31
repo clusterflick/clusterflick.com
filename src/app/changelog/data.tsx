@@ -75,6 +75,18 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
+            When a film is part of a <Link href="/festivals">festival</Link>,
+            the film&apos;s page now says so with a proper card rather than a
+            line of small print. The festival&apos;s logo, the dates it runs,
+            and how many films and showings are in it, all linking through to
+            the festival page.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
             Search is much less fussy about how you type a title. &ldquo;Pomp
             and Circumstance&rdquo; now finds &ldquo;Pomp &amp;
             Circumstance&rdquo;, &ldquo;The Godfather Part 2&rdquo; finds

@@ -1,12 +1,23 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  max-width: 500px;
   margin-top: 24px;
   margin-bottom: 32px;
+  text-align: left;
 }
 
-.line {
+/* The hero stacks and centres its children at this width, which would otherwise
+   shrink the card to its content — stretch it to fill the column instead. */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.label {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
