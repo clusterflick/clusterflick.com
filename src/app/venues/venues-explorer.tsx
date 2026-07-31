@@ -3,7 +3,10 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { VenueGroupData } from "./page";
-import { normalizeForSearch } from "@/lib/filters/normalize";
+import {
+  matchesSearchQuery,
+  normalizeForSearch,
+} from "@/lib/filters/normalize";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
@@ -35,9 +38,7 @@ export default function VenuesExplorer({
   // The same filter drives both the map markers and the list below it.
   const filteredMapVenues = useMemo(() => {
     if (!normalizedQuery) return mapVenues;
-    return mapVenues.filter((v) =>
-      normalizeForSearch(v.name).includes(normalizedQuery),
-    );
+    return mapVenues.filter((v) => matchesSearchQuery(v.name, normalizedQuery));
   }, [mapVenues, normalizedQuery]);
 
   const filteredGroups = useMemo(() => {
@@ -47,7 +48,7 @@ export default function VenuesExplorer({
       .map((group) => ({
         ...group,
         venues: group.venues.filter((v) =>
-          normalizeForSearch(v.name).includes(normalizedQuery),
+          matchesSearchQuery(v.name, normalizedQuery),
         ),
       }))
       .filter((group) => group.venues.length > 0);

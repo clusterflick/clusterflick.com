@@ -1,5 +1,5 @@
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
-import { normalizeForSearch } from "../normalize";
+import { matchesSearchQuery, normalizeForSearch } from "../normalize";
 
 /**
  * Performance notes search filter module.
@@ -49,8 +49,7 @@ export const performanceNotesSearchFilter: FilterModule<FilterId.PerformanceNote
       for (const [id, movie] of Object.entries(movies)) {
         const matchingPerformances = movie.performances.filter(
           (performance) =>
-            performance.notes &&
-            normalizeForSearch(performance.notes).includes(query),
+            performance.notes && matchesSearchQuery(performance.notes, query),
         );
 
         if (matchingPerformances.length > 0) {

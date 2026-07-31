@@ -1,5 +1,5 @@
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
-import { normalizeForSearch } from "../normalize";
+import { matchesSearchQuery, normalizeForSearch } from "../normalize";
 
 /**
  * Search filter module.
@@ -45,12 +45,10 @@ export const searchFilter: FilterModule<FilterId.Search> = {
     const result: MoviesRecord = {};
 
     for (const [id, movie] of Object.entries(movies)) {
-      // Match against normalized versions of both titles
-      const normalizedTitle = normalizeForSearch(movie.normalizedTitle || "");
-      const regularTitle = normalizeForSearch(movie.title);
-
+      // Match against alternative spellings of both titles
       const titleMatch =
-        normalizedTitle.includes(query) || regularTitle.includes(query);
+        matchesSearchQuery(movie.normalizedTitle || "", query) ||
+        matchesSearchQuery(movie.title, query);
 
       if (titleMatch) {
         result[id] = movie;

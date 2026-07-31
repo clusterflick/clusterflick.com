@@ -1,5 +1,5 @@
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
-import { normalizeForSearch } from "../normalize";
+import { matchesSearchQuery, normalizeForSearch } from "../normalize";
 
 /**
  * Showing title search filter module.
@@ -54,7 +54,7 @@ export const showingTitleSearchFilter: FilterModule<FilterId.ShowingTitleSearch>
 
         for (const [showingId, showing] of Object.entries(movie.showings)) {
           const title = showing.title || movie.title;
-          if (normalizeForSearch(title).includes(query)) {
+          if (matchesSearchQuery(title, query)) {
             filteredShowings[showingId] = showing;
           }
         }
