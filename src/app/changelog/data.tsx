@@ -35,6 +35,7 @@ export type ChangeTag =
   | "New venue"
   | "New source"
   | "New festival"
+  | "New film club"
   | "New feature"
   | "Improvement"
   | "Under the hood";
@@ -43,6 +44,7 @@ const TAG_COLORS: Record<ChangeTag, "pink" | "blue" | "gray"> = {
   "New venue": "pink",
   "New source": "pink",
   "New festival": "pink",
+  "New film club": "pink",
   "New feature": "blue",
   Improvement: "blue",
   "Under the hood": "gray",
@@ -68,6 +70,24 @@ export interface ChangelogDay {
  * across the Clusterflick site and its data pipeline.
  */
 export const CHANGELOG: ChangelogDay[] = [
+  {
+    date: "2026-08-01",
+    changes: [
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added the{" "}
+            <Link href="/film-clubs/waltham-forest-cinema-project">
+              Waltham Forest Cinema Project
+            </Link>
+            , a community campaign to bring an independent cinema to the
+            borough.
+          </>
+        ),
+      },
+    ],
+  },
   {
     date: "2026-07-31",
     changes: [

@@ -398,6 +398,16 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "waltham-forest-cinema-project",
+    name: "Waltham Forest Cinema Project",
+    url: "https://walthamforestcinemaproject.com",
+    aliases: ["WFCP"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Waltham Forest Cinema Project" },
+      { [FilterId.PerformanceNotesSearch]: "Waltham Forest Cinema Project" },
+    ],
+  },
+  {
     id: "club-des-femmes",
     name: "Club des Femmes",
     url: "https://clubdesfemmes.com",
