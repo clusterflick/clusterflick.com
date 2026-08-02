@@ -25,7 +25,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["small", "large"],
+      options: ["xsmall", "small", "large"],
     },
   },
 } satisfies Meta<typeof StackedPoster>;
@@ -70,6 +70,25 @@ export const ThreeFilms: Story = {
   args: {
     mainTitle: "Moonlight",
     showOverlay: true,
+    includedMovies: [
+      { title: "Moonlight", posterPath: "/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg" },
+      { title: "The Birds", posterPath: "/eClg8QPg8mwB6INIC4pyR5pAbDr.jpg" },
+      {
+        title: "North by Northwest",
+        posterPath: "/kNOFPQrel9YFCVzI0DF8FnCEpCw.jpg",
+      },
+    ],
+  },
+};
+
+/**
+ * Extra small, as used in the dense updates feed. Unlike the fixed sizes it
+ * fills its column up to 160px, so it lines up with `MoviePoster`'s xsmall.
+ */
+export const ExtraSmall: Story = {
+  args: {
+    mainTitle: "A Collection of Short Films by Richard Heslop",
+    size: "xsmall",
     includedMovies: [
       { title: "Moonlight", posterPath: "/qLnfEmPrDjJfPyyddLJPkXmshkp.jpg" },
       { title: "The Birds", posterPath: "/eClg8QPg8mwB6INIC4pyR5pAbDr.jpg" },

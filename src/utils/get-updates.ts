@@ -29,6 +29,12 @@ export type UpdateFilm = {
    */
   href: string | null;
   posterPath?: string;
+  /**
+   * The films making up a multi-film event (double bill, marathon, shorts
+   * programme). These events carry no poster of their own, so their artwork —
+   * and the fact that they are an event at all — comes from what's inside.
+   */
+  includedMovies?: Array<{ posterPath?: string; title: string }>;
   year?: string;
   classification?: string;
   venues: UpdateVenue[];
@@ -225,6 +231,10 @@ function accumulate(
         title: movie?.title ?? showing.title,
         href: movie ? `${getMovieUrl(movie)}${SHOW_ALL_HASH}` : null,
         posterPath: movie?.posterPath,
+        includedMovies: movie?.includedMovies?.map(({ posterPath, title }) => ({
+          posterPath,
+          title,
+        })),
         year: movie?.year,
         classification: movie?.classification,
         venues: [],

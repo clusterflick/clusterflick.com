@@ -3,6 +3,7 @@ import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import OutlineHeading from "@/components/outline-heading";
 import MoviePoster from "@/components/movie-poster";
+import StackedPoster from "@/components/stacked-poster";
 import EmptyState from "@/components/empty-state";
 import { getStaticData } from "@/utils/get-static-data";
 import {
@@ -50,6 +51,11 @@ export const metadata: Metadata = {
  * A compact poster tile. Venues collapse to a count past the first so a season
  * announcement of thirty films stays scannable rather than filling the page
  * with venue lists.
+ *
+ * Multi-film events never carry artwork of their own, so they take it from the
+ * films inside — stacked when there is more than one to show, as everywhere
+ * else on the site, and otherwise the single poster that exists. Only an event
+ * with no poster anywhere falls back to the placeholder.
  */
 function FilmTile({ film }: { film: UpdateFilm }) {
   const venueLabel =
@@ -59,14 +65,30 @@ function FilmTile({ film }: { film: UpdateFilm }) {
 
   const meta = pluralise(film.performanceCount, "showing");
 
+  const includedMovies = film.includedMovies;
+  const includedWithPosters = includedMovies?.filter((m) => m.posterPath) ?? [];
+  const totalPosters = (film.posterPath ? 1 : 0) + includedWithPosters.length;
+  const useStackedPoster =
+    includedMovies && includedMovies.length > 1 && totalPosters >= 2;
+
   const body = (
     <>
-      <MoviePoster
-        posterPath={film.posterPath}
-        title={film.title}
-        size="xsmall"
-        interactive={!!film.href}
-      />
+      {useStackedPoster ? (
+        <StackedPoster
+          mainPosterPath={film.posterPath}
+          mainTitle={film.title}
+          includedMovies={includedMovies}
+          size="xsmall"
+          interactive={!!film.href}
+        />
+      ) : (
+        <MoviePoster
+          posterPath={film.posterPath || includedWithPosters[0]?.posterPath}
+          title={film.title}
+          size="xsmall"
+          interactive={!!film.href}
+        />
+      )}
       <h4 className={styles.tileTitle}>{film.title}</h4>
       <p className={styles.tileVenue}>{venueLabel}</p>
       <p className={styles.tileMeta}>{meta}</p>

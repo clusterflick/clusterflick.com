@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { getPosterColor } from "@/utils/get-poster-color";
 import styles from "./stacked-poster.module.css";
 
+export type StackedPosterSize = "xsmall" | "small" | "large";
+
 interface StackedPosterProps {
   /** The main movie's poster path */
   mainPosterPath?: string;
@@ -17,8 +19,11 @@ interface StackedPosterProps {
   subtitle?: string;
   /** Whether to show the overlay on hover */
   showOverlay?: boolean;
-  /** Size variant */
-  size?: "small" | "large";
+  /**
+   * Size variant. `xsmall` fills its column up to 160px, matching MoviePoster's
+   * xsmall so stacked and single posters line up in the same dense grid.
+   */
+  size?: StackedPosterSize;
   /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
   interactive?: boolean;
   /** Whether images should be loaded eagerly with fetchpriority="high". */
@@ -27,10 +32,27 @@ interface StackedPosterProps {
   headingLevel?: "h2" | "h3";
 }
 
-// Dimensions for poster cards at each size
-const POSTER_DIMENSIONS = {
+// Dimensions for poster cards at each size. xsmall is the intrinsic size the
+// image is requested at; CSS scales the card to its column.
+const POSTER_DIMENSIONS: Record<
+  StackedPosterSize,
+  { width: number; height: number }
+> = {
+  xsmall: { width: 134, height: 201 },
   small: { width: 168, height: 252 },
   large: { width: 257, height: 385 },
+};
+
+const CARD_CLASSES: Record<StackedPosterSize, string> = {
+  xsmall: styles.posterCardXsmall,
+  small: "",
+  large: styles.posterCardLarge,
+};
+
+const CONTAINER_CLASSES: Record<StackedPosterSize, string> = {
+  xsmall: styles.stackContainerXsmall,
+  small: styles.stackContainer,
+  large: styles.stackContainerLarge,
 };
 
 function PosterImage({
@@ -43,11 +65,11 @@ function PosterImage({
   posterPath?: string;
   title: string;
   className?: string;
-  size?: "small" | "large";
+  size?: StackedPosterSize;
   priority?: boolean;
 }) {
   const dimensions = POSTER_DIMENSIONS[size];
-  const sizeClass = size === "large" ? styles.posterCardLarge : "";
+  const sizeClass = CARD_CLASSES[size];
 
   if (posterPath) {
     const imageSize = size === "large" ? "w500" : "w342";
@@ -99,7 +121,24 @@ function PosterImage({
 
 // Position configs for different poster counts and sizes
 // Spread from top-left (0,0) to bottom-right
-const POSITIONS = {
+const POSITIONS: Record<
+  StackedPosterSize,
+  Record<1 | 2 | 3, Array<{ top: number | string; left: number | string }>>
+> = {
+  xsmall: {
+    // The container is fluid, so the offsets are a share of it rather than
+    // pixels: the card is 84% of the container, leaving 16% to spread across.
+    1: [{ top: "8%", left: "8%" }],
+    2: [
+      { top: 0, left: 0 },
+      { top: "16%", left: "16%" },
+    ],
+    3: [
+      { top: 0, left: 0 },
+      { top: "8%", left: "8%" },
+      { top: "16%", left: "16%" },
+    ],
+  },
   small: {
     // Container: 200x300, Poster: 168x252, Available: 32x48
     1: [{ top: 24, left: 16 }],
@@ -169,7 +208,7 @@ export default function StackedPoster({
   const alwaysShowOverlay = allPosters.length === 0;
 
   const containerClass = clsx(
-    size === "large" ? styles.stackContainerLarge : styles.stackContainer,
+    CONTAINER_CLASSES[size],
     interactive && styles.interactive,
   );
 
