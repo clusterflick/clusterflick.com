@@ -1,4 +1,5 @@
 import VenueCard from "@/components/venue-card";
+import SectionHeading from "@/components/section-heading";
 import { formatDateShort } from "@/utils/format-date";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
@@ -31,7 +32,7 @@ export default function FestivalSection({ festivals }: FestivalSectionProps) {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.label}>Screening as part of</h2>
+      <SectionHeading>Screening as part of</SectionHeading>
       {festivals.map((festival) => (
         <VenueCard
           key={festival.id}

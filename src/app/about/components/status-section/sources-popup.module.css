@@ -60,7 +60,7 @@
 
 .list li {
   padding: 8px;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-light-gray);
   border-bottom: 1px solid rgba(var(--color-white-rgb), 0.06);
 }

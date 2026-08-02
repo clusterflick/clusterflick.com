@@ -4,7 +4,7 @@ import type { Movie } from "@/types";
 import Link from "next/link";
 import { formatCategory } from "@/app/utils";
 import { getPrimaryCategory } from "@/lib/filters";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import styles from "./movie-cell.module.css";
@@ -12,11 +12,18 @@ import styles from "./movie-cell.module.css";
 export default function MovieCell({
   movie,
   priority,
+  showAll,
 }: {
   movie: Movie;
   priority?: boolean;
+  /**
+   * Open the movie page with every performance listed, ignoring the reader's
+   * active filters. Use where the grid is itself the selection (a film list),
+   * so a filtered-out screening still shows on arrival.
+   */
+  showAll?: boolean;
 }) {
-  const href = getMovieUrl(movie);
+  const href = `${getMovieUrl(movie)}${showAll ? SHOW_ALL_HASH : ""}`;
   const includedMovies = movie.includedMovies;
   const subtitle = movie.year || formatCategory(getPrimaryCategory(movie));
 

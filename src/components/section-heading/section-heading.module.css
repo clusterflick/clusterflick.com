@@ -1,0 +1,8 @@
+.heading {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

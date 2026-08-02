@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import Button from "@/components/button";
+import SectionHeading from "@/components/section-heading";
 import styles from "./pill-list.module.css";
 
 interface PillListProps<T> {
@@ -99,7 +100,7 @@ export default function PillList<T = string>({
 
   return (
     <div>
-      <h3 className={titleClassName ?? styles.title}>{title}</h3>
+      <SectionHeading className={titleClassName}>{title}</SectionHeading>
       {maxVisibleMobile == null ? (
         renderList(maxVisible)
       ) : (

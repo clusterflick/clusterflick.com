@@ -1,0 +1,12 @@
+.gridList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 200px);
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Breathing room below the last poster row — the grid gap only applies between
+   rows, so without this the final row sits flush against the page bottom. */
+.gridWrapper {
+  padding-bottom: 40px;
+}

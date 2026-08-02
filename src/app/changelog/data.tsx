@@ -71,6 +71,59 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-02",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            There are now <Link href="/lists">film lists</Link> — the
+            great-films lists critics and audiences keep arguing about, matched
+            against what is actually screening in London. Ten of them to start:
+            the <Link href="/lists/imdb-top-250">IMDb Top 250</Link>,{" "}
+            <Link href="/lists/letterboxd-top-500">
+              Letterboxd&apos;s Top 500
+            </Link>
+            ,{" "}
+            <Link href="/lists/rt-best-of-all-time">
+              Rotten Tomatoes&apos; 300 Best Movies of All Time
+            </Link>{" "}
+            and its <Link href="/lists/rt-100-percent-club">100% Club</Link>,{" "}
+            <Link href="/lists/empire-100-greatest">
+              Empire&apos;s 100 Greatest
+            </Link>
+            , the{" "}
+            <Link href="/lists/guardian-100-best-21st-century">
+              Guardian&apos;s best of the 21st century
+            </Link>
+            , and every winner of{" "}
+            <Link href="/lists/oscar-best-picture">Best Picture</Link>,{" "}
+            <Link href="/lists/oscar-best-international-feature">
+              Best International Feature
+            </Link>
+            , the <Link href="/lists/palme-dor-winners">Palme d&apos;Or</Link>{" "}
+            and the <Link href="/lists/golden-lion-winners">Golden Lion</Link>.
+            Each page shows only the films you can still go and see, in the
+            order they were ranked, and links back to whoever published the
+            list.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Film pages now show the lists a film appears on, with its position
+            where the list is ranked — so{" "}
+            <Link href="/movies/238/the-godfather">The Godfather</Link> tells
+            you it is the Rotten Tomatoes number one and an Academy Award winner
+            without you going looking.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-01",
     changes: [
       {

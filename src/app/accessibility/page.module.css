@@ -180,7 +180,7 @@
 }
 
 .featureShortDesc {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-electric-blue);
   font-weight: 500;
   margin: 0;
@@ -349,7 +349,7 @@
 /* ─── Empty state ─── */
 
 .noScreenings {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-muted-gray);
   font-style: italic;
   padding: 24px;

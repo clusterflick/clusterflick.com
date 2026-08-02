@@ -15,6 +15,8 @@ import { GENRES } from "@/data/genres";
 import { getGenreUrl } from "@/utils/get-genre-url";
 import { FORMATS } from "@/data/formats";
 import { getFormatUrl } from "@/utils/get-format-url";
+import { MOVIE_LISTS } from "@/data/movie-lists";
+import { getMovieListUrl } from "@/utils/get-movie-list-url";
 
 export const dynamic = "force-static";
 
@@ -109,6 +111,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const movieListListPage = {
+    url: "https://clusterflick.com/lists",
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  };
+
+  const movieListPages = MOVIE_LISTS.map((list) => ({
+    url: `https://clusterflick.com${getMovieListUrl(list)}`,
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.6,
+  }));
+
   const venuesByGroup = groupVenuesByGroup(data.venues);
 
   const cinemaGroupPages = VENUE_GROUPS.filter((group) =>
@@ -180,6 +196,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...genrePages,
     formatListPage,
     ...formatPages,
+    movieListListPage,
+    ...movieListPages,
     ...moviePages,
     ...venuePages,
     ...boroughPages,

@@ -1,0 +1,55 @@
+/* About block */
+
+.about {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+
+.about:last-child {
+  margin-bottom: 0;
+}
+
+/* Intro: source logo beside the description */
+
+.intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+
+.introText {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Sized to sit against the first couple of lines of copy. Height is capped
+   rather than fixed so wordmarks and square logos both sit sensibly. */
+.logo {
+  flex-shrink: 0;
+  width: auto;
+  max-width: 120px;
+  height: auto;
+  max-height: 90px;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .intro {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .introText {
+    text-align: center;
+  }
+}
+
+/* Empty state */
+
+.empty {
+  text-align: center;
+  padding: 8px 0 32px;
+}

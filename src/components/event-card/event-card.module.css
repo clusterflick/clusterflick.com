@@ -47,13 +47,20 @@
   text-align: center;
 }
 
+/* Names run to two lines before truncating — several are a word or two too long
+   for one line ("The 100 Best Films of the 21st Century"), and cutting them mid
+   -title loses the part that distinguishes them. Balanced so the two lines are
+   of similar length rather than one full line and one stray word. */
 .name {
   font-size: 18px;
   font-weight: 600;
   line-height: 1.3;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-wrap: balance;
   color: var(--color-electric-blue);
   transition: color 0.2s ease;
 }
@@ -67,16 +74,15 @@
   color: rgba(255, 255, 255, 0.55);
   line-height: 1.5;
   margin: 0;
-  height: calc(1.5em * 2);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  flex-grow: 1;
 }
 
 @media (min-width: 600px) {
   .description {
-    height: calc(1.5em * 4);
     -webkit-line-clamp: 4;
     line-clamp: 4;
   }

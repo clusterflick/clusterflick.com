@@ -38,7 +38,7 @@ export default function CastCrewSection({
         <PillList
           title="Cast"
           items={actorNames}
-          maxVisible={6}
+          maxVisible={4}
           maxVisibleMobile={2}
         />
       )}

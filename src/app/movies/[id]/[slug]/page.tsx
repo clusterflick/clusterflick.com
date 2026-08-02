@@ -7,6 +7,7 @@ import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
+import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
@@ -141,6 +142,9 @@ export default async function MovieDetailPage({
     data.movies,
     getFestivalImagePath,
   );
+
+  // "Top films" lists this movie appears on (RT's 300 Best, the 100% Club, …)
+  const movieLists = getMovieListsForMovie(movie.id, data.movies);
 
   // Non-default screening formats (70mm, IMAX, 3D, …) across upcoming
   // performances, for the format tags below the poster.
@@ -279,6 +283,7 @@ export default async function MovieDetailPage({
         venueCounts={venueCounts}
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
+        movieLists={movieLists}
         formats={formats}
         showingsStaticContent={
           <StaticShowingsList

@@ -1,4 +1,7 @@
 .creditsGrid {
+  /* Matches the top margin on the sibling sections (Appears on, Playing at) so
+     the run of sections below the ratings grid is evenly spaced. */
+  margin-top: 32px;
   display: grid;
   grid-template-columns: fit-content(50%) 1fr;
   gap: 40px;

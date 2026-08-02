@@ -1,0 +1,12 @@
+.section {
+  margin-top: 32px;
+  text-align: left;
+}
+
+/* The film's published position within the list, e.g. "#14". */
+.rank {
+  color: var(--color-muted-gray);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

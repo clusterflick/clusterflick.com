@@ -22,6 +22,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: "/london-cinemas", label: "London Cinemas" },
   { href: "/cinema-groups", label: "Cinema Groups" },
   { href: "/near-me", label: "Near Me" },
+  { href: "/lists", label: "Film Lists" },
   { href: "/festivals", label: "Festivals", primary: true },
   { href: "/film-clubs", label: "Film Clubs", primary: true },
   { href: "/accessibility", label: "Accessibility", primary: true },

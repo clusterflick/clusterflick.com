@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import type { Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
@@ -8,8 +9,24 @@ import FilmPosterGridClient, {
 } from "./film-poster-grid-client";
 import styles from "./film-poster-grid.module.css";
 
+export interface FilmPosterGridMovie {
+  movie: Movie;
+  performanceCount: number;
+  subtitle?: string;
+  /**
+   * Optional marker over the poster's corner — a film's rank within a list, or
+   * an award emblem. Purely decorative: it never takes the click.
+   */
+  badge?: ReactNode;
+  /**
+   * "text" (default) draws a chip top-left, for a rank. "icon" draws a bare
+   * emblem bottom-right with a drop shadow, for an award mark.
+   */
+  badgeVariant?: "text" | "icon";
+}
+
 interface FilmPosterGridProps {
-  movies: { movie: Movie; performanceCount: number; subtitle?: string }[];
+  movies: FilmPosterGridMovie[];
   truncated?: boolean;
   exploreHref?: string;
   exploreLabel?: string;
@@ -33,46 +50,57 @@ export default function FilmPosterGrid({
   movieUrlParams,
   venueId,
 }: FilmPosterGridProps) {
-  const items: FilmPosterGridItem[] = movies.map(({ movie, subtitle }) => {
-    const includedMovies = movie.includedMovies;
-    const includedWithPosters =
-      includedMovies?.filter((m) => m.posterPath) || [];
-    const totalPosters =
-      (movie.posterPath ? 1 : 0) + includedWithPosters.length;
-    const useStackedPoster =
-      includedMovies && includedMovies.length > 1 && totalPosters >= 2;
-    const posterSubtitle = subtitle ?? movie.year;
+  const items: FilmPosterGridItem[] = movies.map(
+    ({ movie, subtitle, badge, badgeVariant }) => {
+      const includedMovies = movie.includedMovies;
+      const includedWithPosters =
+        includedMovies?.filter((m) => m.posterPath) || [];
+      const totalPosters =
+        (movie.posterPath ? 1 : 0) + includedWithPosters.length;
+      const useStackedPoster =
+        includedMovies && includedMovies.length > 1 && totalPosters >= 2;
+      const posterSubtitle = subtitle ?? movie.year;
 
-    return {
-      id: movie.id,
-      node: (
-        <Link
-          key={movie.id}
-          href={`${getMovieUrl(movie)}${movieUrlParams ? `?${movieUrlParams}` : ""}${showAll ? "#show-all" : ""}`}
-          className={styles.filmGridLink}
-        >
-          {useStackedPoster ? (
-            <StackedPoster
-              mainPosterPath={movie.posterPath}
-              mainTitle={movie.title}
-              includedMovies={includedMovies}
-              subtitle={posterSubtitle}
-              showOverlay
-            />
-          ) : (
-            <MoviePoster
-              posterPath={
-                movie.posterPath || includedWithPosters[0]?.posterPath
-              }
-              title={movie.title}
-              subtitle={posterSubtitle}
-              showOverlay
-            />
-          )}
-        </Link>
-      ),
-    };
-  });
+      return {
+        id: movie.id,
+        node: (
+          <Link
+            key={movie.id}
+            href={`${getMovieUrl(movie)}${movieUrlParams ? `?${movieUrlParams}` : ""}${showAll ? "#show-all" : ""}`}
+            className={styles.filmGridLink}
+          >
+            {badge != null && (
+              <span
+                className={
+                  badgeVariant === "icon" ? styles.badgeEmblem : styles.badge
+                }
+              >
+                {badge}
+              </span>
+            )}
+            {useStackedPoster ? (
+              <StackedPoster
+                mainPosterPath={movie.posterPath}
+                mainTitle={movie.title}
+                includedMovies={includedMovies}
+                subtitle={posterSubtitle}
+                showOverlay
+              />
+            ) : (
+              <MoviePoster
+                posterPath={
+                  movie.posterPath || includedWithPosters[0]?.posterPath
+                }
+                title={movie.title}
+                subtitle={posterSubtitle}
+                showOverlay
+              />
+            )}
+          </Link>
+        ),
+      };
+    },
+  );
 
   return (
     <FilmPosterGridClient

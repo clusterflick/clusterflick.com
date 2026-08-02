@@ -16,12 +16,3 @@
     max-width: none;
   }
 }
-
-.label {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted-gray);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}

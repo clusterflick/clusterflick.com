@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Movie, MoviePerformance, Genre, Person, Venue } from "@/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
+import type { MovieListMembership } from "@/utils/get-movie-list-movies";
 import type { FormatDefinition } from "@/data/formats";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
@@ -32,6 +33,7 @@ import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
 import FestivalSection from "./components/festival-section";
+import MovieListsSection from "./components/movie-lists-section";
 import FormatsList from "./components/formats-list";
 import PartOfSection from "./components/part-of-section";
 import PlayingAtSection, {
@@ -48,6 +50,7 @@ type PageContentProps = {
   venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
+  movieLists: MovieListMembership[];
   formats: FormatDefinition[];
   showingsStaticContent?: ReactNode;
 };
@@ -60,6 +63,7 @@ export default function PageContent({
   venueCounts,
   containingEvents,
   festivals,
+  movieLists,
   formats,
   showingsStaticContent,
 }: PageContentProps) {
@@ -296,6 +300,7 @@ export default function PageContent({
             }
           />
 
+          <MovieListsSection lists={movieLists} />
           <FestivalSection festivals={festivals} />
           <CastCrewSection
             directors={movie.directors}

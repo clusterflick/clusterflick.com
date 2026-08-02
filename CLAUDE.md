@@ -28,7 +28,8 @@ Pages at clusterflick.com.
 - **Styling:** CSS Modules exclusively (no CSS-in-JS), `clsx` for conditional
   classes
 - **Data:** Chunked JSON loaded from `/public/data/`, served with gzip compression
-- **Performance:** react-virtualized for large poster grids, data chunking,
+- **Performance:** react-virtuoso for the client-rendered films grid (see Film
+  Lists on why server-rendered grids must not virtualise), data chunking,
   critical CSS extraction
 
 ## Project Structure
@@ -120,6 +121,50 @@ and regular cinemas simultaneously.
 
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
 named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.
+
+## Film Lists
+
+"Top films" lists (IMDb Top 250, Palme d'Or winners, …) live in `src/data/movie-lists/`, surfaced
+at `/lists` and as "Appears on" pills on movie pages.
+
+**What belongs here.** A list is a _named selection with a fixed membership_ — something a reader
+could argue with by name. A threshold slid along a continuum is a filter, not a list: "highest
+rated on Letterboxd" has no natural edge, so where you cut it is arbitrary. Those belong on the
+films grid as a rating filter and sort. The 100% Club is the exception that proves it — computed,
+but its boundary (a perfect score) is inherent rather than chosen.
+
+**Two kinds:**
+
+- **Curated** — reproduces someone else's published selection. Store only what identifies each
+  film, in a `MovieListEntry[]` file, and always link back to the source.
+- **Computed** — derived from rating data already in the dataset via a `score()` function, so it
+  re-evaluates every build. Review-count floors come from `@/utils/movie-ratings.mjs`, shared with
+  the Critics' Picks row.
+
+**Matching** (`src/utils/get-movie-list-movies.ts`) resolves each entry in descending order of
+certainty: `tmdbId` (the dataset keys movies by TMDB id, so this is a direct lookup) → `imdbId` →
+`rtSlug` → title + year. Titles run through `getSearchVariants`, so roman numerals, ampersands and
+punctuation all match; `altTitles` covers original-language titles. `yearTolerance` defaults to 1
+and should be 2 for award lists, which cite the _award_ year — `La Strada` is a 1954 film that won
+in 1956.
+
+The index is built once per dataset and memoized in a `WeakMap`, because every movie page needs the
+reverse lookup.
+
+**Per list you can also set:**
+
+- `filmBadge` — an emblem drawn on every poster (award lists only; a ranked list uses that slot for
+  the position). Sized and inset per list, since a dense round mark needs more room than a thin
+  silhouette.
+- Logo at `public/images/movie-lists/<id>.*`, picked up automatically by id.
+
+**Registry order is deliberate**: awards first, then lists from most selective to broadest. It sets
+the order of the "Appears on" pills, which truncate after 4 on desktop — so the order decides what
+a reader sees. It does _not_ affect the `/lists` index, which sorts by film count.
+
+**Don't virtualise list pages.** `VirtualisedFilmGrid` is for the client-rendered films grid only;
+Virtuoso renders no items during SSR without `initialItemCount`, which would leave the films out of
+the static HTML. List pages use `FilmPosterGrid`, which lays out identically.
 
 ## Testing
 
