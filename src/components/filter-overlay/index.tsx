@@ -392,12 +392,12 @@ export default function FilterOverlay({
           <span className={styles.countsDivider} aria-hidden="true">
             •
           </span>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={handleClose}
-            aria-label="Close filter options"
-          >
+          {/* No aria-label: "Close Filters" is already a good accessible name,
+              and an aria-label that doesn't contain the visible text breaks
+              voice control (WCAG 2.5.3, Label in Name). It also collided with
+              the header trigger, whose own label reads "Close filter options"
+              while the overlay is open. */}
+          <Button variant="link" size="sm" onClick={handleClose}>
             Close Filters
           </Button>
         </div>
