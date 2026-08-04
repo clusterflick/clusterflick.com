@@ -1,48 +1,79 @@
 .container {
   width: 100%;
-  border-top: 1px solid rgba(var(--color-white-rgb), 0.1);
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 18px;
 }
 
+/*
+ * A real control, not a caption. These triggers hide entire filter dimensions
+ * behind them (specific venues, specific dates, extra event options), and as a
+ * muted grey label they read as a heading and went unclicked. The contrast, the
+ * weight and the chevron disc are what make them look pressable; the row itself
+ * stays open — a rule above it rather than a box around it — so it separates
+ * from the filters above without turning into a button the eye trips over.
+ */
 .trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  padding: 8px 0;
+  padding: 12px 0;
   background: none;
   border: none;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.18);
+  border-radius: 0;
   cursor: pointer;
-  color: var(--color-muted-gray);
+  color: var(--color-light-gray);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .trigger:hover {
-  color: var(--color-light-gray);
+  border-top-color: rgba(var(--color-neon-pink-rgb), 0.5);
+  color: var(--color-white);
+}
+
+/* Open sections keep a pink edge, so it's obvious which panel the content
+   below belongs to. */
+.trigger[aria-expanded="true"] {
+  border-top-color: rgba(var(--color-neon-pink-rgb), 0.5);
+  color: var(--color-neon-pink);
 }
 
 .trigger:focus-visible {
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .title {
   display: flex;
   align-items: center;
   gap: 8px;
+  text-align: left;
 }
 
+/* The chevron gets its own disc so the affordance survives at a glance — a bare
+   12px chevron against a wide row is easy to miss. */
 .icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(var(--color-white-rgb), 0.08);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.2s ease;
+}
+
+.trigger:hover .icon,
+.trigger[aria-expanded="true"] .icon {
+  background: rgba(var(--color-neon-pink-rgb), 0.2);
 }
 
 .icon.expanded {
@@ -51,7 +82,7 @@
 
 .content {
   overflow: hidden;
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 .content:not(.expanded) {

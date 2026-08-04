@@ -14,6 +14,7 @@ import {
   formatPresentationFilter,
   formatDimensionFilter,
   hideFinishedFilter,
+  hideSoldOutFilter,
 } from "./modules";
 
 /**
@@ -30,6 +31,7 @@ const modules: AnyFilterModule[] = [
   dateRangeFilter,
   timeRangeFilter,
   hideFinishedFilter,
+  hideSoldOutFilter,
   genresFilter,
   accessibilityFilter,
   formatSourceFilter,

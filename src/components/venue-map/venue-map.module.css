@@ -40,6 +40,13 @@
   top: 12px;
   right: 12px;
   z-index: 1000;
+  /* The locate button is transparent-filled, so pins and cluster bubbles
+     drifting underneath it used to show through. Sit it on a plate matching the
+     CARTO dark_all basemap's land colour, so the button reads as part of the map
+     rather than a window onto it. */
+  background: #0b1114;
+  /* Matches the small button's own radius, so no plate corners peek out. */
+  border-radius: 4px;
 }
 
 .error {

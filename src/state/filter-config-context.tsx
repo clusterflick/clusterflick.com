@@ -230,6 +230,8 @@ type FilterConfigContextType = {
   clearVenues: () => void;
   // Hide finished showings
   toggleHideFinished: () => void;
+  // Hide sold out showings
+  toggleHideSoldOut: () => void;
   // Quick filters (one-tap presets)
   applyQuickFilter: (quickFilter: QuickFilter) => void;
   isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
@@ -597,6 +599,17 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Hide sold out showings
+  const toggleHideSoldOut = useCallback(() => {
+    setFilterState((prev) =>
+      filterManager.set(
+        prev,
+        FilterId.HideSoldOut,
+        !filterManager.get(prev, FilterId.HideSoldOut),
+      ),
+    );
+  }, []);
+
   // Quick filters — apply a preset atomically on top of a clean default state
   // so results never depend on whatever filters were previously set.
   const applyQuickFilter = useCallback((quickFilter: QuickFilter) => {
@@ -660,6 +673,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       selectVenues,
       clearVenues,
       toggleHideFinished,
+      toggleHideSoldOut,
       applyQuickFilter,
       isQuickFilterActive,
       resetFilters,
@@ -692,6 +706,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       selectVenues,
       clearVenues,
       toggleHideFinished,
+      toggleHideSoldOut,
       applyQuickFilter,
       isQuickFilterActive,
       resetFilters,

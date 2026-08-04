@@ -180,3 +180,13 @@
     color: var(--color-neon-pink);
   }
 }
+
+/* The page you're on — the vertical-menu counterpart of the header nav's pink
+   underline. A left accent rather than an underline: these links are full-width
+   blocks, so a rule beneath one would read as a divider between items. The
+   padding compensates for the border so labels stay aligned with the rest. */
+.navLinkCurrent {
+  border-left: 3px solid var(--color-neon-pink);
+  border-radius: 0 8px 8px 0;
+  padding-left: 17px;
+}

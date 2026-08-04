@@ -5,6 +5,17 @@
 }
 
 /*
+ * The page you're on. Links already carry a 2px bottom border globally (faint
+ * blue, pink on hover), so marking the current page is just a matter of filling
+ * that border in — no extra underline element, and no layout shift between
+ * states. The label stays blue, which keeps "current" distinct from "hovered"
+ * (where the text turns pink too).
+ */
+.link.current {
+  border-bottom-color: var(--color-neon-pink);
+}
+
+/*
  * Pre-measurement state: links keep their layout box (so their widths can be
  * read) but paint nothing, so the full set never flashes over the header on
  * narrow screens.

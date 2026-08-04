@@ -11,6 +11,31 @@
   padding: 0 20px 80px;
 }
 
+/* Full-width cinemas block (the "grid" venues layout, used by format and genre
+   pages). The heading spans the whole page rather than a sidebar column, so
+   centre it over the cards instead of stranding it at the far left. Only the
+   heading — the cards keep their own left-aligned text. */
+.gridCinemas h2 {
+  justify-content: center;
+}
+
+/* Flex rather than grid here, because a grid can only centre whole tracks: a
+   final row of two cards would still start hard against the left column, under
+   a centred heading. Cards still grow to fill a complete row exactly as the
+   grid did; the cap stops a short row (or a format with one cinema) from
+   stretching a card across the page, and yields to the container on mobile
+   where full width is what you want. */
+.gridCinemas .venueGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gridCinemas .venueGrid > * {
+  flex: 1 1 280px;
+  max-width: min(340px, 100%);
+}
+
 .venueGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { setUseBrowserBack } from "@/utils/nav-links";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
+import { isCurrentNavPath, setUseBrowserBack } from "@/utils/nav-links";
 import { MENU_ID } from "./menu-id";
 import styles from "./mobile-menu.module.css";
 
@@ -19,10 +21,14 @@ export default function MenuLink({
   href: string;
   label: string;
 }) {
+  const pathname = usePathname();
+  const isCurrent = isCurrentNavPath(pathname, href);
+
   return (
     <Link
       href={href}
-      className={styles.navLink}
+      className={clsx(styles.navLink, isCurrent && styles.navLinkCurrent)}
+      aria-current={isCurrent ? "page" : undefined}
       onClick={() => {
         setUseBrowserBack();
         try {

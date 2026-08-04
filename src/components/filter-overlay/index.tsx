@@ -19,6 +19,10 @@ import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
 
+// How long the "link copied" confirmation stays up. Long enough to read the
+// explanation, short enough that it's gone before you next look at the counts.
+const SHARE_TOAST_MS = 5000;
+
 interface FilterOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,6 +60,7 @@ export default function FilterOverlay({
     selectVenues,
     clearVenues,
     toggleHideFinished,
+    toggleHideSoldOut,
     applyQuickFilter,
     isQuickFilterActive,
     resetFilters,
@@ -104,8 +109,14 @@ export default function FilterOverlay({
     return baseMargin + extraHeight;
   }, [filterTextHeight]);
 
+  // Shown when "Venues Near Me" resolves a location but finds nothing within
+  // range. Distinct from geoError, which covers not getting a location at all.
+  const [nearbyNotice, setNearbyNotice] = useState<string | null>(null);
+
   // Handle nearby venue selection
   const handleNearbyClick = useCallback(async () => {
+    setNearbyNotice(null);
+
     // If we already have position, use cached nearby venues
     if (userPosition && nearbyVenueIds.length > 0) {
       setVenueOption("nearby", nearbyVenueIds);
@@ -114,14 +125,25 @@ export default function FilterOverlay({
 
     // Request location and calculate nearby venues
     const position = await requestLocation();
-    if (position && metaData?.venues) {
-      const nearby = getNearbyVenueIds(
-        position,
-        Object.values(metaData.venues),
-        getVenueIdsWithShowings(movies),
+    if (!position || !metaData?.venues) return;
+
+    const nearby = getNearbyVenueIds(
+      position,
+      Object.values(metaData.venues),
+      getVenueIdsWithShowings(movies),
+    );
+
+    // Nothing in range. Applying this would select zero venues and empty the
+    // results, which reads as a broken filter rather than an answer — so leave
+    // the existing selection alone and say what happened instead.
+    if (nearby.length === 0) {
+      setNearbyNotice(
+        "No venues with showings found near you — your venue selection is unchanged.",
       );
-      setVenueOption("nearby", nearby);
+      return;
     }
+
+    setVenueOption("nearby", nearby);
   }, [
     userPosition,
     nearbyVenueIds,
@@ -174,9 +196,13 @@ export default function FilterOverlay({
   // Quick filter: what's on near me today. Resolves the user's nearby venues
   // (requesting location if needed) then applies the preset and closes.
   const handleNearMeToday = useCallback(async () => {
+    setNearbyNotice(null);
+
     let nearby = nearbyVenueIds;
+    let located = Boolean(userPosition);
     if (!(userPosition && nearby.length > 0)) {
       const position = await requestLocation();
+      located = Boolean(position);
       if (position && metaData?.venues) {
         nearby = getNearbyVenueIds(
           position,
@@ -185,9 +211,18 @@ export default function FilterOverlay({
         );
       }
     }
-    // Location unavailable (denied/failed) — the venue section surfaces the
-    // geolocation error; don't apply a preset with no venues.
-    if (nearby.length === 0) return;
+    // Don't apply a preset with no venues — it would empty the results and read
+    // as a broken filter. A failed lookup is already explained by geoError in
+    // the venue section; a successful one that simply found nothing isn't, so
+    // that case says so itself.
+    if (nearby.length === 0) {
+      if (located) {
+        setNearbyNotice(
+          "No venues with showings found near you — your filters are unchanged.",
+        );
+      }
+      return;
+    }
 
     applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
     onClose();
@@ -221,7 +256,20 @@ export default function FilterOverlay({
   const thisWeekActive = isQuickFilterActive(thisWeekPreset);
   const everythingActive = isQuickFilterActive(everythingPreset);
 
+  // Share filters. "Copied!" on its own doesn't tell anyone what was copied or
+  // what it does, so the result is announced as a short explanatory toast — and
+  // when the clipboard is unavailable (insecure context, permission denied) the
+  // toast shows the link itself so it can still be copied by hand.
+  const [share, setShare] = useState<{
+    status: "copied" | "error";
+    url: string;
+  } | null>(null);
+  const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleClose = useCallback(() => {
+    // Transient feedback shouldn't survive the panel it belongs to — a reopened
+    // overlay would otherwise still be claiming something was just copied.
+    setShare(null);
     onClose();
   }, [onClose]);
 
@@ -277,19 +325,24 @@ export default function FilterOverlay({
     return () => document.removeEventListener("keydown", handleFocusTrap);
   }, [isOpen]);
 
-  // Share filters
-  const [copied, setCopied] = useState(false);
-
   const handleShareFilters = useCallback(async () => {
     const url = buildFilterUrl(filterState);
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setShare({ status: "copied", url });
     } catch {
-      // Fallback: silently fail if clipboard is unavailable
+      setShare({ status: "error", url });
     }
+    if (shareTimer.current) clearTimeout(shareTimer.current);
+    shareTimer.current = setTimeout(() => setShare(null), SHARE_TOAST_MS);
   }, [filterState]);
+
+  // Don't leave a timer running against an unmounted overlay.
+  useEffect(() => {
+    return () => {
+      if (shareTimer.current) clearTimeout(shareTimer.current);
+    };
+  }, []);
 
   // Get genres array from metadata
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
@@ -316,31 +369,64 @@ export default function FilterOverlay({
           {performanceCount.toLocaleString("en-GB")} showings
         </div>
         <div className={styles.filterControls}>
-          <span className={styles.controlLeft}>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={resetFilters}
-              disabled={!hasActiveFilters}
-              aria-label="Reset all filters to defaults"
-            >
-              Reset Filters
-            </Button>
-          </span>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={resetFilters}
+            disabled={!hasActiveFilters}
+            aria-label="Reset all filters to defaults"
+          >
+            Reset Filters
+          </Button>
           <span className={styles.countsDivider} aria-hidden="true">
             •
           </span>
-          <span className={styles.controlRight} aria-live="assertive">
-            <Button
-              variant="link"
-              size="sm"
-              onClick={handleShareFilters}
-              aria-label="Copy shareable filter URL to clipboard"
-            >
-              {copied ? "Copied!" : "Share Filters"}
-            </Button>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={handleShareFilters}
+            aria-label="Copy shareable filter URL to clipboard"
+          >
+            Share Filters
+          </Button>
+          <span className={styles.countsDivider} aria-hidden="true">
+            •
           </span>
+          <Button
+            variant="link"
+            size="sm"
+            onClick={handleClose}
+            aria-label="Close filter options"
+          >
+            Close Filters
+          </Button>
         </div>
+        {share && (
+          <div className={styles.shareToast} role="status">
+            {share.status === "copied" ? (
+              <>
+                <span className={styles.shareToastTitle}>
+                  ✓ Link copied to your clipboard
+                </span>
+                <span className={styles.shareToastBody}>
+                  Paste it anywhere — whoever opens it lands on Clusterflick
+                  with exactly these filters already applied.
+                </span>
+              </>
+            ) : (
+              <>
+                <span className={styles.shareToastTitle}>
+                  Couldn&rsquo;t reach your clipboard
+                </span>
+                <span className={styles.shareToastBody}>
+                  Copy this link by hand — it opens Clusterflick with these
+                  filters applied:
+                </span>
+                <span className={styles.shareToastUrl}>{share.url}</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Quick Filters */}
@@ -429,6 +515,7 @@ export default function FilterOverlay({
             selectedVenues={filterState.venues}
             geoLoading={geoLoading}
             geoError={geoError}
+            nearbyNotice={nearbyNotice}
             onVenueOptionChange={setVenueOption}
             onNearbyClick={handleNearbyClick}
             toggleVenue={toggleVenue}
@@ -448,6 +535,8 @@ export default function FilterOverlay({
             setTimeOption={setTimeOption}
             hideFinished={filterState.hideFinished}
             onToggleHideFinished={toggleHideFinished}
+            hideSoldOut={filterState.hideSoldOut}
+            onToggleHideSoldOut={toggleHideSoldOut}
           />
         </div>
       </div>

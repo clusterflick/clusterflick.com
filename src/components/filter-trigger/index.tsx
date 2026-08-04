@@ -25,6 +25,8 @@ export default function FilterTrigger({
   const { filterState } = useFilterConfig();
   const { metaData } = useCinemaData();
   const textWrapperRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const flashedState = useRef<typeof filterState | null>(null);
 
   // Compute cinema venue IDs
   const cinemaVenueIds = useMemo(() => {
@@ -44,6 +46,36 @@ export default function FilterTrigger({
       cinemaVenueIds,
     });
   }, [filterState, metaData, cinemaVenueIds]);
+
+  // Flash the summary whenever a filter changes. The wording updates either way,
+  // but a line of text quietly rewriting itself is easy to miss — especially
+  // from the far side of the overlay, where the chip you just tapped is nowhere
+  // near the summary. A glow that cools off over the next second draws the eye
+  // up to read what it now says.
+  //
+  // Keyed on the filter state rather than the description text: the description
+  // also changes when venue metadata finishes loading, which is not something
+  // anyone did and shouldn't announce itself.
+  useEffect(() => {
+    const element = textRef.current;
+    if (!element) return;
+
+    // Flash on a genuine change of value, not on "this effect has run before".
+    // Under StrictMode, React deliberately runs mount effects twice while refs
+    // survive in between, so a first-run boolean guard reports the second pass
+    // as a change and flashes on page load. Comparing the state itself is
+    // immune to that: the two mount passes carry the same object, and a
+    // remount (routing back to a filtered page) resets this to null.
+    const previous = flashedState.current;
+    flashedState.current = filterState;
+    if (previous === null || previous === filterState) return;
+
+    element.classList.remove(styles.changed);
+    // Reading a layout property forces the class removal to take effect now, so
+    // re-adding it restarts the animation instead of being coalesced away.
+    void element.offsetWidth;
+    element.classList.add(styles.changed);
+  }, [filterState]);
 
   // Measure text wrapper height and report it continuously during animation
   useEffect(() => {
@@ -85,7 +117,7 @@ export default function FilterTrigger({
       }
     >
       <span className={styles.textWrapper} ref={textWrapperRef}>
-        <span className={styles.text}>
+        <span className={styles.text} ref={textRef}>
           <span className={styles.highlight}>{description.events}</span>
           {" • "}
           <span className={styles.highlight}>{description.venues}</span>

@@ -2,8 +2,13 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { PRIMARY_NAV_LINKS, setUseBrowserBack } from "@/utils/nav-links";
+import {
+  PRIMARY_NAV_LINKS,
+  isCurrentNavPath,
+  setUseBrowserBack,
+} from "@/utils/nav-links";
 import styles from "./header-nav.module.css";
 
 // Space reserved on the right of the nav for the always-visible hamburger
@@ -25,6 +30,7 @@ const NEIGHBOUR_MARGIN = 24;
  */
 export default function HeaderNav() {
   const navRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
   // Natural widths (incl. gap) of each link, cached from live measurements so
   // hidden links don't report 0. Text is static, so these are stable.
   const linkWidths = useRef<number[]>([]);
@@ -101,16 +107,21 @@ export default function HeaderNav() {
       className={clsx(styles.nav, visibleCount === null && styles.measuring)}
       aria-label="Main navigation"
     >
-      {PRIMARY_NAV_LINKS.map(({ href, label }, i) => (
-        <Link
-          key={href}
-          href={href}
-          onClick={setUseBrowserBack}
-          hidden={visibleCount !== null && i >= visibleCount}
-        >
-          {label}
-        </Link>
-      ))}
+      {PRIMARY_NAV_LINKS.map(({ href, label }, i) => {
+        const isCurrent = isCurrentNavPath(pathname, href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={clsx(styles.link, isCurrent && styles.current)}
+            aria-current={isCurrent ? "page" : undefined}
+            onClick={setUseBrowserBack}
+            hidden={visibleCount !== null && i >= visibleCount}
+          >
+            {label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

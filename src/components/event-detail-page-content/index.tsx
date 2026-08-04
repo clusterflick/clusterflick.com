@@ -114,7 +114,11 @@ export default function EventDetailPageContent({
 }: EventDetailPageContentProps) {
   const cinemasSection =
     venues.length > 0 ? (
-      <ContentSection title={cinemasSectionTitle} as="h2">
+      <ContentSection
+        title={cinemasSectionTitle}
+        as="h2"
+        className={venuesLayout === "grid" ? styles.gridCinemas : undefined}
+      >
         <div className={styles.venueGrid}>
           {venues.map((venue) => (
             <VenueCard

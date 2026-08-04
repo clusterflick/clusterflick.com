@@ -114,6 +114,63 @@
   text-overflow: clip;
 }
 
+/*
+ * Applied for one run whenever a filter changes (see FilterTrigger). A glow that
+ * cools off, rather than a colour swap: it's visible in peripheral vision from
+ * anywhere in the overlay, and because it's only a text-shadow nothing reflows
+ * and the summary stays readable throughout.
+ *
+ * Electric blue, not pink — most of what it lights up is the pink `.highlight`
+ * spans, and a pink glow behind pink text barely registers. The contrasting
+ * colour is what makes the flash visible at all.
+ */
+.changed {
+  animation: summaryChanged 0.5s ease-out;
+}
+
+/*
+ * Eight zero-blur shadows ringing each glyph, which paint as a hard outline
+ * rather than the soft halo a blurred shadow gives — that's what makes it
+ * unmissable. Offsets are in `em` so the ring stays proportionate across the
+ * trigger's 14px closed and 28px open sizes. The ninth layer is a wide blur
+ * behind it, so the outline sits on a bloom instead of floating on the
+ * background. Held at full strength for the first fifth of the run, so it
+ * registers before it starts cooling.
+ */
+@keyframes summaryChanged {
+  0%,
+  20% {
+    text-shadow:
+      -0.04em -0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      0.04em -0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      -0.04em 0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      0.04em 0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      0 -0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      0 0.04em 0 rgba(var(--color-electric-blue-rgb), 1),
+      -0.04em 0 0 rgba(var(--color-electric-blue-rgb), 0.9),
+      0.04em 0 0 rgba(var(--color-electric-blue-rgb), 0.7),
+      0 0 0.6em rgba(var(--color-electric-blue-rgb), 0.5);
+  }
+  100% {
+    text-shadow:
+      -0.04em -0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      0.04em -0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      -0.04em 0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      0.04em 0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      0 -0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      0 0.04em 0 rgba(var(--color-electric-blue-rgb), 0),
+      -0.04em 0 0 rgba(var(--color-electric-blue-rgb), 0),
+      0.04em 0 0 rgba(var(--color-electric-blue-rgb), 0),
+      0 0 0.6em rgba(var(--color-electric-blue-rgb), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .changed {
+    animation: none;
+  }
+}
+
 .highlight {
   color: var(--color-neon-pink);
   font-weight: 500;

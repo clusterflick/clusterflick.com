@@ -33,6 +33,8 @@ interface DateFilterSectionProps {
   setTimeOption: (option: TimeOption) => void;
   hideFinished: boolean;
   onToggleHideFinished: () => void;
+  hideSoldOut: boolean;
+  onToggleHideSoldOut: () => void;
 }
 
 export default function DateFilterSection({
@@ -45,6 +47,8 @@ export default function DateFilterSection({
   setTimeOption,
   hideFinished,
   onToggleHideFinished,
+  hideSoldOut,
+  onToggleHideSoldOut,
 }: DateFilterSectionProps) {
   // Calculate date range from performance data
   const { minDateStr, maxDateStr } = useMemo(() => {
@@ -199,12 +203,22 @@ export default function DateFilterSection({
         <h3 id="dates-heading" className={styles.sectionTitle}>
           Dates
         </h3>
-        <Switch
-          id="hide-finished"
-          label="Hide past showings"
-          checked={hideFinished}
-          onChange={onToggleHideFinished}
-        />
+        {/* Both toggles answer "don't show me screenings I can't go to", so
+            they sit together rather than being split across sections. */}
+        <div className={styles.switchGroup}>
+          <Switch
+            id="hide-finished"
+            label="Hide past showings"
+            checked={hideFinished}
+            onChange={onToggleHideFinished}
+          />
+          <Switch
+            id="hide-sold-out"
+            label="Hide sold out showings"
+            checked={hideSoldOut}
+            onChange={onToggleHideSoldOut}
+          />
+        </div>
       </div>
       <p className={styles.sectionDescription}>When do you want to go?</p>
       <div
@@ -246,7 +260,7 @@ export default function DateFilterSection({
           />
         ))}
       </div>
-      <ExpandableSection title="Select Specific Dates &amp; Times">
+      <ExpandableSection title="Exact Dates &amp; Times">
         <div className={styles.advancedFilters}>
           <div className={styles.advancedFilterGroup}>
             <div className={styles.dateRangeInputs}>

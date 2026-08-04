@@ -18,6 +18,7 @@ export enum FilterId {
   FormatPresentation = "formatPresentation",
   FormatDimension = "formatDimension",
   HideFinished = "hideFinished",
+  HideSoldOut = "hideSoldOut",
 }
 
 /**
@@ -40,6 +41,7 @@ export type FilterState = {
   [FilterId.FormatPresentation]: string[] | null;
   [FilterId.FormatDimension]: string[] | null;
   [FilterId.HideFinished]: boolean;
+  [FilterId.HideSoldOut]: boolean;
 };
 
 /**
@@ -104,4 +106,5 @@ export type AnyFilterModule =
   | FilterModule<FilterId.FormatSource>
   | FilterModule<FilterId.FormatPresentation>
   | FilterModule<FilterId.FormatDimension>
-  | FilterModule<FilterId.HideFinished>;
+  | FilterModule<FilterId.HideFinished>
+  | FilterModule<FilterId.HideSoldOut>;

@@ -23,6 +23,8 @@ interface VenueFilterSectionProps {
   selectedVenues: string[] | null;
   geoLoading: boolean;
   geoError: string | null;
+  /** Explanation for a "near me" lookup that succeeded but matched no venues. */
+  nearbyNotice: string | null;
   onVenueOptionChange: (option: VenueOption, venueIds: string[]) => void;
   onNearbyClick: () => void;
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
@@ -39,6 +41,7 @@ export default function VenueFilterSection({
   selectedVenues,
   geoLoading,
   geoError,
+  nearbyNotice,
   onVenueOptionChange,
   onNearbyClick,
   toggleVenue,
@@ -223,13 +226,18 @@ export default function VenueFilterSection({
           {geoError}
         </p>
       )}
+      {nearbyNotice && (
+        <p className={styles.geoNotice} role="status">
+          {nearbyNotice}
+        </p>
+      )}
       <VenueQuickAdd
         ref={quickAddRef}
         venues={allVenues}
         isVenueSelected={isVenueSelected}
         onToggleVenue={(venueId) => toggleVenue(venueId, allVenueIds)}
       />
-      <ExpandableSection title="Select Specific Venues">
+      <ExpandableSection title="Individual Venues">
         <div className={styles.advancedFilters}>
           {/* Venue search filter */}
           <SearchInput

@@ -521,8 +521,13 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   if (timeDesc) {
     datesDesc += `, ${timeDesc}`;
   }
-  if (state.hideFinished) {
-    datesDesc += " and not finished";
+  // Availability toggles ride along with the dates, since both narrow which
+  // performances survive rather than which films do.
+  const availability: string[] = [];
+  if (state.hideFinished) availability.push("not finished");
+  if (state.hideSoldOut) availability.push("not sold out");
+  if (availability.length > 0) {
+    datesDesc += ` and ${formatList(availability, 2)}`;
   }
 
   return {

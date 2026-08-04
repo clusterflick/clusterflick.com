@@ -21,3 +21,4 @@ export {
 } from "./format";
 export type { FormatFilterId, FormatGroupConfig, FormatOption } from "./format";
 export { hideFinishedFilter } from "./hide-finished";
+export { hideSoldOutFilter } from "./hide-sold-out";

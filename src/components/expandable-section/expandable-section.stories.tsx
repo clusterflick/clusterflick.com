@@ -6,6 +6,11 @@ import ExpandableSection from "@/components/expandable-section";
  * expanded or collapsed. Fully accessible with `aria-expanded` and
  * `aria-controls`.
  *
+ * Pass `title` as a noun phrase describing the contents ("Individual Venues").
+ * The trigger renders it as "Show …" / "Hide …" so it reads as an action, and
+ * scrolls itself to the middle of the viewport on expand so the revealed
+ * content isn't left below the fold.
+ *
  * **When to use:**
  * - Secondary content on detail pages that most users do not need immediately
  *   (e.g. accessibility info, extended descriptions).
@@ -31,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 /** Collapsed by default — the user must tap to expand. */
 export const Collapsed: Story = {
   args: {
-    title: "Accessibility information",
+    title: "Accessibility Information",
     children: (
       <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.8 }}>
         This venue has step-free access via the main entrance. A hearing loop is
@@ -42,10 +47,11 @@ export const Collapsed: Story = {
   },
 };
 
-/** Expanded by default — content is visible on first render. */
+/** Expanded by default — content is visible on first render, so the trigger
+ *  reads "Hide …". */
 export const Expanded: Story = {
   args: {
-    title: "About this screening",
+    title: "Screening Details",
     defaultExpanded: true,
     children: (
       <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.8 }}>
@@ -60,7 +66,7 @@ export const Expanded: Story = {
 /** Rich content inside the expandable — a nested list. */
 export const WithList: Story = {
   args: {
-    title: "What to expect",
+    title: "What To Expect",
     children: (
       <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 2, opacity: 0.8 }}>
         <li>Step-free access</li>

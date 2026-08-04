@@ -36,6 +36,19 @@ export const NAV_LINKS: readonly NavLink[] = [
 export const PRIMARY_NAV_LINKS = NAV_LINKS.filter((link) => link.primary);
 
 /**
+ * Whether `href` is the nav entry for the page currently being viewed, so it can
+ * be marked as current. Sub-pages count as their section (`/formats/70mm` is
+ * still Formats), which is why this is a prefix match rather than equality.
+ */
+export function isCurrentNavPath(
+  pathname: string | null,
+  href: string,
+): boolean {
+  if (!pathname) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/**
  * Sets the useBrowserBack flag in sessionStorage so the PageHeader back button
  * uses router.back() instead of navigating to the fixed backUrl. Call this
  * whenever navigating from the main nav to a sub-page.
