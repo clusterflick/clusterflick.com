@@ -71,6 +71,41 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-04",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The <Link href="/films">filters</Link> can now hide sold out
+            showings. Some venues tell us when a performance has gone, and
+            switching this on drops those, so what&apos;s left is what you can
+            still get into. It sits alongside &ldquo;Hide past showings&rdquo;,
+            since both are asking the same thing — don&apos;t show me screenings
+            I can&apos;t go to.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/films">filter panel</Link> is easier to follow
+            while you work in it. The count of what your filters match is now
+            the biggest thing in it rather than fine print, the summary line
+            flashes when it changes so you notice it rewriting itself, the
+            collapsed sections say what they do (&ldquo;Show Individual
+            Venues&rdquo;) instead of sitting there looking like headings, and
+            sharing your filters explains what the copied link actually does —
+            showing you the link to copy by hand if the browser blocks the
+            clipboard. &ldquo;Venues near me&rdquo; also says so when it finds
+            nothing in range, rather than quietly emptying your results.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-02",
     changes: [
       {
