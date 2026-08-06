@@ -283,6 +283,10 @@ export function resolveFilterStateFromUrl(
 /**
  * Build a shareable URL with the current filter state encoded as query params.
  * Only includes params that differ from the defaults.
+ *
+ * The link keeps the page it was shared from — filters are only useful against
+ * the grid that renders them, so dropping the path would send recipients to the
+ * homepage with a query string nothing there acts on.
  */
 export function buildFilterUrl(state: FilterState): string {
   const params = new URLSearchParams();
@@ -294,7 +298,10 @@ export function buildFilterUrl(state: FilterState): string {
   }
 
   const query = params.toString();
-  const base = typeof window !== "undefined" ? window.location.origin : "";
+  const base =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${window.location.pathname}`
+      : "";
   return query ? `${base}?${query}` : base;
 }
 
