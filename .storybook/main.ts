@@ -1,5 +1,18 @@
 import type { StorybookConfig } from "@storybook/nextjs-vite";
 import { mergeConfig, type Rollup } from "vite";
+import getMetaDataFilename from "../src/utils/get-meta-data-filename";
+
+// The metadata filename is content-hashed, so it changes every time the data is
+// reprocessed — CI regenerates it from a fresh release on every run. Resolve it
+// from disk exactly as next.config.ts does; a pinned literal goes stale silently,
+// because StoryDataLoader catches the resulting 404 and renders a "Failed to load
+// data" panel rather than failing a test.
+const metaDataFilename = getMetaDataFilename();
+if (!metaDataFilename) {
+  throw new Error(
+    "No data.meta.*.json found in public/data — run `npm run process-combined-data` before building Storybook",
+  );
+}
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -15,15 +28,13 @@ const config: StorybookConfig = {
   staticDirs: ["../public", "./static"],
   env: (config) => ({
     ...config,
-    // Set the data filename to match the actual file in public/data
-    NEXT_PUBLIC_DATA_FILENAME: "data.meta.adeda41fc3.json",
+    NEXT_PUBLIC_DATA_FILENAME: metaDataFilename,
   }),
   async viteFinal(config) {
     return mergeConfig(config, {
       define: {
-        "process.env.NEXT_PUBLIC_DATA_FILENAME": JSON.stringify(
-          "data.meta.adeda41fc3.json",
-        ),
+        "process.env.NEXT_PUBLIC_DATA_FILENAME":
+          JSON.stringify(metaDataFilename),
       },
       build: {
         // Suppress sourcemap warnings for Next.js app directory files

@@ -65,8 +65,18 @@ export const Default: Story = {
   },
 };
 
-/** A large set — the case virtualisation exists for. */
+/**
+ * A large set — the case virtualisation exists for.
+ *
+ * Not snapshotted. The grid reserves its full scroll height up front, so 400
+ * films stand a page ~24,000px tall — past Chromatic's 25M pixel capture limit
+ * at desktop widths. Virtualisation means almost all of that is empty reserved
+ * space; the rows that do render are the ones `Default` already covers.
+ */
 export const ManyFilms: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
   args: {
     items: films(400).map((movie) => ({ movie })),
   },

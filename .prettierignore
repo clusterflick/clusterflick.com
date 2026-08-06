@@ -1,0 +1,5 @@
+# Written verbatim from node_modules by msw's postinstall (see the "msw" key in
+# package.json) on every install. Formatting it makes the committed copy differ
+# from what npm ci produces, leaving the file permanently dirty in CI — which
+# Chromatic reads as a Storybook config change and uses to disable TurboSnap.
+.storybook/static/mockServiceWorker.js
