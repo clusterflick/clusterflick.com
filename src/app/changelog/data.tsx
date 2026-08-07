@@ -83,6 +83,20 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Heathcote & Star"
+              url="https://heathcoteandstar.co.uk"
+            />
+            , a Leytonstone pub whose upstairs Grove Green Room hosts
+            screenings.
+          </>
+        ),
+      },
     ],
   },
   {
