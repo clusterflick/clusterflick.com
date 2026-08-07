@@ -74,6 +74,30 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-07",
     changes: [
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            There are now <Link href="/collections">film collections</Link> —
+            franchises like Lord of the Rings, Star Wars and The Godfather, laid
+            out in release order so you can see the whole run at once: what you
+            can still catch, and what you have already missed. A collection gets
+            a page while two or more of its films are on, and a film playing
+            inside a double bill or marathon counts too — its poster points at
+            the event.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Film pages now say which collection a film belongs to, so one Star
+            Wars film points you at the other eight without you going looking
+            for them.
+          </>
+        ),
+      },
+      {
         tag: "New film club",
         body: () => (
           <>
