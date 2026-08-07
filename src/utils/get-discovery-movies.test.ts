@@ -12,6 +12,7 @@ import {
   getLastChanceMovies,
   getMarathonMovies,
   getCriticsPicks,
+  getCollectionRow,
   getRating,
   type DiscoveryWindow,
 } from "./get-discovery-movies";
@@ -421,6 +422,96 @@ describe("getCriticsPicks", () => {
       12,
       NOW,
     );
+    expect(result).toHaveLength(0);
+  });
+});
+
+describe("getCollectionRow", () => {
+  const collections = {
+    "1": { id: "1", name: "Alien", slug: "alien", partCount: 6 },
+    "2": { id: "2", name: "Back to the Future", slug: "bttf", partCount: 3 },
+  };
+
+  const inCollection = (id: string, collectionId: string, venues: string[]) =>
+    ({
+      ...makeMovie(
+        id,
+        venues.map((venueId) => ({ venueId })),
+      ),
+      collectionId,
+    }) as Movie;
+
+  it("surfaces collections with at least two films showing", () => {
+    const result = getCollectionRow(
+      asRecord([
+        inCollection("a1", "1", ["v1"]),
+        inCollection("a2", "1", ["v2"]),
+      ]),
+      collections,
+      WINDOW,
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].collection.name).toBe("Alien");
+    expect(result[0].showingCount).toBe(2);
+  });
+
+  it("excludes a collection with only one film showing", () => {
+    const result = getCollectionRow(
+      asRecord([inCollection("a1", "1", ["v1"])]),
+      collections,
+      WINDOW,
+    );
+
+    expect(result).toHaveLength(0);
+  });
+
+  it("ranks by films showing, then by total performances", () => {
+    const result = getCollectionRow(
+      asRecord([
+        inCollection("a1", "1", ["v1"]),
+        inCollection("a2", "1", ["v2"]),
+        inCollection("b1", "2", ["v1", "v2"]),
+        inCollection("b2", "2", ["v1", "v2"]),
+        inCollection("b3", "2", ["v1"]),
+      ]),
+      collections,
+      WINDOW,
+    );
+
+    expect(result.map((r) => r.collection.name)).toEqual([
+      "Back to the Future",
+      "Alien",
+    ]);
+    expect(result[0].showingCount).toBe(3);
+    expect(result[0].performanceCount).toBe(5);
+  });
+
+  it("ignores films whose collection has no page", () => {
+    const result = getCollectionRow(
+      asRecord([
+        inCollection("x1", "missing", ["v1"]),
+        inCollection("x2", "missing", ["v2"]),
+      ]),
+      collections,
+      WINDOW,
+    );
+
+    expect(result).toHaveLength(0);
+  });
+
+  it("ignores films with no performances in the window", () => {
+    const outside = {
+      ...makeMovie("a1", [{ venueId: "v1", times: [NOW + 100 * DAY] }]),
+      collectionId: "1",
+    } as Movie;
+
+    const result = getCollectionRow(
+      asRecord([outside, inCollection("a2", "1", ["v2"])]),
+      collections,
+      WINDOW,
+    );
+
     expect(result).toHaveLength(0);
   });
 });

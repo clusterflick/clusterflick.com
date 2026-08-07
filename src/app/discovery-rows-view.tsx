@@ -1,4 +1,5 @@
 import PosterRow from "@/components/poster-row";
+import CollectionRow from "@/components/collection-row";
 import type { DiscoveryRows } from "@/utils/get-discovery-movies";
 import styles from "./page.module.css";
 
@@ -8,7 +9,14 @@ import styles from "./page.module.css";
  * (view-time data) — see DiscoverySections.
  */
 export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
-  const { popular, criticsPicks, newAdditions, lastChance, marathons } = rows;
+  const {
+    popular,
+    criticsPicks,
+    newAdditions,
+    lastChance,
+    marathons,
+    collections,
+  } = rows;
   const hasNewAdditions =
     newAdditions.newReleases.length +
       newAdditions.returning.length +
@@ -28,6 +36,13 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         intro="Highly rated films worth seeking out this week."
         movies={criticsPicks}
         showAll
+      />
+
+      <CollectionRow
+        title="Sagas & Series"
+        intro="Franchises with more than one instalment showing this week."
+        collections={collections}
+        seeAllHref="/collections"
       />
 
       <PosterRow

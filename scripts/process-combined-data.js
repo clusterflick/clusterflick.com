@@ -245,6 +245,9 @@ function removeIdProperty(data) {
   Object.keys(data.genres).forEach((id) => {
     if (data.genres[id].id === id) delete data.genres[id].id;
   });
+  Object.keys(data.collections).forEach((id) => {
+    if (data.collections[id].id === id) delete data.collections[id].id;
+  });
   Object.keys(data.venues).forEach((id) => {
     if (data.venues[id].id === id) delete data.venues[id].id;
   });
@@ -276,8 +279,15 @@ function removeOptionalData(data) {
 
 try {
   const reducedData = removeOptionalData(data);
-  const { generatedAt, genres, people, venues, urlPrefixes, movies } =
-    reducedData;
+  const {
+    generatedAt,
+    genres,
+    people,
+    venues,
+    collections,
+    urlPrefixes,
+    movies,
+  } = reducedData;
 
   const files = {};
   const mapping = {};
@@ -316,11 +326,31 @@ try {
     writeFileSync(path.join(outputPath, outputFilename), serialised);
   });
 
+  // Every visitor downloads the meta blob, so it only carries what a collection
+  // needs to be *named* — the pill on a movie page and the homepage row. The
+  // membership (parts, overview, backdrop) is an order of magnitude larger and
+  // is only ever read at build time, so it goes to its own file.
+  const collectionRegistry = {};
+  Object.entries(collections).forEach(([id, collection]) => {
+    collectionRegistry[id] = {
+      name: collection.name,
+      slug: collection.slug,
+      posterPath: collection.posterPath,
+      partCount: collection.parts.length,
+    };
+  });
+
+  writeFileSync(
+    path.join(outputPath, "collections.json"),
+    JSON.stringify(collections),
+  );
+
   const meta = {
     generatedAt,
     genres,
     people,
     venues,
+    collections: collectionRegistry,
     urlPrefixes,
     mapping,
     filenames,

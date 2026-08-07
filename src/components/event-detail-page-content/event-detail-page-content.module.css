@@ -51,6 +51,15 @@
   margin-bottom: 28px;
 }
 
+/* Mirrors StandardPageLayout's `.content` wrapper. Secondary content placed
+   after the films sits inside the full-bleed films section rather than that
+   wrapper, so it has to re-impose the same column width itself. */
+.afterFilmsContent {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
 .films {
   text-align: center;
 

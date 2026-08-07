@@ -146,6 +146,12 @@ export default async function MovieDetailPage({
   // "Top films" lists this movie appears on (RT's 300 Best, the 100% Club, …)
   const movieLists = getMovieListsForMovie(movie.id, data.movies);
 
+  // The franchise or series this film belongs to, when that collection has a
+  // page of its own.
+  const collection = movie.collectionId
+    ? data.collections[movie.collectionId]
+    : undefined;
+
   // Non-default screening formats (70mm, IMAX, 3D, …) across upcoming
   // performances, for the format tags below the poster.
   const formats = getMovieFormats(
@@ -284,6 +290,7 @@ export default async function MovieDetailPage({
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
         movieLists={movieLists}
+        collection={collection}
         formats={formats}
         showingsStaticContent={
           <StaticShowingsList

@@ -4,6 +4,7 @@ import type {
   Venue,
   Person,
   Genre,
+  CollectionSummary,
   MetaData,
 } from "@/types";
 
@@ -16,16 +17,21 @@ function expandAndCombine(
     {},
   );
   const combinedData = { ...metaData, movies } as CinemaData;
-  const keysWithIds = ["genres", "movies", "people", "venues"] as Partial<
-    keyof CinemaData
-  >[];
+  const keysWithIds = [
+    "collections",
+    "genres",
+    "movies",
+    "people",
+    "venues",
+  ] as Partial<keyof CinemaData>[];
   keysWithIds.forEach((key) => {
     Object.keys(combinedData[key]).forEach((id: string) => {
       const entry = combinedData[key] as
         | Record<string, Movie>
         | Record<string, Venue>
         | Record<string, Person>
-        | Record<string, Genre>;
+        | Record<string, Genre>
+        | Record<string, CollectionSummary>;
       entry[id].id = id;
     });
   });

@@ -70,7 +70,9 @@ export default async function Home() {
   // Build-time snapshot of the rows for SSR / no-JS / slow connections. The
   // client re-computes these against view-time data once it loads (see
   // DiscoverySections), so lapsed showings drop out.
-  const serverRows = computeDiscoveryRows(data.movies);
+  const serverRows = computeDiscoveryRows(data.movies, {
+    collections: data.collections,
+  });
 
   const nearMeVenues = getNearMeVenues(data);
   // Count all of a club's current films (matching the club page), not just this

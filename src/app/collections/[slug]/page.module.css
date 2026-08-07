@@ -1,0 +1,21 @@
+/* Collection overview shown inside the hero. Constrained for readability and
+   centred to match the centre-aligned hero. */
+.heroBlurb {
+  max-width: 620px;
+  margin: 20px auto 0;
+  line-height: 1.7;
+}
+
+.heroBlurb p {
+  margin: 0;
+}
+
+/* Sits directly under the films grid, which is centred and full-bleed. */
+.eventsSection {
+  margin-top: 48px;
+  text-align: center;
+
+  h2 {
+    justify-content: center;
+  }
+}

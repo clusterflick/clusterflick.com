@@ -20,7 +20,8 @@ interface DiscoverySectionsProps {
 export default function DiscoverySections({
   fallback,
 }: DiscoverySectionsProps) {
-  const { movies, isLoading, hasAttemptedLoad, getData } = useCinemaData();
+  const { movies, metaData, isLoading, hasAttemptedLoad, getData } =
+    useCinemaData();
 
   // Fetch the full dataset once on mount. Empty deps are intentional — getData
   // returns early if the data is already loaded (shared app-wide context).
@@ -34,8 +35,14 @@ export default function DiscoverySections({
   // Anchor the window to "now" (not midnight) so showings that have already
   // finished today drop out — matching how the movie pages hide them.
   const rows = useMemo(
-    () => (ready ? computeDiscoveryRows(movies, { anchorToNow: true }) : null),
-    [ready, movies],
+    () =>
+      ready
+        ? computeDiscoveryRows(movies, {
+            anchorToNow: true,
+            collections: metaData?.collections,
+          })
+        : null,
+    [ready, movies, metaData],
   );
 
   return rows ? <DiscoveryRowsView rows={rows} /> : <>{fallback}</>;

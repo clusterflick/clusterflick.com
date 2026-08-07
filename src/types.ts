@@ -24,6 +24,39 @@ export type Genre = {
   name: string;
 };
 
+/** One film in a TMDB collection, whether or not it is currently screening. */
+export type CollectionPart = {
+  id: string;
+  title: string;
+  releaseDate: string;
+  posterPath?: string;
+};
+
+/**
+ * A TMDB movie collection (a franchise or series) with at least one film
+ * screening in London. Only the naming fields reach the client — the full
+ * record, including `parts`, is read at build time from
+ * `public/data/collections.json`. See `CollectionSummary`.
+ */
+export type Collection = {
+  id: string;
+  name: string;
+  slug: string;
+  overview?: string;
+  posterPath?: string;
+  backdropPath?: string;
+  parts: CollectionPart[];
+};
+
+/** The slice of a collection carried in the meta blob every visitor downloads. */
+export type CollectionSummary = {
+  id: string;
+  name: string;
+  slug: string;
+  posterPath?: string;
+  partCount: number;
+};
+
 export enum Category {
   Movie = "movie",
   MultipleMovies = "multiple-movies",
@@ -50,6 +83,7 @@ export type IncludedMovie = {
   overview?: string;
   normalizedTitle?: string;
   releaseDate?: string;
+  collectionId?: Collection["id"];
 };
 
 export type Showing = {
@@ -236,6 +270,8 @@ export type Movie = {
   directors?: Person["id"][];
   actors?: Person["id"][];
   genres?: Genre["id"][];
+  /** The TMDB collection this film belongs to, when that collection has a page. */
+  collectionId?: Collection["id"];
   imdbId?: string;
   youtubeTrailer?: string;
   posterPath?: string;
@@ -256,6 +292,7 @@ export type CinemaData = {
   venues: Record<string, Venue>;
   people: Record<string, Person>;
   genres: Record<string, Genre>;
+  collections: Record<string, CollectionSummary>;
   movies: Record<string, Movie>;
   urlPrefixes: string[];
 };

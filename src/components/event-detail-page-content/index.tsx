@@ -1,6 +1,6 @@
 import { type ComponentType, type ReactNode } from "react";
 import Link from "next/link";
-import type { Movie, AccessibilityFeature } from "@/types";
+import type { AccessibilityFeature } from "@/types";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
@@ -10,7 +10,9 @@ import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
-import FilmPosterGrid from "@/components/film-poster-grid";
+import FilmPosterGrid, {
+  type FilmPosterGridMovie,
+} from "@/components/film-poster-grid";
 import VenueCard from "@/components/venue-card";
 import LinkedList from "@/components/linked-list";
 import CanonicalRedirect from "@/components/canonical-redirect";
@@ -40,7 +42,7 @@ export interface EventDetailPageContentProps {
   performanceCount: number;
   backUrl: string;
   backText: string;
-  gridMovies: { movie: Movie; performanceCount: number }[];
+  gridMovies: FilmPosterGridMovie[];
   gridMoviesTruncated?: boolean;
   Blurb: ComponentType | null;
   isAlias: boolean;
@@ -69,11 +71,25 @@ export interface EventDetailPageContentProps {
    *  Fills the hero so a photographic backdrop reads without a forced height. */
   heroChildren?: ReactNode;
   /**
+   * Content rendered full-width directly below the films grid, for a section
+   * that belongs with the films rather than beside them — a collection's
+   * remaining, not-currently-showing instalments, say.
+   */
+  afterFilmsChildren?: ReactNode;
+  /**
    * How the cinemas/accessibility block is laid out:
    * - "sidebar" (default): alongside the "About" blurb in a two-column layout.
    * - "grid": full-width below the hero (use when the blurb is in the hero).
    */
   venuesLayout?: "sidebar" | "grid";
+  /**
+   * Where the cinemas/accessibility block sits relative to the films grid.
+   * Defaults to "before-films". Use "after-films" when the films themselves are
+   * the point of the page and the venues are supporting detail — a collection,
+   * where a reader arrives wanting to know which instalments they can see.
+   * Only meaningful with `venuesLayout="grid"`.
+   */
+  secondaryContentPlacement?: "before-films" | "after-films";
 }
 
 /**
@@ -110,7 +126,9 @@ export default function EventDetailPageContent({
   heroBackgroundImage,
   heroBackgroundImageAlt,
   heroChildren,
+  afterFilmsChildren,
   venuesLayout = "sidebar",
+  secondaryContentPlacement = "before-films",
 }: EventDetailPageContentProps) {
   const cinemasSection =
     venues.length > 0 ? (
@@ -194,6 +212,12 @@ export default function EventDetailPageContent({
           />
         );
 
+  // "after-films" moves the whole block below the grid, where it sits in the
+  // full-width section rather than the constrained wrapper — so it only makes
+  // sense for the grid layout, which is already full-width.
+  const showMiddleContentFirst =
+    secondaryContentPlacement === "before-films" || venuesLayout !== "grid";
+
   return (
     <>
       {isAlias && <CanonicalRedirect canonicalUrl={canonicalUrl} />}
@@ -215,7 +239,7 @@ export default function EventDetailPageContent({
         }
         afterContent={
           <>
-            {middleContent && <Divider />}
+            {showMiddleContentFirst && middleContent && <Divider />}
             <div className={styles.filmsSection}>
               <ContentSection
                 title={filmsSectionTitle ?? `Films at ${name}`}
@@ -231,11 +255,19 @@ export default function EventDetailPageContent({
                   showAll={!movieUrlParams}
                 />
               </ContentSection>
+              {afterFilmsChildren}
+              {!showMiddleContentFirst && middleContent && (
+                // The films section is full-bleed, but this block belongs in
+                // the same constrained column StandardPageLayout gives its
+                // children — without it the accessibility list runs the whole
+                // width of the page.
+                <div className={styles.afterFilmsContent}>{middleContent}</div>
+              )}
             </div>
           </>
         }
       >
-        {middleContent || null}
+        {(showMiddleContentFirst && middleContent) || null}
       </StandardPageLayout>
     </>
   );

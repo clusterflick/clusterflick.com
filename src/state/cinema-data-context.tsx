@@ -161,6 +161,7 @@ export async function getMetaData(): Promise<MetaData> {
     genres: expandData<CinemaData["genres"]>(metaData.genres),
     people: expandData<CinemaData["people"]>(metaData.people),
     venues: expandData<CinemaData["venues"]>(metaData.venues),
+    collections: expandData<CinemaData["collections"]>(metaData.collections),
   };
 }
 

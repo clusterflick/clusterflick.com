@@ -8,7 +8,14 @@ import {
   startTransition,
   type ReactNode,
 } from "react";
-import { Movie, MoviePerformance, Genre, Person, Venue } from "@/types";
+import {
+  Movie,
+  MoviePerformance,
+  Genre,
+  Person,
+  Venue,
+  CollectionSummary,
+} from "@/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
 import type { MovieListMembership } from "@/utils/get-movie-list-movies";
 import type { FormatDefinition } from "@/data/formats";
@@ -34,6 +41,7 @@ import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
 import FestivalSection from "./components/festival-section";
 import MovieListsSection from "./components/movie-lists-section";
+import CollectionSection from "./components/collection-section";
 import FormatsList from "./components/formats-list";
 import PartOfSection from "./components/part-of-section";
 import PlayingAtSection, {
@@ -51,6 +59,7 @@ type PageContentProps = {
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
   movieLists: MovieListMembership[];
+  collection?: CollectionSummary;
   formats: FormatDefinition[];
   showingsStaticContent?: ReactNode;
 };
@@ -64,6 +73,7 @@ export default function PageContent({
   containingEvents,
   festivals,
   movieLists,
+  collection,
   formats,
   showingsStaticContent,
 }: PageContentProps) {
@@ -301,6 +311,7 @@ export default function PageContent({
           />
 
           <MovieListsSection lists={movieLists} />
+          <CollectionSection collection={collection} />
           <FestivalSection festivals={festivals} />
           <CastCrewSection
             directors={movie.directors}

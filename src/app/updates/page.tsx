@@ -199,7 +199,7 @@ export default async function UpdatesPage() {
 
                 {release.moreShowings.length > 0 && (
                   <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>More showings</h3>
+                  <h3 className={styles.sectionHeading}>More showings</h3>
                     <ul className={styles.showings}>
                       {release.moreShowings.map((film) => (
                         <li key={film.key} className={styles.showing}>

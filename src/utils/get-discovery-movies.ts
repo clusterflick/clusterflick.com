@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie, CollectionSummary } from "@/types";
 import type { MoviesRecord } from "@/lib/filters/types";
 import { Category } from "@/types";
 import {
@@ -83,12 +83,21 @@ export interface NewAdditions {
   classics: ScoredMovie[];
 }
 
+/** A collection with films showing, as surfaced on the discovery page. */
+export interface ScoredCollection {
+  collection: CollectionSummary;
+  /** Films from the collection showing in the window. */
+  showingCount: number;
+  performanceCount: number;
+}
+
 export interface DiscoveryRows {
   popular: ScoredMovie[];
   criticsPicks: ScoredMovie[];
   newAdditions: NewAdditions;
   lastChance: ScoredMovie[];
   marathons: ScoredMovie[];
+  collections: ScoredCollection[];
 }
 
 /**
@@ -446,6 +455,63 @@ export function getCriticsPicks(
     }));
 }
 
+// A collection needs this many of its films showing to make the row. One
+// instalment of a franchise playing is just a film; two or more is a run worth
+// pointing at.
+const COLLECTION_MIN_SHOWING = 2;
+const COLLECTION_LIMIT = 12;
+
+/**
+ * Collections with several of their films showing in the window — franchises
+ * and series you could work through over a week.
+ *
+ * Membership comes from `movie.collectionId`, so this needs only the movies and
+ * the collection registry carried in the meta blob: both are available on the
+ * client, letting the row be recomputed after hydration like every other one.
+ */
+export function getCollectionRow(
+  movies: MoviesRecord,
+  collections: Record<string, CollectionSummary>,
+  window: DiscoveryWindow = getDiscoveryWindow(),
+  limit: number = COLLECTION_LIMIT,
+): ScoredCollection[] {
+  const showingFilms = new Map<string, Set<string>>();
+  const performanceCounts = new Map<string, number>();
+
+  for (const movie of Object.values(movies)) {
+    const { collectionId } = movie;
+    if (!collectionId || !collections[collectionId]) continue;
+    if (!isDiscoverable(movie)) continue;
+
+    const performanceCount = upcomingPerformances(movie, window).length;
+    if (performanceCount === 0) continue;
+
+    if (!showingFilms.has(collectionId)) {
+      showingFilms.set(collectionId, new Set());
+    }
+    showingFilms.get(collectionId)!.add(movie.id);
+    performanceCounts.set(
+      collectionId,
+      (performanceCounts.get(collectionId) ?? 0) + performanceCount,
+    );
+  }
+
+  return [...showingFilms.entries()]
+    .map(([collectionId, films]) => ({
+      collection: collections[collectionId],
+      showingCount: films.size,
+      performanceCount: performanceCounts.get(collectionId) ?? 0,
+    }))
+    .filter(({ showingCount }) => showingCount >= COLLECTION_MIN_SHOWING)
+    .sort(
+      (a, b) =>
+        b.showingCount - a.showingCount ||
+        b.performanceCount - a.performanceCount ||
+        a.collection.name.localeCompare(b.collection.name),
+    )
+    .slice(0, limit);
+}
+
 /**
  * Computes every discovery row in one pass. Run at build time for the SSR
  * fallback (window anchored to today's midnight, matching the rest of the site's
@@ -455,7 +521,11 @@ export function getCriticsPicks(
  */
 export function computeDiscoveryRows(
   movies: MoviesRecord,
-  options: { now?: number; anchorToNow?: boolean } = {},
+  options: {
+    now?: number;
+    anchorToNow?: boolean;
+    collections?: Record<string, CollectionSummary>;
+  } = {},
 ): DiscoveryRows {
   const now = options.now ?? Date.now();
   const window = getDiscoveryWindow(
@@ -475,5 +545,6 @@ export function computeDiscoveryRows(
     lastChance: getLastChanceMovies(movies, now, LAST_CHANCE_LIMIT),
     // Uncapped — the full marathon/double-bill set is small and inherently special.
     marathons: getMarathonMovies(movies, window, Infinity),
+    collections: getCollectionRow(movies, options.collections ?? {}, window),
   };
 }

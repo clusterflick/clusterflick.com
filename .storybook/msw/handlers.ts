@@ -15,6 +15,7 @@ const emptyMetaData = {
   genres: {},
   people: {},
   venues: {},
+  collections: {},
 };
 
 const emptyMovieData = {};

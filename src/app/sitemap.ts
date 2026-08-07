@@ -17,6 +17,8 @@ import { FORMATS } from "@/data/formats";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
+import { getCollectionsData } from "@/utils/get-collections-data";
+import { getCollectionUrl } from "@/utils/get-collection-url";
 
 export const dynamic = "force-static";
 
@@ -125,6 +127,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  const collectionListPage = {
+    url: "https://clusterflick.com/collections",
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  };
+
+  const collectionPages = Object.values(getCollectionsData()).map(
+    (collection) => ({
+      url: `https://clusterflick.com${getCollectionUrl(collection)}`,
+      lastModified: data.generatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.6,
+    }),
+  );
+
   const venuesByGroup = groupVenuesByGroup(data.venues);
 
   const cinemaGroupPages = VENUE_GROUPS.filter((group) =>
@@ -198,6 +216,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...formatPages,
     movieListListPage,
     ...movieListPages,
+    collectionListPage,
+    ...collectionPages,
     ...moviePages,
     ...venuePages,
     ...boroughPages,

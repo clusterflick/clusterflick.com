@@ -1,0 +1,21 @@
+.section {
+  margin-top: 32px;
+  text-align: left;
+}
+
+/* Reads as part of the sentence rather than as a second label, so it sits
+   quieter than the link but louder than the count. */
+.noun {
+  font-size: 13px;
+  white-space: nowrap;
+  color: rgba(var(--color-light-gray-rgb), 0.8);
+  margin: 0 4px 0 -4px;
+}
+
+/* How many films are in the collection, e.g. "8 films". */
+.count {
+  color: var(--color-muted-gray);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

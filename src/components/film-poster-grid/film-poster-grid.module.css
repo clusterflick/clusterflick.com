@@ -37,6 +37,64 @@
   border-bottom: none;
 }
 
+/* A film listed for completeness with nothing to book — the rest of a
+   collection. Held back from the films you can actually go and see, and
+   deliberately inert: no lift, no brightening, no pointer. The title overlay
+   still appears on hover (MoviePoster keeps that), so the film is identifiable. */
+.unavailable {
+  cursor: default;
+}
+
+/* The dimming sits on the poster rather than the whole item, so the notice
+   below stays legible — opacity on the wrapper would fade that too, and it is
+   the one part that has to be readable. */
+.unavailableFilm {
+  opacity: 0.2;
+  transition: opacity 0.22s;
+}
+
+.unavailable:hover .unavailableFilm {
+  opacity: 0.5;
+}
+
+/* Says why the poster does nothing when tapped. A `title` tooltip can't: it
+   never fires on touch, and touch is exactly where a dead poster is most
+   confusing. Legible at rest, full strength alongside the poster on hover.
+   Above the poster's own hover overlay, which would otherwise paint over it. */
+.notice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding: 4px 6px 5px 6px;
+  border-radius: 4px 4px 1px 1px;
+  color: var(--color-white);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  transition: opacity 0.22s;
+}
+
+/* A dead end — there is nothing to book. Recedes with the poster it sits on. */
+.noticeMuted {
+  background: rgba(0, 0, 0, 0.78);
+  opacity: 0.65;
+}
+
+.unavailable:hover .noticeMuted {
+  opacity: 1;
+}
+
+/* A detour — the film is showing, just inside something else, and the poster
+   leads there instead. Carries the accent colour precisely because this one is
+   an invitation rather than an apology. */
+.noticeAccent {
+  background: rgba(var(--color-neon-pink-rgb), 0.7);
+}
+
 /* A film's position within a list. Sits top-left and never intercepts the
    click meant for the link it sits inside. */
 .badge {

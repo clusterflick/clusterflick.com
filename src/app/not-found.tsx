@@ -46,6 +46,26 @@ function FilmClubNotFound() {
   );
 }
 
+/**
+ * Collection pages come and go with the listings — a collection is published
+ * only while two or more of its films are showing — so a dead link here is
+ * usually a collection that has fallen quiet rather than a mistyped URL. The
+ * message says so instead of implying the reader got it wrong.
+ */
+function CollectionNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-clapper.svg"
+      title="Collection Not Found"
+      message="We couldn't find that collection. Collections appear here while two or more of their films are showing, so it may have nothing on in London right now."
+      backLink={{ url: "/collections/", text: "Back to collections" }}
+      actions={
+        <ButtonLink href="/collections/">Back to collections</ButtonLink>
+      }
+    />
+  );
+}
+
 function VenueNotFound() {
   return (
     <StatusPage
@@ -151,6 +171,7 @@ function getNotFoundType(pathname: string): string {
   if (/^\/movies\//i.test(pathname)) return "movie";
   if (/^\/festivals\//i.test(pathname)) return "festival";
   if (/^\/film-clubs\//i.test(pathname)) return "film-club";
+  if (/^\/collections\//i.test(pathname)) return "collection";
   if (/^\/(london-cinemas|venues)\//i.test(pathname)) return "venue";
   return "generic";
 }
@@ -181,6 +202,7 @@ export default function NotFound() {
     return <MovieNotFound pathname={mountedPathname} />;
   if (/^\/festivals\//i.test(mountedPathname)) return <FestivalNotFound />;
   if (/^\/film-clubs\//i.test(mountedPathname)) return <FilmClubNotFound />;
+  if (/^\/collections\//i.test(mountedPathname)) return <CollectionNotFound />;
   if (/^\/(london-cinemas|venues)\//i.test(mountedPathname))
     return <VenueNotFound />;
   return <GenericNotFound />;

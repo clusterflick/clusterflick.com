@@ -9,6 +9,8 @@ import styles from "./film-poster-grid.module.css";
 export interface FilmPosterGridItem {
   id: string;
   node: ReactNode;
+  /** Shown for completeness, with no dataset entry — never pruned. */
+  unavailable?: boolean;
 }
 
 interface FilmPosterGridClientProps {
@@ -45,7 +47,10 @@ export default function FilmPosterGridClient({
       : new Set(Array.isArray(venueId) ? venueId : [venueId]);
 
   const visibleItems = ready
-    ? items.filter(({ id }) => {
+    ? items.filter(({ id, unavailable }) => {
+        // Never in the dataset to begin with, so there's nothing to prune
+        // against — these are listed precisely because they aren't showing.
+        if (unavailable) return true;
         const movie = movies[id];
         // Movie pruned entirely (all performances in the past) → hide it.
         if (!movie) return false;
