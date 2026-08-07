@@ -135,6 +135,20 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Canal Film Club"
+              url="https://www.instagram.com/canalfilmclub/"
+            />
+            , a DIY queer collective running pop-up B-movie screenings and DJ
+            parties in a secret woodland by the East London canal.
+          </>
+        ),
+      },
     ],
   },
   {
