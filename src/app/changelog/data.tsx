@@ -71,6 +71,21 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-07",
+    changes: [
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added <Link href="/film-clubs/midweek-cinema">Midweek Cinema</Link>,
+            who put films on at 7pm from Monday to Thursday in pubs and bars
+            around London.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-04",
     changes: [
       {

@@ -22,7 +22,7 @@ export const FILM_CLUBS: FilmClub[] = [
   },
   {
     id: "arab-film-club",
-    name: "THe Arab Film Club",
+    name: "The Arab Film Club",
     url: "https://www.instagram.com/thearabfilmclub/",
     aliases: ["arabic-cinema-club"],
     matchers: [
@@ -405,6 +405,17 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Waltham Forest Cinema Project" },
       { [FilterId.PerformanceNotesSearch]: "Waltham Forest Cinema Project" },
+    ],
+  },
+  {
+    id: "midweek-cinema",
+    name: "Midweek Cinema",
+    url: "https://www.instagram.com/midweekcinema/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Midweek Cinema" },
+      { [FilterId.ShowingUrlSearch]: "midweekcinema" },
+      { [FilterId.PerformanceNotesSearch]: "Midweek Cinema" },
     ],
   },
   {
