@@ -276,6 +276,20 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "the-shortest-nights-film-festival",
+    name: "The Shortest Nights Film Festival",
+    url: "https://www.shortsightedcinema.com/theshortestnightsfestival2026",
+    aliases: ["the-shortest-nights", "shortest-nights"],
+    matchers: [
+      {
+        // Matches "The Shortest Nights Film Festival: ..." programme blocks at
+        // The Castle Sidcup, running September 5–6 2026
+        [FilterId.ShowingTitleSearch]: "Shortest Nights",
+        [FilterId.Venues]: ["castlesidcup.com"],
+      },
+    ],
+  },
+  {
     id: "animation-in-love",
     name: "Animation in Love",
     url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",

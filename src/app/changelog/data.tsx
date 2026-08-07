@@ -98,6 +98,20 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="The Shortest Nights Film Festival"
+              url="https://www.shortsightedcinema.com/theshortestnightsfestival2026"
+            />
+            , a BIFA-qualifying weekend of new British short films from Short
+            Sighted Cinema.
+          </>
+        ),
+      },
+      {
         tag: "New film club",
         body: () => (
           <>
