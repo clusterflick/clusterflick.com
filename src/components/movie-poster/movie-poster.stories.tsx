@@ -125,6 +125,28 @@ export const WithPosterExtraSmall: Story = {
   },
 };
 
+/**
+ * `fluid` lets the poster shrink with its container, capping at the size's fixed
+ * width — for cards in a responsive grid, where a fixed poster would overflow
+ * its column.
+ */
+export const Fluid: Story = {
+  args: {
+    title: "Spirited Away",
+    posterPath: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    fluid: true,
+  },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+      {[120, 160, 260].map((width) => (
+        <div key={width} style={{ width }}>
+          <MoviePoster {...args} />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 /** Extra-small text-pattern fallback, for an event with no TMDB match. */
 export const NoPosterExtraSmall: Story = {
   args: {

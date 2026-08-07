@@ -48,6 +48,39 @@
   }
 }
 
+/* Fills the available column rather than holding a fixed size, capping at the
+   size's natural width. `xsmall` already works this way; this makes the same
+   behaviour opt-in for the larger sizes, which otherwise overflow whenever they
+   sit in a fluid grid column narrower than their fixed width. Declared after
+   the size rules so it wins on source order. */
+.poster.fluid,
+.noPoster.fluid {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+}
+
+.poster.fluid.small,
+.noPoster.fluid.small {
+  max-width: 200px;
+}
+
+.poster.fluid.large,
+.noPoster.fluid.large {
+  max-width: 308px;
+}
+
+/* Positioned rather than sized, so the image covers the whole poster instead of
+   being inset by the padding — the padding is only there to hold the fallback
+   text away from the edges. The fixed sizes get this for free by rendering the
+   image at its intrinsic size and letting it overflow the padding evenly. */
+.poster.fluid img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .poster {
   &.small.interactive:hover img,
   &.xsmall.interactive:hover img {

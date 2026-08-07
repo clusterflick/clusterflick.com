@@ -24,6 +24,7 @@ interface MoviePosterImageProps {
   posterPath: string;
   overlay: React.ReactNode | null;
   interactive: boolean;
+  fluid: boolean;
   priority?: boolean;
 }
 
@@ -33,6 +34,7 @@ function MoviePosterImage({
   posterPath,
   overlay,
   interactive,
+  fluid,
   priority,
 }: MoviePosterImageProps) {
   const { imageSize, ...dimensions } = POSTER_DIMENSIONS[size];
@@ -43,6 +45,7 @@ function MoviePosterImage({
       className={clsx(
         styles.poster,
         styles[size],
+        fluid && styles.fluid,
         interactive && styles.interactive,
       )}
     >
@@ -63,6 +66,7 @@ interface TextPatternPosterProps {
   size: PosterSize;
   overlay: React.ReactNode | null;
   interactive: boolean;
+  fluid: boolean;
 }
 
 function TextPatternPoster({
@@ -70,6 +74,7 @@ function TextPatternPoster({
   size,
   overlay,
   interactive,
+  fluid,
 }: TextPatternPosterProps) {
   const color = getPosterColor(title);
   const displayTitle = title.toUpperCase();
@@ -85,6 +90,7 @@ function TextPatternPoster({
         styles.noPoster,
         styles[size],
         styles[`color${color.charAt(0).toUpperCase() + color.slice(1)}`],
+        fluid && styles.fluid,
         interactive && styles.interactive,
       )}
     >
@@ -115,6 +121,13 @@ interface MoviePosterProps {
   showOverlay?: boolean;
   /** Whether the poster is interactive (clickable). Controls hover animations. Defaults to true. */
   interactive?: boolean;
+  /**
+   * Fill the available width, capping at the size's fixed dimensions, instead of
+   * always taking them. Needed inside fluid grid columns, where a fixed poster
+   * overflows once the column is narrower than the poster. Always on for
+   * `xsmall`. Defaults to false.
+   */
+  fluid?: boolean;
   /** Whether this image should be loaded eagerly with fetchpriority="high". */
   priority?: boolean;
   /** Heading level for the overlay title. Defaults to "h2". */
@@ -128,6 +141,7 @@ export default function MoviePoster({
   size = "small",
   showOverlay = false,
   interactive = true,
+  fluid = false,
   priority,
   headingLevel: HeadingTag = "h2",
 }: MoviePosterProps) {
@@ -156,6 +170,7 @@ export default function MoviePoster({
         posterPath={posterPath}
         overlay={overlay}
         interactive={interactive}
+        fluid={fluid}
         priority={priority}
       />
     );
@@ -167,6 +182,7 @@ export default function MoviePoster({
       size={size}
       overlay={overlay}
       interactive={interactive}
+      fluid={fluid}
     />
   );
 }

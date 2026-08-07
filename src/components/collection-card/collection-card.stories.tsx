@@ -67,3 +67,16 @@ export const WithoutPoster: Story = {
     posterPath: undefined,
   },
 };
+
+/**
+ * The narrowest column the listing grid produces. The poster is fluid, so it
+ * shrinks with the card rather than overflowing it.
+ */
+export const InNarrowColumn: Story = {
+  args: Showing.args,
+  render: (args) => (
+    <div style={{ width: 150 }}>
+      <CollectionCard {...args} />
+    </div>
+  ),
+};

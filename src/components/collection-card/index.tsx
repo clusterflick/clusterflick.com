@@ -38,6 +38,7 @@ export default function CollectionCard({
         title={name}
         size="small"
         interactive={false}
+        fluid
       />
       <div className={styles.body}>
         <h3 className={styles.name}>{name}</h3>
