@@ -176,8 +176,18 @@ It works by **probing**: build a candidate state, run the real filter pipeline o
 count what survives. The counts shown are therefore the counts the user will get — there is
 no second implementation of the filter logic to drift out of sync.
 
-**Three kinds of move:**
+**Four kinds of move:**
 
+- **Filter value** — the query names a filter value rather than a film: "70mm" is a source
+  format, "Action" is a genre. Keeps every word typed, so it ranks above everything. Matching
+  is **exact against whole words** (`bestWordRunDistance(…, 0)`), never fuzzy — over a small
+  vocabulary an edit budget multiplies ambiguity for nothing ("Action" is a genre, "Acton" is
+  a place). Matching a _run_ of words is what lets "70mm" find both "70mm" and "IMAX 70mm";
+  both are offered, each with its own probed count. Vocabularies are the format groups,
+  genres, event types and accessibility features. **Venues are deliberately excluded** — their
+  names are full of ordinary words (Rio, Castle, Everyman) that collide with film titles.
+  Genre metadata is keyed by id and the entries carry only a `name`, as `describeFilters`
+  reads them. Unlike a correction this is _not_ gated on the query matching no title.
 - **Redirect** — the same query matched against a different search field (`Search` ↔
   `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks
   everything else. Only offered when the target field is empty. `ShowingUrlSearch` is
@@ -206,8 +216,12 @@ no second implementation of the filter logic to drift out of sync.
 - **Widen** — one filter reset to its permissive value, ordered by elasticity in
   `WIDENABLE`.
 
-**At most one query-rewriting move per combination** (`altersQuery`). Two would demand the
-query match in two fields at once, or correct and re-file it in the same breath.
+**Two moves that write the same filter are never combined.** Each move declares `writes`, and
+a pair whose sets intersect is rejected. Transforms apply in order, so the second silently
+undoes the first while both still appear in the copy — setting the event type to Quizzes and
+then widening the event type to everything produced an offer headed "Show Quizzes" that
+selected all events. This also covers the query fields, so a correction never pairs with a
+redirect and a query never lands in two boxes at once.
 
 **Candidates come from `getRestrictiveFilterIds`, not `getActiveFilterIds`.** Categories and
 the date range have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d), so they report

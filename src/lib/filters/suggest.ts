@@ -1,4 +1,5 @@
-import { Category, Venue } from "@/types";
+import { AccessibilityFeature, Category, Genre, Venue } from "@/types";
+import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import {
   formatDateLong,
   formatDaysFromNow,
@@ -12,7 +13,7 @@ import {
   getPermissiveState,
   getRestrictiveFilterIds,
 } from "./manager";
-import { getPrimaryCategory } from "./modules";
+import { FORMAT_GROUPS, getPrimaryCategory } from "./modules";
 import {
   matchesSearchQuery,
   normalizeForSearch,
@@ -22,16 +23,18 @@ import { formatList } from "./describe";
 
 /**
  * What kind of change an offer represents:
- * - `redirect` — the same query, matched against a different field. Costs the
- *   user nothing: their intent was right, it was just filed against the wrong
- *   column.
+ * - `filter` — the query names a filter value rather than a film ("70mm",
+ *   "Action"). Reads the query exactly as typed, just as something other than
+ *   a title, so it concedes nothing and leads.
+ * - `redirect` — the same query, matched against a different text field. Also
+ *   concedes nothing, but a filter is the stronger reading when both fit.
  * - `correct` — a different query, in the same field. Puts words in the user's
  *   mouth, so it ranks below a redirect, but only ever appears when the query
  *   as typed matches nothing anywhere.
  * - `widen` — a filter given up. Costs the user something real: a date they
  *   didn't want, a venue further away.
  */
-export type SuggestionKind = "redirect" | "correct" | "widen";
+export type SuggestionKind = "filter" | "redirect" | "correct" | "widen";
 
 /** One filter this offer changes, named and — where it can be — explained. */
 export interface SuggestionChange {
@@ -171,12 +174,18 @@ interface Move {
   /** Never paired with another move — offered alone or not at all. */
   soloOnly: boolean;
   /**
-   * Whether this move rewrites the query rather than the filters around it.
-   * At most one such move is allowed per combination: two of them would either
-   * demand the query match in two fields at once, or correct and re-file it in
-   * the same breath — nonsense to read, and nothing anyone asked for.
+   * Whether this move rewrites what the reader asked for rather than the
+   * filters around it. Decides which move leads the offer.
    */
   altersQuery: boolean;
+  /**
+   * Every filter this move sets. Two moves that write the same filter can never
+   * be combined: transforms apply in order, so the second silently undoes the
+   * first while both still appear in the copy. Setting the event type to
+   * Quizzes and then widening the event type to everything produced exactly
+   * that — an offer headed "Show Quizzes" that selected all events.
+   */
+  writes: FilterId[];
   transform: (state: FilterState) => FilterState;
   /**
    * Turns the probe result into the specific fact worth reporting. Only ever
@@ -191,6 +200,127 @@ interface SuggestContext {
   /** Category display labels, as passed to `describeFilters`. */
   categories?: { value: Category; label: string }[];
   venues?: Record<string, Venue> | null;
+  genres?: Record<string, Genre> | null;
+}
+
+/**
+ * A filter whose values a query might be naming instead of a film — "70mm" is
+ * a source format, "Action" is a genre.
+ *
+ * Venues are deliberately absent. Their names are full of ordinary words (Rio,
+ * Castle, Everyman, The Garden) that collide with film titles, and unlike the
+ * vocabularies here there is no reading of the query that makes the collision
+ * harmless.
+ */
+interface ValueVocabulary {
+  filterId: FilterId;
+  /** Names the dimension in a change line, e.g. "Source Format". */
+  label: string;
+  /** Completes the headline: `Show 70mm ${noun}`. Empty where none reads well. */
+  noun: string;
+  entries: {
+    name: string;
+    /** Applies this one value, typed by the vocabulary that owns it. */
+    select: (state: FilterState) => FilterState;
+  }[];
+}
+
+function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
+  const vocabularies: ValueVocabulary[] = FORMAT_GROUPS.map((group) => ({
+    filterId: group.filterId,
+    label: group.title,
+    noun: "screenings",
+    entries: group.options.map((option) => ({
+      name: option.label,
+      select: (state: FilterState) =>
+        set(state, group.filterId, [option.value]),
+    })),
+  }));
+
+  if (context.genres) {
+    vocabularies.push({
+      filterId: FilterId.Genres,
+      label: "Genre",
+      noun: "films",
+      // Keyed by id, and the entries themselves carry only a name — the same
+      // way `describeFilters` reads them.
+      entries: Object.entries(context.genres).map(([id, genre]) => ({
+        name: genre.name,
+        select: (state: FilterState) => set(state, FilterId.Genres, [id]),
+      })),
+    });
+  }
+
+  if (context.categories) {
+    vocabularies.push({
+      filterId: FilterId.Categories,
+      label: "Event type",
+      // The labels are already plural nouns — "Show Quizzes", "Show TV".
+      noun: "",
+      entries: context.categories.map((category) => ({
+        name: category.label,
+        select: (state: FilterState) =>
+          set(state, FilterId.Categories, [category.value]),
+      })),
+    });
+  }
+
+  vocabularies.push({
+    filterId: FilterId.Accessibility,
+    label: "Accessibility",
+    noun: "screenings",
+    entries: Object.entries(ACCESSIBILITY_LABELS).map(([feature, name]) => ({
+      name,
+      select: (state: FilterState) =>
+        set(state, FilterId.Accessibility, [feature as AccessibilityFeature]),
+    })),
+  });
+
+  return vocabularies;
+}
+
+/**
+ * Moves that read the query as a filter value rather than a title.
+ *
+ * Matching is exact against whole words, never fuzzy: over a vocabulary this
+ * small an edit budget multiplies ambiguity for nothing — "Action" is a genre,
+ * "Acton" is a place. Matching a *run* of words rather than the whole name is
+ * what lets "70mm" find both "70mm" and "IMAX 70mm", which is the point: the
+ * two are different offers with different counts, and the reader picks.
+ *
+ * Only the main search box is read this way. The other two fields are already
+ * specialist, and a format string typed into performance notes is a legitimate
+ * note search rather than a mistake.
+ */
+function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
+  const needle = normalizeForSearch(get(state, FilterId.Search).trim());
+  if (needle.length === 0) return [];
+
+  const moves: Move[] = [];
+
+  for (const vocabulary of buildVocabularies(context)) {
+    for (const entry of vocabulary.entries) {
+      const exact =
+        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0;
+      if (!exact) continue;
+
+      moves.push({
+        id: `filter:${vocabulary.filterId}:${entry.name}`,
+        kind: "filter",
+        action: `Show ${entry.name}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
+        label: vocabulary.label,
+        soloOnly: false,
+        // The query was the filter value, so it leaves the search box with it.
+        altersQuery: true,
+        writes: [FilterId.Search, vocabulary.filterId],
+        transform: (current: FilterState) =>
+          entry.select(set(current, FilterId.Search, "")),
+        describeResult: () => entry.name,
+      });
+    }
+  }
+
+  return moves;
 }
 
 /**
@@ -318,6 +448,7 @@ function buildRedirectMoves(state: FilterState): Move[] {
         label: target.label,
         soloOnly: false,
         altersQuery: true,
+        writes: [source.id, target.id],
         transform: (current) =>
           set(set(current, source.id, ""), target.id, query),
         describeResult: (result) => describeRedirectMatch(target.id, result),
@@ -578,6 +709,7 @@ function buildCorrectionMoves(
     label: `Did you mean “${title}”?`,
     soloOnly: false,
     altersQuery: true,
+    writes: [FilterId.Search],
     transform: (current: FilterState) => set(current, FilterId.Search, title),
   }));
 }
@@ -595,6 +727,7 @@ function buildWidenMoves(state: FilterState, context: SuggestContext): Move[] {
       label,
       soloOnly: id === FilterId.Accessibility,
       altersQuery: false,
+      writes: [id],
       transform: (current: FilterState) =>
         set(current, id, get(permissive, id)),
       describeResult: widenDetail(id, state, context),
@@ -684,8 +817,9 @@ export function suggestFilterRelaxations({
   maxProbes = 40,
   categories,
   venues,
+  genres,
 }: SuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues };
+  const context: SuggestContext = { categories, venues, genres };
 
   // Nothing to rescue. Checked here rather than trusted to the caller because
   // the caller's idea of "empty" is easy to take from a different state than
@@ -696,9 +830,12 @@ export function suggestFilterRelaxations({
   // query if taken.
   if (Object.keys(apply(movies, state)).length > 0) return [];
 
-  // Cost order. Redirects concede nothing, so they lead; corrections rewrite
-  // the query, so they follow; widenings give up a filter, so they come last.
+  // Cost order. A filter reading takes the query exactly as typed and is the
+  // strongest reading when it fits at all, so it leads; redirects also concede
+  // nothing but only move the query; corrections rewrite it; widenings give up
+  // a filter, so they come last.
   const moves = [
+    ...buildValueMoves(state, context),
     ...buildRedirectMoves(state),
     ...buildCorrectionMoves(movies, state),
     ...buildWidenMoves(state, context),
@@ -759,7 +896,13 @@ export function suggestFilterRelaxations({
   );
   for (let i = 0; i < pairable.length; i += 1) {
     for (let j = i + 1; j < pairable.length; j += 1) {
-      if (pairable[i].altersQuery && pairable[j].altersQuery) continue;
+      // Two moves writing the same filter contradict each other, and the one
+      // applied second wins silently. That also covers the query fields, so a
+      // correction never pairs with a redirect and no query lands in two boxes.
+      const collides = pairable[i].writes.some((id) =>
+        pairable[j].writes.includes(id),
+      );
+      if (collides) continue;
       const suggestion = evaluate([pairable[i], pairable[j]]);
       if (suggestion) suggestions.push(suggestion);
       if (suggestions.length >= limit) return suggestions;

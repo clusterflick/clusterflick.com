@@ -95,6 +95,7 @@ export default function PageContent() {
       // the offers still work, they just fall back to bare counts.
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
+      genres: metaData?.genres ?? null,
     });
   }, [showEmptyState, isEmpty, movies, metaData, deferredFilterState]);
 
@@ -249,13 +250,11 @@ export default function PageContent() {
         </div>
       )}
       {/* Announces the outcome of taking an offer, since the grid appearing is
-          a silent change for anyone not looking at it. */}
-      <div
-        className={styles.announcer}
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+          a silent change for anyone not looking at it. `role="status"` already
+          implies polite, atomic announcements — spelling those out again added
+          nothing and made this indistinguishable from the filter overlay's own
+          live region to anything selecting on the attributes. */}
+      <div className={styles.announcer} role="status">
         {announcement}
       </div>
       {renderEmptyState()}

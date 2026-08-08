@@ -4,6 +4,8 @@ import {
   Category,
   type Movie,
   type MoviePerformance,
+  FormatSource,
+  type Genre,
   type Venue,
 } from "@/types";
 import {
@@ -25,6 +27,10 @@ const BEYOND_WINDOW = TODAY + 30 * MS_PER_DAY;
 
 interface MovieSpec {
   title: string;
+  /** TMDB genre ids, as the dataset stores them. */
+  genres?: string[];
+  /** Source format of the single performance. */
+  source?: FormatSource;
   /** Original venue title, when it differs from the film title. */
   showingTitle?: string;
   category?: Category;
@@ -42,12 +48,14 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     time: spec.time ?? IN_WINDOW,
     ...(spec.notes ? { notes: spec.notes } : {}),
     ...(spec.subtitled ? { accessibility: { subtitled: true } } : {}),
+    ...(spec.source ? { format: { source: spec.source } } : {}),
   };
 
   return {
     id,
     title: spec.title,
     normalizedTitle: spec.title.toLowerCase(),
+    ...(spec.genres ? { genres: spec.genres } : {}),
     showings: {
       [showingId]: {
         id: showingId,
@@ -84,6 +92,12 @@ const CATEGORIES = [
   { value: Category.Tv, label: "TV" },
   { value: Category.Comedy, label: "Comedy" },
 ];
+
+/** Genre metadata is keyed by id; the entries carry only a name. */
+const GENRES = {
+  "28": { name: "Action" },
+  "18": { name: "Drama" },
+} as unknown as Record<string, Genre>;
 
 const VENUES = {
   "venue-a": { id: "venue-a", name: "Prince Charles Cinema" },
@@ -303,6 +317,145 @@ describe("suggestFilterRelaxations", () => {
         expect(line).not.toContain("accessibility");
       }
     }
+  });
+
+  describe("filter-value offers", () => {
+    it("reads a query that names a filter value as that value", () => {
+      const movies = makeMovies({
+        "1": { title: "The Odyssey", source: FormatSource.SeventyMm },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      const [suggestion] = suggestFilterRelaxations({ movies, state });
+      expect(lines(suggestion)).toEqual([
+        "Show 70mm screenings",
+        "Source Format: 70mm",
+      ]);
+      // The query was the filter value, so it leaves the search box with it.
+      expect(suggestion.state[FilterId.Search]).toBe("");
+      expect(suggestion.state[FilterId.FormatSource]).toEqual([
+        FormatSource.SeventyMm,
+      ]);
+    });
+
+    it("offers every value the query names, not just the first", () => {
+      // "70mm" is a whole word inside "IMAX 70mm" too, and the two are
+      // different screenings with different counts.
+      const movies = makeMovies({
+        "1": { title: "A", source: FormatSource.SeventyMm },
+        "2": { title: "B", source: FormatSource.ImaxSeventyMm },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show 70mm screenings", "Show IMAX 70mm screenings"]);
+    });
+
+    it("reads a genre name, looked up by its record key", () => {
+      const movies = makeMovies({
+        "1": { title: "Heat", genres: ["28"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "action");
+
+      const [suggestion] = suggestFilterRelaxations({
+        movies,
+        state,
+        genres: GENRES,
+      });
+      expect(lines(suggestion)).toEqual(["Show Action films", "Genre: Action"]);
+      expect(suggestion.state[FilterId.Genres]).toEqual(["28"]);
+    });
+
+    it("matches whole words only, never part of one", () => {
+      // "act" inside "Action" would be a coincidence, not a request.
+      const movies = makeMovies({
+        "1": { title: "Heat", genres: ["28"], time: BEYOND_WINDOW },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "act");
+
+      expect(
+        suggestFilterRelaxations({ movies, state, genres: GENRES }).filter(
+          (s) => s.kind === "filter",
+        ),
+      ).toEqual([]);
+    });
+
+    it("does not read a query as a venue name", () => {
+      // Venue names are full of ordinary words, so they are not a vocabulary.
+      const movies = makeMovies({
+        "1": { title: "Heat", venueId: "venue-b", time: BEYOND_WINDOW },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "BFI Southbank");
+
+      expect(
+        suggestFilterRelaxations({ movies, state, venues: VENUES }).filter(
+          (s) => s.kind === "filter",
+        ),
+      ).toEqual([]);
+    });
+
+    it("ranks a filter reading above a redirect", () => {
+      // Both keep every word typed, but "this is a format" is the stronger
+      // reading than "this is part of a venue's own title".
+      const movies = makeMovies({
+        "1": { title: "A", source: FormatSource.SeventyMm },
+        "2": { title: "B", showingTitle: "The Odyssey (70mm)" },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      expect(
+        suggestFilterRelaxations({ movies, state }).map((s) => s.kind),
+      ).toEqual(["filter", "redirect"]);
+    });
+
+    it("never pairs setting a filter with widening the same filter", () => {
+      // Searching "Quizzes" while a subtitles requirement is on: the only quiz
+      // has no subtitles, so setting the event type alone finds nothing, and
+      // the engine used to pair it with *widening* the event type. Transforms
+      // apply in order, so the widening won — an offer headed "Show Quizzes"
+      // that actually selected every event type, subtitles still on.
+      const movies = makeMovies({
+        "1": { title: "Big Fat Quiz", category: Category.Quiz },
+        "2": { title: "Some Film", subtitled: true, category: Category.Tv },
+      });
+      let state = set(getDefaultState(), FilterId.Accessibility, [
+        AccessibilityFeature.Subtitled,
+      ]);
+      state = set(state, FilterId.Search, "Quizzes");
+
+      for (const suggestion of suggestFilterRelaxations({
+        movies,
+        state,
+        categories: [...CATEGORIES, { value: Category.Quiz, label: "Quizzes" }],
+      })) {
+        // Whatever is offered, the event type it lands on must be the one the
+        // copy claims — never widened out from under it.
+        if (suggestion.headline === "Show Quizzes") {
+          expect(suggestion.state[FilterId.Categories]).toEqual([
+            Category.Quiz,
+          ]);
+        }
+      }
+    });
+
+    it("still offers a filter reading alongside a title match", () => {
+      // Unlike a correction, this is not gated on the query matching no title:
+      // "70mm" appears in showing titles and is still a format.
+      const movies = makeMovies({
+        "1": { title: "A", source: FormatSource.SeventyMm },
+        "2": { title: "The Odyssey 70mm", time: BEYOND_WINDOW },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show 70mm screenings"]);
+    });
   });
 
   describe("near-miss corrections", () => {

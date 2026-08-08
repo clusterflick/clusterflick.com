@@ -6,7 +6,11 @@ const POSTER_SELECTOR = 'a[href^="/movies/"]';
 const POSTER_TITLE_SELECTOR = `${POSTER_SELECTOR} h2`;
 const FILTER_TRIGGER_SELECTOR = 'button[aria-label*="filter options"]';
 const SEARCH_INPUT_SELECTOR = "#filter-search";
-const FILTER_COUNTS_SELECTOR = '[aria-live="polite"][aria-atomic="true"]';
+// Scoped to the filter dialog. Selecting a live region by its ARIA attributes
+// alone matches any live region on the page, so the moment a second one existed
+// this resolved to two elements and failed on strict mode.
+const FILTER_COUNTS_SELECTOR =
+  '[role="dialog"][aria-label="Filter options"] [aria-live="polite"][aria-atomic="true"]';
 
 /** The browse/filter grid, which now lives at /films (the home page is discovery). */
 export class FilmsPage {

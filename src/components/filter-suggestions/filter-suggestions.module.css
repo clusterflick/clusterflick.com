@@ -57,6 +57,22 @@
   min-width: 0;
 }
 
+/* Reading the query as a filter value keeps every word the reader typed and
+   ranks above everything else, so it carries the brand accent. */
+.filter {
+  border-color: rgba(var(--color-neon-pink-rgb), 0.4);
+}
+
+.filter:hover,
+.filter:focus-visible {
+  border-color: rgba(var(--color-neon-pink-rgb), 0.75);
+}
+
+.filter .count {
+  color: var(--color-neon-pink);
+  opacity: 0.85;
+}
+
 /* A correction rewrites the reader's words, so it is neither the "you were
    right" yellow of a redirect nor the plain blue of giving a filter up. */
 .correct {

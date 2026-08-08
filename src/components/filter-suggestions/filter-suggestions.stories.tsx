@@ -23,9 +23,11 @@ const suggestion = (
  *   joining them produced "Did you mean “X”?, any date", with a comma after a
  *   question mark and the second change buried at the end of the first.
  *
- * **Three kinds of offer:**
+ * **Four kinds of offer:**
+ * - `filter` (pink) — the query names a filter value rather than a film
+ *   ("70mm", "Action"). Keeps every word typed and ranks above everything.
  * - `redirect` (yellow) — the same query matched against a different search
- *   field. Concedes nothing, so it ranks above everything else.
+ *   field. Also concedes nothing, but a filter is the stronger reading.
  * - `correct` (purple) — a near-miss title replacing the query. Puts words in
  *   the reader's mouth, so it ranks below a redirect, and only ever appears
  *   when the query as typed matches nothing anywhere.
@@ -107,6 +109,56 @@ export const MultipleWidenings: Story = {
         headline: "Show “Perfect Days” & 12 more",
         changes: [{ label: "Any accessibility requirement" }],
         count: 13,
+      }),
+    ],
+  },
+};
+
+/**
+ * The query names a format, not a film. One value can match several options —
+ * "70mm" is a whole word inside "IMAX 70mm" too — and each is its own offer
+ * with its own count.
+ */
+export const FilterValue: Story = {
+  args: {
+    suggestions: [
+      suggestion({
+        id: "filter:formatSource:70mm",
+        kind: "filter",
+        headline: "Show 70mm screenings",
+        changes: [{ label: "Source Format", detail: "70mm" }],
+        count: 2,
+      }),
+      suggestion({
+        id: "filter:formatSource:IMAX 70mm",
+        kind: "filter",
+        headline: "Show IMAX 70mm screenings",
+        changes: [{ label: "Source Format", detail: "IMAX 70mm" }],
+        count: 1,
+      }),
+      suggestion({
+        id: "redirect:search:showingTitleSearch",
+        kind: "redirect",
+        headline: "Search original venue titles instead",
+        changes: [
+          { label: "Original venue title", detail: "“The Odyssey (70mm)”" },
+        ],
+        count: 1,
+      }),
+    ],
+  },
+};
+
+/** The same reading applied to a genre rather than a format. */
+export const FilterValueGenre: Story = {
+  args: {
+    suggestions: [
+      suggestion({
+        id: "filter:genres:Action",
+        kind: "filter",
+        headline: "Show Action films",
+        changes: [{ label: "Genre", detail: "Action" }],
+        count: 42,
       }),
     ],
   },

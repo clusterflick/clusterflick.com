@@ -9,6 +9,7 @@ import styles from "./filter-suggestions.module.css";
  * that give a filter up, so the difference is visible before the label is read.
  */
 const KIND_CLASSES: Record<SuggestionKind, string | undefined> = {
+  filter: styles.filter,
   redirect: styles.redirect,
   correct: styles.correct,
   widen: undefined,
