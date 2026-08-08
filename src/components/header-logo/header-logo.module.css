@@ -51,14 +51,7 @@
  * filter, so it keeps the wordmark.
  */
 @media (max-width: 1536px) {
-  .home.withFilter {
-    img {
-      position: relative;
-      top: 2.5px;
-    }
-
-    div {
-      display: none;
-    }
+  .home.withFilter div {
+    display: none;
   }
 }
