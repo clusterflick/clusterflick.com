@@ -71,6 +71,38 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-08",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            When your <Link href="/films">search or filters</Link> come up
+            empty, the page now suggests what would work instead of leaving you
+            to guess — each suggestion saying how many results it would give
+            you, and applying in one tap. It&apos;ll offer a correction when a
+            title looks mistyped, point out when what you typed matches against
+            a different value (the venue&apos;s own title for a screening, or a
+            note on a performance) and name the filter that&apos;s actually in
+            the way (which is usually the date window or a category you&apos;d
+            forgotten was narrowed).
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Search suggestions also spot when what you typed is a filter rather
+            than a film. Searching &ldquo;70mm&rdquo; offers both 70mm and IMAX
+            70mm as formats, with a count each; the same goes for genres, event
+            types (like quizzes), and accessibility features (like subtitles).
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-07",
     changes: [
       {
