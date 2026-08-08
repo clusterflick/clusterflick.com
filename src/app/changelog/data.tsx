@@ -77,6 +77,18 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
+            Every <Link href="/venues">venue</Link> now has a calendar page,
+            showing its whole programme laid out month by month or as an agenda.
+            It&apos;s built from the same calendar file you can subscribe to
+            from the venue page, so what you see here is exactly what turns up
+            in your own calendar app.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
             Every page now carries the full navigation. There&apos;s also a
             footer on every page listing everywhere you can go, grouped the same
             way the menu is.

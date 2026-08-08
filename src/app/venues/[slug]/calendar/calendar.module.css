@@ -1,0 +1,265 @@
+/*
+ * FullCalendar ships its own stylesheet and injects it at runtime, so this file
+ * is entirely overrides. Most of the work is done through the `--fc-*` custom
+ * properties it reads; the `:global` rules below cover the pieces it hard-codes
+ * — chiefly the toolbar title (an <h2>, which globals.css would otherwise render
+ * at 48px in pink) and the anchors list view uses for events, which pick up the
+ * global blue underline treatment.
+ */
+/* Edge-to-edge, with just enough gutter that the grid does not touch the
+   viewport. The page is one calendar, so it gets the whole width — and at least
+   the whole height, the flex chain below handing the screen down to the grid so
+   FullCalendar's height="100%" has something definite to resolve against. It is
+   a floor rather than a fixed height: a month with tall rows may need more. */
+.calendarWrapper {
+  padding: 0 24px 64px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 720px) {
+  .calendarWrapper {
+    padding: 0 12px 48px;
+  }
+}
+
+.calendar {
+  --fc-small-font-size: 13px;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(var(--color-white-rgb), 0.04);
+  --fc-neutral-text-color: var(--color-light-gray);
+  --fc-border-color: rgba(var(--color-white-rgb), 0.12);
+
+  --fc-button-text-color: var(--color-light-gray);
+  --fc-button-bg-color: rgba(var(--color-white-rgb), 0.06);
+  --fc-button-border-color: rgba(var(--color-white-rgb), 0.16);
+  --fc-button-hover-bg-color: rgba(var(--color-electric-blue-rgb), 0.25);
+  --fc-button-hover-border-color: var(--color-electric-blue);
+  --fc-button-active-bg-color: rgba(var(--color-electric-blue-rgb), 0.4);
+  --fc-button-active-border-color: var(--color-electric-blue);
+
+  --fc-event-bg-color: rgba(var(--color-purple-accent-rgb), 0.55);
+  --fc-event-border-color: rgba(var(--color-neon-pink-rgb), 0.5);
+  --fc-event-text-color: var(--color-white);
+  --fc-event-selected-overlay-color: rgba(var(--color-neon-pink-rgb), 0.25);
+
+  --fc-more-link-bg-color: rgba(var(--color-electric-blue-rgb), 0.2);
+  --fc-more-link-text-color: var(--color-light-gray);
+  --fc-today-bg-color: rgba(var(--color-buttery-yellow-rgb), 0.08);
+  --fc-highlight-color: rgba(var(--color-electric-blue-rgb), 0.2);
+  --fc-list-event-hover-bg-color: rgba(var(--color-white-rgb), 0.06);
+
+  margin-top: 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar :global(.fc) {
+  flex: 1;
+}
+
+/* Toolbar ------------------------------------------------------------- */
+
+.calendar :global(.fc-toolbar) {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.calendar :global(.fc-toolbar-title) {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--color-light-gray);
+  margin: 0;
+}
+
+.calendar :global(.fc-button) {
+  font-weight: 600;
+  text-transform: capitalize;
+  box-shadow: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calendar :global(.fc-button:focus),
+.calendar :global(.fc-button:focus-visible) {
+  box-shadow: none;
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.calendar :global(.fc-button-primary:disabled) {
+  opacity: 0.4;
+}
+
+/* Grid ---------------------------------------------------------------- */
+
+.calendar :global(.fc-col-header-cell) {
+  background: rgba(var(--color-white-rgb), 0.04);
+  font-weight: 600;
+  padding: 8px 0;
+}
+
+.calendar :global(.fc-col-header-cell-cushion),
+.calendar :global(.fc-daygrid-day-number) {
+  color: var(--color-light-gray);
+  border-bottom: none;
+  font-weight: 600;
+}
+
+.calendar :global(.fc-day-other) :global(.fc-daygrid-day-number) {
+  opacity: 0.35;
+}
+
+.calendar :global(.fc-day-today) :global(.fc-daygrid-day-number) {
+  color: var(--color-buttery-yellow);
+}
+
+.calendar :global(.fc-daygrid-event) {
+  padding: 2px 4px;
+  border-radius: 3px;
+  border-left-width: 3px;
+}
+
+.calendar :global(.fc-daygrid-more-link) {
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* The "+n more" popover floats over the page, so it needs an opaque
+   background of its own rather than the transparent page colour. */
+.calendar :global(.fc-popover) {
+  background: var(--color-dark-navy);
+  border-color: rgba(var(--color-white-rgb), 0.16);
+  box-shadow: 0 12px 32px rgba(var(--color-black-rgb), 0.5);
+  z-index: 20;
+}
+
+.calendar :global(.fc-popover-header) {
+  background: rgba(var(--color-white-rgb), 0.06);
+  color: var(--color-light-gray);
+  font-weight: 600;
+}
+
+/* Agenda (list) view --------------------------------------------------- */
+
+.calendar :global(.fc-list) {
+  border-color: var(--fc-border-color);
+}
+
+.calendar :global(.fc-list-day-cushion) {
+  background: rgba(var(--color-white-rgb), 0.06);
+}
+
+.calendar :global(.fc-list-day-text),
+.calendar :global(.fc-list-day-side-text) {
+  color: var(--color-neon-pink);
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.calendar :global(.fc-list-day-text:hover),
+.calendar :global(.fc-list-day-side-text:hover) {
+  color: var(--color-neon-pink);
+}
+
+.calendar :global(.fc-list-event-title) :global(a),
+.calendar :global(.fc-list-event-title) {
+  color: var(--color-light-gray);
+  border-bottom: none;
+  font-weight: 500;
+}
+
+.calendar :global(.fc-list-event:hover) :global(td) {
+  background: var(--fc-list-event-hover-bg-color);
+}
+
+.calendar :global(.fc-list-event-dot) {
+  border-color: var(--color-neon-pink);
+}
+
+.calendar :global(.fc-list-empty) {
+  background: transparent;
+  color: var(--color-muted-gray);
+  padding: 48px 16px;
+}
+
+/* Event content -------------------------------------------------------- */
+
+/* Events with a URL render as anchors, which globals.css would give the blue
+   link colour and underline — unreadable against the event fill, and wrong for
+   something that reads as a block rather than a link. */
+.calendar :global(.fc-event),
+.calendar :global(a.fc-event:hover) {
+  cursor: pointer;
+  color: var(--fc-event-text-color);
+  border-bottom: none;
+  font-weight: 500;
+}
+
+.calendar :global(.fc-daygrid-dot-event),
+.calendar :global(.fc-daygrid-dot-event:hover) {
+  color: var(--color-light-gray);
+}
+
+.calendar :global(.fc-daygrid-dot-event:hover) {
+  background: rgba(var(--color-white-rgb), 0.08);
+}
+
+.calendar :global(.fc-event-time) {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* Screening titles are long and days are narrow; one clipped line per event
+   keeps a night's programme scannable. The full title is on the tooltip. */
+.calendar :global(.fc-event-title) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar :global(.fc-daygrid-event-dot) {
+  border-color: var(--color-neon-pink);
+}
+
+/* Loading and failure states ------------------------------------------- */
+
+.placeholder {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+  color: var(--color-muted-gray);
+}
+
+.error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: rgba(var(--color-neon-pink-rgb), 0.12);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  color: var(--color-light-gray);
+}
+
+.emptyState {
+  margin-top: 48px;
+}
+
+/* Three toolbar chunks do not fit across a phone; stacked they stay tappable. */
+@media (max-width: 720px) {
+  .calendar :global(.fc-toolbar) {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .calendar :global(.fc-toolbar-chunk) {
+    display: flex;
+    justify-content: center;
+  }
+}

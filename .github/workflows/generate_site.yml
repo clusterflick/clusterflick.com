@@ -49,6 +49,11 @@ jobs:
       - run: npm run fetch-diffed-data
         env:
           PAT: ${{ secrets.PAT }}
+      # One ICS per venue, served from our own origin so the calendar pages can
+      # read them without CORS and cache them on a content hash
+      - run: npm run fetch-calendar-data
+        env:
+          PAT: ${{ secrets.PAT }}
       - run: npm run process-combined-data
       - run: npm run generate-summary
         env:

@@ -22,6 +22,7 @@ do
 done
 
 npm run fetch-diffed-data
+npm run fetch-calendar-data
 
 rm -rf ./public/data
 npm run process-combined-data

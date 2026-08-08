@@ -12,12 +12,9 @@ import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
-import Tag from "@/components/tag";
-import {
-  GoogleCalendarIcon,
-  OutlookCalendarIcon,
-  CalendarIcon,
-} from "@/components/icons";
+import VenueHeroDetails from "@/components/venue-hero-details";
+import { ButtonLink } from "@/components/button";
+import { getVenueUrl } from "@/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import PosterRow from "@/components/poster-row";
@@ -25,7 +22,6 @@ import VenueScheduleBoard from "@/components/venue-schedule-board";
 import CollapsibleBoard from "@/components/venue-schedule-board/collapsible-board";
 import type { VenueScheduleDay } from "@/utils/get-venue-schedule";
 import type { ScoredMovie } from "@/utils/get-discovery-movies";
-import SocialLinks from "@/components/social-links";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
 import styles from "./page.module.css";
@@ -87,9 +83,6 @@ export default function VenueDetailPageContent({
   activeFestivals,
   accessibilityStats,
 }: VenueDetailPageContentProps) {
-  const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
-  const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venue.id}`;
-
   const venueMovieParams = `venues=${encodeURIComponent(venue.id)}`;
   // `base=all` starts from a fully permissive state (all dates, all categories)
   // so only the venue constrains results.
@@ -147,46 +140,12 @@ export default function VenueDetailPageContent({
           movieCount={movieCount}
           performanceCount={performanceCount}
         >
-          <div className={styles.heroTagRow}>
-            <div className={styles.heroTagRowSide}>
-              <SocialLinks socials={attributes?.socials} />
-            </div>
-            <div>
-              <Tag color="blue">
-                {venue.type.toLowerCase().trim() === "unknown"
-                  ? "Other"
-                  : venue.type}
-              </Tag>
-            </div>
-            <div className={styles.heroTagRowSide}>
-              <a
-                href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.heroSocialLink}
-                title="Add to Google Calendar"
-              >
-                <GoogleCalendarIcon size={20} />
-              </a>
-              <a
-                href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venue.name)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.heroSocialLink}
-                style={{ padding: 4 }}
-                title="Add to Outlook Calendar"
-              >
-                <OutlookCalendarIcon size={28} />
-              </a>
-              <a
-                href={webcalUrl}
-                className={styles.heroSocialLink}
-                title="Subscribe to calendar"
-              >
-                <CalendarIcon size={20} />
-              </a>
-            </div>
-          </div>
+          <VenueHeroDetails
+            venueId={venue.id}
+            venueName={venue.name}
+            venueType={venue.type}
+            socials={attributes?.socials}
+          />
         </DetailPageHero>
       }
       afterContent={
@@ -212,7 +171,19 @@ export default function VenueDetailPageContent({
       }
     >
       {movieCount > 0 && (
-        <ContentSection title={`On now at ${venue.name}`} as="h2">
+        <ContentSection
+          title={`On now at ${venue.name}`}
+          as="h2"
+          action={
+            <ButtonLink
+              href={`${getVenueUrl(venue)}/calendar`}
+              variant="secondary"
+              size="sm"
+            >
+              View the full calendar
+            </ButtonLink>
+          }
+        >
           <CollapsibleBoard>
             <VenueScheduleBoard
               days={scheduleDays}

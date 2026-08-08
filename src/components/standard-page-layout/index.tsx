@@ -52,6 +52,13 @@ interface StandardPageLayoutProps {
    * poster grid that should span the full page width.
    */
   afterContent?: ReactNode;
+  /**
+   * Omit the site footer. For pages that are a single self-contained tool
+   * rather than a destination to read and move on from — the venue calendar,
+   * where the page is one full-height widget and the footer's link columns are
+   * just noise below it.
+   */
+  hideFooter?: boolean;
 }
 
 /**
@@ -78,6 +85,7 @@ export default function StandardPageLayout({
   backText,
   children,
   afterContent,
+  hideFooter = false,
 }: StandardPageLayoutProps) {
   return (
     <main id="main-content">
@@ -103,7 +111,7 @@ export default function StandardPageLayout({
 
       {children && <div className={styles.content}>{children}</div>}
       {afterContent}
-      <SiteFooter />
+      {!hideFooter && <SiteFooter />}
     </main>
   );
 }

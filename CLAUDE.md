@@ -16,6 +16,7 @@ Pages at clusterflick.com.
 - `npm run format` — Prettier format all files
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
+- `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
@@ -165,6 +166,63 @@ a reader sees. It does _not_ affect the `/lists` index, which sorts by film coun
 **Don't virtualise list pages.** `VirtualisedFilmGrid` is for the client-rendered films grid only;
 Virtuoso renders no items during SSR without `initialItemCount`, which would leave the films out of
 the static HTML. List pages use `FilmPosterGrid`, which lays out identically.
+
+## Venue Calendars
+
+`/venues/<slug>/calendar` renders the venue's published ICS feed in a month grid or agenda.
+
+**The feed is consumed as published, not re-derived.** `clusterflick/data-calendar` releases one
+ICS per venue, named after the venue id with no extension, one asset per venue in the dataset.
+`scripts/fetch-calendar-data.js` downloads the latest release into `public/calendars/` as
+`<venue-id>.<hash>.ics` plus a `manifest.json` of venue id → filename, which
+`@/utils/get-venue-calendar` reads at build time so the hashed URL is baked into the static HTML.
+Serving from our own origin removes CORS from the picture; the content hash means an unchanged
+venue keeps its URL, and so its cache entry, between builds. A missing release is not fatal —
+the manifest comes back empty and pages render their empty state.
+
+The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
+This is deliberate dogfooding: the page reads exactly what subscribers read, so anything wrong in
+the feed shows up here. Events carry the venue's website as their `URL`, not a booking link, so a
+click opens the venue site in a new tab — a feed-side limitation, not a page-side choice.
+
+**Three things about FullCalendar 6 that are load-bearing:**
+
+- **The event source must be a stable object.** FullCalendar identifies a source by object
+  identity, so an inline `events={{ url, format }}` literal makes every re-render drop the parsed
+  feed and refetch. With a `loading` callback that sets state, that is an infinite loop whose
+  visible symptom is events flickering in and vanishing. It is memoized on `calendarPath`.
+- **Custom content hooks render empty under React 19.** `eventContent` returning JSX produces
+  blank events — FullCalendar 6 renders internally with Preact and its React connector predates
+  React 19. Use FullCalendar's own default content and style it through `.fc-*` classes;
+  where a DOM-level touch is needed (the title tooltip), `eventDidMount` works because it hands
+  over a real element.
+- **Named time zones need a plugin.** Only `local` and `UTC` work without one. The feed publishes
+  UTC instants and the default `local` renders them correctly for London readers, so there is no
+  reason to set `timeZone` at all.
+
+The library is client-only (`ssr: false` via a client wrapper, since a Server Component may not
+set that) and pulls in ~300KB, so it stays on this route. That leaves the page with no crawlable
+content, and what it shows already exists on the venue page — hence `noindex` with a canonical
+pointing at the venue page, and no entry in `sitemap.ts`.
+
+The calendar goes in `StandardPageLayout`'s `afterContent` slot, not `children`, so it spans the
+window rather than the 1000px content column — the page is one calendar and reads like a desktop
+calendar app. The wrapper is floored at `100vh` and passes a definite height down a short flex
+chain, which is what lets FullCalendar's `height="100%"` resolve; it is a floor rather than a fixed
+height so a tall month can still grow. `dayMaxEvents` is `true` rather than a number so each cell
+shows as many screenings as the row actually fits. The empty state stays in `children`, where the
+narrower column suits it.
+
+**Late screenings belong to the evening they started.** A 21:30 film ending at 00:30 has an end
+date on the following day, so by default it is drawn in both day cells — and, being technically
+multi-day, as a filled bar rather than a dot. `nextDayThreshold="09:00:00"` keeps it in the start
+day alone (no screening is still running at 09:00), and `eventDisplay="list-item"` renders every
+event as a dot and title so an all-nighter never looks like a different kind of thing.
+
+Styling lives in `calendar.module.css` as `--fc-*` custom properties plus `:global(.fc-…)`
+overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` elements and pick
+up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
+would render at 48px in pink.
 
 ## Zero-Result Suggestions
 

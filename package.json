@@ -9,6 +9,7 @@
     "format": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
+    "fetch-calendar-data": "node ./scripts/fetch-calendar-data.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",
     "test": "vitest run --project unit",
     "storybook": "storybook dev -p 6006",
@@ -17,6 +18,11 @@
     "lighthouse": "node scripts/lighthouse-cache-test.js"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.21",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/icalendar": "^6.1.21",
+    "@fullcalendar/list": "^6.1.21",
+    "@fullcalendar/react": "^6.1.21",
     "@sindresorhus/slugify": "^3.0.0",
     "@turf/boolean-point-in-polygon": "^7.3.4",
     "@turf/helpers": "^7.3.4",
@@ -24,6 +30,7 @@
     "clsx": "^2.1.1",
     "data-analysed": "github:clusterflick/data-analysed",
     "downshift": "^9.4.0",
+    "ical.js": "^1.5.0",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
     "react": "19.2.0",

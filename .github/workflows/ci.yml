@@ -49,6 +49,11 @@ jobs:
       - run: npm run fetch-diffed-data
         env:
           PAT: ${{ secrets.PAT || github.token }}
+      # One ICS per venue, served from our own origin so the calendar pages can
+      # read them without CORS and cache them on a content hash
+      - run: npm run fetch-calendar-data
+        env:
+          PAT: ${{ secrets.PAT || github.token }}
       - run: npm run process-combined-data
       # No GEMINI_API_KEY here: CI never deploys, so generating a paid AI summary
       # per push/PR would be wasted. The script falls back to a deterministic

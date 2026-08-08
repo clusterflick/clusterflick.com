@@ -49,6 +49,7 @@ next-env.d.ts
 /matched-data/
 /diffed-data/
 /public/data/
+/public/calendars/
 
 # Storybook
 *storybook.log

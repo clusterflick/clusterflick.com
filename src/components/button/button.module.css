@@ -55,8 +55,9 @@
 }
 
 .secondary:hover:not(:disabled) {
-  background-color: var(--color-electric-blue);
   color: var(--color-dark-navy);
+  background-color: var(--color-electric-blue);
+  border: 1px solid var(--color-electric-blue);
 }
 
 /* Link variant */

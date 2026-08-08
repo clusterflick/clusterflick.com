@@ -30,6 +30,22 @@
   white-space: nowrap;
 }
 
+/* A long title and an action cannot share a phone's width: the action holds its
+   size, so the heading gets squeezed into a column of single words. Stacking
+   gives the title the full width and drops the action beneath it. */
+@media (max-width: 720px) {
+  .titleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .titleRow .title {
+    margin-bottom: 0;
+  }
+}
+
 .intro {
   font-size: 16px;
   margin-bottom: 32px;

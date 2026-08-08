@@ -5,6 +5,7 @@ import { FestivalsPage } from "./pages/festivals-page";
 import { FestivalDetailPage } from "./pages/festival-detail-page";
 import { VenuesPage } from "./pages/venues-page";
 import { VenueDetailPage } from "./pages/venue-detail-page";
+import { VenueCalendarPage } from "./pages/venue-calendar-page";
 import { LondonCinemasPage } from "./pages/london-cinemas-page";
 import { BoroughDetailPage } from "./pages/borough-detail-page";
 
@@ -205,6 +206,55 @@ test.describe("Venue Pages", () => {
     expect(statusText).toBeTruthy();
 
     await detailPage.screenshot("venue-detail");
+  });
+});
+
+// A venue busy enough that any week of the year has something programmed, so
+// the test can assert on real events rather than an empty grid.
+const CALENDAR_VENUE_SLUG = "prince-charles-cinema";
+
+test.describe("Venue Calendar Page", () => {
+  let calendarPage: VenueCalendarPage;
+
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    calendarPage = new VenueCalendarPage(page);
+    await calendarPage.goto(CALENDAR_VENUE_SLUG);
+  });
+
+  test("calendar renders showings from the ICS feed", async () => {
+    await calendarPage.waitForCalendar();
+    await calendarPage.waitForEvents();
+
+    expect(await calendarPage.countEvents()).toBeGreaterThan(0);
+    expect(await calendarPage.getTitle()).toBeTruthy();
+
+    await calendarPage.screenshot("venue-calendar");
+  });
+
+  test("the back link returns to the venue page", async ({ page }) => {
+    await calendarPage.waitForCalendar();
+
+    await page
+      .getByRole("link", { name: /Prince Charles Cinema/i })
+      .first()
+      .click();
+
+    await page.waitForURL(new RegExp(`/venues/${CALENDAR_VENUE_SLUG}/?$`), {
+      timeout: 10000,
+    });
+  });
+
+  test("switching to the agenda view keeps showing events", async () => {
+    await calendarPage.waitForCalendar();
+    await calendarPage.waitForEvents();
+
+    await calendarPage.switchToAgenda();
+    await calendarPage.waitForEvents();
+
+    expect(await calendarPage.countEvents()).toBeGreaterThan(0);
+
+    await calendarPage.screenshot("venue-calendar-agenda");
   });
 });
 
