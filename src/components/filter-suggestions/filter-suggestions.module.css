@@ -84,11 +84,18 @@
   border-color: rgba(var(--color-purple-accent-rgb), 0.85);
 }
 
+/* Two lines, not one. The headline is the part the reader has to agree to, and
+   film titles are long enough that a single clipped line cost the whole
+   question — `Did you mean “André Rieu's 20…` drops the closing quote and the
+   question mark with it. Clamping still bounds the row's height. */
 .headline {
   font-weight: 600;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .change {

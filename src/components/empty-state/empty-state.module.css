@@ -38,12 +38,18 @@
   opacity: 0.8;
 }
 
+/* The cap is load-bearing, not defensive. Centred in a column flex this row is
+   sized to its content, and a child asking for `width: 100%` against that
+   indefinite width lets the content win — a long suggestion headline sized the
+   row to 611px inside a 390px viewport, overflowing both edges and leaving its
+   own ellipsis nothing to trigger on. */
 .actions {
   margin-top: 24px;
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
+  max-width: 100%;
 }
 
 /* Fullscreen variant - for page-level empty states */
