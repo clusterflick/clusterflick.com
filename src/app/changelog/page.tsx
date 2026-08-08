@@ -4,6 +4,7 @@ import Link from "next/link";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
+import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import Tag from "@/components/tag";
 import { getStaticData } from "@/utils/get-static-data";
@@ -92,7 +93,7 @@ export default async function ChangelogPage() {
 
   return (
     <main id="main-content">
-      <PageHeader backUrl="/about" backText="Back to about" />
+      <PageHeader />
 
       <HeroSection
         backgroundImage="/images/light-circles.jpg"
@@ -135,6 +136,7 @@ export default async function ChangelogPage() {
           ))}
         </ol>
       </section>
+      <SiteFooter />
     </main>
   );
 }

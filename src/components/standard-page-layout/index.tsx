@@ -4,6 +4,7 @@ import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import Divider from "@/components/divider";
 import PreloadCinemaData from "@/components/preload-cinema-data";
+import SiteFooter from "@/components/site-footer";
 import styles from "./standard-page-layout.module.css";
 
 interface StandardPageLayoutProps {
@@ -33,10 +34,16 @@ interface StandardPageLayoutProps {
    * Pass a `<DetailPageHero>` for entity pages (venues, events).
    */
   hero?: ReactNode;
-  /** URL for the PageHeader back button */
-  backUrl: string;
-  /** Label for the PageHeader back button */
-  backText: string;
+  /**
+   * URL and label for the PageHeader back button. Provide both or neither.
+   *
+   * Set these only on pages that sit under a parent route — a venue inside
+   * Venues, a festival inside Festivals. Section pages are siblings of one
+   * another rather than children of the films grid, so they omit the back link
+   * and rely on the header nav, which PageHeader now carries everywhere.
+   */
+  backUrl?: string;
+  backText?: string;
   /** Page body rendered below the hero and divider */
   children: ReactNode;
   /**
@@ -54,7 +61,7 @@ interface StandardPageLayoutProps {
  * constrained content wrapper into a single consistent shell.
  *
  * Use this when a page follows the pattern:
- * - Back navigation to a parent route
+ * - Optional back navigation to a parent route (detail pages only)
  * - A centred hero (default title-based, or a custom `hero` such as DetailPageHero)
  * - Content below a horizontal divider
  * - Optional full-width `afterContent` (e.g. an edge-to-edge poster grid)
@@ -96,6 +103,7 @@ export default function StandardPageLayout({
 
       {children && <div className={styles.content}>{children}</div>}
       {afterContent}
+      <SiteFooter />
     </main>
   );
 }

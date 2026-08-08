@@ -1,5 +1,5 @@
 import { MenuIcon, CloseIcon } from "@/components/icons";
-import { NAV_LINKS } from "@/utils/nav-links";
+import { GROUPED_NAV_LINKS } from "@/utils/nav-links";
 import MenuLink from "./menu-link";
 import { MENU_ID } from "./menu-id";
 import styles from "./mobile-menu.module.css";
@@ -57,11 +57,26 @@ export default function MobileMenu() {
           >
             <CloseIcon size={24} />
           </button>
-          <nav className={styles.nav} aria-label="All pages">
-            {NAV_LINKS.map(({ href, label }) => (
-              <MenuLink key={href} href={href} label={label} />
+          {/*
+           * Grouped rather than one flat run: the list is long enough that
+           * scanning it needs the categories, and the headings give the scroll
+           * some landmarks. Each group is its own labelled nav so the headings
+           * are structure to a screen reader, not just larger text.
+           */}
+          <div className={styles.nav}>
+            {GROUPED_NAV_LINKS.map(({ id, label, links }) => (
+              <nav key={id} className={styles.navGroup} aria-label={label}>
+                <h2 className={styles.navGroupHeading}>{label}</h2>
+                {links.map((link) => (
+                  <MenuLink
+                    key={link.href}
+                    href={link.href}
+                    label={link.label}
+                  />
+                ))}
+              </nav>
             ))}
-          </nav>
+          </div>
         </div>
       </div>
     </div>

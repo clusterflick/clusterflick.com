@@ -38,8 +38,6 @@ export default function FormatsPageContent({
     <StandardPageLayout
       title="Formats"
       subtitle={`${formats.length} formats · ${showingCount} showing now`}
-      backUrl="/films"
-      backText="Back to film list"
     >
       <p className={styles.intro}>
         Some films are best seen in a specific format, whether that&apos;s the

@@ -25,10 +25,12 @@ export default function MainHeader({
    */
   showFilters?: boolean;
 }) {
+  const hasFilter = showFilters && !!onFilterClick;
+
   return (
     <header className={styles.header}>
-      <HeaderLogo hasFilter={showFilters && !!onFilterClick} />
-      {showFilters && !!onFilterClick && (
+      <HeaderLogo hasFilter={hasFilter} />
+      {hasFilter && (
         <div className={styles.filter} data-filter-summary>
           <FilterTrigger
             // hasFilter guarantees onFilterClick is defined here.

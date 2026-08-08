@@ -5,6 +5,7 @@
 .mobileMenu {
   display: flex;
   align-items: center;
+  margin-left: 8px;
 }
 
 .menuButton {
@@ -154,8 +155,8 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 40px;
+  gap: 24px;
+  margin-top: 32px;
   /* Let the link list scroll when it's taller than the viewport, keeping the
      close button pinned at the top of the panel. */
   flex: 1;
@@ -163,11 +164,28 @@
   overflow-y: auto;
 }
 
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navGroupHeading {
+  margin: 0 0 4px;
+  padding: 0 20px;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--color-electric-blue-rgb), 0.55);
+}
+
 .navLink {
   display: block;
-  padding: 16px 20px;
+  padding: 12px 20px;
   font-family: var(--font-montserrat), sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-electric-blue);
   text-decoration: none;
@@ -189,4 +207,18 @@
   border-left: 3px solid var(--color-neon-pink);
   border-radius: 0 8px 8px 0;
   padding-left: 17px;
+}
+
+/* The panel is a fixed-height column, so a long grouped list has to give way
+   on short viewports rather than pushing the close button off screen. */
+@media (max-height: 950px) {
+  .nav {
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .navLink {
+    padding: 8px 20px;
+    font-size: 16px;
+  }
 }

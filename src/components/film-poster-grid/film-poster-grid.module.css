@@ -18,7 +18,7 @@
     rgba(var(--color-midnight-navy-rgb), 1) 100%
   );
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .filmGrid {

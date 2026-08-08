@@ -137,8 +137,8 @@ export default function VenueDetailPageContent({
 
   return (
     <StandardPageLayout
-      backUrl="/films"
-      backText="Back to film list"
+      backUrl="/venues"
+      backText="All venues"
       hero={
         <DetailPageHero
           name={venue.name}

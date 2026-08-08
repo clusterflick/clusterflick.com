@@ -77,6 +77,35 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
+            Every page now carries the full navigation. There&apos;s also a
+            footer on every page listing everywhere you can go, grouped the same
+            way the menu is.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The navigation is grouped now, and a few things are renamed to say
+            what they actually are. &ldquo;Updates&rdquo; is{" "}
+            <Link href="/updates">New Listings</Link>, since it&apos;s new films
+            and showings rather than changes to the site — that&apos;s this
+            page, which is in the menu now too, along with{" "}
+            <Link href="/">Home</Link>. &ldquo;Collections&rdquo; is{" "}
+            <Link href="/collections">Franchises &amp; Series</Link>, which is
+            what&apos;s on those pages and no longer reads as a synonym for{" "}
+            <Link href="/lists">Film Lists</Link>. And
+            &ldquo;Accessibility&rdquo; is{" "}
+            <Link href="/accessibility">Accessible Screenings</Link> — it lists
+            screenings you can go to, not a statement about the website.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
             When your <Link href="/films">search or filters</Link> come up
             empty, the page now suggests what would work instead of leaving you
             to guess — each suggestion saying how many results it would give

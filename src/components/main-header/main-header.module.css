@@ -6,7 +6,12 @@
   );
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 18px;
+  /*
+   * 11px + the 40px hamburger + 11px + the 1px border = 63px, the same height
+   * PageHeader uses on every other page. The 40px is the tallest thing in here:
+   * the filter trigger is 40px and the logo group is boxed to 40px to match.
+   */
+  padding: 11px 18px;
   position: fixed;
   left: 0;
   right: 0;
@@ -21,7 +26,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  min-height: 83px;
+  min-height: 63px;
 }
 
 .filter {
@@ -37,13 +42,12 @@
   align-items: center;
   gap: 12px;
   position: absolute;
-  top: 22px;
+  top: 11px;
   right: 20px;
 }
 
 @media (max-width: 1280px) {
   .navGroup {
-    top: 19px;
     right: 16px;
   }
 }

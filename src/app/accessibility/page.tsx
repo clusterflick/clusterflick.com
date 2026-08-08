@@ -4,6 +4,7 @@ import slugify from "@sindresorhus/slugify";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
+import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
@@ -263,7 +264,7 @@ export default async function AccessibilityPage() {
           __html: JSON.stringify(accessibilityJsonLd),
         }}
       />
-      <PageHeader backUrl="/films" backText="Back to film list" />
+      <PageHeader />
 
       <HeroSection
         backgroundImage="/images/various-movie-seats.jpg"
@@ -506,6 +507,7 @@ export default async function AccessibilityPage() {
           })}
         </div>
       </div>
+      <SiteFooter />
     </main>
   );
 }

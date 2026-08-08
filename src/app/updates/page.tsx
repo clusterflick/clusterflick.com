@@ -138,8 +138,6 @@ export default async function UpdatesPage() {
           .
         </p>
       }
-      backUrl="/"
-      backText="Back to home"
     >
       {releases.length === 0 ? (
         <EmptyState

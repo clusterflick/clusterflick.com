@@ -3,8 +3,14 @@
   align-items: center;
   gap: 12px;
   position: absolute;
-  top: 18px;
+  top: 11px;
   left: 20px;
+  /*
+   * Boxed to the hamburger's 40px opposite it, so the flex centring lines the
+   * mark and wordmark up with the nav rather than hanging them off the top
+   * padding — and so the logo never sets the header's height.
+   */
+  height: 40px;
   background: none;
   border: none;
   border-bottom: none;
@@ -14,8 +20,8 @@
   cursor: pointer;
 
   .logo {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
   }
 
   .spinning {
@@ -26,7 +32,7 @@
     margin: 0;
     position: relative;
     color: var(--color-midnight-navy);
-    font-size: 36px;
+    font-size: 28px;
   }
 }
 

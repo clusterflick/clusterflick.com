@@ -17,12 +17,7 @@ export default function ListsPageContent({
   const subtitle = `${totalCount} ${totalCount === 1 ? "list" : "lists"}`;
 
   return (
-    <StandardPageLayout
-      title="Film Lists"
-      subtitle={subtitle}
-      backUrl="/films"
-      backText="Back to film list"
-    >
+    <StandardPageLayout title="Film Lists" subtitle={subtitle}>
       <p className={styles.intro}>
         The great-films lists that critics and audiences keep arguing about —
         matched against what is actually screening in London. Each page shows

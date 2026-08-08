@@ -1,5 +1,6 @@
 .page {
-  padding-top: 100px;
+  /* Clears the 63px header, keeping the gap the 83px version left above. */
+  padding-top: 80px;
 }
 
 .intro {

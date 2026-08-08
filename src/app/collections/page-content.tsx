@@ -16,12 +16,7 @@ export default function CollectionsPageContent({
   }`;
 
   return (
-    <StandardPageLayout
-      title="Film Collections"
-      subtitle={subtitle}
-      backUrl="/films"
-      backText="Back to film list"
-    >
+    <StandardPageLayout title="Film Collections" subtitle={subtitle}>
       <p className={styles.intro}>
         Franchises, trilogies and long-running series with two or more films
         screening in London right now. Each page shows the whole run, so you can

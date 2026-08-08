@@ -24,12 +24,7 @@ export default function FestivalsPageContent({
       : `${count} ${count === 1 ? "festival" : "festivals"} running`;
 
   return (
-    <StandardPageLayout
-      title="Festivals"
-      subtitle={subtitle}
-      backUrl="/films"
-      backText="Back to film list"
-    >
+    <StandardPageLayout title="Festivals" subtitle={subtitle}>
       {count > 0 && (
         <p className={styles.intro}>
           Clusterflick tracks film festivals happening right now across London.

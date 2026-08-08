@@ -25,8 +25,8 @@ export default function HeaderLogo({
       <Image
         src="/images/icon.svg"
         alt="Clusterflick"
-        width={40}
-        height={40}
+        width={32}
+        height={32}
         className={clsx(styles.logo, isLoading && styles.spinning)}
       />
       <OutlineHeading as="div">Clusterflick</OutlineHeading>

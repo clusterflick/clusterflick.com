@@ -29,8 +29,6 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
     <StandardPageLayout
       title="Genres"
       subtitle={`${genres.length} genres · ${showingCount} showing now`}
-      backUrl="/films"
-      backText="Back to film list"
     >
       <p className={styles.intro}>
         Clusterflick sorts every film showing across London into {genres.length}{" "}

@@ -24,8 +24,6 @@ export default function CinemaGroupsPageContent({
     <StandardPageLayout
       title="London Cinema Groups"
       subtitle={`${groups.length} cinema chains across London, from independent picture houses to major multiplexes`}
-      backUrl="/venues"
-      backText="All venues"
     >
       <ContentSection title="Browse London Cinemas by Group" as="h2">
         <p className={styles.intro}>

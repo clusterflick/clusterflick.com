@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageWrapper from "@/components/page-wrapper";
 import MainHeader from "@/components/main-header";
+import SiteFooter from "@/components/site-footer";
 import OutlineHeading from "@/components/outline-heading";
 import Divider from "@/components/divider";
 import { ButtonLink } from "@/components/button";
@@ -145,6 +146,7 @@ export default async function Home() {
 
           <NearYouSection venues={nearMeVenues} filmClubs={nearMeFilmClubs} />
         </div>
+        <SiteFooter />
       </PageWrapper>
     </>
   );

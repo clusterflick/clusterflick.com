@@ -6,10 +6,25 @@
   z-index: 100;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-neon-pink);
-  padding: 15px 20px;
+  /*
+   * 11px + the 40px hamburger + 11px + the 1px border = the 63px this header
+   * has always been. The nav moved in without changing the height, so the
+   * sticky-header offsets on movie pages (STICKY_TOP in showings-section) and
+   * every page's top padding still line up.
+   */
+  padding: 11px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+/* Logo + optional back link: the header's left-hand anchor. */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
 }
 
 .backButton {
@@ -17,7 +32,10 @@
     0 1px 2px rgba(var(--color-black-rgb), 0.8),
     0 0 8px rgba(var(--color-black-rgb), 0.5);
   position: relative;
-  margin-left: 24px;
+  margin-left: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   svg {
     width: 24px;
@@ -32,6 +50,15 @@
 .logo {
   display: flex;
   border: none;
+  flex-shrink: 0;
+}
+
+/* Right-aligned group holding the inline primary nav + the hamburger menu. */
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .spinning {

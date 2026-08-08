@@ -13,6 +13,7 @@ import { EmailIcon } from "@/components/icons";
 import Divider from "@/components/divider";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
+import SiteFooter from "@/components/site-footer";
 import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
@@ -94,7 +95,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
       />
-      <PageHeader backUrl="/films" backText="Back to film list" />
+      <PageHeader />
 
       <HeroSection
         backgroundImage="/images/various-movie-seats.jpg"
@@ -300,6 +301,7 @@ export default function AboutPage() {
           </ContentSection>
         </div>
       </div>
+      <SiteFooter />
     </main>
   );
 }
