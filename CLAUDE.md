@@ -166,6 +166,108 @@ a reader sees. It does _not_ affect the `/lists` index, which sorts by film coun
 Virtuoso renders no items during SSR without `initialItemCount`, which would leave the films out of
 the static HTML. List pages use `FilmPosterGrid`, which lays out identically.
 
+## Zero-Result Suggestions
+
+When a filtered grid comes up empty, `src/lib/filters/suggest.ts` finds the cheapest
+changes that would return something, each with a real result count, rendered by
+`FilterSuggestions` inside the `EmptyState`.
+
+It works by **probing**: build a candidate state, run the real filter pipeline over it,
+count what survives. The counts shown are therefore the counts the user will get — there is
+no second implementation of the filter logic to drift out of sync.
+
+**Three kinds of move:**
+
+- **Redirect** — the same query matched against a different search field (`Search` ↔
+  `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks
+  everything else. Only offered when the target field is empty. `ShowingUrlSearch` is
+  excluded — internal-only, so it can neither be explained nor undone.
+- **Correct** — a near-miss film title replacing the query ("Did you mean …?"). Ranks below
+  a redirect, because it rewrites what the reader asked for. Generated only when _no_ title
+  matches the query, tested via `matchesSearchQuery` so a query that lands only through a
+  spelling variant ("godfather part 2") still counts as correct. Only the main `Search` box
+  is corrected: it is the only field drawn from a fixed vocabulary of titles.
+
+  Matching compares the query against **runs of whole words** (`normalizeToWords`), scored by
+  an optimal-string-alignment distance that treats an adjacent swap as one edit. Both halves
+  are load-bearing and were learned the hard way:
+  - _Word anchoring._ `normalizeForSearch` strips spaces, so a free-floating substring match
+    scored "ornage" one edit from "short**s for age**s" — three words deep — and beat
+    "A Clockwork Orange". People mistype words, not character windows.
+  - _Transpositions._ Plain Levenshtein charges an adjacent swap as two substitutions, which
+    priced "ornage"→"orange" and "bilss"→"bliss" out of any budget a short query can afford.
+
+  `MIN_CORRECTABLE_LENGTH` is empirical, and 5 is a floor _and_ a ceiling: real cases
+  ("akera"→Akira, "bilss"→Bliss) are five characters, so raising it loses them. Five-character
+  queries stay speculative by nature — anything one edit from a title word draws an offer —
+  which is why offers are phrased as a question and carry a count. Re-measure on live data
+  before changing either the length floor or the budget formula.
+
+- **Widen** — one filter reset to its permissive value, ordered by elasticity in
+  `WIDENABLE`.
+
+**At most one query-rewriting move per combination** (`altersQuery`). Two would demand the
+query match in two fields at once, or correct and re-file it in the same breath.
+
+**Candidates come from `getRestrictiveFilterIds`, not `getActiveFilterIds`.** Categories and
+the date range have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d), so they report
+themselves inactive while still removing results — and they are the most common invisible
+blockers. Anything comparing against defaults instead of `getPermissiveState()` is blind to both.
+
+**Order is editorial, never by count.** Sorting by result count would promote "drop your
+Subtitles requirement" whenever it frees up the most screenings, which is the one suggestion a
+subtitles user cannot act on. Accessibility ranks last and is never combined with another
+move (`soloOnly`) — it is a requirement, not a preference. Search queries are redirected,
+never dropped.
+
+**Rounds stop at two.** Redirects, then single widens, then pairs. A three-filter relaxation
+is a reset with extra steps, so the caller offers a reset instead.
+
+**Cost decides order, not visibility.** The search runs until it has `limit` offers — it does
+_not_ stop at the first productive round. A redirect and a widening answer different questions
+about different films ("wrong field" vs "filters too narrow"), so a cheap redirect must not
+suppress an expensive pair. Searching "word" turns up a performance note straight away while
+the film called "Words" sits outside the date window _and_ in an excluded category, reachable
+only as a pair. The one thing skipped is a pair whose halves already work individually — that
+is a more expensive route to results already listed.
+
+**Each offer is a headline plus one line per filter it changes.**
+
+- The **headline** must read as something you can do. A bare filter name ("Any date") reads as
+  a caption, not a button, so a widening-only offer names the films it would reveal instead
+  (`Show "A" & "B"`, `Show "A" & 29 more`). A move that rewrites the query — a correction or a
+  redirect — leads instead, since that is the part the reader has to agree to.
+- **Change lines** are `Label: detail`, where the detail comes from the move's `describeResult`
+  against the probe result. One line each, never joined: joining produced
+  `Did you mean "X"?, any date` — a comma after a question mark, with the second change buried
+  at the end of the first.
+- A move whose action is already the headline contributes only its detail, so nothing is said
+  twice. A correction has no detail, so it drops out entirely — reporting a next-showing date
+  under a correction implied the date window had moved when it had not. **The next-showing date
+  belongs to the date widening alone.**
+- Dates are relative inside a fortnight ("next showing in 8 days"), absolute beyond it, where
+  counting is harder than reading.
+- Naming categories and venues needs the `categories`/`venues` lookups passed in (same shape as
+  `describeFilters`); without them offers degrade to bare counts rather than breaking.
+  Accessibility has no detail by design, since any detail there argues for giving up a
+  requirement.
+
+**The engine checks its own precondition.** `suggestFilterRelaxations` returns `[]` when the
+state it is handed already has results. The caller's idea of "empty" is easy to take from a
+different state than the one passed in — see the deferred copy below — and one keystroke of
+daylight was enough to offer improvements to a query that had results.
+
+**When several corrections tie** (a one-edit query is routinely one edit from a dozen titles,
+all through the same word), the sort breaks the tie by screening count and then soonest
+showing. Alphabetical is the one ordering with nothing to recommend it; only two corrections
+are ever offered, so the tie-break decides what the reader actually sees.
+
+**On the films page** the empty state pulls up under the search controls whenever it carries
+offers (`.emptyStateNearControls`) — centred in the viewport put them half a screen from the box
+the query was typed into. Suggestions ride a `useDeferredValue` copy of the filter state so
+typing stays responsive; React keeps the previous offers on screen while a pass catches up,
+which is deliberate — blanking them flickered the empty state on every keypress.
+
 ## Testing
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with

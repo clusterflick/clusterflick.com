@@ -1,5 +1,5 @@
 .page {
-  margin-top: 100px;
+  padding-top: 100px;
 }
 
 /* Inline search + filter controls above the movie grid */
@@ -116,4 +116,37 @@
   font-size: 12px;
   font-weight: 400;
   color: var(--color-electric-blue);
+}
+
+/* Stacks the zero-result offers above the reset button. `EmptyState`'s own
+   actions slot is a centred flex row, so the whole group goes in as one item. */
+.emptyActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Live region for suggestion outcomes — present for assistive tech, invisible
+   on screen. Not `display: none`, which would stop it being announced. */
+.announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Pulls the empty state up under the search controls when it carries offers.
+   The centred fullscreen layout puts them half a screen from the box the query
+   was typed into, which is a long way to travel to act on your own search. */
+.emptyStateNearControls {
+  min-height: 0;
+  padding-top: 32px;
+  padding-bottom: 48px;
 }

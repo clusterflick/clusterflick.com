@@ -1,0 +1,105 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 700px;
+  min-width: 25vw;
+}
+
+.offer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-dark-navy-rgb), 0.6);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.25);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.offer:hover,
+.offer:focus-visible {
+  background: rgba(var(--color-dark-navy-rgb), 0.9);
+  border-color: rgba(var(--color-electric-blue-rgb), 0.6);
+}
+
+/* A redirect concedes nothing — it re-files the same query against the field
+   that actually holds it — so it reads as a correction rather than a
+   compromise, and is tinted to match. */
+.redirect {
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.35);
+}
+
+.redirect:hover,
+.redirect:focus-visible {
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.7);
+}
+
+/* Constrained so a long detail line ellipsises instead of shoving the count
+   off the row. min-width:0 is what lets a flex child shrink below its content. */
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* A correction rewrites the reader's words, so it is neither the "you were
+   right" yellow of a redirect nor the plain blue of giving a filter up. */
+.correct {
+  border-color: rgba(var(--color-purple-accent-rgb), 0.45);
+}
+
+.correct:hover,
+.correct:focus-visible {
+  border-color: rgba(var(--color-purple-accent-rgb), 0.85);
+}
+
+.headline {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.change {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-light-gray);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The fact is subordinate to the filter it belongs to, so it recedes while
+   staying on the same line. */
+.changeDetail {
+  font-weight: 400;
+  color: var(--color-muted-gray);
+}
+
+.count {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted-gray);
+  white-space: nowrap;
+}
+
+.redirect .count {
+  color: var(--color-buttery-yellow);
+  opacity: 0.8;
+}

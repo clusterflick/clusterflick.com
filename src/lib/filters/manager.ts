@@ -187,6 +187,23 @@ export function getActiveFilterIds(state: FilterState): FilterId[] {
 }
 
 /**
+ * The IDs of every filter currently narrower than fully permissive — i.e. every
+ * filter that could be cutting results.
+ *
+ * Deliberately not {@link getActiveFilterIds}: two modules have *restrictive*
+ * defaults (categories → Films/Multiple/Shorts, date range → today→+7d), so
+ * they report themselves inactive while still removing results. Someone who has
+ * touched no filter at all and sees an empty grid is usually looking at exactly
+ * one of those two, and an "active filters" view is blind to both.
+ */
+export function getRestrictiveFilterIds(state: FilterState): FilterId[] {
+  const permissive = getPermissiveState();
+  return modules
+    .filter((module) => !valuesEqual(module.get(state), module.get(permissive)))
+    .map((module) => module.id);
+}
+
+/**
  * Applies all filters to the movies data.
  * Filters are applied in order, each receiving the output of the previous.
  * Returns a new movies record with filtering applied.

@@ -76,7 +76,7 @@ export const Fullscreen: Story = {
     variant: "fullscreen",
     actions: (
       <ButtonLink href="/" variant="secondary">
-        Clear all filters
+        Reset filters
       </ButtonLink>
     ),
   },

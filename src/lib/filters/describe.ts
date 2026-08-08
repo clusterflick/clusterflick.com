@@ -45,7 +45,7 @@ export type FilterDescription = {
  * - 3 items: "A, B & C"
  * - 4+ items with maxShow=2: "A & 3 more"
  */
-function formatList(
+export function formatList(
   items: string[],
   maxShow: number,
   overflowSuffix = "",

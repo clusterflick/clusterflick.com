@@ -26,6 +26,8 @@ interface EmptyStateProps {
    * - "contained": Compact box with gradient background (for section-level empty states)
    */
   variant?: "fullscreen" | "contained";
+  /** Layout overrides from the page — spacing only, not a restyle. */
+  className?: string;
 }
 
 /**
@@ -39,12 +41,13 @@ export default function EmptyState({
   hint,
   actions,
   variant = "contained",
+  className,
 }: EmptyStateProps) {
   const variantClass =
     variant === "fullscreen" ? styles.fullscreen : styles.contained;
 
   return (
-    <div className={clsx(styles.emptyState, variantClass)}>
+    <div className={clsx(styles.emptyState, variantClass, className)}>
       <Image
         src={icon.src}
         alt={title || ""}

@@ -48,3 +48,12 @@ export type { FilterBase } from "./manager";
 // Description utilities
 export { describeFilters } from "./describe";
 export type { DescribeOptions, FilterDescription } from "./describe";
+
+// Zero-result suggestions
+export { suggestFilterRelaxations } from "./suggest";
+export type {
+  FilterSuggestion,
+  SuggestionChange,
+  SuggestionKind,
+  SuggestOptions,
+} from "./suggest";

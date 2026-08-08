@@ -35,7 +35,7 @@ const CHARACTER_EQUIVALENTS: [RegExp, string][] = [
  * Non-Latin scripts are preserved — only punctuation is stripped, so titles
  * like "Сталкер" remain searchable.
  */
-export const normalizeForSearch = (str: string): string => {
+const foldForSearch = (str: string): string => {
   let result = str
     .toLowerCase()
     // Remove diacritics: normalize to NFD (decomposed form), then strip combining marks
@@ -46,9 +46,26 @@ export const normalizeForSearch = (str: string): string => {
     result = result.replace(pattern, replacement);
   }
 
-  // Everything that isn't a letter or a number goes, including spaces
-  return result.replace(/[^\p{L}\p{N}]/gu, "");
+  return result;
 };
+
+export const normalizeForSearch = (str: string): string =>
+  // Everything that isn't a letter or a number goes, including spaces
+  foldForSearch(str).replace(/[^\p{L}\p{N}]/gu, "");
+
+/**
+ * The same folding as {@link normalizeForSearch}, but split into words instead
+ * of run together — `normalizeToWords(s).join("") === normalizeForSearch(s)`.
+ *
+ * Substring search wants the run-on form: it must not care where the spaces
+ * fell. Fuzzy matching wants the opposite, because a mistyping never straddles
+ * a word boundary — without the split, "ornage" matches "short**s for age**s"
+ * one edit away, and the real answer never gets a look in.
+ */
+export const normalizeToWords = (str: string): string[] =>
+  foldForSearch(str)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean);
 
 /** Roman numerals, so "The Godfather Part II" is found by "godfather part 2". */
 const ROMAN_NUMERALS: Record<string, string> = {

@@ -235,6 +235,8 @@ type FilterConfigContextType = {
   // Quick filters (one-tap presets)
   applyQuickFilter: (quickFilter: QuickFilter) => void;
   isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
+  // Whole-state replacement (zero-result suggestions)
+  applyFilterState: (state: FilterState) => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -627,6 +629,14 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     [filterState],
   );
 
+  // Replace the whole state in one go. Used by the zero-result suggestions,
+  // which hand back a complete state they have already probed against the
+  // dataset — applying it piecemeal would risk landing on a different state
+  // than the one whose result count was shown to the user.
+  const applyFilterState = useCallback((state: FilterState) => {
+    setFilterState(filterManager.sanitizeFilterState(state));
+  }, []);
+
   // General
   const resetFilters = useCallback(() => {
     setFilterState(filterManager.getDefaultState);
@@ -676,6 +686,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleHideSoldOut,
       applyQuickFilter,
       isQuickFilterActive,
+      applyFilterState,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
@@ -709,6 +720,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleHideSoldOut,
       applyQuickFilter,
       isQuickFilterActive,
+      applyFilterState,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,

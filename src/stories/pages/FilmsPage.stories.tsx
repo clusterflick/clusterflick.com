@@ -130,8 +130,11 @@ export const EmptyData: Story = {
 };
 
 /**
- * The home page with data loaded but filters applied that match nothing.
- * Shows the "No events found" message with suggestion to adjust filters.
+ * The home page with data loaded but a search query that matches nothing
+ * anywhere in the dataset. No relaxation can rescue it, so the empty state
+ * says so plainly and offers only a reset — rather than dangling suggestions
+ * that would still come back empty. See the `FilterSuggestions` stories for
+ * the case where offers are available.
  */
 export const NoFilterResults: Story = {
   args: {},

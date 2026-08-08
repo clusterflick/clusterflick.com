@@ -5,6 +5,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  transition:
+    min-height 0.25s,
+    padding 0.25s;
 }
 
 .icon {
@@ -23,7 +26,7 @@
 .message {
   font-size: 16px;
   color: var(--color-muted-gray);
-  max-width: 400px;
+  max-width: 700px;
   line-height: 1.6;
   margin: 0;
 }
@@ -46,7 +49,7 @@
 /* Fullscreen variant - for page-level empty states */
 .fullscreen {
   padding: 80px 20px;
-  min-height: calc(100vh - 200px);
+  min-height: 70vh;
 }
 
 .fullscreen .icon {

@@ -369,7 +369,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "jellied-reels",
     name: "Jellied Reels",
-    url: "https://www.instagram.com/jelliedreels/",
+    url: "https://www.jellied-reels.com",
     aliases: [],
     matchers: [
       { [FilterId.ShowingTitleSearch]: "presented by Jellied Reels" },
