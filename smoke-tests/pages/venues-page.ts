@@ -1,9 +1,11 @@
 import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
-const VENUE_LINK_SELECTOR = 'a[href^="/venues/"]';
-const VENUE_NAME_SELECTOR =
-  'a[href^="/venues/"] [data-testid="link-grid-label"]';
+// The nav menu and site footer link to /venues/ from every page, so the prefix
+// match alone picks up chrome links — and the (hidden) menu one comes first in
+// the DOM. Excluding the section index itself leaves only real venue links.
+const VENUE_LINK_SELECTOR = 'a[href^="/venues/"]:not([href="/venues/"])';
+const VENUE_NAME_SELECTOR = `${VENUE_LINK_SELECTOR} [data-testid="link-grid-label"]`;
 const SEARCH_INPUT_SELECTOR = 'input[placeholder="Filter venues..."]';
 
 export class VenuesPage {

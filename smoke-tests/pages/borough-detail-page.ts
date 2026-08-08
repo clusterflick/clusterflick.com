@@ -1,7 +1,10 @@
 import { Page } from "@playwright/test";
 
-const BACK_LINK_SELECTOR = 'a[href="/london-cinemas/"]';
-const VENUE_CARD_SELECTOR = 'a[href^="/venues/"]';
+// The nav menu and site footer also link to /london-cinemas/, so the back link
+// is identified by its place in the header identity group rather than its href.
+const BACK_LINK_SELECTOR = '[data-header-logo] a[href="/london-cinemas/"]';
+// Excludes the chrome links to the /venues/ index (see venues-page.ts).
+const VENUE_CARD_SELECTOR = 'a[href^="/venues/"]:not([href="/venues/"])';
 
 export class BoroughDetailPage {
   constructor(private page: Page) {}

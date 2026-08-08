@@ -1,9 +1,12 @@
 import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
-const BOROUGH_LINK_SELECTOR = 'a[href^="/london-cinemas/"]';
-const BOROUGH_NAME_SELECTOR =
-  'a[href^="/london-cinemas/"] [data-testid="link-grid-label"]';
+// The nav menu and site footer link to /london-cinemas/ from every page, so the
+// prefix match alone picks up chrome links — and the (hidden) menu one comes
+// first in the DOM. Excluding the section index itself leaves only boroughs.
+const BOROUGH_LINK_SELECTOR =
+  'a[href^="/london-cinemas/"]:not([href="/london-cinemas/"])';
+const BOROUGH_NAME_SELECTOR = `${BOROUGH_LINK_SELECTOR} [data-testid="link-grid-label"]`;
 
 export class LondonCinemasPage {
   constructor(private page: Page) {}

@@ -1,7 +1,11 @@
 import { Page } from "@playwright/test";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
-const FESTIVAL_CARD_SELECTOR = 'a[href^="/festivals/"]';
+// The nav menu and site footer link to /festivals/ from every page, so the
+// prefix match alone picks up chrome links — and the (hidden) menu one comes
+// first in the DOM. Excluding the section index itself leaves only real cards.
+const FESTIVAL_CARD_SELECTOR =
+  'a[href^="/festivals/"]:not([href="/festivals/"])';
 const FESTIVAL_CARD_NAME_SELECTOR = '[data-testid="event-card-name"]';
 
 export class FestivalsPage {

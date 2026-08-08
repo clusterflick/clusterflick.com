@@ -1,6 +1,8 @@
 import { Page } from "@playwright/test";
 
-const BACK_LINK_SELECTOR = 'a[href="/festivals/"]';
+// The nav menu and site footer also link to /festivals/, so the back link is
+// identified by its place in the header identity group rather than its href.
+const BACK_LINK_SELECTOR = '[data-header-logo] a[href="/festivals/"]';
 const STATUS_CARD_SELECTOR = '[data-testid="status-card"]';
 
 export class FestivalDetailPage {
