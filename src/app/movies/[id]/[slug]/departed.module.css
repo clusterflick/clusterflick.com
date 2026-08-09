@@ -1,0 +1,127 @@
+/* Mirrors the layout of the live movie page (page.module.css) so a film that
+   has finished its run reads as the same page with the listings removed,
+   rather than as a different kind of page. Kept separate rather than shared:
+   the live page's rules are entangled with elements this page has none of. */
+
+.page {
+  min-height: 100vh;
+  background-color: var(--color-midnight-navy);
+  color: var(--color-light-gray);
+}
+
+.heroContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.posterSection {
+  flex-shrink: 0;
+  width: 308px;
+}
+
+.mainInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  margin-bottom: 16px;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+}
+
+.classification {
+  padding: 4px 12px;
+  background-color: rgba(var(--color-electric-blue-rgb), 0.2);
+  border: 1px solid var(--color-electric-blue);
+  border-radius: 4px;
+}
+
+.genres {
+  margin-bottom: 16px;
+  color: var(--color-light-gray);
+}
+
+/* The one thing a reader arriving from an old link needs to know, so it is
+   stated before the synopsis rather than after it. */
+.status {
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-left: 3px solid var(--color-electric-blue);
+  background-color: rgba(var(--color-electric-blue-rgb), 0.12);
+  font-weight: 600;
+}
+
+.overview {
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.action {
+  display: inline-block;
+}
+
+.detailsContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px 60px 20px;
+}
+
+.credits {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 24px;
+  line-height: 1.6;
+}
+
+.credits dt {
+  font-weight: 600;
+  color: var(--color-electric-blue);
+}
+
+.credits dd {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .heroContent {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 16px;
+  }
+
+  .mainInfo {
+    text-align: center;
+  }
+
+  .metadata {
+    justify-content: center;
+  }
+
+  .detailsContainer {
+    padding-top: 32px;
+  }
+
+  .credits {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .credits dd {
+    margin-bottom: 12px;
+  }
+}

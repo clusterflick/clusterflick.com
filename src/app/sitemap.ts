@@ -19,6 +19,7 @@ import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getCollectionsData } from "@/utils/get-collections-data";
 import { getCollectionUrl } from "@/utils/get-collection-url";
+import { getDepartedData } from "@/utils/get-departed-data";
 
 export const dynamic = "force-static";
 
@@ -31,6 +32,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "daily" as const,
     priority: 0.7,
   }));
+
+  // Films that have finished their run. Listed so a page that was indexed while
+  // the film was on stays indexed rather than looking removed, but ranked below
+  // and marked as static: nothing on them will change until the film returns,
+  // at which point it moves back into the set above.
+  const departedMoviePages = Object.values(getDepartedData().movies).map(
+    (movie) => ({
+      url: `https://clusterflick.com/movies/${movie.id}/${slugify(movie.title)}`,
+      lastModified: data.generatedAt,
+      changeFrequency: "yearly" as const,
+      priority: 0.2,
+    }),
+  );
 
   const venuePages = Object.values(data.venues).map((venue: Venue) => ({
     url: `https://clusterflick.com/venues/${slugify(venue.name)}`,
@@ -219,6 +233,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     collectionListPage,
     ...collectionPages,
     ...moviePages,
+    ...departedMoviePages,
     ...venuePages,
     ...boroughPages,
     ...festivalPages,

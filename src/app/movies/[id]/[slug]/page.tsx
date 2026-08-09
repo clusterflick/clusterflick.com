@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
+import { getDepartedData } from "@/utils/get-departed-data";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
@@ -12,6 +13,7 @@ import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import PageContent from "./page-content";
+import DepartedContent from "./departed-content";
 import type { VenuePlayCount } from "./components/playing-at-section";
 import StaticShowingsList from "./components/static-showings-list";
 
@@ -20,11 +22,19 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const data = await getStaticData();
+  const departed = getDepartedData();
 
-  return Object.values(data.movies).map((movie) => ({
-    id: movie.id,
-    slug: slugify(movie.title),
-  }));
+  // Films that have finished their run keep their page. Both sets are keyed by
+  // TMDB id and a film is in exactly one of them, so the union cannot collide.
+  // The URL is rebuilt from the same title the live page used — the departed
+  // bundle maps TMDB through the same builder as the combined data — so an old
+  // link resolves rather than landing next to itself under a new slug.
+  return [...Object.values(data.movies), ...Object.values(departed.movies)].map(
+    (movie) => ({
+      id: movie.id,
+      slug: slugify(movie.title),
+    }),
+  );
 }
 
 export async function generateMetadata({
@@ -34,7 +44,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const data = await getStaticData();
-  const movie = data.movies[id];
+  const departed = getDepartedData();
+  const departedMovie = departed.movies[id];
+  const movie = data.movies[id] ?? departedMovie;
 
   if (!movie) {
     return {
@@ -45,10 +57,13 @@ export async function generateMetadata({
   const title = movie.year ? `${movie.title} (${movie.year})` : movie.title;
   const description =
     movie.overview ||
-    `Find screenings for ${movie.title} at cinemas across London.`;
+    (departedMovie
+      ? `${movie.title} is not currently screening at cinemas in London.`
+      : `Find screenings for ${movie.title} at cinemas across London.`);
 
+  const genreLookup = departedMovie ? departed.genres : data.genres;
   const genreNames = (movie.genres ?? [])
-    .map((id) => data.genres[id]?.name)
+    .map((id) => genreLookup[id]?.name)
     .filter(Boolean) as string[];
 
   return {
@@ -83,7 +98,23 @@ export default async function MovieDetailPage({
   const data = await getStaticData();
   const movie = data.movies[id];
 
+  // A film whose last performance has been and gone drops out of the combined
+  // data entirely, which used to take its page with it. It gets a page of its
+  // own instead — there are no showings to render, so none of what follows
+  // applies.
   if (!movie) {
+    const departed = getDepartedData();
+    const departedMovie = departed.movies[id];
+    if (departedMovie) {
+      return (
+        <DepartedContent
+          movie={departedMovie}
+          genres={departed.genres}
+          people={departed.people}
+        />
+      );
+    }
+
     notFound();
   }
 
