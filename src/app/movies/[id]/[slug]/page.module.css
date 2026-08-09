@@ -93,6 +93,15 @@
   }
 }
 
+/* On the live page the trailer button sits in a ratings card and is sized by
+   it. A departed film has no ratings, so it stands on its own there and needs
+   something to size against, or it spans the whole details column and outshouts
+   the page's actual call to action. */
+.trailerRow {
+  display: flex;
+  margin-bottom: 32px;
+}
+
 .detailsContainer {
   max-width: 1400px;
   margin: 0 auto;

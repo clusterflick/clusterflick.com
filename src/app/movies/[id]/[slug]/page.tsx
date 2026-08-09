@@ -12,6 +12,10 @@ import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
+import {
+  buildMovieJsonLd,
+  buildMovieBreadcrumbJsonLd,
+} from "@/utils/build-movie-json-ld";
 import PageContent from "./page-content";
 import DepartedContent from "./departed-content";
 import type { VenuePlayCount } from "./components/playing-at-section";
@@ -19,6 +23,12 @@ import StaticShowingsList from "./components/static-showings-list";
 
 // Only allow routes from generateStaticParams, 404 for everything else
 export const dynamicParams = false;
+
+/** Resolve a movie's people or genre ids against a lookup, dropping misses. */
+const namesFor = (
+  ids: string[] | undefined,
+  lookup: Record<string, { name: string }>,
+) => (ids ?? []).map((id) => lookup[id]?.name).filter(Boolean) as string[];
 
 export async function generateStaticParams() {
   const data = await getStaticData();
@@ -106,12 +116,42 @@ export default async function MovieDetailPage({
     const departed = getDepartedData();
     const departedMovie = departed.movies[id];
     if (departedMovie) {
+      // The same structured data the live page publishes, minus what a film
+      // with no screenings cannot have: no ScreeningEvents, and no sameAs or
+      // ratings, since the match stage only ever sees the combined data. A
+      // page that exists to keep an indexed link working has to stay readable
+      // to whatever indexed it.
+      const departedUrl = `https://clusterflick.com${getMovieUrl(departedMovie)}`;
       return (
-        <DepartedContent
-          movie={departedMovie}
-          genres={departed.genres}
-          people={departed.people}
-        />
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify([
+                buildMovieJsonLd({
+                  movie: departedMovie,
+                  url: departedUrl,
+                  dateModified: data.generatedAt,
+                  genreNames: namesFor(departedMovie.genres, departed.genres),
+                  directorNames: namesFor(
+                    departedMovie.directors,
+                    departed.people,
+                  ),
+                  actorNames: namesFor(
+                    departedMovie.actors,
+                    departed.people,
+                  ).slice(0, 5),
+                }),
+                buildMovieBreadcrumbJsonLd(departedMovie, departedUrl),
+              ]),
+            }}
+          />
+          <DepartedContent
+            movie={departedMovie}
+            genres={departed.genres}
+            people={departed.people}
+          />
+        </>
       );
     }
 
@@ -205,21 +245,6 @@ export default async function MovieDetailPage({
 
   const movieUrl = `https://clusterflick.com${getMovieUrl(movie)}`;
 
-  const genreNames = (movie.genres ?? [])
-    .map((id) => genres[id]?.name)
-    .filter(Boolean);
-
-  const directors = (movie.directors ?? [])
-    .map((id) => people[id]?.name)
-    .filter(Boolean)
-    .map((name) => ({ "@type": "Person", name }));
-
-  const actors = (movie.actors ?? [])
-    .slice(0, 5)
-    .map((id) => people[id]?.name)
-    .filter(Boolean)
-    .map((name) => ({ "@type": "Person", name }));
-
   const sameAs = [
     movie.imdb?.url,
     movie.letterboxd?.url,
@@ -230,60 +255,21 @@ export default async function MovieDetailPage({
     .filter((url): url is string => Boolean(url))
     .map((url) => hydrateUrl(url, data.urlPrefixes));
 
-  const movieJsonLd: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": "Movie",
-    name: movie.title,
+  const movieJsonLd = buildMovieJsonLd({
+    movie,
     url: movieUrl,
     dateModified: data.generatedAt,
-    ...(movie.overview && { description: movie.overview }),
-    ...(movie.posterPath && {
-      image: `https://image.tmdb.org/t/p/w500${movie.posterPath}`,
-    }),
-    ...((movie.releaseDate || movie.year) && {
-      datePublished: movie.releaseDate ?? movie.year,
-    }),
-    ...(movie.duration && {
-      duration: (() => {
-        const totalMinutes = Math.floor(movie.duration / 1000 / 60);
-        const h = Math.floor(totalMinutes / 60);
-        const m = totalMinutes % 60;
-        return h > 0 && m > 0 ? `PT${h}H${m}M` : h > 0 ? `PT${h}H` : `PT${m}M`;
-      })(),
-    }),
-    ...(movie.classification &&
-      movie.classification !== "Unknown" && {
-        contentRating: movie.classification,
-      }),
-    ...(genreNames.length > 0 && { genre: genreNames }),
-    ...(directors.length > 0 && { director: directors }),
-    ...(actors.length > 0 && { actor: actors }),
-    ...(sameAs.length > 0 && { sameAs }),
-    ...(movie.imdb?.rating != null &&
-      movie.imdb.reviews > 0 && {
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: movie.imdb.rating,
-          bestRating: 10,
-          worstRating: 1,
-          ratingCount: movie.imdb.reviews,
-        },
-      }),
-  };
+    genreNames: namesFor(movie.genres, genres),
+    directorNames: namesFor(movie.directors, people),
+    actorNames: namesFor(movie.actors, people).slice(0, 5),
+    sameAs,
+    aggregateRating:
+      movie.imdb?.rating != null
+        ? { rating: movie.imdb.rating, reviews: movie.imdb.reviews }
+        : undefined,
+  });
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://clusterflick.com",
-      },
-      { "@type": "ListItem", position: 2, name: movie.title, item: movieUrl },
-    ],
-  };
+  const breadcrumbJsonLd = buildMovieBreadcrumbJsonLd(movie, movieUrl);
 
   const screeningEvents = movie.performances
     .filter((p) => p.time >= buildTime)

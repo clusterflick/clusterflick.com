@@ -6,8 +6,12 @@ import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import MoviePoster from "@/components/movie-poster";
 import ContentSection from "@/components/content-section";
-import { ButtonLink } from "@/components/button";
-import styles from "./departed.module.css";
+import EmptyState from "@/components/empty-state";
+import { ButtonLink, ButtonAnchor } from "@/components/button";
+import { PlayIcon } from "@/components/icons";
+import GenresList from "./components/genres-list";
+import CastCrewSection from "./components/cast-crew-section";
+import styles from "./page.module.css";
 
 type DepartedContentProps = {
   movie: DepartedMovie;
@@ -15,35 +19,34 @@ type DepartedContentProps = {
   people: Record<string, Person>;
 };
 
-const namesFor = (ids: string[] | undefined, people: Record<string, Person>) =>
-  (ids ?? []).map((id) => people[id]?.name).filter(Boolean) as string[];
-
 /**
  * The page for a film that has finished its run.
  *
- * It is a static page in the plainest sense: no filters, no client data, no
- * showings — the film is not screening anywhere, and the honest version of this
- * page says so rather than rendering a listings page with nothing in it. It
- * exists so that a link to a film, shared or indexed while it was on, still
- * lands somewhere that answers the question.
+ * Built from the live movie page's own sections and stylesheet, so it is that
+ * page with the showings removed rather than a different kind of page. The one
+ * thing it says for itself goes where the showings would be, which is where a
+ * reader arriving from an old link is already looking.
+ *
+ * The live page's "Appears on" list pills are left off deliberately, not
+ * missing: telling someone that a film they cannot watch is in the top 300
+ * helps nobody, and the lists cut the same way round — their pages only draw
+ * from what is showing.
  */
 export default function DepartedContent({
   movie,
   genres,
   people,
 }: DepartedContentProps) {
-  const directors = namesFor(movie.directors, people);
-  const cast = namesFor(movie.actors, people);
-  const genreNames = (movie.genres ?? [])
-    .map((id) => genres[id]?.name)
-    .filter(Boolean) as string[];
-
   return (
     <main id="main-content" className={styles.page}>
       <PageHeader backUrl="/films" backText="Back to film list" />
 
       <HeroSection
-        backgroundImage="/images/light-circles.jpg"
+        backgroundImage={
+          movie.posterPath
+            ? `https://image.tmdb.org/t/p/w500${movie.posterPath}`
+            : "/images/light-circles.jpg"
+        }
         backgroundImageAlt={`${movie.title} backdrop`}
         contentClassName={styles.heroContent}
       >
@@ -70,47 +73,74 @@ export default function DepartedContent({
             {!!movie.duration && <span>{formatDuration(movie.duration)}</span>}
           </div>
 
-          {genreNames.length > 0 && (
-            <p className={styles.genres}>{genreNames.join(", ")}</p>
-          )}
-
-          <p className={styles.status}>
-            Not currently screening in London
-            {movie.lastPerformance
-              ? ` — last screened ${formatDateLong(movie.lastPerformance)}`
-              : ""}
-          </p>
+          {/* No showings to draw categories from, and none to draw: a departed
+              film is always a TMDB match, so every genre here is a real one. */}
+          <GenresList
+            genreIds={movie.genres || []}
+            genres={genres}
+            showings={{}}
+          />
 
           {movie.overview && (
             <p className={styles.overview}>{movie.overview}</p>
           )}
 
-          <ButtonLink href="/films" className={styles.action}>
-            Browse what&rsquo;s on
-          </ButtonLink>
+          {/* The live page hangs this off RatingsGrid's extraItem slot, which
+              renders nothing without ratings — and a departed film has none,
+              since the match stage only ever sees the combined data. With no
+              screenings left to link to, the trailer is the most useful thing
+              the page still has, so it is rendered on its own. */}
+          {movie.youtubeTrailer && (
+            <div className={styles.trailerRow}>
+              <ButtonAnchor
+                href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.trailerButton}
+              >
+                <PlayIcon />
+                Watch Trailer
+              </ButtonAnchor>
+            </div>
+          )}
+
+          <CastCrewSection
+            directors={movie.directors}
+            actors={movie.actors}
+            people={people}
+          />
         </div>
       </HeroSection>
 
-      {(directors.length > 0 || cast.length > 0) && (
-        <div className={styles.detailsContainer}>
-          <ContentSection title="Cast &amp; crew">
-            <dl className={styles.credits}>
-              {directors.length > 0 && (
-                <>
-                  <dt>{directors.length > 1 ? "Directors" : "Director"}</dt>
-                  <dd>{directors.join(", ")}</dd>
-                </>
-              )}
-              {cast.length > 0 && (
-                <>
-                  <dt>Starring</dt>
-                  <dd>{cast.join(", ")}</dd>
-                </>
-              )}
-            </dl>
-          </ContentSection>
-        </div>
-      )}
+      <div className={styles.detailsContainer}>
+        <ContentSection
+          title="Showings"
+          icon={{
+            src: "/images/icons/neon-ticket.svg",
+            width: 58,
+            height: 33,
+          }}
+        >
+          <EmptyState
+            icon={{
+              src: "/images/icons/neon-ticket-ripped.svg",
+              width: 120,
+              height: 80,
+            }}
+            message="Not currently screening in London"
+            hint={
+              movie.lastPerformance
+                ? `Last screened ${formatDateLong(movie.lastPerformance)}`
+                : undefined
+            }
+            actions={
+              <ButtonLink href="/films">
+                See what else is showing in London
+              </ButtonLink>
+            }
+          />
+        </ContentSection>
+      </div>
     </main>
   );
 }
