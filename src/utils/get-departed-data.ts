@@ -12,6 +12,12 @@ export type DepartedMovie = Omit<Movie, "showings" | "performances"> & {
   lastSeen: string;
   /** Start time of the last performance we ever saw, when we saw one. */
   lastPerformance?: number;
+  /**
+   * A listing still showing under this film's title that carries no TheMovieDB
+   * match. Almost always this film, having lost its match rather than its
+   * screenings — so the page offers it rather than insisting nothing is on.
+   */
+  stillListedAs?: { id: string; title: string };
 };
 
 export type DepartedData = {

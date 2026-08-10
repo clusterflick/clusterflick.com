@@ -20,6 +20,7 @@ type DepartedPageData = {
   movie: DepartedMovie;
   genres: Record<string, Genre>;
   people: Record<string, Person>;
+  buildTime: number;
 };
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -34,6 +35,7 @@ function asDeparted(
   movie: Movie,
   metaData: MetaData,
   lastPerformance?: number,
+  stillListedAs?: { id: string; title: string },
 ): DepartedPageData {
   const genres: Record<string, Genre> = {};
   for (const genreId of movie.genres ?? []) {
@@ -61,9 +63,15 @@ function asDeparted(
   } = movie;
 
   return {
-    movie: { ...rest, lastSeen: "20260801.055209", lastPerformance },
+    movie: {
+      ...rest,
+      lastSeen: "20260801.055209",
+      lastPerformance,
+      stillListedAs,
+    },
     genres,
     people,
+    buildTime: Date.now(),
   };
 }
 
@@ -103,6 +111,22 @@ async function loadUndatedDepartedData(): Promise<DepartedPageData | null> {
   return asDeparted(movie, metaData);
 }
 
+/**
+ * The film lost its TheMovieDB match rather than its screenings, and an
+ * unmatched listing under the same title is still on. `lastPerformance` sits in
+ * the future here, as it does whenever this happens — the screening it names
+ * has not been and gone.
+ */
+async function loadStillListedData(): Promise<DepartedPageData | null> {
+  const metaData = await fetchMetaData();
+  const movie = await findFilm();
+  if (!movie) return null;
+  return asDeparted(movie, metaData, Date.now() + 60 * DAY, {
+    id: "7fc1f2ab",
+    title: `${movie.title} (U)`,
+  });
+}
+
 function DepartedMoviePage() {
   return (
     <StoryDataLoader<DepartedPageData>
@@ -114,6 +138,7 @@ function DepartedMoviePage() {
           movie={data.movie}
           genres={data.genres}
           people={data.people}
+          buildTime={data.buildTime}
         />
       )}
     </StoryDataLoader>
@@ -154,6 +179,26 @@ export const WithoutLastPerformance: Story = {
           movie={data.movie}
           genres={data.genres}
           people={data.people}
+          buildTime={data.buildTime}
+        />
+      )}
+    </StoryDataLoader>
+  ),
+};
+
+/** Lost its match, not its screenings — offers the listing that is still on. */
+export const StillListedUnmatched: Story = {
+  render: () => (
+    <StoryDataLoader<DepartedPageData>
+      loader={loadStillListedData}
+      loadingMessage="Loading movie data..."
+    >
+      {(data) => (
+        <DepartedContent
+          movie={data.movie}
+          genres={data.genres}
+          people={data.people}
+          buildTime={data.buildTime}
         />
       )}
     </StoryDataLoader>

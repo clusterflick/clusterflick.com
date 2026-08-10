@@ -150,6 +150,7 @@ export default async function MovieDetailPage({
             movie={departedMovie}
             genres={departed.genres}
             people={departed.people}
+            buildTime={new Date(data.generatedAt).getTime()}
           />
         </>
       );

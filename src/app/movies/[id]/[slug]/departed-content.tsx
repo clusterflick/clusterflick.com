@@ -1,6 +1,7 @@
 import type { Genre, Person } from "@/types";
 import type { DepartedMovie } from "@/utils/get-departed-data";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
+import { getMovieUrl } from "@/utils/get-movie-url";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
@@ -17,6 +18,8 @@ type DepartedContentProps = {
   movie: DepartedMovie;
   genres: Record<string, Genre>;
   people: Record<string, Person>;
+  /** When the data was generated, which is as close to "now" as a static page gets. */
+  buildTime: number;
 };
 
 /**
@@ -36,7 +39,17 @@ export default function DepartedContent({
   movie,
   genres,
   people,
+  buildTime,
 }: DepartedContentProps) {
+  // `lastPerformance` is the latest performance we ever had *listed*, not the
+  // last one that happened, so it can sit in the future — a film whose match
+  // was lost, or whose remaining screenings were cancelled, keeps the date of a
+  // screening that never came. "Last screened" is nonsense for those, so it
+  // goes unsaid rather than said wrongly.
+  const lastScreened =
+    movie.lastPerformance && movie.lastPerformance <= buildTime
+      ? movie.lastPerformance
+      : undefined;
   return (
     <main id="main-content" className={styles.page}>
       <PageHeader backUrl="/films" backText="Back to film list" />
@@ -121,24 +134,50 @@ export default function DepartedContent({
             height: 33,
           }}
         >
-          <EmptyState
-            icon={{
-              src: "/images/icons/neon-ticket-ripped.svg",
-              width: 120,
-              height: 80,
-            }}
-            message="Not currently screening in London"
-            hint={
-              movie.lastPerformance
-                ? `Last screened ${formatDateLong(movie.lastPerformance)}`
-                : undefined
-            }
-            actions={
-              <ButtonLink href="/films">
-                See what else is showing in London
-              </ButtonLink>
-            }
-          />
+          {/* A listing under this film's title is still on, but we could not
+              confirm it is the same film — so the page offers it rather than
+              flatly stating nothing is showing, which would be wrong whenever
+              a match was lost rather than a run ending. */}
+          {movie.stillListedAs ? (
+            <EmptyState
+              icon={{
+                src: "/images/icons/neon-ticket-ripped.svg",
+                width: 120,
+                height: 80,
+              }}
+              message="This film may still be showing"
+              hint={`A listing for “${movie.stillListedAs.title}” is on, but we couldn’t confirm it’s the same film.`}
+              actions={
+                <>
+                  <ButtonLink href={getMovieUrl(movie.stillListedAs)}>
+                    Were you looking for “{movie.stillListedAs.title}”?
+                  </ButtonLink>
+                  <ButtonLink href="/films" variant="secondary">
+                    See what else is showing
+                  </ButtonLink>
+                </>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={{
+                src: "/images/icons/neon-ticket-ripped.svg",
+                width: 120,
+                height: 80,
+              }}
+              message="Not currently screening in London"
+              hint={
+                lastScreened
+                  ? `Last screened ${formatDateLong(lastScreened)}`
+                  : undefined
+              }
+              actions={
+                <ButtonLink href="/films">
+                  See what else is showing in London
+                </ButtonLink>
+              }
+            />
+          )}
         </ContentSection>
       </div>
     </main>
