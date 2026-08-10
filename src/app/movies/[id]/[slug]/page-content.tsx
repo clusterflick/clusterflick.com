@@ -110,6 +110,16 @@ export default function PageContent({
   // Defer showings computation to allow hero content to render first
   const [isShowingsReady, setIsShowingsReady] = useState(false);
 
+  // ...but only when there's nothing to filter yet. On a client-side navigation
+  // the movie's performances are already in context and filterState is already
+  // in memory, so the filtered list can be computed on the very first render;
+  // deferring there would paint a frame of the unfiltered static list before
+  // swapping to the filtered one, which reads as a flicker. `movies` starts
+  // empty on a cold load, so the hydration pass still matches the server's
+  // static output.
+  const hasPerformanceData = Boolean(movies[movie.id]?.performances);
+  const showingsReady = isShowingsReady || hasPerformanceData;
+
   // Fetch data once on mount, prioritising this movie's data file.
   // Empty deps are intentional: all movie data is loaded into global context once,
   // and getDataWithPriority returns early if data already exists. Subsequent
@@ -132,7 +142,7 @@ export default function PageContent({
   // Apply filters to the movie's performances and showings
   // Only compute when showings are ready (deferred to allow hero to render first)
   const filteredMovie = useMemo(() => {
-    if (!isShowingsReady) return null;
+    if (!showingsReady) return null;
 
     const movieData = movies[movie.id];
     if (!movieData) return null;
@@ -142,7 +152,7 @@ export default function PageContent({
     const filtered = filterManager.apply(movieRecord, filterState);
 
     return filtered[movie.id] || null;
-  }, [isShowingsReady, movies, movie.id, filterState]);
+  }, [showingsReady, movies, movie.id, filterState]);
 
   // Use filtered or unfiltered data based on showAll toggle
   const performances = showAll
@@ -333,9 +343,9 @@ export default function PageContent({
       <div className={styles.detailsContainer}>
         <ShowingsSection
           isLoading={
-            !isShowingsReady ||
-            !hasAttemptedLoad ||
-            (isDataLoading && !movies[movie.id]?.performances)
+            !showingsReady ||
+            (!hasAttemptedLoad && !hasPerformanceData) ||
+            (isDataLoading && !hasPerformanceData)
           }
           performancesByDate={performancesByDate}
           showings={filteredShowings}
