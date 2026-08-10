@@ -84,8 +84,8 @@ export const CHANGELOG: ChangelogDay[] = [
             page is still there now, with the poster and details. Where the
             showings used to be it tells you it&apos;s not currently screening
             in London, when it last played, and points you at{" "}
-            <Link href="/films">what's on</Link>. If it comes back, the page
-            fills back in with performances.
+            <Link href="/films">what&apos;s on</Link>. If it comes back, the
+            page fills back in with performances.
           </>
         ),
       },
