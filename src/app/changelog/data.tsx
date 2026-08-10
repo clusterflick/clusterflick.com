@@ -71,6 +71,27 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-09",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            A film that has finished its run keeps its page. Until now, once the
+            last screening had been and gone the film dropped out of the
+            listings entirely and took its page with it, so an old link — or a
+            search result, or a bookmark — landed on nothing with a 404. The
+            page is still there now, with the poster and details. Where the
+            showings used to be it tells you it&apos;s not currently screening
+            in London, when it last played, and points you at{" "}
+            <Link href="/films">what's on</Link>. If it comes back, the page
+            fills back in with performances.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-08",
     changes: [
       {
