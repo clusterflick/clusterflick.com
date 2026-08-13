@@ -74,18 +74,6 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-13",
     changes: [
       {
-        tag: "New source",
-        body: () => (
-          <>
-            Started pulling in screenings from{" "}
-            <Ext href="https://freefilmfestivals.org">Free Film Festivals</Ext>,
-            the volunteer-run network behind neighbourhood festivals across
-            London — every screening free to attend, in whatever hall, park or
-            pub will have them.
-          </>
-        ),
-      },
-      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
@@ -111,6 +99,32 @@ export const CHANGELOG: ChangelogDay[] = [
             />
             . Each has its own page gathering that neighbourhood&apos;s
             screenings, wherever in the area they happen to be.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            <Link href="/updates">New Listings</Link> is a page per day now,
+            rather than one long scroll of everything from the past fortnight.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-08-12",
+    changes: [
+      {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://freefilmfestivals.org">Free Film Festivals</Ext>,
+            the volunteer-run network behind neighbourhood festivals across
+            London — every screening free to attend, in whatever hall, park or
+            pub will have them.
           </>
         ),
       },
