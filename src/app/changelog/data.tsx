@@ -86,6 +86,35 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the four Free Film Festivals with programmes coming up —{" "}
+            <Festival
+              name="Peckham & Nunhead Free Film Festival"
+              url="https://freefilmfestivals.org/filmfestival/peckham-nunhead/"
+            />
+            ,{" "}
+            <Festival
+              name="Streatham Free Film Festival"
+              url="https://freefilmfestivals.org/filmfestival/streatham/"
+            />
+            ,{" "}
+            <Festival
+              name="Raynes Park Free Film Festival"
+              url="https://freefilmfestivals.org/filmfestival/raynes-park/"
+            />{" "}
+            and{" "}
+            <Festival
+              name="West Norwood Free Film Festival"
+              url="https://freefilmfestivals.org/filmfestival/west-norwood/"
+            />
+            . Each has its own page gathering that neighbourhood&apos;s
+            screenings, wherever in the area they happen to be.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>

@@ -14,7 +14,7 @@ import {
   linkifySummary,
   type SummaryLinkTarget,
 } from "@/utils/linkify-summary";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
@@ -45,7 +45,14 @@ export default async function Home() {
     .map((link) => {
       if (link.movieId) {
         const movie = data.movies[link.movieId];
-        return movie ? { phrase: link.phrase, href: getMovieUrl(movie) } : null;
+        // The summary names a film for a reason the reader's own filters may
+        // hide, so open the page on the full schedule (as the discovery rows do).
+        return movie
+          ? {
+              phrase: link.phrase,
+              href: `${getMovieUrl(movie)}${SHOW_ALL_HASH}`,
+            }
+          : null;
       }
       if (link.venueId) {
         const venue = data.venues[link.venueId];

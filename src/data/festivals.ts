@@ -289,6 +289,55 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  // The Free Film Festivals network tags every performance it publishes with
+  // "Part of the <neighbourhood> Free Film Festival", which is the only thing
+  // distinguishing one festival from another — the screenings share a source,
+  // and each one is at a different hall, pub or park rather than a fixed venue.
+  {
+    id: "peckham-nunhead-free-film-festival",
+    name: "Peckham & Nunhead Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/peckham-nunhead/",
+    aliases: ["pnfff", "peckham-nunhead"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]:
+          "Peckham & Nunhead Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "streatham-free-film-festival",
+    name: "Streatham Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/streatham/",
+    aliases: ["streatham"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Streatham Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "raynes-park-free-film-festival",
+    name: "Raynes Park Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/raynes-park/",
+    aliases: ["raynes-park"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Raynes Park Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "west-norwood-free-film-festival",
+    name: "West Norwood Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/west-norwood/",
+    aliases: ["wnfff", "west-norwood"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "West Norwood Free Film Festival",
+      },
+    ],
+  },
   {
     id: "animation-in-love",
     name: "Animation in Love",
