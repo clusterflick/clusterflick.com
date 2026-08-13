@@ -74,6 +74,18 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-13",
     changes: [
       {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://freefilmfestivals.org">Free Film Festivals</Ext>,
+            the volunteer-run network behind neighbourhood festivals across
+            London — every screening free to attend, in whatever hall, park or
+            pub will have them.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
@@ -110,6 +122,19 @@ export const CHANGELOG: ChangelogDay[] = [
             />
             , a set of South London halls, cafés, libraries and green spaces
             that open up for free film screenings.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: ({ Venue }) => (
+          <>
+            <Venue
+              name="RAF Museum"
+              url="https://www.rafmuseum.org.uk/london/"
+            />{" "}
+            now has its listings read straight from its Propellers &amp; Popcorn
+            page, so its open-air screenings on the airfield are now included.
           </>
         ),
       },
