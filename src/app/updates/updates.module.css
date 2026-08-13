@@ -215,8 +215,75 @@
   background: rgba(var(--color-neon-pink-rgb), 0.8);
 }
 
+/* ─── Capped sections ─── */
+
+/* Centred under the grid or list it extends, with enough room above to detach
+   it from the last row — hard against the posters it read as a caption on the
+   final tile rather than an action for the section. */
+.showMore {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+/* ─── Archive of earlier days ─── */
+
+.archive {
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
+}
+
+.archiveHeading {
+  font-size: 26px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.archiveNote {
+  margin: 0 0 24px;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* ─── Day-to-day navigation ─── */
+
+/* Two slots that keep their sides whether or not both are filled, so the newer
+   link never slides into the older one's place at the ends of the window. */
+.dayNav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(var(--color-electric-blue-rgb), 0.3);
+}
+
+.dayNavSlot {
+  flex: 1;
+  min-width: 0;
+}
+
+.dayNavSlot:last-child {
+  text-align: right;
+}
+
+.dayNavLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+
 @media (min-width: 700px) {
   .releaseHeading {
+    font-size: 32px;
+  }
+
+  .archiveHeading {
     font-size: 32px;
   }
 }

@@ -20,6 +20,12 @@ import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getCollectionsData } from "@/utils/get-collections-data";
 import { getCollectionUrl } from "@/utils/get-collection-url";
 import { getDepartedData } from "@/utils/get-departed-data";
+import {
+  buildUpdates,
+  getUpdateDayPath,
+  groupUpdatesByDay,
+  readDiffBlobs,
+} from "@/utils/get-updates";
 
 export const dynamic = "force-static";
 
@@ -219,8 +225,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Only the days still inside the fetch window are listed — the whole set of
+  // dated pages, since that is all that exists. A day that ages out drops off
+  // here and 404s, which is the honest signal for a page that is genuinely
+  // gone. Ranked below the landing page, which is the durable entry point.
+  const updateDayPages = groupUpdatesByDay(
+    buildUpdates(readDiffBlobs(), data),
+  ).map((day) => ({
+    url: `https://clusterflick.com${getUpdateDayPath(day.date)}`,
+    lastModified: day.releases[0].asOf,
+    changeFrequency: "daily" as const,
+    priority: 0.5,
+  }));
+
   return [
     ...staticPages,
+    ...updateDayPages,
     festivalListPage,
     filmClubListPage,
     cinemaGroupListPage,

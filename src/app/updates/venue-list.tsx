@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { UpdateVenue } from "@/utils/get-updates";
-import styles from "./page.module.css";
+import styles from "./updates.module.css";
 
 /** A chain rolling out one film can name thirty venues; ten reads as a list. */
 const COLLAPSED_COUNT = 10;

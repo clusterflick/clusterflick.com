@@ -9,6 +9,7 @@ import type {
 } from "@/types";
 import { getMovieUrl, SHOW_ALL_HASH } from "./get-movie-url";
 import { getVenueUrl } from "./get-venue-url";
+import { timestampToLondonDateString } from "./format-date";
 
 /** A venue a film newly appeared at, or gained dates at, in a given run. */
 export type UpdateVenue = {
@@ -51,9 +52,26 @@ export type UpdateVenueAddition = {
 };
 
 /**
- * One pipeline run's worth of changes — one published diff, one section on the
- * page, and one item in the feed. Runs are kept separate rather than merged by
- * day so that the page and the RSS feed describe exactly the same units.
+ * A day's worth of runs — one page, one URL segment.
+ *
+ * The day is the unit worth a page because the run is not: the pipeline
+ * publishes two or three times daily and a good number of those carry a single
+ * film, which is a thin thing to give a URL of its own and a thinner one to
+ * land on from the feed. Grouping also halves the number of URLs minted, each
+ * of which lives only as long as its diff stays inside the fetch window.
+ */
+export type UpdateDay = {
+  /** London `YYYY-MM-DD`; also the page's URL segment. */
+  date: string;
+  /** That day's runs, newest first, in the order the page renders them. */
+  releases: UpdateRelease[];
+};
+
+/**
+ * One pipeline run's worth of changes — one published diff, one section on a
+ * page, and one item in the feed. Runs are never merged into each other: the
+ * run is the unit the pipeline publishes, so it stays the unit the page and the
+ * feed describe. Days only decide which runs share a page — see `UpdateDay`.
  */
 export type UpdateRelease = {
   /** The `data-transformed` release this diff describes, e.g. `20260726.055841`. */
@@ -391,6 +409,90 @@ export function buildUpdates(
 
   // Newest run first for display
   return result.reverse();
+}
+
+/**
+ * The London date a run belongs to.
+ *
+ * London rather than UTC because that is the date the run is headed with on the
+ * page: the pipeline publishes London wall-clock tags, so a run just after
+ * midnight during BST carries a UTC timestamp on the previous day. Grouping on
+ * anything else would file it under a date it is never labelled with.
+ */
+export function getUpdateDate(release: UpdateRelease): string {
+  return timestampToLondonDateString(new Date(release.asOf).getTime());
+}
+
+/** The page a day's runs live on. Trailing slash to match `trailingSlash`. */
+export function getUpdateDayPath(date: string): string {
+  return `/updates/${date}/`;
+}
+
+/**
+ * Where a single run can be linked to: its day's page, anchored at its section.
+ *
+ * Runs keep individual addresses without individual pages, which is what lets
+ * the feed go on describing one run per item.
+ */
+export function getUpdateReleasePath(release: UpdateRelease): string {
+  return `${getUpdateDayPath(getUpdateDate(release))}#${release.tag}`;
+}
+
+/**
+ * Group a reverse-chronological run list into days, newest first, preserving
+ * that order within each day.
+ */
+export function groupUpdatesByDay(releases: UpdateRelease[]): UpdateDay[] {
+  const byDate = new Map<string, UpdateRelease[]>();
+
+  for (const release of releases) {
+    const date = getUpdateDate(release);
+    const existing = byDate.get(date);
+    if (existing) existing.push(release);
+    else byDate.set(date, [release]);
+  }
+
+  // Insertion order is already newest-first, the input being sorted that way
+  return [...byDate].map(([date, dayReleases]) => ({
+    date,
+    releases: dayReleases,
+  }));
+}
+
+/**
+ * One line describing a whole day, for the archive list on the index.
+ *
+ * Built by summing the runs rather than by re-summarising their contents: a
+ * film added in the morning and given more dates in the afternoon is two
+ * separate changes, and the day's line counts both, exactly as the day's page
+ * shows both.
+ */
+export function summariseDay(day: UpdateDay): string {
+  const newFilms = day.releases.reduce(
+    (total, release) => total + release.newFilms.length,
+    0,
+  );
+  const showings = day.releases.reduce(
+    (total, release) =>
+      total +
+      release.moreShowings.reduce(
+        (runTotal, film) => runTotal + film.performanceCount,
+        0,
+      ),
+    0,
+  );
+  const newVenues = day.releases.reduce(
+    (total, release) => total + release.newVenues.length,
+    0,
+  );
+
+  const parts: string[] = [];
+  if (newFilms > 0) parts.push(`${pluralise(newFilms, "film")} added`);
+  if (showings > 0) parts.push(`${pluralise(showings, "showing")} added`);
+  if (newVenues > 0) parts.push(`${pluralise(newVenues, "venue")} added`);
+
+  const sentence = parts.join(", ");
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
 
 /** Read the downloaded diff window from disk. Missing data yields no updates. */

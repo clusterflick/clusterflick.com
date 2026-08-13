@@ -66,6 +66,25 @@ function CollectionNotFound() {
   );
 }
 
+/**
+ * Dated update pages are deliberately short-lived: they cover a window of
+ * recent pipeline runs, and an update stops being worth reading once the
+ * screenings it announced have been and gone. Feed items outlive that window —
+ * readers keep them indefinitely — so this is mostly reached from an old item,
+ * and says the page expired rather than implying a mistyped URL.
+ */
+function UpdateNotFound() {
+  return (
+    <StatusPage
+      iconSrc="/images/icons/neon-clapper.svg"
+      title="Update No Longer Available"
+      message="We couldn't find that update. Updates cover the last couple of weeks of listings changes, so this one has probably rolled out of the window."
+      backLink={{ url: "/updates/", text: "Back to updates" }}
+      actions={<ButtonLink href="/updates/">See the latest updates</ButtonLink>}
+    />
+  );
+}
+
 function VenueNotFound() {
   return (
     <StatusPage
@@ -172,6 +191,7 @@ function getNotFoundType(pathname: string): string {
   if (/^\/festivals\//i.test(pathname)) return "festival";
   if (/^\/film-clubs\//i.test(pathname)) return "film-club";
   if (/^\/collections\//i.test(pathname)) return "collection";
+  if (/^\/updates\//i.test(pathname)) return "update";
   if (/^\/(london-cinemas|venues)\//i.test(pathname)) return "venue";
   return "generic";
 }
@@ -203,6 +223,7 @@ export default function NotFound() {
   if (/^\/festivals\//i.test(mountedPathname)) return <FestivalNotFound />;
   if (/^\/film-clubs\//i.test(mountedPathname)) return <FilmClubNotFound />;
   if (/^\/collections\//i.test(mountedPathname)) return <CollectionNotFound />;
+  if (/^\/updates\//i.test(mountedPathname)) return <UpdateNotFound />;
   if (/^\/(london-cinemas|venues)\//i.test(mountedPathname))
     return <VenueNotFound />;
   return <GenericNotFound />;

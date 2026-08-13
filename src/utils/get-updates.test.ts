@@ -7,7 +7,14 @@ import {
   type DiffShowing,
   type Movie,
 } from "@/types";
-import { buildUpdates } from "./get-updates";
+import {
+  buildUpdates,
+  getUpdateReleasePath,
+  groupUpdatesByDay,
+  summariseDay,
+  type UpdateFilm,
+  type UpdateRelease,
+} from "./get-updates";
 
 const DAY = 86_400_000;
 const JUL_25 = new Date("2026-07-25T04:41:53Z").getTime();
@@ -565,5 +572,107 @@ describe("buildUpdates", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].asOf).toBe("2026-07-25T16:37:21Z");
+  });
+});
+
+const updateFilm = (title: string, performanceCount: number): UpdateFilm => ({
+  key: title,
+  title,
+  href: null,
+  venues: [{ id: "a.com", name: "Venue a.com", href: null }],
+  performanceCount,
+  nextPerformance: null,
+});
+
+const release = (
+  asOf: string,
+  overrides: Partial<UpdateRelease> = {},
+): UpdateRelease => ({
+  tag: asOf,
+  asOf,
+  newFilms: [],
+  moreShowings: [],
+  newVenues: [],
+  ...overrides,
+});
+
+describe("groupUpdatesByDay", () => {
+  it("returns nothing when there are no runs", () => {
+    expect(groupUpdatesByDay([])).toEqual([]);
+  });
+
+  it("puts two runs on the same day onto one entry, newest first", () => {
+    const days = groupUpdatesByDay([
+      release("2026-08-13T17:05:00Z"),
+      release("2026-08-13T05:15:00Z"),
+    ]);
+
+    expect(days).toHaveLength(1);
+    expect(days[0].date).toBe("2026-08-13");
+    expect(days[0].releases.map((r) => r.asOf)).toEqual([
+      "2026-08-13T17:05:00Z",
+      "2026-08-13T05:15:00Z",
+    ]);
+  });
+
+  it("keeps days in reverse-chronological order", () => {
+    const days = groupUpdatesByDay([
+      release("2026-08-13T17:05:00Z"),
+      release("2026-08-12T18:19:00Z"),
+      release("2026-08-12T06:02:00Z"),
+    ]);
+
+    expect(days.map((day) => day.date)).toEqual(["2026-08-13", "2026-08-12"]);
+    expect(days[1].releases).toHaveLength(2);
+  });
+
+  // The pipeline publishes London wall-clock tags, so a run just after midnight
+  // during BST carries a UTC timestamp on the day before. It belongs to the day
+  // it is labelled with on the page, not the day UTC puts it on.
+  it("files a run just after London midnight under the London date", () => {
+    const days = groupUpdatesByDay([release("2026-08-13T23:30:00Z")]);
+
+    expect(days[0].date).toBe("2026-08-14");
+  });
+
+  it("links a run to an anchor on its day's page", () => {
+    const path = getUpdateReleasePath(
+      release("2026-08-13T17:05:00Z", { tag: "20260813.180500" }),
+    );
+
+    expect(path).toBe("/updates/2026-08-13/#20260813.180500");
+  });
+});
+
+describe("summariseDay", () => {
+  it("sums every run in the day", () => {
+    const summary = summariseDay({
+      date: "2026-08-13",
+      releases: [
+        release("2026-08-13T17:05:00Z", {
+          newFilms: [updateFilm("Fight Club", 3)],
+          moreShowings: [updateFilm("Heat", 4)],
+        }),
+        release("2026-08-13T05:15:00Z", {
+          newFilms: [updateFilm("Bliss", 1)],
+          newVenues: [{ id: "b.com", name: "Venue b.com", href: null }],
+        }),
+      ],
+    });
+
+    expect(summary).toBe("2 films added, 4 showings added, 1 venue added");
+  });
+
+  it("names only the kinds of change the day actually brought", () => {
+    const summary = summariseDay({
+      date: "2026-08-13",
+      releases: [
+        release("2026-08-13T17:05:00Z", {
+          moreShowings: [updateFilm("Heat", 1)],
+        }),
+      ],
+    });
+
+    expect(summary).toBe("1 showing added");
   });
 });

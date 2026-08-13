@@ -1,6 +1,7 @@
 import { getStaticData } from "@/utils/get-static-data";
 import {
   buildUpdates,
+  getUpdateReleasePath,
   pluralise,
   readDiffBlobs,
   summariseRelease,
@@ -108,11 +109,18 @@ export async function GET() {
   const data = await getStaticData();
   const releases = buildUpdates(readDiffBlobs(), data);
 
+  // Items link to the run's dated page, not to `/updates`. The landing page
+  // carries only the latest day, so a link there would quietly land a reader on
+  // a different run than the item they clicked — and an anchor into it would
+  // resolve against nothing. The dated URL is exact while it exists and 404s
+  // honestly once its diff ages out of the window, which the feed outlives:
+  // items sit in readers indefinitely, so this is the one surface that produces
+  // clicks on updates that have rolled out. `not-found.tsx` explains those.
   const items = releases
     .map(
       (release) => `    <item>
       <title>${escapeXml(releaseTitle(release))}</title>
-      <link>${escapeXml(`${SITE}/updates/#${release.tag}`)}</link>
+      <link>${escapeXml(`${SITE}${getUpdateReleasePath(release)}`)}</link>
       <guid isPermaLink="false">clusterflick-updates-${escapeXml(release.tag)}</guid>
       <pubDate>${toRfc822(release.asOf)}</pubDate>
       <description>${escapeXml(describeRelease(release))}</description>

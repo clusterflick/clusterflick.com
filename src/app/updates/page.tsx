@@ -2,20 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import OutlineHeading from "@/components/outline-heading";
-import MoviePoster from "@/components/movie-poster";
-import StackedPoster from "@/components/stacked-poster";
+import LinkedList from "@/components/linked-list";
+import type { LinkedListItem } from "@/components/linked-list";
 import EmptyState from "@/components/empty-state";
 import { getStaticData } from "@/utils/get-static-data";
 import {
   buildUpdates,
-  pluralise,
+  getUpdateDayPath,
+  groupUpdatesByDay,
   readDiffBlobs,
-  summariseRelease,
+  summariseDay,
 } from "@/utils/get-updates";
-import type { UpdateFilm } from "@/utils/get-updates";
-import { formatDateLong, formatShowingTime } from "@/utils/format-date";
-import VenueList from "./venue-list";
-import styles from "./page.module.css";
+import {
+  dateStringToLondonTimestamp,
+  formatDateLong,
+} from "@/utils/format-date";
+import ReleaseSection from "./release-section";
+import styles from "./updates.module.css";
 
 export const metadata: Metadata = {
   title: "Recently Added London Cinema Listings",
@@ -48,76 +51,27 @@ export const metadata: Metadata = {
 };
 
 /**
- * A compact poster tile. Venues collapse to a count past the first so a season
- * announcement of thirty films stays scannable rather than filling the page
- * with venue lists.
+ * The landing page carries the newest day in full and lists the rest.
  *
- * Multi-film events never carry artwork of their own, so they take it from the
- * films inside — stacked when there is more than one to show, as everywhere
- * else on the site, and otherwise the single poster that exists. Only an event
- * with no poster anywhere falls back to the placeholder.
+ * It is not a redirect to the newest dated page, though it shows the same runs:
+ * `/updates` is in the nav, the sitemap and the feed's autodiscovery link, and
+ * static export has no way to redirect that wouldn't leave those pointing at a
+ * client-side bounce. Showing the latest day here also gives the archive
+ * somewhere to live, so reaching a day from last week is one click rather than
+ * a walk back through the chain.
  */
-function FilmTile({ film }: { film: UpdateFilm }) {
-  const venueLabel =
-    film.venues.length === 1
-      ? film.venues[0].name
-      : pluralise(film.venues.length, "venue");
-
-  const meta = pluralise(film.performanceCount, "showing");
-
-  const includedMovies = film.includedMovies;
-  const includedWithPosters = includedMovies?.filter((m) => m.posterPath) ?? [];
-  const totalPosters = (film.posterPath ? 1 : 0) + includedWithPosters.length;
-  const useStackedPoster =
-    includedMovies && includedMovies.length > 1 && totalPosters >= 2;
-
-  const body = (
-    <>
-      {useStackedPoster ? (
-        <StackedPoster
-          mainPosterPath={film.posterPath}
-          mainTitle={film.title}
-          includedMovies={includedMovies}
-          size="xsmall"
-          interactive={!!film.href}
-        />
-      ) : (
-        <MoviePoster
-          posterPath={film.posterPath || includedWithPosters[0]?.posterPath}
-          title={film.title}
-          size="xsmall"
-          interactive={!!film.href}
-        />
-      )}
-      <h4 className={styles.tileTitle}>{film.title}</h4>
-      <p className={styles.tileVenue}>{venueLabel}</p>
-      <p className={styles.tileMeta}>{meta}</p>
-    </>
-  );
-
-  return (
-    <li className={styles.tile}>
-      {film.href ? (
-        // The whole tile is one target rather than separate poster and title
-        // links. The label replaces the accessible name so a screen reader
-        // reads it once, instead of the poster's alt text and the title in turn.
-        <Link
-          href={film.href}
-          className={styles.tileLink}
-          aria-label={`${film.title} — ${venueLabel}, ${meta}`}
-        >
-          {body}
-        </Link>
-      ) : (
-        body
-      )}
-    </li>
-  );
-}
-
 export default async function UpdatesPage() {
   const data = await getStaticData();
-  const releases = buildUpdates(readDiffBlobs(), data);
+  const days = groupUpdatesByDay(buildUpdates(readDiffBlobs(), data));
+
+  const [latest, ...earlier] = days;
+
+  const archiveItems: LinkedListItem[] = earlier.map((day) => ({
+    key: day.date,
+    href: getUpdateDayPath(day.date),
+    label: formatDateLong(dateStringToLondonTimestamp(day.date)),
+    detail: summariseDay(day),
+  }));
 
   return (
     <StandardPageLayout
@@ -139,7 +93,7 @@ export default async function UpdatesPage() {
         </p>
       }
     >
-      {releases.length === 0 ? (
+      {!latest ? (
         <EmptyState
           variant="contained"
           icon={{
@@ -151,82 +105,30 @@ export default async function UpdatesPage() {
           message="Updates appear here after the next run of the listings pipeline."
         />
       ) : (
-        <ol className={styles.timeline}>
-          {releases.map((release) => {
-            const published = new Date(release.asOf);
-            return (
-              <li key={release.tag} id={release.tag} className={styles.release}>
-                <OutlineHeading
-                  as="h2"
-                  color="blue"
-                  className={styles.releaseHeading}
-                >
-                  {`${formatDateLong(published)} @ ${formatShowingTime(
-                    published.getTime(),
-                  )}`}
-                </OutlineHeading>
-                <p className={styles.releaseSummary}>
-                  {summariseRelease(release)}
-                </p>
+        <>
+          <ol className={styles.timeline}>
+            {latest.releases.map((release) => (
+              <ReleaseSection key={release.tag} release={release} />
+            ))}
+          </ol>
 
-                {release.newVenues.length > 0 && (
-                  <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                      {release.newVenues.length === 1
-                        ? "New venue"
-                        : "New venues"}
-                    </h3>
-                    <p className={styles.prose}>
-                      <VenueList venues={release.newVenues} />
-                    </p>
-                  </section>
-                )}
-
-                {release.newFilms.length > 0 && (
-                  <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>
-                      {pluralise(release.newFilms.length, "new film")}
-                    </h3>
-                    <ul className={styles.tiles}>
-                      {release.newFilms.map((film) => (
-                        <FilmTile key={film.key} film={film} />
-                      ))}
-                    </ul>
-                  </section>
-                )}
-
-                {release.moreShowings.length > 0 && (
-                  <section className={styles.section}>
-                    <h3 className={styles.sectionHeading}>More showings</h3>
-                    <ul className={styles.showings}>
-                      {release.moreShowings.map((film) => (
-                        <li key={film.key} className={styles.showing}>
-                          {film.href ? (
-                            <Link href={film.href}>{film.title}</Link>
-                          ) : (
-                            film.title
-                          )}
-                          {" — "}
-                          {pluralise(film.performanceCount, "new showing")}
-                          {" at "}
-                          {/* One venue names itself; more than one leads with
-                              the count, so the reach is clear before the list */}
-                          {film.venues.length > 1 && (
-                            <>{pluralise(film.venues.length, "venue")}: </>
-                          )}
-                          <VenueList
-                            venues={film.venues}
-                            className={styles.venueLinks}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </li>
-            );
-          })}
-        </ol>
+          {archiveItems.length > 0 && (
+            <section className={styles.archive}>
+              <OutlineHeading
+                as="h2"
+                color="pink"
+                className={styles.archiveHeading}
+              >
+                Earlier updates
+              </OutlineHeading>
+              <p className={styles.archiveNote}>
+                Each day&apos;s changes, kept for as long as the screenings they
+                announce are still worth knowing about.
+              </p>
+              <LinkedList items={archiveItems} />
+            </section>
+          )}
+        </>
       )}
     </StandardPageLayout>
   );
