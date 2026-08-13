@@ -71,6 +71,51 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-13",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "AMP Studios", url: "https://ampstudios.co.uk" },
+                {
+                  name: "Batch & Co. Coffee",
+                  url: "https://powku1.wixsite.com/batchandco",
+                },
+                {
+                  name: "Mountview Academy of Theatre Arts",
+                  url: "https://www.mountview.org.uk",
+                },
+                { name: "Nunhead Cemetery", url: "https://www.fonc.org.uk" },
+                {
+                  name: "St Matthew's Church",
+                  url: "https://www.stmatthewswimbledon.org",
+                },
+                {
+                  name: "Streatham Library",
+                  url: "https://www.lambeth.gov.uk/libraries-0/streatham-library",
+                },
+                {
+                  name: "The British Home",
+                  url: "https://britishhome.org.uk",
+                },
+                {
+                  name: "The Woodfield Pavilion",
+                  url: "https://www.thewoodfield.org",
+                },
+              ]}
+            />
+            , a set of South London halls, cafés, libraries and green spaces
+            that open up for free film screenings.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-09",
     changes: [
       {
