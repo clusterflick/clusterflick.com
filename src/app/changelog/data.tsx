@@ -74,6 +74,16 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-13",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Ibraaz" url="https://ibraaz.org" />, a Fitzrovia
+            arts centre for culture and ideas from the Global Majority, whose
+            screenings happen in Minassa, the cinema room in its basement.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
