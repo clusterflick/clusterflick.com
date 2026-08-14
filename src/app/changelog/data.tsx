@@ -113,6 +113,21 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Latino Film Festival"
+              url="https://londonlatinofilmfestival.org.uk/"
+            />
+            , whose first edition runs 2–6 October with sixty features and
+            shorts from across Latin America and its diasporas, spread over
+            multiple venues.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>

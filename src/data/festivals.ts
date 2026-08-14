@@ -276,6 +276,29 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "london-latino-film-festival",
+    name: "London Latino Film Festival",
+    url: "https://londonlatinofilmfestival.org.uk/",
+    aliases: ["lolaff"],
+    matchers: [
+      {
+        // Matches "London Latino Film Festival presents: ..." showings, which is
+        // how the festival's screenings are titled across its venues (Barbican,
+        // ICA, Ciné Lumière, BFI Stephen Street, The Garden Cinema), October 2–6 2026
+        [FilterId.ShowingTitleSearch]: "London Latino Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Latino Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LoLaFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LoLaFF",
+      },
+    ],
+  },
+  {
     id: "the-shortest-nights-film-festival",
     name: "The Shortest Nights Film Festival",
     url: "https://www.shortsightedcinema.com/theshortestnightsfestival2026",
