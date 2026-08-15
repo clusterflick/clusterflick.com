@@ -36,6 +36,34 @@ function getExtensionFromContentType(contentType) {
   return map[contentType] || ".jpg";
 }
 
+function slugifyForFilename(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// Hosts where the venue is identified by the URL path, not the hostname: the
+// account is theirs but the site is not. Logged out, these serve the
+// platform's own branding, so an automatic fetch yields the Instagram glyph or
+// the Linktree asterisk rather than the venue's logo — a wrong image, not a
+// missing one. They are reported for manual sourcing instead.
+const PATH_IDENTIFIED_HOSTS = new Set([
+  "instagram.com",
+  "facebook.com",
+  "twitter.com",
+  "x.com",
+  "linktr.ee",
+  "tiktok.com",
+  "youtube.com",
+]);
+
+function needsManualImage(domain) {
+  return PATH_IDENTIFIED_HOSTS.has(
+    new URL(domain).hostname.replace(/^www\./, ""),
+  );
+}
+
 const MIN_FILE_SIZE = 1024; // 1KB — skip placeholder/tracking pixels
 const MIN_IMAGE_SIZE = 128;
 const MAX_IMAGE_SIZE = 1024;
@@ -398,6 +426,7 @@ function sleep(ms) {
 
   // Deduplicate by domain — group venues share the same website
   const downloadPlan = new Map(); // domain -> { domain }
+  const claimedNames = new Map(); // safeName -> domain that owns it
   const venueMapping = []; // { id, domain }
 
   for (const attr of allAttributes) {
@@ -406,16 +435,31 @@ function sleep(ms) {
       venueMapping.push({ id, domain: null });
       continue;
     }
+    venueMapping.push({ id, domain });
+    // Never queued for download — see PATH_IDENTIFIED_HOSTS. These are sourced
+    // by hand straight to the per-venue path and picked up further down.
+    if (needsManualImage(domain)) continue;
     if (!downloadPlan.has(domain)) {
-      const safeName = groupName
-        ? groupName
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "")
-        : new URL(domain).hostname.replace(/^www\./, "");
+      let safeName;
+      if (groupName) {
+        safeName = slugifyForFilename(groupName);
+      } else {
+        // A venue whose only web presence is a social account shares a host
+        // with every other such venue - instagram.com/buchanhall and
+        // instagram.com/casalavandauk are two accounts, not one site - so the
+        // bare hostname would have them overwrite each other's download. Fold
+        // the path in for whoever finds the name already taken.
+        const { hostname, pathname } = new URL(domain);
+        safeName = hostname.replace(/^www\./, "");
+        const claimedBy = claimedNames.get(safeName);
+        if (claimedBy && claimedBy !== domain) {
+          const suffix = slugifyForFilename(pathname);
+          if (suffix) safeName = `${safeName}-${suffix}`;
+        }
+        claimedNames.set(safeName, domain);
+      }
       downloadPlan.set(domain, { domain, socials, safeName });
     }
-    venueMapping.push({ id, domain });
   }
 
   const noDomain = venueMapping.filter((v) => v.domain === null);
@@ -716,13 +760,13 @@ function sleep(ms) {
 
   // Post-process: convert ICO/WebP to PNG and resize oversized images
   const POST_PROCESS_MAX = 512;
-  console.log(`\n${colors.bright}Post-processing images...${colors.reset}\n`);
 
-  for (const [, entry] of downloaded) {
-    const { ext, safeName } = entry;
-    const filePath = path.join(OUTPUT_DIR, `${safeName}${ext}`);
+  // Returns the extension the image ended up with, which changes when an
+  // ICO/WebP is converted to PNG.
+  async function postProcessImage(baseName, ext) {
+    const filePath = path.join(OUTPUT_DIR, `${baseName}${ext}`);
 
-    if (!fs.existsSync(filePath) || ext === ".svg") continue;
+    if (!fs.existsSync(filePath) || ext === ".svg") return ext;
 
     const needsConvert = ext === ".ico" || ext === ".webp";
     let needsResize = false;
@@ -732,13 +776,13 @@ function sleep(ms) {
       needsResize =
         metadata.width > POST_PROCESS_MAX || metadata.height > POST_PROCESS_MAX;
     } catch {
-      if (!needsConvert) continue;
+      if (!needsConvert) return ext;
     }
 
-    if (!needsConvert && !needsResize) continue;
+    if (!needsConvert && !needsResize) return ext;
 
     const newExt = needsConvert ? ".png" : ext;
-    const newFilePath = path.join(OUTPUT_DIR, `${safeName}${newExt}`);
+    const newFilePath = path.join(OUTPUT_DIR, `${baseName}${newExt}`);
     const tempPath = filePath + ".tmp";
 
     // ICO: extract embedded PNG since sharp often can't read ICO
@@ -747,7 +791,6 @@ function sleep(ms) {
       if (pngData) {
         fs.writeFileSync(newFilePath, pngData);
         if (filePath !== newFilePath) fs.unlinkSync(filePath);
-        entry.ext = newExt;
         try {
           const meta = await sharp(newFilePath).metadata();
           if (meta.width > POST_PROCESS_MAX || meta.height > POST_PROCESS_MAX) {
@@ -760,19 +803,19 @@ function sleep(ms) {
               .toFile(tempPath);
             fs.renameSync(tempPath, newFilePath);
             console.log(
-              `  ${colors.green}${safeName}${newExt} — .ico → .png, resized${colors.reset}`,
+              `  ${colors.green}${baseName}${newExt} — .ico → .png, resized${colors.reset}`,
             );
           } else {
             console.log(
-              `  ${colors.green}${safeName}${newExt} — .ico → .png${colors.reset}`,
+              `  ${colors.green}${baseName}${newExt} — .ico → .png${colors.reset}`,
             );
           }
         } catch {
           console.log(
-            `  ${colors.green}${safeName}${newExt} — .ico → .png${colors.reset}`,
+            `  ${colors.green}${baseName}${newExt} — .ico → .png${colors.reset}`,
           );
         }
-        continue;
+        return newExt;
       }
     }
 
@@ -793,20 +836,27 @@ function sleep(ms) {
 
       if (filePath !== newFilePath) fs.unlinkSync(filePath);
       fs.renameSync(tempPath, newFilePath);
-      entry.ext = newExt;
 
       const actions = [];
       if (needsConvert) actions.push(`${ext} → ${newExt}`);
       if (needsResize) actions.push("resized");
       console.log(
-        `  ${colors.green}${safeName}${newExt} — ${actions.join(", ")}${colors.reset}`,
+        `  ${colors.green}${baseName}${newExt} — ${actions.join(", ")}${colors.reset}`,
       );
+      return newExt;
     } catch (err) {
       if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
       console.log(
-        `  ${colors.red}${safeName}${ext} — failed: ${err.message}${colors.reset}`,
+        `  ${colors.red}${baseName}${ext} — failed: ${err.message}${colors.reset}`,
       );
+      return ext;
     }
+  }
+
+  console.log(`\n${colors.bright}Post-processing images...${colors.reset}\n`);
+
+  for (const [, entry] of downloaded) {
+    entry.ext = await postProcessImage(entry.safeName, entry.ext);
   }
 
   // Create per-venue copies
@@ -849,6 +899,33 @@ function sleep(ms) {
     }
   }
 
+  // Social-only venues are never downloaded, so their image is saved by hand
+  // straight to the per-venue path. Give it the same conversion and resizing a
+  // fetched image gets, and name the ones still waiting on one.
+  const manual = [];
+
+  for (const { id, domain } of venueMapping) {
+    if (!domain || !needsManualImage(domain)) continue;
+
+    const existing = fs
+      .readdirSync(OUTPUT_DIR)
+      .find(
+        (f) =>
+          f.startsWith(`${id}.`) &&
+          !f.includes("--") &&
+          !f.endsWith(".noimage"),
+      );
+
+    if (!existing) {
+      manual.push(domain);
+      continue;
+    }
+
+    await postProcessImage(id, path.extname(existing));
+    linkedCount++;
+    skippedCount--;
+  }
+
   // Summary
   console.log(`${colors.dim}${"─".repeat(60)}${colors.reset}`);
   console.log(`${colors.bright}Results${colors.reset}`);
@@ -873,6 +950,15 @@ function sleep(ms) {
     console.log();
     for (const { domain, error } of failures) {
       console.log(`  ${colors.red}- ${domain}: ${error}${colors.reset}`);
+    }
+  }
+  if (manual.length > 0) {
+    console.log(
+      `  ${colors.yellow}Manual:     ${manual.length} — save one while logged in${colors.reset}`,
+    );
+    console.log();
+    for (const domain of manual) {
+      console.log(`  ${colors.yellow}- ${domain}${colors.reset}`);
     }
   }
   console.log(

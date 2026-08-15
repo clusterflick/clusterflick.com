@@ -71,6 +71,58 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-15",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Brenchley Gardens Community Centre",
+                  url: "https://www.southwark.gov.uk/housing/tenant-homeowner-and-community-groups/tenant-management-organisations-tmos/southwark-tmos#brenchley-gardens-tmc--2",
+                },
+                {
+                  name: "Buchan Tenants and Residents Hall",
+                  url: "https://www.instagram.com/buchanhall/",
+                },
+                {
+                  name: "Christ Church Peckham",
+                  url: "https://www.christchurchpeckham.org",
+                },
+                {
+                  name: "Cossall Community Hall",
+                  url: "https://cossallresidents.wordpress.com",
+                },
+                { name: "El Chico's", url: "https://www.elchicos.co.uk" },
+                {
+                  name: "Fortune Green",
+                  url: "http://www.fortunegreen.org.uk",
+                },
+                {
+                  name: "Hillside Gardens Park",
+                  url: "https://hillsidegardenspark.co.uk",
+                },
+                {
+                  name: "LEX2 Livesey Exchange",
+                  url: "https://www.liveseyexchange.com",
+                },
+                { name: "Love & Dye", url: "https://www.loveanddye.com" },
+                { name: "Peckham Palms", url: "https://peckhampalms.com" },
+              ]}
+            />
+            , ten more estate halls, parks, churches and neighbourhood
+            businesses lending their rooms to this year&apos;s Free Film
+            Festivals — a Mexican restaurant, a hair salon and a Black-owned
+            beauty arcade among them.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-13",
     changes: [
       {
