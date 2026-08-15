@@ -69,6 +69,29 @@
   opacity: 0.6;
 }
 
+/* The verdict sits where the other cards put a number, so it matches their
+   line height rather than shifting the subtext up. Pink reads as the pass
+   because it is the value colour everywhere else on the grid; blue is the
+   quieter half of the palette, which suits a "no" that isn't a fault. Both
+   are toned back so the mark doesn't shout across the row of scores. */
+.bechdelPass,
+.bechdelFail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 29px;
+}
+
+.bechdelPass {
+  color: var(--color-neon-pink);
+  opacity: 0.8;
+}
+
+.bechdelFail {
+  color: var(--color-electric-blue);
+  opacity: 0.75;
+}
+
 .ratingsSpacing {
   display: grid;
   grid-auto-flow: column;

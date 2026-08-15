@@ -6,10 +6,12 @@ import LinkCard, {
   CardSubtext,
 } from "@/components/link-card";
 import CardGrid from "@/components/card-grid";
+import { TickIcon, CrossIcon } from "@/components/icons";
 import { useCinemaData } from "@/state/cinema-data-context";
 import styles from "./ratings-grid.module.css";
 
 interface RatingsGridProps {
+  bechdel: Movie["bechdel"];
   imdb: Movie["imdb"];
   letterboxd: Movie["letterboxd"];
   moviedb: Movie["moviedb"];
@@ -19,6 +21,7 @@ interface RatingsGridProps {
 }
 
 export default function RatingsGrid({
+  bechdel,
   imdb,
   letterboxd,
   moviedb,
@@ -37,7 +40,8 @@ export default function RatingsGrid({
     (moviedb && moviedb.reviews > 0) ||
     (rottenTomatoes && rottenTomatoes.critics.all?.score) ||
     hasMetacriticCritics ||
-    hasMetacriticAudience;
+    hasMetacriticAudience ||
+    Boolean(bechdel);
 
   if (!hasRatings) {
     return null;
@@ -134,6 +138,44 @@ export default function RatingsGrid({
                   {hasMetacriticCritics && <span>Critics</span>}
                   {hasMetacriticAudience && <span>Audience</span>}
                 </div>
+              </CardSubtext>
+            </LinkCard>
+          )}
+
+          {/* Trails the scores deliberately: a pass/fail verdict is a
+              different kind of thing from a rating out of 10, so it reads
+              better after them than interleaved. Absence of a card means the
+              film isn't on the list, which is the common case — the list is
+              crowd-sourced and covers under half our films — so nothing is
+              rendered to stand in for "not rated". */}
+          {bechdel && (
+            <LinkCard
+              href={hydrateUrl(bechdel.url)}
+              variant="rating"
+              // The verdict is carried by a tick or cross, so it has to be
+              // spelled out here - "1 of 3 criteria" only implies it. The rest
+              // repeats the visible text verbatim, parentheses included, so
+              // the accessible name still contains the label a speech-input
+              // user would read off the card.
+              aria-label={`Bechdel Test: ${bechdel.passes ? "passes" : "fails"}, ${bechdel.rating} of 3 criteria${bechdel.dubious ? " (disputed)" : ""}`}
+            >
+              <CardLabel>Bechdel Test</CardLabel>
+              <CardValue>
+                <span
+                  className={
+                    bechdel.passes ? styles.bechdelPass : styles.bechdelFail
+                  }
+                >
+                  {bechdel.passes ? (
+                    <TickIcon size={28} />
+                  ) : (
+                    <CrossIcon size={28} />
+                  )}
+                </span>
+              </CardValue>
+              <CardSubtext>
+                {bechdel.rating} of 3 criteria
+                {bechdel.dubious && " (disputed)"}
               </CardSubtext>
             </LinkCard>
           )}

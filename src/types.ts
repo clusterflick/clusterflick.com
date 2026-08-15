@@ -198,6 +198,25 @@ export const classificationOrder: Classification[] = [
   Classification.Unknown,
 ];
 
+/**
+ * A film's entry on bechdeltest.com, joined on IMDB id.
+ *
+ * `rating` counts how many of the three criteria the film meets, so it is a
+ * 0-3 tally rather than a score — `passes` is the only meaningful reading of
+ * it. `dubious` marks a verdict the site itself considers disputed, and is
+ * independent of the rating: a film can pass all three and still be dubious.
+ *
+ * Coverage is partial and skews old — the list is crowd-sourced and lags badly
+ * on new releases — so an absent entry means "not rated", never "fails".
+ */
+type Bechdel = {
+  id: number;
+  url: string;
+  rating: 0 | 1 | 2 | 3;
+  passes: boolean;
+  dubious: boolean;
+};
+
 type Imdb = {
   id: string;
   url: string;
@@ -279,6 +298,7 @@ export type Movie = {
   includedMovies?: IncludedMovie[];
   showings: Record<string, Showing>;
   performances: MoviePerformance[];
+  bechdel?: Bechdel;
   imdb?: Imdb;
   letterboxd?: Letterboxd;
   metacritic?: Metacritic;

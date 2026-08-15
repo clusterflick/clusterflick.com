@@ -14,6 +14,7 @@ const optionalReviews = (file) => {
     return {};
   }
 };
+const bechdelResults = optionalReviews("../matched-data/bechdel.json");
 const imdbReviews = optionalReviews("../matched-data/imdb.json");
 const letterboxdReviews = optionalReviews("../matched-data/letterboxd.json");
 const metacriticReviews = optionalReviews("../matched-data/metacritic.json");
@@ -100,6 +101,9 @@ function generateUrlPrefixes(data, minPrefixLength = 20) {
     });
   });
 
+  Object.values(bechdelResults).forEach((result) => {
+    if (result?.url) urls.push(result.url);
+  });
   Object.values(imdbReviews).forEach((review) => {
     if (review?.url) urls.push(review.url);
   });
@@ -190,6 +194,7 @@ function extractCommonUrlPrefix(data) {
 
   Object.values(data.movies).forEach((movie) => {
     // Add reviews to movie data
+    movie.bechdel = bechdelResults[movie.id];
     movie.imdb = imdbReviews[movie.id];
     movie.letterboxd = letterboxdReviews[movie.id];
     movie.metacritic = metacriticReviews[movie.id];

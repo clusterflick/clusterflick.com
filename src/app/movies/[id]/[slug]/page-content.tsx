@@ -300,6 +300,7 @@ export default function PageContent({
           )}
 
           <RatingsGrid
+            bechdel={movie.bechdel}
             imdb={movie.imdb}
             letterboxd={movie.letterboxd}
             moviedb={movie.moviedb}

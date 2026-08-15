@@ -247,6 +247,7 @@ export default async function MovieDetailPage({
   const movieUrl = `https://clusterflick.com${getMovieUrl(movie)}`;
 
   const sameAs = [
+    movie.bechdel?.url,
     movie.imdb?.url,
     movie.letterboxd?.url,
     movie.metacritic?.url,
