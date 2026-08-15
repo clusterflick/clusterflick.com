@@ -74,6 +74,19 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-15",
     changes: [
       {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://gel.now">gel</Ext>, a listings site for
+            London&apos;s grassroots events — mostly gigs, club nights and
+            talks, but with film scattered through it, from one-off screenings
+            at cinemas to films put on in bookshops, studios and community
+            halls.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
