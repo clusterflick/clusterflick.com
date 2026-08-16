@@ -128,6 +128,62 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "All Saints Kingston",
+                  url: "https://allsaintskingston.co.uk",
+                },
+                {
+                  name: "Bethnal Green Nature Reserve",
+                  url: "https://bethnalgreennaturereserve.org",
+                },
+                {
+                  name: "The cornerHOUSE Community Arts Centre",
+                  url: "https://www.thecornerhouse.org",
+                },
+                {
+                  name: "The Mud Room",
+                  url: "https://themudroomlondon.com",
+                },
+                {
+                  name: "The Rookery",
+                  url: "https://www.sccoop.org.uk",
+                },
+                {
+                  name: "The White Lion Pub",
+                  url: "https://www.whitelionsw16.co.uk",
+                },
+                {
+                  name: "Tooting Bec Lido",
+                  url: "https://www.placesleisure.org/centres/tooting-bec-lido/",
+                },
+                {
+                  name: "Waterhouse Hall Theatre",
+                  url: "https://winchmorehillurc.co.uk",
+                },
+                {
+                  name: "Watson's General Telegraph",
+                  url: "https://www.watsonstelegraph.pub",
+                },
+                {
+                  name: "West Wimbledon Hall",
+                  url: "https://www.westwimbledonsociety.org",
+                },
+              ]}
+            />
+            , and ten more after that — a volunteer arts centre in Surbiton, a
+            community cinema in a Winchmore Hill church hall, and a
+            summer&apos;s worth of screenings in a lido, a walled garden, a wild
+            churchyard and a doggy daycare.
+          </>
+        ),
+      },
     ],
   },
   {
