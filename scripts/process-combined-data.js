@@ -22,6 +22,12 @@ const moviedbReviews = optionalReviews("../matched-data/moviedb.json");
 const rottentomatoesReviews = optionalReviews(
   "../matched-data/rottentomatoes.json",
 );
+// Keyed by venue id, and holding only the venues that have ever had a
+// screening — a venue missing from it has never had one, which is not the same
+// as having gone quiet.
+const { venues: venueRegistry = {} } = optionalReviews(
+  "../diffed-data/venue-registry.json",
+);
 
 const simplifySorting = (value) =>
   value
@@ -272,6 +278,20 @@ function removeIdProperty(data) {
   return data;
 }
 
+/**
+ * Stamp each venue with the last screening the registry has ever seen there.
+ *
+ * For a venue with something on this is its furthest-out listing rather than a
+ * past date, so consumers have to check the date has passed before reading it
+ * as "when this venue went quiet".
+ */
+function addVenueLastPerformance(data) {
+  Object.entries(data.venues).forEach(([id, venue]) => {
+    venue.lastPerformance = venueRegistry[id]?.lastPerformance;
+  });
+  return data;
+}
+
 function removeOptionalData(data) {
   return [
     removeShowingOverviews,
@@ -283,7 +303,7 @@ function removeOptionalData(data) {
 }
 
 try {
-  const reducedData = removeOptionalData(data);
+  const reducedData = removeOptionalData(addVenueLastPerformance(data));
   const {
     generatedAt,
     genres,

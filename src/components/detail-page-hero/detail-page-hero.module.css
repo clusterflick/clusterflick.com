@@ -72,3 +72,10 @@
   border: 1px solid rgba(250, 222, 5, 0.3);
   color: var(--color-buttery-yellow);
 }
+
+/* Sits under the status line as a footnote to it, not a second announcement. */
+.statusDetail {
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.75;
+}

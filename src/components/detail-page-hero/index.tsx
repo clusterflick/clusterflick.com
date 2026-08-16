@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
+import { formatDateShort, isInPast } from "@/utils/format-date";
 import styles from "./detail-page-hero.module.css";
 
 interface DetailPageHeroProps {
@@ -15,6 +16,13 @@ interface DetailPageHeroProps {
   backgroundImage?: string;
   /** Alt text for a custom background image. */
   backgroundImageAlt?: string;
+  /**
+   * When the last screening here was, for an entity with nothing on. Shown only
+   * once that date has passed: a venue can hold performances the listings drop
+   * (an event that is not a film, say), which would otherwise date its silence
+   * to next month.
+   */
+  lastPerformance?: number;
   /** Optional content rendered between the URL link and the status card, e.g. a tag/social row */
   children?: ReactNode;
 }
@@ -28,9 +36,12 @@ export default function DetailPageHero({
   performanceCount,
   backgroundImage = "/images/light-circles.jpg",
   backgroundImageAlt = "Decorative light circles",
+  lastPerformance,
   children,
 }: DetailPageHeroProps) {
   const hasEvents = performanceCount > 0;
+  const showLastPerformance =
+    lastPerformance !== undefined && isInPast(lastPerformance);
 
   return (
     <HeroSection
@@ -79,7 +90,17 @@ export default function DetailPageHero({
             {performanceCount === 1 ? "showing" : "showings"}
           </p>
         ) : (
-          <p>No showings currently listed</p>
+          <>
+            <p>No showings currently listed</p>
+            {showLastPerformance && (
+              <p className={styles.statusDetail}>
+                Last screening was{" "}
+                {formatDateShort(new Date(lastPerformance), {
+                  includeYearIfDifferent: true,
+                })}
+              </p>
+            )}
+          </>
         )}
       </div>
     </HeroSection>

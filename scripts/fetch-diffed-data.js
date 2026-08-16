@@ -11,6 +11,11 @@
  * Files land as diffed-data/<tag>.json. Missing data is not fatal: the feed
  * degrades to however many releases exist (there were three on day one), and to
  * an empty page if the repo has none at all, so the site still builds.
+ *
+ * The same releases carry venue-registry.json, which is not a window: it is a
+ * running record, and only the newest copy of it is of any use. It lands as
+ * diffed-data/venue-registry.json for process-combined-data to merge onto the
+ * venues, in the same way matched-data supplies the ratings.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -90,6 +95,44 @@ async function main() {
   }
 
   console.log(`Downloaded ${downloaded} diffed-data release(s) to ${OUT_DIR}`);
+
+  await downloadVenueRegistry(releases);
+}
+
+/**
+ * Take the venue registry from the newest release that carries one.
+ *
+ * Not simply the newest release: releases published before the registry existed
+ * have no such asset, and neither would one published by hand. Absence is not
+ * fatal - venues then render without a last-screening date, as they did before.
+ */
+async function downloadVenueRegistry(releases) {
+  for (const release of releases) {
+    const asset = (release.assets || []).find(
+      ({ name }) => name === "venue-registry.json",
+    );
+    if (!asset) continue;
+
+    const response = await fetch(asset.browser_download_url, {
+      headers: headers(),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Failed downloading venue-registry.json from ${release.tag_name}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const body = await response.text();
+    JSON.parse(body);
+
+    fs.writeFileSync(path.join(OUT_DIR, "venue-registry.json"), body);
+    console.log(`Downloaded venue-registry.json from ${release.tag_name}`);
+    return;
+  }
+
+  console.warn(
+    "No release carries a venue-registry.json; venues will have no last-screening date.",
+  );
 }
 
 main().catch((error) => {

@@ -139,6 +139,7 @@ export default function VenueDetailPageContent({
           url={attributes?.url}
           movieCount={movieCount}
           performanceCount={performanceCount}
+          lastPerformance={venue.lastPerformance}
         >
           <VenueHeroDetails
             venueId={venue.id}

@@ -50,6 +50,36 @@ export const NoEvents: Story = {
   },
 };
 
+/**
+ * A dormant venue, dated by the venue registry. The date is what makes the
+ * difference between "nothing on this week" and "nothing on since the spring"
+ * legible, which a bare status line cannot say.
+ */
+export const NoEventsWithLastScreening: Story = {
+  args: {
+    name: "Electric Cinema",
+    url: "https://www.electriccinema.co.uk",
+    movieCount: 0,
+    performanceCount: 0,
+    lastPerformance: new Date("2026-03-14T20:30:00Z").getTime(),
+  },
+};
+
+/**
+ * A venue with nothing listed whose last known performance is still ahead of
+ * it - possible when its listings hold something the site does not show as a
+ * film. The date is suppressed rather than dating the silence to the future.
+ */
+export const NoEventsWithFuturePerformance: Story = {
+  args: {
+    name: "Electric Cinema",
+    url: "https://www.electriccinema.co.uk",
+    movieCount: 0,
+    performanceCount: 0,
+    lastPerformance: new Date("2099-01-01T20:30:00Z").getTime(),
+  },
+};
+
 /** Hero with a children slot — used for a tag or social link row below the URL. */
 export const WithChildren: Story = {
   args: {

@@ -12,6 +12,13 @@ export type Venue = {
   structure: "solo" | "group";
   type: string;
   groupName?: string;
+  /**
+   * The latest performance the venue registry has ever seen here, which for an
+   * active venue is its furthest-out listing rather than a past date. Absent
+   * for a venue that has never had a screening while the registry has been
+   * watching — not the same as one that has gone quiet.
+   */
+  lastPerformance?: number;
 };
 
 export type Person = {
