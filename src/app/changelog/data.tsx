@@ -71,6 +71,66 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-16",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Poppy's Funerals",
+                  url: "https://www.poppysfunerals.co.uk",
+                },
+                {
+                  name: "Raynes Park Community Church",
+                  url: "https://www.salvationarmy.org.uk/raynes-park",
+                },
+                {
+                  name: "Ruach City Church",
+                  url: "https://www.ruachcitychurch.org",
+                },
+                {
+                  name: "St George's Garrison Church",
+                  url: "https://www.stgeorgeswoolwich.org",
+                },
+                {
+                  name: "St Leonard's Church Hall",
+                  url: "https://stleonard-streatham.org.uk",
+                },
+                {
+                  name: "The Carpet Shop",
+                  url: "https://linktr.ee/thecarpetshoppeckham",
+                },
+                {
+                  name: "The Cavern",
+                  url: "http://www.thecavernfreehouse.co.uk",
+                },
+                {
+                  name: "The Leather Bottle",
+                  url: "https://www.greeneking.co.uk/pubs/greater-london/leather-bottle",
+                },
+                {
+                  name: "The Man of Kent",
+                  url: "https://www.facebook.com/p/The-Man-of-Kent-100068349115605/",
+                },
+                {
+                  name: "The Manor Arms",
+                  url: "https://www.themanorarms.com",
+                },
+              ]}
+            />
+            , ten more rooms taken over by this year&apos;s Free Film Festivals
+            — four pubs and four churches and church halls, plus a railway-arch
+            club on Rye Lane and a funeral director in Raynes Park.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-15",
     changes: [
       {
