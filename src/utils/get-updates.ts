@@ -495,6 +495,14 @@ export function summariseDay(day: UpdateDay): string {
   return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
 
+/**
+ * Diff blobs are written one per release, named for its tag. The directory is
+ * the download target for data-diffed assets generally — venue-registry.json
+ * lands there too — so match the tag rather than taking every .json, which
+ * parsed the registry as a diff and failed the build on its missing fields.
+ */
+const DIFF_BLOB_FILE = /^\d{8}\.\d{6}\.json$/;
+
 /** Read the downloaded diff window from disk. Missing data yields no updates. */
 export function readDiffBlobs(
   directory = join(process.cwd(), "diffed-data"),
@@ -502,7 +510,7 @@ export function readDiffBlobs(
   if (!existsSync(directory)) return [];
 
   return readdirSync(directory)
-    .filter((file) => file.endsWith(".json"))
+    .filter((file) => DIFF_BLOB_FILE.test(file))
     .map(
       (file) =>
         JSON.parse(readFileSync(join(directory, file), "utf-8")) as DiffBlob,

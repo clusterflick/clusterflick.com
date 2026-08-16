@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   Category,
   type CinemaData,
@@ -11,6 +14,7 @@ import {
   buildUpdates,
   getUpdateReleasePath,
   groupUpdatesByDay,
+  readDiffBlobs,
   summariseDay,
   type UpdateFilm,
   type UpdateRelease,
@@ -674,5 +678,32 @@ describe("summariseDay", () => {
     });
 
     expect(summary).toBe("1 showing added");
+  });
+});
+
+describe("readDiffBlobs", () => {
+  // The directory is the download target for data-diffed assets generally, and
+  // venue-registry.json arriving there parsed as a diff and failed the build.
+  it("reads only the tag-named diff blobs, ignoring other assets", () => {
+    const directory = mkdtempSync(join(tmpdir(), "diffed-data-"));
+    writeFileSync(
+      join(directory, "20260816.222719.json"),
+      JSON.stringify({ metadata: { currentRelease: "20260816.222719" } }),
+    );
+    writeFileSync(
+      join(directory, "venue-registry.json"),
+      JSON.stringify({ venues: { "a.com": { lastSeen: "20260816.222719" } } }),
+    );
+
+    const blobs = readDiffBlobs(directory);
+
+    expect(blobs).toHaveLength(1);
+    expect(blobs[0].metadata.currentRelease).toBe("20260816.222719");
+
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it("yields no updates when the directory is missing", () => {
+    expect(readDiffBlobs(join(tmpdir(), "no-such-diffed-data"))).toEqual([]);
   });
 });
