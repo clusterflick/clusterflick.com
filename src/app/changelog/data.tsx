@@ -184,6 +184,59 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Lost Souls Pizza",
+                  url: "https://lostsoulspizza.com",
+                },
+                {
+                  name: "Love Affair Basement",
+                  url: "https://www.loveaffairbasement.co.uk",
+                },
+                {
+                  name: "Oxford House",
+                  url: "https://www.oxfordhouse.org.uk",
+                },
+                {
+                  name: "The Common Press Dalston",
+                  url: "https://www.commonpress.co.uk",
+                },
+                {
+                  name: "Wheatsheaf Community Hall",
+                  url: "https://www.wheatsheafhall.org.uk",
+                },
+              ]}
+            />
+            , five more rooms that put films on between everything else they do
+            — a vampire-themed pizzeria in Camden, a queer basement bar on
+            Hackney Road, a volunteer-run hall in Vauxhall, the settlement house
+            Bethnal Green has had since 1884, and a second Common Press in
+            Dalston.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: ({ Venue }) => (
+          <>
+            Now that there are two of them,{" "}
+            <Venue
+              name="The Common Press Shoreditch"
+              url="https://www.commonpress.co.uk"
+            />{" "}
+            is grouped with its Dalston sibling. Its calendar file is now named
+            &quot;commonpress.co.uk-shoreditch&quot; rather than
+            &quot;commonpress.co.uk&quot;, so anyone subscribed to the old URL
+            will need to resubscribe.
+          </>
+        ),
+      },
     ],
   },
   {
