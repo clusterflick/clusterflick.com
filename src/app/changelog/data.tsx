@@ -267,7 +267,7 @@ export const CHANGELOG: ChangelogDay[] = [
               ]}
             />{" "}
             all had duplicates — Eventbrite, Outsavvy, DICE — and these are now
-            matched, preferring linking to the venue's page.
+            matched, preferring linking to the venue&apos;s page.
           </>
         ),
       },
