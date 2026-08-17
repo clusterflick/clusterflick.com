@@ -30,6 +30,32 @@ const namesFor = (
   lookup: Record<string, { name: string }>,
 ) => (ids ?? []).map((id) => lookup[id]?.name).filter(Boolean) as string[];
 
+// Search engines truncate meta descriptions around this length, and the same
+// string doubles as the OpenGraph description on share cards, which platforms
+// cache for far longer than a rebuild cycle — so it must never be cut mid-word.
+const MAX_DESCRIPTION_LENGTH = 155;
+
+function truncateAtWord(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  const trimmed = text.slice(0, maxLength);
+  const lastSpace = trimmed.lastIndexOf(" ");
+  return `${(lastSpace > 0 ? trimmed.slice(0, lastSpace) : trimmed).trimEnd()}…`;
+}
+
+// Leads with the London showings context, since that's what differentiates
+// this page from every other site carrying the same TMDB synopsis.
+function buildMovieDescription(
+  leadSentence: string,
+  overview?: string,
+): string {
+  if (!overview) return leadSentence;
+
+  const remaining = MAX_DESCRIPTION_LENGTH - leadSentence.length - 1;
+  if (remaining <= 20) return leadSentence;
+
+  return `${leadSentence} ${truncateAtWord(overview, remaining)}`;
+}
+
 export async function generateStaticParams() {
   const data = await getStaticData();
   const departed = getDepartedData();
@@ -65,11 +91,10 @@ export async function generateMetadata({
   }
 
   const title = movie.year ? `${movie.title} (${movie.year})` : movie.title;
-  const description =
-    movie.overview ||
-    (departedMovie
-      ? `${movie.title} is not currently screening at cinemas in London.`
-      : `Find screenings for ${movie.title} at cinemas across London.`);
+  const leadSentence = departedMovie
+    ? `${movie.title} is not currently screening at cinemas in London.`
+    : `Find screenings for ${movie.title} at cinemas across London.`;
+  const description = buildMovieDescription(leadSentence, movie.overview);
 
   const genreLookup = departedMovie ? departed.genres : data.genres;
   const genreNames = (movie.genres ?? [])
