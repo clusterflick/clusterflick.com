@@ -8,6 +8,7 @@ import { VenueDetailPage } from "./pages/venue-detail-page";
 import { VenueCalendarPage } from "./pages/venue-calendar-page";
 import { LondonCinemasPage } from "./pages/london-cinemas-page";
 import { BoroughDetailPage } from "./pages/borough-detail-page";
+import { expectIndexableMetadata, getMetadata } from "./utils/metadata";
 
 const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 
@@ -32,6 +33,13 @@ test.describe("Films Grid (browse & filter)", () => {
     }).toPass({ timeout: 5000 });
 
     await filmsPage.screenshot("initial-load");
+  });
+
+  test("films page has indexable SEO metadata", async ({ page }) => {
+    await expectIndexableMetadata(page, {
+      titleContains: "Every Film Showing in London",
+      canonicalPath: "/films",
+    });
   });
 
   test("scrolling to bottom loads more posters", async () => {
@@ -107,6 +115,11 @@ test.describe("Films Grid (browse & filter)", () => {
     await movieDetails.screenshot("movie-details");
 
     expect(performanceCount).toBeGreaterThanOrEqual(1);
+
+    await expectIndexableMetadata(page, {
+      titleContains: expectedTitle!,
+      canonicalPath: new URL(page.url()).pathname,
+    });
   });
 });
 
@@ -157,6 +170,11 @@ test.describe("Festival Pages", () => {
     expect(statusText).toBeTruthy();
 
     await detailPage.screenshot("festival-detail");
+
+    await expectIndexableMetadata(page, {
+      titleContains: firstName!,
+      canonicalPath: new URL(page.url()).pathname,
+    });
   });
 });
 
@@ -206,6 +224,11 @@ test.describe("Venue Pages", () => {
     expect(statusText).toBeTruthy();
 
     await detailPage.screenshot("venue-detail");
+
+    await expectIndexableMetadata(page, {
+      titleContains: firstName!,
+      canonicalPath: new URL(page.url()).pathname,
+    });
   });
 });
 
@@ -256,6 +279,24 @@ test.describe("Venue Calendar Page", () => {
 
     await calendarPage.screenshot("venue-calendar-agenda");
   });
+
+  // The calendar has nothing crawlable of its own (see CLAUDE.md, Venue
+  // Calendars): it should stay out of the index and credit the venue page.
+  test("calendar page is noindex and credits the venue page as canonical", async ({
+    page,
+  }) => {
+    const metadata = await getMetadata(page);
+
+    expect(metadata.robots).toContain("noindex");
+    expect(metadata.robots).toContain("follow");
+
+    expect(metadata.canonical).toBeTruthy();
+    const canonicalPath = new URL(metadata.canonical!).pathname.replace(
+      /\/$/,
+      "",
+    );
+    expect(canonicalPath).toBe(`/venues/${CALENDAR_VENUE_SLUG}`);
+  });
 });
 
 let londonCinemasPage: LondonCinemasPage;
@@ -293,6 +334,11 @@ test.describe("London Cinemas Pages", () => {
     expect(venueCount).toBeGreaterThanOrEqual(1);
 
     await boroughPage.screenshot("borough-detail");
+
+    await expectIndexableMetadata(page, {
+      titleContains: firstName!,
+      canonicalPath: new URL(page.url()).pathname,
+    });
   });
 });
 
@@ -324,6 +370,11 @@ test.describe("Discovery Home Page", () => {
 
     await page.screenshot({
       path: "test-results/screenshots/discovery-home.png",
+    });
+
+    await expectIndexableMetadata(page, {
+      titleContains: "What's On at London Cinemas",
+      canonicalPath: "/",
     });
   });
 });
