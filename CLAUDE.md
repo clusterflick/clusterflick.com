@@ -182,8 +182,10 @@ the manifest comes back empty and pages render their empty state.
 
 The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
 This is deliberate dogfooding: the page reads exactly what subscribers read, so anything wrong in
-the feed shows up here. Events carry the venue's website as their `URL`, not a booking link, so a
-click opens the venue site in a new tab — a feed-side limitation, not a page-side choice.
+the feed shows up here. Events carry the film's page on this site as their `URL`, not a booking
+link, so a click opens `/movies/<id>/<slug>` in a new tab. The feed builds that address itself,
+from the same combined release the site builds from — it has to agree with `getMovieUrl` exactly,
+since a static export has no dynamic route to catch a near-miss.
 
 **Three things about FullCalendar 6 that are load-bearing:**
 
