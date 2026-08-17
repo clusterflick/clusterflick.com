@@ -74,6 +74,16 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-16",
     changes: [
       {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://www.wegottickets.com">WeGotTickets</Ext>, the
+            independent ticket agency.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
@@ -234,6 +244,30 @@ export const CHANGELOG: ChangelogDay[] = [
             &quot;commonpress.co.uk-shoreditch&quot; rather than
             &quot;commonpress.co.uk&quot;, so anyone subscribed to the old URL
             will need to resubscribe.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: ({ VenueList }) => (
+          <>
+            A screening a venue lists itself no longer appears twice when a
+            ticketing source turns up the showing.{" "}
+            <VenueList
+              items={[
+                {
+                  name: "The Cinema Museum",
+                  url: "http://www.cinemamuseum.org.uk",
+                },
+                {
+                  name: "The Horse Hospital",
+                  url: "https://www.thehorsehospital.com",
+                },
+                { name: "Rio Cinema", url: "https://riocinema.org.uk" },
+              ]}
+            />{" "}
+            all had duplicates — Eventbrite, Outsavvy, DICE — and these are now
+            matched, preferring linking to the venue's page.
           </>
         ),
       },
