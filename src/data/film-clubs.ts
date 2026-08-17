@@ -429,4 +429,14 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Club des Femmes" },
     ],
   },
+  {
+    id: "taste-film",
+    name: "Taste Film",
+    url: "https://www.tastefilm.co.uk",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Taste Film" },
+      { [FilterId.PerformanceNotesSearch]: "Taste Film" },
+    ],
+  },
 ];
