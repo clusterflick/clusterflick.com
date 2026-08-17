@@ -21,10 +21,26 @@ export default function StatusSection() {
     getData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const venueCount = useMemo(
-    () => (metaData ? Object.keys(metaData.venues).length : null),
-    [metaData],
-  );
+  // Most venues we track are listing something at any given time, but not all —
+  // some are seasonal, some go quiet between programmes. Showing the active
+  // count against the total says both how much is on and how much we cover.
+  const venueCounts = useMemo(() => {
+    if (!metaData) return { active: null, total: null };
+
+    const total = Object.keys(metaData.venues).length;
+    if (isLoading || isEmpty) return { active: null, total };
+
+    const active = new Set<string>();
+    for (const movie of Object.values(movies)) {
+      for (const showing of Object.values(movie.showings)) {
+        if (showing.venueId in metaData.venues) {
+          active.add(showing.venueId);
+        }
+      }
+    }
+
+    return { active: active.size, total };
+  }, [metaData, movies, isLoading, isEmpty]);
 
   const externalSources = useMemo(() => {
     if (isLoading || isEmpty || !metaData) return null;
@@ -70,12 +86,15 @@ export default function StatusSection() {
   const stats: Array<{
     label: string;
     value: number | null;
+    /** Renders as "value of total", for a value that is part of a larger set */
+    total?: number | null;
     href?: string;
     onClick?: () => void;
   }> = [
     {
       label: "Venues",
-      value: venueCount,
+      value: venueCounts.active,
+      total: venueCounts.total,
       href: "/venues",
     },
     {
@@ -116,6 +135,12 @@ export default function StatusSection() {
               <>
                 <span className={styles.statValue}>
                   {stat.value.toLocaleString("en-GB")}
+                  {stat.total != null && (
+                    <span className={styles.statSuffix}>
+                      {" "}
+                      of {stat.total.toLocaleString("en-GB")}
+                    </span>
+                  )}
                 </span>
                 <span className={styles.statLabel}>{stat.label}</span>
               </>

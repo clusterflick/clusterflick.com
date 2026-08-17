@@ -36,6 +36,13 @@
   }
 }
 
+/* Ratings appear six or more to a row on a movie page, so they are the one
+   variant that reads better compact than generous. The others are standalone
+   cards and keep the roomier default. */
+.rating {
+  padding: 10px 12px;
+}
+
 .social {
   min-height: 80px;
   flex-direction: row;
@@ -58,9 +65,11 @@
 .label {
   font-size: 13px;
   color: var(--color-electric-blue);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  width: 100%;
+  text-align: center;
 }
 
 .value {
@@ -68,11 +77,15 @@
   font-weight: 700;
   color: var(--color-neon-pink);
   margin-bottom: 4px;
+  width: 100%;
+  text-align: center;
 }
 
 .subtext {
   font-size: 12px;
   color: rgba(var(--color-light-gray-rgb), 0.7);
+  width: 100%;
+  text-align: center;
 }
 
 .title {

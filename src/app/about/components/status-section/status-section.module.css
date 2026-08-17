@@ -61,6 +61,14 @@ button.statCard:hover {
   font-family: var(--font-montserrat), sans-serif;
 }
 
+/* Matches the ratings cards' suffix: same weight and fade, scaled to sit
+   against a 36px figure rather than a 24px one. */
+.statSuffix {
+  font-size: 20px;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
 .statLabel {
   font-size: 14px;
   color: var(--color-light-gray);

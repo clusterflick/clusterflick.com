@@ -14,7 +14,7 @@
 }
 
 .ratingsGrid > a {
-  min-width: 160px;
+  min-width: 140px;
 }
 
 @media (max-width: 900px) {
@@ -98,8 +98,6 @@
   grid-auto-columns: 1fr;
   gap: 16px;
   text-align: center;
-  width: fit-content;
-  margin: 0 auto;
 }
 
 .audienceRatingsScore {

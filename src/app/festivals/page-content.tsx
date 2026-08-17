@@ -7,6 +7,13 @@ import { formatDateShort } from "@/utils/format-date";
 import type { FestivalListItem } from "./page";
 import styles from "./page.module.css";
 
+/**
+ * Past this many venues the intro sentence stops naming them. A run of links
+ * that long stops reading as a sentence and buries the festival cards below it,
+ * and the venues are all reachable from the festivals themselves anyway.
+ */
+const MAX_LISTED_VENUES = 10;
+
 interface FestivalsPageContentProps {
   festivals: FestivalListItem[];
   venues: { name: string; href: string }[];
@@ -32,16 +39,20 @@ export default function FestivalsPageContent({
             <>
               {" "}
               Current festivals are screening at{" "}
-              {venues.map((venue, i) => (
-                <span key={venue.href}>
-                  <Link href={venue.href}>{venue.name}</Link>
-                  {i < venues.length - 2
-                    ? ", "
-                    : i === venues.length - 2
-                      ? " and "
-                      : ""}
-                </span>
-              ))}
+              {venues.length < MAX_LISTED_VENUES ? (
+                venues.map((venue, i) => (
+                  <span key={venue.href}>
+                    <Link href={venue.href}>{venue.name}</Link>
+                    {i < venues.length - 2
+                      ? ", "
+                      : i === venues.length - 2
+                        ? " and "
+                        : ""}
+                  </span>
+                ))
+              ) : (
+                <>{venues.length} venues</>
+              )}
               .
             </>
           )}

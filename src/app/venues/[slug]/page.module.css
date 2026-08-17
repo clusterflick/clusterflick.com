@@ -55,6 +55,12 @@
   margin-bottom: 75px;
 }
 
+.festivalCards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .accessibilitySection h2 {
   margin-bottom: 8px;
 }

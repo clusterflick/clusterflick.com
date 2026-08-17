@@ -10,14 +10,24 @@
 
 /* Search input */
 
-.searchWrapper {
+/* Input, toggle and result count read as one control block, so they are spaced
+   together and carry a single gap down to the first venue group. */
+.searchControls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 32px;
+}
+
+/* The switch spans the full-width input above it, so its default
+   space-between would leave the label a whole column away from the track. */
+.hideEmptySwitch {
+  justify-content: flex-end;
 }
 
 .searchResultCount {
   font-size: 14px;
   color: var(--color-muted-gray);
-  margin: -20px 0 24px;
 }
 
 /* Venue groups */

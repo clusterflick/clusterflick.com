@@ -11,6 +11,7 @@ import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
 import SearchInput from "@/components/search-input";
+import Switch from "@/components/switch";
 import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
 import styles from "./page.module.css";
 
@@ -32,27 +33,36 @@ export default function VenuesExplorer({
   boundary,
 }: VenuesExplorerProps) {
   const [query, setQuery] = useState("");
+  const [hideEmpty, setHideEmpty] = useState(false);
 
   const normalizedQuery = query.trim() ? normalizeForSearch(query) : "";
+  const isFiltering = Boolean(normalizedQuery) || hideEmpty;
 
-  // The same filter drives both the map markers and the list below it.
+  // The same filters drive both the map markers and the list below it.
   const filteredMapVenues = useMemo(() => {
-    if (!normalizedQuery) return mapVenues;
-    return mapVenues.filter((v) => matchesSearchQuery(v.name, normalizedQuery));
-  }, [mapVenues, normalizedQuery]);
+    if (!isFiltering) return mapVenues;
+
+    return mapVenues.filter(
+      (v) =>
+        (!hideEmpty || v.filmCount > 0) &&
+        (!normalizedQuery || matchesSearchQuery(v.name, normalizedQuery)),
+    );
+  }, [mapVenues, normalizedQuery, hideEmpty, isFiltering]);
 
   const filteredGroups = useMemo(() => {
-    if (!normalizedQuery) return groups;
+    if (!isFiltering) return groups;
 
     return groups
       .map((group) => ({
         ...group,
-        venues: group.venues.filter((v) =>
-          matchesSearchQuery(v.name, normalizedQuery),
+        venues: group.venues.filter(
+          (v) =>
+            (!hideEmpty || v.eventCount > 0) &&
+            (!normalizedQuery || matchesSearchQuery(v.name, normalizedQuery)),
         ),
       }))
       .filter((group) => group.venues.length > 0);
-  }, [groups, normalizedQuery]);
+  }, [groups, normalizedQuery, hideEmpty, isFiltering]);
 
   const matchCount = filteredGroups.reduce(
     (sum, g) => sum + g.venues.length,
@@ -65,21 +75,30 @@ export default function VenuesExplorer({
         <VenueMap venues={filteredMapVenues} boundary={boundary} />
       </div>
 
-      <SearchInput
-        id="venues-search"
-        className={styles.searchWrapper}
-        placeholder="Filter venues..."
-        ariaLabel="Filter venues"
-        value={query}
-        onChange={setQuery}
-      />
+      <div className={styles.searchControls}>
+        <SearchInput
+          id="venues-search"
+          placeholder="Filter venues..."
+          ariaLabel="Filter venues"
+          value={query}
+          onChange={setQuery}
+        />
 
-      {query.trim() && (
-        <p className={styles.searchResultCount}>
-          Showing {matchCount.toLocaleString("en-GB")}{" "}
-          {matchCount === 1 ? "venue" : "venues"}
-        </p>
-      )}
+        <Switch
+          id="venues-hide-empty"
+          className={styles.hideEmptySwitch}
+          label="Hide venues with no showings"
+          checked={hideEmpty}
+          onChange={setHideEmpty}
+        />
+
+        {isFiltering && (
+          <p className={styles.searchResultCount}>
+            Showing {matchCount.toLocaleString("en-GB")}{" "}
+            {matchCount === 1 ? "venue" : "venues"}
+          </p>
+        )}
+      </div>
 
       {filteredGroups.map((group) => {
         const groupSlug = GROUP_SLUG_BY_LABEL.get(group.label);
@@ -112,11 +131,14 @@ export default function VenuesExplorer({
         );
       })}
 
-      {filteredGroups.length === 0 && (
-        <p className={styles.noResults}>
-          No venues match &ldquo;{query}&rdquo;
-        </p>
-      )}
+      {filteredGroups.length === 0 &&
+        (query.trim() ? (
+          <p className={styles.noResults}>
+            No venues match &ldquo;{query}&rdquo;
+          </p>
+        ) : (
+          <p className={styles.noResults}>No venues have showings listed</p>
+        ))}
     </>
   );
 }

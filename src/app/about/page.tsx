@@ -189,7 +189,7 @@ export default function AboutPage() {
           </ContentSection>
 
           <ContentSection
-            title="Film Data"
+            title="Acknowledgements"
             as="h3"
             align="center"
             intro={
@@ -213,14 +213,103 @@ export default function AboutPage() {
               <Image
                 src="/images/tmdb-logo.svg"
                 alt="TMDB Logo"
-                width={190}
-                height={82}
+                width={150}
+                height={65}
               />
-              <p className={styles.tmdbDisclaimer}>
+              <p className={styles.disclaimer}>
                 Clusterflick uses the TMDB API but is not endorsed or certified
                 by TMDB.
               </p>
             </div>
+
+            <p className={styles.acknowledgement}>
+              Ratings and review scores on film pages are courtesy of{" "}
+              <a
+                href="https://www.imdb.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                IMDb
+              </a>
+              ,{" "}
+              <a
+                href="https://letterboxd.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Letterboxd
+              </a>
+              ,{" "}
+              <a
+                href="https://www.rottentomatoes.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nowrap"
+              >
+                Rotten Tomatoes
+              </a>
+              ,{" "}
+              <a
+                href="https://www.metacritic.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Metacritic
+              </a>{" "}
+              and the{" "}
+              <a
+                href="https://bechdeltest.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nowrap"
+              >
+                Bechdel Test
+              </a>
+              . Every score links back to the source it came from, so you can
+              read the reviews behind it.
+            </p>
+            {/* IMDb's non-commercial datasets licence asks for this exact
+                sentence, with the URL shown, so it is quoted verbatim rather
+                than folded into the credits above. */}
+            <p className={styles.disclaimer}>
+              Information courtesy of IMDb (
+              <a
+                href="https://www.imdb.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.imdb.com
+              </a>
+              ). Used with permission.
+            </p>
+            {/* CC BY-NC 3.0 wants the source named and linked, and the licence
+                named and linked, wherever the material is used. */}
+            <p className={styles.disclaimer}>
+              Bechdel Test results come from the{" "}
+              <a
+                href="https://bechdeltest.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nowrap"
+              >
+                Bechdel Test Movie List
+              </a>
+              , licensed under{" "}
+              <a
+                href="https://creativecommons.org/licenses/by-nc/3.0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nowrap"
+              >
+                CC BY-NC 3.0
+              </a>
+              .
+            </p>
+            <p className={styles.disclaimer}>
+              All trademarks are the property of their respective owners.
+              Clusterflick is not endorsed by, certified by or affiliated with
+              any of them.
+            </p>
           </ContentSection>
 
           <ContentSection

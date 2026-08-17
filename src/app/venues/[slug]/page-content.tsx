@@ -16,6 +16,8 @@ import VenueHeroDetails from "@/components/venue-hero-details";
 import { ButtonLink } from "@/components/button";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
+import FestivalCard from "@/components/festival-card";
+import type { MovieFestival } from "@/utils/get-movie-festivals";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import PosterRow from "@/components/poster-row";
 import VenueScheduleBoard from "@/components/venue-schedule-board";
@@ -57,7 +59,7 @@ export interface VenueDetailPageContentProps {
   nearbyVenues: NearbyVenue[];
   borough?: VenueBorough | null;
   group?: VenueGroupLink | null;
-  activeFestivals: { name: string; href: string }[];
+  activeFestivals: MovieFestival[];
   accessibilityStats: {
     feature: AccessibilityFeature;
     filmCount: number;
@@ -96,13 +98,11 @@ export default function VenueDetailPageContent({
 
   const festivalsSection = hasFestivals ? (
     <ContentSection title="Festivals" as="h2">
-      <LinkedList
-        items={activeFestivals.map((festival) => ({
-          key: festival.href,
-          href: festival.href,
-          label: festival.name,
-        }))}
-      />
+      <div className={styles.festivalCards}>
+        {activeFestivals.map((festival) => (
+          <FestivalCard key={festival.id} festival={festival} />
+        ))}
+      </div>
     </ContentSection>
   ) : null;
 

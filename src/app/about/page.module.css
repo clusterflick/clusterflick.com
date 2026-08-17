@@ -75,8 +75,19 @@
   gap: 16px;
 }
 
-.tmdbDisclaimer {
+.disclaimer {
   font-style: italic;
   font-size: 14px;
   opacity: 0.8;
+}
+
+/* The reset leaves paragraphs marginless, so stacked notes need separating. */
+.disclaimer + .disclaimer {
+  margin-top: 8px;
+}
+
+/* Sits between the TMDB block and the closing disclaimer, so it needs air on
+   both sides rather than reading as a caption to the logo above it. */
+.acknowledgement {
+  margin: 32px 0 16px;
 }

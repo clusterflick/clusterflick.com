@@ -17,7 +17,8 @@ import { VENUE_GROUPS } from "@/data/venue-groups";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { FESTIVALS } from "@/data/festivals";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
-import { getFestivalUrl } from "@/utils/get-festival-url";
+import { getFestivalImagePath } from "@/utils/get-festival-image";
+import { summariseFestival } from "@/utils/get-movie-festivals";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
 import { AccessibilityFeature, type Movie, type Venue } from "@/types";
@@ -287,17 +288,18 @@ export default async function VenueDetailPage({
       }
     : null;
 
-  // Find active festivals running at this venue
+  // Find active festivals running at this venue. The card carries the
+  // festival's own counts and dates, not the subset showing here, so they match
+  // the festival page it links to.
   const activeFestivalsAtVenue = FESTIVALS.flatMap((festival) => {
     const festMovies = getFestivalMovies(festival, data.movies);
-    if (Object.keys(festMovies).length === 0) return [];
     const atVenue = Object.values(festMovies).some((movie) =>
       movie.performances.some(
         (perf) => movie.showings[perf.showingId]?.venueId === venue.id,
       ),
     );
     if (!atVenue) return [];
-    return [{ name: festival.name, href: getFestivalUrl(festival) }];
+    return [summariseFestival(festival, festMovies, getFestivalImagePath)];
   });
 
   // Build JSON-LD structured data for this venue
