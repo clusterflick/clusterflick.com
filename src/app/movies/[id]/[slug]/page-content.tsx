@@ -274,7 +274,7 @@ export default function PageContent({
 
           {movie.originalTitle && (
             <p className={styles.originalTitle}>
-              Original title: {movie.originalTitle}
+              Original title: <em>{movie.originalTitle}</em>
             </p>
           )}
 
