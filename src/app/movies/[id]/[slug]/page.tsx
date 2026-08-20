@@ -7,6 +7,8 @@ import { getMovieUrl } from "@/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
+import { getMovieFilmClubs } from "@/utils/get-movie-film-clubs";
+import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { hydrateUrl } from "@/utils/hydrate-url";
@@ -240,6 +242,13 @@ export default async function MovieDetailPage({
     getFestivalImagePath,
   );
 
+  // Find film clubs this movie screens with
+  const filmClubs = getMovieFilmClubs(
+    movie.id,
+    data.movies,
+    getFilmClubImagePath,
+  );
+
   // "Top films" lists this movie appears on (RT's 300 Best, the 100% Club, …)
   const movieLists = getMovieListsForMovie(movie.id, data.movies);
 
@@ -333,6 +342,7 @@ export default async function MovieDetailPage({
         venueCounts={venueCounts}
         containingEvents={containingEventsWithoutPerformances}
         festivals={festivals}
+        filmClubs={filmClubs}
         movieLists={movieLists}
         collection={collection}
         formats={formats}

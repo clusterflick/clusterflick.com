@@ -17,6 +17,7 @@ import {
   CollectionSummary,
 } from "@/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
+import type { MovieFilmClub } from "@/utils/get-movie-film-clubs";
 import type { MovieListMembership } from "@/utils/get-movie-list-movies";
 import type { FormatDefinition } from "@/data/formats";
 import { useCinemaData } from "@/state/cinema-data-context";
@@ -40,7 +41,7 @@ import GenresList from "./components/genres-list";
 import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
 import IncludedFilmsSection from "./components/included-films-section";
-import FestivalSection from "./components/festival-section";
+import ScreeningAsPartOf from "./components/screening-as-part-of";
 import MovieListsSection from "./components/movie-lists-section";
 import CollectionSection from "./components/collection-section";
 import FormatsList from "./components/formats-list";
@@ -59,6 +60,7 @@ type PageContentProps = {
   venueCounts: VenuePlayCount[];
   containingEvents: Omit<Movie, "performances">[];
   festivals: MovieFestival[];
+  filmClubs: MovieFilmClub[];
   movieLists: MovieListMembership[];
   collection?: CollectionSummary;
   formats: FormatDefinition[];
@@ -73,6 +75,7 @@ export default function PageContent({
   venueCounts,
   containingEvents,
   festivals,
+  filmClubs,
   movieLists,
   collection,
   formats,
@@ -335,7 +338,7 @@ export default function PageContent({
 
           <MovieListsSection lists={movieLists} />
           <CollectionSection collection={collection} />
-          <FestivalSection festivals={festivals} />
+          <ScreeningAsPartOf festivals={festivals} filmClubs={filmClubs} />
           <CastCrewSection
             directors={movie.directors}
             actors={movie.actors}

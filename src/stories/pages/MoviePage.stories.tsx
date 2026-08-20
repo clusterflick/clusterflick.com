@@ -163,6 +163,7 @@ function DefaultMoviePage() {
           containingEvents={data.containingEvents}
           formats={data.formats}
           festivals={[]}
+          filmClubs={[]}
           movieLists={[]}
         />
       )}
@@ -233,6 +234,7 @@ export const WithIncludedMovies: Story = {
           containingEvents={data.containingEvents}
           formats={data.formats}
           festivals={[]}
+          filmClubs={[]}
           movieLists={[]}
         />
       )}

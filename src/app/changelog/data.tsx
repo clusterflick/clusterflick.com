@@ -71,6 +71,22 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-21",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            A film&apos;s page now credits the film club putting a screening on,
+            alongside festivals under &ldquo;Screening as part of&rdquo; — so a{" "}
+            <Link href="/film-clubs/bar-trash">Bar Trash</Link> night says so,
+            and links to everything else the club has coming up.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-20",
     changes: [
       {
