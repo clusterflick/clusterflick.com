@@ -57,6 +57,12 @@
   margin-bottom: 16px;
 }
 
+.originalTitle {
+  font-style: italic;
+  color: var(--color-muted-gray);
+  margin-bottom: 16px;
+}
+
 .metadata {
   display: flex;
   align-items: center;
