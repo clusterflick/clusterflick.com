@@ -28,6 +28,7 @@ import { filterManager, describeFilters } from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
 import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
+import { formatLanguage } from "@/utils/format-language";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
@@ -285,6 +286,11 @@ export default function PageContent({
               </span>
             )}
             {!!movie.duration && <span>{formatDuration(movie.duration)}</span>}
+            {!!movie.originalLanguage && (
+              <span className={styles.language}>
+                {formatLanguage(movie.originalLanguage)}
+              </span>
+            )}
           </div>
 
           <GenresList

@@ -289,6 +289,8 @@ export type Movie = {
   normalizedTitle: string;
   /** The title in its original language, when that isn't English and differs from `title`. */
   originalTitle?: string;
+  /** ISO 639-1 code of the film's original language, when that isn't English. */
+  originalLanguage?: string;
   isUnmatched?: boolean;
   classification?: Classification;
   overview?: string;
