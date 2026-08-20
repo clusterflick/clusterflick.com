@@ -61,6 +61,20 @@ const kinotekaVenues = [
   "bbk.ac.uk-cinema",
 ];
 
+// Fringe! titles its screenings several ways — "… - FRINGE!" (Genesis),
+// "FRINGE! PRESENTS …" (The Nickel), "Fringe! and Pink Palace: …" (Rio) and
+// "Fringe x <collaborator> presents: …". Search normalisation strips
+// punctuation, so the bang cannot anchor a matcher and a bare "Fringe" would
+// also catch any film with the word in its title. The bare match is therefore
+// scoped to the venues the festival currently uses, with the full name and the
+// "presents" form left unscoped so a new venue is still picked up.
+const fringeVenues = [
+  "genesiscinema.co.uk",
+  "riocinema.org.uk",
+  "thenickel.co.uk",
+  "thegardencinema.co.uk",
+];
+
 export const FESTIVALS: Festival[] = [
   {
     id: "bfi-flare",
@@ -373,6 +387,99 @@ export const FESTIVALS: Festival[] = [
         [FilterId.ShowingTitleSearch]: "Animation in Love",
         [FilterId.Venues]: ["barbican.org.uk"],
       },
+    ],
+  },
+  {
+    id: "hong-kong-film-festival-uk",
+    name: "Hong Kong Film Festival UK",
+    url: "https://www.hkff.uk",
+    aliases: ["hkff", "hong-kong-film-festival"],
+    matchers: [
+      {
+        // Venues title these "Hong Kong Film Festival UK: ..." (Rio) or
+        // "Hong Kong Film Festival 2026-27 - ..." (Theatreship). The fourth
+        // edition runs 25 September – 4 October 2026 across 11 London venues.
+        [FilterId.ShowingTitleSearch]: "Hong Kong Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Hong Kong Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "HKFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "HKFF",
+      },
+    ],
+  },
+  {
+    id: "kino-london-short-film-festival",
+    name: "Kino London Short Film Festival",
+    url: "https://www.kinoshortfilm.com",
+    aliases: ["klsff", "kino-london"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Kino London Short Film Festival",
+      },
+      {
+        // Catches the industry sessions and open-screen nights, which are
+        // titled "Kino Industry Session: …" and "Short Film Open Screen".
+        [FilterId.PerformanceNotesSearch]: "Kino Short Film",
+      },
+    ],
+  },
+  {
+    id: "ukrainian-film-festival",
+    name: "Ukrainian Film Festival",
+    url: "https://uil.org.uk/ukrainian-film-festival/",
+    aliases: ["ukrainian-film-fest"],
+    matchers: [
+      // Curzon titles these "Ukrainian Film Fest: …"; the festival's own name
+      // is "Ukrainian Film Festival", and the shorter string matches both.
+      { [FilterId.ShowingTitleSearch]: "Ukrainian Film Fest" },
+      { [FilterId.PerformanceNotesSearch]: "Ukrainian Film Fest" },
+    ],
+  },
+  {
+    id: "wine-dark-short-film-festival",
+    name: "Wine Dark Short Film Festival",
+    url: "https://www.winedark.co.uk/wine-dark-short-film-festival",
+    aliases: ["wdsff", "wine-dark"],
+    matchers: [
+      // Picturehouse titles each strand "<Strand> - Wine Dark Short Film
+      // Festival".
+      { [FilterId.ShowingTitleSearch]: "Wine Dark Short Film Festival" },
+      { [FilterId.PerformanceNotesSearch]: "Wine Dark Short Film Festival" },
+    ],
+  },
+  {
+    id: "fringe-queer-film-arts-fest",
+    name: "Fringe! Queer Film & Arts Fest",
+    url: "https://www.fringefilmfest.com",
+    aliases: ["fringe", "fringe-queer-film-festival"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Fringe",
+        [FilterId.Venues]: fringeVenues,
+      },
+      { [FilterId.ShowingTitleSearch]: "Fringe Queer Film Festival" },
+      { [FilterId.ShowingTitleSearch]: "Fringe Presents" },
+    ],
+  },
+  {
+    id: "fighting-spirit-film-festival",
+    name: "The Fighting Spirit Film Festival",
+    url: "https://www.fightingspiritfilmfestival.com",
+    aliases: ["fsff", "fighting-spirit"],
+    matchers: [
+      {
+        // The Rio titles each screening "Fighting Spirit: …". Scoped to the
+        // venue because "Fighting Spirit" is also a film title in its own
+        // right; the full festival name is matched unscoped below.
+        [FilterId.ShowingTitleSearch]: "Fighting Spirit",
+        [FilterId.Venues]: ["riocinema.org.uk"],
+      },
+      { [FilterId.ShowingTitleSearch]: "Fighting Spirit Film Festival" },
     ],
   },
 ];

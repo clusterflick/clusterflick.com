@@ -439,4 +439,34 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Taste Film" },
     ],
   },
+  {
+    id: "lucilas-film-club",
+    name: "Lucila's Film Club",
+    url: "https://www.instagram.com/lucilasfilmclub/",
+    aliases: ["lucila-safdie-film-club"],
+    matchers: [
+      // Press and listings split between "Lucila's Film Club" and "Lucila
+      // Safdie Film Club"; search normalisation strips punctuation but not the
+      // possessive "s", so both spellings need their own matcher.
+      { [FilterId.ShowingTitleSearch]: "Lucila's Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Lucila's Film Club" },
+      { [FilterId.ShowingTitleSearch]: "Lucila Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Lucila Film Club" },
+      { [FilterId.ShowingTitleSearch]: "Lucila Safdie" },
+      { [FilterId.PerformanceNotesSearch]: "Lucila Safdie" },
+    ],
+  },
+  {
+    id: "deeper-into-movies",
+    name: "Deeper Into Movies",
+    url: "https://deepermovies.com",
+    aliases: [],
+    matchers: [
+      // Everyman puts the club in the title; DICE listings for The Haggerston
+      // carry it only in the performance notes ("Presented by Deeper Into
+      // Movies"), with the film's own title as the showing title.
+      { [FilterId.ShowingTitleSearch]: "Deeper Into Movies" },
+      { [FilterId.PerformanceNotesSearch]: "Deeper Into Movies" },
+    ],
+  },
 ];

@@ -71,6 +71,132 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-20",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Hong Kong Film Festival UK"
+              url="https://www.hkff.uk"
+            />
+            , the diaspora-led festival of Hong Kong and East and Southeast
+            Asian cinema, whose fourth edition runs 25 September to 4 October
+            across eleven London venues — its biggest programme yet, with
+            seventeen UK premieres alongside restored classics and experimental
+            work.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added five more festivals with programmes coming up —{" "}
+            <Festival
+              name="Kino London Short Film Festival"
+              url="https://www.kinoshortfilm.com"
+            />
+            , a BIFA qualifier built around shorts by emerging filmmakers;{" "}
+            <Festival
+              name="Fringe! Queer Film & Arts Fest"
+              url="https://www.fringefilmfest.com"
+            />
+            , volunteer-run and free or cheap to get into since 2011;{" "}
+            <Festival
+              name="The Fighting Spirit Film Festival"
+              url="https://www.fightingspiritfilmfestival.com"
+            />
+            , one of the few festivals anywhere given over to martial arts and
+            action cinema;{" "}
+            <Festival
+              name="Ukrainian Film Festival"
+              url="https://uil.org.uk/ukrainian-film-festival/"
+            />
+            , the Ukrainian Institute London&apos;s yearly run at Curzon Soho;
+            and{" "}
+            <Festival
+              name="Wine Dark Short Film Festival"
+              url="https://www.winedark.co.uk/wine-dark-short-film-festival"
+            />
+            , London&apos;s first festival of shorts made by D/deaf, disabled
+            and neurodivergent teams.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/lucilas-film-club">
+              Lucila&apos;s Film Club
+            </Link>
+            , a female-directors-only movie night run by fashion designer Lucila
+            Safdie and her best friend June, which started out at the Genesis
+            Cinema in east London.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/deeper-into-movies">
+              Deeper Into Movies
+            </Link>
+            , which grew out of Steven T Hanley&apos;s VHS screenings in London
+            dive bars into regular nights at The Haggerston and Screen on the
+            Green — contemporary cinema and overlooked gems, often with a
+            lecture or a live score alongside the film.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            A film&apos;s page now shows its original title too (where that
+            differs from the English one) — Amélie shows its original French
+            title{" "}
+            <em>&ldquo;Le Fabuleux Destin d&apos;Amélie Poulain&rdquo;</em> too
+            — along with the language it was made in.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            <Link href="/films">Searching</Link> looks at original titles too so
+            you don&apos;t have to reach for whatever it was called in English —{" "}
+            <em>&ldquo;Fabuleux&rdquo;</em> finds Amélie.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-08-17",
+    changes: [
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added <Link href="/film-clubs/taste-film">Taste Film</Link>, an
+            immersive dining experience that pairs a tasting menu with a
+            screening, each course arriving as its scene does. Founded by former
+            Film Studies teacher Amy Fernando, who had the idea watching the
+            prison cooking scene in Goodfellas.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-16",
     changes: [
       {
