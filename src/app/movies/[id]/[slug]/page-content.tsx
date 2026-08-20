@@ -271,6 +271,12 @@ export default function PageContent({
             {movie.title}
           </OutlineHeading>
 
+          {movie.originalTitle && (
+            <p className={styles.originalTitle}>
+              Original title: {movie.originalTitle}
+            </p>
+          )}
+
           <div className={styles.metadata}>
             {!!movie.year && <span>{movie.year}</span>}
             {!!movie.classification && (
