@@ -45,10 +45,14 @@ export const searchFilter: FilterModule<FilterId.Search> = {
     const result: MoviesRecord = {};
 
     for (const [id, movie] of Object.entries(movies)) {
-      // Match against alternative spellings of both titles
+      // Match against alternative spellings of both titles, plus the
+      // original-language title for foreign-language films (e.g. searching
+      // "Fabuleux" finds Amélie).
       const titleMatch =
         matchesSearchQuery(movie.normalizedTitle || "", query) ||
-        matchesSearchQuery(movie.title, query);
+        matchesSearchQuery(movie.title, query) ||
+        (!!movie.originalTitle &&
+          matchesSearchQuery(movie.originalTitle, query));
 
       if (titleMatch) {
         result[id] = movie;
