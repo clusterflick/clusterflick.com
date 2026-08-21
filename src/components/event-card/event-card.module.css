@@ -1,8 +1,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 24px;
+  gap: 12px;
+  padding: 18px 12px;
   border-radius: 16px;
   height: 100%;
   box-sizing: border-box;
