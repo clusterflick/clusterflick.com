@@ -758,17 +758,18 @@ function sleep(ms) {
     await sleep(DELAY_MS);
   }
 
-  // Post-process: convert ICO/WebP to PNG and resize oversized images
+  // Post-process: convert ICO/WebP/GIF to PNG and resize oversized images
   const POST_PROCESS_MAX = 512;
 
   // Returns the extension the image ended up with, which changes when an
-  // ICO/WebP is converted to PNG.
+  // ICO/WebP/GIF is converted to PNG. get-venue-image.ts only looks for
+  // .jpg/.png/.svg, so any other format left on disk is invisible to the site.
   async function postProcessImage(baseName, ext) {
     const filePath = path.join(OUTPUT_DIR, `${baseName}${ext}`);
 
     if (!fs.existsSync(filePath) || ext === ".svg") return ext;
 
-    const needsConvert = ext === ".ico" || ext === ".webp";
+    const needsConvert = ext === ".ico" || ext === ".webp" || ext === ".gif";
     let needsResize = false;
 
     try {

@@ -86,6 +86,58 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Bojangles Brasserie",
+                  url: "https://wearebojangles.com",
+                },
+                {
+                  name: "Green Alley Studios",
+                  url: "https://www.instagram.com/green_alley_studios",
+                },
+                {
+                  name: "Orchard Dry Dock",
+                  url: "https://www.goodluckhope.com",
+                },
+                { name: "Oslo Hackney", url: "https://www.oslohackney.com" },
+                {
+                  name: "Polish Social and Cultural Association POSK",
+                  url: "https://posk.org",
+                },
+                { name: "The Bedford", url: "https://thebedford.com" },
+                {
+                  name: "The Cyprus High Commission",
+                  url: "http://www.cyprusinuk.com",
+                },
+                {
+                  name: "The Griffin",
+                  url: "https://www.griffinwhetstone.pub",
+                },
+                {
+                  name: "Tower Bridge Collective",
+                  url: "https://towerbridgecollective.co.uk",
+                },
+                {
+                  name: "Upminster Windmill",
+                  url: "https://www.upminsterwindmill.org",
+                },
+              ]}
+            />
+            , ten more places whose screenings only ever surface on the
+            ticketing platforms — among them a Grade II* smock mill running
+            outdoor cinema under its sails, the largest Polish centre in Western
+            Europe, a rediscovered dry dock at the mouth of the Lea, and the
+            Cyprus High Commission&apos;s nights of Cypriot film in St
+            James&apos;s Square.
+          </>
+        ),
+      },
+      {
         tag: "New feature",
         body: () => (
           <>
