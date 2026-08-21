@@ -62,7 +62,7 @@ type PageContentProps = {
   festivals: MovieFestival[];
   filmClubs: MovieFilmClub[];
   movieLists: MovieListMembership[];
-  collection?: CollectionSummary;
+  collections: CollectionSummary[];
   formats: FormatDefinition[];
   showingsStaticContent?: ReactNode;
 };
@@ -77,7 +77,7 @@ export default function PageContent({
   festivals,
   filmClubs,
   movieLists,
-  collection,
+  collections,
   formats,
   showingsStaticContent,
 }: PageContentProps) {
@@ -337,7 +337,7 @@ export default function PageContent({
           />
 
           <MovieListsSection lists={movieLists} />
-          <CollectionSection collection={collection} />
+          <CollectionSection collections={collections} />
           <ScreeningAsPartOf festivals={festivals} filmClubs={filmClubs} />
           <CastCrewSection
             directors={movie.directors}

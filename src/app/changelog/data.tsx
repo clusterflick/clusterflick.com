@@ -141,10 +141,27 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
-            A film&apos;s page now credits the film club putting a screening on,
-            alongside festivals under &ldquo;Screening as part of&rdquo; — so a{" "}
-            <Link href="/film-clubs/bar-trash">Bar Trash</Link> night says so,
-            and links to everything else the club has coming up.
+            &ldquo;More Than a Screening&rdquo; on the{" "}
+            <Link href="/">home page</Link> picks out the nights that are more
+            than the film — a Q&amp;A with someone who made it, a silent with a
+            live score, a first UK showing. Cinemas only ever mention these in
+            passing in a listing&apos;s small print, so they are read out of the
+            listings themselves and ranked by how rare they actually are: an
+            introduction is worth noticing at a cinema that rarely gives one and
+            not at a cinema that always does, and one Q&amp;A among a
+            film&apos;s fifty showings is a genuinely different evening.
+            Sold-out nights are left out — there is no point pointing at a door
+            you can&apos;t get through.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Marathons and double bills now say which{" "}
+            <Link href="/collections">collection</Link> they belong to, the way
+            a single film always has.
           </>
         ),
       },

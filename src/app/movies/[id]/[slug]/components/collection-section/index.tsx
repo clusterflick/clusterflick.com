@@ -7,25 +7,26 @@ import PillList from "@/components/pill-list";
 import styles from "./collection-section.module.css";
 
 interface CollectionSectionProps {
-  collection?: CollectionSummary;
+  collections: CollectionSummary[];
 }
 
 /**
- * The collection this film belongs to. A film is in at most one, so this is a
- * single pill — the list shape keeps it consistent with the "Appears on" lists
- * directly above it.
+ * The collections this listing belongs to. A film is in at most one; a
+ * marathon or double bill takes its collections from the films it screens, so
+ * it can name several — see `getMovieCollections`.
  */
 export default function CollectionSection({
-  collection,
+  collections,
 }: CollectionSectionProps) {
-  if (!collection) return null;
+  if (collections.length === 0) return null;
 
   return (
     <div className={styles.section}>
       <PillList
         title="Part of"
         itemNoun="collections"
-        items={[collection]}
+        items={collections}
+        maxVisible={3}
         renderItem={(item) => (
           <>
             <Link href={getCollectionUrl(item)}>{item.name}</Link>

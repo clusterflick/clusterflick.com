@@ -7,6 +7,7 @@ import {
 } from "@/lib/filters/modules/categories";
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
 import { getRating, isEvergreen } from "@/utils/movie-ratings.mjs";
+import { findBestOccasionPerMovie } from "@/lib/occasions";
 
 export { getRating };
 
@@ -21,6 +22,8 @@ export { getRating };
  *   classics.
  * - Last Chance: matched films whose final non-sold-out showing is within 3 days.
  * - Marathons: multi-film events (double bills, all-nighters) showing soon.
+ * - More Than a Screening: performances carrying an occasion — a Q&A, a live
+ *   score, a premiere — scored for rarity by `@/lib/occasions`.
  *
  * A film may legitimately appear in more than one row — a new blockbuster can be
  * both "Showing Across London" and a new release, which is intentional. Each
@@ -61,6 +64,13 @@ const POPULAR_LIMIT = 18;
 const CRITICS_LIMIT = 18;
 const NEW_ADDITIONS_LIMIT = 24; // per age bucket
 const LAST_CHANCE_LIMIT = 24;
+// Occasions look a fortnight ahead rather than a week: a one-off with a guest
+// is worth planning around, and a single week turns up too few to fill a row.
+const OCCASIONS_WINDOW_DAYS = 14;
+// Deliberately longer than the other rows while the classification is being
+// judged: the row scrolls, so entries past the first screenful cost a reader
+// nothing and give us more of the tail to look at.
+const OCCASIONS_LIMIT = 20;
 const LONDON_TIMEZONE = "Europe/London";
 
 export interface DiscoveryWindow {
@@ -97,6 +107,7 @@ export interface DiscoveryRows {
   newAdditions: NewAdditions;
   lastChance: ScoredMovie[];
   marathons: ScoredMovie[];
+  occasions: ScoredMovie[];
   collections: ScoredCollection[];
 }
 
@@ -324,14 +335,18 @@ export function getVenueNewAdditions(
     .map(({ movie, performanceCount }) => ({ movie, performanceCount }));
 }
 
-function formatLastShowing(time: number): string {
-  const label = new Date(time).toLocaleDateString("en-GB", {
+/** "Sat 23 Aug" — the weekday earns its place when a date is a fortnight out. */
+function formatDayAndDate(time: number): string {
+  return new Date(time).toLocaleDateString("en-GB", {
     weekday: "short",
     day: "numeric",
     month: "short",
     timeZone: LONDON_TIMEZONE,
   });
-  return `Last showing ${label}`;
+}
+
+function formatLastShowing(time: number): string {
+  return `Last showing ${formatDayAndDate(time)}`;
 }
 
 /**
@@ -513,6 +528,37 @@ export function getCollectionRow(
 }
 
 /**
+ * Screenings that are more than a screening — a guest in the room, a live
+ * score, a premiere — one per film, rarest first.
+ *
+ * The scoring lives in `@/lib/occasions`, because "is this rare?" is a
+ * judgement about the whole dataset (how routine the signal is at that venue,
+ * how often the film screens elsewhere) rather than about the row. All this
+ * does is put the occasion where a reader will see it: the poster subtitle,
+ * which is otherwise the film's year.
+ */
+export function getOccasionMovies(
+  movies: MoviesRecord,
+  window: DiscoveryWindow,
+  limit: number = OCCASIONS_LIMIT,
+): ScoredMovie[] {
+  return findBestOccasionPerMovie(movies, {
+    start: window.rangeStart,
+    end: window.rangeEnd,
+  })
+    .slice(0, limit)
+    .map(({ movie, performance, label, filmPerformanceCount }) => ({
+      movie,
+      performanceCount: filmPerformanceCount,
+      // Non-breaking spaces inside the date: these subtitles are long enough to
+      // wrap ("Intro by Lillian Crawford · Mon 24 Aug"), and a date broken
+      // across two lines reads as two facts. The separator is bound to the date
+      // as well, so it travels with it rather than dangling at a line end.
+      subtitle: `${label} ·\u00A0${formatDayAndDate(performance.time).replace(/ /g, "\u00A0")}`,
+    }));
+}
+
+/**
  * Computes every discovery row in one pass. Run at build time for the SSR
  * fallback (window anchored to today's midnight, matching the rest of the site's
  * SSR) and again on the client with `anchorToNow` so the window starts at the
@@ -545,6 +591,10 @@ export function computeDiscoveryRows(
     lastChance: getLastChanceMovies(movies, now, LAST_CHANCE_LIMIT),
     // Uncapped — the full marathon/double-bill set is small and inherently special.
     marathons: getMarathonMovies(movies, window, Infinity),
+    occasions: getOccasionMovies(
+      movies,
+      getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),
+    ),
     collections: getCollectionRow(movies, options.collections ?? {}, window),
   };
 }

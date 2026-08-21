@@ -15,6 +15,7 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
     newAdditions,
     lastChance,
     marathons,
+    occasions,
     collections,
   } = rows;
   const hasNewAdditions =
@@ -35,6 +36,13 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         title="Critics' Picks"
         intro="Highly rated films worth seeking out this week."
         movies={criticsPicks}
+        showAll
+      />
+
+      <PosterRow
+        title="More Than a Screening"
+        intro="Q&As, live scores and premieres — nights you can't catch on another date."
+        movies={occasions}
         showAll
       />
 

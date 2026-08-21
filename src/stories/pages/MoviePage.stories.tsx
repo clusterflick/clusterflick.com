@@ -165,6 +165,7 @@ function DefaultMoviePage() {
           festivals={[]}
           filmClubs={[]}
           movieLists={[]}
+          collections={[]}
         />
       )}
     </StoryDataLoader>
@@ -236,6 +237,7 @@ export const WithIncludedMovies: Story = {
           festivals={[]}
           filmClubs={[]}
           movieLists={[]}
+          collections={[]}
         />
       )}
     </StoryDataLoader>

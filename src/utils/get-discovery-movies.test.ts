@@ -13,6 +13,7 @@ import {
   getMarathonMovies,
   getCriticsPicks,
   getCollectionRow,
+  getOccasionMovies,
   getRating,
   type DiscoveryWindow,
 } from "./get-discovery-movies";
@@ -24,6 +25,8 @@ const WINDOW: DiscoveryWindow = { rangeStart: NOW, rangeEnd: NOW + 8 * DAY };
 
 interface ShowingSpec {
   venueId: string;
+  /** The venue's own title for the showing, where it differs from the film's. */
+  title?: string;
   seen?: number;
   /** Performance times for this showing (defaults to one inside the window). */
   times?: number[];
@@ -35,6 +38,7 @@ interface MovieOpts {
   year?: string;
   releaseDate?: string;
   isUnmatched?: boolean;
+  posterPath?: string;
   includedMovies?: IncludedMovie[];
   lb?: { rating: number; reviews: number };
   rt?: { score: number; reviews: number };
@@ -55,6 +59,7 @@ function makeMovie(
     showings[showingId] = {
       id: showingId,
       category,
+      title: spec.title,
       url: `https://example.com/${showingId}`,
       venueId: spec.venueId,
       ...(spec.seen !== undefined ? { seen: spec.seen } : {}),
@@ -79,6 +84,7 @@ function makeMovie(
     year: opts.year,
     releaseDate: opts.releaseDate,
     isUnmatched: opts.isUnmatched,
+    posterPath: opts.posterPath,
     includedMovies: opts.includedMovies,
     letterboxd: opts.lb
       ? {
@@ -513,5 +519,34 @@ describe("getCollectionRow", () => {
     );
 
     expect(result).toHaveLength(0);
+  });
+});
+
+describe("getOccasionMovies", () => {
+  const window: DiscoveryWindow = { rangeStart: NOW, rangeEnd: NOW + 15 * DAY };
+
+  it("leads the subtitle with the occasion and the date it falls on", () => {
+    const movies = asRecord([
+      makeMovie("a", [{ venueId: "v1", title: "A + Q&A with Mark Gatiss" }], {
+        posterPath: "/a.jpg",
+      }),
+    ]);
+
+    const [row] = getOccasionMovies(movies, window);
+    // The date is bound together with non-breaking spaces so it cannot wrap.
+    expect(row.subtitle).toBe(
+      "Q&A with Mark Gatiss ·\u00A0Wed\u00A015\u00A0Nov",
+    );
+  });
+
+  it("keeps a film with no poster, which MoviePoster draws from the title", () => {
+    const movies = asRecord([
+      makeMovie("with-poster", [{ venueId: "v1", title: "One + Q&A" }], {
+        posterPath: "/one.jpg",
+      }),
+      makeMovie("no-poster", [{ venueId: "v2", title: "Two + Q&A" }]),
+    ]);
+
+    expect(getOccasionMovies(movies, window)).toHaveLength(2);
   });
 });

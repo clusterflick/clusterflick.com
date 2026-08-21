@@ -11,6 +11,7 @@ import { getMovieFilmClubs } from "@/utils/get-movie-film-clubs";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
+import { getMovieCollections } from "@/utils/get-movie-collections";
 import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
@@ -252,11 +253,10 @@ export default async function MovieDetailPage({
   // "Top films" lists this movie appears on (RT's 300 Best, the 100% Club, …)
   const movieLists = getMovieListsForMovie(movie.id, data.movies);
 
-  // The franchise or series this film belongs to, when that collection has a
-  // page of its own.
-  const collection = movie.collectionId
-    ? data.collections[movie.collectionId]
-    : undefined;
+  // The franchise or series this listing belongs to, when that collection has
+  // a page of its own. A multi-film event has no collection id of its own, so
+  // it inherits the collections of the films it screens.
+  const collections = getMovieCollections(movie, data.collections);
 
   // Non-default screening formats (70mm, IMAX, 3D, …) across upcoming
   // performances, for the format tags below the poster.
@@ -344,7 +344,7 @@ export default async function MovieDetailPage({
         festivals={festivals}
         filmClubs={filmClubs}
         movieLists={movieLists}
-        collection={collection}
+        collections={collections}
         formats={formats}
         showingsStaticContent={
           <StaticShowingsList
