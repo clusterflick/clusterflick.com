@@ -26,7 +26,7 @@ import {
 // Hardcoded image paths (normally resolved from filesystem at build time)
 const FESTIVAL_IMAGE_PATHS: Record<string, string> = {
   "festival-of-creativity-gothic-film-festival":
-    "/images/festivals/festival-of-creativity-gothic-film-festival.png",
+    "/images/festivals/festival-of-creativity-gothic-film-festival.jpg",
   "london-soundtrack-festival":
     "/images/festivals/london-soundtrack-festival.jpg",
   "judgement-hall-festival": "/images/festivals/judgement-hall-festival.jpg",

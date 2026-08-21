@@ -194,6 +194,16 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "reel-talk",
+    name: "Reel Talk",
+    url: "https://eastcroydoncool.co.uk/reel-talk/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Reel Talk" },
+      { [FilterId.PerformanceNotesSearch]: "Reel Talk" },
+    ],
+  },
+  {
     id: "rio-feminist-film-group",
     name: "Rio Feminist Film Group",
     url: "https://www.instagram.com/riofeminists/",

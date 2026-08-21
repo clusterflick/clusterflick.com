@@ -138,6 +138,25 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added <Link href="/film-clubs/reel-talk">Reel Talk</Link>, East
+            Croydon Cool&apos;s sociable film club for locals who like bold
+            movies and big conversations, run in partnership with the{" "}
+            <Venue
+              name="David Lean Cinema"
+              url="https://www.davidleancinema.org.uk"
+            />
+            . Hosts Pilar Nalwimba and Louis Holder bookend the screening with a
+            conversation about the film, and the audience carries it on
+            afterwards over drinks — a one-word review board, a postcard collage
+            station, and a video rental store where you crack open a tape with a
+            stranger and answer the question inside.
+          </>
+        ),
+      },
+      {
         tag: "New feature",
         body: () => (
           <>
