@@ -13,7 +13,7 @@ import {
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import type { Collection } from "@/types";
+import type { Collection, Movie } from "@/types";
 import type { FilmPosterGridMovie } from "@/components/film-poster-grid";
 import CollectionDetailPageContent from "./page-content";
 
@@ -179,18 +179,37 @@ export default async function CollectionDetailPage({
   // the list. A collection holds a handful, so the same block reads "1 film
   // with subtitles" — which the film's own page tells you faster, and which
   // only appeared on a third of collections anyway.
+  //
+  // Marathons and double bills count too. A standalone screening contributes
+  // the film itself; an event contributes every film of this collection it
+  // carries, so a cinema running the first eight instalments back to back
+  // reads as showing eight of them. Aggregating the standalone half alone hid
+  // a venue whose only involvement was an event — and on the collections whose
+  // films screen exclusively that way, that emptied the section outright.
+  const venueSources: { movie: Movie; filmIds: string[] }[] = [
+    ...showing.flatMap(({ movie }) =>
+      movie ? [{ movie, filmIds: [movie.id] }] : [],
+    ),
+    ...containingEvents.map(({ movie }) => ({
+      movie,
+      filmIds: (movie.includedMovies ?? [])
+        .filter((included) => included.collectionId === collection.id)
+        .map((included) => included.id),
+    })),
+  ];
+
   const venueFilmSets = new Map<string, Set<string>>();
   const venuePerfCounts = new Map<string, number>();
 
-  for (const { movie } of showing) {
-    if (!movie) continue;
+  for (const { movie, filmIds } of venueSources) {
     for (const perf of movie.performances) {
       if (perf.time < nowTs) continue;
       const showingEntry = movie.showings[perf.showingId];
       if (!showingEntry) continue;
       const { venueId } = showingEntry;
       if (!venueFilmSets.has(venueId)) venueFilmSets.set(venueId, new Set());
-      venueFilmSets.get(venueId)!.add(movie.id);
+      const films = venueFilmSets.get(venueId)!;
+      for (const filmId of filmIds) films.add(filmId);
       venuePerfCounts.set(venueId, (venuePerfCounts.get(venueId) ?? 0) + 1);
     }
   }
