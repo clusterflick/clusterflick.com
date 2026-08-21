@@ -74,6 +74,18 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-08-21",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue name="Big Penny Social" url="https://bigpennysocial.co.uk" />
+            , the Walthamstow beer hall and events space in the old
+            Truman&apos;s Social Club, where Deeper Into Movies puts on family
+            screenings and music documentaries.
+          </>
+        ),
+      },
+      {
         tag: "New feature",
         body: () => (
           <>
