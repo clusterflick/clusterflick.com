@@ -39,26 +39,31 @@
   margin-bottom: 40px;
 }
 
+/* `minmax(0, …)` rather than a bare `1fr`: the venue name is `white-space: nowrap`,
+   so a track sized by its `auto` minimum can never shrink below the longest name
+   and pushes the page into horizontal scroll. The name ellipsises once the track
+   is free to shrink. */
 .venueGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
 @media (min-width: 600px) {
   .venueGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .venueGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .venueItem {
   position: relative;
+  min-width: 0;
 }
 
 .distance {

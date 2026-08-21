@@ -1,18 +1,19 @@
 .container {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-  max-width: 500px;
   margin-top: 24px;
   margin-bottom: 32px;
   text-align: left;
 }
 
-/* The hero stacks and centres its children at this width, which would otherwise
-   shrink the card to its content — stretch it to fill the column instead. */
-@media (max-width: 768px) {
-  .container {
-    width: 100%;
-    max-width: none;
-  }
+/* Cards hug their content here rather than filling the column, on a floor wide
+   enough to stay card-shaped. The floor yields on a narrow screen — a flat
+   400px would run past the viewport on a phone. Scoped to this section because
+   `VenueCard` is shared with the venue grids, where a min-width overflows the
+   grid track. */
+.container > a {
+  min-width: min(400px, 100%);
+  max-width: 100%;
 }
