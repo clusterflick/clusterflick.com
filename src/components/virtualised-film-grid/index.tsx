@@ -134,6 +134,13 @@ export default function VirtualisedFilmGrid({
         useWindowScroll
         increaseViewportBy={900}
         totalCount={items.length}
+        // Keyed by film, not by index. Virtuoso's default index keys make a
+        // filter change reuse the previous cell's DOM — React re-points the
+        // existing <img> at a new src, and the browser holds the old poster on
+        // screen until the new one decodes, so for a moment the grid shows the
+        // films that were just filtered out. A per-film key swaps the element
+        // instead, leaving the empty poster panel until the image arrives.
+        computeItemKey={(index) => items[index].movie.id}
         components={{ List: GridList, Item: GridItem }}
         itemContent={(index) => (
           <MovieCell

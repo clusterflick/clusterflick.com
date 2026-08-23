@@ -39,6 +39,7 @@ function MoviePosterImage({
 }: MoviePosterImageProps) {
   const { imageSize, ...dimensions } = POSTER_DIMENSIONS[size];
   const isPriority = priority ?? size === "large";
+  const src = `https://image.tmdb.org/t/p/${imageSize}${posterPath}`;
 
   return (
     <div
@@ -49,8 +50,14 @@ function MoviePosterImage({
         interactive && styles.interactive,
       )}
     >
+      {/* Keyed by src so a poster swap mounts a fresh element rather than
+          re-pointing this one: a re-pointed <img> keeps painting the previous
+          poster until the new one decodes, which on a slow connection shows the
+          outgoing film in the incoming film's place. A new element shows the
+          empty poster panel instead. */}
       <Image
-        src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
+        key={src}
+        src={src}
         alt={title}
         width={dimensions.width}
         height={dimensions.height}

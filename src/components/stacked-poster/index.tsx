@@ -73,10 +73,15 @@ function PosterImage({
 
   if (posterPath) {
     const imageSize = size === "large" ? "w500" : "w342";
+    const src = `https://image.tmdb.org/t/p/${imageSize}${posterPath}`;
     return (
       <div className={clsx(styles.posterCard, sizeClass, className)}>
+        {/* Keyed by src for the same reason as MoviePoster: re-pointing an
+            existing <img> leaves the previous poster on screen until the new
+            one decodes. */}
         <Image
-          src={`https://image.tmdb.org/t/p/${imageSize}${posterPath}`}
+          key={src}
+          src={src}
           alt={title}
           width={dimensions.width}
           height={dimensions.height}
