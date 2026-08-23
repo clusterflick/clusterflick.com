@@ -1,4 +1,3 @@
-import type { VenueAttributes } from "./get-venue-attributes";
 import type { SocialHandles } from "./build-social-links";
 
 type Platform = "letterboxd" | "twitter" | "instagram";
@@ -17,7 +16,7 @@ const PLATFORMS: Platform[] = ["letterboxd", "twitter", "instagram"];
  * @param totalVenues  the group's full venue count (the majority denominator)
  */
 export function getGroupCorporateSocials(
-  venueSocials: Array<VenueAttributes["socials"]>,
+  venueSocials: Array<SocialHandles>,
   totalVenues: number,
 ): SocialHandles {
   const result: NonNullable<SocialHandles> = {

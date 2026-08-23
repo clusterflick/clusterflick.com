@@ -9,6 +9,7 @@ import {
 } from "@/state/filter-config-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { describeFilters } from "@/lib/filters";
+import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
 import styles from "./filter-trigger.module.css";
 
 interface FilterTriggerProps {
@@ -29,12 +30,10 @@ export default function FilterTrigger({
   const flashedState = useRef<typeof filterState | null>(null);
 
   // Compute cinema venue IDs
-  const cinemaVenueIds = useMemo(() => {
-    if (!metaData?.venues) return [];
-    return Object.values(metaData.venues)
-      .filter((v) => v.type === "Cinema")
-      .map((v) => v.id);
-  }, [metaData]);
+  const cinemaVenueIds = useMemo(
+    () => getCinemaVenueIds(metaData?.venues),
+    [metaData],
+  );
 
   // Generate filter description
   const description = useMemo(() => {

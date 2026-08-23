@@ -1,3 +1,5 @@
+import type { SocialHandles } from "@/utils/build-social-links";
+
 export type Position = {
   lat: number;
   lon: number;
@@ -9,8 +11,21 @@ export type Venue = {
   url: string;
   address: string;
   geo: Position;
+  /** Venue's own handles, as published in the combined release. */
+  socials: SocialHandles;
   structure: "solo" | "group";
   type: string;
+  /**
+   * What the entry represents, which is what drives the cinemas and small
+   * screenings venue presets. Deliberately separate from `type`: `type`
+   * describes the place, `programming` describes how film gets on there, so a
+   * venue can be retyped for accuracy without silently moving between presets.
+   *
+   * - `cinema` — a programmed cinema operation, whoever owns the building
+   * - `venue`  — a substantial programmed venue that isn't a cinema
+   * - `host`   — a place that incidentally hosts screenings
+   */
+  programming: "cinema" | "venue" | "host";
   groupName?: string;
   /**
    * The latest performance the venue registry has ever seen here, which for an

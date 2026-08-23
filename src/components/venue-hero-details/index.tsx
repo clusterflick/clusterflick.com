@@ -1,4 +1,4 @@
-import type { VenueAttributes } from "@/utils/get-venue-attributes";
+import type { SocialHandles } from "@/utils/build-social-links";
 import Tag from "@/components/tag";
 import SocialLinks from "@/components/social-links";
 import {
@@ -12,9 +12,9 @@ interface VenueHeroDetailsProps {
   /** Venue id — the filename of its feed in the data-calendar release. */
   venueId: string;
   venueName: string;
-  /** Raw `type` from the dataset; "unknown" is presented as "Other". */
+  /** The venue's `type` from the dataset, rendered as-is. */
   venueType: string;
-  socials?: VenueAttributes["socials"];
+  socials?: SocialHandles;
 }
 
 /**
@@ -39,9 +39,7 @@ export default function VenueHeroDetails({
         <SocialLinks socials={socials} />
       </div>
       <div>
-        <Tag color="blue">
-          {venueType.toLowerCase().trim() === "unknown" ? "Other" : venueType}
-        </Tag>
+        <Tag color="blue">{venueType}</Tag>
       </div>
       <div className={styles.heroTagRowSide}>
         <a

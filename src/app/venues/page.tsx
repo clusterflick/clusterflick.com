@@ -89,7 +89,7 @@ function buildVenueGroups(
   return Array.from(groupMap.values())
     .map((group) => ({
       id: group.id,
-      label: group.label === "Unknown" ? "Other" : group.label,
+      label: group.label,
       venues: group.venues
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(({ name, displayName, href, eventCount }) => ({

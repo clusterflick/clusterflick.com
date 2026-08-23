@@ -57,12 +57,12 @@ export const WithoutSocials: Story = {
 };
 
 /**
- * Venues whose type is unrecorded come through the dataset as "unknown" and are
- * presented as "Other" rather than exposing the raw value.
+ * Venues that fit none of the vocabulary's categories carry the type "Other",
+ * which is rendered like any other type.
  */
-export const UnknownType: Story = {
+export const OtherType: Story = {
   args: {
-    venueType: "unknown",
+    venueType: "Other",
     socials: null,
   },
 };

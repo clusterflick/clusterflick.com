@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueAttributes } from "@/utils/get-venue-attributes";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueCalendarPath } from "@/utils/get-venue-calendar";
@@ -101,7 +100,6 @@ export default async function VenueCalendarPage({
   }
 
   const data = await getStaticData();
-  const attributes = getVenueAttributes(venue.id);
   const imagePath = getVenueImagePath(venue.id);
   const calendarPath = getVenueCalendarPath(venue.id);
   const { movieCount, performanceCount } = getVenueMovieCounts(
@@ -118,7 +116,7 @@ export default async function VenueCalendarPage({
         <DetailPageHero
           name={venue.name}
           imagePath={imagePath}
-          url={attributes?.url}
+          url={venue.url}
           movieCount={movieCount}
           performanceCount={performanceCount}
         >
@@ -126,7 +124,7 @@ export default async function VenueCalendarPage({
             venueId={venue.id}
             venueName={venue.name}
             venueType={venue.type}
-            socials={attributes?.socials}
+            socials={venue.socials}
           />
         </DetailPageHero>
       }
