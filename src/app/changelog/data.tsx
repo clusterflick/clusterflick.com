@@ -81,6 +81,120 @@ export const CHANGELOG: ChangelogDay[] = [
             <VenueList
               items={[
                 {
+                  name: "Perivale Community Hive",
+                  url: "https://perivalehive.co.uk",
+                },
+                {
+                  name: "Shoreditch Library",
+                  url: "https://hackney.gov.uk/shoreditch-library/",
+                },
+                {
+                  name: "North Kensington Library",
+                  url: "https://www.rbkc.gov.uk/libraries-0/your-local-library/north-kensington-library",
+                },
+                {
+                  name: "Whitton Library",
+                  url: "https://www.richmond.gov.uk/whitton_library",
+                },
+                {
+                  name: "Leyton Library",
+                  url: "https://www.walthamforest.gov.uk/libraries/local-libraries/leyton-library",
+                },
+                {
+                  name: "Leytonstone Library",
+                  url: "https://www.walthamforest.gov.uk/libraries/local-libraries/leytonstone-library",
+                },
+              ]}
+            />
+            , six London libraries with a film club going on between the shelves
+            — classic films and National Theatre broadcasts in Hoxton, heritage
+            month seasons on Ladbroke Grove, a festival of shorts in Whitton,
+            kids&apos; clubs either side of Leyton, and Silver Screenings at the
+            volunteer-run library Perivale rescued for itself.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Union Chapel" url="https://unionchapel.org.uk" />
+            , the Islington chapel that is a working church, an award-winning
+            music venue and a homelessness charity at once, and where the Ocean
+            and Banff mountain film festivals pitch up on tour.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Building Centre"
+              url="https://www.buildingcentre.co.uk"
+            />
+            , the built-environment gallery on Store Street, where a new film
+            club screens films about architecture and urban life — it opened
+            with Tati&apos;s Playtime.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue name="Algha's Plantroom" url="https://www.plantroom.space" />
+            , a cultural space on the second floor of Algha Works on Fish
+            Island, home to Blackney Wick Film Club and its themed nights of
+            film and sound system.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue name="HKUK Kingston Community Centre" url="https://hk.uk" />,
+            the old Kingston telephone exchange turned community centre by Hong
+            Kongers who had recently moved to the area, screening
+            Cantonese-language films with Q&amp;As.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Greener and Cleaner",
+                  url: "https://www.greenerandcleaner.co.uk",
+                },
+                {
+                  name: "Morland Community Hall",
+                  url: "https://communityhalls.hackney.gov.uk/venues/19-morland-community-hall",
+                },
+              ]}
+            />
+            , a sustainability hub tucked into a Bromley shopping centre running
+            an environmental film cafe, and a Hackney estate hall where the
+            residents run their own film club.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
                   name: "Langthorne Park",
                   url: "https://www.walthamforest.gov.uk/libraries-arts-parks-and-leisure/parks-and-open-spaces/langthorne-park",
                 },
