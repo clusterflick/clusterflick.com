@@ -179,7 +179,7 @@ export default async function FilmClubDetailPage({
         id: venueId,
         name: venue?.name ?? venueId,
         href: venue ? getVenueUrl(venue) : "#",
-        type: venue?.type ?? "Unknown",
+        type: venue?.type ?? "Other",
         imagePath: getVenueImagePath(venueId),
         filmCount: films.size,
         performanceCount: venuePerfCounts.get(venueId) ?? 0,

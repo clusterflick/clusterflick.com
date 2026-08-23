@@ -4,7 +4,6 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getVenueGroupMapPath } from "@/utils/get-venue-group-image";
-import { getVenueAttributes } from "@/utils/get-venue-attributes";
 import {
   getVenueGroupUrl,
   getVenueGroupTitle,
@@ -145,7 +144,7 @@ export default async function CinemaGroupPage({
   // Infer the group's shared corporate socials from its venues, then let any
   // explicit registry override (fallback) take precedence.
   const detectedSocials = getGroupCorporateSocials(
-    groupVenues.map((v) => getVenueAttributes(v.id)?.socials ?? null),
+    groupVenues.map((v) => v.socials ?? null),
     groupVenues.length,
   );
   const socials = {

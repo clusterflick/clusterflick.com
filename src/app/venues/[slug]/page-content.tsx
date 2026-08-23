@@ -1,7 +1,6 @@
 import { Fragment, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { VenueAttributes } from "@/utils/get-venue-attributes";
 import { AccessibilityFeature, type Movie, type Venue } from "@/types";
 import {
   ACCESSIBILITY_LABELS,
@@ -46,7 +45,6 @@ export type VenueGroupLink = {
 
 export interface VenueDetailPageContentProps {
   venue: Venue;
-  attributes: VenueAttributes | null;
   imagePath: string | null;
   mapImagePath: string | null;
   movieCount: number;
@@ -69,7 +67,6 @@ export interface VenueDetailPageContentProps {
 
 export default function VenueDetailPageContent({
   venue,
-  attributes,
   imagePath,
   mapImagePath,
   movieCount,
@@ -136,7 +133,7 @@ export default function VenueDetailPageContent({
         <DetailPageHero
           name={venue.name}
           imagePath={imagePath}
-          url={attributes?.url}
+          url={venue.url}
           movieCount={movieCount}
           performanceCount={performanceCount}
           lastPerformance={venue.lastPerformance}
@@ -145,7 +142,7 @@ export default function VenueDetailPageContent({
             venueId={venue.id}
             venueName={venue.name}
             venueType={venue.type}
-            socials={attributes?.socials}
+            socials={venue.socials}
           />
         </DetailPageHero>
       }

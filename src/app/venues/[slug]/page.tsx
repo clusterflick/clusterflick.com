@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueAttributes } from "@/utils/get-venue-attributes";
 import { getVenueImagePath, getVenueMapPath } from "@/utils/get-venue-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getDistanceInMiles } from "@/utils/geo-distance";
@@ -86,8 +85,7 @@ function buildVenueDescription(
     return `${venue.name} showings - ${seoDescription}. Find screenings and book tickets.`;
   }
 
-  const typePart =
-    venue.type.toLowerCase() !== "unknown" ? venue.type : "venue";
+  const typePart = venue.type !== "Other" ? venue.type : "venue";
 
   if (movieCount > 0) {
     return `${venue.name} is a London ${typePart}. ${movieCount} ${filmWord} showing. Find screenings and book tickets.`;
@@ -175,7 +173,6 @@ export default async function VenueDetailPage({
   }
 
   const data = await getStaticData();
-  const attributes = getVenueAttributes(venue.id);
   const imagePath = getVenueImagePath(venue.id);
   const mapImagePath = getVenueMapPath(venue.id);
 
@@ -307,7 +304,7 @@ export default async function VenueDetailPage({
     {
       "@context": "https://schema.org",
       ...buildVenueSchema(venue, {
-        url: attributes?.url || venue.url,
+        url: venue.url,
         image: imagePath ? `https://clusterflick.com${imagePath}` : undefined,
       }),
     },
@@ -347,7 +344,6 @@ export default async function VenueDetailPage({
       />
       <VenueDetailPageContent
         venue={venue}
-        attributes={attributes}
         imagePath={imagePath}
         mapImagePath={mapImagePath}
         movieCount={movieCount}

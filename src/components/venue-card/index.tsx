@@ -51,7 +51,7 @@ export default function VenueCard({
         {type && (
           <div className={styles.meta}>
             <Tag color="blue" size="sm">
-              {type.toLowerCase() === "unknown" ? "Other" : type}
+              {type}
             </Tag>
           </div>
         )}

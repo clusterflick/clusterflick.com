@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import VenueDetailPageContent from "@/app/venues/[slug]/page-content";
 import type { VenueDetailPageContentProps } from "@/app/venues/[slug]/page-content";
 import VenueBlurb from "@/components/venues/princecharlescinema.com";
-import type { VenueAttributes } from "@/utils/get-venue-attributes";
 import type { Movie, Venue } from "@/types";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
@@ -21,11 +20,10 @@ import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
 
 const VENUE_ID = "princecharlescinema.com";
 
-// Hardcoded venue attributes (normally read from filesystem via getVenueAttributes)
-const princeCharlesAttributes: VenueAttributes = {
+// Stand-in venue for when the story dataset has no entry for this id.
+const princeCharlesVenue: Venue = {
   id: VENUE_ID,
   name: "Prince Charles Cinema",
-  domain: "https://princecharlescinema.com",
   socials: {
     letterboxd: "thepcc",
     twitter: "ThePCCLondon",
@@ -36,6 +34,7 @@ const princeCharlesAttributes: VenueAttributes = {
   geo: { lat: 51.51149384362524, lon: -0.130186840699272 },
   structure: "solo",
   type: "Cinema",
+  programming: "cinema",
 };
 
 // Image paths (served by Storybook's staticDirs from public/)
@@ -50,15 +49,7 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
 
   const venue: Venue = metaData.venues[VENUE_ID]
     ? { ...metaData.venues[VENUE_ID], id: VENUE_ID }
-    : {
-        id: VENUE_ID,
-        name: princeCharlesAttributes.name,
-        url: princeCharlesAttributes.url,
-        address: princeCharlesAttributes.address,
-        geo: princeCharlesAttributes.geo,
-        structure: princeCharlesAttributes.structure,
-        type: princeCharlesAttributes.type,
-      };
+    : princeCharlesVenue;
 
   // Collect movies showing at this venue
   let movieCount = 0;
@@ -95,7 +86,6 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
 
   return {
     venue,
-    attributes: princeCharlesAttributes,
     imagePath: VENUE_IMAGE_PATH,
     mapImagePath: VENUE_MAP_PATH,
     movieCount,
