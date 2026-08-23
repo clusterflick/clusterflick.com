@@ -97,6 +97,63 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Alexandra Palace Theatre"
+              url="https://www.alexandrapalace.com/theatre/"
+            />
+            , the Victorian auditorium on the hill in Haringey that spent a
+            stint as a cinema, then eighty years shut and quietly decaying,
+            before reopening with the decay left on show — films turn up there
+            played to a live band.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Ognisko Polskie"
+              url="https://www.ogniskopolskie.org.uk"
+            />
+            , the Polish Hearth Club in South Kensington, open since 1939, whose
+            KinoKlub shows recent Polish cinema in the ballroom with dinner
+            beforehand.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="The Well Walk Theatre"
+              url="https://www.thewellwalktheatre.com"
+            />
+            , a 50-seat family theatre, bookshop and cafe in Hampstead, where
+            the Cine Club runs vintage animation and silent-era films with live
+            musical accompaniment.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="The Mildmay Club" url="https://mildmay.club" />,
+            the Newington Green members&apos; club that has been radical since
+            1888 and on screen ever since — the Krays films, Vera Drake, Made in
+            Dagenham — and now shows the occasional film of its own.
+          </>
+        ),
+      },
     ],
   },
   {
