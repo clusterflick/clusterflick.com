@@ -71,6 +71,35 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-23",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Langthorne Park",
+                  url: "https://www.walthamforest.gov.uk/libraries-arts-parks-and-leisure/parks-and-open-spaces/langthorne-park",
+                },
+                {
+                  name: "Stoneydown Park",
+                  url: "https://www.walthamforest.gov.uk/libraries-arts-parks-and-leisure/parks-and-open-spaces/our-other-parks",
+                },
+              ]}
+            />
+            , two Waltham Forest parks where Stow Film Lounge sets up its
+            open-air cinema over the summer — an amphitheatre in Leytonstone
+            named after a long-gone Stratford abbey, and Walthamstow&apos;s
+            ornamental gardens off Pretoria Avenue.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-21",
     changes: [
       {
