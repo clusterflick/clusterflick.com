@@ -1,56 +1,44 @@
 .container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
   margin-bottom: 32px;
 }
 
+/* Rating cards never wrap: a stray card on a second line reads as a separate
+   group rather than the tail of the row. The row scrolls instead, at every
+   width — the same gesture on a phone and on a narrow window. */
 .ratingsWrapper {
-  display: contents;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ratingsWrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .ratingsGrid {
-  display: contents;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  width: max-content;
 }
 
 .ratingsGrid > a {
+  flex-shrink: 0;
   min-width: 140px;
 }
 
+/* Centred while the row still fits; auto margins collapse once it overflows. */
 @media (max-width: 900px) {
   .ratingsGrid {
-    justify-content: center;
     margin: 0 auto;
   }
 }
 
 @media (max-width: 768px) {
-  .container {
-    display: block;
-  }
-
-  .ratingsWrapper {
-    display: block;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .ratingsWrapper::-webkit-scrollbar {
-    display: none;
-  }
-
   .ratingsGrid {
-    display: flex;
-    flex-wrap: nowrap;
     gap: 12px;
-    width: max-content;
-  }
-
-  .ratingsGrid > a {
-    flex-shrink: 0;
   }
 }
 

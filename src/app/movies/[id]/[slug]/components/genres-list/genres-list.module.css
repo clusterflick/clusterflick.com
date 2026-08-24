@@ -1,24 +1,45 @@
 .genres {
   display: flex;
   align-items: center;
-  gap: 8px;
   margin-bottom: 24px;
-  flex-wrap: wrap;
 }
 
-/* Pushed to the end of the row so it lines up with the tags on their line
-   when there's room, and drops to its own full-width line when there isn't. */
+/* The tags never wrap — they scroll, so a long genre list stays one line and
+   leaves the action beside it rather than being pushed around by it. */
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.tags > a {
+  white-space: nowrap;
+}
+
+/* Sits at the end of the tag row when there's room for it there. */
 .action {
-  margin-left: auto;
+  margin-left: 24px;
+  flex-shrink: 0;
 }
 
+/* Below tablet the row is too tight to hold both, so the action drops onto
+   its own line under the tags — centred, and only as wide as its content:
+   a full-bleed button reads as a page-level call to action, which it isn't. */
 @media (max-width: 900px) {
   .genres {
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .tags {
+    max-width: 100%;
   }
 
   .action {
-    width: 100%;
     margin-left: 0;
   }
 }

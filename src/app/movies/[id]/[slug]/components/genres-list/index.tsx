@@ -18,10 +18,11 @@ interface GenresListProps {
   genreIds: string[];
   genres: Record<string, Genre>;
   showings: Record<string, Showing>;
-  /** Rendered at the end of the row, pushed to the right on desktop — the
-   * Watch Trailer button, when there is one. Keeping this a slot rather than
-   * a `trailerUrl` prop leaves the button's markup with its callers, who
-   * already differ on it (a departed film has no showings to size against). */
+  /** Rendered at the end of the row on desktop, and below the tags once the
+   * row is too tight for both — the Watch Trailer button, when there is one.
+   * Keeping this a slot rather than a `trailerUrl` prop leaves the button's
+   * markup with its callers, who already differ on it (a departed film has no
+   * showings to size against). */
   action?: ReactNode;
 }
 
@@ -37,25 +38,27 @@ export default function GenresList({
 
   return (
     <div className={styles.genres}>
-      {genreIds.map((genreId) => {
-        const genreName = genres[genreId]?.name;
-        const isCategorised = genreName !== "Uncategorised";
-        const showingCategories = isCategorised
-          ? []
-          : [...new Set(Object.values(showings).map((s) => s.category))];
-        return (
-          <Fragment key={genreId}>
-            <Tag color="pink" href={GENRE_URL_BY_ID.get(genreId)}>
-              {genreName}
-            </Tag>
-            {showingCategories.map((category) => (
-              <Tag key={category} color="blue">
-                {formatCategory(category)}
+      <div className={styles.tags}>
+        {genreIds.map((genreId) => {
+          const genreName = genres[genreId]?.name;
+          const isCategorised = genreName !== "Uncategorised";
+          const showingCategories = isCategorised
+            ? []
+            : [...new Set(Object.values(showings).map((s) => s.category))];
+          return (
+            <Fragment key={genreId}>
+              <Tag color="pink" href={GENRE_URL_BY_ID.get(genreId)}>
+                {genreName}
               </Tag>
-            ))}
-          </Fragment>
-        );
-      })}
+              {showingCategories.map((category) => (
+                <Tag key={category} color="blue">
+                  {formatCategory(category)}
+                </Tag>
+              ))}
+            </Fragment>
+          );
+        })}
+      </div>
       {action && <div className={styles.action}>{action}</div>}
     </div>
   );
