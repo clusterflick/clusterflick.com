@@ -71,6 +71,28 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-24",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="The South London Film Festival"
+              url="https://www.southlondonfilmfest.co.uk/"
+            />
+            , the not-for-profit that calls itself the official film festival of
+            South London and runs at the Ritzy in Brixton from 12 to 27
+            September — an official awards showcase, UK premieres and live
+            Q&amp;As, programmed from open submissions that are free to enter
+            for students.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-23",
     changes: [
       {

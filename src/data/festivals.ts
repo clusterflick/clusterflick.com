@@ -482,4 +482,21 @@ export const FESTIVALS: Festival[] = [
       { [FilterId.ShowingTitleSearch]: "Fighting Spirit Film Festival" },
     ],
   },
+  {
+    id: "south-london-film-festival",
+    name: "The South London Film Festival",
+    url: "https://www.southlondonfilmfest.co.uk/",
+    aliases: ["slff", "south-london-film-fest"],
+    matchers: [
+      {
+        // The Ritzy titles these "The South London Film Festival Presents: …"
+        // and "The South London Film Festival Official Awards Showcase 2026";
+        // the 2026 edition runs 12–27 September, all at the Ritzy.
+        [FilterId.ShowingTitleSearch]: "South London Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "South London Film Festival",
+      },
+    ],
+  },
 ];
