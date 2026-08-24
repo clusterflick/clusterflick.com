@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Movie } from "@/types";
 import LinkCard, {
   CardLabel,
@@ -17,7 +16,6 @@ interface RatingsGridProps {
   moviedb: Movie["moviedb"];
   rottenTomatoes: Movie["rottenTomatoes"];
   metacritic: Movie["metacritic"];
-  extraItem?: ReactNode;
 }
 
 export default function RatingsGrid({
@@ -27,7 +25,6 @@ export default function RatingsGrid({
   moviedb,
   rottenTomatoes,
   metacritic,
-  extraItem,
 }: RatingsGridProps) {
   const { hydrateUrl } = useCinemaData();
   // Treat a 0 score as "no score" — Metacritic returns 0 for the user score
@@ -181,8 +178,6 @@ export default function RatingsGrid({
           )}
         </CardGrid>
       </div>
-
-      {extraItem && <div className={styles.extraItem}>{extraItem}</div>}
     </div>
   );
 }

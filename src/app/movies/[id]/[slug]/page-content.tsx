@@ -300,6 +300,19 @@ export default function PageContent({
             genreIds={movie.genres || []}
             genres={genres}
             showings={movie.showings}
+            action={
+              movie.youtubeTrailer ? (
+                <ButtonAnchor
+                  href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.trailerButton}
+                >
+                  <PlayIcon />
+                  Watch Trailer
+                </ButtonAnchor>
+              ) : undefined
+            }
           />
 
           {movie.overview && (
@@ -321,19 +334,6 @@ export default function PageContent({
             moviedb={movie.moviedb}
             rottenTomatoes={movie.rottenTomatoes}
             metacritic={movie.metacritic}
-            extraItem={
-              movie.youtubeTrailer ? (
-                <ButtonAnchor
-                  href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.trailerButton}
-                >
-                  <PlayIcon />
-                  Watch Trailer
-                </ButtonAnchor>
-              ) : undefined
-            }
           />
 
           <MovieListsSection lists={movieLists} />

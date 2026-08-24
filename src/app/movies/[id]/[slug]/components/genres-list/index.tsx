@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import { Genre, Showing } from "@/types";
 import { formatCategory } from "@/app/utils";
 import { GENRES } from "@/data/genres";
@@ -18,14 +18,20 @@ interface GenresListProps {
   genreIds: string[];
   genres: Record<string, Genre>;
   showings: Record<string, Showing>;
+  /** Rendered at the end of the row, pushed to the right on desktop — the
+   * Watch Trailer button, when there is one. Keeping this a slot rather than
+   * a `trailerUrl` prop leaves the button's markup with its callers, who
+   * already differ on it (a departed film has no showings to size against). */
+  action?: ReactNode;
 }
 
 export default function GenresList({
   genreIds,
   genres,
   showings,
+  action,
 }: GenresListProps) {
-  if (!genreIds || genreIds.length === 0) {
+  if ((!genreIds || genreIds.length === 0) && !action) {
     return null;
   }
 
@@ -50,6 +56,7 @@ export default function GenresList({
           </Fragment>
         );
       })}
+      {action && <div className={styles.action}>{action}</div>}
     </div>
   );
 }

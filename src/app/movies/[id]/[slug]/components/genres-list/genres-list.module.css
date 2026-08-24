@@ -1,12 +1,24 @@
 .genres {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
+/* Pushed to the end of the row so it lines up with the tags on their line
+   when there's room, and drops to its own full-width line when there isn't. */
+.action {
+  margin-left: auto;
+}
+
 @media (max-width: 900px) {
   .genres {
     justify-content: center;
+  }
+
+  .action {
+    width: 100%;
+    margin-left: 0;
   }
 }

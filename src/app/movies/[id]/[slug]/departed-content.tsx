@@ -92,29 +92,23 @@ export default function DepartedContent({
             genreIds={movie.genres || []}
             genres={genres}
             showings={{}}
+            action={
+              movie.youtubeTrailer ? (
+                <ButtonAnchor
+                  href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.trailerButton}
+                >
+                  <PlayIcon />
+                  Watch Trailer
+                </ButtonAnchor>
+              ) : undefined
+            }
           />
 
           {movie.overview && (
             <p className={styles.overview}>{movie.overview}</p>
-          )}
-
-          {/* The live page hangs this off RatingsGrid's extraItem slot, which
-              renders nothing without ratings — and a departed film has none,
-              since the match stage only ever sees the combined data. With no
-              screenings left to link to, the trailer is the most useful thing
-              the page still has, so it is rendered on its own. */}
-          {movie.youtubeTrailer && (
-            <div className={styles.trailerRow}>
-              <ButtonAnchor
-                href={`https://www.youtube.com/watch?v=${movie.youtubeTrailer}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.trailerButton}
-              >
-                <PlayIcon />
-                Watch Trailer
-              </ButtonAnchor>
-            </div>
           )}
 
           <CastCrewSection
