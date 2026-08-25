@@ -99,8 +99,10 @@ export default function DepartedContent({
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.trailerButton}
+                  variant="secondary"
+                  size="md"
                 >
-                  <PlayIcon />
+                  <PlayIcon size={18} />
                   Watch Trailer
                 </ButtonAnchor>
               ) : undefined
