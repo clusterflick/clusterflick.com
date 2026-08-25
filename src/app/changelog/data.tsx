@@ -81,20 +81,9 @@ export const CHANGELOG: ChangelogDay[] = [
             <Link href="/film-clubs/never-watching-movies">
               Never Watching Movies
             </Link>
-            , the diaspora film club curated by Zain Gibson, social media
-            manager at the{" "}
+            , diaspora film curated by Zain Gibson, social media manager at the{" "}
             <Venue name="Rio Cinema" url="https://riocinema.org.uk" /> and one
-            of several the Rio&apos;s own staff run out of the building.
-            Screenings come with an introduction and often a guest — Claire
-            Harrison of Category H co-presented <em>Car Wash</em>, and a Rio
-            Forever night put <em>Empire Records</em> alongside a Q&amp;A with
-            current and former Rio staff — and the club plays out beyond the Rio
-            too, taking Dee Rees&apos;s <em>Pariah</em> to{" "}
-            <Venue
-              name="Dalston Superstore"
-              url="https://dalstonsuperstore.com"
-            />{" "}
-            with Transmissions.
+            of several clubs the Rio&apos;s own staff run out of the building.
           </>
         ),
       },

@@ -4,33 +4,27 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Never Watching Movies is curated by Zain Gibson, social media manager at
-        the <Link href="/venues/rio-cinema">Rio Cinema</Link> in{" "}
-        <Link href="/london-cinemas/hackney">Hackney</Link>, and screens
-        diaspora film — one of a handful of clubs the Rio&apos;s own staff run
-        out of the building. Screenings come with an introduction from Gibson,
-        and often a guest: <em>Car Wash</em> was co-presented with Claire
-        Harrison of{" "}
-        <Link href="/film-clubs/category-h-film-club">Category H</Link>, and a
-        Rio Forever night paired <em>Empire Records</em> with a Q&amp;A between
-        current and former Rio staff on what it is actually like to work in the
-        UK&apos;s longest running cinema.
+        Never Watching Movies screens diaspora film, curated by Zain Gibson,
+        social media manager at the{" "}
+        <Link href="/venues/rio-cinema">Rio Cinema</Link> in{" "}
+        <Link href="/london-cinemas/hackney">Hackney</Link> and one of several
+        clubs the Rio&apos;s own staff run out of the building. Nights are
+        introduced from the front of the room, often with a guest co-host from
+        another London club, and the club takes its programme beyond the Rio to
+        venues around Dalston.
       </p>
       <p>
-        It plays out beyond the Rio too. A night at{" "}
-        <Link href="/venues/dalston-superstore">Dalston Superstore</Link> with{" "}
-        <Link href="/film-clubs/transmissions">Transmissions</Link> — where the
-        club was billed as &ldquo;a cultural force hailing from our neighbours
-        at the Rio cinema&rdquo; — screened Dee Rees&apos;s <em>Pariah</em>,
-        reading its rare portrait of Black stud culture as an exploration of
-        masculinity and self-discovery, with relaxed first-come seating and
-        subtitles throughout.
+        What Gibson is after is the room rather than the film alone: &ldquo;I
+        think watching any film with other people makes it a completely
+        different experience. The most rewarding part is whether it&apos;s a
+        busy event or a small event, it&apos;s something that impacts
+        someone.&rdquo;
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "Zain Gibson's Dalston film club, screening diaspora cinema at the Rio and beyond with introductions and guest co-hosts";
+  "Zain Gibson's Dalston film club, screening diaspora cinema at the Rio Cinema and beyond";
 
 export default FilmClubBlurb;
