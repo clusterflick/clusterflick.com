@@ -479,4 +479,17 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Deeper Into Movies" },
     ],
   },
+  {
+    id: "never-watching-movies",
+    name: "Never Watching Movies",
+    url: "https://www.instagram.com/neverwatchingmovies/",
+    aliases: ["neverwatchingmovies"],
+    matchers: [
+      // Listings style the name both ways — "Never Watching Movies presents"
+      // at the Rio, "NEVERWATCHINGMOVIES x …" for collaborations elsewhere —
+      // but search normalisation strips spaces, so one matcher covers both.
+      { [FilterId.ShowingTitleSearch]: "Never Watching Movies" },
+      { [FilterId.PerformanceNotesSearch]: "Never Watching Movies" },
+    ],
+  },
 ];
