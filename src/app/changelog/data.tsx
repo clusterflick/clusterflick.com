@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-25",
+    changes: [
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/never-watching-movies">
+              Never Watching Movies
+            </Link>
+            , diaspora film curated by Zain Gibson, social media manager at the{" "}
+            <Venue name="Rio Cinema" url="https://riocinema.org.uk" /> and one
+            of several clubs the Rio&apos;s own staff run out of the building.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-24",
     changes: [
       {
