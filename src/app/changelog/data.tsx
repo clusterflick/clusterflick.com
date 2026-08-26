@@ -71,6 +71,29 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-26",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Tibet Film Festival London"
+              url="https://www.tibetfilmfestival.org/london"
+            />
+            , the London edition of what calls itself the only film festival
+            featuring contemporary Tibetan cinema — founded in Z&uuml;rich in
+            2009, brought here in 2019 by Kunsang Kelden and Dechen Pemba, and
+            run by volunteers who have moved it from Deptford Cinema to the
+            Genesis, the Rio and beyond. The 2026 edition runs 25 to 27
+            September.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-25",
     changes: [
       {

@@ -499,4 +499,31 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "tibet-film-festival",
+    name: "Tibet Film Festival London",
+    url: "https://www.tibetfilmfestival.org/london",
+    aliases: ["tff-london", "tibet-film-festival-london"],
+    matchers: [
+      {
+        // Venues title these "Tibet Film Festival: ..." / "Tibet Film Festival
+        // London presents: ..."; the 2026 London edition runs 25-27 September
+        // across east and central London (past editions: Genesis, Rio, The
+        // Garden Cinema, Regent Street Cinema). Left unscoped because the
+        // festival moves venues each year and the full name is distinctive
+        // enough on its own - a bare "Tibet" would catch films with the word in
+        // their title.
+        [FilterId.ShowingTitleSearch]: "Tibet Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Tibet Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "TFF London",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "TFF London",
+      },
+    ],
+  },
 ];
