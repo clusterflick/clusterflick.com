@@ -180,6 +180,26 @@ Serving from our own origin removes CORS from the picture; the content hash mean
 venue keeps its URL, and so its cache entry, between builds. A missing release is not fatal —
 the manifest comes back empty and pages render their empty state.
 
+**Network failure is expected; missing data is not.** Fetching hundreds of assets from GitHub's
+CDN means the occasional dropped connection, and one of those used to fail the whole build. Every
+request retries with jittered exponential backoff under a request timeout, and the body is read
+_inside_ the retried attempt — a connection dropped mid-stream is the case worth retrying, and it
+happens after the headers have arrived. A 4xx is not retried, being a permanent answer.
+
+A download that still fails after all that **fails the build**. The tempting alternative — drop
+that venue and carry on — is wrong here, because a venue absent from the manifest renders an empty
+calendar, which tells a reader it has no screenings rather than that we failed to fetch them:
+wrong information, not absent information. Deploys are triggered per data release, so a red build
+costs one update and leaves the previous complete site standing, which is much cheaper than a
+green build quietly shipping a partial set. This is the opposite call from a missing _release_
+above, where every venue is equally empty and the site plainly has no calendar data at all.
+
+Failures are still **collected rather than thrown at the first one**, even though any of them
+fails the build. `Promise.all` rejects on the first rejection without cancelling its siblings, so
+throwing from a worker exited the process mid-flight knowing nothing about the other 400 assets —
+and skipped `writeManifest`, leaving a wiped directory and no manifest behind. Draining the queue
+first means one log line distinguishes a single flaky venue from an outage.
+
 The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
 This is deliberate dogfooding: the page reads exactly what subscribers read, so anything wrong in
 the feed shows up here. Events carry the film's page on this site as their `URL`, not a booking

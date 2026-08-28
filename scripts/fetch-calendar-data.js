@@ -25,6 +25,19 @@ const OUT_DIR = path.join(process.cwd(), "public", "calendars");
 // Downloads run against GitHub's asset CDN; a handful at a time keeps the ~336
 // files quick without tripping abuse detection.
 const CONCURRENCY = 8;
+// The CDN drops the occasional connection mid-run. Retrying is what separates a
+// blip from an outage, and a failed build from a slightly slower one.
+const MAX_ATTEMPTS = 4;
+const RETRY_BASE_MS = 500;
+// No response in 30s is a hung socket, not a slow one; without this a stalled
+// connection holds a worker (and the CI job) open indefinitely.
+const REQUEST_TIMEOUT_MS = 30_000;
+// A download that fails every attempt fails the build. A venue missing from the
+// manifest renders an empty calendar, which tells a reader it has no screenings
+// — wrong information, not absent information — so shipping a partial set is
+// worse than shipping nothing. Deploys run per data release, so a red build
+// costs one update and leaves the previous, complete site standing.
+const MAX_LOGGED_FAILURES = 10;
 
 const headers = () => {
   const value = {
@@ -39,13 +52,63 @@ const headers = () => {
   return value;
 };
 
-async function fetchJson(url) {
-  const response = await fetch(url, { headers: headers() });
-  if (!response.ok) {
-    throw new Error(`${response.status} ${response.statusText} for ${url}`);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 5xx and 429 are the server asking us to come back later; 4xx is a permanent
+// answer that no amount of retrying will change.
+const isRetryableStatus = (status) => status === 429 || status >= 500;
+
+/**
+ * Fetches a URL and reads its body through `read`, retrying transient network
+ * errors and server-side failures with exponential backoff. Network errors
+ * surface as a bare `TypeError: fetch failed` with no useful stack, so the
+ * label is what makes the log readable.
+ *
+ * The body is read inside the retried attempt rather than by the caller: a
+ * connection dropped part-way through a response is exactly the failure worth
+ * retrying, and it happens while streaming, after the headers have arrived.
+ */
+async function fetchWithRetry(url, label, read) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: headers(),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+
+      if (!response.ok) {
+        const error = new Error(
+          `${label}: ${response.status} ${response.statusText}`,
+        );
+        // A 4xx is a permanent answer; stop rather than spend three more
+        // attempts confirming it.
+        error.permanent = !isRetryableStatus(response.status);
+        throw error;
+      }
+
+      return await read(response);
+    } catch (error) {
+      if (error.permanent) throw error;
+      lastError = error.message.startsWith(label)
+        ? error
+        : new Error(`${label}: ${error.message}`);
+    }
+
+    if (attempt < MAX_ATTEMPTS) {
+      // Exponential backoff with jitter, so 8 workers knocked out by the same
+      // blip do not all come back at the same instant.
+      const delay = RETRY_BASE_MS * 2 ** (attempt - 1);
+      await sleep(delay + Math.random() * RETRY_BASE_MS);
+    }
   }
-  return response.json();
+
+  throw lastError;
 }
+
+const fetchJson = (url) =>
+  fetchWithRetry(url, url, (response) => response.json());
 
 function writeManifest(manifest) {
   fs.writeFileSync(
@@ -55,21 +118,20 @@ function writeManifest(manifest) {
 }
 
 async function downloadAsset(asset) {
-  const response = await fetch(asset.browser_download_url, {
-    headers: headers(),
-  });
-  if (!response.ok) {
-    throw new Error(
-      `Failed downloading ${asset.name}: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const body = await response.text();
-  // Sanity check the payload here so a truncated download or an error page
-  // fails the build rather than becoming an empty calendar on the site.
-  if (!body.startsWith("BEGIN:VCALENDAR")) {
-    throw new Error(`${asset.name} is not an ICS file`);
-  }
+  const body = await fetchWithRetry(
+    asset.browser_download_url,
+    `Failed downloading ${asset.name}`,
+    async (response) => {
+      const text = await response.text();
+      // Sanity check the payload here so a truncated download or an error page
+      // is retried, and ultimately fails, rather than becoming an empty
+      // calendar on the site.
+      if (!text.startsWith("BEGIN:VCALENDAR")) {
+        throw new Error(`${asset.name} is not an ICS file`);
+      }
+      return text;
+    },
+  );
 
   const hash = crypto
     .createHash("sha256")
@@ -85,19 +147,26 @@ async function downloadAsset(asset) {
 async function downloadAll(assets) {
   const queue = [...assets];
   const entries = [];
+  const failures = [];
 
   const workers = Array.from(
     { length: Math.min(CONCURRENCY, queue.length) },
     async () => {
       let asset;
       while ((asset = queue.shift())) {
-        entries.push(await downloadAsset(asset));
+        // One venue failing must not abandon the rest of the downloads, so
+        // each is settled independently and judged collectively below.
+        try {
+          entries.push(await downloadAsset(asset));
+        } catch (error) {
+          failures.push({ name: asset.name, message: error.message });
+        }
       }
     },
   );
 
   await Promise.all(workers);
-  return entries;
+  return { entries, failures };
 }
 
 async function main() {
@@ -124,9 +193,30 @@ async function main() {
     return;
   }
 
-  const entries = await downloadAll(assets);
+  const { entries, failures } = await downloadAll(assets);
   // Sorted so the manifest diffs cleanly between builds
   entries.sort(([a], [b]) => a.localeCompare(b));
+
+  if (failures.length > 0) {
+    // Every failure is reported, not just the one that happened to land first,
+    // so a single log says whether this was one flaky venue or an outage.
+    // Capped, because an outage fails every asset at once and hundreds of
+    // identical lines bury the summary that explains the exit code.
+    console.error(
+      `\n${failures.length} of ${assets.length} calendar(s) could not be downloaded after ${MAX_ATTEMPTS} attempts:`,
+    );
+    for (const { message } of failures.slice(0, MAX_LOGGED_FAILURES)) {
+      console.error(`   - ${message}`);
+    }
+    if (failures.length > MAX_LOGGED_FAILURES) {
+      console.error(
+        `   - ...and ${failures.length - MAX_LOGGED_FAILURES} more`,
+      );
+    }
+    throw new Error(
+      `${failures.length} of ${assets.length} calendar downloads failed.`,
+    );
+  }
 
   writeManifest({
     tag: release.tag_name,
