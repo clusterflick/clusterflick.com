@@ -75,6 +75,20 @@ const fringeVenues = [
   "thegardencinema.co.uk",
 ];
 
+// The BFI runs LFF from the South Bank: the galas are at the Southbank
+// Centre's Royal Festival Hall but ticketed by the BFI, so they arrive under
+// BFI Southbank alongside the competition programme, the Screen Talks and the
+// LFF for Free events. The rest of the 70th edition is split between BFI IMAX
+// and four West End partner cinemas.
+const londonFilmFestivalVenues = [
+  "bfi.org.uk-southbank",
+  "bfi.org.uk-imax",
+  "curzon.com-soho",
+  "ica.art",
+  "princecharlescinema.com",
+  "myvue.com-leicester-square",
+];
+
 export const FESTIVALS: Festival[] = [
   {
     id: "bfi-flare",
@@ -545,6 +559,46 @@ export const FESTIVALS: Festival[] = [
         // festival moves house (Prince Charles, Empire, Cineworld, now the two
         // ODEON Luxes) and the name is distinctive enough on its own.
         [FilterId.ShowingTitleSearch]: "FrightFest",
+      },
+    ],
+  },
+  {
+    id: "bfi-london-film-festival",
+    name: "BFI London Film Festival",
+    url: "https://www.bfi.org.uk/london-film-festival",
+    aliases: ["lff", "london-film-festival"],
+    matchers: [
+      {
+        // The full name is the only form safe to match unscoped: search
+        // normalisation strips spacing, so a bare "London Film Festival" is a
+        // substring of "The South London Film Festival" and would swallow the
+        // Ritzy's programme whole. Keeping the BFI prefix also picks up the
+        // year-round member events ("BFI London Film Festival Member Quiz").
+        [FilterId.ShowingTitleSearch]: "BFI London Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "BFI London Film Festival",
+      },
+      {
+        // Partner cinemas drop the BFI prefix and shorten the name, titling
+        // screenings "London Film Festival: ..." or "LFF: ...". Both short
+        // forms are scoped to the festival's venues — "lff" survives
+        // normalisation as a bare three-letter run that could fall inside an
+        // ordinary title.
+        [FilterId.ShowingTitleSearch]: "London Film Festival",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Film Festival",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LFF",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LFF",
+        [FilterId.Venues]: londonFilmFestivalVenues,
       },
     ],
   },
