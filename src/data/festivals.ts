@@ -526,4 +526,26 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "frightfest",
+    name: "FrightFest",
+    url: "https://www.frightfest.co.uk",
+    aliases: ["fright-fest", "tubi-frightfest"],
+    matchers: [
+      {
+        // The ODEON Luxe Leicester Square and West End screens tag every
+        // performance "Part of FrightFest <year>". Search normalisation strips
+        // spaces, so this single string also covers venues that write it
+        // "Fright Fest".
+        [FilterId.PerformanceNotesSearch]: "FrightFest",
+      },
+      {
+        // Some venues instead title the screening "FrightFest presents: ..." /
+        // "FrightFest Halloween All-Dayer: ...". Left unscoped because the
+        // festival moves house (Prince Charles, Empire, Cineworld, now the two
+        // ODEON Luxes) and the name is distinctive enough on its own.
+        [FilterId.ShowingTitleSearch]: "FrightFest",
+      },
+    ],
+  },
 ];

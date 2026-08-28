@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-28",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival name="FrightFest" url="https://www.frightfest.co.uk" />,
+            &ldquo;the UK&rsquo;s No.1 horror &amp; fantasy film festival&rdquo;
+            &mdash; founded in 2000 at the Prince Charles Cinema to give the UK
+            an answer to Sitges and Brussels, and now an annual takeover of
+            Leicester Square across the August bank holiday weekend. The 27th
+            edition runs 27 to 31 August at the ODEON Luxe Leicester Square and
+            ODEON Luxe West End, with eighty-two features across five screens.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-26",
     changes: [
       {
