@@ -77,6 +77,26 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New festival",
         body: ({ Festival }) => (
           <>
+            Added the{" "}
+            <Festival
+              name="BFI London Film Festival"
+              url="https://www.bfi.org.uk/london-film-festival"
+            />
+            , the UK&rsquo;s biggest film event &mdash; running every October
+            since 1957, when it opened at the newly built National Film Theatre
+            with a programme of films already acclaimed elsewhere. The 70th
+            edition runs 7 to 18 October, with galas at the Royal Festival Hall,
+            the competition programme at BFI Southbank, and screenings at BFI
+            IMAX, Curzon Soho, the ICA, the Prince Charles and Vue West End. The
+            programme is announced on 2 September, so listings will fill out
+            over the coming weeks.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
             Added{" "}
             <Festival name="FrightFest" url="https://www.frightfest.co.uk" />,
             &ldquo;the UK&rsquo;s No.1 horror &amp; fantasy film festival&rdquo;
