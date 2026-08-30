@@ -38,6 +38,16 @@ export async function getMetadata(page: Page): Promise<PageMetadata> {
   }));
 }
 
+// `document.title` is not the raw text of the <title> element: the getter strips
+// leading/trailing whitespace and collapses internal runs of it to a single
+// space. Expected titles here are scraped from the DOM with `textContent`,
+// which does neither — so a film whose title carries a double space ("…presents
+// 8  Astonishing Animated Shorts…") failed a raw substring check on whitespace
+// alone. Playwright's own `toContainText` normalises for the same reason.
+function normalizeWhitespace(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
+}
+
 // `trailingSlash: true` (next.config.ts) makes the live URL end in "/", but
 // `alternates.canonical` values across src/app/**/page.tsx are written without
 // one — comparing raw strings would fail on that alone, not on a real bug.
@@ -59,7 +69,9 @@ export async function expectIndexableMetadata(
 ): Promise<PageMetadata> {
   const metadata = await getMetadata(page);
 
-  expect(metadata.title).toContain(titleContains);
+  expect(normalizeWhitespace(metadata.title)).toContain(
+    normalizeWhitespace(titleContains),
+  );
   expect(metadata.title).toContain("Clusterflick");
 
   expect(metadata.description).toBeTruthy();
