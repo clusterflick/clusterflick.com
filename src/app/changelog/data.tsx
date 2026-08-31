@@ -71,6 +71,28 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-08-31",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="The People's Letters Bookshop"
+              url="https://peoplesletters.org"
+            />
+            , a worker-led co-operative bookshop and community space on
+            Cambridge Heath Road in Bethnal Green, set up by booksellers who
+            unionised at their former shop and rebuilt as a co-op after it
+            closed. Its events room runs screenings alongside book launches,
+            workshops and book clubs.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-28",
     changes: [
       {
