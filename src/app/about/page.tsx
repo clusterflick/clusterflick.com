@@ -10,6 +10,7 @@ import LinkCard, {
   CardTitle,
 } from "@/components/link-card";
 import { EmailIcon } from "@/components/icons";
+import { ButtonLink } from "@/components/button";
 import Divider from "@/components/divider";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
@@ -36,7 +37,7 @@ const faqs = [
   {
     question: "What is Clusterflick?",
     answer:
-      "Clusterflick is a free site that brings together film screenings from across London's 300+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
+      "Clusterflick is a free site that brings together film screenings from across London's 400+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
   },
   {
     question: "Where does Clusterflick's film data come from?",
@@ -51,7 +52,12 @@ const faqs = [
   {
     question: "Is Clusterflick open source?",
     answer:
-      "Yes, the code for the Clusterflick website, the processing pipeline, and the data generated is all open source and available on GitHub.",
+      "Yes, the code for the Clusterflick website and the processing pipeline is open source and available on GitHub, under the MIT licence.",
+  },
+  {
+    question: "Can I use Clusterflick's screening data in my own project?",
+    answer:
+      "Yes. The showing data is refreshed daily, available in two formats, and free to use — including commercially — under CC BY 4.0, as long as you credit us. Film metadata supplied by TMDB is excluded and stays subject to TMDB's own terms; the data licence page has the full terms.",
   },
 ];
 
@@ -318,8 +324,8 @@ export default function AboutPage() {
             align="center"
             intro={
               <>
-                The code for this site, the processing pipeline, and data
-                generated is all open source and{" "}
+                The code for this site and the processing pipeline behind it is
+                open source under the MIT licence, and{" "}
                 <a
                   href="https://github.com/clusterflick/"
                   target="_blank"
@@ -327,7 +333,9 @@ export default function AboutPage() {
                 >
                   available on GitHub
                 </a>
-                . To see what&apos;s new on Clusterflick, see{" "}
+                . The screening data it produces is published separately under{" "}
+                <Link href="/data-licence">CC BY 4.0</Link>. To see what&apos;s
+                new on Clusterflick, see{" "}
                 <Link href="/changelog">the Changelog</Link>, which details new
                 venues, sources and festivals, as well as features and
                 improvements across the site and its data.
@@ -372,7 +380,21 @@ export default function AboutPage() {
             title="Showing Data"
             as="h3"
             align="center"
-            intro="The showing data is refreshed daily and available in different formats:"
+            intro={
+              <>
+                The showing data is refreshed daily, available in two formats,
+                and free to use — including commercially — under{" "}
+                <a
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nowrap"
+                >
+                  CC BY 4.0
+                </a>
+                , as long as you credit us.
+              </>
+            }
           >
             <CardGrid>
               {dataFormats.map((format) => (
@@ -387,6 +409,11 @@ export default function AboutPage() {
                 </LinkCard>
               ))}
             </CardGrid>
+            <p className={styles.licenceLink}>
+              <ButtonLink href="/data-licence" variant="secondary">
+                Read the data licence
+              </ButtonLink>
+            </p>
           </ContentSection>
         </div>
       </div>

@@ -1,0 +1,123 @@
+/* Hero */
+.hero {
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 56px;
+  margin-bottom: 24px;
+}
+
+.tagline {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+/* Content wrapper — narrower than the About page's card grids, because this is
+   mostly prose and long measures are hard to read. */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+/* CardGrid has no trailing margin of its own, and the prose below explains the
+   cards, so it needs a gap wider than the one between two paragraphs. */
+.datasets {
+  margin-bottom: 32px;
+}
+
+/* ─── Attribution snippets ─── */
+
+.snippets {
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.snippetLabel {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-electric-blue);
+}
+
+.snippetValue {
+  margin: 0;
+}
+
+/* The snippet is meant to be selected and copied, so it stays on one line and
+   scrolls sideways rather than wrapping into something that pastes with a
+   stray line break in it. */
+.snippetValue pre {
+  margin: 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: rgba(var(--color-dark-navy-rgb), 0.6);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.25);
+}
+
+.snippetValue code {
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre;
+  color: var(--color-light-gray);
+}
+
+.inlineCode {
+  font-size: 0.92em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(var(--color-dark-navy-rgb), 0.7);
+}
+
+/* ─── Internal repositories ─── */
+
+.repoList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.repo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  line-height: 1.6;
+}
+
+/* A floor on the repo name so every description starts at the same x, turning
+   the list into two readable columns. The names run to 15 characters, so this
+   clears the longest of them. */
+.repo code {
+  min-width: 140px;
+  text-align: center;
+}
+
+.repoNote {
+  font-size: 15px;
+  color: var(--color-muted-gray);
+  flex: 1 1 320px;
+}

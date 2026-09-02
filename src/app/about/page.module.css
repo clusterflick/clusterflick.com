@@ -91,3 +91,9 @@
 .acknowledgement {
   margin: 32px 0 16px;
 }
+
+/* The licence sits alongside the format cards rather than under them — it is
+   the terms those downloads come with, not an afterthought. */
+.licenceLink {
+  margin-top: 28px;
+}

@@ -57,6 +57,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: "/updates", label: "New Listings", group: "site" },
   { href: "/about", label: "About", group: "site" },
   { href: "/changelog", label: "Changelog", group: "site" },
+  { href: "/data-licence", label: "Data Licence", group: "site" },
 ];
 
 /** `NAV_LINKS` bucketed into `NAV_GROUPS` order, for the menu and the footer. */
