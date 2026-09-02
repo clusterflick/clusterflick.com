@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
   description:
-    "Discover what's worth seeing across London's 300+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
+    "Discover what's worth seeing across London's 400+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
   alternates: {
     canonical: "/",
   },
@@ -108,7 +108,7 @@ export default async function Home() {
             What&apos;s On at London Cinemas
           </OutlineHeading>
           <p className={styles.introLead}>
-            Clusterflick brings every film screening across 300+ London venues
+            Clusterflick brings every film screening across 400+ London venues
             into one place.
             <br />
             From blockbusters at{" "}

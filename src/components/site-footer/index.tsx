@@ -35,7 +35,7 @@ export default function SiteFooter() {
           ))}
         </div>
         <p className={styles.colophon}>
-          Clusterflick brings every film screening across 300+ London venues
+          Clusterflick brings every film screening across 400+ London venues
           into one place.
         </p>
       </div>

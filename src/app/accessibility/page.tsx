@@ -21,7 +21,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Accessible Cinema",
   description:
-    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 300+ cinemas.",
+    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 400+ cinemas.",
   alternates: {
     canonical: "/accessibility",
   },
@@ -210,7 +210,7 @@ export default async function AccessibilityPage() {
     {
       question: "What accessibility features can I find screenings for?",
       answer:
-        "Clusterflick tracks audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings across London's 300+ cinemas.",
+        "Clusterflick tracks audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings across London's 400+ cinemas.",
     },
     {
       question: "Where does the accessibility data come from?",
@@ -280,7 +280,7 @@ export default async function AccessibilityPage() {
           <strong>Cinema for everyone.</strong>
           <br />
           Find screenings with audio description, captions, relaxed
-          environments, and more across London&apos;s 300+ venues.
+          environments, and more across London&apos;s 400+ venues.
         </p>
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and

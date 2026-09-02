@@ -10,7 +10,7 @@ import GenresPageContent from "./page-content";
 export const metadata: Metadata = {
   title: "Browse Films by Genre in London",
   description:
-    "Browse London cinema listings by genre — horror, comedy, drama, science fiction, documentary and more. Find films by genre showing across London's 300+ cinemas.",
+    "Browse London cinema listings by genre — horror, comedy, drama, science fiction, documentary and more. Find films by genre showing across London's 400+ cinemas.",
   alternates: {
     canonical: "/genres",
   },
