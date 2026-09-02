@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import FestivalCard from "@/components/festival-card";
 import FilmClubCard from "@/components/film-club-card";
 import SectionHeading from "@/components/section-heading";
@@ -23,15 +24,19 @@ export default function ScreeningAsPartOf({
     return null;
   }
 
+  const isScrollable = festivals.length + filmClubs.length > 1;
+
   return (
     <div className={styles.container}>
       <SectionHeading>Screening as part of</SectionHeading>
-      {festivals.map((festival) => (
-        <FestivalCard key={festival.id} festival={festival} />
-      ))}
-      {filmClubs.map((filmClub) => (
-        <FilmClubCard key={filmClub.id} filmClub={filmClub} />
-      ))}
+      <div className={clsx(styles.row, isScrollable && styles.scrollable)}>
+        {festivals.map((festival) => (
+          <FestivalCard key={festival.id} festival={festival} />
+        ))}
+        {filmClubs.map((filmClub) => (
+          <FilmClubCard key={filmClub.id} filmClub={filmClub} />
+        ))}
+      </div>
     </div>
   );
 }

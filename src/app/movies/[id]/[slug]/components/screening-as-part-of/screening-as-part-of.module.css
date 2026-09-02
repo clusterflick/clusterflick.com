@@ -1,11 +1,36 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
   margin-top: 24px;
   margin-bottom: 32px;
   text-align: left;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+}
+
+/* Several programmes stack into a tall column that pushes the showings off the
+   screen, so past one card the section becomes a scrolling row — the same
+   gesture, at every width, as the ratings row above it.
+
+   A scroller clips, and what it would clip is the hover state: the card lifts
+   3px and casts a shadow that reaches ~21px below where it sat. The padding is
+   the room for both, and the negative margin gives it back, so the section
+   occupies exactly the space it did before. */
+.scrollable {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 4px 22px;
+  margin: -6px -4px -22px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollable::-webkit-scrollbar {
+  display: none;
 }
 
 /* Cards hug their content here rather than filling the column, on a floor wide
@@ -13,7 +38,15 @@
    400px would run past the viewport on a phone. Scoped to this section because
    `VenueCard` is shared with the venue grids, where a min-width overflows the
    grid track. */
-.container > a {
+.row > a {
+  flex: 0 0 auto;
   min-width: min(400px, 100%);
   max-width: 100%;
+}
+
+/* In the row the floor stops short of the full width so the next card peeks in
+   past the edge, which is what says the row scrolls. */
+.scrollable > a {
+  min-width: min(400px, 85%);
+  max-width: none;
 }
