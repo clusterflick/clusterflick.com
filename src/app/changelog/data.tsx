@@ -71,6 +71,35 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-07",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Independent Film Festival"
+              url="https://liff.org"
+            />
+            , founded in 2004 and devoted to &ldquo;first- and second-time
+            filmmakers telling amazing stories with limited budgets&rdquo;.
+            Unusually it runs twice a year, spring and autumn, both editions at
+            the{" "}
+            <Venue
+              name="Genesis Cinema"
+              url="https://www.genesiscinema.co.uk"
+            />{" "}
+            on Mile End Road. The autumn edition runs 2 to 11 October, with ten
+            days of premieres from almost a hundred filmmakers, awards for the
+            best low-budget, micro-budget and no-budget features, and industry
+            sessions alongside the screenings.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-08-31",
     changes: [
       {

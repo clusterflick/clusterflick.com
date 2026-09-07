@@ -602,4 +602,39 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-independent-film-festival",
+    name: "London Independent Film Festival",
+    url: "https://liff.org",
+    // The festival's own acronym is LIFF, but that slug belongs to the London
+    // Indian Film Festival, which registered it first — aliases become static
+    // routes, so a second claim on it would resolve to the other festival.
+    aliases: ["london-indie-film-festival", "london-independent-film-fest"],
+    matchers: [
+      {
+        // The Genesis titles every screening and industry session "<Name> -
+        // LIFF", which is the only marker the listings carry — the films
+        // themselves are premieres with no other tell. Search normalisation
+        // strips punctuation and spacing, so the suffix cannot be anchored and
+        // a bare "LIFF" is a three-letter run that falls inside ordinary words
+        // ("Cliffhanger"). It is therefore scoped to the Genesis, which has
+        // hosted every edition since the festival started and is the only
+        // venue it uses.
+        [FilterId.ShowingTitleSearch]: "LIFF",
+        [FilterId.Venues]: ["genesiscinema.co.uk"],
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LIFF",
+        [FilterId.Venues]: ["genesiscinema.co.uk"],
+      },
+      {
+        // The full name is distinctive enough to match unscoped, so a venue the
+        // festival spills into is still picked up.
+        [FilterId.ShowingTitleSearch]: "London Independent Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Independent Film Festival",
+      },
+    ],
+  },
 ];
