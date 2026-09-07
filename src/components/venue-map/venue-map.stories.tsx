@@ -23,7 +23,8 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  * **Notes:**
  * - Client-only and lazy-loaded (Leaflet needs `window`); it never enters the
  *   static-export prerender.
- * - Basemap tiles are fetched from CARTO over the network (free, no API key).
+ * - Basemap tiles are fetched from CARTO over the network, using the free API
+ *   key baked into `leaflet-venue-map.tsx` (CARTO requires one per request).
  * - Must be rendered inside a `GeolocationProvider` (the decorator supplies one
  *   here; the real app wires it in `layout.tsx`).
  */
