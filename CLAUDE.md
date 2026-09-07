@@ -107,6 +107,7 @@ Film clubs are defined in `src/data/film-clubs.ts`. Each club has a `matchers` a
 
 - Matchers are **OR'd** — a movie matches if it satisfies any one matcher object
 - Filter keys within a single matcher are **AND'd** — all keys must match simultaneously
+- The OR is taken over **showings and performances, not movie ids** — see below
 
 **Available matcher filter IDs** (use `FilterId.*` from `@/lib/filters/types`):
 
@@ -119,6 +120,15 @@ All of these filters prune at **showing level**: only matching showings (and the
 returned. A movie screening at three venues will only surface the venue(s) whose showing matched —
 not the full set. This is critical for correctness when a film screens at both a film club venue
 and regular cinemas simultaneously.
+
+Because each matcher returns the movie pruned to _its own_ matches, a film matching two matchers
+arrives once per matcher, each copy carrying a different slice of the same film.
+`applyMatchers` (`@/lib/filters/apply-matchers`, shared with festivals) therefore unions those
+slices per movie; keeping the last copy silently drops the venues the earlier matchers found. The
+Japanese Film Club is the case to keep in mind: the Phoenix lists "Shall We Dance?" under the club's
+name and hands booking to the club, so its own listing is what we hold (the club's copy is
+deduplicated away upstream) and only the _title_ matcher finds it — while the note matcher finds the
+club-sourced showings at other venues.
 
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
 named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.

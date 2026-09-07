@@ -1,9 +1,5 @@
-import {
-  FilterId,
-  type FilterState,
-  type MoviesRecord,
-} from "@/lib/filters/types";
-import { apply, getPermissiveState } from "@/lib/filters/manager";
+import type { MoviesRecord } from "@/lib/filters/types";
+import { applyMatchers } from "@/lib/filters/apply-matchers";
 import type { Festival } from "@/data/festivals";
 
 /**
@@ -16,21 +12,7 @@ export function getFestivalMovies(
   festival: Festival,
   movies: MoviesRecord,
 ): MoviesRecord {
-  const result: MoviesRecord = {};
-
-  for (const matcher of festival.matchers) {
-    const state: FilterState = {
-      ...getPermissiveState(),
-      ...matcher,
-      [FilterId.HideFinished]: true,
-    };
-    const filtered = apply(movies, state);
-    for (const [id, movie] of Object.entries(filtered)) {
-      result[id] = movie;
-    }
-  }
-
-  return result;
+  return applyMatchers(festival.matchers, movies);
 }
 
 /**
