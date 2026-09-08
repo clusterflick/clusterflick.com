@@ -88,6 +88,20 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Staffordshire St"
+              url="https://www.staffordshirest.com"
+            />
+            , a not-for-profit arts space and artists&apos; studios in Peckham,
+            where STST Film Club screens experimental and archival film.
+          </>
+        ),
+      },
     ],
   },
   {
