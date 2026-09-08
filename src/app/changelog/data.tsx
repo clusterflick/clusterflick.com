@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-08",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Stockwell Park Community Centre"
+              url="https://www.thetrust.org.uk"
+            />
+            , a charity-run community centre on Aytoun Place in Stockwell with a
+            hall for hire, a community café and a media studio, where visiting
+            film programmes put on screenings.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-07",
     changes: [
       {
