@@ -637,4 +637,36 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-breeze-film-festival",
+    name: "London Breeze Film Festival",
+    url: "https://londonbreezefilmfestival.com",
+    aliases: ["london-breeze", "barnes-film-festival"],
+    matchers: [
+      {
+        // Every venue leads with the festival's name, in one form or another:
+        // "London Breeze Film Festival Opening Gala Film: ..." (Regent Street
+        // Cinema), "London Breeze Film Festival presents ..." (The Garden
+        // Cinema), "London Breeze Industry Networker". "London Breeze" is the
+        // shortest form all of them share, and is distinctive enough to match
+        // unscoped — which matters here, because the festival takes a
+        // different set of venues each year.
+        [FilterId.ShowingTitleSearch]: "London Breeze",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Breeze",
+      },
+      {
+        // The one listing in the programme carrying no marker of its own: The
+        // Garden Cinema files its 25th-anniversary screening of Silent Grace
+        // under the festival on its own site, but neither the showing title nor
+        // the performance notes we receive say so. Pinned to the venue and to
+        // the run of the 11th edition (21–25 October 2026) so a later
+        // revival of the film is not swept in with it.
+        [FilterId.ShowingTitleSearch]: "Silent Grace + Panel",
+        [FilterId.Venues]: ["thegardencinema.co.uk"],
+        [FilterId.DateRange]: { start: 1792537200000, end: 1792972800000 },
+      },
+    ],
+  },
 ];
