@@ -71,6 +71,44 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-09",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Breeze Film Festival"
+              url="https://londonbreezefilmfestival.com"
+            />
+            , &ldquo;a breath of fresh air on the international film festival
+            circuit&rdquo;. Founded in 2016 as the Barnes Film Festival and
+            BIFA-qualifying since 2021, it showcases emerging filmmakers and
+            award-winning films from the UK and abroad. The eleventh edition
+            runs 21 to 25 October, opening with a gala at{" "}
+            <Venue
+              name="Regent Street Cinema"
+              url="https://www.regentstreetcinema.com"
+            />
+            , spending the weekend at{" "}
+            <Venue
+              name="The Garden Cinema"
+              url="https://www.thegardencinema.co.uk"
+            />{" "}
+            and closing with the awards at{" "}
+            <Venue
+              name="Riverside Studios"
+              url="https://riversidestudios.co.uk"
+            />
+            , with industry roundtables and networking sessions running
+            alongside the screenings.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-08",
     changes: [
       {
