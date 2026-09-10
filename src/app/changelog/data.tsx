@@ -71,6 +71,22 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-10",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue name="The Mall Tavern" url="https://www.themalltavern.com" />
+            , a Kensington pub whose downstairs room hosts Midweek Cinema on the
+            third Wednesday of every month.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-09",
     changes: [
       {
