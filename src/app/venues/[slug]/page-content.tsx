@@ -17,6 +17,8 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
 import FestivalCard from "@/components/festival-card";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
+import FilmClubCard from "@/components/film-club-card";
+import type { MovieFilmClub } from "@/utils/get-movie-film-clubs";
 import FilmPosterGrid from "@/components/film-poster-grid";
 import PosterRow from "@/components/poster-row";
 import VenueScheduleBoard from "@/components/venue-schedule-board";
@@ -58,6 +60,7 @@ export interface VenueDetailPageContentProps {
   borough?: VenueBorough | null;
   group?: VenueGroupLink | null;
   activeFestivals: MovieFestival[];
+  filmClubs: MovieFilmClub[];
   accessibilityStats: {
     feature: AccessibilityFeature;
     filmCount: number;
@@ -80,6 +83,7 @@ export default function VenueDetailPageContent({
   borough,
   group,
   activeFestivals,
+  filmClubs,
   accessibilityStats,
 }: VenueDetailPageContentProps) {
   const venueMovieParams = `venues=${encodeURIComponent(venue.id)}`;
@@ -90,17 +94,38 @@ export default function VenueDetailPageContent({
   const hasJustAdded = justAdded.length > 0;
 
   const hasFestivals = activeFestivals.length > 0;
+  const hasFilmClubs = filmClubs.length > 0;
   const hasAccessibility = accessibilityStats.length > 0;
-  const hasBoth = hasFestivals && hasAccessibility;
+  // Festivals and film clubs are both programmes brought to the venue, so they
+  // stack in the main column with accessibility alongside them.
+  const hasProgrammes = hasFestivals || hasFilmClubs;
+  const hasBoth = hasProgrammes && hasAccessibility;
 
   const festivalsSection = hasFestivals ? (
     <ContentSection title="Festivals" as="h2">
-      <div className={styles.festivalCards}>
+      <div className={styles.cardStack}>
         {activeFestivals.map((festival) => (
           <FestivalCard key={festival.id} festival={festival} />
         ))}
       </div>
     </ContentSection>
+  ) : null;
+
+  const filmClubsSection = hasFilmClubs ? (
+    <ContentSection title="Film Clubs" as="h2">
+      <div className={styles.cardStack}>
+        {filmClubs.map((filmClub) => (
+          <FilmClubCard key={filmClub.id} filmClub={filmClub} />
+        ))}
+      </div>
+    </ContentSection>
+  ) : null;
+
+  const programmesSection = hasProgrammes ? (
+    <>
+      {festivalsSection}
+      {filmClubsSection}
+    </>
   ) : null;
 
   const accessibilitySection = hasAccessibility ? (
@@ -265,13 +290,16 @@ export default function VenueDetailPageContent({
                 </p>
               )}
             </ContentSection>
-            {!hasBoth && festivalsSection}
+            {!hasBoth && programmesSection}
             {!hasBoth && accessibilitySection}
           </>
         }
       />
       {hasBoth && (
-        <ColumnsLayout main={festivalsSection} sidebar={accessibilitySection} />
+        <ColumnsLayout
+          main={programmesSection}
+          sidebar={accessibilitySection}
+        />
       )}
       {nearbyVenues.length > 0 && (
         <div>

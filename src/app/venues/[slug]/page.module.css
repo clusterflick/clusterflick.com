@@ -55,7 +55,7 @@
   margin-bottom: 75px;
 }
 
-.festivalCards {
+.cardStack {
   display: flex;
   flex-direction: column;
   gap: 8px;

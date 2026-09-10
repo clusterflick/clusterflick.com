@@ -18,6 +18,10 @@ import { FESTIVALS } from "@/data/festivals";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { summariseFestival } from "@/utils/get-movie-festivals";
+import { FILM_CLUBS } from "@/data/film-clubs";
+import { getFilmClubMovies } from "@/utils/get-film-club-movies";
+import { getFilmClubImagePath } from "@/utils/get-film-club-image";
+import { summariseFilmClub } from "@/utils/get-movie-film-clubs";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
 import { AccessibilityFeature, type Movie, type Venue } from "@/types";
@@ -299,6 +303,20 @@ export default async function VenueDetailPage({
     return [summariseFestival(festival, festMovies, getFestivalImagePath)];
   });
 
+  // Find the film clubs that screen here. Like the festival cards above, the
+  // card carries the club's own counts rather than the subset showing at this
+  // venue, so they agree with the club page it links to.
+  const filmClubsAtVenue = FILM_CLUBS.flatMap((club) => {
+    const clubMovies = getFilmClubMovies(club, data.movies);
+    const atVenue = Object.values(clubMovies).some((movie) =>
+      movie.performances.some(
+        (perf) => movie.showings[perf.showingId]?.venueId === venue.id,
+      ),
+    );
+    if (!atVenue) return [];
+    return [summariseFilmClub(club, clubMovies, getFilmClubImagePath)];
+  });
+
   // Build JSON-LD structured data for this venue
   const venueJsonLd = [
     {
@@ -357,6 +375,7 @@ export default async function VenueDetailPage({
         borough={boroughInfo}
         group={groupInfo}
         activeFestivals={activeFestivalsAtVenue}
+        filmClubs={filmClubsAtVenue}
         accessibilityStats={venueAccessibilityStats}
       />
     </>

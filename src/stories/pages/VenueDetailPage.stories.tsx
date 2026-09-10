@@ -96,6 +96,7 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     justAdded: getVenueNewAdditions(allMovies, VENUE_ID),
     nearbyVenues: [],
     activeFestivals: [],
+    filmClubs: [],
     accessibilityStats: [],
   };
 }
