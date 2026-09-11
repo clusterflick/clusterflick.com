@@ -71,6 +71,21 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-11",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="The O2" url="https://www.theo2.co.uk" />, the
+            Greenwich Peninsula arena, where films turn up as live-to-picture
+            events played to a full orchestra.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-10",
     changes: [
       {
