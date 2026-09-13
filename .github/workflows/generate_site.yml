@@ -185,3 +185,27 @@ jobs:
             test-results/
             playwright-report/
           retention-days: 7
+
+  trigger_downstream:
+    name: Trigger downstream
+    runs-on: ubuntu-latest
+    permissions: {}
+    # This site is the end of the pipeline - dispatched by both data-calendar
+    # and data-matched - so by the time it deploys, every release the
+    # management site reads has been published. Triggering from data-combined
+    # instead would always build it against the previous day's data-matched,
+    # since data-matched is dispatched by that same release and takes hours.
+    #
+    # Hung off verify-hash rather than smoke-tests: a smoke-test failure is
+    # exactly when the management site is worth rebuilding, so it must not gate
+    # this. A cancelled run of this workflow never reaches here at all
+    # (`cancel-in-progress` above), which the management site's own nightly
+    # schedule is there to cover.
+    needs: verify-hash
+    steps:
+      - name: Repository Dispatch for manage.clusterflick.com
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.PAT }}
+          repository: clusterflick/manage.clusterflick.com
+          event-type: release_event
