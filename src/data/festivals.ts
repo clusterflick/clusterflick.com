@@ -9,58 +9,6 @@ export type Festival = {
   matchers: Partial<FilterState>[];
 };
 
-// https://kinoteka.org.uk/programme
-const kinotekaTitles = [
-  "THE SOLIDARITY TRILOGY: MAN OF MARBLE",
-  "ROUGH TREATMENT",
-  "THE PROMISED LAND",
-  "THE CONDUCTOR",
-  "THE SOLIDARITY TRILOGY: MAN OF IRON",
-  "CHOPIN, A SONATA IN PARIS",
-  "MAN OF HOPE",
-  "KORCZAK",
-  "IN MEMORIAM: MARCEL ŁOZIŃSKI",
-  "FRANZ",
-  "HOME SWEET HOME",
-  "KATYN",
-  "FRAMES OF FREEDOM",
-  "MAN OF IRON",
-  "POSSESSION",
-  "THE DOG WHO TRAVELLED BY TRAIN 2",
-  "The Travelling Dog 2",
-  "DANTON",
-  "A SHORT FILM ABOUT KILLING",
-  "MR. OLBRYCHSKI",
-  "THE GOOD BOY",
-  "AFTERIMAGE",
-  "KIEŚLOWSKI DOCU-SHORTS",
-  "THE DOUBLE LIFE OF VERONIQUE",
-  "THE POSSESSED",
-  "THE PUBLIC WOMAN",
-  "A GENERATION",
-  "A SHORT FILM ABOUT LOVE",
-  "TRAINS",
-  "KANAL",
-  "ASHES AND DIAMONDS",
-  "LARP: LOVE, TROLLS AND OTHER QUESTS",
-  "PILATE AND THE OTHERS",
-  "Pilate and Others",
-  "LETTERS FROM WOLF STREET",
-  "LOVE IN GERMANY",
-  "THE IN-LAWS 3",
-  "BROTHER",
-];
-
-const kinotekaVenues = [
-  "bfi.org.uk-southbank",
-  "bfi.org.uk-imax",
-  "institut-francais.org.uk",
-  "ica.art",
-  "curzon.com-bloomsbury",
-  "barbican.org.uk",
-  "bbk.ac.uk-cinema",
-];
-
 // Fringe! titles its screenings several ways — "… - FRINGE!" (Genesis),
 // "FRINGE! PRESENTS …" (The Nickel), "Fringe! and Pink Palace: …" (Rio) and
 // "Fringe x <collaborator> presents: …". Search normalisation strips
@@ -182,25 +130,15 @@ export const FESTIVALS: Festival[] = [
     aliases: ["Polish Film Festival"],
     matchers: [
       {
+        // "Kinoteka" is a distinctive proper noun, so it matches unscoped —
+        // the festival takes a different set of venues each year. The 2026
+        // edition also ran a block of films at BFI Southbank, and two one-offs
+        // at The Garden Cinema, listed under their own titles alone with
+        // nothing marking them as festival screenings; titles like
+        // "Possession" or "Brother" can only be enumerated per edition and
+        // clamped to that edition's run, or they sweep in later revivals.
         [FilterId.ShowingTitleSearch]: "Kinoteka",
-        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
-        [FilterId.Venues]: kinotekaVenues,
       },
-      {
-        [FilterId.ShowingTitleSearch]: "PHOTOSENSITIVE",
-        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
-        [FilterId.Venues]: ["thegardencinema.co.uk"],
-      },
-      {
-        [FilterId.ShowingTitleSearch]: "ANNIVERSARY",
-        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
-        [FilterId.Venues]: ["thegardencinema.co.uk"],
-      },
-      ...kinotekaTitles.map((title) => ({
-        [FilterId.ShowingTitleSearch]: title,
-        [FilterId.DateRange]: { start: 1770163200000, end: 1774742400000 },
-        [FilterId.Venues]: kinotekaVenues,
-      })),
     ],
   },
   {
