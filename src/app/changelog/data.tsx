@@ -71,6 +71,43 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-14",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Erotic Film Festival London"
+              url="https://eroticfilmfestivallondon.com"
+            />
+            , which is &ldquo;here to showcase bold, beautifully crafted films
+            that explore desire, intimacy, and human connection&rdquo; and calls
+            itself &ldquo;the beginning of a movement that recognises erotic
+            cinema as one of the most vital, under-explored frontiers in
+            contemporary cinema&rdquo;. It programmes shorts of 31 minutes or
+            less in any genre, &ldquo;from documentary to sci-fi, fantasy to
+            kink, animation to experimental&rdquo;, grouped into curated
+            programmes and competing for a Film of the Festival award, a Special
+            Mention and an Audience Award voted for in the room. The 2026
+            edition runs 1 and 2 October, at{" "}
+            <Venue
+              name="Coldharbour Blue"
+              url="https://www.coldharbourblue.com/events"
+            />{" "}
+            in Loughborough Junction and{" "}
+            <Venue name="The Bath House" url="https://thebathhouse.co" /> in
+            Hackney Wick, with exhibitions, live performances, talks and
+            workshops alongside the films. Neither venue has published its
+            October listings yet, so the programme will fill out over the coming
+            weeks.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-11",
     changes: [
       {

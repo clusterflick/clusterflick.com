@@ -669,4 +669,34 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "erotic-film-festival-london",
+    name: "Erotic Film Festival London",
+    url: "https://eroticfilmfestivallondon.com",
+    aliases: ["eff-london", "erotic-film-festival"],
+    matchers: [
+      {
+        // Coldharbour Blue billed the 2025 edition as plain "Erotic Film
+        // Festival London", and the festival's own Eventbrite as "Erotic Film
+        // Festival London Presents...". The full name is distinctive enough to
+        // match unscoped, which matters here: the festival takes a different
+        // pair of venues each year — Coldharbour Blue and The Bath House on
+        // Eastway for the 1–2 October 2026 edition.
+        [FilterId.ShowingTitleSearch]: "Erotic Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Erotic Film Festival",
+      },
+      {
+        // The festival brands itself "EFF London". The bare acronym is far too
+        // short to match on — search normalisation strips spacing, so "EFF"
+        // would fall inside ordinary words — but "EFF London" survives as a
+        // distinctive run.
+        [FilterId.ShowingTitleSearch]: "EFF London",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "EFF London",
+      },
+    ],
+  },
 ];
