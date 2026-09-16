@@ -71,6 +71,21 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-16",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Folklore" url="https://folklorehoxton.co.uk" />,
+            a Hackney Road live music venue on the edge of Hoxton, where the
+            film nights are put on by promoters hiring the room.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-14",
     changes: [
       {
