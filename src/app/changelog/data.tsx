@@ -83,6 +83,23 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/witch-of-popcorn">
+              The Witch Of Popcorn
+            </Link>
+            , interactive B-movie nights of &ldquo;gags, games &amp;
+            cabaret&rdquo; where host Loose Willis riffs live over the film and
+            the audience is there to take part, with special performances,
+            trivia and prizes around the screening. Their next night is at{" "}
+            <Venue name="Folklore" url="https://folklorehoxton.co.uk" /> on 13
+            October.
+          </>
+        ),
+      },
     ],
   },
   {

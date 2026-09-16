@@ -492,4 +492,17 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Never Watching Movies" },
     ],
   },
+  {
+    id: "witch-of-popcorn",
+    name: "The Witch Of Popcorn",
+    url: "https://linktr.ee/witchofpopcorn",
+    aliases: ["witchofpopcorn"],
+    matchers: [
+      // The club styles itself "The Witch Of Popcorn" in listings and
+      // "@witchofpopcorn" everywhere else; search normalisation strips spaces,
+      // so one matcher covers both.
+      { [FilterId.ShowingTitleSearch]: "Witch of Popcorn" },
+      { [FilterId.PerformanceNotesSearch]: "Witch of Popcorn" },
+    ],
+  },
 ];
