@@ -74,6 +74,31 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-16",
     changes: [
       {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Ealing Film Festival"
+              url="https://ealingfilmfestival.com"
+            />
+            , &ldquo;shining a spotlight on emerging filmmaking talent&rdquo;
+            with a mission to &ldquo;give the next generation of filmmakers a
+            platform and audience, as well as a forum to meet like-minded
+            industry professionals&rdquo;. Founded in 2020 by Annemarie
+            Flanagan, Alan Granley and Peter Gould, it shows shorts by emerging
+            and established filmmakers &mdash; many of them students at
+            Ealing&rsquo;s University of West London and MetFilm School &mdash;
+            drawn from 458 submissions across more than 40 countries last year.
+            This year&rsquo;s festival opens at{" "}
+            <Venue name="ActOne Cinema" url="https://actonecinema.co.uk" /> on
+            15 October with two Homegrown screenings of &ldquo;stories born and
+            bred in West London&rdquo;, ahead of further days at cinemas around
+            the borough.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ Venue }) => (
           <>

@@ -637,4 +637,28 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "ealing-film-festival",
+    name: "Ealing Film Festival",
+    url: "https://ealingfilmfestival.com",
+    // "EFF" is not claimed here: the Erotic Film Festival already brands
+    // itself EFF London, and a bare three-letter slug is ambiguous between
+    // them.
+    aliases: ["ealing-film-fest", "ealing"],
+    matchers: [
+      {
+        // ActOne titles the programme blocks "Ealing Film Festival: Homegrown
+        // 1"; "Ealing Film Fest" is the shorter form, and a substring of the
+        // full name once search normalisation strips spacing, so it covers
+        // both. Left unscoped: the festival takes whichever rooms in the
+        // borough it can get — ActOne, Ealing Picturehouse and Pitzhanger
+        // Manor — and a bare "Ealing" would catch the Ealing Studios
+        // comedies, which play all over London.
+        [FilterId.ShowingTitleSearch]: "Ealing Film Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Ealing Film Fest",
+      },
+    ],
+  },
 ];
