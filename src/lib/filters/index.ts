@@ -16,6 +16,10 @@ export {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  directorsFilter,
+  castFilter,
+  PEOPLE_GROUPS,
+  getPeopleVocabulary,
   formatSourceFilter,
   formatPresentationFilter,
   formatDimensionFilter,
@@ -27,6 +31,9 @@ export type {
   FormatFilterId,
   FormatGroupConfig,
   FormatOption,
+  PeopleFilterId,
+  PeopleGroupConfig,
+  PersonOption,
 } from "./modules";
 
 // Manager functions and object

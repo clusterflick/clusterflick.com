@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import clsx from "clsx";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { filterManager, buildFilterUrl, FilterId } from "@/lib/filters";
+import {
+  filterManager,
+  buildFilterUrl,
+  FilterId,
+  getPeopleVocabulary,
+} from "@/lib/filters";
 import { useFilterConfig, QuickFilter } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
@@ -15,6 +20,7 @@ import SearchInput from "@/components/search-input";
 import QuickFiltersSection from "./quick-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
+import PeopleFilterSection from "./people-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
@@ -45,6 +51,8 @@ export default function FilterOverlay({
     toggleGenre,
     selectAllGenres,
     clearAllGenres,
+    togglePerson,
+    clearPeople,
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
@@ -347,6 +355,14 @@ export default function FilterOverlay({
   // Get genres array from metadata
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
 
+  // Folded from the films rather than read off `metaData.people`, which
+  // carries no role and so cannot say who directed. Memoised on the dataset:
+  // it is one pass over every film's credits, not something to redo per open.
+  const peopleVocabulary = useMemo(
+    () => getPeopleVocabulary(movies, metaData?.people ?? null),
+    [movies, metaData],
+  );
+
   return (
     <div
       ref={overlayRef}
@@ -502,6 +518,16 @@ export default function FilterOverlay({
             toggleFormat={toggleFormat}
             selectAllFormat={selectAllFormat}
             clearAllFormat={clearAllFormat}
+          />
+
+          <PeopleFilterSection
+            vocabulary={peopleVocabulary}
+            selected={{
+              [FilterId.Directors]: filterState.directors,
+              [FilterId.Cast]: filterState.cast,
+            }}
+            togglePerson={togglePerson}
+            clearPeople={clearPeople}
           />
         </div>
 

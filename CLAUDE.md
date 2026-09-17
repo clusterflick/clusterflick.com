@@ -256,6 +256,51 @@ overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` 
 up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
 would render at 48px in pink.
 
+## Cast & Crew Filters
+
+Directors and cast are **filters on the films grid, not pages of their own**
+(`src/lib/filters/modules/people.ts`, surfaced in the filter overlay's
+`PeopleFilterSection`).
+
+**Why no `/directors/<id>` pages.** Measured against a live release: 1,288
+distinct directors, of whom **1,082 (84%) have exactly one film showing**. A page
+each would be ~1,300 static pages that mostly reproduce a TMDB synopsis already
+on the film's own page — thin content, and a meaningful share of a build that
+already runs 20 minutes for ~3,600 pages. It is also the call `/lists` already
+documents: "a threshold slid along a continuum is a filter, not a list", and
+"directors with enough films on" re-cuts itself every week. The stale-page
+problem that films need (`departed-movies.json`) therefore never arises here —
+there is no page to 404.
+
+**The data is already shipped.** `people` is 449KB of the 645KB meta blob every
+visitor downloads, and `movie.directors` / `movie.actors` are already in the
+chunks. Before these filters that payload existed only to render name pills. The
+filters cost no additional bytes.
+
+**`people` carries no role** — it is a flat `{ id, name }` map covering
+directors and cast alike. `getPeopleVocabulary` folds `movie.directors` and
+`movie.actors` to split them, and the fold doubles as the per-name film count.
+Memoise it on the dataset; it is one pass over every film's credits.
+
+**Empty means unfiltered, unlike genres.** Both store `string[] | null`, but
+genres are an enumerated chip list where `[]` legitimately means "none selected,
+nothing matches". People are a typeahead with no Select All, so `[]` is just what
+removing the last name leaves behind — it is treated as no filter, and
+`fromUrlParams` normalises it to `null` so an empty `?directors=` can never
+report itself restrictive while filtering nothing.
+
+**Names link from movie pages** (`CastCrewSection` → `getPersonFilterUrl`), which
+is the only thing making the filters discoverable — nobody opens an overlay
+looking for a filter they don't know exists. Links carry `base=all`, since the
+today→+7d default would answer a director with one film three weeks out by
+showing nothing.
+
+**The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
+already used, generalised. Matching is plain case-insensitive substring, never
+fuzzy, and results stop at `maxResults` **in list order** — so the vocabulary
+must arrive best-represented first, or a two-letter query walks all 11,000 cast
+names.
+
 ## Zero-Result Suggestions
 
 When a filtered grid comes up empty, `src/lib/filters/suggest.ts` finds the cheapest
@@ -274,8 +319,14 @@ no second implementation of the filter logic to drift out of sync.
   vocabulary an edit budget multiplies ambiguity for nothing ("Action" is a genre, "Acton" is
   a place). Matching a _run_ of words is what lets "70mm" find both "70mm" and "IMAX 70mm";
   both are offered, each with its own probed count. Vocabularies are the format groups,
-  genres, event types and accessibility features. **Venues are deliberately excluded** — their
-  names are full of ordinary words (Rio, Castle, Everyman) that collide with film titles.
+  genres, event types, accessibility features and **directors**. **Venues are deliberately
+  excluded** — their names are full of ordinary words (Rio, Castle, Everyman) that collide
+  with film titles. Directors are gated on `MIN_DIRECTOR_CREDITS_FOR_SUGGESTION` (2) and cast
+  excluded outright: at ~1,300 and ~11,000 names they are one and two orders of magnitude
+  larger than every other vocabulary here, and the scan runs on the deferred path that exists
+  to keep typing responsive. This is the route by which someone who types "Scorsese" — not a
+  title — reaches the people filters at all, so lowering the gate to 1 is a live option;
+  measure a suggestion pass on real data first.
   Genre metadata is keyed by id and the entries carry only a `name`, as `describeFilters`
   reads them. Unlike a correction this is _not_ gated on the query matching no title.
 - **Redirect** — the same query matched against a different search field (`Search` ↔

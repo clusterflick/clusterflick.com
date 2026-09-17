@@ -19,6 +19,7 @@ import {
   FilterState,
   FilterId,
   FormatFilterId,
+  PeopleFilterId,
   filterManager,
 } from "@/lib/filters";
 import {
@@ -205,6 +206,9 @@ type FilterConfigContextType = {
   toggleGenre: (genreId: string, allGenreIds: string[]) => void;
   selectAllGenres: () => void;
   clearAllGenres: () => void;
+  // People (directors / cast) — keyed by filter id
+  togglePerson: (filterId: PeopleFilterId, personId: string) => void;
+  clearPeople: (filterId: PeopleFilterId) => void;
   // Accessibility
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
@@ -410,6 +414,31 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
 
   const clearAllGenres = useCallback(() => {
     setFilterState((prev) => filterManager.set(prev, FilterId.Genres, []));
+  }, []);
+
+  // People - null means no filter, [...] means films crediting any of them.
+  // There is no "none selected" here: removing the last name returns to null
+  // rather than to an empty grid the reader has no obvious way out of. See
+  // the note on value semantics in `lib/filters/modules/people.ts`.
+  const togglePerson = useCallback(
+    (filterId: PeopleFilterId, personId: string) => {
+      setFilterState((prev) => {
+        const current = filterManager.get(prev, filterId) ?? [];
+        const updated = current.includes(personId)
+          ? current.filter((id) => id !== personId)
+          : [...current, personId];
+        return filterManager.set(
+          prev,
+          filterId,
+          updated.length > 0 ? updated : null,
+        );
+      });
+    },
+    [],
+  );
+
+  const clearPeople = useCallback((filterId: PeopleFilterId) => {
+    setFilterState((prev) => filterManager.set(prev, filterId, null));
   }, []);
 
   // Accessibility - null means all (no filter), [] means none, [...] means specific
@@ -668,6 +697,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleGenre,
       selectAllGenres,
       clearAllGenres,
+      togglePerson,
+      clearPeople,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
@@ -702,6 +733,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleGenre,
       selectAllGenres,
       clearAllGenres,
+      togglePerson,
+      clearPeople,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,

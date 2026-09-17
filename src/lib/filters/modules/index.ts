@@ -11,6 +11,13 @@ export {
   DAY_END_MINUTES,
 } from "./time-range";
 export { genresFilter } from "./genres";
+export {
+  directorsFilter,
+  castFilter,
+  PEOPLE_GROUPS,
+  getPeopleVocabulary,
+} from "./people";
+export type { PeopleFilterId, PeopleGroupConfig, PersonOption } from "./people";
 export { accessibilityFilter } from "./accessibility";
 export {
   formatSourceFilter,

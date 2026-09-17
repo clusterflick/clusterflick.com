@@ -13,7 +13,12 @@ import {
   getPermissiveState,
   getRestrictiveFilterIds,
 } from "./manager";
-import { FORMAT_GROUPS, getPrimaryCategory } from "./modules";
+import {
+  FORMAT_GROUPS,
+  PEOPLE_GROUPS,
+  getPrimaryCategory,
+  type PersonOption,
+} from "./modules";
 import {
   matchesSearchQuery,
   normalizeForSearch,
@@ -156,6 +161,16 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     action: "Include sold-out showings",
   },
   { id: FilterId.Venues, label: "All venues", action: "Search all venues" },
+  // Below venues because giving up a name discards the reader's stated
+  // subject rather than widening the terms around it: someone who picked
+  // Scorsese would rather travel than watch somebody else. Still above
+  // accessibility, which is a requirement rather than a preference.
+  {
+    id: FilterId.Directors,
+    label: "All directors",
+    action: "Search all directors",
+  },
+  { id: FilterId.Cast, label: "All cast", action: "Search all cast" },
   {
     id: FilterId.Accessibility,
     label: "Any accessibility requirement",
@@ -201,6 +216,12 @@ interface SuggestContext {
   categories?: { value: Category; label: string }[];
   venues?: Record<string, Venue> | null;
   genres?: Record<string, Genre> | null;
+  /**
+   * The director vocabulary, as `getPeopleVocabulary` returns it. Only the
+   * well-represented end of it is read — see
+   * {@link MIN_DIRECTOR_CREDITS_FOR_SUGGESTION}.
+   */
+  directors?: PersonOption[] | null;
 }
 
 /**
@@ -220,10 +241,37 @@ interface ValueVocabulary {
   noun: string;
   entries: {
     name: string;
+    /**
+     * What the headline says in place of the bare name, where the name alone
+     * would not read as an instruction. Defaults to `name`.
+     */
+    displayName?: string;
     /** Applies this one value, typed by the vocabulary that owns it. */
     select: (state: FilterState) => FilterState;
   }[];
 }
+
+/**
+ * How many currently-screening films a director needs before their name is read
+ * as a filter value.
+ *
+ * Two, not one, for two reasons. The vocabulary is built and scanned on every
+ * suggestion pass, and the full director list is ~1,300 names against the ~20
+ * of every other vocabulary here — an order of magnitude more `normalizeToWords`
+ * work per pass, on the deferred path that exists to keep typing responsive.
+ * And a name is a far weaker signal than a format string: a one-film director
+ * shares a surname with a title often enough that the offer would sometimes be
+ * a non-sequitur, which is the objection that keeps venues out entirely.
+ *
+ * The cost is real and worth stating: a director with exactly one film on draws
+ * no offer, which is precisely the reader who has no other route to it. Lowering
+ * this to 1 is a one-word change if the pass turns out to be cheap enough in
+ * practice — measure a suggestion pass on live data first.
+ *
+ * Cast is excluded from value moves altogether at ~11,000 names, where both
+ * objections are an order of magnitude worse again.
+ */
+const MIN_DIRECTOR_CREDITS_FOR_SUGGESTION = 2;
 
 function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
   const vocabularies: ValueVocabulary[] = FORMAT_GROUPS.map((group) => ({
@@ -248,6 +296,24 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
         name: genre.name,
         select: (state: FilterState) => set(state, FilterId.Genres, [id]),
       })),
+    });
+  }
+
+  if (context.directors) {
+    const group = PEOPLE_GROUPS[0];
+    vocabularies.push({
+      filterId: group.filterId,
+      label: group.label,
+      // Completes as "Show films directed by Martin Scorsese", which reads as
+      // an instruction where a bare "Show Martin Scorsese" reads as a billing.
+      noun: "",
+      entries: context.directors
+        .filter(({ count }) => count >= MIN_DIRECTOR_CREDITS_FOR_SUGGESTION)
+        .map(({ id, name }) => ({
+          name,
+          displayName: `${group.headlineNoun} ${group.verb} ${name}`,
+          select: (state: FilterState) => set(state, group.filterId, [id]),
+        })),
     });
   }
 
@@ -304,10 +370,11 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
         bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0;
       if (!exact) continue;
 
+      const display = entry.displayName ?? entry.name;
       moves.push({
         id: `filter:${vocabulary.filterId}:${entry.name}`,
         kind: "filter",
-        action: `Show ${entry.name}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
+        action: `Show ${display}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
         label: vocabulary.label,
         soloOnly: false,
         // The query was the filter value, so it leaves the search box with it.
@@ -818,8 +885,9 @@ export function suggestFilterRelaxations({
   categories,
   venues,
   genres,
+  directors,
 }: SuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues, genres };
+  const context: SuggestContext = { categories, venues, genres, directors };
 
   // Nothing to rescue. Checked here rather than trusted to the caller because
   // the caller's idea of "empty" is easy to take from a different state than

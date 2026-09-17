@@ -29,6 +29,8 @@ interface MovieSpec {
   title: string;
   /** TMDB genre ids, as the dataset stores them. */
   genres?: string[];
+  /** TMDB person ids, as the dataset stores them. */
+  directors?: string[];
   /** Source format of the single performance. */
   source?: FormatSource;
   /** Original venue title, when it differs from the film title. */
@@ -56,6 +58,7 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     title: spec.title,
     normalizedTitle: spec.title.toLowerCase(),
     ...(spec.genres ? { genres: spec.genres } : {}),
+    ...(spec.directors ? { directors: spec.directors } : {}),
     showings: {
       [showingId]: {
         id: showingId,
@@ -455,6 +458,95 @@ describe("suggestFilterRelaxations", () => {
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show 70mm screenings"]);
+    });
+  });
+
+  describe("director offers", () => {
+    // Two films each, so both clear MIN_DIRECTOR_CREDITS_FOR_SUGGESTION.
+    const DIRECTORS = [
+      { id: "d1", name: "Martin Scorsese", count: 2 },
+      { id: "d2", name: "Lynne Ramsay", count: 2 },
+    ];
+
+    it("reads a query that names a director as that director", () => {
+      const movies = makeMovies({
+        "1": { title: "Taxi Driver", directors: ["d1"] },
+        "2": { title: "Goodfellas", directors: ["d1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "scorsese");
+
+      const [suggestion] = suggestFilterRelaxations({
+        movies,
+        state,
+        directors: DIRECTORS,
+      });
+      // The headline names the films, not just the person: "Show Martin
+      // Scorsese" would read as a billing rather than an instruction.
+      expect(lines(suggestion)).toEqual([
+        "Show films directed by Martin Scorsese",
+        "Director: Martin Scorsese",
+      ]);
+      expect(suggestion.state[FilterId.Search]).toBe("");
+      expect(suggestion.state[FilterId.Directors]).toEqual(["d1"]);
+      expect(suggestion.count).toBe(2);
+    });
+
+    it("matches a surname as a whole word within the full name", () => {
+      const movies = makeMovies({
+        "1": { title: "Ratcatcher", directors: ["d2"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "ramsay");
+
+      expect(
+        suggestFilterRelaxations({ movies, state, directors: DIRECTORS })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show films directed by Lynne Ramsay"]);
+    });
+
+    it("ignores a director with too few films to be worth offering", () => {
+      const movies = makeMovies({
+        "1": { title: "Morvern Callar", directors: ["d3"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "reygadas");
+
+      expect(
+        suggestFilterRelaxations({
+          movies,
+          state,
+          directors: [{ id: "d3", name: "Carlos Reygadas", count: 1 }],
+        }).filter((s) => s.kind === "filter"),
+      ).toEqual([]);
+    });
+
+    it("offers nothing when no director vocabulary is passed", () => {
+      const movies = makeMovies({
+        "1": { title: "Taxi Driver", directors: ["d1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "scorsese");
+
+      expect(
+        suggestFilterRelaxations({ movies, state }).filter(
+          (s) => s.kind === "filter",
+        ),
+      ).toEqual([]);
+    });
+
+    it("widens an active director filter when it is what emptied the grid", () => {
+      const movies = makeMovies({
+        "1": { title: "Taxi Driver", directors: ["d1"] },
+      });
+      // Nobody by d2 is screening, so the only way back to results is to drop
+      // the name — the offer that discards the reader's stated subject, and so
+      // the one that ranks below every other widening bar accessibility.
+      const state = set(getDefaultState(), FilterId.Directors, ["d2"]);
+
+      const offers = suggestFilterRelaxations({ movies, state });
+      expect(offers.map((s) => s.kind)).toContain("widen");
+      const widened = offers.find((s) =>
+        s.changes.some((change) => change.label === "All directors"),
+      );
+      expect(widened?.state[FilterId.Directors]).toBeNull();
     });
   });
 

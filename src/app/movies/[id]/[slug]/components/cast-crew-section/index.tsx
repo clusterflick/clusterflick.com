@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { Person } from "@/types";
+import { FilterId, PeopleFilterId } from "@/lib/filters";
+import { getPersonFilterUrl } from "@/utils/get-person-filter-url";
 import PillList from "@/components/pill-list";
 import styles from "./cast-crew-section.module.css";
 
@@ -8,36 +11,60 @@ interface CastCrewSectionProps {
   people: Record<string, Person>;
 }
 
-const getNames = (ids: string[], people: Record<string, Person>) =>
-  ids.map((id) => people[id]?.name).filter(Boolean) as string[];
+type CreditPill = { id: string; name: string };
+
+const getCredits = (
+  ids: string[],
+  people: Record<string, Person>,
+): CreditPill[] =>
+  ids.flatMap((id) => {
+    const name = people[id]?.name;
+    return name ? [{ id, name }] : [];
+  });
+
+/**
+ * Each name links into the films grid filtered to that person's credits, which
+ * is where a "what else are they in?" question gets answered — there are no
+ * director or cast pages to send it to, and at ~84% of directors having a
+ * single film on at any time, there should not be.
+ *
+ * A name with nothing currently screening lands on an empty grid rather than a
+ * 404, and the grid's own zero-result suggestions take it from there.
+ */
+const renderCredit = (filterId: PeopleFilterId) =>
+  function CreditPillLink({ id, name }: CreditPill) {
+    return <Link href={getPersonFilterUrl(filterId, id)}>{name}</Link>;
+  };
 
 export default function CastCrewSection({
   directors,
   actors,
   people,
 }: CastCrewSectionProps) {
-  const hasDirectors = directors && directors.length > 0;
-  const hasActors = actors && actors.length > 0;
+  const directorCredits = directors ? getCredits(directors, people) : [];
+  const actorCredits = actors ? getCredits(actors, people) : [];
 
-  if (!hasDirectors && !hasActors) {
+  if (directorCredits.length === 0 && actorCredits.length === 0) {
     return null;
   }
 
-  const actorNames = actors ? getNames(actors, people) : [];
-
   return (
     <div className={styles.creditsGrid}>
-      {hasDirectors && (
+      {directorCredits.length > 0 && (
         <PillList
-          title={`Director${directors.length > 1 ? "s" : ""}`}
-          items={getNames(directors, people)}
+          title={`Director${directorCredits.length > 1 ? "s" : ""}`}
+          items={directorCredits}
+          renderItem={renderCredit(FilterId.Directors)}
+          itemNoun="directors"
         />
       )}
 
-      {hasActors && (
+      {actorCredits.length > 0 && (
         <PillList
           title="Cast"
-          items={actorNames}
+          items={actorCredits}
+          renderItem={renderCredit(FilterId.Cast)}
+          itemNoun="cast"
           maxVisible={4}
           maxVisibleMobile={2}
         />

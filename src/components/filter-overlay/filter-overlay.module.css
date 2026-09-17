@@ -74,6 +74,16 @@
   color: var(--color-muted-gray);
 }
 
+/* Heading for one group inside a section (Directors, Cast). Quieter than
+   .sectionTitle so the section still reads as one block rather than two. */
+.sectionSubTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 /* Second question within a section (e.g. "What time of day?"), needs breathing
    room above it to separate it from the preceding chip group. */
 .sectionSubDescription {

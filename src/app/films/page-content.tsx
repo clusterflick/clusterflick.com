@@ -9,6 +9,8 @@ import {
 import {
   filterManager,
   suggestFilterRelaxations,
+  getPeopleVocabulary,
+  FilterId,
   type FilterSuggestion,
 } from "@/lib/filters";
 import Button from "@/components/button";
@@ -86,6 +88,15 @@ export default function PageContent() {
   // `suggestFilterRelaxations` checks the state it is handed and returns
   // nothing when that state still has results, which is what stops offers for
   // the previous query flashing up here.
+  // Folded once per dataset, not per suggestion pass: a pass already costs a
+  // full filter run per probe, and rebuilding ~1,300 directors underneath it
+  // would put that on the deferred path that exists to keep typing responsive.
+  const directorVocabulary = useMemo(
+    () =>
+      getPeopleVocabulary(movies, metaData?.people ?? null)[FilterId.Directors],
+    [movies, metaData],
+  );
+
   const suggestions = useMemo(() => {
     if (!showEmptyState || isEmpty) return [];
     return suggestFilterRelaxations({
@@ -96,8 +107,19 @@ export default function PageContent() {
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
       genres: metaData?.genres ?? null,
+      // Lets a query that names a director be read as one ("Scorsese" is not a
+      // title), which is the only route to the people filters for a reader who
+      // does not know the overlay has them.
+      directors: directorVocabulary,
     });
-  }, [showEmptyState, isEmpty, movies, metaData, deferredFilterState]);
+  }, [
+    showEmptyState,
+    isEmpty,
+    movies,
+    metaData,
+    deferredFilterState,
+    directorVocabulary,
+  ]);
 
   const searchRef = useRef<HTMLInputElement>(null);
   const [announcement, setAnnouncement] = useState("");
