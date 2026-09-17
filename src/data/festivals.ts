@@ -661,4 +661,36 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "windrush-international-caribbean-film-festival",
+    name: "Windrush International Caribbean Film Festival",
+    url: "https://www.windrushfilmfestival.com",
+    // "windrush" alone is safe as a slug — the festivals namespace has nothing
+    // else with the name — but deliberately not as a matcher: films about the
+    // Windrush generation carry it in their own titles, and the Ritzy sits on
+    // Windrush Square.
+    aliases: ["wicff", "wcff", "windrush-caribbean-film-festival", "windrush"],
+    matchers: [
+      {
+        // The festival has billed itself both ways — "Windrush Caribbean Film
+        // Festival" for the UK editions and "Windrush International Caribbean
+        // Film Festival" for the 2026 one — so the matcher takes the part they
+        // share rather than either full name. Left unscoped: the London
+        // programme is co-presented with Black History Walks and African
+        // Odysseys and takes whichever rooms it can get. "African Odysseys" is
+        // not matched: it is a year-round BFI Southbank strand, and claiming it
+        // would file every one of its screenings under this festival.
+        [FilterId.ShowingTitleSearch]: "Caribbean Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Caribbean Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "WICFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "WICFF",
+      },
+    ],
+  },
 ];
