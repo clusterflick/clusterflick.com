@@ -80,7 +80,7 @@ export const CHANGELOG: ChangelogDay[] = [
             Added the{" "}
             <Festival
               name="Windrush International Caribbean Film Festival"
-              url="https://www.windrushfilmfestival.com"
+              url="https://www.instagram.com/windrush_fest"
             />
             , which grew out of the UK&rsquo;s Windrush Caribbean Film Festival
             and this year runs internationally for the first time &mdash; across

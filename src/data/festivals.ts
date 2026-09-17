@@ -664,7 +664,7 @@ export const FESTIVALS: Festival[] = [
   {
     id: "windrush-international-caribbean-film-festival",
     name: "Windrush International Caribbean Film Festival",
-    url: "https://www.windrushfilmfestival.com",
+    url: "https://www.instagram.com/windrush_fest",
     // "windrush" alone is safe as a slug — the festivals namespace has nothing
     // else with the name — but deliberately not as a matcher: films about the
     // Windrush generation carry it in their own titles, and the Ritzy sits on
