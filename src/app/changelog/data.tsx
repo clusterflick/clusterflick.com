@@ -88,8 +88,7 @@ export const CHANGELOG: ChangelogDay[] = [
             October, under the banner &ldquo;Changing the Game&rdquo;. The
             London programme is co-presented with Black History Walks and the
             BFI&rsquo;s African Odysseys, opening with a celebration of Sir
-            Horace Ov&eacute; and his Brixton cricket comedy &ldquo;Playing
-            Away&rdquo;.
+            Horace Ov&eacute;.
           </>
         ),
       },
