@@ -235,6 +235,21 @@ interface SuggestContext {
  */
 interface ValueVocabulary {
   filterId: FilterId;
+  /**
+   * Drop every match when the query names more than one entry.
+   *
+   * Off by default, because for most vocabularies several matches is the
+   * feature: "70mm" naming both 70mm and IMAX 70mm gives two offers with
+   * different counts, and the reader picks.
+   *
+   * Names are the opposite. A vocabulary of people is mostly forenames held in
+   * common — "john" is 27 directors in a live release, "michael" 19 — and an
+   * offer per holder would fill every slot the empty state has with guesses,
+   * crowding out the widenings that would actually have helped. A fragment that
+   * names 27 people names none of them, so it is read as a name only when it
+   * picks out exactly one. "scorsese" and "john carpenter" do; "john" does not.
+   */
+  requireUniqueMatch?: boolean;
   /** Names the dimension in a change line, e.g. "Source Format". */
   label: string;
   /** Completes the headline: `Show 70mm ${noun}`. Empty where none reads well. */
@@ -250,28 +265,6 @@ interface ValueVocabulary {
     select: (state: FilterState) => FilterState;
   }[];
 }
-
-/**
- * How many currently-screening films a director needs before their name is read
- * as a filter value.
- *
- * Two, not one, for two reasons. The vocabulary is built and scanned on every
- * suggestion pass, and the full director list is ~1,300 names against the ~20
- * of every other vocabulary here — an order of magnitude more `normalizeToWords`
- * work per pass, on the deferred path that exists to keep typing responsive.
- * And a name is a far weaker signal than a format string: a one-film director
- * shares a surname with a title often enough that the offer would sometimes be
- * a non-sequitur, which is the objection that keeps venues out entirely.
- *
- * The cost is real and worth stating: a director with exactly one film on draws
- * no offer, which is precisely the reader who has no other route to it. Lowering
- * this to 1 is a one-word change if the pass turns out to be cheap enough in
- * practice — measure a suggestion pass on live data first.
- *
- * Cast is excluded from value moves altogether at ~11,000 names, where both
- * objections are an order of magnitude worse again.
- */
-const MIN_DIRECTOR_CREDITS_FOR_SUGGESTION = 2;
 
 function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
   const vocabularies: ValueVocabulary[] = FORMAT_GROUPS.map((group) => ({
@@ -307,13 +300,17 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
       // Completes as "Show films directed by Martin Scorsese", which reads as
       // an instruction where a bare "Show Martin Scorsese" reads as a billing.
       noun: "",
-      entries: context.directors
-        .filter(({ count }) => count >= MIN_DIRECTOR_CREDITS_FOR_SUGGESTION)
-        .map(({ id, name }) => ({
-          name,
-          displayName: `${group.headlineNoun} ${group.verb} ${name}`,
-          select: (state: FilterState) => set(state, group.filterId, [id]),
-        })),
+      requireUniqueMatch: true,
+      // Every director, with no floor on how many films they have on. A floor
+      // was the obvious guard and the wrong one: at two credits it ruled out
+      // 1,082 of 1,288 directors — precisely the ones with no other route to
+      // their film — while still leaving 46 contested fragments behind.
+      // Uniqueness reaches 1,285 of them and leaves none.
+      entries: context.directors.map(({ id, name }) => ({
+        name,
+        displayName: `${group.headlineNoun} ${group.verb} ${name}`,
+        select: (state: FilterState) => set(state, group.filterId, [id]),
+      })),
     });
   }
 
@@ -365,11 +362,14 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
   const moves: Move[] = [];
 
   for (const vocabulary of buildVocabularies(context)) {
-    for (const entry of vocabulary.entries) {
-      const exact =
-        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0;
-      if (!exact) continue;
+    const matched = vocabulary.entries.filter(
+      (entry) =>
+        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0,
+    );
+    // An ambiguous name is not a reading of the query, it is a shortlist.
+    if (vocabulary.requireUniqueMatch && matched.length > 1) continue;
 
+    for (const entry of matched) {
       const display = entry.displayName ?? entry.name;
       moves.push({
         id: `filter:${vocabulary.filterId}:${entry.name}`,

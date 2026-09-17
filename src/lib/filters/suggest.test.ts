@@ -462,7 +462,6 @@ describe("suggestFilterRelaxations", () => {
   });
 
   describe("director offers", () => {
-    // Two films each, so both clear MIN_DIRECTOR_CREDITS_FOR_SUGGESTION.
     const DIRECTORS = [
       { id: "d1", name: "Martin Scorsese", count: 2 },
       { id: "d2", name: "Lynne Ramsay", count: 2 },
@@ -504,19 +503,80 @@ describe("suggestFilterRelaxations", () => {
       ).toEqual(["Show films directed by Lynne Ramsay"]);
     });
 
-    it("ignores a director with too few films to be worth offering", () => {
+    it("offers a director with a single film, who has no other route", () => {
       const movies = makeMovies({
         "1": { title: "Morvern Callar", directors: ["d3"] },
       });
       const state = set(getDefaultState(), FilterId.Search, "reygadas");
 
+      const [suggestion] = suggestFilterRelaxations({
+        movies,
+        state,
+        directors: [{ id: "d3", name: "Carlos Reygadas", count: 1 }],
+      });
+      expect(suggestion.headline).toBe(
+        "Show films directed by Carlos Reygadas",
+      );
+      expect(suggestion.count).toBe(1);
+    });
+
+    // A forename is 27 directors in a live release. Offering one each would
+    // fill every slot in the empty state with guesses and push out the
+    // widenings that would actually have helped.
+    it("offers nothing when the query names more than one director", () => {
+      const movies = makeMovies({
+        "1": { title: "Halloween", directors: ["j1"] },
+        "2": { title: "Excalibur", directors: ["j2"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "john");
+
       expect(
         suggestFilterRelaxations({
           movies,
           state,
-          directors: [{ id: "d3", name: "Carlos Reygadas", count: 1 }],
+          directors: [
+            { id: "j1", name: "John Carpenter", count: 1 },
+            { id: "j2", name: "John Boorman", count: 1 },
+          ],
         }).filter((s) => s.kind === "filter"),
       ).toEqual([]);
+    });
+
+    it("offers again once the query narrows to one of them", () => {
+      const movies = makeMovies({
+        "1": { title: "Halloween", directors: ["j1"] },
+        "2": { title: "Excalibur", directors: ["j2"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "john carpenter");
+
+      expect(
+        suggestFilterRelaxations({
+          movies,
+          state,
+          directors: [
+            { id: "j1", name: "John Carpenter", count: 1 },
+            { id: "j2", name: "John Boorman", count: 1 },
+          ],
+        })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show films directed by John Carpenter"]);
+    });
+
+    // The uniqueness rule is per vocabulary — the formats must keep offering
+    // both "70mm" and "IMAX 70mm", which is the documented behaviour there.
+    it("leaves multi-match vocabularies alone", () => {
+      const movies = makeMovies({
+        "1": { title: "A", source: FormatSource.SeventyMm },
+        "2": { title: "B", source: FormatSource.ImaxSeventyMm },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      expect(
+        suggestFilterRelaxations({ movies, state, directors: DIRECTORS })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show 70mm screenings", "Show IMAX 70mm screenings"]);
     });
 
     it("offers nothing when no director vocabulary is passed", () => {

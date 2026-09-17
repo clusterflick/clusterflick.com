@@ -321,14 +321,26 @@ no second implementation of the filter logic to drift out of sync.
   both are offered, each with its own probed count. Vocabularies are the format groups,
   genres, event types, accessibility features and **directors**. **Venues are deliberately
   excluded** — their names are full of ordinary words (Rio, Castle, Everyman) that collide
-  with film titles. Directors are gated on `MIN_DIRECTOR_CREDITS_FOR_SUGGESTION` (2) and cast
-  excluded outright: at ~1,300 and ~11,000 names they are one and two orders of magnitude
-  larger than every other vocabulary here, and the scan runs on the deferred path that exists
-  to keep typing responsive. This is the route by which someone who types "Scorsese" — not a
-  title — reaches the people filters at all, so lowering the gate to 1 is a live option;
-  measure a suggestion pass on real data first.
-  Genre metadata is keyed by id and the entries carry only a `name`, as `describeFilters`
-  reads them. Unlike a correction this is _not_ gated on the query matching no title.
+  with film titles. Genre metadata is keyed by id and the entries carry only a `name`, as
+  `describeFilters` reads them. Unlike a correction this is _not_ gated on the query matching
+  no title.
+
+  **Directors set `requireUniqueMatch`**, which drops every match when the query names more
+  than one. A vocabulary of people is mostly forenames held in common — "john" is 27 directors
+  in a live release, "michael" 19 — and an offer per holder would fill the empty state with
+  guesses and push out the widenings that would actually have helped. A fragment naming 27
+  people names none of them; "scorsese" and "john carpenter" still land. It is off everywhere
+  else, where several matches is the feature ("70mm" → 70mm _and_ IMAX 70mm, each with its own
+  count).
+
+  A credit floor was tried first and was the wrong guard on every measured axis. At two credits
+  it ruled out 1,082 of 1,288 directors — exactly the single-film ones with no other route to
+  their film — and still left 46 contested fragments. Uniqueness reaches 1,285 and leaves none.
+  The cost argument for a floor did not survive measurement either: a suggestion pass over a
+  live release is ~26ms whether it scans 0, 206 or 1,288 names, because the probes dominate and
+  the vocabulary scan is ~0.3ms. **Cast is still excluded** — 11,000 names, and "starring X"
+  competing with "directed by Y" for the same query is a separate design question.
+
 - **Redirect** — the same query matched against a different search field (`Search` ↔
   `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks
   everything else. Only offered when the target field is empty. `ShowingUrlSearch` is
