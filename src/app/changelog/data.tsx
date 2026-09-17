@@ -71,6 +71,30 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-17",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Windrush International Caribbean Film Festival"
+              url="https://www.instagram.com/windrush_fest"
+            />
+            , which grew out of the UK&rsquo;s Windrush Caribbean Film Festival
+            and this year runs internationally for the first time &mdash; across
+            the UK, Canada and Trinidad &amp; Tobago from 24 September to 30
+            October, under the banner &ldquo;Changing the Game&rdquo;. The
+            London programme is co-presented with Black History Walks and the
+            BFI&rsquo;s African Odysseys, opening with a celebration of Sir
+            Horace Ov&eacute;.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-16",
     changes: [
       {
