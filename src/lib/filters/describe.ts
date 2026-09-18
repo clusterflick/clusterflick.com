@@ -401,15 +401,8 @@ function describeAccessibility(state: FilterState): string | null | "none" {
 }
 
 /**
- * Describes the director and cast filters, in group order.
- *
- * Each is a phrase to be appended to the events description ("directed by
- * Martin Scorsese"), not a standalone clause, because the two read as one
- * sentence with whatever precedes them.
- *
- * An empty selection is no filter at all for these two — see the note on value
- * semantics in `modules/people.ts` — so it is described as nothing rather than
- * as "none selected".
+ * Describes the director and cast filters as clauses to append to the events
+ * description ("directed by Martin Scorsese"), not standalone ones.
  */
 function describePeople(
   state: FilterState,
@@ -550,10 +543,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
   }
 
-  // Credits and queries read as clauses on whatever the branches above
-  // settled on, so they are appended once rather than per branch — "All
-  // events directed by Agnès Varda" and "Films directed by Agnès Varda"
-  // are the same sentence with a different subject.
+  // Appended once rather than per branch: these read as clauses on whatever the
+  // branches settled on, whether that is "All events" or "Films".
   if (!selectionIsEmpty) {
     if (peoplePhrases.length > 0) {
       eventsDesc += ` ${peoplePhrases.join(" and ")}`;

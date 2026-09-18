@@ -16,16 +16,10 @@ interface PeopleFilterSectionProps {
 }
 
 /**
- * Director and cast filters.
- *
- * A typeahead rather than a chip list, which is the whole reason this section
- * looks different from Events: the vocabulary is ~1,300 directors and ~11,000
- * cast, derived from what is actually screening, so there is nothing to
- * enumerate and no "Select All" that would mean anything. Only the current
- * selection is drawn as chips, which doubles as the way to remove one.
- *
- * The counts beside each suggestion are films currently in the dataset, not a
- * filmography — this is a filter over what is on, not a record of a career.
+ * Director and cast filters — a typeahead rather than a chip list, because the
+ * vocabulary is ~1,300 directors and ~11,000 cast derived from what is actually
+ * screening, so there is nothing to enumerate and no "Select All" that would
+ * mean anything. Only the current selection is drawn as chips.
  */
 export default function PeopleFilterSection({
   vocabulary,
@@ -48,11 +42,9 @@ export default function PeopleFilterSection({
         const options = vocabulary[group.filterId] ?? [];
         const chosen = selected[group.filterId] ?? [];
         const chosenSet = new Set(chosen);
-        // The chips are drawn from the vocabulary so they carry a name and a
-        // count. A selected id the current dataset no longer knows about — a
-        // shared link whose films have all come off — would otherwise render as
-        // a nameless chip that cannot be explained, so it is left out of the
-        // chips while staying in the filter state.
+        // Drawn from the vocabulary so they carry a name and count. An id the
+        // dataset no longer knows — a shared link whose films have come off —
+        // is left out of the chips but stays in the filter state.
         const chosenOptions = options.filter((option) =>
           chosenSet.has(option.id),
         );

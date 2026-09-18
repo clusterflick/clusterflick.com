@@ -8,32 +8,20 @@ import EntityQuickAdd, {
 
 /**
  * `EntityQuickAdd` is a search-and-toggle combobox for adding or removing one
- * named thing from a filter. Type to search, then pick a suggestion to flip its
- * inclusion; each suggestion shows whether it is already selected and how many
- * films it accounts for. Picking closes the menu and clears the query, ready
- * for the next search.
+ * named thing from a filter. Picking closes the menu and clears the query,
+ * ready for the next search. It owns no selection state — `isSelected` and
+ * `onToggle` keep it in lockstep with whatever renders the current selection.
  *
- * It owns no selection state — `isSelected` and `onToggle` keep it in lockstep
- * with whatever renders the current selection (chips, a grouped list).
+ * **When to use:** any filter whose vocabulary is too large to enumerate as
+ * chips — venues (~400), directors (~1,300), cast (~11,000) all use it.
  *
- * **When to use:**
- * - Any filter whose vocabulary is too large to enumerate as chips. Venues
- *   (~400), directors (~1,300) and cast (~11,000) all use it.
+ * **When NOT to use:** small fixed vocabularies (genres, formats, event types),
+ * where a chip list shows every option at once; or browsing rather than
+ * finding, since there is no way to see the whole list here.
  *
- * **When NOT to use:**
- * - Small fixed vocabularies — genres, formats, event types. A chip list shows
- *   every option at once and is a better fit.
- * - Browsing rather than finding. There is no way to see the whole list here.
- *
- * **Matching** is a plain case-insensitive substring, never fuzzy: the reader
- * is typing a name they already have in mind, and an edit budget over eleven
- * thousand cast names would put a different Anderson at the top of every list.
- * Results stop at `maxResults` in list order, so callers should pass the
- * best-represented entries first.
- *
- * **Accessibility:** Built on Downshift's `useCombobox`, so it exposes a proper
- * combobox/listbox with `aria-activedescendant`, arrow-key navigation, and
- * Enter/Escape handling. Each option announces its selected state.
+ * **Accessibility:** Downshift's `useCombobox`, so a proper combobox/listbox
+ * with `aria-activedescendant`, arrow keys and Enter/Escape. Each option
+ * announces its selected state.
  */
 const meta = {
   title: "Components/EntityQuickAdd",
@@ -105,11 +93,7 @@ function Interactive({
   );
 }
 
-/**
- * The directors filter. Try typing "scott" — it matches both Ridley Scott and
- * a surname inside another name, which is why picking is explicit rather than
- * automatic.
- */
+/** The directors filter. Try typing "scott". */
 export const Directors: Story = {
   args: {
     items: SAMPLE_DIRECTORS,
@@ -130,10 +114,7 @@ export const Directors: Story = {
   ),
 };
 
-/**
- * The same control against the venue vocabulary, where it started. Try "cine"
- * or "bfi".
- */
+/** The same control against the venue vocabulary. Try "cine" or "bfi". */
 export const Venues: Story = {
   args: {
     items: SAMPLE_VENUES,

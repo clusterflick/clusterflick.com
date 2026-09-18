@@ -64,20 +64,11 @@ export const PEOPLE_GROUPS: PeopleGroupConfig[] = [
 /**
  * Builds a filter module for one credit list.
  *
- * The value semantics deliberately differ from the genres filter, which shares
- * the same `string[] | null` shape. Genres are a fixed, fully-enumerated chip
- * list with Select All / Clear All, so `[]` there means "none selected, nothing
- * matches" — a state the reader can reach and undo.
- *
- * People are a typeahead over a thousand-plus names with no "select all" to
- * speak of, so the only two meaningful states are "not filtering" and "these
- * names". `[]` is therefore treated as no filter rather than as a wall: it is
- * what removing the last name leaves behind, and emptying the grid at that
- * point would be a trap with no visible way out.
- *
- * `fromUrlParams` normalises `[]` to `null` for the same reason, so that an
- * empty `?directors=` can never leave the state reporting itself restrictive
- * (and drawing a "widen" suggestion) while filtering nothing.
+ * `[]` means *no filter*, unlike the genres module which shares this shape: a
+ * typeahead has no Select All, so an empty selection is just what removing the
+ * last name leaves behind, and emptying the grid there is a trap with no way
+ * out. `fromUrlParams` normalises it to `null` so an empty `?directors=` never
+ * reports itself restrictive while filtering nothing.
  */
 function buildPeopleFilter(
   group: PeopleGroupConfig,
@@ -151,15 +142,11 @@ export type PersonOption = {
 };
 
 /**
- * The people currently worth offering, per group, best represented first.
+ * The people worth offering, per group, best represented first.
  *
- * Derived from the films rather than from the `people` lookup, which is a flat
- * `{ id, name }` map carrying no role — it cannot say who directed and who
- * appeared, only who was involved. Folding the credit lists is the only way to
- * split the two, and it doubles as the count shown beside each name.
- *
- * Runs once per dataset, not per keystroke: the whole vocabulary is ~1,300
- * directors and ~11,000 cast, so the fold is cheap but not free.
+ * Derived from the films rather than the `people` lookup, which is a flat
+ * `{ id, name }` map carrying no role — folding the credit lists is the only
+ * way to tell who directed from who appeared, and it yields the film count too.
  */
 export function getPeopleVocabulary(
   movies: Record<string, Movie>,
@@ -212,15 +199,10 @@ export type PeopleMatch = {
 /**
  * Every whole-word run of every name, mapped to the people who claim it.
  *
- * Keyed the way `normalizeForSearch` renders a query — words folded and run
- * together with no separators — because `normalizeToWords(s).join("") ===
- * normalizeForSearch(s)`. A lookup is therefore exactly the comparison
- * `bestWordRunDistance(needle, normalizeToWords(name), 0) === 0` used to make
- * entry by entry, at O(1) instead of a scan of 12,000 names per pass.
- *
- * Built once per dataset and memoised alongside the vocabulary it indexes. The
- * scan it replaces was ~10ms of every suggestion pass once cast was included,
- * paid whether or not anything matched.
+ * Keyed as `normalizeForSearch` renders a query, which is exact because
+ * `normalizeToWords(s).join("") === normalizeForSearch(s)` — so a lookup is the
+ * whole-word-run comparison it replaces, at O(1) rather than a scan of 12,000
+ * names per suggestion pass.
  */
 export type PeopleIndex = Map<string, PeopleMatch>;
 
@@ -266,36 +248,16 @@ export type ResolvedPerson = {
  * The people a query names, in the order they should be offered — or nothing,
  * when it names too many to be naming anyone.
  *
- * A name is a far weaker signal than a format string. Most of a people
- * vocabulary is forenames held in common ("john" is 27 directors in a live
- * release, "michael" 19), so a fragment is read as a name only when it picks
- * out one person per role. The tiers:
+ * A name is a weaker signal than a format string: most of a people vocabulary
+ * is forenames held in common, so a fragment is read as a name only when it
+ * picks out one person per role. Unique in one role wins; unique in both offers
+ * both, since only the reader knows which of two people they meant; ambiguous
+ * in both offers nothing. Two roles held by the same *name* — compared by name,
+ * not id, because TheMovieDB carries duplicate person records — is one person
+ * answering for two sets of films, so both are offered there too.
  *
- * 1. Unique in one role and ambiguous or absent in the other → that one. This
- *    is overwhelmingly "unique director, ambiguous cast" (502 fragments against
- *    20 the other way), which is the point: unique among 1,288 directors is a
- *    far stronger claim than unique among 11,070 cast.
- * 2. Unique in both and the names differ → both, since they are two different
- *    people and only the reader knows which they meant. Preferring the director
- *    was measured and is wrong 23 times in 212 — "pacino" is Al Pacino (6
- *    films, cast) far more often than Julie Pacino (1 film, director).
- * 3. Unique in both and the names match → both, being one person in two roles,
- *    each answering for a different set of films. Compared by name rather than
- *    id on purpose: TheMovieDB carries duplicate person records, so John
- *    Carpenter directing and John Carpenter appearing can be two ids, and a
- *    reader cannot tell two identical names apart anyway.
- * 4. Ambiguous in both → nothing. A fragment naming 27 people names none.
- *
- * The needle must already be folded by `normalizeForSearch`, which is how the
- * index is keyed — `normalizeToWords(s).join("") === normalizeForSearch(s)`, so
- * a lookup is exactly the whole-word-run comparison this replaces.
- *
- * Ordering within a pair is by films currently showing, then popularity, then
- * director. Film count leads because it is what the offer actually accounts
- * for — a twelve-film retrospective is the better answer to an ambiguous
- * surname. Popularity settles the rest, which is most of them: of 212 pairs the
- * counts are equal in 165, and there a name's standing is the only signal left.
- * Director breaks a remaining tie, keeping the stronger vocabulary first.
+ * Ordering is films showing, then popularity, then director. See "Zero-Result
+ * Suggestions" in CLAUDE.md for the measurements behind each of these.
  */
 export function resolvePeopleQuery(
   /** The query, already through `normalizeForSearch` — spaces and all. */

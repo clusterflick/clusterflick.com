@@ -8,11 +8,7 @@ import styles from "./entity-quick-add.module.css";
 
 export interface EntityQuickAddItem {
   id: string;
-  /**
-   * Full, unabbreviated name — shown as-is so near-duplicates (several
-   * Cineworlds, two actors called James Stewart) stay distinguishable in the
-   * flat suggestion list.
-   */
+  /** Full, unabbreviated name, so near-duplicates stay distinguishable. */
   name: string;
   count: number;
 }
@@ -51,9 +47,8 @@ interface EntityQuickAddProps {
  * no selection state of its own, delegating to `isSelected`/`onToggle` so it
  * stays in lockstep with whatever renders the current selection.
  *
- * Matching is a plain case-insensitive substring, never fuzzy. The reader is
- * typing a name they already have in mind, and an edit budget over eleven
- * thousand cast names would put a different Anderson at the top of every list.
+ * Matching is a plain case-insensitive substring, never fuzzy: the reader is
+ * typing a name they already have in mind.
  */
 export default function EntityQuickAdd({
   items: allItems,
@@ -77,10 +72,9 @@ export default function EntityQuickAdd({
   const items = useMemo(() => {
     const query = inputValue.toLowerCase().trim();
     if (!query) return [];
+    // `allItems` arrives best-represented first, so stopping early keeps the
+    // most-screened matches and avoids walking 11,000 cast names.
     const matches: EntityQuickAddItem[] = [];
-    // `allItems` arrives best-represented first, so stopping at `maxResults`
-    // keeps the most-screened matches rather than whichever sorted earliest —
-    // and stops a two-letter query walking all eleven thousand cast names.
     for (const item of allItems) {
       if (!item.name.toLowerCase().includes(query)) continue;
       matches.push(item);
@@ -99,12 +93,9 @@ export default function EntityQuickAdd({
   } = useCombobox<EntityQuickAddItem>({
     items,
     inputValue,
-    // Downshift generates its own input id and `getInputProps()` spreads it
-    // over anything passed alongside, so the id has to be handed to the hook
-    // rather than to the input. Several of these share a page (venues,
-    // directors, cast), and `getLabelProps()` builds its `htmlFor` from this —
-    // so a generated id would leave each label pointing at a name that changes
-    // between renders.
+    // Must go to the hook, not the input: `getInputProps()` spreads Downshift's
+    // own generated id over anything passed alongside, and `getLabelProps()`
+    // builds its `htmlFor` from it.
     inputId,
     // Keep selection empty so the same item can be toggled repeatedly and no
     // "selected" value is ever written back into the input.

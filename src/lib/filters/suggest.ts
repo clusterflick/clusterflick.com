@@ -182,12 +182,7 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
 interface Move {
   id: string;
   kind: SuggestionKind;
-  /**
-   * Marks moves that are two readings of one query and must be offered
-   * together — the director and the cast member a surname could each name.
-   * Truncating between them would silently turn "we do not know which" into
-   * "the first one", which is the guess the tiers exist to avoid.
-   */
+  /** Moves that are two readings of one query and must be offered together. */
   pairId?: string;
   /** Imperative phrasing, used when this move leads the offer. */
   action: string;
@@ -223,10 +218,7 @@ interface SuggestContext {
   categories?: { value: Category; label: string }[];
   venues?: Record<string, Venue> | null;
   genres?: Record<string, Genre> | null;
-  /**
-   * Name fragments to the people who claim them, from `buildPeopleIndex`.
-   * Absent means no query is read as naming anyone.
-   */
+  /** From `buildPeopleIndex`; absent means no query is read as naming anyone. */
   people?: PeopleIndex | null;
 }
 
@@ -351,14 +343,9 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
 }
 
 /**
- * Moves that read the query as naming a person rather than a film.
- *
- * The tiers, the ordering and the reasons for both live in
- * {@link resolvePeopleQuery}; this turns what it returns into moves. When it
- * returns two they are a pair — one query, two readings — and carry a shared
- * `pairId` so the round-one cut cannot take one and drop the other.
- *
- * Only the main search box is read this way, as with the other value moves.
+ * Moves that read the query as naming a person rather than a film. The tiers
+ * and ordering live in {@link resolvePeopleQuery}; two results are a pair and
+ * share a `pairId` so the round-one cut cannot split them.
  */
 function buildPeopleMoves(state: FilterState, context: SuggestContext): Move[] {
   if (!context.people) return [];
@@ -952,12 +939,9 @@ export function suggestFilterRelaxations({
       suggestions.push(suggestion);
       worksAlone.add(move.id);
     }
-    // A pair is two readings of one query — the director and the cast member a
-    // surname could each name. Cutting between them would present the first as
-    // the answer when the whole point is that we do not know which was meant,
-    // so the limit gives way by one rather than split it. It can only ever be
-    // exceeded by one, since a pair is two moves and its second half is never
-    // itself followed by a partner.
+    // Cutting a pair would present its first half as the answer when the whole
+    // point is that we don't know which was meant, so the limit gives way by
+    // one instead. Only ever by one, since a pair is two moves.
     if (suggestions.length >= limit && !partnerFollows(index)) {
       return suggestions;
     }

@@ -13,21 +13,14 @@ interface CastCrewSectionProps {
 }
 
 /**
- * Each name links into the films grid filtered to that person's credits, which
- * is where a "what else are they in?" question gets answered — there are no
- * director or cast pages to send it to, and at ~84% of directors having a
- * single film on at any time, there should not be.
+ * Each name links into the films grid filtered to that person's credits. A name
+ * with nothing currently screening lands on an empty grid rather than a 404.
  *
- * A name with nothing currently screening lands on an empty grid rather than a
- * 404, and the grid's own zero-result suggestions take it from there.
- *
- * The links are built here and handed to `PillList` as items, rather than
- * through its `renderItem` callback: `PillList` is a client component and this
- * one is not, so a callback would be a function crossing the server/client
- * boundary. That only fails on the departed movie page — the live one renders
- * inside `page-content`, which is `"use client"`, so nothing is serialised —
- * which is exactly why it survived a dev-server check and died in the export.
- * Elements cross the boundary fine; functions do not.
+ * The links are built here and passed as items rather than through PillList's
+ * `renderItem`: PillList is a client component and this one is not, so a
+ * callback would be a function crossing the server/client boundary. That breaks
+ * only the departed movie page — the live one renders inside `page-content`,
+ * which is `"use client"`. Elements cross fine; functions do not.
  */
 const creditPills = (
   ids: string[],

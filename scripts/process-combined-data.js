@@ -255,25 +255,12 @@ function removeOffAccessiblityIndicators(data) {
 /**
  * Replace each person's raw TheMovieDB popularity with a 0-99 percentile rank.
  *
- * The site uses this for one thing: deciding which of two people sharing a
- * surname a search meant, when both have the same number of films on. Only the
- * ordering matters, never the magnitude - so the cheapest faithful encoding
- * wins, and the raw float costs 274KB across 13,000-odd people in a blob every
- * visitor downloads. A rank costs 91KB.
+ * Only the ordering matters — it breaks ties between two people a search could
+ * equally have named — so the rank costs 91KB where the raw float costs 274KB
+ * in a blob every visitor downloads. A percentile rather than a rounded score
+ * because popularity is skewed enough that rounding puts almost everyone at 0.
  *
- * A percentile rather than a rounded score because popularity is heavily
- * skewed: rounding puts almost everyone at 0 or 1, and the ties this exists to
- * break are mostly between two people at the obscure end, where rounding
- * discriminates least. Ranking spreads them evenly, so two people who differ at
- * all usually land in different buckets.
- *
- * Collapsing 13,000 people into 100 buckets does leave neighbours tied. That is
- * the intended failure: two people within a percentile of each other are not
- * meaningfully distinguishable, and the caller falls through to its next
- * tie-break rather than acting on noise.
- *
- * A person TheMovieDB gives no score for gets no rank, rather than rank 0 -
- * they are unranked, not unpopular.
+ * Someone TheMovieDB has no score for gets no rank: unranked, not unpopular.
  */
 function rankPeoplePopularity(data) {
   const scored = Object.values(data.people).filter(

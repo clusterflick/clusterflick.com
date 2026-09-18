@@ -88,10 +88,8 @@ export default function PageContent() {
   // `suggestFilterRelaxations` checks the state it is handed and returns
   // nothing when that state still has results, which is what stops offers for
   // the previous query flashing up here.
-  // Folded and indexed once per dataset, not per suggestion pass. A pass
-  // already costs a full filter run per probe, and scanning ~12,000 names
-  // underneath that added ~10ms to every one — paid whether or not anything
-  // matched, on the deferred path that exists to keep typing responsive.
+  // Indexed once per dataset: scanning ~12,000 names per suggestion pass added
+  // ~10ms to every one, on the deferred path that keeps typing responsive.
   const peopleIndex = useMemo(
     () =>
       buildPeopleIndex(getPeopleVocabulary(movies, metaData?.people ?? null)),
@@ -108,9 +106,8 @@ export default function PageContent() {
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
       genres: metaData?.genres ?? null,
-      // Lets a query that names a person be read as one ("Scorsese" is not a
-      // title), which is the only route to the people filters for a reader who
-      // does not know the overlay has them.
+      // Lets a query naming a person be read as one — the only route to the
+      // people filters for a reader who doesn't know the overlay has them.
       people: peopleIndex,
     });
   }, [
