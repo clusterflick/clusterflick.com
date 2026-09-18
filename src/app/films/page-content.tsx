@@ -9,6 +9,7 @@ import {
 import {
   filterManager,
   suggestFilterRelaxations,
+  getHiddenByDate,
   getPeopleVocabulary,
   buildPeopleIndex,
   type FilterSuggestion,
@@ -16,6 +17,7 @@ import {
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import VirtualisedFilmGrid from "@/components/virtualised-film-grid";
+import HiddenResultsNotice from "@/components/hidden-results-notice";
 import MainHeader from "@/components/main-header";
 import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
@@ -118,6 +120,16 @@ export default function PageContent() {
     deferredFilterState,
     peopleIndex,
   ]);
+
+  // One extra filter pass, and only while the grid is short enough for the
+  // answer to look complete when it is not. Runs on the live state rather than
+  // the deferred copy the suggestions use: it is a single pass rather than
+  // thirty-odd probes, and a stale count under a grid that has already moved on
+  // would be wrong rather than merely late.
+  const hiddenByDate = useMemo(() => {
+    if (isEmpty || moviesList.length === 0) return null;
+    return getHiddenByDate(movies, filterState, moviesList.length);
+  }, [isEmpty, movies, filterState, moviesList.length]);
 
   const searchRef = useRef<HTMLInputElement>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -280,6 +292,20 @@ export default function PageContent() {
       {renderEmptyState()}
       {moviesList.length > 0 && (
         <VirtualisedFilmGrid items={moviesList.map((movie) => ({ movie }))} />
+      )}
+      {hiddenByDate && (
+        <HiddenResultsNotice
+          count={hiddenByDate.count}
+          from={hiddenByDate.from}
+          onShowAll={() => {
+            applyFilterState(hiddenByDate.state);
+            setAnnouncement(
+              `Showing all dates. ${hiddenByDate.count.toLocaleString("en-GB")} more result${
+                hiddenByDate.count === 1 ? "" : "s"
+              }.`,
+            );
+          }}
+        />
       )}
       {isLoading && (
         <LoadingIndicator

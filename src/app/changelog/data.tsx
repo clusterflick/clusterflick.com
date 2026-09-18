@@ -104,6 +104,36 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Names survive a typo now. &ldquo;Mark Hammill&rdquo; and
+            &ldquo;Scorsesee&rdquo; find the person they are one letter from,
+            both in the <Link href="/films">films</Link> search and in the cast
+            and crew boxes in the filter panel, where a misspelling used to
+            answer with nothing at all. Only the closest names are offered, so a
+            near-miss is read the same way a correct spelling is: one name is
+            that person, two are two people worth choosing between, and a
+            surname shared by a crowd is still nobody in particular.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            When a filtered list comes back with only a film or two, a line
+            underneath now says what the date range is keeping out &mdash;
+            search for Mark Hamill and you get The Wild Robot this week, with
+            three more waiting in December. The dates are the easiest filter to
+            forget you have set, because everything starts out showing the next
+            seven days. It stays out of the way of a full list: this is a note
+            about an answer that looks complete and isn&rsquo;t, not a
+            suggestion that something has gone wrong.
+          </>
+        ),
+      },
     ],
   },
   {

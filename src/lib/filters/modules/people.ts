@@ -1,6 +1,11 @@
 import { Movie } from "@/types";
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
 import { normalizeToWords } from "../normalize";
+import {
+  bestWordRunDistance,
+  editBudgetFor,
+  MIN_FUZZY_LENGTH,
+} from "../word-distance";
 
 /** The two people filter IDs. Each reads one credit list on the movie. */
 export type PeopleFilterId = FilterId.Directors | FilterId.Cast;
@@ -204,15 +209,26 @@ export type PeopleMatch = {
  * whole-word-run comparison it replaces, at O(1) rather than a scan of 12,000
  * names per suggestion pass.
  */
-export type PeopleIndex = Map<string, PeopleMatch>;
+export type PeopleIndex = {
+  /** Whole-word run -> the people claiming it. The exact, O(1) path. */
+  byRun: Map<string, PeopleMatch>;
+  /**
+   * Every name pre-split into words, one row per role held, for the fuzzy
+   * fallback. Split here rather than per pass: it is the same work either way,
+   * and doing it once per dataset keeps it off the deferred path.
+   */
+  entries: { person: PersonOption; words: string[]; role: keyof PeopleMatch }[];
+};
 
 export function buildPeopleIndex(
   groups: Record<PeopleFilterId, PersonOption[]>,
 ): PeopleIndex {
-  const index: PeopleIndex = new Map();
+  const byRun: PeopleIndex["byRun"] = new Map();
+  const entries: PeopleIndex["entries"] = [];
 
-  const add = (person: PersonOption, key: keyof PeopleMatch) => {
+  const add = (person: PersonOption, role: keyof PeopleMatch) => {
     const words = normalizeToWords(person.name);
+    entries.push({ person, words, role });
     // "John John" would otherwise claim the same run twice and read as two
     // people to anything counting matches.
     const seen = new Set<string>();
@@ -222,12 +238,12 @@ export function buildPeopleIndex(
         run += words[end];
         if (seen.has(run)) continue;
         seen.add(run);
-        let match = index.get(run);
+        let match = byRun.get(run);
         if (!match) {
           match = { directors: [], cast: [] };
-          index.set(run, match);
+          byRun.set(run, match);
         }
-        match[key].push(person);
+        match[role].push(person);
       }
     }
   };
@@ -235,7 +251,43 @@ export function buildPeopleIndex(
   for (const person of groups[FilterId.Directors]) add(person, "directors");
   for (const person of groups[FilterId.Cast]) add(person, "cast");
 
-  return index;
+  return { byRun, entries };
+}
+
+/**
+ * The people closest to a misspelt query, and only the closest.
+ *
+ * Everything at the minimum distance found is returned and everything further
+ * is dropped, because the tiers below then read a near-miss exactly as they
+ * read an exact hit: one name is that person, two are two candidates, a crowd
+ * is nobody. Keeping the whole edit budget instead would hand them an average
+ * of seven names where the closest tier holds one 42% of the time — and where
+ * it does hold one, it is the right person 98% of the time.
+ *
+ * Only reached when the exact lookup found nothing, so this can add offers but
+ * never remove them: the worst case is the silence there was before.
+ */
+function fuzzyMatch(
+  needle: string,
+  index: PeopleIndex,
+): PeopleMatch | undefined {
+  if (needle.length < MIN_FUZZY_LENGTH) return undefined;
+
+  const budget = editBudgetFor(needle);
+  let best = budget + 1;
+  let match: PeopleMatch = { directors: [], cast: [] };
+
+  for (const { person, words, role } of index.entries) {
+    const distance = bestWordRunDistance(needle, words, budget);
+    if (distance > best) continue;
+    if (distance < best) {
+      best = distance;
+      match = { directors: [], cast: [] };
+    }
+    match[role].push(person);
+  }
+
+  return best <= budget ? match : undefined;
 }
 
 /** One person a query named, and the filter that would select them. */
@@ -264,7 +316,9 @@ export function resolvePeopleQuery(
   needle: string,
   index: PeopleIndex,
 ): ResolvedPerson[] {
-  const match = index.get(needle);
+  // Exact first, always: the index answers in O(1) and a name spelt correctly
+  // must never be re-read as a near-miss of a different one.
+  const match = index.byRun.get(needle) ?? fuzzyMatch(needle, index);
   if (!match) return [];
 
   const director =
