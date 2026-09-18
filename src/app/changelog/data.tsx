@@ -71,6 +71,42 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-18",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Films can now be filtered by{" "}
+            <Link href="/films">director and cast</Link>. Every name on a
+            film&rsquo;s page is a link, so &ldquo;what else has she got
+            on?&rdquo; is one click rather than a fresh search, and the filter
+            panel has a search box for each. There are deliberately no director
+            pages: at any moment about five in six directors have exactly one
+            film showing in London, so a page each would mostly be a synopsis
+            you can already read on the film&rsquo;s own page.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Searching a name now finds the person rather than shrugging. Type
+            &ldquo;Scorsese&rdquo; into the <Link href="/films">films</Link>{" "}
+            search and, with no film by that name, the site offers his films
+            instead. Where a surname belongs to two different people it offers
+            both rather than picking one &mdash; &ldquo;Pacino&rdquo; turns up
+            Al and Julie, whoever has more on leading &mdash; and where it
+            belongs to twenty-seven, as &ldquo;John&rdquo; does, it offers
+            neither, because a name that fits that many people names none of
+            them.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-17",
     changes: [
       {
