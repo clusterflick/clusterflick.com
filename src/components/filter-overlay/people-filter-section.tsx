@@ -20,6 +20,10 @@ interface PeopleFilterSectionProps {
  * vocabulary is ~1,300 directors and ~11,000 cast derived from what is actually
  * screening, so there is nothing to enumerate and no "Select All" that would
  * mean anything. Only the current selection is drawn as chips.
+ *
+ * Rendered as two `advancedFilterGroup`s beside Genre and the formats rather
+ * than as a section of its own, so it reads as another way to narrow an event
+ * rather than a separate idea.
  */
 export default function PeopleFilterSection({
   vocabulary,
@@ -28,16 +32,7 @@ export default function PeopleFilterSection({
   clearPeople,
 }: PeopleFilterSectionProps) {
   return (
-    <section className={styles.section} aria-labelledby="people-heading">
-      <div className={styles.sectionHeader}>
-        <h3 id="people-heading" className={styles.sectionTitle}>
-          Cast &amp; Crew
-        </h3>
-      </div>
-      <p className={styles.sectionDescription}>
-        Find films by the people who made them
-      </p>
-
+    <>
       {PEOPLE_GROUPS.map((group) => {
         const options = vocabulary[group.filterId] ?? [];
         const chosen = selected[group.filterId] ?? [];
@@ -53,8 +48,8 @@ export default function PeopleFilterSection({
 
         return (
           <div key={group.filterId} className={styles.advancedFilterGroup}>
-            <div className={styles.sectionHeader}>
-              <h4 className={styles.sectionSubTitle}>{group.title}</h4>
+            <div className={styles.advancedFilterHeader}>
+              <h4 className={styles.advancedFilterTitle}>{group.title}</h4>
               <div className={styles.selectionControls}>
                 <Button
                   variant="link"
@@ -98,6 +93,6 @@ export default function PeopleFilterSection({
           </div>
         );
       })}
-    </section>
+    </>
   );
 }

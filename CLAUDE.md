@@ -295,6 +295,14 @@ looking for a filter they don't know exists. Links carry `base=all`, since the
 today→+7d default would answer a director with one film three weeks out by
 showing nothing.
 
+**It sits inside "More Event Options", above Genre**, as two
+`advancedFilterGroup`s rather than a section of its own — cast and crew are
+another way to narrow an event, not a separate idea. Those groups space their
+own children, so `EntityQuickAdd` carries no margin of its own and each placing
+section supplies it (`standaloneQuickAdd` for the venue one, which sits in a
+section with no gap). Two CSS modules cannot override one another by class
+order, so the margin has to live at one end or the other, not both.
+
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
 already used, generalised. Matching is case-insensitive substring, and results
 stop at `maxResults` **in list order** — so the vocabulary must arrive
@@ -365,9 +373,12 @@ full — an unfiltered `/films` shows 448 films with 1,382 more beyond the windo
 **A film already on screen is never counted as hidden**, however many of its
 showings fall outside the window: the reader can see it and click through.
 
-**The date is absolute even when it is days away**, unlike the relative phrasing
-the suggestion engine uses for a single next showing. This one begins a range
-rather than naming an event, and "showing from in 3 days" does not read.
+**Shaped like a suggestion offer** — command, then the fact, then the count it
+yields — because it is the same kind of thing to press. Quieter for the reason
+above: no accent border, no list around it. It follows the same fortnight rule
+for dates ("next in 9 days" inside it, "next on Sunday 27 December" beyond), via
+`RELATIVE_DAY_LIMIT` in `format-date.ts`, which both this and the suggestion
+engine now read.
 
 It probes the live filter state, not the deferred copy the suggestions use: it
 is a single pass rather than thirty-odd probes, and a stale count under a grid
@@ -495,6 +506,13 @@ redirect and a query never lands in two boxes at once.
 the date range have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d), so they report
 themselves inactive while still removing results — and they are the most common invisible
 blockers. Anything comparing against defaults instead of `getPermissiveState()` is blind to both.
+
+**Every multi-select filter reads as "or".** They all match a film satisfying
+_any_ selected value — two directors returns the films of either, not the films
+they made together — so `formatList` takes a conjunction and each of them passes
+"or": "directed by Ridley Scott or George Lucas and starring Mark Hamill". Only
+the availability toggles are a genuine "and", both applying at once, and only
+they keep "&".
 
 **Order is editorial, never by count.** Sorting by result count would promote "drop your
 Subtitles requirement" whenever it frees up the most screenings, which is the one suggestion a

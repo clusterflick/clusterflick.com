@@ -392,6 +392,12 @@
   margin: -8px 0 0;
 }
 
+/* Standing on its own in a section with no gap, the control spaces itself.
+   Inside an advancedFilterGroup the group's gap already does it. */
+.standaloneQuickAdd {
+  margin: 16px 0;
+}
+
 .advancedFilterHeader {
   display: flex;
   align-items: center;

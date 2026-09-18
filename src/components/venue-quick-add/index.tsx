@@ -21,6 +21,8 @@ interface VenueQuickAddProps {
   onToggleVenue: (venueId: string) => void;
   /** Max suggestions shown at once. */
   maxResults?: number;
+  /** Merged onto the wrapper; the placing section owns the spacing. */
+  className?: string;
   /** Optional handle exposing `focus()` for the underlying search input. */
   ref?: Ref<VenueQuickAddHandle>;
 }
@@ -38,6 +40,7 @@ export default function VenueQuickAdd({
   isVenueSelected,
   onToggleVenue,
   maxResults,
+  className,
   ref,
 }: VenueQuickAddProps) {
   return (
@@ -49,6 +52,7 @@ export default function VenueQuickAdd({
       placeholder="Quick toggle a venue…"
       ariaLabel="Quick toggle a venue"
       maxResults={maxResults}
+      className={className}
       ref={ref}
     />
   );

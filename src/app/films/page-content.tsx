@@ -254,8 +254,8 @@ export default function PageContent() {
           <SearchInput
             id="films-search"
             className={styles.controlsSearch}
-            placeholder="Search event title..."
-            ariaLabel="Search event title"
+            placeholder="Search the catalogue..."
+            ariaLabel="Search the catalogue"
             value={filterState.search}
             onChange={setSearchQuery}
             inputRef={searchRef}
@@ -296,6 +296,7 @@ export default function PageContent() {
       {hiddenByDate && (
         <HiddenResultsNotice
           count={hiddenByDate.count}
+          total={hiddenByDate.total}
           from={hiddenByDate.from}
           onShowAll={() => {
             applyFilterState(hiddenByDate.state);

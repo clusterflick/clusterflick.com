@@ -460,8 +460,8 @@ export default function FilterOverlay({
       <div className={styles.searchSection}>
         <SearchInput
           id="filter-search"
-          placeholder="Search event title..."
-          ariaLabel="Search event title"
+          placeholder="Search the catalogue..."
+          ariaLabel="Search the catalogue"
           value={filterState.search}
           onChange={setSearchQuery}
         />
@@ -495,6 +495,17 @@ export default function FilterOverlay({
         <div className={styles.categorySection}>
           <CategoryFilterSection
             movies={movies}
+            beforeGenres={
+              <PeopleFilterSection
+                vocabulary={peopleVocabulary}
+                selected={{
+                  [FilterId.Directors]: filterState.directors,
+                  [FilterId.Cast]: filterState.cast,
+                }}
+                togglePerson={togglePerson}
+                clearPeople={clearPeople}
+              />
+            }
             genres={genres}
             filterState={{
               categories: filterState.categories,
@@ -518,16 +529,6 @@ export default function FilterOverlay({
             toggleFormat={toggleFormat}
             selectAllFormat={selectAllFormat}
             clearAllFormat={clearAllFormat}
-          />
-
-          <PeopleFilterSection
-            vocabulary={peopleVocabulary}
-            selected={{
-              [FilterId.Directors]: filterState.directors,
-              [FilterId.Cast]: filterState.cast,
-            }}
-            togglePerson={togglePerson}
-            clearPeople={clearPeople}
           />
         </div>
 

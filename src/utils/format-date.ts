@@ -333,6 +333,12 @@ export function getDaysFromNow(
 }
 
 /**
+ * Beyond a fortnight, "in 23 days" is harder to place than the date itself, so
+ * anything further out is named rather than counted to.
+ */
+export const RELATIVE_DAY_LIMIT = 14;
+
+/**
  * Format a number of days from now as a relative string.
  * @returns "today", "tomorrow", or "in X days"
  */

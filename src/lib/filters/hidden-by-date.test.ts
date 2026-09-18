@@ -53,6 +53,9 @@ describe("getHiddenByDate", () => {
     const result = getHiddenByDate(data, withCast(), 1);
     expect(result?.count).toBe(2);
     expect(result?.from).toBe(BEYOND);
+    // What pressing the offer yields, which is the hidden films plus the one
+    // already on screen - not the same number as `count`.
+    expect(result?.total).toBe(3);
   });
 
   it("hands back a state that reveals them", () => {

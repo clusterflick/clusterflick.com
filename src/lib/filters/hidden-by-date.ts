@@ -20,6 +20,8 @@ export const THIN_RESULT_LIMIT = 3;
 export type HiddenByDate = {
   /** Films only the date window is keeping out. */
   count: number;
+  /** What the grid would hold once it is widened — what the offer yields. */
+  total: number;
   /** When the soonest of them is on. */
   from: number;
   /** The state that would reveal them, for the caller to apply. */
@@ -78,5 +80,5 @@ export function getHiddenByDate(
 
   if (count === 0 || !Number.isFinite(from)) return null;
 
-  return { count, from, state: widened };
+  return { count, total: Object.keys(revealed).length, from, state: widened };
 }

@@ -39,6 +39,8 @@ interface EntityQuickAddProps {
   ariaLabel: string;
   /** Max suggestions shown at once. */
   maxResults?: number;
+  /** Merged onto the wrapper, so a gapped parent can drop the default margin. */
+  className?: string;
   /** Optional handle exposing `focus()` for the underlying search input. */
   ref?: Ref<EntityQuickAddHandle>;
 }
@@ -100,6 +102,7 @@ export default function EntityQuickAdd({
   placeholder,
   ariaLabel,
   maxResults = 8,
+  className,
   ref,
 }: EntityQuickAddProps) {
   const [inputValue, setInputValue] = useState("");
@@ -194,7 +197,7 @@ export default function EntityQuickAdd({
   const showMenu = isOpen && items.length > 0;
 
   return (
-    <div className={styles.quickAdd}>
+    <div className={clsx(styles.quickAdd, className)}>
       <label {...getLabelProps()} className={styles.visuallyHidden}>
         {ariaLabel}
       </label>

@@ -33,11 +33,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const IN_THREE_WEEKS = Date.now() + 21 * 24 * 60 * 60 * 1000;
+const IN_NINE_DAYS = Date.now() + 9 * 24 * 60 * 60 * 1000;
 
 /** The case this exists for: searching a cast member with most of their films later in the year. */
 export const Default: Story = {
   args: {
     count: 3,
+    total: 4,
     from: IN_THREE_WEEKS,
     onShowAll: () => {},
   },
@@ -47,6 +49,7 @@ export const Default: Story = {
 export const SingleFilm: Story = {
   args: {
     count: 1,
+    total: 2,
     from: IN_THREE_WEEKS,
     onShowAll: () => {},
   },
@@ -56,7 +59,18 @@ export const SingleFilm: Story = {
 export const Many: Story = {
   args: {
     count: 21,
+    total: 22,
     from: Date.now() + 60 * 24 * 60 * 60 * 1000,
+    onShowAll: () => {},
+  },
+};
+
+/** Inside a fortnight the date is counted to rather than named. */
+export const SoonEnoughToCount: Story = {
+  args: {
+    count: 2,
+    total: 5,
+    from: IN_NINE_DAYS,
     onShowAll: () => {},
   },
 };

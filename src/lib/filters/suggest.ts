@@ -4,6 +4,7 @@ import {
   formatDateLong,
   formatDaysFromNow,
   getDaysFromNow,
+  RELATIVE_DAY_LIMIT,
 } from "@/utils/format-date";
 import { FilterId, FilterState, MoviesRecord } from "./types";
 import {
@@ -543,9 +544,6 @@ function widenDetail(
 
 /** How many alternative titles to put forward at most. */
 const MAX_CORRECTIONS = 2;
-
-/** Beyond a fortnight, "in 23 days" is harder to place than the date itself. */
-const RELATIVE_DAY_LIMIT = 14;
 
 /**
  * Titles close enough to the query to be a plausible mistyping of it, best
