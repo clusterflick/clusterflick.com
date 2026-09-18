@@ -295,11 +295,28 @@ looking for a filter they don't know exists. Links carry `base=all`, since the
 today→+7d default would answer a director with one film three weeks out by
 showing nothing.
 
+**It sits inside "More Event Options", above Genre**, as two
+`advancedFilterGroup`s rather than a section of its own — cast and crew are
+another way to narrow an event, not a separate idea. Those groups space their
+own children, so `EntityQuickAdd` carries no margin of its own and each placing
+section supplies it (`standaloneQuickAdd` for the venue one, which sits in a
+section with no gap). Two CSS modules cannot override one another by class
+order, so the margin has to live at one end or the other, not both.
+
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
-already used, generalised. Matching is plain case-insensitive substring, never
-fuzzy, and results stop at `maxResults` **in list order** — so the vocabulary
-must arrive best-represented first, or a two-letter query walks all 11,000 cast
-names.
+already used, generalised. Matching is case-insensitive substring, and results
+stop at `maxResults` **in list order** — so the vocabulary must arrive
+best-represented first, or a two-letter query walks all 11,000 cast names.
+
+**A menu falls back to fuzzy; it has nothing to disambiguate.** When the
+substring pass finds nothing the query is re-read as a misspelling ("Mark
+Hammill" is one letter from a real name and used to answer with an empty menu),
+and the closest names are listed closest-first. Unlike the suggestion engine
+there is no tier logic here: a menu _is_ a list of candidates, so several
+matches is the normal outcome rather than a problem. Only on zero substring
+matches, so the scan never runs while a normal search is being typed, and the
+word-splitting is cached in a `WeakMap` on the list rather than done on mount —
+most sessions never mistype anything.
 
 **`buildPeopleIndex` is not optional at this size.** It maps every whole-word
 run of every name to the people claiming it, keyed the way `normalizeForSearch`
@@ -328,6 +345,51 @@ the same way, behind an exact name match and the person's department.
 started emitting it carries none, and TheMovieDB has no score for some people.
 Absent is not zero — unranked, not unpopular — and the ordering falls through to
 director-first.
+
+## Thin-Result Notice
+
+When a filtered grid returns a handful of films and widening the dates would
+return meaningfully more, `getHiddenByDate` (`src/lib/filters/hidden-by-date.ts`)
+says so in a quiet line under the grid, rendered by `HiddenResultsNotice`.
+
+**Separate from the suggestion engine on purpose.** That exists to rescue a
+search that returned nothing and is phrased that way throughout; this is the
+opposite situation — the search worked, and the answer is merely narrower than
+it looks. It is one probe rather than a pass, offers one widening rather than
+ranking many, and reads as a fact rather than a rescue. An empty grid returns
+null and belongs to the engine, which can pair the date with whatever else is
+wrong where this only knows dates.
+
+**Dates only.** The date window is the documented most-common invisible blocker
+and the only one with a natural reading ("more showing later"). Anything else
+would be a suggestion, which is the engine's job.
+
+**`THIN_RESULT_LIMIT` is 3, and it almost never binds.** Across every person
+filter in a live release, 71% show nothing at all, 27% show exactly one film and
+under 1% show more than three; raising the limit to five moves the fire rate
+from 20% to 21%. What it does do is keep the line off a grid that is genuinely
+full — an unfiltered `/films` shows 448 films with 1,382 more beyond the window.
+
+**A film already on screen is never counted as hidden**, however many of its
+showings fall outside the window: the reader can see it and click through.
+
+**Shaped like a suggestion offer** — command, then the fact, then the count it
+yields — because it is the same kind of thing to press. Quieter for the reason
+above: no accent border, no list around it. It follows the same fortnight rule
+for dates ("next in 9 days" inside it, "next on Sunday 27 December" beyond), via
+`RELATIVE_DAY_LIMIT` in `format-date.ts`, which both this and the suggestion
+engine now read.
+
+**It needs a lead-in, for the same reason the empty state has a heading.** A
+button on its own under a grid that looks finished has nothing saying why it is
+there. "Expecting more results?" is a question rather than a heading, because
+the films above it are a real answer and this only asks whether a longer one was
+expected — a heading would announce a section and claim more of the page than
+the notice is worth.
+
+It probes the live filter state, not the deferred copy the suggestions use: it
+is a single pass rather than thirty-odd probes, and a stale count under a grid
+that has already moved on would be wrong rather than merely late.
 
 ## Zero-Result Suggestions
 
@@ -373,6 +435,20 @@ no second implementation of the filter logic to drift out of sync.
   4. Ambiguous in both → nothing. "john" is 27 directors; a fragment naming 27
      people names none of them.
 
+  **A miss falls through to fuzzy, and the tiers then read it unchanged.** When
+  the exact index lookup finds nothing, `fuzzyMatch` returns everyone at the
+  _closest_ edit distance and only them, and the four tiers above apply as
+  written — one name is that person, two are two candidates, a crowd is nobody.
+  Keeping the whole edit budget instead would hand them an average of seven
+  names; the closest tier holds exactly one 42% of the time, and where it does,
+  it is the right person **98%** of the time. Exact always wins first, so a
+  correctly spelt name is never re-read as a near-miss of a different one, and
+  fuzzy can only add offers where there were none.
+
+  This is deliberately _not_ a "did you mean" correction like the title one
+  below. The offer already names the person and carries a count, so there is
+  nothing to ask: "hammill" simply offers **Show films starring Mark Hamill**.
+
   **Ordering within a pair**: films currently showing, then popularity, then
   director. Film count leads because it is what the offer accounts for — a
   twelve-film retrospective is the better answer to an ambiguous surname.
@@ -416,7 +492,8 @@ no second implementation of the filter logic to drift out of sync.
   - _Transpositions._ Plain Levenshtein charges an adjacent swap as two substitutions, which
     priced "ornage"→"orange" and "bilss"→"bliss" out of any budget a short query can afford.
 
-  `MIN_CORRECTABLE_LENGTH` is empirical, and 5 is a floor _and_ a ceiling: real cases
+  `MIN_FUZZY_LENGTH` (in `word-distance.ts`, shared with the people lookup) is empirical,
+  and 5 is a floor _and_ a ceiling: real cases
   ("akera"→Akira, "bilss"→Bliss) are five characters, so raising it loses them. Five-character
   queries stay speculative by nature — anything one edit from a title word draws an offer —
   which is why offers are phrased as a question and carry a count. Re-measure on live data
@@ -436,6 +513,13 @@ redirect and a query never lands in two boxes at once.
 the date range have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d), so they report
 themselves inactive while still removing results — and they are the most common invisible
 blockers. Anything comparing against defaults instead of `getPermissiveState()` is blind to both.
+
+**Every multi-select filter reads as "or".** They all match a film satisfying
+_any_ selected value — two directors returns the films of either, not the films
+they made together — so `formatList` takes a conjunction and each of them passes
+"or": "directed by Ridley Scott or George Lucas and starring Mark Hamill". Only
+the availability toggles are a genuine "and", both applying at once, and only
+they keep "&".
 
 **Order is editorial, never by count.** Sorting by result count would promote "drop your
 Subtitles requirement" whenever it frees up the most screenings, which is the one suggestion a

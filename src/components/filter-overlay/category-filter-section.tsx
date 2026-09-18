@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import {
   AccessibilityFeature,
   AccessibilityFilterValue,
@@ -39,6 +39,12 @@ const ACCESSIBILITY_OPTIONS: {
 
 interface CategoryFilterSectionProps {
   movies: CinemaData["movies"];
+  /**
+   * Extra filter groups, rendered inside "More Event Options" above Genre.
+   * A slot rather than a sibling section so cast and crew sit among the other
+   * ways to narrow an event instead of below them all.
+   */
+  beforeGenres?: ReactNode;
   genres: Genre[] | null;
   filterState: {
     categories: Category[] | null;
@@ -66,6 +72,7 @@ interface CategoryFilterSectionProps {
 
 export default function CategoryFilterSection({
   movies,
+  beforeGenres,
   genres,
   filterState,
   toggleCategory,
@@ -398,6 +405,7 @@ export default function CategoryFilterSection({
               See a list of all formats
             </Link>
           </p>
+          {beforeGenres}
           {/* Genre Filter */}
           <div className={styles.advancedFilterGroup}>
             <div className={styles.advancedFilterHeader}>

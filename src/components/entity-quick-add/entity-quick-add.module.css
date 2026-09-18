@@ -1,6 +1,6 @@
+/* No margin of its own — the section placing it owns the spacing. */
 .quickAdd {
   width: 100%;
-  margin: 16px 0;
 }
 
 /* Positioning context for the absolutely-positioned suggestion menu. */

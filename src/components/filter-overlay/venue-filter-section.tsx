@@ -232,6 +232,7 @@ export default function VenueFilterSection({
         </p>
       )}
       <VenueQuickAdd
+        className={styles.standaloneQuickAdd}
         ref={quickAddRef}
         venues={allVenues}
         isVenueSelected={isVenueSelected}

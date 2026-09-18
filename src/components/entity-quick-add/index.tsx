@@ -4,6 +4,12 @@ import { Ref, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useCombobox } from "downshift";
 import clsx from "clsx";
 import SearchInput from "@/components/search-input";
+import { normalizeForSearch, normalizeToWords } from "@/lib/filters/normalize";
+import {
+  bestWordRunDistance,
+  editBudgetFor,
+  MIN_FUZZY_LENGTH,
+} from "@/lib/filters/word-distance";
 import styles from "./entity-quick-add.module.css";
 
 export interface EntityQuickAddItem {
@@ -33,8 +39,46 @@ interface EntityQuickAddProps {
   ariaLabel: string;
   /** Max suggestions shown at once. */
   maxResults?: number;
+  /** Merged onto the wrapper, so a gapped parent can drop the default margin. */
+  className?: string;
   /** Optional handle exposing `focus()` for the underlying search input. */
   ref?: Ref<EntityQuickAddHandle>;
+}
+
+/**
+ * Names pre-split into words, built the first time a list needs a fuzzy pass
+ * and kept for as long as that list lives.
+ *
+ * Lazy and cached rather than memoised alongside the list: splitting 11,000
+ * names costs about as much as the scan itself, and most sessions never mistype
+ * anything, so it should not be paid on mount.
+ */
+const wordCache = new WeakMap<EntityQuickAddItem[], string[][]>();
+
+function fuzzyMatches(
+  items: EntityQuickAddItem[],
+  needle: string,
+  limit: number,
+): EntityQuickAddItem[] {
+  if (needle.length < MIN_FUZZY_LENGTH) return [];
+
+  let words = wordCache.get(items);
+  if (!words) {
+    words = items.map((item) => normalizeToWords(item.name));
+    wordCache.set(items, words);
+  }
+
+  const budget = editBudgetFor(needle);
+  const scored: { item: EntityQuickAddItem; distance: number }[] = [];
+  for (let index = 0; index < items.length; index += 1) {
+    const distance = bestWordRunDistance(needle, words[index], budget);
+    if (distance <= budget) scored.push({ item: items[index], distance });
+  }
+
+  return scored
+    .sort((a, b) => a.distance - b.distance || b.item.count - a.item.count)
+    .slice(0, limit)
+    .map(({ item }) => item);
 }
 
 /**
@@ -58,6 +102,7 @@ export default function EntityQuickAdd({
   placeholder,
   ariaLabel,
   maxResults = 8,
+  className,
   ref,
 }: EntityQuickAddProps) {
   const [inputValue, setInputValue] = useState("");
@@ -72,6 +117,7 @@ export default function EntityQuickAdd({
   const items = useMemo(() => {
     const query = inputValue.toLowerCase().trim();
     if (!query) return [];
+
     // `allItems` arrives best-represented first, so stopping early keeps the
     // most-screened matches and avoids walking 11,000 cast names.
     const matches: EntityQuickAddItem[] = [];
@@ -80,7 +126,13 @@ export default function EntityQuickAdd({
       matches.push(item);
       if (matches.length >= maxResults) break;
     }
-    return matches;
+    if (matches.length > 0) return matches;
+
+    // Nothing matched as typed, so read it as a misspelling — "Mark Hammill"
+    // is one letter from a real name and currently answers with an empty menu.
+    // A menu is a list of candidates, so unlike the suggestion engine there is
+    // nothing here to disambiguate: show the closest, closest first.
+    return fuzzyMatches(allItems, normalizeForSearch(query), maxResults);
   }, [allItems, inputValue, maxResults]);
 
   const {
@@ -145,7 +197,7 @@ export default function EntityQuickAdd({
   const showMenu = isOpen && items.length > 0;
 
   return (
-    <div className={styles.quickAdd}>
+    <div className={clsx(styles.quickAdd, className)}>
       <label {...getLabelProps()} className={styles.visuallyHidden}>
         {ariaLabel}
       </label>

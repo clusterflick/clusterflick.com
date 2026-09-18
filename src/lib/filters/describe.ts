@@ -52,26 +52,32 @@ export type FilterDescription = {
  * - 2 items: "A & B"
  * - 3 items: "A, B & C"
  * - 4+ items with maxShow=2: "A & 3 more"
+ *
+ * `conjunction` is "or" for every multi-select filter, because they all match a
+ * film that satisfies *any* of the selected values — two directors returns the
+ * films of either, not the films they made together. Only the availability
+ * toggles are a genuine "and", both applying at once, so only they keep "&".
  */
 export function formatList(
   items: string[],
   maxShow: number,
   overflowSuffix = "",
+  conjunction = "&",
 ): string {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
-  if (items.length === 2) return `${items[0]} & ${items[1]}`;
+  if (items.length === 2) return `${items[0]} ${conjunction} ${items[1]}`;
 
   if (items.length <= maxShow) {
     const allButLast = items.slice(0, -1);
     const last = items[items.length - 1];
-    return `${allButLast.join(", ")} & ${last}`;
+    return `${allButLast.join(", ")} ${conjunction} ${last}`;
   }
 
   // Truncate
   const overflow = items.length - 1;
   const suffix = overflowSuffix ? ` ${overflowSuffix}` : "";
-  return `${items[0]} & ${overflow} more${suffix}`;
+  return `${items[0]} ${conjunction} ${overflow} more${suffix}`;
 }
 
 /**
@@ -97,7 +103,7 @@ function describeCategories(
     .map((cat) => categoryLabels.find((c) => c.value === cat)?.label)
     .filter((label): label is string => !!label);
 
-  return formatList(labels, 3, "event types");
+  return formatList(labels, 3, "event types", "or");
 }
 
 /**
@@ -132,7 +138,7 @@ function describeGenres(
     return "none";
   }
 
-  return formatList(names, 3);
+  return formatList(names, 3, "", "or");
 }
 
 /**
@@ -242,7 +248,7 @@ function describeVenues(
     return `At ${venues.length} venues`;
   }
 
-  return `At ${formatList(names, 2)}`;
+  return `At ${formatList(names, 2, "", "or")}`;
 }
 
 /**
@@ -397,7 +403,7 @@ function describeAccessibility(state: FilterState): string | null | "none" {
     return ACCESSIBILITY_LABELS[value as AccessibilityFeature] ?? value;
   });
 
-  return formatList(labels, 3);
+  return formatList(labels, 3, "", "or");
 }
 
 /**
@@ -420,7 +426,7 @@ function describePeople(
       .filter((name): name is string => !!name);
     if (names.length === 0) continue;
 
-    phrases.push(`${group.verb} ${formatList(names, 2, "people")}`);
+    phrases.push(`${group.verb} ${formatList(names, 2, "people", "or")}`);
   }
 
   return phrases;
@@ -539,7 +545,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
 
     // Add format suffix if specific formats selected
     if (formatLabels.length > 0) {
-      eventsDesc += ` in ${formatList(formatLabels, 3)}`;
+      eventsDesc += ` in ${formatList(formatLabels, 3, "", "or")}`;
     }
   }
 

@@ -408,3 +408,87 @@ describe("resolvePeopleQuery", () => {
     });
   });
 });
+
+describe("fuzzy name matching", () => {
+  const p = (id: string, name: string, count: number): PersonOption => ({
+    id,
+    name,
+    count,
+  });
+
+  const resolve = (
+    needle: string,
+    directors: PersonOption[],
+    cast: PersonOption[] = [],
+  ) =>
+    resolvePeopleQuery(
+      normalizeForSearch(needle),
+      buildPeopleIndex({
+        [FilterId.Directors]: directors,
+        [FilterId.Cast]: cast,
+      }),
+    ).map(({ person, group }) => `${group.label}:${person.name}`);
+
+  const HAMILL = [p("a1", "Mark Hamill", 4)];
+
+  it("reads a misspelt surname as the name it is one edit from", () => {
+    expect(resolve("hammill", [], HAMILL)).toEqual(["Cast:Mark Hamill"]);
+    expect(resolve("hamil", [], HAMILL)).toEqual(["Cast:Mark Hamill"]);
+  });
+
+  it("reads a misspelt full name", () => {
+    expect(resolve("mark hammill", [], HAMILL)).toEqual(["Cast:Mark Hamill"]);
+  });
+
+  it("handles a transposition, which is one edit and not two", () => {
+    expect(resolve("scorsees", [p("d1", "Martin Scorsese", 12)])).toEqual([
+      "Director:Martin Scorsese",
+    ]);
+  });
+
+  // Exact must win outright: a correctly spelt name that happens to sit one
+  // edit from another must never be re-read as a near-miss of it.
+  it("prefers an exact match over a closer-looking neighbour", () => {
+    const people = [p("a1", "Mark Hamill", 1), p("a2", "Mark Hamil", 9)];
+    expect(resolve("mark hamill", [], people)).toEqual(["Cast:Mark Hamill"]);
+  });
+
+  // Only the closest tier is kept, so a one-edit match is not diluted by the
+  // two-edit matches that share its budget.
+  it("keeps only the closest candidates", () => {
+    const people = [p("a1", "Mark Hamill", 1), p("a2", "Mark Hamiltons", 9)];
+    expect(resolve("hammill", [], people)).toEqual(["Cast:Mark Hamill"]);
+  });
+
+  // The tiers read a near-miss exactly as they read an exact hit, so two
+  // equally-close names in the same role are as ambiguous as "john" is.
+  it("offers nothing when two names in one role are equally close", () => {
+    const people = [p("a1", "Jon Hamm", 2), p("a2", "Ron Hamm", 1)];
+    expect(resolve("con hamm", [], people)).toEqual([]);
+  });
+
+  it("offers both when the two are one per role, as an exact hit would", () => {
+    expect(
+      resolve("con hamm", [p("d1", "Jon Hamm", 1)], [p("a1", "Ron Hamm", 3)]),
+    ).toEqual(["Cast:Ron Hamm", "Director:Jon Hamm"]);
+  });
+
+  it("offers nothing when a crowd is equally close", () => {
+    const people = [
+      p("a1", "Ann Smith", 1),
+      p("a2", "Ann Smoth", 1),
+      p("a3", "Ann Smath", 1),
+    ];
+    expect(resolve("ann smuth", [], people)).toEqual([]);
+  });
+
+  it("leaves a query too short to be worth guessing at alone", () => {
+    // Four characters with a one-edit budget matches far too much to mean one
+    // person, which is the same floor the title corrections use.
+    expect(resolve("hami", [], HAMILL)).toEqual([]);
+  });
+
+  it("finds nothing when the query is nowhere near a name", () => {
+    expect(resolve("kurosawa", [], HAMILL)).toEqual([]);
+  });
+});

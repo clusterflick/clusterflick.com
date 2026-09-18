@@ -59,6 +59,10 @@ export type { FilterBase } from "./manager";
 export { describeFilters } from "./describe";
 export type { DescribeOptions, FilterDescription } from "./describe";
 
+// Thin-result notice
+export { getHiddenByDate, THIN_RESULT_LIMIT } from "./hidden-by-date";
+export type { HiddenByDate } from "./hidden-by-date";
+
 // Zero-result suggestions
 export { suggestFilterRelaxations } from "./suggest";
 export type {
