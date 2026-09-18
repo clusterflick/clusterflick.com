@@ -20,6 +20,8 @@ export {
   castFilter,
   PEOPLE_GROUPS,
   getPeopleVocabulary,
+  buildPeopleIndex,
+  resolvePeopleQuery,
   formatSourceFilter,
   formatPresentationFilter,
   formatDimensionFilter,
@@ -34,6 +36,7 @@ export type {
   PeopleFilterId,
   PeopleGroupConfig,
   PersonOption,
+  PeopleIndex,
 } from "./modules";
 
 // Manager functions and object

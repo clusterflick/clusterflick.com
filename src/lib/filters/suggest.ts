@@ -15,9 +15,9 @@ import {
 } from "./manager";
 import {
   FORMAT_GROUPS,
-  PEOPLE_GROUPS,
   getPrimaryCategory,
-  type PersonOption,
+  resolvePeopleQuery,
+  type PeopleIndex,
 } from "./modules";
 import {
   matchesSearchQuery,
@@ -182,6 +182,13 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
 interface Move {
   id: string;
   kind: SuggestionKind;
+  /**
+   * Marks moves that are two readings of one query and must be offered
+   * together — the director and the cast member a surname could each name.
+   * Truncating between them would silently turn "we do not know which" into
+   * "the first one", which is the guess the tiers exist to avoid.
+   */
+  pairId?: string;
   /** Imperative phrasing, used when this move leads the offer. */
   action: string;
   /** Noun phrasing, used when this move is listed as one of the changes. */
@@ -217,11 +224,10 @@ interface SuggestContext {
   venues?: Record<string, Venue> | null;
   genres?: Record<string, Genre> | null;
   /**
-   * The director vocabulary, as `getPeopleVocabulary` returns it. Only the
-   * well-represented end of it is read — see
-   * {@link MIN_DIRECTOR_CREDITS_FOR_SUGGESTION}.
+   * Name fragments to the people who claim them, from `buildPeopleIndex`.
+   * Absent means no query is read as naming anyone.
    */
-  directors?: PersonOption[] | null;
+  people?: PeopleIndex | null;
 }
 
 /**
@@ -235,32 +241,12 @@ interface SuggestContext {
  */
 interface ValueVocabulary {
   filterId: FilterId;
-  /**
-   * Drop every match when the query names more than one entry.
-   *
-   * Off by default, because for most vocabularies several matches is the
-   * feature: "70mm" naming both 70mm and IMAX 70mm gives two offers with
-   * different counts, and the reader picks.
-   *
-   * Names are the opposite. A vocabulary of people is mostly forenames held in
-   * common — "john" is 27 directors in a live release, "michael" 19 — and an
-   * offer per holder would fill every slot the empty state has with guesses,
-   * crowding out the widenings that would actually have helped. A fragment that
-   * names 27 people names none of them, so it is read as a name only when it
-   * picks out exactly one. "scorsese" and "john carpenter" do; "john" does not.
-   */
-  requireUniqueMatch?: boolean;
   /** Names the dimension in a change line, e.g. "Source Format". */
   label: string;
   /** Completes the headline: `Show 70mm ${noun}`. Empty where none reads well. */
   noun: string;
   entries: {
     name: string;
-    /**
-     * What the headline says in place of the bare name, where the name alone
-     * would not read as an instruction. Defaults to `name`.
-     */
-    displayName?: string;
     /** Applies this one value, typed by the vocabulary that owns it. */
     select: (state: FilterState) => FilterState;
   }[];
@@ -288,28 +274,6 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
       entries: Object.entries(context.genres).map(([id, genre]) => ({
         name: genre.name,
         select: (state: FilterState) => set(state, FilterId.Genres, [id]),
-      })),
-    });
-  }
-
-  if (context.directors) {
-    const group = PEOPLE_GROUPS[0];
-    vocabularies.push({
-      filterId: group.filterId,
-      label: group.label,
-      // Completes as "Show films directed by Martin Scorsese", which reads as
-      // an instruction where a bare "Show Martin Scorsese" reads as a billing.
-      noun: "",
-      requireUniqueMatch: true,
-      // Every director, with no floor on how many films they have on. A floor
-      // was the obvious guard and the wrong one: at two credits it ruled out
-      // 1,082 of 1,288 directors — precisely the ones with no other route to
-      // their film — while still leaving 46 contested fragments behind.
-      // Uniqueness reaches 1,285 of them and leaves none.
-      entries: context.directors.map(({ id, name }) => ({
-        name,
-        displayName: `${group.headlineNoun} ${group.verb} ${name}`,
-        select: (state: FilterState) => set(state, group.filterId, [id]),
       })),
     });
   }
@@ -362,19 +326,15 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
   const moves: Move[] = [];
 
   for (const vocabulary of buildVocabularies(context)) {
-    const matched = vocabulary.entries.filter(
-      (entry) =>
-        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0,
-    );
-    // An ambiguous name is not a reading of the query, it is a shortlist.
-    if (vocabulary.requireUniqueMatch && matched.length > 1) continue;
+    for (const entry of vocabulary.entries) {
+      const exact =
+        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0;
+      if (!exact) continue;
 
-    for (const entry of matched) {
-      const display = entry.displayName ?? entry.name;
       moves.push({
         id: `filter:${vocabulary.filterId}:${entry.name}`,
         kind: "filter",
-        action: `Show ${display}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
+        action: `Show ${entry.name}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
         label: vocabulary.label,
         soloOnly: false,
         // The query was the filter value, so it leaves the search box with it.
@@ -388,6 +348,42 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
   }
 
   return moves;
+}
+
+/**
+ * Moves that read the query as naming a person rather than a film.
+ *
+ * The tiers, the ordering and the reasons for both live in
+ * {@link resolvePeopleQuery}; this turns what it returns into moves. When it
+ * returns two they are a pair — one query, two readings — and carry a shared
+ * `pairId` so the round-one cut cannot take one and drop the other.
+ *
+ * Only the main search box is read this way, as with the other value moves.
+ */
+function buildPeopleMoves(state: FilterState, context: SuggestContext): Move[] {
+  if (!context.people) return [];
+  const needle = normalizeForSearch(get(state, FilterId.Search).trim());
+  if (needle.length === 0) return [];
+
+  const resolved = resolvePeopleQuery(needle, context.people);
+  const pairId = resolved.length > 1 ? `people:${needle}` : undefined;
+
+  return resolved.map(({ person, group }) => ({
+    id: `filter:${group.filterId}:${person.id}`,
+    kind: "filter" as const,
+    // "Show films directed by Martin Scorsese" reads as an instruction where a
+    // bare "Show Martin Scorsese" reads as a billing.
+    action: `Show ${group.headlineNoun} ${group.verb} ${person.name}`,
+    label: group.label,
+    soloOnly: false,
+    ...(pairId ? { pairId } : {}),
+    // The query was the person's name, so it leaves the search box with them.
+    altersQuery: true,
+    writes: [FilterId.Search, group.filterId],
+    transform: (current: FilterState) =>
+      set(set(current, FilterId.Search, ""), group.filterId, [person.id]),
+    describeResult: () => person.name,
+  }));
 }
 
 /**
@@ -885,9 +881,9 @@ export function suggestFilterRelaxations({
   categories,
   venues,
   genres,
-  directors,
+  people,
 }: SuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues, genres, directors };
+  const context: SuggestContext = { categories, venues, genres, people };
 
   // Nothing to rescue. Checked here rather than trusted to the caller because
   // the caller's idea of "empty" is easy to take from a different state than
@@ -904,6 +900,7 @@ export function suggestFilterRelaxations({
   // a filter, so they come last.
   const moves = [
     ...buildValueMoves(state, context),
+    ...buildPeopleMoves(state, context),
     ...buildRedirectMoves(state),
     ...buildCorrectionMoves(movies, state),
     ...buildWidenMoves(state, context),
@@ -940,13 +937,30 @@ export function suggestFilterRelaxations({
   // hits are also the cheapest.
   const suggestions: FilterSuggestion[] = [];
   const worksAlone = new Set<string>();
-  for (const move of moves) {
+
+  // Whether the move after this one completes the same pair. Paired moves are
+  // built adjacent, so this only has to look one ahead.
+  const partnerFollows = (index: number) => {
+    const pairId = moves[index]?.pairId;
+    return !!pairId && moves[index + 1]?.pairId === pairId;
+  };
+
+  for (let index = 0; index < moves.length; index += 1) {
+    const move = moves[index];
     const suggestion = evaluate([move]);
     if (suggestion) {
       suggestions.push(suggestion);
       worksAlone.add(move.id);
     }
-    if (suggestions.length >= limit) return suggestions;
+    // A pair is two readings of one query — the director and the cast member a
+    // surname could each name. Cutting between them would present the first as
+    // the answer when the whole point is that we do not know which was meant,
+    // so the limit gives way by one rather than split it. It can only ever be
+    // exceeded by one, since a pair is two moves and its second half is never
+    // itself followed by a partner.
+    if (suggestions.length >= limit && !partnerFollows(index)) {
+      return suggestions;
+    }
   }
 
   // Round two — pairs. Reached even when round one found something, because a

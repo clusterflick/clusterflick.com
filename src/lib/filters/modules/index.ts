@@ -16,8 +16,17 @@ export {
   castFilter,
   PEOPLE_GROUPS,
   getPeopleVocabulary,
+  buildPeopleIndex,
+  resolvePeopleQuery,
 } from "./people";
-export type { PeopleFilterId, PeopleGroupConfig, PersonOption } from "./people";
+export type {
+  PeopleFilterId,
+  PeopleGroupConfig,
+  PersonOption,
+  PeopleIndex,
+  PeopleMatch,
+  ResolvedPerson,
+} from "./people";
 export { accessibilityFilter } from "./accessibility";
 export {
   formatSourceFilter,

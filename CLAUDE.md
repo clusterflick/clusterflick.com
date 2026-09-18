@@ -301,6 +301,34 @@ fuzzy, and results stop at `maxResults` **in list order** — so the vocabulary
 must arrive best-represented first, or a two-letter query walks all 11,000 cast
 names.
 
+**`buildPeopleIndex` is not optional at this size.** It maps every whole-word
+run of every name to the people claiming it, keyed the way `normalizeForSearch`
+renders a query — safe because `normalizeToWords(s).join("") ===
+normalizeForSearch(s)`, so a lookup is exactly the whole-word-run comparison it
+replaces. Scanning the names instead cost ~10ms of every suggestion pass once
+cast was included (29ms → 39ms), paid whether or not anything matched, on the
+deferred path that exists to keep typing responsive. Build it once per dataset
+and memoise it beside the vocabulary.
+
+**Popularity is a tie-break and nothing more.** `combine` publishes TheMovieDB's
+`popularity` with each person and `rankPeoplePopularity` in
+`scripts/process-combined-data.js` replaces it with a 0–99 percentile rank
+before it reaches the client. A percentile rather than a rounded score because
+popularity is heavily skewed — rounding puts almost everyone at 0 or 1, and the
+ties this exists to break are mostly between two people at the obscure end. The
+float would cost 274KB across the meta blob every visitor downloads; the rank
+costs 91KB.
+
+The underlying score is a rolling _trending_ measure recomputed daily from page
+views, not standing, so it must never rank anything on its own — it only orders
+two people a query could equally have named. `common/get-movie-data.js` uses it
+the same way, behind an exact name match and the person's department.
+
+**Every reader must cope without it.** A release published before the pipeline
+started emitting it carries none, and TheMovieDB has no score for some people.
+Absent is not zero — unranked, not unpopular — and the ordering falls through to
+director-first.
+
 ## Zero-Result Suggestions
 
 When a filtered grid comes up empty, `src/lib/filters/suggest.ts` finds the cheapest
@@ -325,21 +353,49 @@ no second implementation of the filter logic to drift out of sync.
   `describeFilters` reads them. Unlike a correction this is _not_ gated on the query matching
   no title.
 
-  **Directors set `requireUniqueMatch`**, which drops every match when the query names more
-  than one. A vocabulary of people is mostly forenames held in common — "john" is 27 directors
-  in a live release, "michael" 19 — and an offer per holder would fill the empty state with
-  guesses and push out the widenings that would actually have helped. A fragment naming 27
-  people names none of them; "scorsese" and "john carpenter" still land. It is off everywhere
-  else, where several matches is the feature ("70mm" → 70mm _and_ IMAX 70mm, each with its own
-  count).
+  **People are resolved jointly, not as two vocabularies** (`resolvePeopleQuery`
+  in `lib/filters/modules/people.ts`). A name is a far weaker signal than a
+  format string: most of a people vocabulary is forenames held in common, so a
+  fragment is read as a name only when it picks out one person per role.
+  1. Unique in one role, ambiguous or absent in the other → that one. Measured
+     502 fragments to 20 in the "unique director, ambiguous cast" direction,
+     which is the point — unique among 1,288 directors is a far stronger claim
+     than unique among 11,070 cast.
+  2. Unique in both, names differ → **both**. They are two different people and
+     only the reader knows which. Preferring the director was measured and is
+     wrong 23 times in 212, on exactly the names people type: "pacino" is Al
+     Pacino (6 films) far more often than Julie Pacino (1).
+  3. Unique in both, names match → both, being one person in two roles answering
+     for different films. Compared **by name, not id**: TheMovieDB carries
+     duplicate person records, so John Carpenter directing and John Carpenter
+     appearing can be two ids, and a reader cannot tell two identical names
+     apart anyway.
+  4. Ambiguous in both → nothing. "john" is 27 directors; a fragment naming 27
+     people names none of them.
 
-  A credit floor was tried first and was the wrong guard on every measured axis. At two credits
-  it ruled out 1,082 of 1,288 directors — exactly the single-film ones with no other route to
-  their film — and still left 46 contested fragments. Uniqueness reaches 1,285 and leaves none.
-  The cost argument for a floor did not survive measurement either: a suggestion pass over a
-  live release is ~26ms whether it scans 0, 206 or 1,288 names, because the probes dominate and
-  the vocabulary scan is ~0.3ms. **Cast is still excluded** — 11,000 names, and "starring X"
-  competing with "directed by Y" for the same query is a separate design question.
+  **Ordering within a pair**: films currently showing, then popularity, then
+  director. Film count leads because it is what the offer accounts for — a
+  twelve-film retrospective is the better answer to an ambiguous surname.
+  Popularity settles the rest, which is most of them: of 212 pairs the counts
+  are equal in 165. Director breaks what remains. This is not a breach of "order
+  is editorial, never by count" below: that rule stops count overriding whether
+  an offer is _actionable_ across kinds of move, and here both offers are the
+  same kind and equally actionable — the only question is which person was
+  meant.
+
+  **A pair is never split.** The round-one cut gives way by one rather than take
+  the first and drop the second, which would present a guess as the answer. It
+  can only overflow by one, since a pair is two moves. Nothing else can push a
+  pair to the boundary today: measured, **zero** of the 212 tier-2 and 259
+  tier-3 fragments collide with the format, genre, event-type or accessibility
+  vocabularies. The guard is for when that stops being true.
+
+  A credit floor was tried first and was the wrong guard on every measured axis:
+  at two credits it ruled out 1,082 of 1,288 directors — exactly the single-film
+  ones with no other route to their film — and still left 46 contested
+  fragments. Uniqueness reaches 1,285 and leaves none. The cost argument for a
+  floor did not survive measurement either: the scan is ~0.3ms against a ~26ms
+  pass, because the probes dominate.
 
 - **Redirect** — the same query matched against a different search field (`Search` ↔
   `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks

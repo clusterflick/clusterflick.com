@@ -10,7 +10,7 @@ import {
   filterManager,
   suggestFilterRelaxations,
   getPeopleVocabulary,
-  FilterId,
+  buildPeopleIndex,
   type FilterSuggestion,
 } from "@/lib/filters";
 import Button from "@/components/button";
@@ -88,12 +88,13 @@ export default function PageContent() {
   // `suggestFilterRelaxations` checks the state it is handed and returns
   // nothing when that state still has results, which is what stops offers for
   // the previous query flashing up here.
-  // Folded once per dataset, not per suggestion pass: a pass already costs a
-  // full filter run per probe, and rebuilding ~1,300 directors underneath it
-  // would put that on the deferred path that exists to keep typing responsive.
-  const directorVocabulary = useMemo(
+  // Folded and indexed once per dataset, not per suggestion pass. A pass
+  // already costs a full filter run per probe, and scanning ~12,000 names
+  // underneath that added ~10ms to every one — paid whether or not anything
+  // matched, on the deferred path that exists to keep typing responsive.
+  const peopleIndex = useMemo(
     () =>
-      getPeopleVocabulary(movies, metaData?.people ?? null)[FilterId.Directors],
+      buildPeopleIndex(getPeopleVocabulary(movies, metaData?.people ?? null)),
     [movies, metaData],
   );
 
@@ -107,10 +108,10 @@ export default function PageContent() {
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
       genres: metaData?.genres ?? null,
-      // Lets a query that names a director be read as one ("Scorsese" is not a
+      // Lets a query that names a person be read as one ("Scorsese" is not a
       // title), which is the only route to the people filters for a reader who
       // does not know the overlay has them.
-      directors: directorVocabulary,
+      people: peopleIndex,
     });
   }, [
     showEmptyState,
@@ -118,7 +119,7 @@ export default function PageContent() {
     movies,
     metaData,
     deferredFilterState,
-    directorVocabulary,
+    peopleIndex,
   ]);
 
   const searchRef = useRef<HTMLInputElement>(null);

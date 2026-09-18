@@ -11,7 +11,15 @@ import {
   resolveFilterStateFromUrl,
   buildFilterUrl,
 } from "../manager";
-import { directorsFilter, castFilter, getPeopleVocabulary } from "./people";
+import {
+  directorsFilter,
+  castFilter,
+  getPeopleVocabulary,
+  buildPeopleIndex,
+  resolvePeopleQuery,
+  PersonOption,
+} from "./people";
+import { normalizeForSearch } from "../normalize";
 
 const IN_WINDOW = getLondonMidnightTimestamp() + 2 * MS_PER_DAY;
 
@@ -229,5 +237,174 @@ describe("getPeopleVocabulary", () => {
     const vocabulary = getPeopleVocabulary(MOVIES, null);
     expect(vocabulary[FilterId.Directors]).toEqual([]);
     expect(vocabulary[FilterId.Cast]).toEqual([]);
+  });
+});
+
+describe("resolvePeopleQuery", () => {
+  const p = (
+    id: string,
+    name: string,
+    count: number,
+    popularity?: number,
+  ): PersonOption => ({
+    id,
+    name,
+    count,
+    ...(popularity === undefined ? {} : { popularity }),
+  });
+
+  const resolve = (
+    needle: string,
+    directors: PersonOption[],
+    cast: PersonOption[] = [],
+  ) =>
+    resolvePeopleQuery(
+      // The engine hands this in already folded; mirror that here.
+      normalizeForSearch(needle),
+      buildPeopleIndex({
+        [FilterId.Directors]: directors,
+        [FilterId.Cast]: cast,
+      }),
+    ).map(({ person, group }) => `${group.label}:${person.name}`);
+
+  it("indexes every whole-word run of a name", () => {
+    const directors = [p("d1", "Jean-Pierre Jeunet", 1)];
+    for (const needle of ["jean", "pierre", "jeunet", "jeanpierre"]) {
+      expect(resolve(needle, directors)).toEqual([
+        "Director:Jean-Pierre Jeunet",
+      ]);
+    }
+    expect(resolve("jeun", directors)).toEqual([]);
+  });
+
+  it("counts a name repeated within itself once", () => {
+    // Otherwise "John John" claims "john" twice and reads as two people.
+    expect(resolve("john", [p("d1", "John John", 1)])).toEqual([
+      "Director:John John",
+    ]);
+  });
+
+  describe("tier 1 — unique in one role", () => {
+    it("uses the role that is unambiguous", () => {
+      expect(
+        resolve(
+          "andrei",
+          [p("d1", "Andrei Tarkovsky", 1)],
+          [p("a1", "Andrei Petrov", 1), p("a2", "Andrei Ivanov", 1)],
+        ),
+      ).toEqual(["Director:Andrei Tarkovsky"]);
+    });
+
+    it("works in the other direction too", () => {
+      expect(
+        resolve(
+          "smith",
+          [p("d1", "A Smith", 1), p("d2", "B Smith", 1)],
+          [p("a1", "Maggie Smith", 1)],
+        ),
+      ).toEqual(["Cast:Maggie Smith"]);
+    });
+  });
+
+  describe("tier 2 — two different people", () => {
+    it("offers both rather than guessing between them", () => {
+      expect(
+        resolve(
+          "ridley",
+          [p("d1", "Ridley Scott", 7)],
+          [p("a1", "Judith Ridley", 1)],
+        ),
+      ).toEqual(["Director:Ridley Scott", "Cast:Judith Ridley"]);
+    });
+
+    it("leads with whoever has more films currently showing", () => {
+      // Preferring the director outright put Julie Pacino's one film above Al
+      // Pacino's six.
+      expect(
+        resolve(
+          "pacino",
+          [p("d1", "Julie Pacino", 1)],
+          [p("a1", "Al Pacino", 6)],
+        ),
+      ).toEqual(["Cast:Al Pacino", "Director:Julie Pacino"]);
+    });
+
+    it("breaks an equal count on popularity", () => {
+      expect(
+        resolve(
+          "zombie",
+          [p("d1", "Rob Zombie", 5, 80)],
+          [p("a1", "Sheri Moon Zombie", 5, 30)],
+        ),
+      ).toEqual(["Director:Rob Zombie", "Cast:Sheri Moon Zombie"]);
+      expect(
+        resolve(
+          "zombie",
+          [p("d1", "Rob Zombie", 5, 10)],
+          [p("a1", "Sheri Moon Zombie", 5, 90)],
+        ),
+      ).toEqual(["Cast:Sheri Moon Zombie", "Director:Rob Zombie"]);
+    });
+
+    it("ranks someone with a score above someone without one", () => {
+      expect(
+        resolve(
+          "palma",
+          [p("d1", "Brian De Palma", 2)],
+          [p("a1", "Rossy de Palma", 2, 50)],
+        ),
+      ).toEqual(["Cast:Rossy de Palma", "Director:Brian De Palma"]);
+    });
+
+    // A release published before the pipeline emitted popularity has none.
+    it("falls back to director-first when neither carries a score", () => {
+      expect(
+        resolve(
+          "palma",
+          [p("d1", "Brian De Palma", 2)],
+          [p("a1", "Rossy de Palma", 2)],
+        ),
+      ).toEqual(["Director:Brian De Palma", "Cast:Rossy de Palma"]);
+    });
+  });
+
+  describe("tier 3 — one person in two roles", () => {
+    it("offers both roles, each answering for different films", () => {
+      expect(
+        resolve(
+          "eastwood",
+          [p("1", "Clint Eastwood", 2)],
+          [p("1", "Clint Eastwood", 3)],
+        ),
+      ).toEqual(["Cast:Clint Eastwood", "Director:Clint Eastwood"]);
+    });
+
+    // TheMovieDB carries duplicate person records, so the same human can hold
+    // two ids — and a reader cannot tell two identical names apart anyway.
+    it("compares by name, not id", () => {
+      expect(
+        resolve(
+          "john carpenter",
+          [p("d1", "John Carpenter", 1)],
+          [p("a1", "John Carpenter", 1)],
+        ),
+      ).toEqual(["Director:John Carpenter", "Cast:John Carpenter"]);
+    });
+  });
+
+  describe("tier 4 — ambiguous everywhere", () => {
+    it("names nobody when it names everybody", () => {
+      expect(
+        resolve(
+          "john",
+          [p("d1", "John Carpenter", 1), p("d2", "John Boorman", 1)],
+          [p("a1", "John Cazale", 1), p("a2", "John Hurt", 1)],
+        ),
+      ).toEqual([]);
+    });
+
+    it("returns nothing for a fragment no name claims", () => {
+      expect(resolve("kurosawa", [p("d1", "Agnès Varda", 1)])).toEqual([]);
+    });
   });
 });

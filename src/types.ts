@@ -39,6 +39,17 @@ export type Venue = {
 export type Person = {
   id: string;
   name: string;
+  /**
+   * TheMovieDB popularity as a 0-99 percentile rank across the dataset, from
+   * `rankPeoplePopularity` in `scripts/process-combined-data.js`.
+   *
+   * Only ever a tie-break between two people a search could equally have meant
+   * — never a ranking in its own right, since the underlying score is a rolling
+   * trending measure that churns daily. Absent for anyone TheMovieDB has no
+   * score for, and absent entirely on a release published before the pipeline
+   * started emitting it, so every reader must cope without it.
+   */
+  p?: number;
 };
 
 export type Genre = {

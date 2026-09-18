@@ -252,6 +252,43 @@ function removeOffAccessiblityIndicators(data) {
   return data;
 }
 
+/**
+ * Replace each person's raw TheMovieDB popularity with a 0-99 percentile rank.
+ *
+ * The site uses this for one thing: deciding which of two people sharing a
+ * surname a search meant, when both have the same number of films on. Only the
+ * ordering matters, never the magnitude - so the cheapest faithful encoding
+ * wins, and the raw float costs 274KB across 13,000-odd people in a blob every
+ * visitor downloads. A rank costs 91KB.
+ *
+ * A percentile rather than a rounded score because popularity is heavily
+ * skewed: rounding puts almost everyone at 0 or 1, and the ties this exists to
+ * break are mostly between two people at the obscure end, where rounding
+ * discriminates least. Ranking spreads them evenly, so two people who differ at
+ * all usually land in different buckets.
+ *
+ * Collapsing 13,000 people into 100 buckets does leave neighbours tied. That is
+ * the intended failure: two people within a percentile of each other are not
+ * meaningfully distinguishable, and the caller falls through to its next
+ * tie-break rather than acting on noise.
+ *
+ * A person TheMovieDB gives no score for gets no rank, rather than rank 0 -
+ * they are unranked, not unpopular.
+ */
+function rankPeoplePopularity(data) {
+  const scored = Object.values(data.people).filter(
+    (person) => typeof person.popularity === "number",
+  );
+  const ordered = [...scored].sort((a, b) => a.popularity - b.popularity);
+
+  ordered.forEach((person, index) => {
+    person.p = Math.floor((index / ordered.length) * 100);
+  });
+  Object.values(data.people).forEach((person) => delete person.popularity);
+
+  return data;
+}
+
 function removeIdProperty(data) {
   Object.keys(data.genres).forEach((id) => {
     if (data.genres[id].id === id) delete data.genres[id].id;
@@ -298,6 +335,7 @@ function removeOptionalData(data) {
     trimRottenTomatoData,
     extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
+    rankPeoplePopularity,
     removeIdProperty,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);
 }

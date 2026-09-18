@@ -16,6 +16,7 @@ import {
 import { FilterId, type FilterState, type MoviesRecord } from "./types";
 import { getDefaultState, set, apply } from "./manager";
 import { suggestFilterRelaxations, type FilterSuggestion } from "./suggest";
+import { buildPeopleIndex } from "./modules/people";
 
 /**
  * The date filter's default is computed from the real clock (today→+7d), so
@@ -31,6 +32,7 @@ interface MovieSpec {
   genres?: string[];
   /** TMDB person ids, as the dataset stores them. */
   directors?: string[];
+  actors?: string[];
   /** Source format of the single performance. */
   source?: FormatSource;
   /** Original venue title, when it differs from the film title. */
@@ -59,6 +61,7 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     normalizedTitle: spec.title.toLowerCase(),
     ...(spec.genres ? { genres: spec.genres } : {}),
     ...(spec.directors ? { directors: spec.directors } : {}),
+    ...(spec.actors ? { actors: spec.actors } : {}),
     showings: {
       [showingId]: {
         id: showingId,
@@ -461,11 +464,25 @@ describe("suggestFilterRelaxations", () => {
     });
   });
 
-  describe("director offers", () => {
-    const DIRECTORS = [
-      { id: "d1", name: "Martin Scorsese", count: 2 },
-      { id: "d2", name: "Lynne Ramsay", count: 2 },
-    ];
+  describe("people offers", () => {
+    const index = (
+      directors: {
+        id: string;
+        name: string;
+        count: number;
+        popularity?: number;
+      }[],
+      cast: {
+        id: string;
+        name: string;
+        count: number;
+        popularity?: number;
+      }[] = [],
+    ) =>
+      buildPeopleIndex({
+        [FilterId.Directors]: directors,
+        [FilterId.Cast]: cast,
+      });
 
     it("reads a query that names a director as that director", () => {
       const movies = makeMovies({
@@ -477,7 +494,7 @@ describe("suggestFilterRelaxations", () => {
       const [suggestion] = suggestFilterRelaxations({
         movies,
         state,
-        directors: DIRECTORS,
+        people: index([{ id: "d1", name: "Martin Scorsese", count: 2 }]),
       });
       // The headline names the films, not just the person: "Show Martin
       // Scorsese" would read as a billing rather than an instruction.
@@ -490,6 +507,19 @@ describe("suggestFilterRelaxations", () => {
       expect(suggestion.count).toBe(2);
     });
 
+    it("reads a query that names a cast member as that cast member", () => {
+      const movies = makeMovies({ "1": { title: "Heat", actors: ["a1"] } });
+      const state = set(getDefaultState(), FilterId.Search, "pacino");
+
+      const [suggestion] = suggestFilterRelaxations({
+        movies,
+        state,
+        people: index([], [{ id: "a1", name: "Al Pacino", count: 1 }]),
+      });
+      expect(suggestion.headline).toBe("Show films starring Al Pacino");
+      expect(suggestion.state[FilterId.Cast]).toEqual(["a1"]);
+    });
+
     it("matches a surname as a whole word within the full name", () => {
       const movies = makeMovies({
         "1": { title: "Ratcatcher", directors: ["d2"] },
@@ -497,7 +527,11 @@ describe("suggestFilterRelaxations", () => {
       const state = set(getDefaultState(), FilterId.Search, "ramsay");
 
       expect(
-        suggestFilterRelaxations({ movies, state, directors: DIRECTORS })
+        suggestFilterRelaxations({
+          movies,
+          state,
+          people: index([{ id: "d2", name: "Lynne Ramsay", count: 1 }]),
+        })
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show films directed by Lynne Ramsay"]);
@@ -512,7 +546,7 @@ describe("suggestFilterRelaxations", () => {
       const [suggestion] = suggestFilterRelaxations({
         movies,
         state,
-        directors: [{ id: "d3", name: "Carlos Reygadas", count: 1 }],
+        people: index([{ id: "d3", name: "Carlos Reygadas", count: 1 }]),
       });
       expect(suggestion.headline).toBe(
         "Show films directed by Carlos Reygadas",
@@ -523,7 +557,7 @@ describe("suggestFilterRelaxations", () => {
     // A forename is 27 directors in a live release. Offering one each would
     // fill every slot in the empty state with guesses and push out the
     // widenings that would actually have helped.
-    it("offers nothing when the query names more than one director", () => {
+    it("offers nothing when the query names more than one person in a role", () => {
       const movies = makeMovies({
         "1": { title: "Halloween", directors: ["j1"] },
         "2": { title: "Excalibur", directors: ["j2"] },
@@ -534,10 +568,10 @@ describe("suggestFilterRelaxations", () => {
         suggestFilterRelaxations({
           movies,
           state,
-          directors: [
+          people: index([
             { id: "j1", name: "John Carpenter", count: 1 },
             { id: "j2", name: "John Boorman", count: 1 },
-          ],
+          ]),
         }).filter((s) => s.kind === "filter"),
       ).toEqual([]);
     });
@@ -553,33 +587,198 @@ describe("suggestFilterRelaxations", () => {
         suggestFilterRelaxations({
           movies,
           state,
-          directors: [
+          people: index([
             { id: "j1", name: "John Carpenter", count: 1 },
             { id: "j2", name: "John Boorman", count: 1 },
-          ],
+          ]),
         })
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show films directed by John Carpenter"]);
     });
 
-    // The uniqueness rule is per vocabulary — the formats must keep offering
-    // both "70mm" and "IMAX 70mm", which is the documented behaviour there.
-    it("leaves multi-match vocabularies alone", () => {
+    // Tier 1: unique in one role, ambiguous in the other. Overwhelmingly this
+    // is a unique director against a common cast forename.
+    it("uses the unambiguous role when the other is contested", () => {
       const movies = makeMovies({
-        "1": { title: "A", source: FormatSource.SeventyMm },
-        "2": { title: "B", source: FormatSource.ImaxSeventyMm },
+        "1": { title: "Stalker", directors: ["d1"], actors: ["a1", "a2"] },
       });
-      const state = set(getDefaultState(), FilterId.Search, "70mm");
+      const state = set(getDefaultState(), FilterId.Search, "andrei");
 
       expect(
-        suggestFilterRelaxations({ movies, state, directors: DIRECTORS })
+        suggestFilterRelaxations({
+          movies,
+          state,
+          people: index(
+            [{ id: "d1", name: "Andrei Tarkovsky", count: 1 }],
+            [
+              { id: "a1", name: "Andrei Petrov", count: 1 },
+              { id: "a2", name: "Andrei Ivanov", count: 1 },
+            ],
+          ),
+        })
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
-      ).toEqual(["Show 70mm screenings", "Show IMAX 70mm screenings"]);
+      ).toEqual(["Show films directed by Andrei Tarkovsky"]);
     });
 
-    it("offers nothing when no director vocabulary is passed", () => {
+    // Tier 2: two different people, so both are offered rather than one
+    // guessed at — and the more-screened leads.
+    it("offers both when a surname names two different people", () => {
+      const movies = makeMovies({
+        "1": { title: "The Godfather", actors: ["a1"] },
+        "2": { title: "Heat", actors: ["a1"] },
+        "3": { title: "Cinema Sabaya", directors: ["d1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "pacino");
+
+      const offers = suggestFilterRelaxations({
+        movies,
+        state,
+        people: index(
+          [{ id: "d1", name: "Julie Pacino", count: 1 }],
+          [{ id: "a1", name: "Al Pacino", count: 2 }],
+        ),
+      }).filter((s) => s.kind === "filter");
+
+      expect(offers.map((s) => s.headline)).toEqual([
+        "Show films starring Al Pacino",
+        "Show films directed by Julie Pacino",
+      ]);
+    });
+
+    it("breaks an equal-count tie on popularity", () => {
+      const movies = makeMovies({
+        "1": { title: "House of 1000 Corpses", directors: ["d1"] },
+        "2": { title: "The Lords of Salem", actors: ["a1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "zombie");
+
+      const offers = suggestFilterRelaxations({
+        movies,
+        state,
+        people: index(
+          [{ id: "d1", name: "Rob Zombie", count: 1, popularity: 80 }],
+          [{ id: "a1", name: "Sheri Moon Zombie", count: 1, popularity: 30 }],
+        ),
+      }).filter((s) => s.kind === "filter");
+
+      expect(offers.map((s) => s.headline)).toEqual([
+        "Show films directed by Rob Zombie",
+        "Show films starring Sheri Moon Zombie",
+      ]);
+    });
+
+    // A release published before the pipeline emitted popularity carries none.
+    it("falls back to director-first when neither carries popularity", () => {
+      const movies = makeMovies({
+        "1": { title: "A", directors: ["d1"] },
+        "2": { title: "B", actors: ["a1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "palma");
+
+      expect(
+        suggestFilterRelaxations({
+          movies,
+          state,
+          people: index(
+            [{ id: "d1", name: "Brian De Palma", count: 1 }],
+            [{ id: "a1", name: "Rossy de Palma", count: 1 }],
+          ),
+        })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual([
+        "Show films directed by Brian De Palma",
+        "Show films starring Rossy de Palma",
+      ]);
+    });
+
+    // Tier 3: one person in two roles. Compared by name, not id — TheMovieDB
+    // carries duplicate person records for the same human.
+    it("offers both roles when the same name holds each, across different ids", () => {
+      const movies = makeMovies({
+        "1": { title: "Halloween", directors: ["d1"] },
+        "2": { title: "The Fog", actors: ["a1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "john carpenter");
+
+      expect(
+        suggestFilterRelaxations({
+          movies,
+          state,
+          people: index(
+            [{ id: "d1", name: "John Carpenter", count: 1 }],
+            [{ id: "a1", name: "John Carpenter", count: 1 }],
+          ),
+        })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual([
+        "Show films directed by John Carpenter",
+        "Show films starring John Carpenter",
+      ]);
+    });
+
+    it("keeps a pair together rather than cutting it at the limit", () => {
+      const movies = makeMovies({
+        "1": { title: "A", directors: ["d1"] },
+        "2": { title: "B", actors: ["a1"] },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "palma");
+      const people = index(
+        [{ id: "d1", name: "Brian De Palma", count: 1 }],
+        [{ id: "a1", name: "Rossy de Palma", count: 1 }],
+      );
+
+      // A limit of one would otherwise present the director as the answer,
+      // which is the guess the pair exists to avoid.
+      const offers = suggestFilterRelaxations({
+        movies,
+        state,
+        people,
+        limit: 1,
+      });
+      expect(offers.map((s) => s.headline)).toEqual([
+        "Show films directed by Brian De Palma",
+        "Show films starring Rossy de Palma",
+      ]);
+    });
+
+    // Each half is probed on its own, so one returning nothing does not drag
+    // the other down with it. The pruned half can still come back in round two
+    // paired with a widening — which is the right answer, since Rossy's film is
+    // on, just outside the default window.
+    it("probes each half of a pair independently", () => {
+      const movies = makeMovies({
+        "1": { title: "A", directors: ["d1"] },
+        "2": { title: "B", actors: ["a1"], time: BEYOND_WINDOW },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "palma");
+
+      const offers = suggestFilterRelaxations({
+        movies,
+        state,
+        people: index(
+          [{ id: "d1", name: "Brian De Palma", count: 1 }],
+          [{ id: "a1", name: "Rossy de Palma", count: 1 }],
+        ),
+      }).filter((s) => s.kind === "filter");
+
+      expect(offers.map((s) => s.headline)).toEqual([
+        "Show films directed by Brian De Palma",
+        "Show films starring Rossy de Palma",
+      ]);
+      // The director's stands alone; the cast member's only returns anything
+      // once the date window moves with it.
+      expect(offers[0].changes.map((c) => c.label)).toEqual(["Director"]);
+      expect(offers[1].changes.map((c) => c.label)).toEqual([
+        "Cast",
+        "Any date",
+      ]);
+    });
+
+    it("offers nothing when no people index is passed", () => {
       const movies = makeMovies({
         "1": { title: "Taxi Driver", directors: ["d1"] },
       });
@@ -607,6 +806,22 @@ describe("suggestFilterRelaxations", () => {
         s.changes.some((change) => change.label === "All directors"),
       );
       expect(widened?.state[FilterId.Directors]).toBeNull();
+    });
+
+    // The uniqueness rule is people-only — the formats must keep offering both
+    // "70mm" and "IMAX 70mm", which is the documented behaviour there.
+    it("leaves multi-match vocabularies alone", () => {
+      const movies = makeMovies({
+        "1": { title: "A", source: FormatSource.SeventyMm },
+        "2": { title: "B", source: FormatSource.ImaxSeventyMm },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "70mm");
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show 70mm screenings", "Show IMAX 70mm screenings"]);
     });
   });
 
