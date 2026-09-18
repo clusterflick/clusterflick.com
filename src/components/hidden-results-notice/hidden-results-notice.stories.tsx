@@ -17,7 +17,9 @@ import HiddenResultsNotice from "@/components/hidden-results-notice";
  *   more of them is noise.
  *
  * It is deliberately quieter than a suggestion: the reader's search worked, and
- * this only points out that the answer is narrower than it looks.
+ * this only points out that the answer is narrower than it looks. The lead-in
+ * question does the framing the empty state gets from its heading — without it
+ * a button appears under a finished-looking grid with nothing saying why.
  */
 const meta = {
   title: "Components/HiddenResultsNotice",

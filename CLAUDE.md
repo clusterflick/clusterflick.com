@@ -380,6 +380,13 @@ for dates ("next in 9 days" inside it, "next on Sunday 27 December" beyond), via
 `RELATIVE_DAY_LIMIT` in `format-date.ts`, which both this and the suggestion
 engine now read.
 
+**It needs a lead-in, for the same reason the empty state has a heading.** A
+button on its own under a grid that looks finished has nothing saying why it is
+there. "Expecting more results?" is a question rather than a heading, because
+the films above it are a real answer and this only asks whether a longer one was
+expected — a heading would announce a section and claim more of the page than
+the notice is worth.
+
 It probes the live filter state, not the deferred copy the suggestions use: it
 is a single pass rather than thirty-odd probes, and a stale count under a grid
 that has already moved on would be wrong rather than merely late.
