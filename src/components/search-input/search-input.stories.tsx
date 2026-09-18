@@ -46,8 +46,8 @@ const Controlled: Story["render"] = (args) => {
 
 const baseArgs = {
   id: "story-search",
-  placeholder: "Search the catalogue...",
-  ariaLabel: "Search the catalogue",
+  placeholder: "Search event title...",
+  ariaLabel: "Search event title",
   onChange: () => {},
 };
 

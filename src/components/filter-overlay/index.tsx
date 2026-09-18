@@ -460,8 +460,8 @@ export default function FilterOverlay({
       <div className={styles.searchSection}>
         <SearchInput
           id="filter-search"
-          placeholder="Search the catalogue..."
-          ariaLabel="Search the catalogue"
+          placeholder="Search event title..."
+          ariaLabel="Search event title"
           value={filterState.search}
           onChange={setSearchQuery}
         />
