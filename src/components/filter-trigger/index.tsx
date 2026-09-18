@@ -42,6 +42,7 @@ export default function FilterTrigger({
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues || null,
       genres: metaData?.genres || null,
+      people: metaData?.people || null,
       cinemaVenueIds,
     });
   }, [filterState, metaData, cinemaVenueIds]);

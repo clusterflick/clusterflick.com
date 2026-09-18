@@ -3,10 +3,16 @@ import {
   ACCESSIBILITY_NONE,
   Category,
   Genre,
+  Person,
   Venue,
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
-import { FORMAT_GROUPS, DAY_START_MINUTES, DAY_END_MINUTES } from "./modules";
+import {
+  FORMAT_GROUPS,
+  PEOPLE_GROUPS,
+  DAY_START_MINUTES,
+  DAY_END_MINUTES,
+} from "./modules";
 import {
   formatDateShort,
   getLondonMidnightTimestamp,
@@ -25,6 +31,8 @@ export type DescribeOptions = {
   categories: { value: Category; label: string }[];
   venues: Record<string, Venue> | null;
   genres: Record<string, Genre> | null;
+  /** Name lookup for the director and cast filters; without it they go undescribed. */
+  people?: Record<string, Person> | null;
   cinemaVenueIds: string[];
   nearbyVenueIds?: string[]; // Optional: for "Venues Near Me" detection
 };
@@ -393,6 +401,32 @@ function describeAccessibility(state: FilterState): string | null | "none" {
 }
 
 /**
+ * Describes the director and cast filters as clauses to append to the events
+ * description ("directed by Martin Scorsese"), not standalone ones.
+ */
+function describePeople(
+  state: FilterState,
+  peopleLookup: Record<string, Person> | null | undefined,
+): string[] {
+  if (!peopleLookup) return [];
+
+  const phrases: string[] = [];
+  for (const group of PEOPLE_GROUPS) {
+    const selected = state[group.filterId];
+    if (!selected || selected.length === 0) continue;
+
+    const names = selected
+      .map((id) => peopleLookup[id]?.name)
+      .filter((name): name is string => !!name);
+    if (names.length === 0) continue;
+
+    phrases.push(`${group.verb} ${formatList(names, 2, "people")}`);
+  }
+
+  return phrases;
+}
+
+/**
  * Describes the format filters (source / presentation / dimension).
  * - `emptyTitle`: title of the first group with nothing selected (no matches)
  * - `labels`: selected option labels across all active groups
@@ -428,17 +462,29 @@ function describeFormats(state: FilterState): {
  * Generates a human-readable description of the current filter state.
  */
 export function describeFilters(options: DescribeOptions): FilterDescription {
-  const { state, categories, venues, genres, cinemaVenueIds, nearbyVenueIds } =
-    options;
+  const {
+    state,
+    categories,
+    venues,
+    genres,
+    people,
+    cinemaVenueIds,
+    nearbyVenueIds,
+  } = options;
 
   // Build events description
   let eventsDesc: string;
+  // A dimension with nothing selected returns no events at all, so the
+  // clauses below have nothing to qualify — they are suppressed rather than
+  // hung off "No genres selected".
+  let selectionIsEmpty = false;
 
   const categoryDesc = describeCategories(state, categories);
   const genreDesc = describeGenres(state, genres);
   const accessibilityDesc = describeAccessibility(state);
   const { emptyTitle: formatEmptyTitle, labels: formatLabels } =
     describeFormats(state);
+  const peoplePhrases = describePeople(state, people);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
@@ -448,26 +494,27 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allGenres = !state.genres;
   const allAccessibility = !state.accessibility;
   const allFormats = FORMAT_GROUPS.every((group) => !state[group.filterId]);
+  const allPeople = peoplePhrases.length === 0;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
     eventsDesc = "No genres selected";
+    selectionIsEmpty = true;
   } else if (accessibilityDesc === "none") {
     eventsDesc = "No accessibility features selected";
+    selectionIsEmpty = true;
   } else if (formatEmptyTitle) {
     eventsDesc = `No ${formatEmptyTitle} selected`;
-  } else if (allCategories && allGenres && allAccessibility && allFormats) {
-    // All categories, genres, accessibility, and formats selected
+    selectionIsEmpty = true;
+  } else if (
+    allCategories &&
+    allGenres &&
+    allAccessibility &&
+    allFormats &&
+    allPeople
+  ) {
+    // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
-    if (searchQuery) {
-      eventsDesc += ` matching "${searchQuery}"`;
-    }
-    if (showingTitleQuery) {
-      eventsDesc += ` with showing title "${showingTitleQuery}"`;
-    }
-    if (performanceNotesQuery) {
-      eventsDesc += ` with notes "${performanceNotesQuery}"`;
-    }
   } else {
     const parts: string[] = [];
 
@@ -494,8 +541,14 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     if (formatLabels.length > 0) {
       eventsDesc += ` in ${formatList(formatLabels, 3)}`;
     }
+  }
 
-    // Add search suffix
+  // Appended once rather than per branch: these read as clauses on whatever the
+  // branches settled on, whether that is "All events" or "Films".
+  if (!selectionIsEmpty) {
+    if (peoplePhrases.length > 0) {
+      eventsDesc += ` ${peoplePhrases.join(" and ")}`;
+    }
     if (searchQuery) {
       eventsDesc += ` matching "${searchQuery}"`;
     }

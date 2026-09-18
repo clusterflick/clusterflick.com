@@ -13,6 +13,8 @@ export enum FilterId {
   DateRange = "dateRange",
   TimeRange = "timeRange",
   Genres = "genres",
+  Directors = "directors",
+  Cast = "cast",
   Accessibility = "accessibility",
   FormatSource = "formatSource",
   FormatPresentation = "formatPresentation",
@@ -36,6 +38,8 @@ export type FilterState = {
   [FilterId.DateRange]: { start: number | null; end: number | null };
   [FilterId.TimeRange]: { start: number; end: number };
   [FilterId.Genres]: string[] | null;
+  [FilterId.Directors]: string[] | null;
+  [FilterId.Cast]: string[] | null;
   [FilterId.Accessibility]: AccessibilityFilterValue[] | null;
   [FilterId.FormatSource]: string[] | null;
   [FilterId.FormatPresentation]: string[] | null;
@@ -102,6 +106,8 @@ export type AnyFilterModule =
   | FilterModule<FilterId.DateRange>
   | FilterModule<FilterId.TimeRange>
   | FilterModule<FilterId.Genres>
+  | FilterModule<FilterId.Directors>
+  | FilterModule<FilterId.Cast>
   | FilterModule<FilterId.Accessibility>
   | FilterModule<FilterId.FormatSource>
   | FilterModule<FilterId.FormatPresentation>

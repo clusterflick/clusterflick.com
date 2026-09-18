@@ -39,6 +39,12 @@ export type Venue = {
 export type Person = {
   id: string;
   name: string;
+  /**
+   * TheMovieDB popularity as a 0-99 percentile rank. Only a tie-break between
+   * two people a search could equally have meant. Absent on older releases and
+   * for anyone TheMovieDB has no score for, so readers must cope without it.
+   */
+  p?: number;
 };
 
 export type Genre = {

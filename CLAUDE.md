@@ -256,6 +256,79 @@ overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` 
 up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
 would render at 48px in pink.
 
+## Cast & Crew Filters
+
+Directors and cast are **filters on the films grid, not pages of their own**
+(`src/lib/filters/modules/people.ts`, surfaced in the filter overlay's
+`PeopleFilterSection`).
+
+**Why no `/directors/<id>` pages.** Measured against a live release: 1,288
+distinct directors, of whom **1,082 (84%) have exactly one film showing**. A page
+each would be ~1,300 static pages that mostly reproduce a TMDB synopsis already
+on the film's own page — thin content, and a meaningful share of a build that
+already runs 20 minutes for ~3,600 pages. It is also the call `/lists` already
+documents: "a threshold slid along a continuum is a filter, not a list", and
+"directors with enough films on" re-cuts itself every week. The stale-page
+problem that films need (`departed-movies.json`) therefore never arises here —
+there is no page to 404.
+
+**The data is already shipped.** `people` is 449KB of the 645KB meta blob every
+visitor downloads, and `movie.directors` / `movie.actors` are already in the
+chunks. Before these filters that payload existed only to render name pills. The
+filters cost no additional bytes.
+
+**`people` carries no role** — it is a flat `{ id, name }` map covering
+directors and cast alike. `getPeopleVocabulary` folds `movie.directors` and
+`movie.actors` to split them, and the fold doubles as the per-name film count.
+Memoise it on the dataset; it is one pass over every film's credits.
+
+**Empty means unfiltered, unlike genres.** Both store `string[] | null`, but
+genres are an enumerated chip list where `[]` legitimately means "none selected,
+nothing matches". People are a typeahead with no Select All, so `[]` is just what
+removing the last name leaves behind — it is treated as no filter, and
+`fromUrlParams` normalises it to `null` so an empty `?directors=` can never
+report itself restrictive while filtering nothing.
+
+**Names link from movie pages** (`CastCrewSection` → `getPersonFilterUrl`), which
+is the only thing making the filters discoverable — nobody opens an overlay
+looking for a filter they don't know exists. Links carry `base=all`, since the
+today→+7d default would answer a director with one film three weeks out by
+showing nothing.
+
+**The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
+already used, generalised. Matching is plain case-insensitive substring, never
+fuzzy, and results stop at `maxResults` **in list order** — so the vocabulary
+must arrive best-represented first, or a two-letter query walks all 11,000 cast
+names.
+
+**`buildPeopleIndex` is not optional at this size.** It maps every whole-word
+run of every name to the people claiming it, keyed the way `normalizeForSearch`
+renders a query — safe because `normalizeToWords(s).join("") ===
+normalizeForSearch(s)`, so a lookup is exactly the whole-word-run comparison it
+replaces. Scanning the names instead cost ~10ms of every suggestion pass once
+cast was included (29ms → 39ms), paid whether or not anything matched, on the
+deferred path that exists to keep typing responsive. Build it once per dataset
+and memoise it beside the vocabulary.
+
+**Popularity is a tie-break and nothing more.** `combine` publishes TheMovieDB's
+`popularity` with each person and `rankPeoplePopularity` in
+`scripts/process-combined-data.js` replaces it with a 0–99 percentile rank
+before it reaches the client. A percentile rather than a rounded score because
+popularity is heavily skewed — rounding puts almost everyone at 0 or 1, and the
+ties this exists to break are mostly between two people at the obscure end. The
+float would cost 274KB across the meta blob every visitor downloads; the rank
+costs 91KB.
+
+The underlying score is a rolling _trending_ measure recomputed daily from page
+views, not standing, so it must never rank anything on its own — it only orders
+two people a query could equally have named. `common/get-movie-data.js` uses it
+the same way, behind an exact name match and the person's department.
+
+**Every reader must cope without it.** A release published before the pipeline
+started emitting it carries none, and TheMovieDB has no score for some people.
+Absent is not zero — unranked, not unpopular — and the ordering falls through to
+director-first.
+
 ## Zero-Result Suggestions
 
 When a filtered grid comes up empty, `src/lib/filters/suggest.ts` finds the cheapest
@@ -274,10 +347,56 @@ no second implementation of the filter logic to drift out of sync.
   vocabulary an edit budget multiplies ambiguity for nothing ("Action" is a genre, "Acton" is
   a place). Matching a _run_ of words is what lets "70mm" find both "70mm" and "IMAX 70mm";
   both are offered, each with its own probed count. Vocabularies are the format groups,
-  genres, event types and accessibility features. **Venues are deliberately excluded** — their
-  names are full of ordinary words (Rio, Castle, Everyman) that collide with film titles.
-  Genre metadata is keyed by id and the entries carry only a `name`, as `describeFilters`
-  reads them. Unlike a correction this is _not_ gated on the query matching no title.
+  genres, event types, accessibility features and **directors**. **Venues are deliberately
+  excluded** — their names are full of ordinary words (Rio, Castle, Everyman) that collide
+  with film titles. Genre metadata is keyed by id and the entries carry only a `name`, as
+  `describeFilters` reads them. Unlike a correction this is _not_ gated on the query matching
+  no title.
+
+  **People are resolved jointly, not as two vocabularies** (`resolvePeopleQuery`
+  in `lib/filters/modules/people.ts`). A name is a far weaker signal than a
+  format string: most of a people vocabulary is forenames held in common, so a
+  fragment is read as a name only when it picks out one person per role.
+  1. Unique in one role, ambiguous or absent in the other → that one. Measured
+     502 fragments to 20 in the "unique director, ambiguous cast" direction,
+     which is the point — unique among 1,288 directors is a far stronger claim
+     than unique among 11,070 cast.
+  2. Unique in both, names differ → **both**. They are two different people and
+     only the reader knows which. Preferring the director was measured and is
+     wrong 23 times in 212, on exactly the names people type: "pacino" is Al
+     Pacino (6 films) far more often than Julie Pacino (1).
+  3. Unique in both, names match → both, being one person in two roles answering
+     for different films. Compared **by name, not id**: TheMovieDB carries
+     duplicate person records, so John Carpenter directing and John Carpenter
+     appearing can be two ids, and a reader cannot tell two identical names
+     apart anyway.
+  4. Ambiguous in both → nothing. "john" is 27 directors; a fragment naming 27
+     people names none of them.
+
+  **Ordering within a pair**: films currently showing, then popularity, then
+  director. Film count leads because it is what the offer accounts for — a
+  twelve-film retrospective is the better answer to an ambiguous surname.
+  Popularity settles the rest, which is most of them: of 212 pairs the counts
+  are equal in 165. Director breaks what remains. This is not a breach of "order
+  is editorial, never by count" below: that rule stops count overriding whether
+  an offer is _actionable_ across kinds of move, and here both offers are the
+  same kind and equally actionable — the only question is which person was
+  meant.
+
+  **A pair is never split.** The round-one cut gives way by one rather than take
+  the first and drop the second, which would present a guess as the answer. It
+  can only overflow by one, since a pair is two moves. Nothing else can push a
+  pair to the boundary today: measured, **zero** of the 212 tier-2 and 259
+  tier-3 fragments collide with the format, genre, event-type or accessibility
+  vocabularies. The guard is for when that stops being true.
+
+  A credit floor was tried first and was the wrong guard on every measured axis:
+  at two credits it ruled out 1,082 of 1,288 directors — exactly the single-film
+  ones with no other route to their film — and still left 46 contested
+  fragments. Uniqueness reaches 1,285 and leaves none. The cost argument for a
+  floor did not survive measurement either: the scan is ~0.3ms against a ~26ms
+  pass, because the probes dominate.
+
 - **Redirect** — the same query matched against a different search field (`Search` ↔
   `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks
   everything else. Only offered when the target field is empty. `ShowingUrlSearch` is

@@ -13,7 +13,12 @@ import {
   getPermissiveState,
   getRestrictiveFilterIds,
 } from "./manager";
-import { FORMAT_GROUPS, getPrimaryCategory } from "./modules";
+import {
+  FORMAT_GROUPS,
+  getPrimaryCategory,
+  resolvePeopleQuery,
+  type PeopleIndex,
+} from "./modules";
 import {
   matchesSearchQuery,
   normalizeForSearch,
@@ -156,6 +161,16 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     action: "Include sold-out showings",
   },
   { id: FilterId.Venues, label: "All venues", action: "Search all venues" },
+  // Below venues because giving up a name discards the reader's stated
+  // subject rather than widening the terms around it: someone who picked
+  // Scorsese would rather travel than watch somebody else. Still above
+  // accessibility, which is a requirement rather than a preference.
+  {
+    id: FilterId.Directors,
+    label: "All directors",
+    action: "Search all directors",
+  },
+  { id: FilterId.Cast, label: "All cast", action: "Search all cast" },
   {
     id: FilterId.Accessibility,
     label: "Any accessibility requirement",
@@ -167,6 +182,8 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
 interface Move {
   id: string;
   kind: SuggestionKind;
+  /** Moves that are two readings of one query and must be offered together. */
+  pairId?: string;
   /** Imperative phrasing, used when this move leads the offer. */
   action: string;
   /** Noun phrasing, used when this move is listed as one of the changes. */
@@ -201,6 +218,8 @@ interface SuggestContext {
   categories?: { value: Category; label: string }[];
   venues?: Record<string, Venue> | null;
   genres?: Record<string, Genre> | null;
+  /** From `buildPeopleIndex`; absent means no query is read as naming anyone. */
+  people?: PeopleIndex | null;
 }
 
 /**
@@ -321,6 +340,37 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
   }
 
   return moves;
+}
+
+/**
+ * Moves that read the query as naming a person rather than a film. The tiers
+ * and ordering live in {@link resolvePeopleQuery}; two results are a pair and
+ * share a `pairId` so the round-one cut cannot split them.
+ */
+function buildPeopleMoves(state: FilterState, context: SuggestContext): Move[] {
+  if (!context.people) return [];
+  const needle = normalizeForSearch(get(state, FilterId.Search).trim());
+  if (needle.length === 0) return [];
+
+  const resolved = resolvePeopleQuery(needle, context.people);
+  const pairId = resolved.length > 1 ? `people:${needle}` : undefined;
+
+  return resolved.map(({ person, group }) => ({
+    id: `filter:${group.filterId}:${person.id}`,
+    kind: "filter" as const,
+    // "Show films directed by Martin Scorsese" reads as an instruction where a
+    // bare "Show Martin Scorsese" reads as a billing.
+    action: `Show ${group.headlineNoun} ${group.verb} ${person.name}`,
+    label: group.label,
+    soloOnly: false,
+    ...(pairId ? { pairId } : {}),
+    // The query was the person's name, so it leaves the search box with them.
+    altersQuery: true,
+    writes: [FilterId.Search, group.filterId],
+    transform: (current: FilterState) =>
+      set(set(current, FilterId.Search, ""), group.filterId, [person.id]),
+    describeResult: () => person.name,
+  }));
 }
 
 /**
@@ -818,8 +868,9 @@ export function suggestFilterRelaxations({
   categories,
   venues,
   genres,
+  people,
 }: SuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues, genres };
+  const context: SuggestContext = { categories, venues, genres, people };
 
   // Nothing to rescue. Checked here rather than trusted to the caller because
   // the caller's idea of "empty" is easy to take from a different state than
@@ -836,6 +887,7 @@ export function suggestFilterRelaxations({
   // a filter, so they come last.
   const moves = [
     ...buildValueMoves(state, context),
+    ...buildPeopleMoves(state, context),
     ...buildRedirectMoves(state),
     ...buildCorrectionMoves(movies, state),
     ...buildWidenMoves(state, context),
@@ -872,13 +924,27 @@ export function suggestFilterRelaxations({
   // hits are also the cheapest.
   const suggestions: FilterSuggestion[] = [];
   const worksAlone = new Set<string>();
-  for (const move of moves) {
+
+  // Whether the move after this one completes the same pair. Paired moves are
+  // built adjacent, so this only has to look one ahead.
+  const partnerFollows = (index: number) => {
+    const pairId = moves[index]?.pairId;
+    return !!pairId && moves[index + 1]?.pairId === pairId;
+  };
+
+  for (let index = 0; index < moves.length; index += 1) {
+    const move = moves[index];
     const suggestion = evaluate([move]);
     if (suggestion) {
       suggestions.push(suggestion);
       worksAlone.add(move.id);
     }
-    if (suggestions.length >= limit) return suggestions;
+    // Cutting a pair would present its first half as the answer when the whole
+    // point is that we don't know which was meant, so the limit gives way by
+    // one instead. Only ever by one, since a pair is two moves.
+    if (suggestions.length >= limit && !partnerFollows(index)) {
+      return suggestions;
+    }
   }
 
   // Round two — pairs. Reached even when round one found something, because a

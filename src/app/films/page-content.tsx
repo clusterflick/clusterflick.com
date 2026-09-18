@@ -9,6 +9,8 @@ import {
 import {
   filterManager,
   suggestFilterRelaxations,
+  getPeopleVocabulary,
+  buildPeopleIndex,
   type FilterSuggestion,
 } from "@/lib/filters";
 import Button from "@/components/button";
@@ -86,6 +88,14 @@ export default function PageContent() {
   // `suggestFilterRelaxations` checks the state it is handed and returns
   // nothing when that state still has results, which is what stops offers for
   // the previous query flashing up here.
+  // Indexed once per dataset: scanning ~12,000 names per suggestion pass added
+  // ~10ms to every one, on the deferred path that keeps typing responsive.
+  const peopleIndex = useMemo(
+    () =>
+      buildPeopleIndex(getPeopleVocabulary(movies, metaData?.people ?? null)),
+    [movies, metaData],
+  );
+
   const suggestions = useMemo(() => {
     if (!showEmptyState || isEmpty) return [];
     return suggestFilterRelaxations({
@@ -96,8 +106,18 @@ export default function PageContent() {
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
       genres: metaData?.genres ?? null,
+      // Lets a query naming a person be read as one — the only route to the
+      // people filters for a reader who doesn't know the overlay has them.
+      people: peopleIndex,
     });
-  }, [showEmptyState, isEmpty, movies, metaData, deferredFilterState]);
+  }, [
+    showEmptyState,
+    isEmpty,
+    movies,
+    metaData,
+    deferredFilterState,
+    peopleIndex,
+  ]);
 
   const searchRef = useRef<HTMLInputElement>(null);
   const [announcement, setAnnouncement] = useState("");

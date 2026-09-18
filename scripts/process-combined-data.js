@@ -252,6 +252,30 @@ function removeOffAccessiblityIndicators(data) {
   return data;
 }
 
+/**
+ * Replace each person's raw TheMovieDB popularity with a 0-99 percentile rank.
+ *
+ * Only the ordering matters — it breaks ties between two people a search could
+ * equally have named — so the rank costs 91KB where the raw float costs 274KB
+ * in a blob every visitor downloads. A percentile rather than a rounded score
+ * because popularity is skewed enough that rounding puts almost everyone at 0.
+ *
+ * Someone TheMovieDB has no score for gets no rank: unranked, not unpopular.
+ */
+function rankPeoplePopularity(data) {
+  const scored = Object.values(data.people).filter(
+    (person) => typeof person.popularity === "number",
+  );
+  const ordered = [...scored].sort((a, b) => a.popularity - b.popularity);
+
+  ordered.forEach((person, index) => {
+    person.p = Math.floor((index / ordered.length) * 100);
+  });
+  Object.values(data.people).forEach((person) => delete person.popularity);
+
+  return data;
+}
+
 function removeIdProperty(data) {
   Object.keys(data.genres).forEach((id) => {
     if (data.genres[id].id === id) delete data.genres[id].id;
@@ -298,6 +322,7 @@ function removeOptionalData(data) {
     trimRottenTomatoData,
     extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
+    rankPeoplePopularity,
     removeIdProperty,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);
 }
