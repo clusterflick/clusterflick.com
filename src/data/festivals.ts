@@ -150,6 +150,9 @@ export const FESTIVALS: Festival[] = [
       {
         [FilterId.ShowingTitleSearch]: "Doc'n Roll",
       },
+      {
+        [FilterId.PerformanceNotesSearch]: "Doc'n Roll",
+      },
     ],
   },
   {
@@ -378,6 +381,9 @@ export const FESTIVALS: Festival[] = [
         // titled "Kino Industry Session: …" and "Short Film Open Screen".
         [FilterId.PerformanceNotesSearch]: "Kino Short Film",
       },
+      {
+        [FilterId.PerformanceNotesSearch]: "Kino London Short Film Festival",
+      },
     ],
   },
   {
@@ -416,6 +422,7 @@ export const FESTIVALS: Festival[] = [
       },
       { [FilterId.ShowingTitleSearch]: "Fringe Queer Film Festival" },
       { [FilterId.ShowingTitleSearch]: "Fringe Presents" },
+      { [FilterId.PerformanceNotesSearch]: "Fringe Queer Film Festival" },
     ],
   },
   {
