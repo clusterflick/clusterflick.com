@@ -6,17 +6,6 @@ import {
   normalizeForSearch,
 } from "@/lib/filters/normalize";
 
-/**
- * The Garden Cinema tags a screening as part of a festival and names the
- * festival separately, so `cinemas/thegardencinema.co.uk` in
- * `clusterflick/scripts` joins the two into a performance note reading
- * "Part of the <festival the venue's own link names>".
- *
- * That wording is the only thing tying those screenings to a festival — the
- * film's title routinely says nothing about it — and it lives in another
- * repository, so the coupling is worth pinning down here. Each case below is a
- * note taken verbatim from a release.
- */
 const GARDEN_NOTES: [note: string, festivalId: string][] = [
   [
     "Part of the Doc'n Roll Film Festival 2026\nThe screening will be followed by a Q&A.",

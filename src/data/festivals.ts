@@ -151,10 +151,6 @@ export const FESTIVALS: Festival[] = [
         [FilterId.ShowingTitleSearch]: "Doc'n Roll",
       },
       {
-        // The Garden lists its Doc'n Roll screenings under the film's own
-        // title — "Köln Tracks: The Legend Of Keith Jarrett's Köln Concert +
-        // Q&A" names the festival nowhere — and carries it in the performance
-        // note instead.
         [FilterId.PerformanceNotesSearch]: "Doc'n Roll",
       },
     ],
@@ -386,8 +382,6 @@ export const FESTIVALS: Festival[] = [
         [FilterId.PerformanceNotesSearch]: "Kino Short Film",
       },
       {
-        // The Garden writes the festival's full name into its performance
-        // notes, which the abbreviated form above is not a substring of.
         [FilterId.PerformanceNotesSearch]: "Kino London Short Film Festival",
       },
     ],
@@ -428,9 +422,6 @@ export const FESTIVALS: Festival[] = [
       },
       { [FilterId.ShowingTitleSearch]: "Fringe Queer Film Festival" },
       { [FilterId.ShowingTitleSearch]: "Fringe Presents" },
-      // The Garden's performance notes carry the festival's full name, so this
-      // one needs no venue scope — unlike the bare "Fringe" above, nothing else
-      // says "Fringe Queer Film Festival".
       { [FilterId.PerformanceNotesSearch]: "Fringe Queer Film Festival" },
     ],
   },
