@@ -8,19 +8,19 @@ import {
 
 const GARDEN_NOTES: [note: string, festivalId: string][] = [
   [
-    "Part of the Doc'n Roll Film Festival 2026\nThe screening will be followed by a Q&A.",
+    "Part of Doc'n Roll Film Festival 2026\nThe screening will be followed by a Q&A.",
     "docn-roll-film-festival",
   ],
   [
-    "Part of the Kino London Short Film Festival 2026\nThe screening will be followed by a discussion.",
+    "Part of Kino London Short Film Festival 2026\nThe screening will be followed by a discussion.",
     "kino-london-short-film-festival",
   ],
   [
-    "Part of the Fringe! Queer Film Festival 2026\nThe screening will be followed by a Q&A.",
+    "Part of Fringe! Queer Film Festival 2026\nThe screening will be followed by a Q&A.",
     "fringe-queer-film-arts-fest",
   ],
-  ["Part of the Tibet Film Festival London 2026", "tibet-film-festival"],
-  ["Part of the London Latino Film Festival", "london-latino-film-festival"],
+  ["Part of Tibet Film Festival London 2026", "tibet-film-festival"],
+  ["Part of London Latino Film Festival", "london-latino-film-festival"],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
