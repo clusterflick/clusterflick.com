@@ -229,6 +229,52 @@ interface SuggestContext {
 }
 
 /**
+ * Other words for a value — what people type rather than what the pill says.
+ *
+ * Aliases rather than an edit budget, because the words worth catching are
+ * rarely spellings of the label: "subs", "captioned" and "SDH" are all
+ * subtitles and none is within any distance of it. Plurals and past tenses
+ * ("subtitle", "subtitled") need no entry here; {@link foldSuffix} covers them.
+ *
+ * Accessibility is keyed by feature and genres by name, since genre ids come
+ * from the dataset.
+ */
+const ACCESSIBILITY_ALIASES: Record<AccessibilityFeature, string[]> = {
+  [AccessibilityFeature.AudioDescription]: ["audio described", "AD"],
+  [AccessibilityFeature.BabyFriendly]: [
+    "baby",
+    "parent and baby",
+    "parent and child",
+    "carer and baby",
+  ],
+  [AccessibilityFeature.HardOfHearing]: ["HOH"],
+  [AccessibilityFeature.Relaxed]: [
+    "relaxed screening",
+    "autism friendly",
+    "sensory friendly",
+  ],
+  [AccessibilityFeature.Subtitled]: [
+    "subs",
+    "captioned",
+    "captions",
+    "closed captions",
+    "SDH",
+  ],
+};
+
+const GENRE_ALIASES: Record<string, string[]> = {
+  "science fiction": ["sci-fi", "scifi"],
+  animation: ["animated"],
+  history: ["historical"],
+  documentary: ["docs"],
+};
+
+const CATEGORY_ALIASES: Partial<Record<Category, string[]>> = {
+  // "quizzes" folds to "quizz", which "quiz" cannot reach.
+  [Category.Quiz]: ["quiz"],
+};
+
+/**
  * A filter whose values a query might be naming instead of a film — "70mm" is
  * a source format, "Action" is a genre.
  *
@@ -245,10 +291,21 @@ interface ValueVocabulary {
   noun: string;
   entries: {
     name: string;
+    /** The value this entry selects, as the filter stores it. */
+    value: string;
+    /** Other words that name this value; see {@link ACCESSIBILITY_ALIASES}. */
+    aliases?: string[];
+    /**
+     * A format's "nothing special" value — Digital, Normal, 2D. Selecting it
+     * is never what a query was reaching for when titles already matched.
+     */
+    isDefault?: boolean;
     /** Applies this one value, typed by the vocabulary that owns it. */
     select: (state: FilterState) => FilterState;
   }[];
 }
+
+type ValueEntry = ValueVocabulary["entries"][number];
 
 function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
   const vocabularies: ValueVocabulary[] = FORMAT_GROUPS.map((group) => ({
@@ -257,6 +314,8 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
     noun: "screenings",
     entries: group.options.map((option) => ({
       name: option.label,
+      value: option.value,
+      isDefault: option.value === group.defaultValue,
       select: (state: FilterState) =>
         set(state, group.filterId, [option.value]),
     })),
@@ -271,6 +330,8 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
       // way `describeFilters` reads them.
       entries: Object.entries(context.genres).map(([id, genre]) => ({
         name: genre.name,
+        value: id,
+        aliases: GENRE_ALIASES[genre.name.toLowerCase()],
         select: (state: FilterState) => set(state, FilterId.Genres, [id]),
       })),
     });
@@ -284,6 +345,8 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
       noun: "",
       entries: context.categories.map((category) => ({
         name: category.label,
+        value: category.value,
+        aliases: CATEGORY_ALIASES[category.value],
         select: (state: FilterState) =>
           set(state, FilterId.Categories, [category.value]),
       })),
@@ -296,6 +359,8 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
     noun: "screenings",
     entries: Object.entries(ACCESSIBILITY_LABELS).map(([feature, name]) => ({
       name,
+      value: feature,
+      aliases: ACCESSIBILITY_ALIASES[feature as AccessibilityFeature],
       select: (state: FilterState) =>
         set(state, FilterId.Accessibility, [feature as AccessibilityFeature]),
     })),
@@ -305,13 +370,91 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
 }
 
 /**
+ * Folds the common English endings off a normalised term, so "subtitle",
+ * "subtitled" and "subtitles" all meet at "subtitl".
+ *
+ * Applied to both sides of a comparison, so it only has to be consistent, not
+ * linguistically right — and it only ever compares against a vocabulary of a
+ * few dozen values, where two different words folding together is harmless.
+ * Anything that would leave fewer than three letters is left alone, so "ad"
+ * and "tv" stay themselves.
+ */
+function foldSuffix(term: string): string {
+  const rules: [RegExp, string][] = [
+    [/ies$/, "y"],
+    [/es$/, ""],
+    [/ed$/, ""],
+    [/s$/, ""],
+  ];
+  let folded = term;
+  for (const [pattern, replacement] of rules) {
+    if (pattern.test(folded)) {
+      folded = folded.replace(pattern, replacement);
+      break;
+    }
+  }
+  folded = folded.replace(/e$/, "");
+  return folded.length >= 3 ? folded : term;
+}
+
+/**
+ * Whether the query names this value: the whole query, suffix-folded, equals a
+ * run of whole words from the value's name or one of its aliases.
+ *
+ * Matching a *run* rather than the whole name is what lets "70mm" find both
+ * "70mm" and "IMAX 70mm".
+ */
+function namesEntry(needle: string, entry: ValueEntry): boolean {
+  const target = foldSuffix(needle);
+  return [entry.name, ...(entry.aliases ?? [])].some((name) => {
+    const words = normalizeToWords(name);
+    for (let start = 0; start < words.length; start += 1) {
+      let run = "";
+      for (let end = start; end < words.length; end += 1) {
+        run += words[end];
+        if (foldSuffix(run) === target) return true;
+      }
+    }
+    return false;
+  });
+}
+
+/** Every vocabulary value the query names, in vocabulary order. */
+function findNamedValues(
+  needle: string,
+  context: SuggestContext,
+): { vocabulary: ValueVocabulary; entry: ValueEntry }[] {
+  const found: { vocabulary: ValueVocabulary; entry: ValueEntry }[] = [];
+  for (const vocabulary of buildVocabularies(context)) {
+    for (const entry of vocabulary.entries) {
+      if (namesEntry(needle, entry)) found.push({ vocabulary, entry });
+    }
+  }
+  return found;
+}
+
+function buildValueMove(vocabulary: ValueVocabulary, entry: ValueEntry): Move {
+  return {
+    id: `filter:${vocabulary.filterId}:${entry.name}`,
+    kind: "filter",
+    action: `Show ${entry.name}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
+    label: vocabulary.label,
+    soloOnly: false,
+    // The query was the filter value, so it leaves the search box with it.
+    altersQuery: true,
+    writes: [FilterId.Search, vocabulary.filterId],
+    transform: (current: FilterState) =>
+      entry.select(set(current, FilterId.Search, "")),
+    describeResult: () => entry.name,
+  };
+}
+
+/**
  * Moves that read the query as a filter value rather than a title.
  *
- * Matching is exact against whole words, never fuzzy: over a vocabulary this
- * small an edit budget multiplies ambiguity for nothing — "Action" is a genre,
- * "Acton" is a place. Matching a *run* of words rather than the whole name is
- * what lets "70mm" find both "70mm" and "IMAX 70mm", which is the point: the
- * two are different offers with different counts, and the reader picks.
+ * Matching is against whole words plus aliases and folded endings, never an
+ * edit budget: the words people actually use for a value ("subs", "captioned")
+ * are not misspellings of its label, and no distance reaches them.
  *
  * Only the main search box is read this way. The other two fields are already
  * specialist, and a format string typed into performance notes is a legitimate
@@ -321,31 +464,9 @@ function buildValueMoves(state: FilterState, context: SuggestContext): Move[] {
   const needle = normalizeForSearch(get(state, FilterId.Search).trim());
   if (needle.length === 0) return [];
 
-  const moves: Move[] = [];
-
-  for (const vocabulary of buildVocabularies(context)) {
-    for (const entry of vocabulary.entries) {
-      const exact =
-        bestWordRunDistance(needle, normalizeToWords(entry.name), 0) === 0;
-      if (!exact) continue;
-
-      moves.push({
-        id: `filter:${vocabulary.filterId}:${entry.name}`,
-        kind: "filter",
-        action: `Show ${entry.name}${vocabulary.noun ? ` ${vocabulary.noun}` : ""}`,
-        label: vocabulary.label,
-        soloOnly: false,
-        // The query was the filter value, so it leaves the search box with it.
-        altersQuery: true,
-        writes: [FilterId.Search, vocabulary.filterId],
-        transform: (current: FilterState) =>
-          entry.select(set(current, FilterId.Search, "")),
-        describeResult: () => entry.name,
-      });
-    }
-  }
-
-  return moves;
+  return findNamedValues(needle, context).map(({ vocabulary, entry }) =>
+    buildValueMove(vocabulary, entry),
+  );
 }
 
 /**
@@ -871,4 +992,76 @@ export function suggestFilterRelaxations({
   }
 
   return suggestions;
+}
+
+export interface FilterValueOfferOptions extends Pick<
+  SuggestContext,
+  "categories" | "genres"
+> {
+  movies: MoviesRecord;
+  state: FilterState;
+  /** How many films the grid is showing for `state`. */
+  shownCount: number;
+  /** Maximum offers to return. */
+  limit?: number;
+}
+
+/**
+ * Offers to read the query as a filter value when it matched some titles too —
+ * "horror" finding two films with the word in their name, when what was meant
+ * was the genre.
+ *
+ * The companion to the filter-value move in {@link suggestFilterRelaxations},
+ * which only runs once the grid is empty and so never hears about a word that
+ * happens to appear in a title. Here the search worked, so the offer is a
+ * question rather than a rescue, and it is only made when taking it returns
+ * more films than the grid already shows: when the titles are the bigger
+ * answer, they were probably what was meant.
+ *
+ * Two kinds of value are never offered, because the reader already has them:
+ * one the filter has selected, and a format's "nothing special" default
+ * (Digital, Normal, 2D). People are left out too — a name rarely matches a
+ * title, so the empty-grid path already catches it.
+ */
+export function getFilterValueOffers({
+  movies,
+  state,
+  shownCount,
+  limit = 2,
+  categories,
+  genres,
+}: FilterValueOfferOptions): FilterSuggestion[] {
+  if (shownCount === 0) return [];
+  const needle = normalizeForSearch(get(state, FilterId.Search).trim());
+  if (needle.length === 0) return [];
+
+  const offers: FilterSuggestion[] = [];
+
+  for (const { vocabulary, entry } of findNamedValues(needle, {
+    categories,
+    genres,
+  })) {
+    if (entry.isDefault) continue;
+    const selected = get(state, vocabulary.filterId) as string[] | null;
+    if (selected?.includes(entry.value)) continue;
+
+    const move = buildValueMove(vocabulary, entry);
+    const candidate = move.transform(state);
+    const result = apply(movies, candidate);
+    const count = Object.keys(result).length;
+    if (count <= shownCount) continue;
+
+    const headline = buildHeadline([move], result);
+    offers.push({
+      id: move.id,
+      kind: move.kind,
+      headline,
+      changes: buildChanges([move], headline, result),
+      count,
+      state: candidate,
+    });
+    if (offers.length >= limit) break;
+  }
+
+  return offers;
 }

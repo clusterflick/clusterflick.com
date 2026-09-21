@@ -15,7 +15,11 @@ import {
 } from "@/utils/format-date";
 import { FilterId, type FilterState, type MoviesRecord } from "./types";
 import { getDefaultState, set, apply } from "./manager";
-import { suggestFilterRelaxations, type FilterSuggestion } from "./suggest";
+import {
+  getFilterValueOffers,
+  suggestFilterRelaxations,
+  type FilterSuggestion,
+} from "./suggest";
 import { buildPeopleIndex } from "./modules/people";
 
 /**
@@ -465,6 +469,37 @@ describe("suggestFilterRelaxations", () => {
           .map((s) => s.headline),
       ).toEqual(["Show 70mm screenings"]);
     });
+  });
+
+  it.each(["subtitle", "Subtitled", "subtitles", "subs", "captioned", "SDH"])(
+    "reads %s as the subtitles requirement",
+    (query) => {
+      // Endings fold, and the words people use that are no spelling of the
+      // label at all come from aliases.
+      const movies = makeMovies({
+        "1": { title: "Heat", subtitled: true },
+      });
+      const state = set(getDefaultState(), FilterId.Search, query);
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show Subtitles screenings"]);
+    },
+  );
+
+  it("folds plurals on genre names", () => {
+    const movies = makeMovies({
+      "1": { title: "Heat", genres: ["18"] },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "dramas");
+
+    expect(
+      suggestFilterRelaxations({ movies, state, genres: GENRES })
+        .filter((s) => s.kind === "filter")
+        .map((s) => s.headline),
+    ).toEqual(["Show Drama films"]);
   });
 
   describe("people offers", () => {
@@ -1161,5 +1196,74 @@ describe("suggestFilterRelaxations", () => {
     expect(suggestFilterRelaxations({ movies, state, limit: 1 })).toHaveLength(
       1,
     );
+  });
+});
+
+describe("getFilterValueOffers", () => {
+  const offers = (movies: MoviesRecord, state: FilterState) =>
+    getFilterValueOffers({
+      movies,
+      state,
+      shownCount: Object.keys(apply(movies, state)).length,
+      categories: CATEGORIES,
+      genres: GENRES,
+    });
+
+  it("offers the filter reading when it returns more than the titles", () => {
+    const movies = makeMovies({
+      "1": { title: "Action Point" },
+      "2": { title: "Heat", genres: ["28"] },
+      "3": { title: "Ronin", genres: ["28"] },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "action");
+
+    const [offer, ...rest] = offers(movies, state);
+    expect(rest).toEqual([]);
+    expect(lines(offer)).toEqual(["Show Action films", "Genre: Action"]);
+    expect(offer.count).toBe(2);
+    expect(offer.state[FilterId.Search]).toBe("");
+  });
+
+  it("stays quiet when the titles are the bigger answer", () => {
+    const movies = makeMovies({
+      "1": { title: "Action Point" },
+      "2": { title: "Action Jackson" },
+      "3": { title: "Heat", genres: ["28"] },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "action");
+
+    expect(offers(movies, state)).toEqual([]);
+  });
+
+  it("stays quiet on an empty grid, which the relaxation engine owns", () => {
+    const movies = makeMovies({
+      "1": { title: "Heat", genres: ["28"] },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "action");
+
+    expect(offers(movies, state)).toEqual([]);
+  });
+
+  it("never offers a value the filter already has selected", () => {
+    const movies = makeMovies({
+      "1": { title: "Action Point", genres: ["28"] },
+      "2": { title: "Heat", genres: ["28"] },
+    });
+    let state = set(getDefaultState(), FilterId.Genres, ["28"]);
+    state = set(state, FilterId.Search, "action");
+
+    expect(offers(movies, state)).toEqual([]);
+  });
+
+  it("never offers a format's default value", () => {
+    // Every screening without a recorded format is Digital, so the reading
+    // always "wins" and is never what the query meant.
+    const movies = makeMovies({
+      "1": { title: "Digital Dreams" },
+      "2": { title: "Heat" },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "digital");
+
+    expect(offers(movies, state)).toEqual([]);
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
+import clsx from "clsx";
 import dynamic from "next/dynamic";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
@@ -9,6 +10,7 @@ import {
 import {
   filterManager,
   suggestFilterRelaxations,
+  getFilterValueOffers,
   getHiddenByDate,
   getPeopleVocabulary,
   buildPeopleIndex,
@@ -132,6 +134,20 @@ export default function PageContent() {
     return getHiddenByDate(movies, filterState, moviesList.length);
   }, [isEmpty, movies, filterState, moviesList.length]);
 
+  // The query also names a format, genre, event type or accessibility need, and
+  // reading it that way returns more than the titles did. Live state for the
+  // same reason as above, and cheap: it only probes when a value is named.
+  const valueOffers = useMemo(() => {
+    if (isEmpty || moviesList.length === 0) return [];
+    return getFilterValueOffers({
+      movies,
+      state: filterState,
+      shownCount: moviesList.length,
+      categories: EVENT_CATEGORIES,
+      genres: metaData?.genres ?? null,
+    });
+  }, [isEmpty, movies, metaData, filterState, moviesList.length]);
+
   const searchRef = useRef<HTMLInputElement>(null);
   const [announcement, setAnnouncement] = useState("");
 
@@ -148,6 +164,24 @@ export default function PageContent() {
     );
     searchRef.current?.focus();
   };
+
+  // Above the grid rather than under it like the date notice: this isn't
+  // limited to short grids, and under a long one nobody would reach it. When
+  // the date notice is showing the grid is three films at most, so the two
+  // offers sit together beneath it instead — both are questions about whether
+  // the grid is the answer the reader wanted.
+  const renderValueOffers = (className?: string) =>
+    valueOffers.length > 0 && (
+      <div className={clsx(styles.valueOffers, className)}>
+        <p className={styles.valueOffersLead}>
+          Searched film titles for “{filterState.search.trim()}”. Did you mean…
+        </p>
+        <FilterSuggestions
+          suggestions={valueOffers}
+          onApply={applySuggestion}
+        />
+      </div>
+    );
 
   const renderEmptyState = () => {
     if (error) {
@@ -295,9 +329,11 @@ export default function PageContent() {
         {announcement}
       </div>
       {renderEmptyState()}
+      {!hiddenByDate && renderValueOffers()}
       {moviesList.length > 0 && (
         <VirtualisedFilmGrid items={moviesList.map((movie) => ({ movie }))} />
       )}
+      {hiddenByDate && renderValueOffers(styles.valueOffersBelowGrid)}
       {hiddenByDate && (
         <HiddenResultsNotice
           count={hiddenByDate.count}

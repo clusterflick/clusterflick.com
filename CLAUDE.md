@@ -405,15 +405,28 @@ no second implementation of the filter logic to drift out of sync.
 
 - **Filter value** — the query names a filter value rather than a film: "70mm" is a source
   format, "Action" is a genre. Keeps every word typed, so it ranks above everything. Matching
-  is **exact against whole words** (`bestWordRunDistance(…, 0)`), never fuzzy — over a small
-  vocabulary an edit budget multiplies ambiguity for nothing ("Action" is a genre, "Acton" is
-  a place). Matching a _run_ of words is what lets "70mm" find both "70mm" and "IMAX 70mm";
-  both are offered, each with its own probed count. Vocabularies are the format groups,
+  is against **whole words, with folded endings and aliases** — never an edit budget. The
+  words people actually type for a value are mostly not spellings of its label: "subs",
+  "captioned" and "SDH" all mean Subtitles and no distance reaches any of them, so they are
+  aliases (`ACCESSIBILITY_ALIASES`, `GENRE_ALIASES`, `CATEGORY_ALIASES` in `suggest.ts`).
+  `foldSuffix` strips -s/-es/-ies/-ed from both sides, which covers "subtitle", "subtitled"
+  and "dramas" without an entry. Matching a _run_ of words is what lets "70mm" find both
+  "70mm" and "IMAX 70mm"; both are offered, each with its own probed count. Vocabularies are the format groups,
   genres, event types, accessibility features and **directors**. **Venues are deliberately
   excluded** — their names are full of ordinary words (Rio, Castle, Everyman) that collide
   with film titles. Genre metadata is keyed by id and the entries carry only a `name`, as
   `describeFilters` reads them. Unlike a correction this is _not_ gated on the query matching
   no title.
+
+  **The same reading is offered on a grid that has results** (`getFilterValueOffers`),
+  because the engine above only runs on an empty one and "horror" or "16mm" usually appears
+  in a title or two. It is shown _above_ the grid — it is not limited to short grids, and
+  under a long one nobody would reach it. The exception is when the thin-result notice is
+  showing: the grid is then three films at most, so the offer sits beneath it, just above
+  that notice. Either way it only appears when taking it returns more films than
+  the grid already shows. A value already selected, and a format's default (Digital, Normal,
+  2D), are never offered. People are left out: a name rarely matches a title, so the empty
+  path already catches it.
 
   **People are resolved jointly, not as two vocabularies** (`resolvePeopleQuery`
   in `lib/filters/modules/people.ts`). A name is a far weaker signal than a
