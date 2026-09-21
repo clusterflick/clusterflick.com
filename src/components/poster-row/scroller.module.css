@@ -15,8 +15,9 @@
 
 .posterScroller {
   display: flex;
-  gap: 16px;
+  gap: var(--poster-scroller-gap, 16px);
   overflow-x: auto;
+  padding-top: var(--poster-scroller-padding-top, 0);
   padding-bottom: 8px;
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
@@ -134,7 +135,7 @@
    amount so they stay aligned with the surrounding content. Above 1200px the
    container is centred with whitespace, where full-bleed would look wrong. */
 @media (max-width: 1200px) {
-  .posterScroller {
+  .posterScroller.bleed {
     margin-inline: calc(50% - 50vw);
     padding-inline: calc(50vw - 50%);
     scroll-padding-inline: calc(50vw - 50%);

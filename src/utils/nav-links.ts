@@ -30,6 +30,7 @@ export const NAV_GROUPS: readonly { id: NavGroupId; label: string }[] = [
 export const NAV_LINKS: readonly NavLink[] = [
   { href: "/", label: "Home", group: "discover" },
   { href: "/films", label: "Films", group: "discover" },
+  { href: "/planner", label: "Planner", group: "discover" },
   { href: "/near-me", label: "Near Me", group: "discover" },
   { href: "/formats", label: "Formats", group: "discover" },
   { href: "/genres", label: "Genres", group: "discover" },
@@ -77,6 +78,7 @@ export const GROUPED_NAV_LINKS = NAV_GROUPS.map((group) => ({
  */
 const PRIMARY_NAV_HREFS: readonly string[] = [
   "/films",
+  "/planner",
   "/near-me",
   "/venues",
   "/festivals",

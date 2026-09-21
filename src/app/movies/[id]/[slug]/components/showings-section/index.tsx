@@ -19,11 +19,13 @@ import {
   formatDaysFromNow,
   isInPast,
 } from "@/utils/format-date";
-import Button, { ButtonAnchor } from "@/components/button";
+import Button from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import PerformanceCard from "./performance-card";
+import PerformanceCard, {
+  PerformanceCardActions,
+} from "@/components/performance-card";
 import styles from "./showings-section.module.css";
 
 // Card grid sizing — kept in sync with .performancesRow gap in the CSS module.
@@ -96,7 +98,11 @@ function renderPerformanceCard(
   const showing = showings[performance.showingId];
   const venue = venues[showing?.venueId];
   const isPast = isInPast(performance.time);
-  const isSoldOut = performance.status?.soldOut;
+  const status = isPast
+    ? "past"
+    : performance.status?.soldOut
+      ? "soldOut"
+      : undefined;
   const showingTitle =
     showing?.title && titlesDiffer(movieTitle, showing.title)
       ? showing.title
@@ -112,34 +118,14 @@ function renderPerformanceCard(
       accessibility={performance.accessibility}
       format={performance.format}
       notes={performance.notes}
-      className={clsx(
-        isPast && styles.past,
-        !isPast && isSoldOut && styles.soldOut,
-      )}
+      status={status}
     >
-      {/* Card overlay link - covers the whole card */}
-      <a
-        href={showing ? hydrateUrl(showing.url) : undefined}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.cardLink}
-        aria-label={`View ${venue?.name || "venue"} listing`}
+      <PerformanceCardActions
+        showingUrl={showing ? hydrateUrl(showing.url) : undefined}
+        bookingUrl={hydrateUrl(performance.bookingUrl)}
+        venueName={venue?.name}
+        status={status}
       />
-      {isPast && <div className={styles.finishedBadge}>Finished</div>}
-      {isSoldOut && !isPast && (
-        <div className={styles.soldOutBadge}>Sold Out</div>
-      )}
-      {!isPast && !isSoldOut && (
-        <ButtonAnchor
-          href={hydrateUrl(performance.bookingUrl)}
-          target="_blank"
-          rel="noopener noreferrer"
-          size="sm"
-          className={styles.bookingButton}
-        >
-          Book
-        </ButtonAnchor>
-      )}
     </PerformanceCard>
   );
 }

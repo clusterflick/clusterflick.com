@@ -1,0 +1,58 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Square icon buttons: the chevron alone, centred. Scoped under .stepper to
+   out-rank Button's own padding and display, which otherwise win or lose on
+   stylesheet order. */
+.stepper .step {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.previousIcon {
+  transform: rotate(90deg);
+}
+
+.nextIcon {
+  transform: rotate(-90deg);
+}
+
+.label {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.day {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.relative {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-neon-pink);
+}
+
+@media (min-width: 768px) {
+  .day {
+    font-size: 20px;
+  }
+}

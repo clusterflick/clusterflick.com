@@ -9,7 +9,28 @@ import { getAccessibilityLabel } from "@/utils/accessibility-labels";
 import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
 import Tag from "@/components/tag";
-import styles from "./showings-section.module.css";
+import { ButtonAnchor } from "@/components/button";
+import styles from "./performance-card.module.css";
+
+/**
+ * - `default` fills a grid cell (the listing page's 280px-minimum columns).
+ * - `compact` is a fixed narrow card for a horizontal strip (the planner),
+ *   where the default width would make a row thousands of pixels wide.
+ */
+export type PerformanceCardSize = "default" | "compact";
+
+/** A performance that can no longer be booked, styled down to match. */
+export type PerformanceCardStatus = "past" | "soldOut";
+
+const sizeStyles: Record<PerformanceCardSize, string | undefined> = {
+  default: undefined,
+  compact: styles.compact,
+};
+
+const statusStyles: Record<PerformanceCardStatus, string> = {
+  past: styles.past,
+  soldOut: styles.soldOut,
+};
 
 interface PerformanceCardProps {
   time: number;
@@ -20,20 +41,21 @@ interface PerformanceCardProps {
   accessibility?: MoviePerformance["accessibility"];
   format?: MoviePerformance["format"];
   notes?: string;
-  /** Extra class(es) for state styling (e.g. past / sold-out). */
+  size?: PerformanceCardSize;
+  status?: PerformanceCardStatus;
   className?: string;
   /**
-   * Interactive overlays rendered first inside the card — the full-card link,
-   * booking button and status badges. Omitted by the static SEO render, which
-   * is deliberately non-interactive.
+   * Interactive overlays rendered first inside the card — normally
+   * `PerformanceCardActions`. Omitted by the static SEO render, which is
+   * deliberately non-interactive.
    */
   children?: ReactNode;
 }
 
 /**
- * Presentational showing card shared by the interactive `ShowingsSection` list
- * and the SSR-only `StaticShowingsList`, so both render identically. All
- * interactivity (links, booking button, badges) is injected via `children`.
+ * Presentational showing card shared by the listing page's interactive list,
+ * its SSR-only static list and the planner, so all of them render identically.
+ * All interactivity (links, booking button, badges) is injected via `children`.
  */
 export default function PerformanceCard({
   time,
@@ -43,12 +65,19 @@ export default function PerformanceCard({
   accessibility,
   format,
   notes,
+  size = "default",
+  status,
   className,
   children,
 }: PerformanceCardProps) {
   return (
     <div
-      className={clsx(styles.performanceCard, className)}
+      className={clsx(
+        styles.performanceCard,
+        sizeStyles[size],
+        status && statusStyles[status],
+        className,
+      )}
       data-testid="performance-card"
     >
       {children}
@@ -101,5 +130,51 @@ export default function PerformanceCard({
         </div>
       )}
     </div>
+  );
+}
+
+interface PerformanceCardActionsProps {
+  /** The venue's page for this showing; the whole card links there. */
+  showingUrl?: string;
+  bookingUrl: string;
+  venueName?: string;
+  status?: PerformanceCardStatus;
+}
+
+/**
+ * The interactive layer of a `PerformanceCard`: a whole-card link to the
+ * venue's listing, a "Finished" or "Sold Out" badge, and a Book button that
+ * appears on hover (always on touch widths). Pass it as the card's children.
+ * URLs must already be hydrated (`useCinemaData().hydrateUrl`).
+ */
+export function PerformanceCardActions({
+  showingUrl,
+  bookingUrl,
+  venueName,
+  status,
+}: PerformanceCardActionsProps) {
+  return (
+    <>
+      <a
+        href={showingUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.cardLink}
+        aria-label={`View ${venueName || "venue"} listing`}
+      />
+      {status === "past" && <div className={styles.badge}>Finished</div>}
+      {status === "soldOut" && <div className={styles.badge}>Sold Out</div>}
+      {status !== "past" && status !== "soldOut" && (
+        <ButtonAnchor
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          size="sm"
+          className={styles.bookingButton}
+        >
+          Book
+        </ButtonAnchor>
+      )}
+    </>
   );
 }

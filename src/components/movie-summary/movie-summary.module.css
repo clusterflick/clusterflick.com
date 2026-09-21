@@ -1,0 +1,105 @@
+.summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* 72px tall at the poster's 2:3, level with the three lines beside it. */
+.posterLink {
+  flex: 0 0 48px;
+  width: 48px;
+  border-bottom: none;
+  text-decoration: none;
+}
+
+.posterLink:hover {
+  border-bottom: none;
+}
+
+/* Poster and title are one destination, so hovering either lights up both:
+   the title takes the global link hover, the poster its usual zoom. */
+.summary:has(a:hover) .heading a {
+  color: var(--color-neon-pink);
+  border-bottom-color: var(--color-neon-pink);
+}
+
+.summary:has(a:hover) .posterLink img {
+  transform: scale(1.05);
+}
+
+.details {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Sized for a row, not a page: the global h2 is a 48px display heading. */
+.heading {
+  margin: 0;
+  padding-bottom: 4px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white);
+}
+
+.year {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-gray);
+}
+
+/* One line: the original title gives way (ellipsis, full text in the tooltip)
+   so the certificate and running time always stay visible. */
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.originalTitle {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+/* Softened: a row of full-strength pink pills per film outshouts the title. */
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  opacity: 0.75;
+}
+
+.classification {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  background-color: rgba(var(--color-electric-blue-rgb), 0.2);
+  border: 1px solid var(--color-electric-blue);
+  border-radius: 4px;
+}
+
+.duration {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+}
+
+@media (min-width: 768px) {
+  .heading {
+    font-size: 19px;
+  }
+}

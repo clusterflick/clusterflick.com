@@ -1,0 +1,59 @@
+.page {
+  /* Clears the 63px header, keeping the same gap as the catalogue. */
+  padding-top: 80px;
+}
+
+/* Full width: each row is mostly a strip of 280px cards, so width decides how
+   many showings are visible before scrolling — about three at 1000px, around
+   six at 1920px, which covers most filtered days. */
+.content {
+  padding: 0 16px 60px;
+}
+
+@media (min-width: 768px) {
+  .content {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Low-key: the page's job starts at the day stepper, so the heading names the
+   view without claiming the space the global 64px h1 would. */
+.intro {
+  margin: 0 auto 16px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+.controls {
+  max-width: 560px;
+  margin: 0 auto 8px;
+}
+
+.count {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.loading {
+  padding: 40px 20px 60px;
+}

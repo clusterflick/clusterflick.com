@@ -5,7 +5,7 @@ import {
   formatDaysFromNow,
 } from "@/utils/format-date";
 import { titlesDiffer } from "@/utils/title-differs";
-import PerformanceCard from "../showings-section/performance-card";
+import PerformanceCard from "@/components/performance-card";
 import styles from "../showings-section/showings-section.module.css";
 
 // How many upcoming performances to bake into the static HTML. Half of the 50
