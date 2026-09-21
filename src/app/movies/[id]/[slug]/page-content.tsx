@@ -34,8 +34,7 @@ import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import { ButtonAnchor } from "@/components/button";
-import MoviePoster from "@/components/movie-poster";
-import StackedPoster from "@/components/stacked-poster";
+import EventPoster, { getPrimaryPosterPath } from "@/components/event-poster";
 import { PlayIcon } from "@/components/icons";
 import GenresList from "./components/genres-list";
 import RatingsGrid from "./components/ratings-grid";
@@ -191,16 +190,13 @@ export default function PageContent({
     history.replaceState(null, "", next ? SHOW_ALL_HASH : cleanPath);
   }, [showAll]);
 
-  // Check if this event has included movies for stacked posters
   const includedMovies = movie.includedMovies;
-  const includedWithPosters = includedMovies?.filter((m) => m.posterPath) || [];
-  const totalPosters = (movie.posterPath ? 1 : 0) + includedWithPosters.length;
-  const useStackedPoster =
-    includedMovies && includedMovies.length > 1 && totalPosters >= 2;
 
   // Get the best poster path for backdrop (movie's own or first included movie's)
-  const backdropPosterPath =
-    movie.posterPath || includedWithPosters[0]?.posterPath;
+  const backdropPosterPath = getPrimaryPosterPath(
+    movie.posterPath,
+    includedMovies,
+  );
 
   const performancesByDate = useMemo(() => {
     if (!performances || performances.length === 0) return {};
@@ -244,23 +240,15 @@ export default function PageContent({
         contentClassName={styles.heroContent}
       >
         <div className={styles.posterSection}>
-          {useStackedPoster ? (
-            <StackedPoster
-              mainPosterPath={movie.posterPath}
-              mainTitle={movie.title}
-              includedMovies={includedMovies}
-              size="large"
-              interactive={false}
-            />
-          ) : (
-            <MoviePoster
-              posterPath={
-                movie.posterPath || includedWithPosters[0]?.posterPath
-              }
-              title={movie.title}
-              size="large"
-            />
-          )}
+          {/* Not interactive: a large poster has no hover effect anyway, and
+              the stack's fan-out isn't wanted on the page's own poster. */}
+          <EventPoster
+            title={movie.title}
+            posterPath={movie.posterPath}
+            includedMovies={includedMovies}
+            size="large"
+            interactive={false}
+          />
           {formats.length > 0 && (
             <div className={styles.formatsDesktop}>
               <FormatsList formats={formats} variant="poster" />

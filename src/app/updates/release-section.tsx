@@ -1,7 +1,6 @@
 import Link from "next/link";
 import OutlineHeading from "@/components/outline-heading";
-import MoviePoster from "@/components/movie-poster";
-import StackedPoster from "@/components/stacked-poster";
+import EventPoster from "@/components/event-poster";
 import { pluralise, summariseRelease } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
 import { formatDateLong, formatShowingTime } from "@/utils/format-date";
@@ -37,30 +36,15 @@ function FilmTile({ film }: { film: UpdateFilm }) {
 
   const meta = pluralise(film.performanceCount, "showing");
 
-  const includedMovies = film.includedMovies;
-  const includedWithPosters = includedMovies?.filter((m) => m.posterPath) ?? [];
-  const totalPosters = (film.posterPath ? 1 : 0) + includedWithPosters.length;
-  const useStackedPoster =
-    includedMovies && includedMovies.length > 1 && totalPosters >= 2;
-
   const body = (
     <>
-      {useStackedPoster ? (
-        <StackedPoster
-          mainPosterPath={film.posterPath}
-          mainTitle={film.title}
-          includedMovies={includedMovies}
-          size="xsmall"
-          interactive={!!film.href}
-        />
-      ) : (
-        <MoviePoster
-          posterPath={film.posterPath || includedWithPosters[0]?.posterPath}
-          title={film.title}
-          size="xsmall"
-          interactive={!!film.href}
-        />
-      )}
+      <EventPoster
+        title={film.title}
+        posterPath={film.posterPath}
+        includedMovies={film.includedMovies}
+        size="xsmall"
+        interactive={!!film.href}
+      />
       <h4 className={styles.tileTitle}>{film.title}</h4>
       <p className={styles.tileVenue}>{venueLabel}</p>
       <p className={styles.tileMeta}>{meta}</p>
