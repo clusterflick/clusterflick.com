@@ -1,15 +1,9 @@
 import clsx from "clsx";
 import type { MoviePerformance, Showing, Venue } from "@/types";
 import MovieSummary from "@/components/movie-summary";
-import PosterScroller from "@/components/poster-row/scroller";
-import PerformanceCard, {
-  PerformanceCardActions,
-  type PerformanceCardStatus,
-} from "@/components/performance-card";
+import PlannerLane, { PlannerLaneCard } from "@/components/planner-lane";
 import { ButtonLink } from "@/components/button";
-import { isInPast } from "@/utils/format-date";
 import { setUseBrowserBack } from "@/utils/nav-links";
-import { titlesDiffer } from "@/utils/title-differs";
 import styles from "./planner-row.module.css";
 
 /**
@@ -49,14 +43,6 @@ interface PlannerRowProps {
   className?: string;
 }
 
-function getStatus(
-  performance: MoviePerformance,
-): PerformanceCardStatus | undefined {
-  if (isInPast(performance.time)) return "past";
-  if (performance.status?.soldOut) return "soldOut";
-  return undefined;
-}
-
 /**
  * One film's line in the planner: a condensed summary above a horizontally
  * scrolling strip of that day's performances. Past the limit, the strip ends
@@ -87,49 +73,26 @@ export default function PlannerRow({
         genres={genres}
         posterPath={movie.posterPath}
       />
-      <div className={styles.lane}>
-        <PosterScroller bleed={false}>
-          {shown.map((performance, index) => {
-            const showing = movie.showings[performance.showingId];
-            const venue = showing ? venues[showing.venueId] : undefined;
-            const status = getStatus(performance);
-            return (
-              <PerformanceCard
-                key={`${performance.showingId}-${performance.time}-${index}`}
-                size="compact"
-                time={performance.time}
-                venueName={venue?.name}
-                showingTitle={
-                  showing?.title && titlesDiffer(movie.title, showing.title)
-                    ? showing.title
-                    : undefined
-                }
-                screen={performance.screen}
-                accessibility={performance.accessibility}
-                format={performance.format}
-                notes={performance.notes}
-                status={status}
-              >
-                <PerformanceCardActions
-                  showingUrl={showing ? hydrateUrl(showing.url) : undefined}
-                  bookingUrl={hydrateUrl(performance.bookingUrl)}
-                  venueName={venue?.name}
-                  status={status}
-                />
-              </PerformanceCard>
-            );
-          })}
-          {hiddenCount > 0 && (
-            // Sets the back-button flag on the way out, as the film links do,
-            // so the listing page's back returns here rather than to /films.
-            <div className={styles.more} onClick={setUseBrowserBack}>
-              <ButtonLink href={href} variant="secondary" size="sm">
-                and {hiddenCount.toLocaleString("en-GB")} more
-              </ButtonLink>
-            </div>
-          )}
-        </PosterScroller>
-      </div>
+      <PlannerLane>
+        {shown.map((performance, index) => (
+          <PlannerLaneCard
+            key={`${performance.showingId}-${performance.time}-${index}`}
+            movie={movie}
+            performance={performance}
+            venues={venues}
+            hydrateUrl={hydrateUrl}
+          />
+        ))}
+        {hiddenCount > 0 && (
+          // Sets the back-button flag on the way out, as the film links do,
+          // so the listing page's back returns here rather than to /films.
+          <div className={styles.more} onClick={setUseBrowserBack}>
+            <ButtonLink href={href} variant="secondary" size="sm">
+              and {hiddenCount.toLocaleString("en-GB")} more
+            </ButtonLink>
+          </div>
+        )}
+      </PlannerLane>
     </article>
   );
 }

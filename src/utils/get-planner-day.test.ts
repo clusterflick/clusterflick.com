@@ -4,7 +4,10 @@ import { dateStringToLondonTimestamp } from "@/utils/format-date";
 import {
   clampToRange,
   findNearestShowingDay,
+  formatHour,
+  getPlannerHours,
   getPlannerRange,
+  groupBySameStart,
   getPlannerRows,
   isDateString,
   shiftDate,
@@ -130,5 +133,59 @@ describe("findNearestShowingDay", () => {
     expect(
       findNearestShowingDay(films, "2026-09-26", "next", range),
     ).toBeNull();
+  });
+});
+
+describe("getPlannerHours", () => {
+  const films = [
+    movie("1", "Zodiac", [at("2026-09-21", 14.5), at("2026-09-21", 19)]),
+    movie("2", "Alien", [at("2026-09-21", 19), at("2026-09-21", 14.25)]),
+    movie("3", "Heat", [at("2026-09-22", 19)]),
+  ];
+
+  it("groups by London hour, soonest first then by title, with one divider per empty run", () => {
+    const sections = getPlannerHours(films, "2026-09-21");
+    expect(sections.map((s) => s.kind)).toEqual(["hour", "gap", "hour"]);
+    expect(sections[1]).toEqual({ kind: "gap", from: 15, to: 18 });
+    const [afternoon, , evening] = sections;
+    if (afternoon.kind !== "hour" || evening.kind !== "hour") throw new Error();
+    expect(afternoon.hour).toBe(14);
+    expect(afternoon.items.map((i) => i.movie.title)).toEqual([
+      "Alien",
+      "Zodiac",
+    ]);
+    expect(evening.items.map((i) => i.movie.title)).toEqual([
+      "Alien",
+      "Zodiac",
+    ]);
+  });
+
+  it("is empty for a day with nothing on", () => {
+    expect(getPlannerHours(films, "2026-09-23")).toEqual([]);
+  });
+
+  it("formats hours as clock times", () => {
+    expect(formatHour(9)).toBe("09:00");
+    expect(formatHour(19)).toBe("19:00");
+  });
+});
+
+describe("groupBySameStart", () => {
+  it("groups one film at one start time, keeping other times and films apart", () => {
+    const item = (id: string, time: number, n: number) => ({
+      movie: { id },
+      performance: { time },
+      n,
+    });
+    const groups = groupBySameStart([
+      item("a", 1800, 1),
+      item("b", 1800, 2),
+      item("a", 1800, 3),
+      item("a", 1845, 4),
+      item("a", 1800, 5),
+    ]);
+    expect(groups.map((g) => g.first.n)).toEqual([1, 2, 4]);
+    expect(groups[0].rest.map((i) => i.n)).toEqual([3, 5]);
+    expect(groups[2].rest).toEqual([]);
   });
 });

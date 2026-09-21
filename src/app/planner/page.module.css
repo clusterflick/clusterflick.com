@@ -40,6 +40,30 @@
   margin: 0 auto 8px;
 }
 
+/* Shrink-wrapped and centred, so the spinner can hang off its right edge
+   without nudging the chips off centre. */
+.viewToggle {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  gap: 8px;
+  margin: 12px auto 0;
+}
+
+.viewSpinner {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  display: flex;
+  transform: translateY(-50%);
+}
+
+.switching {
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
 .count {
   margin: 8px 0 0;
   text-align: center;

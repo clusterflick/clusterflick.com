@@ -6,17 +6,6 @@
   border-bottom: 1px solid rgba(var(--color-electric-blue-rgb), 0.2);
 }
 
-/* The faint lane marks each strip as one scrollable track even when the cards
-   happen to fit; PosterScroller inside fades whichever edge has more beyond it.
-   The top padding is room for a card's hover lift, which overflow would clip. */
-.lane {
-  --poster-scroller-gap: 8px;
-  --poster-scroller-padding-top: 8px;
-  padding: 0 8px;
-  background-color: rgba(var(--color-dark-navy-rgb), 0.35);
-  border-radius: 10px;
-}
-
 .more {
   flex: 0 0 auto;
   display: flex;

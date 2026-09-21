@@ -1,5 +1,14 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useDeferredValue,
+  useState,
+} from "react";
+import clsx from "clsx";
 import dynamic from "next/dynamic";
 import {
   Virtuoso,
@@ -10,11 +19,14 @@ import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
+import Chip from "@/components/chip";
 import DayStepper from "@/components/day-stepper";
 import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import MainHeader from "@/components/main-header";
+import Spinner from "@/components/spinner";
 import PlannerRow from "@/components/planner-row";
+import PlannerHourRow, { PlannerHourGap } from "@/components/planner-hour-row";
 import {
   dateStringToLondonTimestamp,
   formatDateLong,
@@ -25,11 +37,15 @@ import { getMovieUrl } from "@/utils/get-movie-url";
 import {
   clampToRange,
   findNearestShowingDay,
+  formatHour,
+  getPlannerHours,
   getPlannerRange,
   getPlannerRows,
   isDateString,
   shiftDate,
   type DateString,
+  type PlannerHourSection,
+  type PlannerRowData,
 } from "@/utils/get-planner-day";
 import styles from "./page.module.css";
 
@@ -44,11 +60,42 @@ const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
  */
 const DAY_PARAM = "day";
 
+/**
+ * Group by film (the default) or by the hour showings start — two views of the
+ * same day. View state like the day, so it rides in the URL beside it.
+ */
+type PlannerView = "film" | "time";
+const VIEW_PARAM = "view";
+
 function readDayFromUrl(): DateString | null {
   if (typeof window === "undefined") return null;
   const day = new URLSearchParams(window.location.search).get(DAY_PARAM);
   return isDateString(day) ? day : null;
 }
+
+function readViewFromUrl(): PlannerView {
+  if (typeof window === "undefined") return "film";
+  const view = new URLSearchParams(window.location.search).get(VIEW_PARAM);
+  return view === "time" ? "time" : "film";
+}
+
+/** Only what departs from the defaults, so a first visit keeps a clean URL. */
+function writeUrl(day: DateString | null, view: PlannerView) {
+  const params = new URLSearchParams();
+  if (day) params.set(DAY_PARAM, day);
+  if (view !== "film") params.set(VIEW_PARAM, view);
+  const query = params.toString();
+  window.history.replaceState(
+    null,
+    "",
+    `${window.location.pathname}${query ? `?${query}` : ""}`,
+  );
+}
+
+/** One entry in the virtualised list, whichever way the day is grouped. */
+type PlannerListItem =
+  | { kind: "film"; key: string; row: PlannerRowData }
+  | { kind: "hour" | "gap"; key: string; section: PlannerHourSection };
 
 /**
  * Rows vary in height, so unlike the catalogue there is no reserving the page
@@ -60,13 +107,13 @@ const SCROLL_STORAGE_KEY = "clusterflick-planner-scroll";
 
 interface SavedScroll {
   day: DateString;
-  /** First and last film, to tell the same list from a re-filtered one. */
+  /** View, length and first and last keys: the same list, not a re-filtered one. */
   signature: string;
   snapshot: StateSnapshot;
 }
 
-function getRowsSignature(rows: { movie: { id: string } }[]): string {
-  return `${rows.length}:${rows[0]?.movie.id}:${rows[rows.length - 1]?.movie.id}`;
+function getListSignature(view: PlannerView, items: { key: string }[]): string {
+  return `${view}:${items.length}:${items[0]?.key}:${items[items.length - 1]?.key}`;
 }
 
 /** Read once and cleared, so only the return trip restores it. */
@@ -78,11 +125,6 @@ function takeSavedScroll(): SavedScroll | null {
   } catch {
     return null;
   }
-}
-
-function writeDayToUrl(day: DateString) {
-  const url = `${window.location.pathname}?${DAY_PARAM}=${day}`;
-  window.history.replaceState(null, "", url);
 }
 
 export default function PageContent() {
@@ -109,6 +151,13 @@ export default function PageContent() {
   // to differ from the server's null because nothing that shows the day renders
   // until the data has loaded, which is after hydration.
   const [chosenDay, setChosenDay] = useState<DateString | null>(readDayFromUrl);
+  const [view, setView] = useState<PlannerView>(readViewFromUrl);
+  // The chips follow `view` at once; the list follows this deferred copy,
+  // which React renders at low priority while the old list stays up. The by-
+  // time list is a lot of DOM, and without this the chip didn't highlight
+  // until it had all been built.
+  const listView = useDeferredValue(view);
+  const isSwitchingView = listView !== view;
 
   // With the filter params gone the provider's own strip-on-mount (which runs
   // after this, parent effects following child ones) has nothing to do, so a
@@ -151,13 +200,40 @@ export default function PageContent() {
     [rangeMovies, day],
   );
 
-  const goToDay = useCallback((next: DateString) => {
-    setChosenDay(next);
-    writeDayToUrl(next);
-    // The list below is replaced wholesale, so staying scrolled halfway down
-    // would land the reader mid-way through a different day.
+  // Only computed in the view that shows it.
+  const hours = useMemo(
+    () => (day && listView === "time" ? getPlannerHours(rangeMovies, day) : []),
+    [rangeMovies, day, listView],
+  );
+
+  const listItems = useMemo<PlannerListItem[]>(
+    () =>
+      listView === "film"
+        ? rows.map((row) => ({ kind: "film", key: row.movie.id, row }))
+        : hours.map((section) => ({
+            kind: section.kind,
+            key: `${section.kind}-${section.kind === "hour" ? section.hour : section.from}`,
+            section,
+          })),
+    [listView, rows, hours],
+  );
+
+  // Either change replaces the list wholesale, so staying scrolled halfway
+  // down would land the reader mid-way through something else.
+  const goToDay = useCallback(
+    (next: DateString) => {
+      setChosenDay(next);
+      writeUrl(next, view);
+      window.scrollTo({ top: 0 });
+    },
+    [view],
+  );
+
+  const changeView = (next: PlannerView) => {
+    setView(next);
+    writeUrl(chosenDay, next);
     window.scrollTo({ top: 0 });
-  }, []);
+  };
 
   const genreNames = useCallback(
     (ids: string[] | undefined) =>
@@ -270,7 +346,65 @@ export default function PageContent() {
       );
     }
 
-    const signature = getRowsSignature(rows);
+    const renderItem = (item: PlannerListItem) => {
+      if (item.kind === "film") {
+        const { movie, performances } = item.row;
+        return (
+          <PlannerRow
+            movie={movie}
+            href={getMovieUrl(movie)}
+            performances={performances}
+            venues={metaData?.venues ?? {}}
+            genres={genreNames(movie.genres)}
+            hydrateUrl={hydrateUrl}
+          />
+        );
+      }
+      const { section } = item;
+      if (section.kind === "gap") {
+        return (
+          <PlannerHourGap
+            from={formatHour(section.from)}
+            until={formatHour(section.to + 1)}
+          />
+        );
+      }
+      return (
+        <PlannerHourRow
+          label={formatHour(section.hour)}
+          items={section.items.map(({ movie, performance }) => ({
+            movie,
+            performance,
+            film: {
+              title: movie.title,
+              year: movie.year,
+              posterPath: movie.posterPath,
+              href: getMovieUrl(movie),
+            },
+          }))}
+          venues={metaData?.venues ?? {}}
+          hydrateUrl={hydrateUrl}
+        />
+      );
+    };
+
+    // Not virtualised: a day has at most ~25 hour rows and dividers, and each
+    // row is heavy (up to PLANNER_HOUR_LIMIT cards with posters), so mounting
+    // and unmounting them as they crossed Virtuoso's buffer cost more while
+    // scrolling than rendering the lot once. Rows staying mounted also keeps
+    // opened groups and "Show more" steps, and lets the browser's own scroll
+    // restoration work on return, as on the catalogue.
+    if (listView === "time") {
+      return (
+        <div>
+          {listItems.map((item) => (
+            <Fragment key={item.key}>{renderItem(item)}</Fragment>
+          ))}
+        </div>
+      );
+    }
+
+    const signature = getListSignature(listView, listItems);
     const restoreFrom =
       savedScroll?.day === day && savedScroll.signature === signature
         ? savedScroll.snapshot
@@ -300,19 +434,9 @@ export default function PageContent() {
           restoreStateFrom={restoreFrom}
           useWindowScroll
           increaseViewportBy={600}
-          data={rows}
-          computeItemKey={(_, row) => row.movie.id}
-          className={styles.rows}
-          itemContent={(_, row) => (
-            <PlannerRow
-              movie={row.movie}
-              href={getMovieUrl(row.movie)}
-              performances={row.performances}
-              venues={metaData?.venues ?? {}}
-              genres={genreNames(row.movie.genres)}
-              hydrateUrl={hydrateUrl}
-            />
-          )}
+          data={listItems}
+          computeItemKey={(_, item) => item.key}
+          itemContent={(_, item) => renderItem(item)}
         />
       </div>
     );
@@ -334,8 +458,8 @@ export default function PageContent() {
         <div className={styles.intro}>
           <h1 className={styles.title}>Planner</h1>
           <p className={styles.subtitle}>
-            Everything showing on one day, film by film, with each film&rsquo;s
-            times side by side.
+            Everything showing on one day, grouped by film or by the hour it
+            starts.
           </p>
         </div>
         {hasAttemptedLoad && !isLoading && !error && range && day && (
@@ -347,13 +471,44 @@ export default function PageContent() {
               onPrevious={() => goToDay(shiftDate(day, -1))}
               onNext={() => goToDay(shiftDate(day, 1))}
             />
+            <div
+              className={styles.viewToggle}
+              role="radiogroup"
+              aria-label="Group by"
+              aria-busy={isSwitchingView}
+            >
+              <Chip
+                type="radio"
+                name="planner-view"
+                value="film"
+                label="By film"
+                checked={view === "film"}
+                onChange={() => changeView("film")}
+              />
+              <Chip
+                type="radio"
+                name="planner-view"
+                value="time"
+                label="By time"
+                checked={view === "time"}
+                onChange={() => changeView("time")}
+              />
+              {isSwitchingView && (
+                <span className={styles.viewSpinner}>
+                  <Spinner size={16} />
+                </span>
+              )}
+            </div>
             <p className={styles.count}>
               {rows.length.toLocaleString("en-GB")}{" "}
               {rows.length === 1 ? "film" : "films"} showing
             </p>
           </div>
         )}
-        {renderBody()}
+        {/* The outgoing list stays up, dimmed, while the next one renders. */}
+        <div className={clsx(isSwitchingView && styles.switching)}>
+          {renderBody()}
+        </div>
         {isLoading && (
           <LoadingIndicator
             message="Loading movies..."

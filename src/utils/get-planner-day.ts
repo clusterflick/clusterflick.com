@@ -1,6 +1,7 @@
 import type { Movie, MoviePerformance } from "@/types";
 import {
   dateStringToLondonTimestamp,
+  getLondonMinutesOfDay,
   timestampToLondonDateString,
 } from "@/utils/format-date";
 
@@ -134,4 +135,104 @@ export function findNearestShowingDay(
 
   const found = timestampToLondonDateString(best);
   return found >= range.first && found <= range.last ? found : null;
+}
+
+/** One performance and the film it belongs to, for lanes that mix films. */
+export interface PlannerHourItem {
+  movie: Movie;
+  performance: MoviePerformance;
+}
+
+export type PlannerHourSection =
+  | {
+      kind: "hour";
+      /** London clock hour, 0–23. */
+      hour: number;
+      items: PlannerHourItem[];
+    }
+  | {
+      /** A run of empty hours between two busy ones, shown as one divider. */
+      kind: "gap";
+      from: number;
+      to: number;
+    };
+
+/**
+ * The day's performances grouped by the London clock hour they start in, for
+ * the by-time view. Within an hour: soonest first, then by title. Empty hours
+ * between the first and last busy ones collapse into one `gap` per run, so the
+ * page shows where the day has room without a row per empty hour.
+ */
+export function getPlannerHours(
+  movies: Movie[],
+  date: DateString,
+): PlannerHourSection[] {
+  const start = dateStringToLondonTimestamp(date);
+  const end = dateStringToLondonTimestamp(shiftDate(date, 1));
+
+  const byHour = new Map<number, PlannerHourItem[]>();
+  for (const movie of movies) {
+    for (const performance of movie.performances) {
+      if (performance.time < start || performance.time >= end) continue;
+      const hour = Math.floor(getLondonMinutesOfDay(performance.time) / 60);
+      const items = byHour.get(hour);
+      if (items) items.push({ movie, performance });
+      else byHour.set(hour, [{ movie, performance }]);
+    }
+  }
+  if (byHour.size === 0) return [];
+
+  const hours = [...byHour.keys()].sort((a, b) => a - b);
+  const sections: PlannerHourSection[] = [];
+  for (const [index, hour] of hours.entries()) {
+    const previous = hours[index - 1];
+    if (previous !== undefined && hour - previous > 1) {
+      sections.push({ kind: "gap", from: previous + 1, to: hour - 1 });
+    }
+    const items = byHour
+      .get(hour)!
+      .sort(
+        (a, b) =>
+          a.performance.time - b.performance.time ||
+          a.movie.normalizedTitle.localeCompare(b.movie.normalizedTitle),
+      );
+    sections.push({ kind: "hour", hour, items });
+  }
+  return sections;
+}
+
+type Groupable = { movie: { id: string }; performance: { time: number } };
+
+/** Performances of one film starting at one moment: the first, and the rest. */
+export interface PlannerTimeGroup<T extends Groupable> {
+  /** Film and start time, stable across renders. */
+  key: string;
+  first: T;
+  rest: T[];
+}
+
+/**
+ * Collapse performances of the same film starting at the same moment into one
+ * entry, in the order each first appears. A wide release is otherwise a run of
+ * identical cards differing only by venue. Only an exact start time groups —
+ * an 18:45 showing stays its own card rather than hiding behind an 18:00 one.
+ * Measured on a September release, the busiest unfiltered hour goes from 339
+ * performances to about 145 entries.
+ */
+export function groupBySameStart<T extends Groupable>(
+  items: T[],
+): PlannerTimeGroup<T>[] {
+  const groups = new Map<string, PlannerTimeGroup<T>>();
+  for (const item of items) {
+    const key = `${item.movie.id}@${item.performance.time}`;
+    const group = groups.get(key);
+    if (group) group.rest.push(item);
+    else groups.set(key, { key, first: item, rest: [] });
+  }
+  return [...groups.values()];
+}
+
+/** A London clock hour as "19:00". */
+export function formatHour(hour: number): string {
+  return `${String(hour).padStart(2, "0")}:00`;
 }

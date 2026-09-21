@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import {
   FormatDimension,
@@ -10,6 +11,7 @@ import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
 import Tag from "@/components/tag";
 import { ButtonAnchor } from "@/components/button";
+import MoviePoster from "@/components/movie-poster";
 import styles from "./performance-card.module.css";
 
 /**
@@ -22,6 +24,11 @@ export type PerformanceCardSize = "default" | "compact";
 /** A performance that can no longer be booked, styled down to match. */
 export type PerformanceCardStatus = "past" | "soldOut";
 
+/** "Screen 2" for a bare number, the venue's own name ("NFT1") otherwise. */
+function formatScreen(screen: string): string {
+  return screen.length > 3 ? screen : "Screen " + screen;
+}
+
 const sizeStyles: Record<PerformanceCardSize, string | undefined> = {
   default: undefined,
   compact: styles.compact,
@@ -32,6 +39,15 @@ const statusStyles: Record<PerformanceCardStatus, string> = {
   soldOut: styles.soldOut,
 };
 
+/** The film a card belongs to, for lists where nothing around it says so. */
+export interface PerformanceCardFilm {
+  title: string;
+  year?: string;
+  posterPath?: string;
+  /** The film's listing page. */
+  href: string;
+}
+
 interface PerformanceCardProps {
   time: number;
   venueName?: string;
@@ -41,6 +57,13 @@ interface PerformanceCardProps {
   accessibility?: MoviePerformance["accessibility"];
   format?: MoviePerformance["format"];
   notes?: string;
+  /**
+   * Names the film under the time — for lists that mix films (the planner's
+   * by-time view). Leave out where the page or row already names it.
+   */
+  film?: PerformanceCardFilm;
+  /** Runs alongside the film link, e.g. to set the back-button flag. */
+  onFilmClick?: () => void;
   size?: PerformanceCardSize;
   status?: PerformanceCardStatus;
   className?: string;
@@ -65,6 +88,8 @@ export default function PerformanceCard({
   accessibility,
   format,
   notes,
+  film,
+  onFilmClick,
   size = "default",
   status,
   className,
@@ -82,14 +107,53 @@ export default function PerformanceCard({
     >
       {children}
       <div className={styles.performanceTime}>{formatShowingTime(time)}</div>
-      {venueName && <div className={styles.performanceVenue}>{venueName}</div>}
+      {film ? (
+        // Poster beside three single lines — film, venue, screen — so a lane
+        // of mixed films reads evenly. Only the film links are raised above
+        // the whole-card venue link (as the Book button is), so the rest of
+        // this block still goes to the venue's page.
+        <div className={styles.film}>
+          <Link
+            href={film.href}
+            className={styles.filmPoster}
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={onFilmClick}
+          >
+            <MoviePoster
+              posterPath={film.posterPath}
+              title={film.title}
+              size="xsmall"
+              fluid
+            />
+          </Link>
+          <div className={styles.filmText}>
+            <div className={styles.filmTitle}>
+              <Link href={film.href} onClick={onFilmClick} title={film.title}>
+                {film.title}
+              </Link>
+              {film.year && (
+                <span className={styles.filmYear}>{film.year}</span>
+              )}
+            </div>
+            {venueName && (
+              <div className={styles.performanceVenue}>{venueName}</div>
+            )}
+            {screen && (
+              <div className={styles.performanceScreen}>
+                {formatScreen(screen)}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        venueName && <div className={styles.performanceVenue}>{venueName}</div>
+      )}
       {showingTitle && (
         <div className={styles.showingTitle}>{showingTitle}</div>
       )}
-      {screen && (
-        <div className={styles.performanceScreen}>
-          {screen.length > 3 ? screen : "Screen " + screen}
-        </div>
+      {!film && screen && (
+        <div className={styles.performanceScreen}>{formatScreen(screen)}</div>
       )}
       <div className={styles.performanceTags}>
         {accessibility

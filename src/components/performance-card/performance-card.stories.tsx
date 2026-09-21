@@ -115,6 +115,26 @@ export const Compact: Story = {
   },
 };
 
+/**
+ * With the film named under the time, for lists that mix films (the planner's
+ * by-time view). The film links to its page; the rest of the card to the venue.
+ */
+export const WithFilm: Story = {
+  args: {
+    time: IN_TWO_HOURS,
+    venueName: "Rio Cinema",
+    screen: "1",
+    size: "compact",
+    film: {
+      title: "Apocalypse Now",
+      year: "1979",
+      posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
+      href: "/movies/28/apocalypse-now",
+    },
+    children: actions(),
+  },
+};
+
 /** Static render: no link, badge or Book button, as crawlers see it. */
 export const Static: Story = {
   args: {

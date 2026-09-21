@@ -36,6 +36,83 @@
   color: var(--color-neon-pink);
 }
 
+/* Poster beside three single lines: film, venue, screen. */
+.film {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+/* The film links sit above the whole-card venue link (z-index 1); the venue
+   and screen text stays beneath it, so clicking those still opens the venue. */
+.filmPoster,
+.filmTitle a {
+  position: relative;
+  z-index: 2;
+}
+
+.filmPoster {
+  flex: 0 0 48px;
+  width: 48px;
+  border-bottom: none;
+  text-decoration: none;
+}
+
+.filmPoster:hover {
+  border-bottom: none;
+}
+
+.filmText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* One line: the title gives way (ellipsis, full title in its tooltip) so the
+   year always shows. */
+.filmTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.filmTitle a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.filmYear {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.filmText .performanceVenue,
+.filmText .performanceScreen {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Poster and title are one destination, so hovering either lights up both. */
+.film:has(.filmPoster:hover, .filmTitle a:hover) .filmTitle a {
+  color: var(--color-neon-pink);
+  border-bottom-color: var(--color-neon-pink);
+}
+
+.film:has(.filmPoster:hover, .filmTitle a:hover) .filmPoster img {
+  transform: scale(1.05);
+}
+
 .performanceVenue {
   font-size: 14px;
   font-weight: 600;
