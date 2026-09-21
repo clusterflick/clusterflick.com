@@ -56,7 +56,9 @@ export default function EmptyState({
         className={styles.icon}
       />
       {title && <h2 className={styles.title}>{title}</h2>}
-      <p className={styles.message}>{message}</p>
+      <p className={clsx(styles.message, !title && styles.messageAsHeading)}>
+        {message}
+      </p>
       {hint && <p className={styles.hint}>{hint}</p>}
       {actions && <div className={styles.actions}>{actions}</div>}
     </div>

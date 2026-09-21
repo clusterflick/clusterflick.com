@@ -78,7 +78,10 @@
   margin-bottom: 16px;
 }
 
-.contained .message {
+/* With no title, a contained message is the headline and the hint explains
+   it. With a title, the message is body text, as in the fullscreen variant —
+   styling it as a heading too read as two headings in a row. */
+.contained .messageAsHeading {
   font-size: 18px;
   font-weight: 600;
   color: var(--color-light-gray);

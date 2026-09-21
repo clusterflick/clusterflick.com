@@ -141,6 +141,11 @@
   pointer-events: none;
 }
 
+/* Clear of the sticky controls bar it would otherwise sit right against. */
+.emptyDay {
+  margin-top: 32px;
+}
+
 .emptyActions {
   display: flex;
   flex-wrap: wrap;

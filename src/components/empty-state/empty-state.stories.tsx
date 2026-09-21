@@ -14,6 +14,11 @@ import { ButtonLink } from "@/components/button";
  *   fill, for page-level empty states where nothing else is shown (e.g. a
  *   failed data load).
  *
+ * **Title or not:** give a `title` and the message is body text beneath it.
+ * Leave it out and, in the contained variant, the message becomes the
+ * headline, with `hint` as the explanation. Pick one shape — a title *and* a
+ * headline-sized message read as two headings.
+ *
  * **When to use:**
  * - When a list, grid, or filtered view returns zero results.
  * - When an async data load fails and there is nothing to render.

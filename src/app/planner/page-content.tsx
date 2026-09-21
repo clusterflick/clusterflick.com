@@ -326,6 +326,7 @@ export default function PageContent() {
       );
       return (
         <EmptyState
+          className={styles.emptyDay}
           icon={{
             src: "/images/icons/neon-clapper.svg",
             width: 120,
