@@ -85,6 +85,22 @@ export function getPermissiveState(): FilterState {
 }
 
 /**
+ * The starting state for `base=all` links ("explore everything at X"): every
+ * category and every date, otherwise the browsing defaults.
+ *
+ * Deliberately not getPermissiveState(). That is the widest a search can be
+ * taken, so it shows finished showings too; a link a reader follows to browse
+ * should hide them as every other browsing view does.
+ */
+export function getBrowseAllState(): FilterState {
+  return {
+    ...getDefaultState(),
+    [FilterId.Categories]: null, // all categories, including Events
+    [FilterId.DateRange]: { start: null, end: null }, // all dates
+  };
+}
+
+/**
  * Sanitises an unknown object into a valid FilterState.
  * Any missing or corrupt keys are replaced with their module defaults.
  * This protects against stale session storage, malformed URL params,
@@ -229,8 +245,9 @@ export function apply(movies: MoviesRecord, state: FilterState): MoviesRecord {
  * - `default` (or absent) — the `/catalogue` browsing defaults (Films/Multiple/
  *   Shorts, today→+7d). A deep link is self-contained: dimensions it doesn't
  *   mention fall back to these defaults, never to whatever was in session.
- * - `all` — fully permissive (all categories, all dates); every other dimension
- *   is already permissive by default. Use for "explore everything at X" links.
+ * - `all` — all categories and all dates, otherwise the defaults (so past
+ *   showings stay hidden); see getBrowseAllState. Use for "explore everything
+ *   at X" links.
  * - `patch` — the caller's current state; unmentioned dimensions are preserved.
  *   The one opt-in that amends session state instead of replacing it.
  */
@@ -246,7 +263,7 @@ function getBaseState(
 ): FilterState {
   switch (base) {
     case "all":
-      return getPermissiveState();
+      return getBrowseAllState();
     case "patch":
       return currentState;
     default:
