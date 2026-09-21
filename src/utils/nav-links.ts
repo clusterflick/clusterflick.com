@@ -79,7 +79,6 @@ export const GROUPED_NAV_LINKS = NAV_GROUPS.map((group) => ({
 const PRIMARY_NAV_HREFS: readonly string[] = [
   "/films",
   "/planner",
-  "/near-me",
   "/venues",
   "/festivals",
   "/film-clubs",
