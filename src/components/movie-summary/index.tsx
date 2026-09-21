@@ -1,6 +1,8 @@
 import Link from "next/link";
 import clsx from "clsx";
-import MoviePoster from "@/components/movie-poster";
+import EventPoster, {
+  type EventPosterIncludedMovie,
+} from "@/components/event-poster";
 import Tag from "@/components/tag";
 import { formatDuration } from "@/utils/format-date";
 import { setUseBrowserBack } from "@/utils/nav-links";
@@ -19,6 +21,8 @@ interface MovieSummaryProps {
   /** Genre names, already resolved from ids. */
   genres?: string[];
   posterPath?: string;
+  /** A double bill's or marathon's films, shown as a stacked poster. */
+  includedMovies?: EventPosterIncludedMovie[];
   /** Heading level for the title. Defaults to "h2". */
   headingLevel?: "h2" | "h3";
   className?: string;
@@ -38,6 +42,7 @@ export default function MovieSummary({
   duration,
   genres = [],
   posterPath,
+  includedMovies,
   headingLevel: HeadingTag = "h2",
   className,
 }: MovieSummaryProps) {
@@ -57,12 +62,16 @@ export default function MovieSummary({
       >
         {/* Fluid so the image covers the whole box: otherwise it sits inside
             the padding meant for the text-only placeholder, which at this
-            size shrinks it by a third and crops it. */}
-        <MoviePoster
+            size shrinks it by a third and crops it. Not interactive: the zoom
+            comes from the shared poster-and-title hover in the CSS, and a
+            stack's fan-out is too much movement at this size. */}
+        <EventPoster
           posterPath={posterPath}
+          includedMovies={includedMovies}
           title={title}
           size="xsmall"
           fluid
+          interactive={false}
         />
       </Link>
       <div className={styles.details}>

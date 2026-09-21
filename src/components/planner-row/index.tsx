@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import type { MoviePerformance, Showing, Venue } from "@/types";
 import MovieSummary from "@/components/movie-summary";
+import type { EventPosterIncludedMovie } from "@/components/event-poster";
 import PlannerLane, { PlannerLaneCard } from "@/components/planner-lane";
 import { ButtonLink } from "@/components/button";
 import { setUseBrowserBack } from "@/utils/nav-links";
@@ -24,6 +25,7 @@ export interface PlannerRowMovie {
   classification?: string;
   duration?: number;
   posterPath?: string;
+  includedMovies?: EventPosterIncludedMovie[];
   showings: Record<string, Showing>;
 }
 
@@ -72,6 +74,7 @@ export default function PlannerRow({
         duration={movie.duration}
         genres={genres}
         posterPath={movie.posterPath}
+        includedMovies={movie.includedMovies}
       />
       <PlannerLane>
         {shown.map((performance, index) => (

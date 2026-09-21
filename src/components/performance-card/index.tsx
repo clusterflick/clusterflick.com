@@ -11,7 +11,9 @@ import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
 import Tag from "@/components/tag";
 import { ButtonAnchor } from "@/components/button";
-import MoviePoster from "@/components/movie-poster";
+import EventPoster, {
+  type EventPosterIncludedMovie,
+} from "@/components/event-poster";
 import styles from "./performance-card.module.css";
 
 /**
@@ -44,6 +46,8 @@ export interface PerformanceCardFilm {
   title: string;
   year?: string;
   posterPath?: string;
+  /** A double bill's or marathon's films, shown as a stacked poster. */
+  includedMovies?: EventPosterIncludedMovie[];
   /** The film's listing page. */
   href: string;
 }
@@ -120,11 +124,15 @@ export default function PerformanceCard({
             aria-hidden="true"
             onClick={onFilmClick}
           >
-            <MoviePoster
+            {/* Not interactive: the zoom comes from the shared poster-and-
+                title hover, and a stack's fan-out is too much at this size. */}
+            <EventPoster
               posterPath={film.posterPath}
+              includedMovies={film.includedMovies}
               title={film.title}
               size="xsmall"
               fluid
+              interactive={false}
             />
           </Link>
           <div className={styles.filmText}>

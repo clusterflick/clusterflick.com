@@ -385,6 +385,7 @@ export default function PageContent() {
               title: movie.title,
               year: movie.year,
               posterPath: movie.posterPath,
+              includedMovies: movie.includedMovies,
               href: getMovieUrl(movie),
             },
           }))}
