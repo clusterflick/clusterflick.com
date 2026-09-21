@@ -78,16 +78,29 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             A new <Link href="/planner">planner</Link> for working out what you
-            can actually get to. Where the <Link href="/films">films</Link> page
-            asks what&rsquo;s on, the planner takes one day at a time and gives
-            each film a row, with all its screening times that day laid side by
-            side &mdash; so once you&rsquo;ve narrowed things to a few cinemas
-            and a handful of candidates, you can see when each is on without
-            opening a page per film. Switch to &ldquo;By time&rdquo; and the
-            same day is grouped by the hour things start instead, for when you
-            know when you&rsquo;re free and want to see what fits. It uses the
-            same filters as the films page, so whatever you&rsquo;ve set on one
-            carries across to the other.
+            can actually get to. Where the <Link href="/catalogue">films</Link>{" "}
+            page asks what&rsquo;s on, the planner takes one day at a time and
+            gives each film a row, with all its screening times that day laid
+            side by side &mdash; so once you&rsquo;ve narrowed things to a few
+            cinemas and a handful of candidates, you can see when each is on
+            without opening a page per film. Switch to &ldquo;By time&rdquo; and
+            the same day is grouped by the hour things start instead, for when
+            you know when you&rsquo;re free and want to see what fits. It uses
+            the same filters as the films page, so whatever you&rsquo;ve set on
+            one carries across to the other.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            The films page has moved to{" "}
+            <Link href="/catalogue">/catalogue</Link>, which sits better beside
+            the planner: they&rsquo;re two views of the same listings, one
+            browsing everything that&rsquo;s on and one working out a single
+            day. Old links to <code>/films</code> still work &mdash; filters and
+            all.
           </>
         ),
       },
@@ -106,9 +119,9 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
-            The search and filters on the <Link href="/films">films</Link> page
-            now stay at the top as you scroll, so you can refine a search from
-            halfway down the grid rather than scrolling back up first. The
+            The search and filters on the <Link href="/catalogue">films</Link>{" "}
+            page now stay at the top as you scroll, so you can refine a search
+            from halfway down the grid rather than scrolling back up first. The
             planner&rsquo;s day controls sit in the same spot, so switching
             between the two keeps everything where you left it.
           </>
@@ -124,7 +137,7 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             Films can now be filtered by{" "}
-            <Link href="/films">director and cast</Link>. Every name on a
+            <Link href="/catalogue">director and cast</Link>. Every name on a
             film&rsquo;s page is a link, so &ldquo;what else has she got
             on?&rdquo; is one click rather than a fresh search, and the filter
             panel has a search box for each. There are deliberately no director
@@ -139,7 +152,7 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             Searching a name now finds the person rather than shrugging. Type
-            &ldquo;Scorsese&rdquo; into the <Link href="/films">films</Link>{" "}
+            &ldquo;Scorsese&rdquo; into the <Link href="/catalogue">films</Link>{" "}
             search and, with no film by that name, the site offers his films
             instead. Where a surname belongs to two different people it offers
             both rather than picking one &mdash; &ldquo;Pacino&rdquo; turns up
@@ -156,8 +169,8 @@ export const CHANGELOG: ChangelogDay[] = [
           <>
             Names survive a typo now. &ldquo;Mark Hammill&rdquo; and
             &ldquo;Scorsesee&rdquo; find the person they are one letter from,
-            both in the <Link href="/films">films</Link> search and in the cast
-            and crew boxes in the filter panel, where a misspelling used to
+            both in the <Link href="/catalogue">films</Link> search and in the
+            cast and crew boxes in the filter panel, where a misspelling used to
             answer with nothing at all. Only the closest names are offered, so a
             near-miss is read the same way a correct spelling is: one name is
             that person, two are two people worth choosing between, and a
@@ -975,9 +988,9 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
-            <Link href="/films">Searching</Link> looks at original titles too so
-            you don&apos;t have to reach for whatever it was called in English —{" "}
-            <em>&ldquo;Fabuleux&rdquo;</em> finds Amélie.
+            <Link href="/catalogue">Searching</Link> looks at original titles
+            too so you don&apos;t have to reach for whatever it was called in
+            English — <em>&ldquo;Fabuleux&rdquo;</em> finds Amélie.
           </>
         ),
       },
@@ -1420,7 +1433,7 @@ export const CHANGELOG: ChangelogDay[] = [
             page is still there now, with the poster and details. Where the
             showings used to be it tells you it&apos;s not currently screening
             in London, when it last played, and points you at{" "}
-            <Link href="/films">what&apos;s on</Link>. If it comes back, the
+            <Link href="/catalogue">what&apos;s on</Link>. If it comes back, the
             page fills back in with performances.
           </>
         ),
@@ -1475,7 +1488,7 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
-            When your <Link href="/films">search or filters</Link> come up
+            When your <Link href="/catalogue">search or filters</Link> come up
             empty, the page now suggests what would work instead of leaving you
             to guess — each suggestion saying how many results it would give
             you, and applying in one tap. It&apos;ll offer a correction when a
@@ -1588,7 +1601,7 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
-            The <Link href="/films">filters</Link> can now hide sold out
+            The <Link href="/catalogue">filters</Link> can now hide sold out
             showings. Some venues tell us when a performance has gone, and
             switching this on drops those, so what&apos;s left is what you can
             still get into. It sits alongside &ldquo;Hide past showings&rdquo;,
@@ -1601,7 +1614,7 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
-            The <Link href="/films">filter panel</Link> is easier to follow
+            The <Link href="/catalogue">filter panel</Link> is easier to follow
             while you work in it. The count of what your filters match is now
             the biggest thing in it rather than fine print, the summary line
             flashes when it changes so you notice it rewriting itself, the
@@ -2119,9 +2132,9 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             Made searching and filtering on the{" "}
-            <Link href="/films">films page</Link> quicker and easier, with new
-            convenience filter buttons and better spacing for the search bar on
-            mobile.
+            <Link href="/catalogue">films page</Link> quicker and easier, with
+            new convenience filter buttons and better spacing for the search bar
+            on mobile.
           </>
         ),
       },

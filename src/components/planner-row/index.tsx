@@ -107,7 +107,7 @@ export default function PlannerRow({
         ))}
         {hiddenCount > 0 && (
           // Sets the back-button flag on the way out, as the film links do,
-          // so the listing page's back returns here rather than to /films.
+          // so the listing page's back returns here rather than to /catalogue.
           <div className={styles.more} onClick={setUseBrowserBack}>
             <ButtonLink href={href} variant="secondary" size="sm">
               and {hiddenCount.toLocaleString("en-GB")} more

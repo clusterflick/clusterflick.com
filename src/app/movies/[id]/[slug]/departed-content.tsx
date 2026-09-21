@@ -52,7 +52,7 @@ export default function DepartedContent({
       : undefined;
   return (
     <main id="main-content" className={styles.page}>
-      <PageHeader backUrl="/films" backText="Back to film list" />
+      <PageHeader backUrl="/catalogue" backText="Back to film list" />
 
       <HeroSection
         backgroundImage={
@@ -148,7 +148,7 @@ export default function DepartedContent({
                   <ButtonLink href={getMovieUrl(movie.stillListedAs)}>
                     Were you looking for “{movie.stillListedAs.title}”?
                   </ButtonLink>
-                  <ButtonLink href="/films" variant="secondary">
+                  <ButtonLink href="/catalogue" variant="secondary">
                     See what else is showing
                   </ButtonLink>
                 </>
@@ -168,7 +168,7 @@ export default function DepartedContent({
                   : undefined
               }
               actions={
-                <ButtonLink href="/films">
+                <ButtonLink href="/catalogue">
                   See what else is showing in London
                 </ButtonLink>
               }

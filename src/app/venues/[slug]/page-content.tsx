@@ -90,7 +90,7 @@ export default function VenueDetailPageContent({
   // `base=all` starts from a fully permissive state (all dates, all categories)
   // so only the venue constrains results.
   const allVenueMovieParams = `base=all&${venueMovieParams}`;
-  const allVenueFilmsHref = `/films?${allVenueMovieParams}`;
+  const allVenueFilmsHref = `/catalogue?${allVenueMovieParams}`;
   const hasJustAdded = justAdded.length > 0;
 
   const hasFestivals = activeFestivals.length > 0;
@@ -142,7 +142,7 @@ export default function VenueDetailPageContent({
       <LinkedList
         items={accessibilityStats.map(({ feature, filmCount }) => ({
           key: feature,
-          href: `/films?base=all&venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
+          href: `/catalogue?base=all&venues=${encodeURIComponent(venue.id)}&accessibility=${feature}`,
           label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
           detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
         }))}

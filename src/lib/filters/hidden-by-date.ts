@@ -12,7 +12,7 @@ import { apply, get, getPermissiveState, set } from "./manager";
  * never binds: 71% of them show nothing at all (the suggestion engine's job),
  * 27% show exactly one film, and under 1% show more than three. Raising it to
  * five moves the fire rate from 20% to 21%. What it does do is keep the line
- * off a grid that is genuinely full — an unfiltered `/films` shows 448 films
+ * off a grid that is genuinely full — an unfiltered `/catalogue` shows 448 films
  * with 1,382 more beyond the window, and a note about those is noise.
  */
 export const THIN_RESULT_LIMIT = 3;

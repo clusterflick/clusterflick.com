@@ -14,5 +14,5 @@ export function getPersonFilterUrl(
 ): string {
   const group = PEOPLE_GROUPS.find(({ filterId: id }) => id === filterId);
   if (!group) throw new Error(`No people filter group for "${filterId}"`);
-  return `/films?base=all&${group.urlParam}=${encodeURIComponent(personId)}`;
+  return `/catalogue?base=all&${group.urlParam}=${encodeURIComponent(personId)}`;
 }

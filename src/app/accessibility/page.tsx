@@ -389,7 +389,7 @@ export default async function AccessibilityPage() {
           {features.map((featureStat) => {
             const config = FEATURE_CONFIG[featureStat.feature];
             const label = ACCESSIBILITY_LABELS[featureStat.feature];
-            const filterUrl = `/films?accessibility=${featureStat.feature}`;
+            const filterUrl = `/catalogue?accessibility=${featureStat.feature}`;
 
             return (
               <section

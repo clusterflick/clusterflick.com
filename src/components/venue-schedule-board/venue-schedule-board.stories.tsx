@@ -115,7 +115,7 @@ const POPULATED: VenueScheduleDay[] = [
 export const Default: Story = {
   args: {
     days: POPULATED,
-    seeAllHref: "/films?venues=example",
+    seeAllHref: "/catalogue?venues=example",
   },
 };
 
@@ -125,7 +125,7 @@ export const OneDayEmpty: Story = {
       POPULATED[0],
       { label: "Tomorrow", date: TODAY_MIDNIGHT + DAY, entries: [] },
     ],
-    seeAllHref: "/films?venues=example",
+    seeAllHref: "/catalogue?venues=example",
   },
 };
 
@@ -135,7 +135,7 @@ export const Empty: Story = {
       { label: "Today", date: TODAY_MIDNIGHT, entries: [] },
       { label: "Tomorrow", date: TODAY_MIDNIGHT + DAY, entries: [] },
     ],
-    seeAllHref: "/films?venues=example",
+    seeAllHref: "/catalogue?venues=example",
   },
 };
 
@@ -162,7 +162,7 @@ const BUSY_TITLES = [
 export const Collapsible: Story = {
   args: {
     days: POPULATED,
-    seeAllHref: "/films?venues=example",
+    seeAllHref: "/catalogue?venues=example",
   },
   render: (args) => {
     const busyDay = (label: string, dayOffset: number): VenueScheduleDay => ({

@@ -182,7 +182,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: "https://clusterflick.com/films",
+      url: "https://clusterflick.com/catalogue",
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 1,

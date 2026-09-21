@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import PageContent from "@/app/films/page-content";
+import PageContent from "@/app/catalogue/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import {
   FilterConfigProvider,

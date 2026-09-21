@@ -81,7 +81,7 @@ export default function BoroughPageContent({
   const mapImagePath = `/images/boroughs/${boroughSlug}.png`;
 
   // Link to the film list pre-filtered to this borough's venues.
-  const filmsHref = `/films?base=all&venues=${venues
+  const filmsHref = `/catalogue?base=all&venues=${venues
     .map((venue) => encodeURIComponent(venue.id))
     .join(",")}`;
 

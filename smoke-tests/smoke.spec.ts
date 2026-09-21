@@ -38,7 +38,19 @@ test.describe("Films Grid (browse & filter)", () => {
   test("films page has indexable SEO metadata", async ({ page }) => {
     await expectIndexableMetadata(page, {
       titleContains: "Every Film Showing in London",
-      canonicalPath: "/films",
+      canonicalPath: "/catalogue",
+    });
+  });
+
+  // The catalogue moved from /films. Links into /films carry filters (cast and
+  // crew, venue, genre links), so the redirect — Cloudflare's 301, or the page's
+  // own fallback — must keep the query. The catalogue strips applied params
+  // from the address bar, so check the filter took effect rather than the URL.
+  test("the old /films URL redirects with its filters", async ({ page }) => {
+    await page.goto(`${SITE_URL}/films/?base=all&genres=18`);
+    await page.waitForURL(/\/catalogue\//);
+    await expect(page.locator("[data-filter-summary]")).toContainText("Drama", {
+      timeout: 15000,
     });
   });
 
@@ -361,12 +373,12 @@ test.describe("Discovery Home Page", () => {
       page.getByRole("heading", { name: "Showing Across London" }),
     ).toBeVisible();
 
-    // Prominent CTA into the full grid at /films.
+    // Prominent CTA into the full grid at /catalogue.
     const browseCta = page
       .getByRole("link", { name: /Browse all films/i })
       .first();
     await expect(browseCta).toBeVisible();
-    await expect(browseCta).toHaveAttribute("href", /\/films\/?$/);
+    await expect(browseCta).toHaveAttribute("href", /\/catalogue\/?$/);
 
     await page.screenshot({
       path: "test-results/screenshots/discovery-home.png",

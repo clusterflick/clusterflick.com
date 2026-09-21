@@ -69,7 +69,7 @@ export function getDefaultState(): FilterState {
 /**
  * Creates a fully permissive ("all") filter state where every filter is a no-op.
  *
- * Unlike getDefaultState(), which reflects the `/films` browsing defaults
+ * Unlike getDefaultState(), which reflects the `/catalogue` browsing defaults
  * (Films/Multiple/Shorts categories, a today→+7d window, finished showings
  * hidden), this overrides the three restrictive modules with their true
  * no-filter sentinels. Used as the base for club/festival matchers, where only
@@ -226,7 +226,7 @@ export function apply(movies: MoviesRecord, state: FilterState): MoviesRecord {
 /**
  * The starting point a URL's filter params are applied on top of, chosen by the
  * `base` query param:
- * - `default` (or absent) — the `/films` browsing defaults (Films/Multiple/
+ * - `default` (or absent) — the `/catalogue` browsing defaults (Films/Multiple/
  *   Shorts, today→+7d). A deep link is self-contained: dimensions it doesn't
  *   mention fall back to these defaults, never to whatever was in session.
  * - `all` — fully permissive (all categories, all dates); every other dimension

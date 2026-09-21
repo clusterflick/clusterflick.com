@@ -17,7 +17,7 @@
   }
 }
 
-/* Above 1200px, match the /films poster grid's edges, so hopping between the
+/* Above 1200px, match the /catalogue poster grid's edges, so hopping between the
    two views keeps the same left and right spacing. Same mechanism rather than a
    computed width: as many grid columns as fit, centred, with every child
    spanning them all — so both pages fit the same number of columns at every

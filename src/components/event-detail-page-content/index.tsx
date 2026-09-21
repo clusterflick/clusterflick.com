@@ -53,7 +53,7 @@ export interface EventDetailPageContentProps {
   accessibilityStats?: AccessibilityStat[];
   /** Heading for the films grid. Defaults to `Films at {name}`. */
   filmsSectionTitle?: string;
-  /** Href for the "explore" link below the films grid. Defaults to `/films`. */
+  /** Href for the "explore" link below the films grid. Defaults to `/catalogue`. */
   filmsExploreHref?: string;
   /** Label for the "explore" link below the films grid. */
   filmsExploreLabel?: string;
@@ -120,7 +120,7 @@ export default function EventDetailPageContent({
   cinemasSectionTitle = "Cinemas",
   accessibilityStats = [],
   filmsSectionTitle,
-  filmsExploreHref = "/films",
+  filmsExploreHref = "/catalogue",
   filmsExploreLabel = "Or start exploring all films",
   movieUrlParams,
   heroBackgroundImage,

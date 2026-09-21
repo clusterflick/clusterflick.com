@@ -368,7 +368,7 @@ would be a suggestion, which is the engine's job.
 filter in a live release, 71% show nothing at all, 27% show exactly one film and
 under 1% show more than three; raising the limit to five moves the fire rate
 from 20% to 21%. What it does do is keep the line off a grid that is genuinely
-full — an unfiltered `/films` shows 448 films with 1,382 more beyond the window.
+full — an unfiltered `/catalogue` shows 448 films with 1,382 more beyond the window.
 
 **A film already on screen is never counted as hidden**, however many of its
 showings fall outside the window: the reader can see it and click through.

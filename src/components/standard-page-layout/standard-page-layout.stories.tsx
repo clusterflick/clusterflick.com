@@ -145,7 +145,7 @@ export const WithCustomHero: Story = {
         performanceCount={128}
       />
     ),
-    backUrl: "/films",
+    backUrl: "/catalogue",
     backText: "Back to film list",
     children: (
       <p style={{ color: "rgba(255,255,255,0.7)" }}>

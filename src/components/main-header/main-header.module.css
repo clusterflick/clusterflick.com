@@ -18,7 +18,7 @@
   top: 0;
   z-index: 150;
   /* No glow below the border: it spilled onto the sticky controls bar that
-     sits directly under the header on /films and /planner. */
+     sits directly under the header on /catalogue and /planner. */
   border-bottom: 1px solid var(--color-neon-pink);
   display: flex;
   align-items: center;

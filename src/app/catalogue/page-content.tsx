@@ -53,7 +53,7 @@ export default function PageContent() {
 
   // Apply any URL params on mount — FilterConfigProvider stays mounted across
   // client-side navigations, so its useState initialiser never re-reads URL
-  // params. Without this, navigating to /films?venues=… via a client-side link
+  // params. Without this, navigating to /catalogue?venues=… via a client-side link
   // would leave the filter unapplied until a full refresh.
   useEffect(() => {
     applyUrlParams();

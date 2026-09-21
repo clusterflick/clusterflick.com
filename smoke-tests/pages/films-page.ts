@@ -12,7 +12,7 @@ const SEARCH_INPUT_SELECTOR = "#filter-search";
 const FILTER_COUNTS_SELECTOR =
   '[role="dialog"][aria-label="Filter options"] [aria-live="polite"][aria-atomic="true"]';
 
-/** The browse/filter grid, which now lives at /films (the home page is discovery). */
+/** The browse/filter grid, which lives at /catalogue (the home page is discovery). */
 export class FilmsPage {
   constructor(private page: Page) {}
 
@@ -24,7 +24,7 @@ export class FilmsPage {
       .getByRole("link", { name: /Browse all films/i })
       .first()
       .click();
-    await this.page.waitForURL(/\/films\/?$/);
+    await this.page.waitForURL(/\/catalogue\/?$/);
     await this.page.waitForSelector(POSTER_SELECTOR, { timeout: 10000 });
     await this.waitForAllDataLoaded();
     await this.waitForFilterAvailable();

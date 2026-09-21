@@ -137,7 +137,7 @@ jobs:
             "keyLocation": "https://clusterflick.com/${INDEXNOW_KEY}.txt",
             "urlList": [
               "https://clusterflick.com/",
-              "https://clusterflick.com/films",
+              "https://clusterflick.com/catalogue",
               "https://clusterflick.com/festivals",
               "https://clusterflick.com/film-clubs",
               "https://clusterflick.com/cinema-groups",

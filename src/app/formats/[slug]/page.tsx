@@ -39,7 +39,7 @@ function formatFilterParams(format: FormatDefinition): string {
 
 /** Deep link into the live, filtered film list for this format. */
 function browseHref(format: FormatDefinition): string {
-  return `/films?${formatFilterParams(format)}`;
+  return `/catalogue?${formatFilterParams(format)}`;
 }
 
 export async function generateMetadata({

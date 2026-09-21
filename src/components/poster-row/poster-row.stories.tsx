@@ -11,7 +11,7 @@ import PosterRow from "@/components/poster-row";
  * - Curated discovery rows (popular, new additions, last chance, marathons).
  *
  * **When NOT to use:**
- * - Full browse/filter surfaces — those use the virtualised grid on `/films`.
+ * - Full browse/filter surfaces — those use the virtualised grid on `/catalogue`.
  *
  * Renders nothing when `movies` is empty, so sections self-hide.
  */
@@ -86,7 +86,7 @@ export const WithSeeAll: Story = {
       movie,
       subtitle: "Last showing Sun",
     })),
-    seeAllHref: "/films",
+    seeAllHref: "/catalogue",
     seeAllLabel: "Browse all",
   },
 };

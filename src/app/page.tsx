@@ -138,7 +138,7 @@ export default async function Home() {
 
         <div className={styles.sections}>
           <div className={styles.browseCta}>
-            <ButtonLink href="/films">Browse all films →</ButtonLink>
+            <ButtonLink href="/catalogue">Browse all films →</ButtonLink>
           </div>
 
           <DiscoverySections
@@ -146,7 +146,7 @@ export default async function Home() {
           />
 
           <div className={styles.browseCta}>
-            <ButtonLink href="/films">Browse all films →</ButtonLink>
+            <ButtonLink href="/catalogue">Browse all films →</ButtonLink>
           </div>
 
           <Divider />

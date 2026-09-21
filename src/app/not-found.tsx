@@ -16,8 +16,8 @@ function GenericNotFound() {
       iconSrc="/images/icons/neon-ticket-ripped.svg"
       title="Page Not Found"
       message="We couldn't find that page. It may have been moved or removed."
-      backLink={{ url: "/films", text: "Back to film list" }}
-      actions={<ButtonLink href="/films">Back to film list</ButtonLink>}
+      backLink={{ url: "/catalogue", text: "Back to film list" }}
+      actions={<ButtonLink href="/catalogue">Back to film list</ButtonLink>}
     />
   );
 }
@@ -180,8 +180,8 @@ function MovieNotFound({ pathname }: { pathname: string }) {
       iconSrc="/images/icons/neon-ticket-ripped.svg"
       title="Film Not Found"
       message="We couldn't find that film. It may no longer be showing or the link may have changed."
-      backLink={{ url: "/films", text: "Back to film list" }}
-      actions={<ButtonLink href="/films">Back to film list</ButtonLink>}
+      backLink={{ url: "/catalogue", text: "Back to film list" }}
+      actions={<ButtonLink href="/catalogue">Back to film list</ButtonLink>}
     />
   );
 }
