@@ -17,37 +17,93 @@
   }
 }
 
-/* Low-key: the page's job starts at the day stepper, so the heading names the
-   view without claiming the space the global 64px h1 would. */
-.intro {
-  margin: 0 auto 16px;
-  text-align: center;
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.title {
-  margin: 0;
-  font-size: 28px;
+/* Pulled up flush under the fixed header (the page's 80px top padding leaves
+   17px), matching the catalogue's bar. */
+.controlsBar {
+  margin-top: -17px;
 }
 
-.subtitle {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: var(--color-muted-gray);
+/* Phone: the stepper takes the first line, and the view switch and More
+   Filters share the second, left and right. Two equal columns rather than auto
+   ones: auto tracks under space-between don't stretch, which left the stepper
+   only as wide as the row beneath it. */
+.controlsInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "stepper stepper"
+    "start end";
+  align-items: center;
+  gap: 8px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.controls {
-  max-width: 560px;
-  margin: 0 auto 8px;
+.stepper {
+  grid-area: stepper;
+  justify-self: center;
+  width: 100%;
+  max-width: 400px;
 }
 
-/* Shrink-wrapped and centred, so the spinner can hang off its right edge
-   without nudging the chips off centre. */
+.controlsStart {
+  grid-area: start;
+  justify-self: start;
+}
+
+.controlsEnd {
+  grid-area: end;
+  justify-self: end;
+}
+
 .viewToggle {
   position: relative;
   display: flex;
-  width: fit-content;
   gap: 8px;
-  margin: 12px auto 0;
+}
+
+/* One line from 640px: chips (172px) and More Filters (98px), with the
+   stepper squeezed between them down to ~250px. Its date shortens to fit
+   ("Wed 30 Sept", via the stepper's own container query), and the second line
+   ("tomorrow · 1,234 showings") needs ~160px, so ~580px is the floor. */
+@media (min-width: 640px) {
+  .controlsInner {
+    /* Side columns never narrower than what they hold, so the stepper is what
+       gives way as the bar narrows. */
+    grid-template-columns:
+      minmax(max-content, 1fr)
+      minmax(0, 400px)
+      minmax(max-content, 1fr);
+    grid-template-areas: "start stepper end";
+    gap: 16px;
+  }
+
+  /* Beside the stepper rather than out at the edges of their columns. */
+  .controlsStart {
+    justify-self: end;
+  }
+
+  .controlsEnd {
+    justify-self: start;
+  }
+}
+
+@media (min-width: 768px) {
+  .controlsInner {
+    gap: 24px;
+  }
 }
 
 .viewSpinner {
@@ -64,13 +120,6 @@
   pointer-events: none;
 }
 
-.count {
-  margin: 8px 0 0;
-  text-align: center;
-  font-size: 13px;
-  color: var(--color-muted-gray);
-}
-
 .emptyActions {
   display: flex;
   flex-wrap: wrap;
@@ -80,4 +129,13 @@
 
 .loading {
   padding: 40px 20px 60px;
+}
+
+/* On one line the chips' right edge meets the stepper, so the spinner hangs
+   off their left instead. After the base rule, which it overrides. */
+@media (min-width: 640px) {
+  .viewSpinner {
+    left: auto;
+    right: calc(100% + 10px);
+  }
 }

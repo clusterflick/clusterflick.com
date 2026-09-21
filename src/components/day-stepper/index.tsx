@@ -15,6 +15,14 @@ const dayFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: LONDON_TIMEZONE,
 });
 
+/** "Mon 21 Sept", for when the full name won't fit. */
+const shortDayFormatter = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  timeZone: LONDON_TIMEZONE,
+});
+
 interface DayStepperProps {
   /** Any timestamp on the day being shown (London midnight, typically). */
   day: number;
@@ -24,6 +32,11 @@ interface DayStepperProps {
   hasPrevious: boolean;
   /** False at the end of the range: the next control is disabled. */
   hasNext: boolean;
+  /**
+   * A short fact about the day, shown after the relative day on the second
+   * line — the planner's "108 films".
+   */
+  detail?: string;
   className?: string;
 }
 
@@ -37,6 +50,7 @@ export default function DayStepper({
   onNext,
   hasPrevious,
   hasNext,
+  detail,
   className,
 }: DayStepperProps) {
   const daysFromNow = getDaysFromNow(day);
@@ -56,10 +70,22 @@ export default function DayStepper({
       {/* Announced on change, so stepping is not a silent swap of the list
           below for anyone not looking at the label. */}
       <div className={styles.label} aria-live="polite">
-        <span className={styles.day}>{dayFormatter.format(day)}</span>
-        {daysFromNow !== null && (
-          <span className={styles.relative}>
-            {formatDaysFromNow(daysFromNow)}
+        {/* Both forms render; the label's own width picks one (see CSS). */}
+        <span className={styles.day}>
+          <span className={styles.dayLong}>{dayFormatter.format(day)}</span>
+          <span className={styles.dayShort}>
+            {shortDayFormatter.format(day)}
+          </span>
+        </span>
+        {(daysFromNow !== null || detail) && (
+          <span className={styles.subline}>
+            {daysFromNow !== null && (
+              <span className={styles.relative}>
+                {formatDaysFromNow(daysFromNow)}
+              </span>
+            )}
+            {daysFromNow !== null && detail && " · "}
+            {detail && <span className={styles.detail}>{detail}</span>}
           </span>
         )}
       </div>

@@ -25,6 +25,7 @@ import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import MainHeader from "@/components/main-header";
 import Spinner from "@/components/spinner";
+import StickyBar from "@/components/sticky-bar";
 import PlannerRow from "@/components/planner-row";
 import PlannerHourRow, { PlannerHourGap } from "@/components/planner-hour-row";
 import {
@@ -216,6 +217,11 @@ export default function PageContent() {
             section,
           })),
     [listView, rows, hours],
+  );
+
+  const showingCount = useMemo(
+    () => rows.reduce((total, row) => total + row.performances.length, 0),
+    [rows],
   );
 
   // Either change replaces the list wholesale, so staying scrolled halfway
@@ -454,25 +460,17 @@ export default function PageContent() {
         onClose={() => setIsFilterOverlayOpen(false)}
         filterTextHeight={filterTextHeight}
       />
-      <div className={styles.content}>
-        <div className={styles.intro}>
-          <h1 className={styles.title}>Planner</h1>
-          <p className={styles.subtitle}>
-            Everything showing on one day, grouped by film or by the hour it
-            starts.
-          </p>
-        </div>
-        {hasAttemptedLoad && !isLoading && !error && range && day && (
-          <div className={styles.controls}>
-            <DayStepper
-              day={dateStringToLondonTimestamp(day)}
-              hasPrevious={day > range.first}
-              hasNext={day < range.last}
-              onPrevious={() => goToDay(shiftDate(day, -1))}
-              onNext={() => goToDay(shiftDate(day, 1))}
-            />
+      {/* Named for screen readers; the header nav already marks the page. */}
+      <h1 className={styles.srOnly}>Planner</h1>
+      {hasAttemptedLoad && !isLoading && !error && range && day && (
+        // Sticky, as the catalogue's search row is: the day in view stays
+        // visible down a long list, and stepping works from anywhere.
+        <StickyBar className={styles.controlsBar}>
+          {/* View switch, day, filters — the stepper centred between them
+              as the catalogue's search box is between its buttons. */}
+          <div className={styles.controlsInner}>
             <div
-              className={styles.viewToggle}
+              className={clsx(styles.viewToggle, styles.controlsStart)}
               role="radiogroup"
               aria-label="Group by"
               aria-busy={isSwitchingView}
@@ -499,12 +497,35 @@ export default function PageContent() {
                 </span>
               )}
             </div>
-            <p className={styles.count}>
-              {rows.length.toLocaleString("en-GB")}{" "}
-              {rows.length === 1 ? "film" : "films"} showing
-            </p>
+            <DayStepper
+              className={styles.stepper}
+              day={dateStringToLondonTimestamp(day)}
+              hasPrevious={day > range.first}
+              hasNext={day < range.last}
+              onPrevious={() => goToDay(shiftDate(day, -1))}
+              onNext={() => goToDay(shiftDate(day, 1))}
+              detail={
+                listView === "time"
+                  ? `${showingCount.toLocaleString("en-GB")} ${
+                      showingCount === 1 ? "showing" : "showings"
+                    }`
+                  : `${rows.length.toLocaleString("en-GB")} ${
+                      rows.length === 1 ? "film" : "films"
+                    }`
+              }
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.controlsEnd}
+              onClick={() => setIsFilterOverlayOpen(true)}
+            >
+              More Filters
+            </Button>
           </div>
-        )}
+        </StickyBar>
+      )}
+      <div className={styles.content}>
         {/* The outgoing list stays up, dimmed, while the next one renders. */}
         <div className={clsx(isSwitchingView && styles.switching)}>
           {renderBody()}

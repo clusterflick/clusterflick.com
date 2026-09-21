@@ -1,0 +1,25 @@
+/* The header only grows while the filter overlay covers the page, so the
+   offset can be fixed at its 63px. */
+/* Translucent and blurred with the same recipe as MainHeader, so content
+   passes under the two alike and the bar reads as part of the header. */
+.bar {
+  position: sticky;
+  top: 63px;
+  z-index: 10;
+  padding: 10px 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-dark-navy-rgb), 0.95) 0%,
+    rgba(var(--color-midnight-navy-rgb), 0.98) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(var(--color-electric-blue-rgb), 0.2);
+}
+
+@media (min-width: 768px) {
+  .bar {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

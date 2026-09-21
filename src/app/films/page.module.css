@@ -3,14 +3,21 @@
   padding-top: 80px;
 }
 
-/* Inline search + filter controls above the movie grid */
+/* Pulled up flush under the fixed header (the page's 80px top padding leaves
+   17px), with the gap to the grid below it. */
+.controlsBar {
+  margin: -17px 0 24px;
+}
+
+/* Inline search + filter controls, in the sticky bar above the movie grid.
+   The bar supplies 16px of gutter; 4px more keeps the old 20px. */
 .controls {
   display: flex;
   align-items: center;
   gap: 12px;
   max-width: 788px;
-  margin: 0 auto 24px;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: 0 4px;
 }
 
 .controlsSearch {

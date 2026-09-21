@@ -16,6 +16,7 @@ import {
 } from "@/lib/filters";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
+import StickyBar from "@/components/sticky-bar";
 import VirtualisedFilmGrid from "@/components/virtualised-film-grid";
 import HiddenResultsNotice from "@/components/hidden-results-notice";
 import MainHeader from "@/components/main-header";
@@ -247,39 +248,43 @@ export default function PageContent() {
         filterTextHeight={filterTextHeight}
       />
       {hasAttemptedLoad && !error && !isEmpty && (
-        <div className={styles.controls}>
-          {/* Spacer matches the Reset button width so the search bar stays
+        // Sticky, as the planner's day controls are, so the two views keep
+        // their controls in the same place.
+        <StickyBar className={styles.controlsBar}>
+          <div className={styles.controls}>
+            {/* Spacer matches the Reset button width so the search bar stays
               centred between the two. */}
-          <div className={styles.controlsSpacer} aria-hidden="true" />
-          <SearchInput
-            id="films-search"
-            className={styles.controlsSearch}
-            placeholder="Search the catalogue..."
-            ariaLabel="Search the catalogue"
-            value={filterState.search}
-            onChange={setSearchQuery}
-            inputRef={searchRef}
-            trailing={
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsFilterOverlayOpen(true)}
-              >
-                More Filters
-              </Button>
-            }
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            className={styles.controlsReset}
-            onClick={resetFilters}
-            disabled={!hasActiveFilters}
-            aria-label="Reset all filters to defaults"
-          >
-            Reset
-          </Button>
-        </div>
+            <div className={styles.controlsSpacer} aria-hidden="true" />
+            <SearchInput
+              id="films-search"
+              className={styles.controlsSearch}
+              placeholder="Search the catalogue..."
+              ariaLabel="Search the catalogue"
+              value={filterState.search}
+              onChange={setSearchQuery}
+              inputRef={searchRef}
+              trailing={
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsFilterOverlayOpen(true)}
+                >
+                  More Filters
+                </Button>
+              }
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.controlsReset}
+              onClick={resetFilters}
+              disabled={!hasActiveFilters}
+              aria-label="Reset all filters to defaults"
+            >
+              Reset
+            </Button>
+          </div>
+        </StickyBar>
       )}
       {/* Announces the outcome of taking an offer, since the grid appearing is
           a silent change for anyone not looking at it. `role="status"` already

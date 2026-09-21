@@ -40,6 +40,16 @@ export const Default: Story = {
   args: { day: TODAY + MS_PER_DAY, hasPrevious: true, hasNext: true },
 };
 
+/** With a detail after the relative day, as the planner shows its count. */
+export const WithDetail: Story = {
+  args: {
+    day: TODAY + MS_PER_DAY,
+    hasPrevious: true,
+    hasNext: true,
+    detail: "108 films",
+  },
+};
+
 /** The first day of the range: previous is disabled. */
 export const StartOfRange: Story = {
   args: { day: TODAY, hasPrevious: false, hasNext: true },
@@ -60,7 +70,10 @@ export const SingleDay: Story = {
   args: { day: TODAY, hasPrevious: false, hasNext: false },
 };
 
-/** Mobile is the constraining width; the control must stay on one line. */
+/**
+ * Mobile is the constraining width; the control must stay on one line. Below
+ * ~250px of label the date shortens ("Wed 30 Sept") rather than truncating.
+ */
 export const Narrow: Story = {
   args: { day: TODAY + 3 * MS_PER_DAY, hasPrevious: true, hasNext: true },
   decorators: [

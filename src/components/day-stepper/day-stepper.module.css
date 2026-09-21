@@ -33,11 +33,15 @@
   align-items: center;
   text-align: center;
   line-height: 1.2;
+  /* Queried below to shorten the date. The label's width rather than the
+     screen's, since that is what runs out, wherever the stepper is placed:
+     in the planner, a phone narrower than ~380px. */
+  container-type: inline-size;
 }
 
 .day {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-electric-blue);
   white-space: nowrap;
   overflow: hidden;
@@ -45,9 +49,34 @@
   max-width: 100%;
 }
 
-.relative {
+.dayShort {
+  display: none;
+}
+
+/* "Wednesday 30 September" needs ~240px at the 20px desktop size. Below
+   that, "Wed 30 Sept" beats the full name cut off with an ellipsis. The
+   hidden form is display: none, so only the visible one is announced. */
+@container (max-width: 250px) {
+  .dayLong {
+    display: none;
+  }
+
+  .dayShort {
+    display: inline;
+  }
+}
+
+/* The extra 6px also brings the planner's controls bar to the catalogue's
+   66px, so the two line up when switching between them. */
+.subline {
+  padding: 4px 0 2px;
   font-size: 13px;
   font-weight: 500;
+  color: var(--color-muted-gray);
+  white-space: nowrap;
+}
+
+.relative {
   color: var(--color-neon-pink);
 }
 
