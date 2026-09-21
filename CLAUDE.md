@@ -577,9 +577,17 @@ different state than the one passed in — see the deferred copy below — and o
 daylight was enough to offer improvements to a query that had results.
 
 **When several corrections tie** (a one-edit query is routinely one edit from a dozen titles,
-all through the same word), the sort breaks the tie by screening count and then soonest
-showing. Alphabetical is the one ordering with nothing to recommend it; only two corrections
-are ever offered, so the tie-break decides what the reader actually sees.
+all through the same word), the sort breaks the tie by **reach**, then screening count, then
+soonest showing. Alphabetical is the one ordering with nothing to recommend it; only two
+corrections are ever offered, so the tie-break decides what the reader actually sees.
+
+Reach (`correctionReach`) is how many filter changes the correction needs on top of the
+rewrite: 0 if the current filters already show the film, 1 if one widening does. A candidate
+needing more is dropped before the cut, since rounds stop at two and it could only ever be
+probed and discarded. Ranking on screenings alone let "mark h" spend both slots on a festival
+outside the date window and a talk no pair could reach, while "Sherman's March", showing
+that week, was never looked at. Each check runs the pipeline over the one film, not the
+dataset.
 
 **On the films page** the empty state pulls up under the search controls whenever it carries
 offers (`.emptyStateNearControls`) — centred in the viewport put them half a screen from the box

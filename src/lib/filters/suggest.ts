@@ -676,8 +676,16 @@ const MAX_CORRECTIONS = 2;
  * goes through `matchesSearchQuery` rather than the distance, so a query that
  * only lands via a spelling variant ("godfather part 2") is recognised as
  * correct too.
+ *
+ * Candidates the current filters could not reach within one widening are
+ * dropped before the cut — see {@link correctionReach}.
  */
-function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
+function findNearMissTitles(
+  movies: MoviesRecord,
+  state: FilterState,
+  widens: Move[],
+): string[] {
+  const query = get(state, FilterId.Search).trim();
   const needle = normalizeForSearch(query);
   if (needle.length < MIN_FUZZY_LENGTH) return [];
 
@@ -694,9 +702,14 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
     if (matchesSearchQuery(movie.title, needle)) return [];
   }
 
+  // Widenings a correction can be paired with. Accessibility never pairs, so
+  // a film only it hides is out of reach.
+  const pairableWidens = widens.filter((move) => !move.soloOnly);
+
   const matches: {
     title: string;
     distance: number;
+    reach: number;
     showings: number;
     soonest: number;
   }[] = [];
@@ -709,6 +722,9 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
     );
     if (distance > maxDistance) continue;
 
+    const reach = correctionReach(movie, state, pairableWidens);
+    if (reach === null) continue;
+
     let soonest = Infinity;
     for (const performance of movie.performances) {
       if (performance.time < soonest) soonest = performance.time;
@@ -717,6 +733,7 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
     matches.push({
       title: movie.title,
       distance,
+      reach,
       showings: movie.performances.length,
       soonest,
     });
@@ -732,9 +749,16 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
   // the one meant, since a film showing across London all week is a better
   // guess than one with a single late-night slot; the soonest showing settles
   // what is left, favouring something the reader can actually go and see.
+  //
+  // Reach comes before either: a film the current filters already show is a
+  // one-change offer, one that needs a widening costs two, and only two are
+  // ever offered. Ranking on screenings alone let "mark h" spend both slots on
+  // a festival outside the date window and a talk no pair could reach, while
+  // "Sherman's March", on this week, was never looked at.
   matches.sort(
     (a, b) =>
       a.distance - b.distance ||
+      a.reach - b.reach ||
       b.showings - a.showings ||
       a.soonest - b.soonest ||
       a.title.localeCompare(b.title),
@@ -750,6 +774,31 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
 }
 
 /**
+ * How many filter changes a correction to this film costs on top of the
+ * rewrite itself: 0 when the current filters already show it, 1 when a single
+ * widening does, and null when nothing within the engine's two-change limit
+ * reaches it — a candidate that could only ever be probed and discarded.
+ *
+ * Runs the pipeline over this one film rather than the dataset, since only
+ * whether *it* survives matters here, so pricing every candidate stays cheap.
+ */
+function correctionReach(
+  movie: MoviesRecord[string],
+  state: FilterState,
+  widens: Move[],
+): number | null {
+  const single: MoviesRecord = { [movie.id]: movie };
+  const corrected = set(state, FilterId.Search, movie.title);
+  if (Object.keys(apply(single, corrected)).length > 0) return 0;
+  for (const widen of widens) {
+    if (Object.keys(apply(single, widen.transform(corrected))).length > 0) {
+      return 1;
+    }
+  }
+  return null;
+}
+
+/**
  * Moves that replace the query with a title it was probably a mistyping of.
  *
  * Only the main search box is corrected. It takes the overwhelming majority of
@@ -760,11 +809,11 @@ function findNearMissTitles(movies: MoviesRecord, query: string): string[] {
 function buildCorrectionMoves(
   movies: MoviesRecord,
   state: FilterState,
+  widens: Move[],
 ): Move[] {
-  const query = get(state, FilterId.Search).trim();
-  if (query.length === 0) return [];
+  if (get(state, FilterId.Search).trim().length === 0) return [];
 
-  return findNearMissTitles(movies, query).map((title) => ({
+  return findNearMissTitles(movies, state, widens).map((title) => ({
     id: `correct:${title}`,
     kind: "correct" as const,
     action: `Did you mean “${title}”?`,
@@ -901,12 +950,13 @@ export function suggestFilterRelaxations({
   // strongest reading when it fits at all, so it leads; redirects also concede
   // nothing but only move the query; corrections rewrite it; widenings give up
   // a filter, so they come last.
+  const widens = buildWidenMoves(state, context);
   const moves = [
     ...buildValueMoves(state, context),
     ...buildPeopleMoves(state, context),
     ...buildRedirectMoves(state),
-    ...buildCorrectionMoves(movies, state),
-    ...buildWidenMoves(state, context),
+    ...buildCorrectionMoves(movies, state, widens),
+    ...widens,
   ];
   if (moves.length === 0) return [];
 

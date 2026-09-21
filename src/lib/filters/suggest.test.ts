@@ -877,6 +877,52 @@ describe("suggestFilterRelaxations", () => {
       expect(suggestion.state[FilterId.Search]).toBe("Eternal Sunshine");
     });
 
+    it("prefers a correction the current filters already show", () => {
+      // "mark h" is one edit from "March" in all three. Ranked on screenings
+      // alone, the festival and the talk took both slots — and the talk needs
+      // two widenings, so it could never be offered — leaving the film showing
+      // this week unseen.
+      const movies = makeMovies({
+        banff: { title: "Banff Festival - 3 March", time: BEYOND_WINDOW },
+        talk: {
+          title: "Mark Kermode Live",
+          category: Category.Talk,
+          time: BEYOND_WINDOW,
+        },
+        sherman: { title: "Sherman's March" },
+      });
+      for (const id of ["banff", "talk"]) {
+        const [performance] = movies[id].performances;
+        movies[id].performances.push({ ...performance }, { ...performance });
+      }
+      const state = set(getDefaultState(), FilterId.Search, "mark h");
+
+      const corrections = suggestFilterRelaxations({ movies, state })
+        .filter((s) => s.kind === "correct")
+        .map((s) => [s.headline, s.changes.length]);
+      expect(corrections).toEqual([
+        ["Did you mean “Sherman's March”?", 0],
+        ["Did you mean “Banff Festival - 3 March”?", 1],
+      ]);
+    });
+
+    it("drops a correction no single widening could reach", () => {
+      const movies = makeMovies({
+        talk: {
+          title: "Eternal Sunshine",
+          category: Category.Talk,
+          time: BEYOND_WINDOW,
+        },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "Eternl Sunshine");
+
+      expect(
+        suggestFilterRelaxations({ movies, state }).filter(
+          (s) => s.kind === "correct",
+        ),
+      ).toEqual([]);
+    });
+
     it("composes a correction with a widening", () => {
       // The corrected title is *also* outside the default window, so neither
       // change is enough on its own.
