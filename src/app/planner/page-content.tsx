@@ -17,6 +17,7 @@ import {
 } from "react-virtuoso";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
@@ -39,9 +40,13 @@ import {
   clampToRange,
   findNearestShowingDay,
   formatHour,
+  getLastShowingDay,
   getPlannerHours,
   getPlannerRange,
   getPlannerRows,
+  getPlannerWeek,
+  PLANNER_WEEK_LENGTH,
+  getShowingDays,
   isDateString,
   shiftDate,
   type DateString,
@@ -201,6 +206,23 @@ export default function PageContent() {
     [rangeMovies, day],
   );
 
+  // As many weeks as fit beside the summary: six on the widest screens, four
+  // or two on smaller desktops, one where the strip must fit a phone.
+  const fitsTwoWeeks = useMediaQuery("(min-width: 1024px)");
+  const fitsFourWeeks = useMediaQuery("(min-width: 1440px)");
+  const fitsSixWeeks = useMediaQuery("(min-width: 1800px)");
+  const stripDays = fitsSixWeeks
+    ? 42
+    : fitsFourWeeks
+      ? 28
+      : fitsTwoWeeks
+        ? 14
+        : PLANNER_WEEK_LENGTH;
+  const week = useMemo(
+    () => (day && range ? getPlannerWeek(day, range, stripDays) : []),
+    [day, range, stripDays],
+  );
+
   // Only computed in the view that shows it.
   const hours = useMemo(
     () => (day && listView === "time" ? getPlannerHours(rangeMovies, day) : []),
@@ -356,6 +378,10 @@ export default function PageContent() {
     const renderItem = (item: PlannerListItem) => {
       if (item.kind === "film") {
         const { movie, performances } = item.row;
+        // The strip follows the filters, as the rows do; last chance reads
+        // the unfiltered film, so it means the last day anywhere — not just
+        // at the venues or in the date range picked.
+        const lastDay = getLastShowingDay(movies[movie.id] ?? movie);
         return (
           <PlannerRow
             movie={movie}
@@ -364,6 +390,34 @@ export default function PageContent() {
             venues={metaData?.venues ?? {}}
             genres={genreNames(movie.genres)}
             hydrateUrl={hydrateUrl}
+            // A one-day range has nothing to compare the day against.
+            week={
+              week.length > 1
+                ? {
+                    days: week,
+                    showing: getShowingDays(movie, week),
+                    selected: day,
+                    continuesBefore: week[0] > range.first,
+                    continuesAfter: week[week.length - 1] < range.last,
+                    moreBefore:
+                      findNearestShowingDay(
+                        [movie],
+                        week[0],
+                        "previous",
+                        range,
+                      ) !== null,
+                    moreAfter:
+                      findNearestShowingDay(
+                        [movie],
+                        week[week.length - 1],
+                        "next",
+                        range,
+                      ) !== null,
+                    onSelect: goToDay,
+                  }
+                : undefined
+            }
+            lastChance={lastDay === day}
           />
         );
       }

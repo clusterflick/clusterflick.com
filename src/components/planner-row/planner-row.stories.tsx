@@ -139,3 +139,36 @@ export const Narrow: Story = {
     ),
   ],
 };
+
+const WEEK = Array.from({ length: 7 }, (_, i) =>
+  new Date(Date.now() + i * 24 * HOUR).toISOString().slice(0, 10),
+);
+
+/** With the week strip: on today and twice more later in the week. */
+export const WithWeek: Story = {
+  args: {
+    ...baseArgs,
+    performances: performances(3),
+    week: {
+      days: WEEK,
+      showing: new Set([WEEK[0], WEEK[3], WEEK[4]]),
+      selected: WEEK[0],
+      onSelect: () => {},
+    },
+  },
+};
+
+/** The last day it is showing anywhere. */
+export const LastChance: Story = {
+  args: {
+    ...baseArgs,
+    performances: performances(2),
+    week: {
+      days: WEEK,
+      showing: new Set([WEEK[0]]),
+      selected: WEEK[0],
+      onSelect: () => {},
+    },
+    lastChance: true,
+  },
+};

@@ -63,6 +63,11 @@ export const Blue: Story = {
   args: { children: "Subtitled", color: "blue" },
 };
 
+/** Yellow tag for something time-sensitive, such as a last chance. */
+export const Yellow: Story = {
+  args: { children: "Last chance", color: "yellow", size: "sm" },
+};
+
 /** Gray inactive tag for unavailable or disabled states. */
 export const Gray: Story = {
   args: { children: "No listings", color: "gray" },

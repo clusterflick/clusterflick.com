@@ -6,6 +6,34 @@
   border-bottom: 1px solid rgba(var(--color-electric-blue-rgb), 0.2);
 }
 
+/* The day strip goes under the summary on a phone and beside it, on the
+   right, where desktop has the room: every row's strip then lines up in one
+   column to compare down the page. */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .summary {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Down by the lane it summarises, rather than up by the title. */
+  .days {
+    flex: 0 0 auto;
+    align-self: flex-end;
+  }
+}
+
 .more {
   flex: 0 0 auto;
   display: flex;

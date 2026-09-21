@@ -1,0 +1,108 @@
+/* Quieter than the performances below: a summary, not the thing to read. */
+.days {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  opacity: 0.8;
+}
+
+/* A 24px-wide cell around a small dot, so the tap target is a thumb's width
+   while the mark stays quiet. Reset for the button form; the span form reads
+   the same. */
+.day {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 24px;
+  /* Room for the selected dot's ring, 3px beyond the dot, inside the hover
+     background. */
+  padding: 5px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-muted-gray);
+}
+
+button.day {
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button.day:hover,
+button.day:focus-visible {
+  background: rgba(var(--color-electric-blue-rgb), 0.15);
+}
+
+.initial {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--color-light-gray-rgb), 0.3);
+}
+
+.showing {
+  color: var(--color-light-gray);
+}
+
+.showing .dot {
+  border-color: var(--color-electric-blue);
+  background: var(--color-electric-blue);
+}
+
+/* The day in view: pink, and ringed with a gap so it reads as "here" rather
+   than as a larger dot. An outline rather than a box-shadow, so the gap is
+   see-through over the hover background instead of painted navy. */
+.selected {
+  color: var(--color-neon-pink);
+}
+
+.selected .dot {
+  border-color: var(--color-neon-pink);
+  background: var(--color-neon-pink);
+  outline: 1px solid var(--color-neon-pink);
+  outline-offset: 2px;
+}
+
+/* Level with the dots: the row is bottom-aligned, and a day cell has 5px of
+   padding under its 8px dot. */
+.edge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 8px;
+  margin-bottom: 5px;
+}
+
+/* The range stops here: a bookend. */
+.stops {
+  width: 1px;
+  height: 12px;
+  margin: 0 4px 3px;
+  background: rgba(var(--color-light-gray-rgb), 0.4);
+}
+
+/* The range carries on: two small dots. */
+.continues {
+  padding: 0 2px;
+}
+
+.continues span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-light-gray);
+  opacity: 0.4;
+}
+
+/* …and the film is showing out there too. */
+.more span {
+  background: var(--color-electric-blue);
+  opacity: 0.6;
+}

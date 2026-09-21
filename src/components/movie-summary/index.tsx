@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import EventPoster, {
@@ -20,6 +21,8 @@ interface MovieSummaryProps {
   duration?: number;
   /** Genre names, already resolved from ids. */
   genres?: string[];
+  /** Further tags, drawn after the genres on the same line. */
+  tags?: ReactNode;
   posterPath?: string;
   /** A double bill's or marathon's films, shown as a stacked poster. */
   includedMovies?: EventPosterIncludedMovie[];
@@ -41,6 +44,7 @@ export default function MovieSummary({
   classification,
   duration,
   genres = [],
+  tags,
   posterPath,
   includedMovies,
   headingLevel: HeadingTag = "h2",
@@ -100,13 +104,14 @@ export default function MovieSummary({
             )}
           </div>
         )}
-        {genres.length > 0 && (
+        {(genres.length > 0 || tags) && (
           <div className={styles.genres}>
             {genres.map((genre) => (
               <Tag key={genre} size="sm">
                 {genre}
               </Tag>
             ))}
+            {tags}
           </div>
         )}
       </div>

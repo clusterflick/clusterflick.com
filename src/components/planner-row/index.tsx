@@ -3,6 +3,8 @@ import type { MoviePerformance, Showing, Venue } from "@/types";
 import MovieSummary from "@/components/movie-summary";
 import type { EventPosterIncludedMovie } from "@/components/event-poster";
 import PlannerLane, { PlannerLaneCard } from "@/components/planner-lane";
+import PlannerDays, { type PlannerDaysProps } from "@/components/planner-days";
+import Tag from "@/components/tag";
 import { ButtonLink } from "@/components/button";
 import { setUseBrowserBack } from "@/utils/nav-links";
 import styles from "./planner-row.module.css";
@@ -42,6 +44,10 @@ interface PlannerRowProps {
   hydrateUrl: (url: string) => string;
   /** Defaults to `PLANNER_ROW_LIMIT`. */
   limit?: number;
+  /** The film's week, drawn as a strip of days between summary and lane. */
+  week?: PlannerDaysProps;
+  /** The day in view is the last it is showing anywhere. */
+  lastChance?: boolean;
   className?: string;
 }
 
@@ -58,6 +64,8 @@ export default function PlannerRow({
   genres,
   hydrateUrl,
   limit = PLANNER_ROW_LIMIT,
+  week,
+  lastChance,
   className,
 }: PlannerRowProps) {
   const shown = performances.slice(0, limit);
@@ -65,17 +73,28 @@ export default function PlannerRow({
 
   return (
     <article className={clsx(styles.row, className)}>
-      <MovieSummary
-        href={href}
-        title={movie.title}
-        year={movie.year}
-        originalTitle={movie.originalTitle}
-        classification={movie.classification}
-        duration={movie.duration}
-        genres={genres}
-        posterPath={movie.posterPath}
-        includedMovies={movie.includedMovies}
-      />
+      <div className={styles.header}>
+        <MovieSummary
+          className={styles.summary}
+          href={href}
+          title={movie.title}
+          year={movie.year}
+          originalTitle={movie.originalTitle}
+          classification={movie.classification}
+          duration={movie.duration}
+          genres={genres}
+          tags={
+            lastChance && (
+              <Tag size="sm" color="yellow">
+                Last chance
+              </Tag>
+            )
+          }
+          posterPath={movie.posterPath}
+          includedMovies={movie.includedMovies}
+        />
+        {week && <PlannerDays {...week} className={styles.days} />}
+      </div>
       <PlannerLane>
         {shown.map((performance, index) => (
           <PlannerLaneCard

@@ -5,10 +5,13 @@ import {
   clampToRange,
   findNearestShowingDay,
   formatHour,
+  getLastShowingDay,
   getPlannerHours,
   getPlannerRange,
   groupBySameStart,
   getPlannerRows,
+  getPlannerWeek,
+  getShowingDays,
   isDateString,
   shiftDate,
 } from "./get-planner-day";
@@ -187,5 +190,84 @@ describe("groupBySameStart", () => {
     expect(groups.map((g) => g.first.n)).toEqual([1, 2, 4]);
     expect(groups[0].rest.map((i) => i.n)).toEqual([3, 5]);
     expect(groups[2].rest).toEqual([]);
+  });
+});
+
+describe("getPlannerWeek", () => {
+  const range = { first: "2026-09-21", last: "2026-10-31" };
+
+  it("puts the first day of the range at the start", () => {
+    const week = getPlannerWeek("2026-09-21", range);
+    expect(week).toHaveLength(7);
+    expect(week[0]).toBe("2026-09-21");
+    expect(week[6]).toBe("2026-09-27");
+  });
+
+  it("centres a day in the middle of the range", () => {
+    const week = getPlannerWeek("2026-10-10", range);
+    expect(week[0]).toBe("2026-10-07");
+    expect(week[3]).toBe("2026-10-10");
+    expect(week[6]).toBe("2026-10-13");
+  });
+
+  it("slides to stay inside the range near either end", () => {
+    expect(getPlannerWeek("2026-09-22", range)[0]).toBe("2026-09-21");
+    expect(getPlannerWeek("2026-10-30", range)[6]).toBe("2026-10-31");
+    expect(getPlannerWeek("2026-10-31", range)[0]).toBe("2026-10-25");
+  });
+
+  it("shows a range shorter than a week whole", () => {
+    const short = { first: "2026-09-21", last: "2026-09-23" };
+    expect(getPlannerWeek("2026-09-22", short)).toEqual([
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23",
+    ]);
+  });
+
+  it("covers a fortnight when asked, centred the same way", () => {
+    const fortnight = getPlannerWeek("2026-10-10", range, 14);
+    expect(fortnight).toHaveLength(14);
+    expect(fortnight[0]).toBe("2026-10-04");
+    expect(fortnight[13]).toBe("2026-10-17");
+    expect(getPlannerWeek("2026-09-21", range, 14)[13]).toBe("2026-10-04");
+  });
+
+  it("counts whole days across a clock change", () => {
+    const autumn = { first: "2026-10-22", last: "2026-11-30" };
+    expect(getPlannerWeek("2026-10-29", autumn)[0]).toBe("2026-10-26");
+  });
+});
+
+describe("getShowingDays", () => {
+  it("returns only the requested days the film is on", () => {
+    const film = movie("1", "A", [
+      at("2026-09-22", 20),
+      at("2026-09-22", 22),
+      at("2026-09-25", 18),
+      at("2026-10-10", 18),
+    ]);
+    const days = getShowingDays(film, [
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-25",
+    ]);
+    expect([...days].sort()).toEqual(["2026-09-22", "2026-09-25"]);
+  });
+
+  it("files a late showing under its London date", () => {
+    const film = movie("1", "A", [at("2026-09-22", 23.5)]);
+    expect(getShowingDays(film, ["2026-09-22"]).has("2026-09-22")).toBe(true);
+  });
+});
+
+describe("getLastShowingDay", () => {
+  it("is the London date of the latest performance", () => {
+    const film = movie("1", "A", [at("2026-09-25", 18), at("2026-09-22", 20)]);
+    expect(getLastShowingDay(film)).toBe("2026-09-25");
+  });
+
+  it("is null for a film with no performances", () => {
+    expect(getLastShowingDay(movie("1", "A", []))).toBeNull();
   });
 });

@@ -2,6 +2,7 @@ import type { Movie, MoviePerformance } from "@/types";
 import {
   dateStringToLondonTimestamp,
   getLondonMinutesOfDay,
+  MS_PER_DAY,
   timestampToLondonDateString,
 } from "@/utils/format-date";
 
@@ -135,6 +136,62 @@ export function findNearestShowingDay(
 
   const found = timestampToLondonDateString(best);
   return found >= range.first && found <= range.last ? found : null;
+}
+
+/** Days a film's day strip shows where there is little room. */
+export const PLANNER_WEEK_LENGTH = 7;
+
+/** Whole days from `from` to `to`, both London dates. */
+function daysBetween(from: DateString, to: DateString): number {
+  const toUtc = (date: DateString) => {
+    const [year, month, day] = date.split("-").map(Number);
+    return Date.UTC(year, month - 1, day);
+  };
+  return Math.round((toUtc(to) - toUtc(from)) / MS_PER_DAY);
+}
+
+/**
+ * The days a film's strip covers while `date` is viewed: `days` of them (a
+ * week by default) centred on it, slid to stay inside the range — so the first
+ * day of the range has the rest after it, the last has them before. A range
+ * shorter than that is shown whole. Never a day outside the range, where an empty dot would read as
+ * "not showing" when it means "not asked about".
+ */
+export function getPlannerWeek(
+  date: DateString,
+  range: PlannerRange,
+  days: number = PLANNER_WEEK_LENGTH,
+): DateString[] {
+  const length = Math.min(days, daysBetween(range.first, range.last) + 1);
+  const before = Math.floor((length - 1) / 2);
+  const offset = daysBetween(range.first, date);
+  const latestStart = daysBetween(range.first, range.last) - length + 1;
+  const startOffset = Math.min(Math.max(0, offset - before), latestStart);
+  const start = shiftDate(range.first, startOffset);
+  return Array.from({ length }, (_, index) => shiftDate(start, index));
+}
+
+/** Which of `days` the film has a performance on. */
+export function getShowingDays(
+  movie: Movie,
+  days: DateString[],
+): Set<DateString> {
+  const wanted = new Set(days);
+  const showing = new Set<DateString>();
+  for (const { time } of movie.performances) {
+    const date = timestampToLondonDateString(time);
+    if (wanted.has(date)) showing.add(date);
+  }
+  return showing;
+}
+
+/** The last day the film has any performance, or null if it has none. */
+export function getLastShowingDay(movie: Movie): DateString | null {
+  let latest = -Infinity;
+  for (const { time } of movie.performances) {
+    if (time > latest) latest = time;
+  }
+  return latest === -Infinity ? null : timestampToLondonDateString(latest);
 }
 
 /** One performance and the film it belongs to, for lanes that mix films. */

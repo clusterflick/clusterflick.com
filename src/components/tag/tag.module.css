@@ -56,6 +56,17 @@
   color: var(--color-electric-blue);
 }
 
+/* Yellow is far lighter than the pink and blue, so at full strength its
+   border and text glare beside them; softened to sit at the same weight. */
+.yellow {
+  background-color: rgba(var(--color-buttery-yellow-rgb), 0.15);
+  border: 1px solid rgba(var(--color-buttery-yellow-rgb), 0.75);
+}
+
+.yellow.sm {
+  color: rgba(var(--color-buttery-yellow-rgb), 0.75);
+}
+
 .gray {
   background-color: rgba(var(--color-light-gray-rgb), 0.2);
   border: 1px solid var(--color-light-gray);

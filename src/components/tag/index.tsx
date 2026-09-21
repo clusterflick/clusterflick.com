@@ -10,9 +10,10 @@ interface TagProps {
    * Color variant:
    * - "pink": Neon pink accent (default)
    * - "blue": Electric blue accent
+   * - "yellow": Buttery yellow, for something time-sensitive
    * - "gray": Muted gray (for disabled/inactive states)
    */
-  color?: "pink" | "blue" | "gray";
+  color?: "pink" | "blue" | "yellow" | "gray";
   /**
    * Size variant:
    * - "md": Standard size for genre tags (default)
