@@ -23,6 +23,12 @@
   --color-neon-pink-rgb: 241, 40, 105;
   --color-purple-accent-rgb: 100, 50, 150;
   --color-white-rgb: 255, 255, 255;
+
+  /* The /films poster grid's columns, shared with /planner so its content
+     edges land where the grid's do. VirtualisedFilmGrid mirrors these in JS
+     (POSTER_WIDTH, GAP) to reserve its height — change both together. */
+  --film-grid-column: 200px;
+  --film-grid-gap: 8px;
 }
 
 html,

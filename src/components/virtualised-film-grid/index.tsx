@@ -7,6 +7,7 @@ import type { Movie } from "@/types";
 import MovieCell from "@/components/movie-cell";
 import styles from "./virtualised-film-grid.module.css";
 
+// Mirrors --film-grid-column and --film-grid-gap in globals.css.
 const POSTER_WIDTH = 200;
 const POSTER_HEIGHT = 300;
 const GAP = 8;

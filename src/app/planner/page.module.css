@@ -17,6 +17,27 @@
   }
 }
 
+/* Above 1200px, match the /films poster grid's edges, so hopping between the
+   two views keeps the same left and right spacing. Same mechanism rather than a
+   computed width: as many grid columns as fit, centred, with every child
+   spanning them all — so both pages fit the same number of columns at every
+   width, margins stepping with them. Below 1200px the lanes keep the width. */
+@media (min-width: 1200px) {
+  .content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--film-grid-column));
+    column-gap: var(--film-grid-gap);
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .content > * {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

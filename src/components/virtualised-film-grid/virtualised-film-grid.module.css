@@ -1,8 +1,8 @@
 .gridList {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 200px);
+  grid-template-columns: repeat(auto-fit, var(--film-grid-column));
   justify-content: center;
-  gap: 8px;
+  gap: var(--film-grid-gap);
 }
 
 /* Breathing room below the last poster row — the grid gap only applies between
