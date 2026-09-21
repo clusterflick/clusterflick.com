@@ -55,8 +55,7 @@ export type FilterDescription = {
  *
  * `conjunction` is "or" for every multi-select filter, because they all match a
  * film that satisfies *any* of the selected values — two directors returns the
- * films of either, not the films they made together. Only the availability
- * toggles are a genuine "and", both applying at once, so only they keep "&".
+ * films of either, not the films they made together.
  */
 export function formatList(
   items: string[],
@@ -581,13 +580,10 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     datesDesc += `, ${timeDesc}`;
   }
   // Availability toggles ride along with the dates, since both narrow which
-  // performances survive rather than which films do.
-  const availability: string[] = [];
-  if (state.hideFinished) availability.push("not finished");
-  if (state.hideSoldOut) availability.push("not sold out");
-  if (availability.length > 0) {
-    datesDesc += ` and ${formatList(availability, 2)}`;
-  }
+  // performances survive rather than which films do. Hiding finished showings
+  // is the default, so it goes unsaid; only turning it off is worth a mention.
+  if (state.hideSoldOut) datesDesc += " and not sold out";
+  if (!state.hideFinished) datesDesc += ", including finished";
 
   return {
     events: eventsDesc,

@@ -186,7 +186,7 @@ export default function FilterOverlay({
       categories: FILM_CATEGORIES,
       venues: null,
       dateOption: "this-week",
-      hideFinished: false,
+      hideFinished: true,
     }),
     [FILM_CATEGORIES],
   );

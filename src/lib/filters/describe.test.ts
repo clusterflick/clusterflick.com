@@ -65,18 +65,22 @@ describe("describeFilters reads multi-select filters as or", () => {
     expect(events(state)).toContain("Films or Quizzes");
   });
 
-  // The one genuine "and": both toggles apply at once rather than either.
-  it("keeps & for the availability toggles", () => {
-    let state = set(getDefaultState(), FilterId.HideFinished, true);
-    state = set(state, FilterId.HideSoldOut, true);
-    const { dates } = describeFilters({
-      state,
-      categories: CATEGORIES,
-      venues: null,
-      genres: GENRES,
-      people: PEOPLE,
-      cinemaVenueIds: [],
-    });
-    expect(dates).toContain("not finished & not sold out");
+  // Hiding finished showings is the default, so only turning it off is said.
+  it("mentions finished showings only when they are included", () => {
+    const dates = (state: ReturnType<typeof getDefaultState>) =>
+      describeFilters({
+        state,
+        categories: CATEGORIES,
+        venues: null,
+        genres: GENRES,
+        people: PEOPLE,
+        cinemaVenueIds: [],
+      }).dates;
+
+    expect(dates(getDefaultState())).not.toContain("finished");
+    const included = set(getDefaultState(), FilterId.HideFinished, false);
+    expect(dates(included)).toContain(", including finished");
+    const both = set(included, FilterId.HideSoldOut, true);
+    expect(dates(both)).toContain("and not sold out, including finished");
   });
 });

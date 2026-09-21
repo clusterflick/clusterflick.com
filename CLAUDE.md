@@ -509,17 +509,16 @@ then widening the event type to everything produced an offer headed "Show Quizze
 selected all events. This also covers the query fields, so a correction never pairs with a
 redirect and a query never lands in two boxes at once.
 
-**Candidates come from `getRestrictiveFilterIds`, not `getActiveFilterIds`.** Categories and
-the date range have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d), so they report
-themselves inactive while still removing results — and they are the most common invisible
-blockers. Anything comparing against defaults instead of `getPermissiveState()` is blind to both.
+**Candidates come from `getRestrictiveFilterIds`, not `getActiveFilterIds`.** Categories, the
+date range and hide-finished have _restrictive_ defaults (Films/Multiple/Shorts, today→+7d,
+finished showings hidden), so they report themselves inactive while still removing results — and
+they are the most common invisible blockers. Anything comparing against defaults instead of
+`getPermissiveState()` is blind to them.
 
 **Every multi-select filter reads as "or".** They all match a film satisfying
 _any_ selected value — two directors returns the films of either, not the films
 they made together — so `formatList` takes a conjunction and each of them passes
-"or": "directed by Ridley Scott or George Lucas and starring Mark Hamill". Only
-the availability toggles are a genuine "and", both applying at once, and only
-they keep "&".
+"or": "directed by Ridley Scott or George Lucas and starring Mark Hamill".
 
 **Order is editorial, never by count.** Sorting by result count would promote "drop your
 Subtitles requirement" whenever it frees up the most screenings, which is the one suggestion a

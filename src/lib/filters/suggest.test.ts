@@ -175,6 +175,9 @@ describe("suggestFilterRelaxations", () => {
       AccessibilityFeature.Subtitled,
     ]);
     state = set(state, FilterId.DateRange, { start: TODAY, end: TODAY });
+    // The fixture's "today" showings are at midnight, so already started;
+    // shown here, since this is about ordering rather than finished showings.
+    state = set(state, FilterId.HideFinished, false);
 
     expect(suggestFilterRelaxations({ movies, state })).toEqual([
       expect.objectContaining({

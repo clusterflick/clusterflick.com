@@ -70,16 +70,17 @@ export function getDefaultState(): FilterState {
  * Creates a fully permissive ("all") filter state where every filter is a no-op.
  *
  * Unlike getDefaultState(), which reflects the `/films` browsing defaults
- * (Films/Multiple/Shorts categories and a today→+7d window), this overrides the
- * two restrictive modules with their true no-filter sentinels. Used as the base
- * for club/festival matchers, where only the matcher itself should constrain
- * results.
+ * (Films/Multiple/Shorts categories, a today→+7d window, finished showings
+ * hidden), this overrides the three restrictive modules with their true
+ * no-filter sentinels. Used as the base for club/festival matchers, where only
+ * the matcher itself should constrain results.
  */
 export function getPermissiveState(): FilterState {
   return {
     ...getDefaultState(),
     [FilterId.Categories]: null, // all categories, including Events
     [FilterId.DateRange]: { start: null, end: null }, // all dates
+    [FilterId.HideFinished]: false, // finished showings too
   };
 }
 
