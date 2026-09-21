@@ -71,6 +71,52 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-21",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            A new <Link href="/planner">planner</Link> for working out what you
+            can actually get to. Where the <Link href="/films">films</Link> page
+            asks what&rsquo;s on, the planner takes one day at a time and gives
+            each film a row, with all its screening times that day laid side by
+            side &mdash; so once you&rsquo;ve narrowed things to a few cinemas
+            and a handful of candidates, you can see when each is on without
+            opening a page per film. Switch to &ldquo;By time&rdquo; and the
+            same day is grouped by the hour things start instead, for when you
+            know when you&rsquo;re free and want to see what fits. It uses the
+            same filters as the films page, so whatever you&rsquo;ve set on one
+            carries across to the other.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Screenings that have already started are now hidden by default
+            &mdash; a showing you can&rsquo;t get to is no help deciding what to
+            see. If you do want them, &ldquo;Hide past showings&rdquo; in the
+            filter panel turns them back on.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The search and filters on the <Link href="/films">films</Link> page
+            now stay at the top as you scroll, so you can refine a search from
+            halfway down the grid rather than scrolling back up first. The
+            planner&rsquo;s day controls sit in the same spot, so switching
+            between the two keeps everything where you left it.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-18",
     changes: [
       {
