@@ -88,7 +88,8 @@
   max-width: 800px;
 }
 
-.trailerButton {
+/* Doubled to outrank Button's display, which may load after this module */
+.trailerButton.trailerButton {
   display: flex;
   align-items: center;
   gap: 12px;
