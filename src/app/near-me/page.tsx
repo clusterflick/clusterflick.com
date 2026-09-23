@@ -19,24 +19,24 @@ import { AccessibilityFeature } from "@/types";
 import NearMePageContent from "./page-content";
 
 export const metadata: Metadata = {
-  title: "Near Me — Discover Cinemas, Film Clubs & Festivals in Your Borough",
+  title: "Near Me — Your Local Cinemas and What's On Nearby",
   description:
-    "Find cinemas, film clubs, festivals, and accessible screenings near you. Use your location or choose your London borough to discover what's showing nearby.",
+    "Your local cinemas and what's on at them next, plus critics' picks, one-off screenings, film clubs and festivals near you. Use your location or choose your London borough.",
   alternates: {
     canonical: "/near-me",
   },
   openGraph: {
-    title: "Near Me — What's On Near You | Clusterflick",
+    title: "Near Me — What's On Nearby | Clusterflick",
     description:
-      "Discover cinemas, film clubs, festivals, and accessible screenings near you in London.",
+      "Your local cinemas, what's on at them next, and the film clubs and festivals near you in London.",
     url: "https://clusterflick.com/near-me",
     siteName: "Clusterflick",
   },
   twitter: {
     card: "summary",
-    title: "Near Me — What's On Near You | Clusterflick",
+    title: "Near Me — What's On Nearby | Clusterflick",
     description:
-      "Discover cinemas, film clubs, festivals, and accessible screenings near you in London.",
+      "Your local cinemas, what's on at them next, and the film clubs and festivals near you in London.",
     creator: "@clusterflick",
   },
 };

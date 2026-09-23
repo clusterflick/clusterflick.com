@@ -9,7 +9,7 @@ import { FILM_CLUBS } from "@/data/film-clubs";
 
 /**
  * Shared build-time precompute for location-aware sections. Used by both the
- * full `/near-me` page and the home page's "Near You" teaser so the two never
+ * full `/near-me` page and the home page's Near Me section so the two never
  * diverge.
  */
 

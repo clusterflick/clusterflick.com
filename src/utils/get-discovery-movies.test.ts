@@ -15,6 +15,7 @@ import {
   getCollectionRow,
   getOccasionMovies,
   getRating,
+  computeNearMeRows,
   type DiscoveryWindow,
 } from "./get-discovery-movies";
 
@@ -548,5 +549,62 @@ describe("getOccasionMovies", () => {
     ]);
 
     expect(getOccasionMovies(movies, window)).toHaveLength(2);
+  });
+});
+
+describe("computeNearMeRows", () => {
+  const NEAR = new Set(["near"]);
+  const GOOD = { lb: { rating: 4.5, reviews: 5000 } };
+
+  it("only picks films showing at the nearby venues", () => {
+    const movies = asRecord([
+      makeMovie("here", [{ venueId: "near" }], GOOD),
+      makeMovie("there", [{ venueId: "far" }], GOOD),
+    ]);
+
+    const { criticsPicks } = computeNearMeRows(movies, NEAR, NOW);
+    expect(criticsPicks.map((s) => s.movie.id)).toEqual(["here"]);
+  });
+
+  it("calls a film's last nearby showing its last chance", () => {
+    // Its run carries on elsewhere, but not anywhere the reader would go.
+    const movies = asRecord([
+      makeMovie("leaving", [
+        { venueId: "near", times: [NOW + DAY] },
+        { venueId: "far", times: [NOW + 30 * DAY] },
+      ]),
+    ]);
+
+    const { lastChance } = computeNearMeRows(movies, NEAR, NOW);
+    expect(lastChance.map((s) => s.movie.id)).toEqual(["leaving"]);
+  });
+
+  it("counts a film as just added when it has only just reached a nearby venue", () => {
+    const movies = asRecord([
+      makeMovie(
+        "arrived",
+        [
+          { venueId: "far", seen: NOW - 60 * DAY },
+          { venueId: "near", seen: NOW - DAY },
+        ],
+        { year: "2020" },
+      ),
+      makeMovie("elsewhere", [{ venueId: "far", seen: NOW - DAY }], {
+        year: "2020",
+      }),
+    ]);
+
+    const { justAdded } = computeNearMeRows(movies, NEAR, NOW);
+    expect(justAdded.map((s) => s.movie.id)).toEqual(["arrived"]);
+  });
+
+  it("keeps only occasions at the nearby venues", () => {
+    const movies = asRecord([
+      makeMovie("qa-here", [{ venueId: "near", title: "A + Q&A" }]),
+      makeMovie("qa-there", [{ venueId: "far", title: "B + Q&A" }]),
+    ]);
+
+    const { occasions } = computeNearMeRows(movies, NEAR, NOW);
+    expect(occasions.map((s) => s.movie.id)).toEqual(["qa-here"]);
   });
 });

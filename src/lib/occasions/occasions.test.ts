@@ -352,6 +352,24 @@ describe("findBestOccasionPerMovie", () => {
     expect(findOccasions(index([soldOut]), window)).toHaveLength(1);
   });
 
+  it("narrows to the given venues without losing a film's nearby night", () => {
+    const both = makeMovie("both", {
+      notes: "Q&A with Someone Famous",
+      venues: ["far", "near"],
+    });
+    const farOnly = makeMovie("far-only", {
+      notes: "Q&A with Someone Famous",
+      venues: ["far"],
+    });
+
+    const found = findBestOccasionPerMovie(index([both, farOnly]), window, {
+      venueIds: new Set(["near"]),
+    });
+    expect(found.map((o) => [o.movie.id, o.venueId])).toEqual([
+      ["both", "near"],
+    ]);
+  });
+
   it("prefers variety when two venues' occasions are level", () => {
     const movies = ["a", "b"].flatMap((venue) =>
       Array.from({ length: 3 }, (_, i) =>

@@ -4,8 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .exploreLinks {
@@ -122,106 +122,19 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Map (results) */
+/* Results */
+
+.pending {
+  color: var(--color-muted-gray);
+  margin: 0;
+}
+
+.rows {
+  margin: 8px 0 24px;
+}
 
 .mapSection {
   margin-bottom: 32px;
-}
-
-/* Venue grid (results) */
-
-/* `minmax(0, …)` rather than a bare `1fr`: the venue name is `white-space: nowrap`,
-   so a track sized by its `auto` minimum can never shrink below the longest name
-   and pushes the page into horizontal scroll. The name ellipsises once the track
-   is free to shrink. */
-.venueGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-}
-
-@media (min-width: 600px) {
-  .venueGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.venueItem {
-  position: relative;
-  min-width: 0;
-}
-
-.distance {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-electric-blue);
-  background: rgba(1, 0, 19, 0.85);
-  padding: 3px 8px;
-  border-radius: 20px;
-  pointer-events: none;
-}
-
-/* Event scroller (film clubs, festivals) — horizontal to save vertical space */
-
-.eventScroller {
-  list-style: none;
-  padding: 12px;
-  margin: 0;
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-.eventScroller > li {
-  flex: 0 0 auto;
-  width: 280px;
-  scroll-snap-align: start;
-}
-
-.countBadge {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-electric-blue);
-  background: rgba(49, 158, 219, 0.12);
-  padding: 2px 12px;
-  border-radius: 20px;
-  line-height: 1.5;
-}
-
-/* Meta items inside EventCard */
-
-.metaItem {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.filmCount {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-electric-blue);
-  background: rgba(49, 158, 219, 0.12);
-  padding: 2px 10px;
-  border-radius: 20px;
-}
-
-/* Accessibility section intro link */
-
-.accessibilitySection h2 {
-  margin-bottom: 8px;
-}
-
-.accessibilitySection p {
-  font-size: 14px;
-  margin-bottom: 28px;
 }
 
 /* No results */

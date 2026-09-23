@@ -11,9 +11,10 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  *
  * Two overlay modes: pass `boundary` (a GeoJSON object) to trace the Greater
  * London outline behind the pins (the `/venues` page), or `distanceRingsMiles`
- * (e.g. `[1, 2]`) to draw dashed distance rings around the user and frame them
- * instead of the venues (the `/near-me` page — rings only appear once a position
- * is known).
+ * (e.g. `[1, 2]`) to draw dashed distance rings around the user and frame the
+ * venues together with the user (the `/near-me` page — rings only appear once a
+ * position is known). Set `highlighted` on a venue to draw it larger and keep it
+ * out of the clusters, as the near-me page does for the reader's locals.
  *
  * **When to use:** for a spatial, browse-by-location overview of many venues.
  *
