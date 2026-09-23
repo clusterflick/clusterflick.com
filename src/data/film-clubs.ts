@@ -505,4 +505,39 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Witch of Popcorn" },
     ],
   },
+  {
+    id: "korean-film-club",
+    name: "Korean Film Club",
+    url: "https://koreanfilm.club",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Korean Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Korean Film Club" },
+    ],
+  },
+  {
+    id: "ai-movie-club",
+    name: "AI Movie Club",
+    url: "https://aimc.ii.inc",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "AI Movie Club" },
+      { [FilterId.PerformanceNotesSearch]: "AI Movie Club" },
+    ],
+  },
+  {
+    id: "anti-brainrot-club",
+    name: "ANTI-BRAINROT CLUB",
+    url: "https://www.instagram.com/abrc.london/",
+    aliases: ["abrc"],
+    matchers: [
+      // Luma listings lead with the acronym ("ABRC FILM CLUB & DISCUSSION: …",
+      // "ABRC: THE VAMPIRE DIARIES SCREENING"); the full name is kept for
+      // anything that spells it out. "abrc" appears nowhere else in the data.
+      { [FilterId.ShowingTitleSearch]: "ABRC" },
+      { [FilterId.PerformanceNotesSearch]: "ABRC" },
+      { [FilterId.ShowingTitleSearch]: "Anti-Brainrot Club" },
+      { [FilterId.PerformanceNotesSearch]: "Anti-Brainrot Club" },
+    ],
+  },
 ];

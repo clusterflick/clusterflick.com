@@ -122,6 +122,55 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/korean-film-club">Korean Film Club</Link>,
+            sharing Korean cinema and the stories of the diaspora, with history
+            and culture experts brought in around each film. Their September
+            edition is at{" "}
+            <Venue name="The Exchange NW1" url="https://exchangenw1.com" /> on
+            29 September.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added <Link href="/film-clubs/ai-movie-club">AI Movie Club</Link>,
+            free monthly screenings of films about artificial intelligence and
+            what it means to be human, each opened by a short talk from a guest
+            working in AI. Next up is The Matrix at{" "}
+            <Venue
+              name="Kensington Central Library"
+              url="https://www.rbkc.gov.uk/libraries"
+            />{" "}
+            on 24 September.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/anti-brainrot-club">
+              ANTI-BRAINROT CLUB
+            </Link>
+            , a London community for getting off your phone and meeting
+            like-minded people, whose film nights pair a screening with a
+            discussion afterwards. Their next is Parasite at{" "}
+            <Venue
+              name="Close-Up Film Centre"
+              url="https://www.closeupfilmcentre.com"
+            />{" "}
+            on 10 October.
+          </>
+        ),
+      },
     ],
   },
   {
