@@ -20,7 +20,7 @@ import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
 import DiscoverySections from "./discovery-sections";
 import DiscoveryRowsView from "./discovery-rows-view";
-import NearYouSection from "./near-you-section";
+import NearMeSection from "./near-me-section";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -151,7 +151,7 @@ export default async function Home() {
 
           <Divider />
 
-          <NearYouSection venues={nearMeVenues} filmClubs={nearMeFilmClubs} />
+          <NearMeSection venues={nearMeVenues} filmClubs={nearMeFilmClubs} />
         </div>
         <SiteFooter />
       </PageWrapper>

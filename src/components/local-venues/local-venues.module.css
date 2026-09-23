@@ -1,0 +1,141 @@
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+.card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(var(--color-white-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.initial {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(var(--color-white-rgb), 0.4);
+}
+
+.heading {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* A card title, not a page heading: globals.css sizes h3 for sections. */
+.name {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.distance {
+  color: var(--color-electric-blue);
+  font-weight: 600;
+}
+
+.label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-gray);
+}
+
+.list {
+  list-style: none;
+  margin: -6px 0 0;
+  padding: 0;
+}
+
+.entry {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 0;
+}
+
+.entry + .entry {
+  border-top: 1px solid rgba(var(--color-light-gray-rgb), 0.08);
+}
+
+.when {
+  flex-shrink: 0;
+  width: 8.5em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-light-gray);
+}
+
+.day {
+  color: var(--color-muted-gray);
+}
+
+.film {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.clubs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+}

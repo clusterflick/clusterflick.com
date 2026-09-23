@@ -1,0 +1,47 @@
+.prompt {
+  max-width: 824px;
+  margin: 0 auto 64px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  background-color: rgba(var(--color-light-gray-rgb), 0.06);
+  border: 1px solid rgba(var(--color-light-gray-rgb), 0.18);
+  border-radius: 8px;
+}
+
+.promptTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.promptText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  margin: 0 0 4px;
+}
+
+.error {
+  font-size: 14px;
+  color: var(--color-neon-pink);
+  opacity: 0.85;
+}
+
+.results {
+  margin-bottom: 48px;
+}
+
+.pending {
+  color: var(--color-muted-gray);
+  margin: 0;
+}
+
+.cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
