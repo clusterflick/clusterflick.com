@@ -71,6 +71,60 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-23",
+    changes: [
+      {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://luma.com">Luma</Ext>, the events platform, where
+            a lot of London&rsquo;s film clubs put their listings.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Better Space",
+                  url: "https://www.betterspace.london",
+                },
+                {
+                  name: "Frequency Coffee Camden Passage",
+                  url: "https://frequencycoffee.com",
+                },
+                {
+                  name: "The Exchange NW1",
+                  url: "https://exchangenw1.com",
+                },
+                {
+                  name: "The Roof Gardens",
+                  url: "https://www.theroofgardens.com",
+                },
+                {
+                  name: "The Trafalgar",
+                  url: "https://www.thetrafalgarchelsea.com",
+                },
+                { name: "triplebond", url: "https://triple-bond.co.uk" },
+                { name: "Woolwich Works", url: "https://www.woolwich.works" },
+              ]}
+            />
+            , seven places running film clubs that keep their listings on Luma —
+            a Clerkenwell coworking space, an Angel coffee shop, a Marylebone
+            studio hub, the Kensington roof gardens, a pub on the King&apos;s
+            Road, a wellness club off Marylebone Lane, and the arts centre on
+            the Royal Arsenal.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-21",
     changes: [
       {
