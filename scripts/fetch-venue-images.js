@@ -417,6 +417,20 @@ async function downloadImage(url) {
   };
 }
 
+// A venue's own file, whatever its extension, and never a debug or marker file.
+// It wins over the shared download: the members of a group can be separately
+// branded - The Bedford and The Trafalgar share a parent company and nothing
+// else - so a logo placed here by hand has to survive a run that would
+// otherwise copy the group's over it.
+function findVenueImage(id) {
+  return fs
+    .readdirSync(OUTPUT_DIR)
+    .find(
+      (f) =>
+        f.startsWith(`${id}.`) && !f.includes("--") && !f.endsWith(".noimage"),
+    );
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -879,7 +893,7 @@ function sleep(ms) {
 
     const sourcePath = path.join(OUTPUT_DIR, sourceName);
 
-    if (sourceName === destName || fs.existsSync(destPath)) {
+    if (sourceName === destName || findVenueImage(id)) {
       linkedCount++;
       continue;
     }
@@ -908,14 +922,7 @@ function sleep(ms) {
   for (const { id, domain } of venueMapping) {
     if (!domain || !needsManualImage(domain)) continue;
 
-    const existing = fs
-      .readdirSync(OUTPUT_DIR)
-      .find(
-        (f) =>
-          f.startsWith(`${id}.`) &&
-          !f.includes("--") &&
-          !f.endsWith(".noimage"),
-      );
+    const existing = findVenueImage(id);
 
     if (!existing) {
       manual.push(domain);
