@@ -700,4 +700,28 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "uk-jewish-film-festival",
+    name: "UK Jewish Film Festival",
+    url: "https://ukjewishfilm.org/",
+    aliases: ["ukjff", "jewish-film-festival"],
+    matchers: [
+      {
+        // Curzon titles its screenings "UKJFF: …" and Picturehouse
+        // "UKJFF 2026: …". The abbreviation is distinctive enough to match
+        // unscoped: the festival spreads across a dozen London venues and
+        // changes them from year to year.
+        [FilterId.ShowingTitleSearch]: "UKJFF",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "UK Jewish Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "UK Jewish Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "UKJFF",
+      },
+    ],
+  },
 ];
