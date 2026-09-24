@@ -540,4 +540,16 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Anti-Brainrot Club" },
     ],
   },
+  {
+    id: "deptford-cinema",
+    name: "Deptford Cinema",
+    url: "https://deptfordcinema.org",
+    aliases: [],
+    matchers: [
+      // Host venues credit the screenings in performance notes ("Presented by
+      // Deptford Cinema"); the title matcher covers any that lead with it.
+      { [FilterId.ShowingTitleSearch]: "Deptford Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Deptford Cinema" },
+    ],
+  },
 ];

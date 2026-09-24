@@ -74,6 +74,20 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-24",
     changes: [
       {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/deptford-cinema">Deptford Cinema</Link>, the
+            volunteer-run, not-for-profit community cinema that spent six years
+            on Deptford Broadway and now screens as pop-ups, with a monthly
+            residency at{" "}
+            <Venue name="The Brookmill" url="https://www.thebrookmill.co.uk" />.
+            Next up is Daisies there on 27 September.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
