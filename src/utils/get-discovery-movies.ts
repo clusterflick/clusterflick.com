@@ -8,6 +8,7 @@ import {
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
 import { getRating, isEvergreen } from "@/utils/movie-ratings.mjs";
 import { findBestOccasionPerMovie } from "@/lib/occasions";
+import { pruneByShowings } from "@/utils/prune-movies";
 
 export { getRating };
 
@@ -305,6 +306,29 @@ export function getVenueNewAdditions(
   window: DiscoveryWindow = getDiscoveryWindow(),
   limit: number = DEFAULT_LIMIT,
 ): ScoredMovie[] {
+  return getNewAdditionsAtVenues(
+    movies,
+    new Set([venueId]),
+    now,
+    window,
+    limit,
+  );
+}
+
+/**
+ * {@link getVenueNewAdditions} over a set of venues — the near-me page's "Just
+ * added" row. Only showings at those venues count, both for when a film was
+ * first seen and for whether it still has an upcoming performance, so a film
+ * that was added elsewhere a month ago and only reached a nearby venue this week
+ * is new here.
+ */
+export function getNewAdditionsAtVenues(
+  movies: MoviesRecord,
+  venueIds: ReadonlySet<string>,
+  now: number = Date.now(),
+  window: DiscoveryWindow = getDiscoveryWindow(),
+  limit: number = DEFAULT_LIMIT,
+): ScoredMovie[] {
   const cutoff = now - NEW_ADDITION_LOOKBACK_DAYS * MS_PER_DAY;
 
   return Object.values(movies)
@@ -313,7 +337,7 @@ export function getVenueNewAdditions(
       const venueShowingIds = new Set<string>();
       let earliestSeen = Infinity;
       for (const [showingId, showing] of Object.entries(movie.showings)) {
-        if (showing.venueId !== venueId) continue;
+        if (!venueIds.has(showing.venueId)) continue;
         venueShowingIds.add(showingId);
         if (typeof showing.seen === "number" && showing.seen < earliestSeen) {
           earliestSeen = showing.seen;
@@ -536,16 +560,21 @@ export function getCollectionRow(
  * how often the film screens elsewhere) rather than about the row. All this
  * does is put the occasion where a reader will see it: the poster subtitle,
  * which is otherwise the film's year.
+ *
+ * Pass `venueIds` to keep only occasions at those venues. They are still scored
+ * against the whole dataset — see `findBestOccasionPerMovie`.
  */
 export function getOccasionMovies(
   movies: MoviesRecord,
   window: DiscoveryWindow,
   limit: number = OCCASIONS_LIMIT,
+  venueIds?: ReadonlySet<string>,
 ): ScoredMovie[] {
-  return findBestOccasionPerMovie(movies, {
-    start: window.rangeStart,
-    end: window.rangeEnd,
-  })
+  return findBestOccasionPerMovie(
+    movies,
+    { start: window.rangeStart, end: window.rangeEnd },
+    { venueIds },
+  )
     .slice(0, limit)
     .map(({ movie, performance, label, filmPerformanceCount }) => ({
       movie,
@@ -596,5 +625,60 @@ export function computeDiscoveryRows(
       getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),
     ),
     collections: getCollectionRow(movies, options.collections ?? {}, window),
+  };
+}
+
+/** The discovery rows scoped to the venues near a reader (the near-me page). */
+export interface NearMeRows {
+  criticsPicks: ScoredMovie[];
+  occasions: ScoredMovie[];
+  justAdded: ScoredMovie[];
+  marathons: ScoredMovie[];
+  lastChance: ScoredMovie[];
+}
+
+/**
+ * The home page's rows, answered for the venues near the reader rather than the
+ * whole city. Most rows run over the dataset pruned to those venues, which is
+ * what makes them local: a critics' pick counts only nearby showings, and "last
+ * chance" becomes the last chance to catch a film *nearby*, which is the more
+ * useful thing to know when the reader is choosing where to go.
+ *
+ * Occasions are the exception — they are scored against the full dataset and
+ * then filtered, because whether a Q&A is rare is a question about London.
+ *
+ * "Showing Across London" has no local equivalent: it ranks breadth, and breadth
+ * across a dozen venues says little. Collections are left out for the same
+ * reason — a franchise run is a city-wide thing.
+ *
+ * Always anchored to `now`: this only runs on the client, once the reader's
+ * position is known.
+ */
+export function computeNearMeRows(
+  movies: MoviesRecord,
+  venueIds: ReadonlySet<string>,
+  now: number = Date.now(),
+): NearMeRows {
+  const window = getDiscoveryWindow(7, now);
+  const nearby = pruneByShowings(movies, (showing) =>
+    venueIds.has(showing.venueId),
+  );
+  return {
+    criticsPicks: getCriticsPicks(nearby, window, CRITICS_LIMIT, now),
+    occasions: getOccasionMovies(
+      movies,
+      getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),
+      OCCASIONS_LIMIT,
+      venueIds,
+    ),
+    justAdded: getNewAdditionsAtVenues(
+      movies,
+      venueIds,
+      now,
+      window,
+      NEW_ADDITIONS_LIMIT,
+    ),
+    marathons: getMarathonMovies(nearby, window, Infinity),
+    lastChance: getLastChanceMovies(nearby, now, LAST_CHANCE_LIMIT),
   };
 }

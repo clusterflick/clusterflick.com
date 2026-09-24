@@ -256,6 +256,40 @@ overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` 
 up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
 would render at 48px in pink.
 
+## Near Me
+
+`/near-me` and the home page's Near Me section are two views of one hook,
+`useNearMe` (`src/hooks/use-near-me.ts`), so they cannot disagree about where
+the reader is or what is near them. Everything location-dependent is computed
+on the client; the page ships only build-time venue, club and festival counts.
+
+**One nearby set feeds everything.** It is `getNearbyVenueIds`, the rule behind
+the filter overlay's "Venues near me", plus the reader's locals. The page's rows,
+map, cinema list and "What's on near me today" link all read that one set, so a
+click never shows a different set of venues from the page it came from. The
+locals are added in because the overlay's rule stops at ten venues, which in
+Dalston is inside 0.6 miles, while a local can be up to two miles off. Without
+them the today link skipped the Hackney Picturehouse the page had just named.
+
+**Locals** (`getLocalVenues`) are the closest two venues within two miles with
+_more than_ five bookable screenings in the next seven days, plus a third within
+half a mile. A week rather than today, so a local does not vanish on a quiet
+Monday. They count the default film categories, so the count agrees with the
+today link, which carries only `venues`, `dateStart` and `dateEnd` and leaves
+the rest at the catalogue defaults, the same state as the overlay's preset.
+
+**The rows are the home page's rows, localised** (`computeNearMeRows`). Most
+run over the listings pruned to the nearby venues, which makes "last chance"
+mean the last _nearby_ showing. Occasions are the exception. They are scored
+against the whole city and filtered afterwards, because rarity is a London-wide
+question. "Showing Across London" and collections are left out, since both rank
+breadth and breadth across a dozen venues says little.
+
+**The map frames the venues and the reader, not the rings.** Framing the
+two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
+Locals are drawn larger and outside the cluster group, so they never fold into a
+bubble.
+
 ## Cast & Crew Filters
 
 Directors and cast are **filters on the films grid, not pages of their own**

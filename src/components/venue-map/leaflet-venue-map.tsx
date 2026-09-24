@@ -29,6 +29,8 @@ export interface VenueMapVenue {
   lat: number;
   lon: number;
   filmCount: number;
+  /** Drawn larger, above the clusters — the near-me page's locals. */
+  highlighted?: boolean;
 }
 
 // CARTO basemaps now require an API key on every tile request. It travels in
@@ -93,6 +95,14 @@ const venueIcon = L.divIcon({
   popupAnchor: [0, -8],
 });
 
+const highlightedVenueIcon = L.divIcon({
+  className: styles.venueMarker,
+  html: `<span class="${styles.venuePin} ${styles.venuePinHighlighted}"></span>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
+  popupAnchor: [0, -12],
+});
+
 const userIcon = L.divIcon({
   className: styles.userMarker,
   html: `<span class="${styles.userDot}"></span>`,
@@ -111,6 +121,33 @@ function createClusterIcon(cluster: L.MarkerCluster) {
   });
 }
 
+function renderVenueMarker(venue: VenueMapVenue, icon: L.DivIcon) {
+  return (
+    <Marker
+      key={venue.id}
+      position={[venue.lat, venue.lon]}
+      icon={icon}
+      // Dim venues with nothing currently showing.
+      opacity={venue.filmCount > 0 ? 1 : 0.5}
+      zIndexOffset={venue.highlighted ? 1000 : 0}
+    >
+      <Popup>
+        <Link href={venue.href} className={styles.popupTitle}>
+          <MapPinIcon size={20} className={styles.popupIcon} />
+          {venue.name}
+        </Link>
+        <span className={styles.popupMeta}>
+          {venue.filmCount > 0
+            ? `${venue.filmCount.toLocaleString("en-GB")} ${
+                venue.filmCount === 1 ? "film" : "films"
+              } showing`
+            : "No showings currently listed"}
+        </span>
+      </Popup>
+    </Marker>
+  );
+}
+
 /** Bridges the Leaflet map instance up to the parent so controls can drive it. */
 function MapRefBridge({ onMap }: { onMap: (map: L.Map) => void }) {
   const map = useMap();
@@ -125,8 +162,9 @@ interface LeafletVenueMapProps {
   boundary?: GeoJSON.GeoJsonObject;
   /**
    * Radii (in miles) to draw as distance rings around the user's position, e.g.
-   * `[1, 2]`. When set (and a position is known) the map frames the largest ring
-   * instead of the venue bounds. Used by the near-me page.
+   * `[1, 2]`. When set (and a position is known) the map frames the venues and
+   * the user together, falling back to the largest ring when there are no
+   * venues. Used by the near-me page.
    */
   distanceRingsMiles?: number[];
 }
@@ -150,17 +188,20 @@ export default function LeafletVenueMap({
     [venues],
   );
 
-  // Square that encloses the outermost ring, so both rings + the user dot are
-  // always framed regardless of where the nearby venues happen to fall.
+  // In rings mode, frame the venues with the user dot, not the rings: framing
+  // the outermost ring left the nearest venues bunched in the middle of an
+  // empty two-mile circle. The rings are context and may run off the edge. With
+  // no venues the ring is all there is to frame.
   const ringsBounds = useMemo(() => {
     if (!showRings || !position) return null;
+    const here = L.latLng(position.lat, position.lon);
+    if (venuesBounds) return L.latLngBounds([here, here]).extend(venuesBounds);
     const maxRadius = Math.max(...distanceRingsMiles!) * MILES_TO_METRES;
-    return L.latLng(position.lat, position.lon).toBounds(2 * maxRadius);
-  }, [showRings, position, distanceRingsMiles]);
+    return here.toBounds(2 * maxRadius);
+  }, [showRings, position, distanceRingsMiles, venuesBounds]);
 
-  // In rings mode we frame the rings; otherwise the venues. Keeping these two
-  // memos separate means geolocation resolving on the venues page can't nudge
-  // the venue-framed view.
+  // Keeping the venues page's target independent of the position means
+  // geolocation resolving there can't nudge the venue-framed view.
   const fitTarget = useMemo(
     () => ringsBounds ?? venuesBounds,
     [ringsBounds, venuesBounds],
@@ -173,7 +214,10 @@ export default function LeafletVenueMap({
     if (!map || !fitTarget) return;
 
     if (!didFit.current) {
-      map.fitBounds(fitTarget, { padding: FIT_PADDING });
+      map.fitBounds(fitTarget, {
+        padding: FIT_PADDING,
+        maxZoom: REFIT_MAX_ZOOM,
+      });
       didFit.current = true;
       return;
     }
@@ -242,30 +286,14 @@ export default function LeafletVenueMap({
           chunkedLoading
           maxClusterRadius={50}
         >
-          {venues.map((venue) => (
-            <Marker
-              key={venue.id}
-              position={[venue.lat, venue.lon]}
-              icon={venueIcon}
-              // Dim venues with nothing currently showing.
-              opacity={venue.filmCount > 0 ? 1 : 0.5}
-            >
-              <Popup>
-                <Link href={venue.href} className={styles.popupTitle}>
-                  <MapPinIcon size={20} className={styles.popupIcon} />
-                  {venue.name}
-                </Link>
-                <span className={styles.popupMeta}>
-                  {venue.filmCount > 0
-                    ? `${venue.filmCount.toLocaleString("en-GB")} ${
-                        venue.filmCount === 1 ? "film" : "films"
-                      } showing`
-                    : "No showings currently listed"}
-                </span>
-              </Popup>
-            </Marker>
-          ))}
+          {venues
+            .filter((venue) => !venue.highlighted)
+            .map((venue) => renderVenueMarker(venue, venueIcon))}
         </MarkerClusterGroup>
+        {/* Outside the cluster group, so a local never folds into a bubble. */}
+        {venues
+          .filter((venue) => venue.highlighted)
+          .map((venue) => renderVenueMarker(venue, highlightedVenueIcon))}
         {position && (
           <Marker
             position={[position.lat, position.lon]}
