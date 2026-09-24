@@ -4,6 +4,7 @@ import { initialize, mswLoader } from "msw-storybook-addon";
 import { Montserrat, Inter } from "next/font/google";
 import clsx from "clsx";
 import { handlers } from "./msw/handlers";
+import { MockUserProvider } from "../src/state/user-context";
 import "../src/app/globals.css";
 import "./preview.css";
 
@@ -68,6 +69,14 @@ const preview: Preview = {
 
   // Global decorators to apply fonts and set env var
   decorators: [
+    // Every page sits inside UserProvider, which would need Firebase. Stories
+    // get a signed-out reader instead, as most visitors are; a story that
+    // needs another state wraps itself in its own MockUserProvider.
+    (Story) => (
+      <MockUserProvider value={{ status: "signed-out" }}>
+        <Story />
+      </MockUserProvider>
+    ),
     (Story) => {
       // Clear filter state from sessionStorage before each story so that
       // persisted filters don't leak between stories or across sessions.

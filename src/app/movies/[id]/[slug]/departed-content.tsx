@@ -10,6 +10,7 @@ import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
 import { ButtonLink, ButtonAnchor } from "@/components/button";
 import { PlayIcon } from "@/components/icons";
+import UserListButtons from "@/components/user-list-buttons";
 import GenresList from "./components/genres-list";
 import CastCrewSection from "./components/cast-crew-section";
 import styles from "./page.module.css";
@@ -108,6 +109,8 @@ export default function DepartedContent({
               ) : undefined
             }
           />
+
+          <UserListButtons movie={movie} />
 
           {movie.overview && (
             <p className={styles.overview}>{movie.overview}</p>

@@ -1,0 +1,28 @@
+.wrapper {
+  margin-bottom: 24px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Doubled to outrank Button's display, which may load after this module. */
+.button.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error {
+  margin-top: 12px;
+  color: var(--color-neon-pink);
+}
+
+/* The movie hero centres its content below tablet width. */
+@media (max-width: 900px) {
+  .buttons {
+    justify-content: center;
+  }
+}

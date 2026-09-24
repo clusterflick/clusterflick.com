@@ -71,12 +71,19 @@ export async function addToUserList(
   listId: UserListId,
   movieId: Movie["id"],
   entry: UserListEntry,
+  /** Lists the film leaves in the same write, so the two can't disagree. */
+  removeFrom: UserListId[] = [],
 ): Promise<void> {
-  const { setDoc } = await import("firebase/firestore/lite");
+  const { setDoc, deleteField } = await import("firebase/firestore/lite");
   // Merge rather than update: the document doesn't exist until the first add.
   await setDoc(
     await getUserDocRef(db, uid),
-    { [listId]: { [movieId]: entry } },
+    {
+      [listId]: { [movieId]: entry },
+      ...Object.fromEntries(
+        removeFrom.map((otherId) => [otherId, { [movieId]: deleteField() }]),
+      ),
+    },
     { merge: true },
   );
 }

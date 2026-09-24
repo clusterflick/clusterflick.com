@@ -4,12 +4,18 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import LinkedList from "@/components/linked-list";
+import FilmPosterGrid, {
+  type FilmPosterGridMovie,
+} from "@/components/film-poster-grid";
 import LoadingIndicator from "@/components/loading-indicator";
 import Button from "@/components/button";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
-import { UserListId, type UserLists } from "@/lib/user-lists";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import {
+  UserListId,
+  type UserListEntry,
+  type UserLists,
+} from "@/lib/user-lists";
+import { useCinemaData } from "@/state/cinema-data-context";
 import styles from "./page.module.css";
 
 const LIST_LABELS: Record<UserListId, { title: string; empty: string }> = {
@@ -294,22 +300,91 @@ function UserListSection({
   listId: UserListId;
   lists: UserLists;
 }) {
+  const { removeFromList } = useUserContext();
+  const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
   const { title, empty } = LIST_LABELS[listId];
-  const items = Object.entries(lists[listId])
-    .sort(([, a], [, b]) => b.addedAt - a.addedAt)
-    .map(([id, entry]) => ({
-      key: id,
-      href: getMovieUrl({ id, title: entry.title }),
-      label: entry.title,
-      detail: entry.year,
-    }));
+  const entries = Object.entries(lists[listId]).sort(
+    ([, a], [, b]) => b.addedAt - a.addedAt,
+  );
+
+  if (entries.length === 0) {
+    return (
+      <ContentSection title={title}>
+        <p className={styles.empty}>{empty}</p>
+      </ContentSection>
+    );
+  }
+
+  const toGridMovie = (
+    [id, entry]: [string, UserListEntry],
+    showing: boolean,
+  ): FilmPosterGridMovie => ({
+    // The snapshot is all a film that's left the dataset has; one that's
+    // still in it may have gained a poster since it was added.
+    movie: {
+      id,
+      title: entry.title,
+      year: entry.year,
+      posterPath: movies[id]?.posterPath ?? entry.posterPath,
+    },
+    performanceCount: 0,
+    // Unlinked when not showing: whether its departed page still exists is
+    // only known at build time, and a dead link is worse than none.
+    unavailable: !showing,
+    notice: showing ? undefined : "Not showing",
+    action: (
+      <Button
+        variant="link"
+        onClick={() => removeFromList(listId, id)}
+        aria-label={`Remove ${entry.title} from ${title}`}
+      >
+        Remove
+      </Button>
+    ),
+  });
+
+  const count = <span className={styles.count}>{entries.length}</span>;
+
+  if (!hasAttemptedLoad || isLoading) {
+    return (
+      <ContentSection title={title} titleBadge={count}>
+        <LoadingIndicator message="Checking what's showing…" size="sm" />
+      </ContentSection>
+    );
+  }
+
+  // Without the data there's no telling what's showing, so everything is
+  // listed and linked as it is — the grid doesn't prune on an error either.
+  if (error) {
+    return (
+      <ContentSection title={title} titleBadge={count}>
+        <FilmPosterGrid
+          movies={entries.map((entry) => toGridMovie(entry, true))}
+        />
+      </ContentSection>
+    );
+  }
+
+  const showing = entries.filter(([id]) => movies[id]);
+  const notShowing = entries.filter(([id]) => !movies[id]);
 
   return (
-    <ContentSection title={title}>
-      {items.length > 0 ? (
-        <LinkedList items={items} />
-      ) : (
-        <p className={styles.empty}>{empty}</p>
+    <ContentSection title={title} titleBadge={count}>
+      {showing.length > 0 && (
+        <>
+          <h3 className={styles.groupTitle}>Showing now</h3>
+          <FilmPosterGrid
+            movies={showing.map((entry) => toGridMovie(entry, true))}
+          />
+        </>
+      )}
+      {notShowing.length > 0 && (
+        <>
+          <h3 className={styles.groupTitle}>Not showing</h3>
+          <FilmPosterGrid
+            movies={notShowing.map((entry) => toGridMovie(entry, false))}
+          />
+        </>
       )}
     </ContentSection>
   );

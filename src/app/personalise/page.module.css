@@ -80,3 +80,15 @@
   align-items: center;
   gap: 12px;
 }
+
+.count {
+  margin-left: 12px;
+  font-size: 0.6em;
+  color: var(--color-muted-gray);
+}
+
+.groupTitle {
+  margin: 24px 0 12px;
+  font-size: 16px;
+  color: var(--color-muted-gray);
+}

@@ -23,7 +23,7 @@ import {
   fetchUserLists,
   removeFromUserList,
   toUserListEntry,
-  type UserListId,
+  UserListId,
   type UserLists,
 } from "@/lib/user-lists";
 
@@ -226,17 +226,25 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
       const entry = toUserListEntry(movie);
+      // Seeing a film fulfils wanting to see it. The reverse doesn't hold:
+      // wanting to see something again leaves the record that you have.
+      const removeFrom =
+        listId === UserListId.Seen ? [UserListId.Watchlist] : [];
       const previous = lists;
-      setLists((current) =>
-        current
-          ? {
-              ...current,
-              [listId]: { ...current[listId], [movie.id]: entry },
-            }
-          : current,
-      );
+      setLists((current) => {
+        if (!current) return current;
+        const next = {
+          ...current,
+          [listId]: { ...current[listId], [movie.id]: entry },
+        };
+        for (const otherId of removeFrom) {
+          next[otherId] = { ...current[otherId] };
+          delete next[otherId][movie.id];
+        }
+        return next;
+      });
       try {
-        await addToUserList(db, user.uid, listId, movie.id, entry);
+        await addToUserList(db, user.uid, listId, movie.id, entry, removeFrom);
       } catch (error) {
         setLists(previous);
         throw error;

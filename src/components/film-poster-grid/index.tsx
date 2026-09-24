@@ -51,6 +51,11 @@ export interface FilmPosterGridMovie {
    * a detour rather than a dead end.
    */
   notice?: string;
+  /**
+   * A control drawn under the poster — removing a film from a reader's list.
+   * Outside the poster's link, since a button can't sit inside one.
+   */
+  action?: ReactNode;
 }
 
 interface FilmPosterGridProps {
@@ -79,7 +84,16 @@ export default function FilmPosterGrid({
   venueId,
 }: FilmPosterGridProps) {
   const items: FilmPosterGridItem[] = movies.map(
-    ({ movie, linkTo, subtitle, badge, badgeVariant, unavailable, notice }) => {
+    ({
+      movie,
+      linkTo,
+      subtitle,
+      badge,
+      badgeVariant,
+      unavailable,
+      notice,
+      action,
+    }) => {
       const includedMovies = movie.includedMovies;
       const includedWithPosters =
         includedMovies?.filter((m) => m.posterPath) || [];
@@ -136,26 +150,35 @@ export default function FilmPosterGrid({
 
       const target = linkTo ?? movie;
 
+      const film = unavailable ? (
+        <div
+          key={movie.id}
+          className={clsx(styles.filmGridLink, styles.unavailable)}
+        >
+          {noticeBar}
+          <div className={styles.unavailableFilm}>{poster}</div>
+        </div>
+      ) : (
+        <Link
+          key={movie.id}
+          href={`${getMovieUrl(target)}${movieUrlParams ? `?${movieUrlParams}` : ""}${showAll ? "#show-all" : ""}`}
+          className={styles.filmGridLink}
+        >
+          {noticeBar}
+          {poster}
+        </Link>
+      );
+
       return {
         id: target.id,
         unavailable,
-        node: unavailable ? (
-          <div
-            key={movie.id}
-            className={clsx(styles.filmGridLink, styles.unavailable)}
-          >
-            {noticeBar}
-            <div className={styles.unavailableFilm}>{poster}</div>
+        node: action ? (
+          <div key={movie.id} className={styles.filmGridItem}>
+            {film}
+            <div className={styles.action}>{action}</div>
           </div>
         ) : (
-          <Link
-            key={movie.id}
-            href={`${getMovieUrl(target)}${movieUrlParams ? `?${movieUrlParams}` : ""}${showAll ? "#show-all" : ""}`}
-            className={styles.filmGridLink}
-          >
-            {noticeBar}
-            {poster}
-          </Link>
+          film
         ),
       };
     },

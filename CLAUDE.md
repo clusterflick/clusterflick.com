@@ -659,6 +659,20 @@ the same one the film's URL is built from, so it is stable across releases; the
 slug is derived from the title, as `getMovieUrl` does. The rules restrict the
 document to the list fields, so a new list needs a rules change too.
 
+**Controls live on the film's page only** (`UserListButtons`), never on
+posters: marking every grid would mean loading the SDK on every page for a
+signed-in reader. Signed out, the buttons link to `/personalise`, which makes
+them the way in to personalisation. **Marking a film seen takes it off the
+watchlist**, in the same write so the two can't disagree; the reverse doesn't
+hold, since wanting to see a film again doesn't undo having seen it.
+
+**`/personalise` splits each list into showing now and not showing**, using
+the client cinema data, since what's on is the question a watchlist is
+brought to. Films not showing are drawn `unavailable` and unlinked: whether a
+departed page still exists is only known at build time. Each poster carries a
+Remove button through `FilmPosterGrid`'s `action` slot, which sits outside the
+poster's link.
+
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so
 signed-out, browser-held lists that merge on sign-in remain an option.
