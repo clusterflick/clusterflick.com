@@ -1,0 +1,82 @@
+.form {
+  max-width: 560px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .row {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Same pill as SearchInput, without the search icon it can't drop. */
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 20px;
+  font-size: 16px;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+.input:hover {
+  background: rgba(var(--color-white-rgb), 0.08);
+  border-color: rgba(var(--color-white-rgb), 0.25);
+}
+
+.input:focus {
+  outline: none;
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: var(--color-neon-pink);
+  box-shadow: 0 0 0 3px rgba(var(--color-neon-pink-rgb), 0.15);
+}
+
+.input::placeholder {
+  color: var(--color-muted-gray);
+}
+
+.error {
+  margin-top: 12px;
+  color: var(--color-neon-pink);
+}
+
+.signedInAs {
+  margin-bottom: 32px;
+  color: var(--color-muted-gray);
+}
+
+.signedInAs strong {
+  color: var(--color-light-gray);
+}
+
+.empty,
+.small {
+  color: var(--color-muted-gray);
+}
+
+.small {
+  font-size: 14px;
+}
+
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}

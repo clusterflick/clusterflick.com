@@ -65,6 +65,13 @@ jobs:
           echo "old_hash=$OLD_HASH" >> $GITHUB_OUTPUT
           echo "Current live hash: ${OLD_HASH:-<none>}"
       - run: npm run build
+        # Repository variables, not secrets: the Firebase web config is public by
+        # design. Unset, personalisation switches itself off.
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./out

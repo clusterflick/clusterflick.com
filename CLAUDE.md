@@ -617,6 +617,57 @@ cannot drift between the two. What differs:
 
 It probes one film, so it runs on the live state rather than a deferred copy.
 
+## Personalisation
+
+`/personalise` is where a reader signs in and manages their lists (watchlist,
+seen). Accounts exist to hold those lists, and the page is framed around them
+rather than around an account.
+
+**Firebase, entirely client-side.** The site is a static export, so the browser
+talks to Firebase Auth and Firestore directly and the Firestore security rules
+(`firestore.rules`, deployed with the Firebase CLI via `firebase.json`) are the
+only thing guarding the data. The `NEXT_PUBLIC_FIREBASE_*` web config is public
+by design, set as repository _variables_ in `generate_site.yml`, and listed in
+`.env.example` for local use. **When it is absent the feature switches itself
+off** (`isFirebaseConfigured`, status `unavailable`), which is what keeps local
+builds, Storybook, Chromatic and CI working without a project.
+
+**Sign-up and sign-in are one action.** Email-link ("magic link") sign-in
+creates the account the first time a link is redeemed, so there is no
+registration page. The link returns to `/personalise/`, which redeems it. The
+address must be supplied again to redeem it — the link deliberately doesn't
+carry it, so an intercepted link is useless on its own — which is why it is
+parked in `localStorage` (not `sessionStorage`: the link opens in a new tab),
+deleted on use, and ignored after an hour. Opened in another browser, the page
+asks for the address instead.
+
+**Nobody pays for the SDK who doesn't use it.** `loadFirebase` dynamically
+imports it, and the `UserProvider` (`@/state/user-context`) only calls it for a
+visitor carrying the `clusterflick-signed-in` flag, or when sign-in starts. The
+flag holds no personal data; if it outlives the session the SDK loads, reports
+nobody and clears it. Keep every `firebase/*` import dynamic or type-only —
+one static import puts the SDK in every page's bundle. Firestore is
+`firebase/firestore/lite`: lists need neither realtime listeners nor offline
+caching. Auth is `initializeAuth` rather than `getAuth`, which would bundle the
+popup/redirect resolvers email links never use.
+
+**Storage is one document per user at `users/{uid}`**, every list a map of
+movie id → `UserListEntry`. One read per session. The entry snapshots title,
+year and poster because a listed film outlives its run — once it leaves the
+dataset and later its departed page, the snapshot is all there is. The id is
+the same one the film's URL is built from, so it is stable across releases; the
+slug is derived from the title, as `getMovieUrl` does. The rules restrict the
+document to the list fields, so a new list needs a rules change too.
+
+**Lists are account-only for now**, but the data layer takes a `UserListId`
+and a movie snapshot and knows nothing about where they're kept, so
+signed-out, browser-held lists that merge on sign-in remain an option.
+
+**Deleting an account deletes the lists first**: once the account is gone, the
+rules let nobody delete its document. Firebase may refuse the account deletion
+without a recent sign-in; the lists are gone by then and the page says how to
+finish.
+
 ## Testing
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
+import { UserProvider } from "@/state/user-context";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -110,7 +111,9 @@ export default function RootLayout({
         </a>
         <CinemaDataProvider>
           <FilterConfigProvider>
-            <GeolocationProvider>{children}</GeolocationProvider>
+            <GeolocationProvider>
+              <UserProvider>{children}</UserProvider>
+            </GeolocationProvider>
           </FilterConfigProvider>
         </CinemaDataProvider>
       </body>
