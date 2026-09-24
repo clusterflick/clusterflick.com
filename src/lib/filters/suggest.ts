@@ -1,4 +1,4 @@
-import { AccessibilityFeature, Category, Genre, Venue } from "@/types";
+import { AccessibilityFeature, Category, Genre, Movie, Venue } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import {
   formatDateLong,
@@ -960,16 +960,8 @@ export function suggestFilterRelaxations({
   ];
   if (moves.length === 0) return [];
 
-  let probes = 0;
-
-  const evaluate = (combination: Move[]): FilterSuggestion | null => {
-    if (probes >= maxProbes) return null;
-    probes += 1;
-
-    const candidate = combination.reduce(
-      (result, move) => move.transform(result),
-      state,
-    );
+  return findOffers(moves, limit, maxProbes, (combination) => {
+    const candidate = combine(state, combination);
     const filtered = apply(movies, candidate);
     const count = Object.keys(filtered).length;
     if (count === 0) return null;
@@ -984,6 +976,34 @@ export function suggestFilterRelaxations({
       count,
       state: candidate,
     };
+  });
+}
+
+/** The state a combination of moves produces, applied in order. */
+function combine(state: FilterState, combination: Move[]): FilterState {
+  return combination.reduce((result, move) => move.transform(result), state);
+}
+
+/**
+ * The search itself, shared by the films grid and the film page so the two can
+ * only differ in which moves they consider and how an offer is phrased — never
+ * in the order offers come in, how far the search goes, or which combinations
+ * it refuses.
+ *
+ * `evaluate` probes one combination and returns its offer, or null when it
+ * reveals nothing. Every call counts against `maxProbes`.
+ */
+function findOffers(
+  moves: Move[],
+  limit: number,
+  maxProbes: number,
+  evaluate: (combination: Move[]) => FilterSuggestion | null,
+): FilterSuggestion[] {
+  let probes = 0;
+  const probe = (combination: Move[]): FilterSuggestion | null => {
+    if (probes >= maxProbes) return null;
+    probes += 1;
+    return evaluate(combination);
   };
 
   // Round one — a single change. `moves` is already in cost order, so the first
@@ -1000,7 +1020,7 @@ export function suggestFilterRelaxations({
 
   for (let index = 0; index < moves.length; index += 1) {
     const move = moves[index];
-    const suggestion = evaluate([move]);
+    const suggestion = probe([move]);
     if (suggestion) {
       suggestions.push(suggestion);
       worksAlone.add(move.id);
@@ -1035,13 +1055,126 @@ export function suggestFilterRelaxations({
         pairable[j].writes.includes(id),
       );
       if (collides) continue;
-      const suggestion = evaluate([pairable[i], pairable[j]]);
+      const suggestion = probe([pairable[i], pairable[j]]);
       if (suggestion) suggestions.push(suggestion);
       if (suggestions.length >= limit) return suggestions;
     }
   }
 
   return suggestions;
+}
+
+export interface ShowingSuggestOptions extends Omit<SuggestContext, "people"> {
+  /** The film whose page this is, with every performance it has. */
+  movie: Movie;
+  state: FilterState;
+  /** Maximum offers to return. */
+  limit?: number;
+  /** Hard ceiling on filter-pipeline passes, as for the films grid. */
+  maxProbes?: number;
+}
+
+/**
+ * The film-page counterpart to {@link suggestFilterRelaxations}: when the
+ * filters hide every showing of the film being looked at, the changes that
+ * would bring some back, each with the number of showings it reveals.
+ *
+ * Only widenings apply. Every other kind of move answers "your query named the
+ * wrong thing", and on a film page the subject is fixed — there is no other
+ * film to redirect to, correct towards or read a filter value out of. For the
+ * same reason a query is widened here rather than redirected: whatever was
+ * typed, it was not a search for this page, which the reader has already
+ * found.
+ *
+ * Counts are showings, not films. Measured in films every offer would read
+ * "1 result" and name the film the reader is already looking at.
+ *
+ * Returns nothing when the film already has showings under the state given.
+ * The "Show all" button is the reset beyond the two changes the engine stops
+ * at, so there is nothing to add when nothing within two changes works.
+ */
+export function suggestShowingRelaxations({
+  movie,
+  state,
+  limit = 3,
+  maxProbes = 40,
+  categories,
+  venues,
+  genres,
+}: ShowingSuggestOptions): FilterSuggestion[] {
+  const context: SuggestContext = { categories, venues, genres };
+  const movies: MoviesRecord = { [movie.id]: movie };
+
+  const countShowings = (result: MoviesRecord) =>
+    result[movie.id]?.performances.length ?? 0;
+
+  if (countShowings(apply(movies, state)) > 0) return [];
+
+  const widens = buildWidenMoves(state, context);
+  // Dropping a query is cheaper than giving up an accessibility requirement,
+  // which stays last on its own terms.
+  const accessibility = widens.filter((move) => move.soloOnly);
+  const moves = [
+    ...widens.filter((move) => !move.soloOnly),
+    ...buildQueryDropMoves(state),
+    ...accessibility,
+  ];
+  if (moves.length === 0) return [];
+
+  return findOffers(moves, limit, maxProbes, (combination) => {
+    const candidate = combine(state, combination);
+    const filtered = apply(movies, candidate);
+    const count = countShowings(filtered);
+    if (count === 0) return null;
+
+    // The catalogue names the films an offer reveals, but here that is the
+    // film already on screen. The actions themselves are the instruction, and
+    // the change lines beneath carry what they reveal.
+    const headline = combination
+      .map((move, index) =>
+        index === 0 ? move.action : lowerFirst(move.action),
+      )
+      .join(" and ");
+
+    return {
+      id: combination.map((move) => move.id).join("+"),
+      kind: "widen",
+      headline,
+      changes: buildChanges(combination, headline, filtered),
+      count,
+      state: candidate,
+    };
+  });
+}
+
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+/**
+ * Moves that clear a text query, for the film page only — the films grid
+ * redirects a query and never drops it. A search left over from the grid
+ * ("alien", or "Q&A" in performance notes) can hide every showing of the film the reader went on to
+ * open, and nothing but a reset would otherwise say so.
+ */
+function buildQueryDropMoves(state: FilterState): Move[] {
+  return REDIRECT_FIELDS.flatMap((field) => {
+    const query = get(state, field.id).trim();
+    if (query.length === 0) return [];
+
+    return [
+      {
+        id: `drop:${field.id}`,
+        kind: "widen" as const,
+        action: `Clear the ${field.label.toLowerCase()} search for “${query}”`,
+        label: `Any ${field.label.toLowerCase()}`,
+        soloOnly: false,
+        altersQuery: false,
+        writes: [field.id],
+        transform: (current: FilterState) => set(current, field.id, ""),
+      },
+    ];
+  });
 }
 
 export interface FilterValueOfferOptions extends Pick<

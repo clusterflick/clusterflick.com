@@ -25,7 +25,12 @@ import {
   useFilterConfig,
   EVENT_CATEGORIES,
 } from "@/state/filter-config-context";
-import { filterManager, describeFilters } from "@/lib/filters";
+import {
+  filterManager,
+  describeFilters,
+  suggestShowingRelaxations,
+  type FilterSuggestion,
+} from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
 import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
@@ -87,7 +92,7 @@ export default function PageContent({
     isLoading: isDataLoading,
     hasAttemptedLoad,
   } = useCinemaData();
-  const { filterState, applyUrlParams } = useFilterConfig();
+  const { filterState, applyUrlParams, applyFilterState } = useFilterConfig();
   const [showAll, setShowAll] = useState(false);
 
   // Initialise from hash and sync on back/forward navigation.
@@ -182,6 +187,44 @@ export default function PageContent({
       cinemaVenueIds,
     });
   }, [filterState, metaData, cinemaVenueIds]);
+
+  // What would bring back showings the filters hide, when they hide all of
+  // them. Probes this one film only, so unlike the films grid it runs on the
+  // live state rather than a deferred copy.
+  const suggestions = useMemo(() => {
+    if (
+      showAll ||
+      !showingsReady ||
+      !unfilteredMovie ||
+      !unfilteredMovie.performances?.length ||
+      (filteredMovie?.performances?.length ?? 0) > 0
+    ) {
+      return [];
+    }
+    return suggestShowingRelaxations({
+      movie: unfilteredMovie,
+      state: filterState,
+      categories: EVENT_CATEGORIES,
+      venues: metaData?.venues ?? null,
+      genres: metaData?.genres ?? null,
+    });
+  }, [
+    showAll,
+    showingsReady,
+    unfilteredMovie,
+    filteredMovie,
+    filterState,
+    metaData,
+  ]);
+
+  // Writes the global filter state, as the films grid does: an offer is a
+  // filter change, and one that quietly lapsed on leaving the page would make
+  // the grid disagree with what the reader just chose. "Show all" remains the
+  // way to look past the filters without changing them.
+  const applySuggestion = useCallback(
+    (suggestion: FilterSuggestion) => applyFilterState(suggestion.state),
+    [applyFilterState],
+  );
 
   const handleShowAllToggle = useCallback(() => {
     const next = !showAll;
@@ -363,6 +406,8 @@ export default function PageContent({
           onShowAllToggle={handleShowAllToggle}
           unfilteredPerformanceCount={unfilteredPerformances.length}
           filteredPerformanceCount={filteredMovie?.performances?.length || 0}
+          suggestions={suggestions}
+          onApplySuggestion={applySuggestion}
           staticContent={showingsStaticContent}
         />
       </div>
