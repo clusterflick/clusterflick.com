@@ -595,6 +595,28 @@ the query was typed into. Suggestions ride a `useDeferredValue` copy of the filt
 typing stays responsive; React keeps the previous offers on screen while a pass catches up,
 which is deliberate — blanking them flickered the empty state on every keypress.
 
+### On a film page
+
+When the filters hide every showing of the film being looked at, the showings
+section's empty state carries offers from `suggestShowingRelaxations`, beside
+the existing **Show all** button. It shares `findOffers` with the grid engine, so
+ordering, the two-change limit, pair collisions and `soloOnly` accessibility
+cannot drift between the two. What differs:
+
+- **Only widenings.** Filter-value, people, redirect and correction moves all
+  answer "your query named the wrong thing", and a film page's subject is fixed.
+- **Queries are dropped, not redirected.** A search left over from the grid
+  ("alien", "Q&A" in notes) can hide every showing of the film opened next, and
+  nothing but a reset would otherwise say so. This is the one place a query is
+  given up; it sits after the widenings and before accessibility.
+- **Counts are showings.** In films every offer would read "1 result", and a
+  widen headline would name the film already on screen — so the headline is the
+  action itself ("Search all dates and search all venues").
+- **Offers write the global filter state**, as on the grid. An offer is a filter
+  change; "Show all" is the way to look past the filters without changing them.
+
+It probes one film, so it runs on the live state rather than a deferred copy.
+
 ## Testing
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with

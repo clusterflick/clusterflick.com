@@ -11,7 +11,9 @@ const suggestion = (
 /**
  * `FilterSuggestions` lists the cheapest changes that would turn an empty
  * filtered view into a populated one. It renders the output of
- * `suggestFilterRelaxations`.
+ * `suggestFilterRelaxations` on the films grid, and of
+ * `suggestShowingRelaxations` on a film page, where `unit="showing"` counts
+ * showings rather than films.
  *
  * **Each offer stacks two kinds of line:**
  * - The **headline** says what taking the offer does, phrased as something you
@@ -337,6 +339,40 @@ export const LongDetail: Story = {
           },
         ],
         count: 1,
+      }),
+    ],
+  },
+};
+
+/**
+ * On a film page. The film is fixed, so only widenings apply and the count is
+ * showings: naming the film, or counting it as "1 result", would tell the
+ * reader nothing they can't already see.
+ */
+export const FilmPage: Story = {
+  args: {
+    unit: "showing",
+    suggestions: [
+      suggestion({
+        id: "widen:dateRange",
+        kind: "widen",
+        headline: "Search all dates",
+        changes: [{ label: "Any date", detail: "next showing in 12 days" }],
+        count: 4,
+      }),
+      suggestion({
+        id: "widen:venues",
+        kind: "widen",
+        headline: "Search all venues",
+        changes: [{ label: "All venues", detail: "at BFI Southbank" }],
+        count: 1,
+      }),
+      suggestion({
+        id: "drop:search",
+        kind: "widen",
+        headline: "Clear the film title search for “alien”",
+        changes: [],
+        count: 9,
       }),
     ],
   },

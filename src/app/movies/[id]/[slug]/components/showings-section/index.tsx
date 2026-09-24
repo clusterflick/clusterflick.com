@@ -13,7 +13,7 @@ import { GroupedVirtuoso } from "react-virtuoso";
 import { MoviePerformance, Showing, Venue } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { titlesDiffer } from "@/utils/title-differs";
-import { FilterDescription } from "@/lib/filters";
+import type { FilterDescription, FilterSuggestion } from "@/lib/filters";
 import {
   getDaysFromNow,
   formatDaysFromNow,
@@ -23,6 +23,7 @@ import Button from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
+import FilterSuggestions from "@/components/filter-suggestions";
 import PerformanceCard, {
   PerformanceCardActions,
 } from "@/components/performance-card";
@@ -143,6 +144,13 @@ interface ShowingsSectionProps {
   unfilteredPerformanceCount: number;
   filteredPerformanceCount: number;
   /**
+   * Filter changes that would bring back some of the showings the filters are
+   * hiding, from `suggestShowingRelaxations`. Only non-empty when every
+   * showing is hidden.
+   */
+  suggestions: FilterSuggestion[];
+  onApplySuggestion: (suggestion: FilterSuggestion) => void;
+  /**
    * SSR-only static list of upcoming showings, server-rendered and shown until
    * the component hydrates, at which point the interactive list takes over.
    */
@@ -160,6 +168,8 @@ export default function ShowingsSection({
   onShowAllToggle,
   unfilteredPerformanceCount,
   filteredPerformanceCount,
+  suggestions,
+  onApplySuggestion,
   staticContent,
 }: ShowingsSectionProps) {
   const { hydrateUrl, error, retry } = useCinemaData();
@@ -340,9 +350,20 @@ export default function ShowingsSection({
                   : "No showings currently available"
               }
               hint={
-                unfilteredPerformanceCount > 0
-                  ? "Try adjusting your filters to see more results"
-                  : undefined
+                unfilteredPerformanceCount === 0
+                  ? undefined
+                  : suggestions.length > 0
+                    ? "These would bring some back:"
+                    : "Try adjusting your filters to see more results"
+              }
+              actions={
+                suggestions.length > 0 && (
+                  <FilterSuggestions
+                    suggestions={suggestions}
+                    onApply={onApplySuggestion}
+                    unit="showing"
+                  />
+                )
               }
             />
           ) : (

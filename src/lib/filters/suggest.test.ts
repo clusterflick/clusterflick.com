@@ -18,6 +18,7 @@ import { getDefaultState, set, apply } from "./manager";
 import {
   getFilterValueOffers,
   suggestFilterRelaxations,
+  suggestShowingRelaxations,
   type FilterSuggestion,
 } from "./suggest";
 import { buildPeopleIndex } from "./modules/people";
@@ -1311,5 +1312,125 @@ describe("getFilterValueOffers", () => {
     const state = set(getDefaultState(), FilterId.Search, "digital");
 
     expect(offers(movies, state)).toEqual([]);
+  });
+});
+
+describe("suggestShowingRelaxations", () => {
+  /** A film with one performance at each of the given times. */
+  const filmAt = (spec: MovieSpec, times: number[]): Movie => {
+    const movie = makeMovie("1", spec);
+    const [performance] = movie.performances;
+    return {
+      ...movie,
+      performances: times.map((time) => ({ ...performance, time })),
+    };
+  };
+
+  it("names the date as the blocker, with the next showing", () => {
+    const movie = filmAt({ title: "Eternal Sunshine" }, [BEYOND_WINDOW]);
+    const state = getDefaultState();
+
+    const [suggestion] = suggestShowingRelaxations({ movie, state });
+    expect(lines(suggestion)).toEqual([
+      "Search all dates",
+      `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+    ]);
+  });
+
+  it("counts showings rather than films", () => {
+    // In films every offer would read "1 result": the film on screen.
+    const movie = filmAt({ title: "A" }, [
+      BEYOND_WINDOW,
+      BEYOND_WINDOW + MS_PER_DAY,
+      BEYOND_WINDOW + 2 * MS_PER_DAY,
+    ]);
+
+    const [suggestion] = suggestShowingRelaxations({
+      movie,
+      state: getDefaultState(),
+    });
+    expect(suggestion.count).toBe(3);
+  });
+
+  it("returns a state that really does reveal the advertised showings", () => {
+    const movie = filmAt({ title: "A", venueId: "venue-b" }, [
+      BEYOND_WINDOW,
+      BEYOND_WINDOW + MS_PER_DAY,
+    ]);
+    const state = set(getDefaultState(), FilterId.Venues, ["venue-a"]);
+
+    const suggestions = suggestShowingRelaxations({ movie, state });
+    expect(suggestions).not.toHaveLength(0);
+    for (const suggestion of suggestions) {
+      const result = apply({ [movie.id]: movie }, suggestion.state);
+      expect(result[movie.id].performances).toHaveLength(suggestion.count);
+    }
+  });
+
+  it("offers nothing when the film already has showings", () => {
+    const movie = filmAt({ title: "A" }, [IN_WINDOW]);
+
+    expect(
+      suggestShowingRelaxations({ movie, state: getDefaultState() }),
+    ).toEqual([]);
+  });
+
+  it("phrases a pair as both actions, one change line each", () => {
+    const movie = filmAt({ title: "A", venueId: "venue-b" }, [BEYOND_WINDOW]);
+    const state = set(getDefaultState(), FilterId.Venues, ["venue-a"]);
+
+    const suggestions = suggestShowingRelaxations({
+      movie,
+      state,
+      venues: VENUES,
+    });
+    expect(suggestions.map(lines)).toEqual([
+      [
+        "Search all dates and search all venues",
+        `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+        "All venues: at BFI Southbank",
+      ],
+    ]);
+  });
+
+  it("offers to clear a query left over from the films grid", () => {
+    const movie = filmAt({ title: "Dumbo" }, [IN_WINDOW]);
+    const state = set(
+      getDefaultState(),
+      FilterId.PerformanceNotesSearch,
+      "Q&A",
+    );
+
+    expect(suggestShowingRelaxations({ movie, state }).map(lines)).toEqual([
+      ["Clear the performance note search for “Q&A”"],
+    ]);
+  });
+
+  it("never offers a redirect, correction or filter-value reading", () => {
+    // "action" names a genre and is one edit from nothing here, but the page's
+    // subject is fixed: the only reading left is that the query is in the way.
+    const movie = filmAt({ title: "Dumbo", genres: ["28"] }, [IN_WINDOW]);
+    const state = set(getDefaultState(), FilterId.Search, "action");
+
+    const suggestions = suggestShowingRelaxations({
+      movie,
+      state,
+      genres: GENRES,
+    });
+    expect(suggestions.map((s) => s.headline)).toEqual([
+      "Clear the film title search for “action”",
+    ]);
+    expect(suggestions.every((s) => s.kind === "widen")).toBe(true);
+  });
+
+  it("never pairs an accessibility requirement with anything else", () => {
+    // Only dropping subtitles *and* widening the date reveals anything, which
+    // is exactly the combination that must not be offered.
+    const movie = filmAt({ title: "A" }, [BEYOND_WINDOW]);
+    const state = set(getDefaultState(), FilterId.Accessibility, [
+      AccessibilityFeature.Subtitled,
+    ]);
+
+    expect(suggestShowingRelaxations({ movie, state, limit: 10 })).toEqual([]);
   });
 });

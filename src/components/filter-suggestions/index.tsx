@@ -20,6 +20,11 @@ interface FilterSuggestionsProps {
   suggestions: FilterSuggestion[];
   /** Called with the full filter state the chosen offer produces. */
   onApply: (suggestion: FilterSuggestion) => void;
+  /**
+   * What `count` counts, singular. Films on the grid; showings on a film page,
+   * where every offer would otherwise read "1 result".
+   */
+  unit?: string;
   className?: string;
 }
 
@@ -31,6 +36,7 @@ interface FilterSuggestionsProps {
 export default function FilterSuggestions({
   suggestions,
   onApply,
+  unit = "result",
   className,
 }: FilterSuggestionsProps) {
   if (suggestions.length === 0) return null;
@@ -61,7 +67,7 @@ export default function FilterSuggestions({
               ))}
             </span>
             <span className={styles.count}>
-              {suggestion.count.toLocaleString("en-GB")} result
+              {suggestion.count.toLocaleString("en-GB")} {unit}
               {suggestion.count === 1 ? "" : "s"}
             </span>
           </button>

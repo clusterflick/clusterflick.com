@@ -64,11 +64,16 @@ export { getHiddenByDate, THIN_RESULT_LIMIT } from "./hidden-by-date";
 export type { HiddenByDate } from "./hidden-by-date";
 
 // Zero-result suggestions
-export { suggestFilterRelaxations, getFilterValueOffers } from "./suggest";
+export {
+  suggestFilterRelaxations,
+  suggestShowingRelaxations,
+  getFilterValueOffers,
+} from "./suggest";
 export type {
   FilterSuggestion,
   SuggestionChange,
   SuggestionKind,
   SuggestOptions,
+  ShowingSuggestOptions,
   FilterValueOfferOptions,
 } from "./suggest";
