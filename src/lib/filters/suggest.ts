@@ -126,7 +126,9 @@ const REDIRECT_FIELDS: { id: SearchFieldId; noun: string; label: string }[] = [
  * requirement, not a preference.
  *
  * The search fields are absent by design. A typed query is the clearest
- * statement of intent on the page, so it gets redirected, never dropped.
+ * statement of intent on the page, so it gets redirected rather than dropped —
+ * the exception being a second query left beside a film title query, see
+ * {@link buildStaleQueryMoves}.
  */
 const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
   { id: FilterId.DateRange, label: "Any date", action: "Search all dates" },
@@ -637,6 +639,40 @@ function buildRedirectMoves(state: FilterState): Move[] {
 }
 
 /**
+ * Moves that clear an original venue title or performance note query sitting
+ * alongside a film title query.
+ *
+ * Every text field narrows independently, so a film has to match all of them
+ * at once — and the second box is rarely filled in with that in mind. It is
+ * usually left over: typed earlier, or put there by taking a redirect offer,
+ * and still in force when the reader goes back to the main box and searches
+ * for something else. Nothing on the grid says the old query is still there,
+ * so the new one simply comes up empty.
+ *
+ * This is the one place the films grid gives up a query rather than
+ * redirecting it. The film title is what was typed last, so it is the one to
+ * keep; the other field is the likelier mistake. A redirect can't help, since
+ * the query has nowhere empty left to go. It leads the offer, because it
+ * discards something the reader typed and they need to agree to that, and it
+ * names the films it brings back since the headline no longer does.
+ */
+function buildStaleQueryMoves(state: FilterState): Move[] {
+  if (get(state, FilterId.Search).trim().length === 0) return [];
+
+  return REDIRECT_FIELDS.filter((field) => field.id !== FilterId.Search)
+    .flatMap((field) => buildQueryDropMoves(state, [field]))
+    .map((move) => ({
+      ...move,
+      altersQuery: true,
+      describeResult: (result: MoviesRecord) =>
+        formatList(
+          Object.values(result).map((movie) => `“${movie.title}”`),
+          2,
+        ),
+    }));
+}
+
+/**
  * Which widenings have something specific to say about their result. The rest
  * stand on their count alone: "all genres" freeing up 12 films is already the
  * whole story, and naming the genres would just restate the label.
@@ -948,14 +984,16 @@ export function suggestFilterRelaxations({
 
   // Cost order. A filter reading takes the query exactly as typed and is the
   // strongest reading when it fits at all, so it leads; redirects also concede
-  // nothing but only move the query; corrections rewrite it; widenings give up
-  // a filter, so they come last.
+  // nothing but only move the query; corrections rewrite it; clearing a stale
+  // second query gives up words the reader typed, but ones they have likely
+  // forgotten about, so it still beats giving up a filter; widenings come last.
   const widens = buildWidenMoves(state, context);
   const moves = [
     ...buildValueMoves(state, context),
     ...buildPeopleMoves(state, context),
     ...buildRedirectMoves(state),
     ...buildCorrectionMoves(movies, state, widens),
+    ...buildStaleQueryMoves(state),
     ...widens,
   ];
   if (moves.length === 0) return [];
@@ -1152,13 +1190,17 @@ function lowerFirst(text: string): string {
 }
 
 /**
- * Moves that clear a text query, for the film page only — the films grid
- * redirects a query and never drops it. A search left over from the grid
+ * Moves that clear a text query. On the film page any query can go; the films
+ * grid only drops one sitting beside a film title query
+ * ({@link buildStaleQueryMoves}) and otherwise redirects. A search left over from the grid
  * ("alien", or "Q&A" in performance notes) can hide every showing of the film the reader went on to
  * open, and nothing but a reset would otherwise say so.
  */
-function buildQueryDropMoves(state: FilterState): Move[] {
-  return REDIRECT_FIELDS.flatMap((field) => {
+function buildQueryDropMoves(
+  state: FilterState,
+  fields = REDIRECT_FIELDS,
+): Move[] {
+  return fields.flatMap((field) => {
     const query = get(state, field.id).trim();
     if (query.length === 0) return [];
 

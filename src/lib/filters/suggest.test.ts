@@ -266,6 +266,102 @@ describe("suggestFilterRelaxations", () => {
     ).toEqual([]);
   });
 
+  describe("stale second queries", () => {
+    it("offers to clear a performance note query left beside a title search", () => {
+      const movies = makeMovies({
+        "1": { title: "Alien", notes: "Presented in 70mm" },
+        "2": { title: "Aliens" },
+      });
+      let state = set(
+        getDefaultState(),
+        FilterId.PerformanceNotesSearch,
+        "Q&A",
+      );
+      state = set(state, FilterId.Search, "alien");
+
+      const [suggestion] = suggestFilterRelaxations({ movies, state });
+      expect(lines(suggestion)).toEqual([
+        "Clear the performance note search for “Q&A”",
+        "Any performance note: “Alien” & “Aliens”",
+      ]);
+      expect(suggestion.count).toBe(2);
+      // The film title query is kept; only the stale one goes.
+      expect(suggestion.state[FilterId.Search]).toBe("alien");
+      expect(suggestion.state[FilterId.PerformanceNotesSearch]).toBe("");
+    });
+
+    it("offers to clear an original venue title query left beside a title search", () => {
+      const movies = makeMovies({
+        "1": { title: "Alien", showingTitle: "Alien (40th Anniversary)" },
+      });
+      let state = set(
+        getDefaultState(),
+        FilterId.ShowingTitleSearch,
+        "Community Film Screening",
+      );
+      state = set(state, FilterId.Search, "alien");
+
+      expect(labels(movies, state)).toEqual([
+        "Clear the original venue title search for “Community Film Screening”",
+      ]);
+    });
+
+    it("ranks clearing the stale query above any widening", () => {
+      const movies = makeMovies({
+        "1": { title: "Alien" },
+        "2": { title: "Aliens", notes: "Q&A", time: BEYOND_WINDOW },
+      });
+      let state = set(
+        getDefaultState(),
+        FilterId.PerformanceNotesSearch,
+        "Q&A",
+      );
+      state = set(state, FilterId.Search, "alien");
+
+      expect(labels(movies, state)).toEqual([
+        "Clear the performance note search for “Q&A”",
+        "Show “Aliens”",
+      ]);
+    });
+
+    it("pairs clearing the stale query with a widening", () => {
+      const movies = makeMovies({
+        "1": { title: "Alien", time: BEYOND_WINDOW },
+      });
+      let state = set(
+        getDefaultState(),
+        FilterId.PerformanceNotesSearch,
+        "Q&A",
+      );
+      state = set(state, FilterId.Search, "alien");
+
+      const [suggestion] = suggestFilterRelaxations({ movies, state });
+      expect(suggestion.headline).toBe(
+        "Clear the performance note search for “Q&A”",
+      );
+      expect(suggestion.changes.map((change) => change.label)).toEqual([
+        "Any performance note",
+        "Any date",
+      ]);
+    });
+
+    it("never clears a second query when the film title box is empty", () => {
+      const movies = makeMovies({ "1": { title: "Alien" } });
+      let state = set(
+        getDefaultState(),
+        FilterId.PerformanceNotesSearch,
+        "Q&A",
+      );
+      state = set(state, FilterId.ShowingTitleSearch, "alien");
+
+      expect(
+        suggestFilterRelaxations({ movies, state }).filter((s) =>
+          s.id.includes(`drop:${FilterId.PerformanceNotesSearch}`),
+        ),
+      ).toEqual([]);
+    });
+  });
+
   it("falls back to pairs when no single change is enough", () => {
     const movies = makeMovies({
       "1": {
