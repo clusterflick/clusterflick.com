@@ -401,7 +401,7 @@ It works by **probing**: build a candidate state, run the real filter pipeline o
 count what survives. The counts shown are therefore the counts the user will get — there is
 no second implementation of the filter logic to drift out of sync.
 
-**Four kinds of move:**
+**Five kinds of move:**
 
 - **Filter value** — the query names a filter value rather than a film: "70mm" is a source
   format, "Action" is a genre. Keeps every word typed, so it ranks above everything. Matching
@@ -490,6 +490,14 @@ no second implementation of the filter logic to drift out of sync.
   `ShowingTitleSearch` ↔ `PerformanceNotesSearch`). Concedes nothing, so it outranks
   everything else. Only offered when the target field is empty. `ShowingUrlSearch` is
   excluded — internal-only, so it can neither be explained nor undone.
+- **Clear a stale query** — when the film title box and the original venue title or
+  performance note box are both filled, clearing the other box (the title query is kept).
+  Every text field narrows independently, and the second one is usually left over — typed
+  earlier, or put there by a redirect offer — when the reader goes back to search by title.
+  No redirect can help, since the query has nowhere empty to go. It leads its offer (the
+  reader must agree to losing words they typed) and names the films it brings back; ranks
+  after corrections, before widens. The one place the grid drops a query rather than
+  redirecting it.
 - **Correct** — a near-miss film title replacing the query ("Did you mean …?"). Ranks below
   a redirect, because it rewrites what the reader asked for. Generated only when _no_ title
   matches the query, tested via `matchesSearchQuery` so a query that lands only through a
@@ -537,7 +545,7 @@ they made together — so `formatList` takes a conjunction and each of them pass
 Subtitles requirement" whenever it frees up the most screenings, which is the one suggestion a
 subtitles user cannot act on. Accessibility ranks last and is never combined with another
 move (`soloOnly`) — it is a requirement, not a preference. Search queries are redirected,
-never dropped.
+never dropped — except a stale second query beside a film title query, above.
 
 **Rounds stop at two.** Redirects, then single widens, then pairs. A three-filter relaxation
 is a reset with extra steps, so the caller offers a reset instead.
