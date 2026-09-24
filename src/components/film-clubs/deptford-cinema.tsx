@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function FilmClubBlurb() {
   return (
     <section>
@@ -9,8 +11,10 @@ function FilmClubBlurb() {
         looking for a new permanent space in Deptford.
       </p>
       <p>
-        In the meantime it screens as pop-ups: a residency at The Brookmill on
-        the last Sunday of the month, and events at the Telegraph Hill Centre,
+        In the meantime it screens as pop-ups: a residency at{" "}
+        <Link href="/venues/the-brookmill">The Brookmill</Link> on the last
+        Sunday of the month, and events at the{" "}
+        <Link href="/venues/telegraph-hill-centre">Telegraph Hill Centre</Link>,
         usually with pay-what-you-can tickets. The volunteers run it on a
         non-hierarchical basis and are always open to collaborations.
       </p>
