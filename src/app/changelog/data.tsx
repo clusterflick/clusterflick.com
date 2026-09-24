@@ -71,6 +71,24 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-24",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="UK Jewish Film Festival"
+              url="https://ukjewishfilm.org/"
+            />
+            , whose 30th edition runs across London from 5 to 15 November.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-23",
     changes: [
       {
