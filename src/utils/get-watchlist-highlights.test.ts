@@ -50,16 +50,15 @@ describe("getWatchlistHighlights", () => {
       ["ending", "running"],
       NOW,
     );
-    expect(highlights.get("ending")?.endsAt).toBe(NOW + 3 * DAY);
-    expect(highlights.get("running")?.endsAt).toBeNull();
+    expect(highlights.get("ending")?.finalShowing?.time).toBe(NOW + 3 * DAY);
+    expect(highlights.get("running")?.finalShowing).toBeNull();
   });
 
   it("judges the end by the last showing that isn't sold out", () => {
     const movies = index([makeMovie("film", [1, 20], { soldOut: [1] })]);
-    expect(getWatchlistHighlights(movies, ["film"], NOW).get("film")).toEqual({
-      endsAt: NOW + DAY,
-      occasion: null,
-    });
+    const highlight = getWatchlistHighlights(movies, ["film"], NOW).get("film");
+    expect(highlight?.finalShowing?.time).toBe(NOW + DAY);
+    expect(highlight?.occasion).toBeNull();
   });
 
   it("finds an occasion however far out it is", () => {

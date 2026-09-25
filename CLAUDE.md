@@ -698,23 +698,42 @@ link — the pill the film page's list buttons use, pink on hover. Signed in, th
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
-**The watchlist says what's time-sensitive** (`getWatchlistHighlights`). Films
-whose last bookable showing is within the home page's Last Chance window get a
-**Last chance** group of their own, soonest first, above Showing now; the
-definition is shared so a film can't be ending on one page and not the other.
-An upcoming occasion — a Q&A, a live score — is drawn as a pink `highlight` line
-on the tile. It is the More Than a Screening scoring with no end date: scored
-over the whole dataset (house style is judged per venue) and then filtered to
-the watchlist, so what the home row wouldn't call rare isn't flagged here
-either. Sold-out occasions are skipped.
+**The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
+two groups above Showing now, each soonest first:
+
+- **Last chance** — the last bookable showing is within the home page's Last
+  Chance window. The definition is shared, so a film can't be ending on one
+  page and not the other.
+- **More than a screening** — an upcoming occasion (a Q&A, a live score). This
+  is the home row's scoring with no end date: scored over the whole dataset
+  (house style is judged per venue) and then filtered to the watchlist, so
+  what the home row wouldn't call rare isn't flagged here either. Sold-out
+  occasions are skipped.
+
+A film can be in both, and each group then says its own thing about it; either
+takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
+above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
+plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). It sits
+at the foot of the tile rather than among the details, where it pushed that
+tile's title out of line with the rest of the row.
+
+The two groups **share a row while they're short**: each is a flex item sized
+for its own tiles (`--tiles` × PosterTileList's 140px minimum plus gaps), with
+no growth, so two small groups hug their films side by side and a long one
+wraps onto a row of its own and shrinks to the full width. Each has a floor at
+the width of the longest heading, since a wrapped heading drops its lane out
+of line with its neighbour's.
 
 **Removing offers an undo in place** (`RemovedPosterTile`). The removal is
 written straight away — closing the tab never loses it — and the page holds the
 entry locally so its tile keeps its place, with **Undo** where **Remove** was.
 Undo writes the entry back as it was (`restoreToList`: original `addedAt`, and
 none of `addToList`'s side effects, which for Seen would take the film off the
-watchlist). The countdown is a CSS animation whose end is the expiry, so it
-pauses on hover and keyboard focus without a timer to keep in step.
+watchlist). The countdown is a 3s CSS animation whose end is the expiry. It
+does **not** pause on hover: the pointer is on Undo the moment the tile
+appears, so hover-pausing held it open until the reader moved away. It pauses
+on keyboard focus only, because focus is moved to Undo and expiring underneath
+it would drop a keyboard reader back to the top of the page.
 
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so

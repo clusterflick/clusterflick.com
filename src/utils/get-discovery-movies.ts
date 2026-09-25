@@ -1,4 +1,4 @@
-import type { Movie, CollectionSummary } from "@/types";
+import type { Movie, MoviePerformance, CollectionSummary } from "@/types";
 import type { MoviesRecord } from "@/lib/filters/types";
 import { Category } from "@/types";
 import {
@@ -345,26 +345,24 @@ function formatDayAndDate(time: number): string {
   });
 }
 
-export function formatLastShowing(time: number): string {
+function formatLastShowing(time: number): string {
   return `Last showing ${formatDayAndDate(time)}`;
 }
 
 /**
- * When the film's last bookable showing is: the final upcoming performance
- * that isn't sold out, or null when there is none.
+ * The film's last bookable showing: the final upcoming performance that isn't
+ * sold out, or null when there is none.
  */
-export function getFinalShowingTime(
+export function getFinalShowing(
   movie: Movie,
   now: number = Date.now(),
-): number | null {
-  let finalTime: number | null = null;
+): MoviePerformance | null {
+  let final: MoviePerformance | null = null;
   for (const performance of movie.performances) {
     if (performance.time < now || performance.status?.soldOut) continue;
-    if (finalTime === null || performance.time > finalTime) {
-      finalTime = performance.time;
-    }
+    if (!final || performance.time > final.time) final = performance;
   }
-  return finalTime;
+  return final;
 }
 
 /**
@@ -578,7 +576,7 @@ export function getOccasionMovies(
  * two facts. The separator is bound to the date as well, so it travels with it
  * rather than dangling at a line end.
  */
-export function formatOccasion({
+function formatOccasion({
   label,
   performance,
 }: Pick<Occasion, "label" | "performance">): string {

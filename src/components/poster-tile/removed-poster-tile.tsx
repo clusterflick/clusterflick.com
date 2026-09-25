@@ -20,14 +20,16 @@ export interface RemovedPosterTileProps {
  * and puts **Undo** where the tile's own control was — a mistaken click is put
  * right by clicking again in the same place.
  *
- * The countdown is a CSS animation, and its end is the expiry: pausing it
- * while the tile is hovered or holds keyboard focus pauses the timer with it, so
- * nobody loses the undo while reaching for it.
+ * The countdown is a CSS animation, and its end is the expiry. It is short,
+ * and it doesn't pause on hover: the pointer is resting on Undo the moment
+ * the tile appears, so pausing there held it open until the reader moved
+ * away. It pauses on keyboard focus only — focus is moved to Undo, and
+ * letting it expire underneath would drop a keyboard reader back to the top.
  */
 export default function RemovedPosterTile({
   title,
   message,
-  duration = 8000,
+  duration = 3000,
   onUndo,
   onExpire,
 }: RemovedPosterTileProps) {

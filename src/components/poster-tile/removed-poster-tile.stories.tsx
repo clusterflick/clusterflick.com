@@ -5,8 +5,8 @@ import PosterTile, { PosterTileList, RemovedPosterTile } from ".";
 /**
  * `RemovedPosterTile` holds the place of a `PosterTile` that has just been
  * removed, with an **Undo** where the tile's own control was and a countdown
- * along the foot of the empty poster. The countdown pauses on hover and on
- * keyboard focus; when it runs out, `onExpire` fires and the caller drops it.
+ * along the foot of the empty poster. The countdown pauses on keyboard focus
+ * only; when it runs out, `onExpire` fires and the caller drops it.
  *
  * **When to use:** after removing a film from a reader's list, in the same
  * `PosterTileList` position the film held.

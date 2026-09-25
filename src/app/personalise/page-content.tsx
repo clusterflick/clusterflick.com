@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from "react";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
 import PosterTile, {
   PosterTileList,
   RemovedPosterTile,
+  type PosterTileNote,
 } from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
@@ -17,10 +24,8 @@ import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
-import {
-  formatLastShowing,
-  formatOccasion,
-} from "@/utils/get-discovery-movies";
+import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
+import type { MoviePerformance } from "@/types";
 import {
   UserListId,
   type UserListEntry,
@@ -76,6 +81,25 @@ function getSortTitle(title: string) {
     .replace(/^the /, "")
     .normalize("NFD")
     .replace(/[^a-z0-9]/g, "");
+}
+
+const dayFormatter = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  timeZone: "Europe/London",
+});
+
+/**
+ * "Tomorrow, 20:30 · Prince Charles Cinema". A note is read to decide whether
+ * to book, so it names the day plainly where it can, and says where.
+ */
+function formatShowing(time: number, venueName?: string) {
+  const days = getDaysFromNow(time, 1);
+  const day =
+    days === 0 ? "Today" : days === 1 ? "Tomorrow" : dayFormatter.format(time);
+  const when = `${day}, ${formatShowingTime(time)}`;
+  return venueName ? `${when} · ${venueName}` : when;
 }
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
@@ -386,7 +410,8 @@ function UserListSection({
   lists: UserLists;
 }) {
   const { removeFromList, restoreToList } = useUserContext();
-  const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
+  const { movies, metaData, hasAttemptedLoad, isLoading, error } =
+    useCinemaData();
   // Held while their undo is on offer, so each keeps its place in the grid
   // rather than the films after it closing up under the pointer.
   const [removed, setRemoved] = useState<Record<string, UserListEntry>>({});
@@ -466,9 +491,16 @@ function UserListSection({
     );
   }
 
+  const describeShowing = (id: string, performance: MoviePerformance) => {
+    const venueId = movies[id]?.showings[performance.showingId]?.venueId;
+    const venueName = venueId ? metaData?.venues[venueId]?.name : undefined;
+    return formatShowing(performance.time, venueName);
+  };
+
   const toTile = (
     { id, entry, isRemoved }: (typeof entries)[number],
     showing: boolean,
+    note?: PosterTileNote,
   ) => {
     if (isRemoved) {
       return (
@@ -481,11 +513,6 @@ function UserListSection({
         />
       );
     }
-    const highlight = highlights.get(id);
-    const details = [
-      ...(highlight?.endsAt ? [formatLastShowing(highlight.endsAt)] : []),
-      ...(entry.year ? [entry.year] : []),
-    ];
     return (
       <PosterTile
         key={id}
@@ -499,12 +526,8 @@ function UserListSection({
         // Unlinked when not showing: whether its departed page still exists is
         // only known at build time, and a dead link is worse than none.
         href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
-        // A Q&A or a live score is the one thing here worth rearranging an
-        // evening for, so it reads first and in the accent colour.
-        highlight={
-          highlight?.occasion ? formatOccasion(highlight.occasion) : undefined
-        }
-        details={details.length > 0 ? details : undefined}
+        details={entry.year ? [entry.year] : undefined}
+        note={note}
         action={
           <button
             type="button"
@@ -544,25 +567,68 @@ function UserListSection({
     );
   }
 
-  // Soonest to end first: the order to book them in.
-  const endsAt = (id: string) => highlights.get(id)?.endsAt ?? null;
+  // Each soonest first: the order to book them in. A film can be in both —
+  // ending this week with a Q&A on its last night — and each group then says
+  // its own thing about it. Either takes it out of Showing now.
+  const finalShowing = (id: string) => highlights.get(id)?.finalShowing;
+  const occasion = (id: string) => highlights.get(id)?.occasion;
   const ending = entries
-    .filter(({ id }) => movies[id] && endsAt(id) !== null)
-    .sort((a, b) => endsAt(a.id)! - endsAt(b.id)!);
-  const showing = entries.filter(({ id }) => movies[id] && endsAt(id) === null);
+    .filter(({ id }) => movies[id] && finalShowing(id))
+    .sort((a, b) => finalShowing(a.id)!.time - finalShowing(b.id)!.time);
+  const occasions = entries
+    .filter(({ id }) => movies[id] && occasion(id))
+    .sort(
+      (a, b) =>
+        occasion(a.id)!.performance.time - occasion(b.id)!.performance.time,
+    );
+  const showing = entries.filter(
+    ({ id }) => movies[id] && !finalShowing(id) && !occasion(id),
+  );
   const notShowing = entries.filter(({ id }) => !movies[id]);
+
+  const highlightGroups = [
+    {
+      key: "ending",
+      title: "Last chance",
+      tiles: ending.map((entry) =>
+        toTile(entry, true, {
+          label: "Final showing",
+          detail: describeShowing(entry.id, finalShowing(entry.id)!),
+        }),
+      ),
+    },
+    {
+      key: "occasions",
+      title: "More than a screening",
+      tiles: occasions.map((entry) => {
+        const { label, performance } = occasion(entry.id)!;
+        return toTile(entry, true, {
+          label,
+          detail: describeShowing(entry.id, performance),
+        });
+      }),
+    },
+  ].filter(({ tiles }) => tiles.length > 0);
 
   return (
     <ContentSection title={title} titleBadge={count}>
-      {ending.length > 0 && (
-        <>
-          <h3 className={styles.groupTitle}>Last chance</h3>
-          <div className={styles.lane}>
-            <PosterTileList>
-              {ending.map((entry) => toTile(entry, true))}
-            </PosterTileList>
-          </div>
-        </>
+      {highlightGroups.length > 0 && (
+        // Side by side while both are short, each on its own row once either
+        // needs the width. See `.highlightGroup`.
+        <div className={styles.highlightGroups}>
+          {highlightGroups.map((group) => (
+            <section
+              key={group.key}
+              className={styles.highlightGroup}
+              style={{ "--tiles": group.tiles.length } as CSSProperties}
+            >
+              <h3 className={styles.groupTitle}>{group.title}</h3>
+              <div className={styles.lane}>
+                <PosterTileList>{group.tiles}</PosterTileList>
+              </div>
+            </section>
+          ))}
+        </div>
       )}
       {showing.length > 0 && (
         <>

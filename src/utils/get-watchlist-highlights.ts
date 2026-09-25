@@ -1,8 +1,8 @@
-import type { Movie } from "@/types";
+import type { Movie, MoviePerformance } from "@/types";
 import type { MoviesRecord } from "@/lib/filters/types";
 import { findOccasions, type Occasion } from "@/lib/occasions";
 import {
-  getFinalShowingTime,
+  getFinalShowing,
   LAST_CHANCE_DAYS,
 } from "@/utils/get-discovery-movies";
 import { MS_PER_DAY } from "@/utils/format-date";
@@ -14,7 +14,7 @@ export interface WatchlistHighlight {
    * Chance window — the same definition, so a film can't be ending on one
    * page and not the other.
    */
-  endsAt: number | null;
+  finalShowing: MoviePerformance | null;
   /** The film's best bookable occasion — a Q&A, a live score, a premiere. */
   occasion: Occasion | null;
 }
@@ -59,9 +59,9 @@ export function getWatchlistHighlights(
 
   const deadline = now + LAST_CHANCE_DAYS * MS_PER_DAY;
   for (const id of wanted) {
-    const finalTime = getFinalShowingTime(movies[id], now);
+    const final = getFinalShowing(movies[id], now);
     highlights.set(id, {
-      endsAt: finalTime !== null && finalTime <= deadline ? finalTime : null,
+      finalShowing: final && final.time <= deadline ? final : null,
       occasion: null,
     });
   }

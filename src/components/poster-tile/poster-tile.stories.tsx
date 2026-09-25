@@ -79,14 +79,17 @@ export const Unlinked: Story = {
   },
 };
 
-/** With a highlight — an occasion worth planning around — above the details. */
-export const WithHighlight: Story = {
+/** With a note above the control — what makes the film time-sensitive. */
+export const WithNote: Story = {
   args: {
     title: "Apocalypse Now",
     posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
     href: "/movies/28/apocalypse-now",
-    highlight: "Q&A with Eleanor Coppola · Sat 3 Oct",
-    details: ["Last showing Sun 4 Oct", "1979"],
+    details: ["1979"],
+    note: {
+      label: "Q&A with Eleanor Coppola",
+      detail: "Sat 3 Oct, 18:30 · BFI Southbank",
+    },
     action: <Button variant="link">Remove</Button>,
   },
 };

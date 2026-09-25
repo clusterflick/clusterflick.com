@@ -10,6 +10,14 @@ export {
   type RemovedPosterTileProps,
 } from "./removed-poster-tile";
 
+/** A boxed note above a tile's control — what makes the film time-sensitive. */
+export interface PosterTileNote {
+  /** What it is — "Final showing", "Q&A with Mike Leigh". */
+  label: string;
+  /** When and where. */
+  detail?: string;
+}
+
 export interface PosterTileProps {
   title: string;
   posterPath?: string;
@@ -21,11 +29,6 @@ export interface PosterTileProps {
   /** Where the tile leads. Without one, the tile is drawn unlinked. */
   href?: string;
   /**
-   * Something the reader should act on — a Q&A, a last showing — drawn in the
-   * accent colour above the details.
-   */
-  highlight?: string;
-  /**
    * Short lines under the title — a venue, a count, a year. The first reads
    * more strongly than the rest.
    */
@@ -35,6 +38,12 @@ export interface PosterTileProps {
    * the link, since a button can't sit inside one.
    */
   action?: ReactNode;
+  /**
+   * Something to act on — a final showing, a Q&A — boxed at the foot of the
+   * tile, above the action. At the foot rather than with the details, so tiles
+   * with and without one keep their titles in line across the row.
+   */
+  note?: PosterTileNote;
 }
 
 /**
@@ -46,11 +55,10 @@ export default function PosterTile({
   posterPath,
   includedMovies,
   href,
-  highlight,
   details = [],
   action,
+  note,
 }: PosterTileProps) {
-  const lines = highlight ? [highlight, ...details] : details;
   const body = (
     <>
       <EventPoster
@@ -61,7 +69,6 @@ export default function PosterTile({
         interactive={!!href}
       />
       <h4 className={styles.title}>{title}</h4>
-      {highlight && <p className={styles.highlight}>{highlight}</p>}
       {details.map((detail, index) => (
         <p key={index} className={styles.detail}>
           {detail}
@@ -80,7 +87,7 @@ export default function PosterTile({
           href={href}
           className={styles.link}
           aria-label={
-            lines.length > 0 ? `${title} — ${lines.join(", ")}` : title
+            details.length > 0 ? `${title} — ${details.join(", ")}` : title
           }
         >
           {body}
@@ -88,7 +95,19 @@ export default function PosterTile({
       ) : (
         body
       )}
-      {action && <div className={styles.action}>{action}</div>}
+      {(note || action) && (
+        <div className={styles.action}>
+          {note && (
+            <p className={styles.note}>
+              <strong className={styles.noteLabel}>{note.label}</strong>
+              {note.detail && (
+                <span className={styles.noteDetail}>{note.detail}</span>
+              )}
+            </p>
+          )}
+          {action}
+        </div>
+      )}
     </li>
   );
 }

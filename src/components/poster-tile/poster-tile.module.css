@@ -88,13 +88,29 @@
   padding-top: 8px;
 }
 
-.highlight {
-  margin: 0 0 2px;
+/* A small card of its own, so it reads as a fact about the film's showings
+   rather than one more line of detail. */
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 8px;
+  padding: 6px 8px;
   font-size: 12px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--color-neon-pink);
+  line-height: 1.35;
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.35);
+  border-radius: 6px;
   overflow-wrap: anywhere;
+}
+
+.noteLabel {
+  font-weight: 600;
+  color: var(--color-neon-pink);
+}
+
+.noteDetail {
+  color: var(--color-light-gray);
 }
 
 /* ---- Removed ---- */
@@ -141,7 +157,6 @@
   animation-fill-mode: forwards;
 }
 
-.tile:hover .countdown,
 .tile:has(:focus-visible) .countdown {
   animation-play-state: paused;
 }
