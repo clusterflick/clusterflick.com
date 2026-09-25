@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import clsx from "clsx";
 import EventPoster, {
   type EventPosterIncludedMovie,
 } from "@/components/event-poster";
@@ -22,8 +21,8 @@ export interface PosterTileProps {
    */
   details?: string[];
   /**
-   * A control beside the last line of detail — removing a film from a
-   * reader's list. Outside the link, since a button can't sit inside one.
+   * A control under the text — removing a film from a reader's list. Outside
+   * the link, since a button can't sit inside one.
    */
   action?: ReactNode;
 }
@@ -59,12 +58,7 @@ export default function PosterTile({
   );
 
   return (
-    <li
-      className={clsx(
-        styles.tile,
-        action && details.length > 0 && styles.actionBeside,
-      )}
-    >
+    <li className={styles.tile}>
       {href ? (
         // The poster and text are one target rather than separate links. The
         // label replaces the accessible name so a screen reader reads it once,

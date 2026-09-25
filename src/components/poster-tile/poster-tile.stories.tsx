@@ -58,7 +58,7 @@ export const Event: Story = {
   },
 };
 
-/** With a control beside the last line of detail, as on a reader's watchlist. */
+/** With a control under the text, as on a reader's watchlist. */
 export const WithAction: Story = {
   args: {
     title: "Apocalypse Now",

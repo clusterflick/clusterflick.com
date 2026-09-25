@@ -8,12 +8,13 @@
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 20px 16px;
   justify-content: start;
-  /* Each tile only as tall as its own content, so a control pinned to its
-     bottom stays on its last line rather than dropping to the row's. */
-  align-items: start;
 }
 
+/* A column, so an action can sit at the foot of a tile stretched to its
+   row's height, lining up with its neighbours' whatever their titles wrap to. */
 .tile {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
@@ -82,27 +83,7 @@
   opacity: 0.55;
 }
 
-/* A control sits on the last line of detail, at its right-hand end: it is
-   positioned rather than laid out beside it because the detail is inside the
-   link and the control can't be. The detail stops short of it so the two never
-   overlap. Without any detail, it takes a line of its own instead. */
-.tile {
-  position: relative;
-}
-
-.actionBeside .detail:last-of-type {
-  padding-right: 80px;
-}
-
-.actionBeside .action {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
-
 .action {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 12px;
-  line-height: 1.4;
+  margin-top: auto;
+  padding-top: 8px;
 }

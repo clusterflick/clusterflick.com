@@ -440,7 +440,7 @@ function UserListSection({
           onClick={() => removeFromList(listId, id)}
           aria-label={`Remove ${entry.title} from ${title}`}
         >
-          <CloseIcon size={12} />
+          <CloseIcon size={14} />
           Remove
         </button>
       }

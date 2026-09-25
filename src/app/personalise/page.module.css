@@ -181,30 +181,41 @@
   border-radius: 10px;
 }
 
-/* Pink and paired with a cross, so it reads as an action rather than one more
-   line of detail beside the year. Sized to that line so the two share it. */
+/* The pill the film page's "Want to see" and "Seen it" use, as this is the
+   same control's other half. Pink on hover rather than white: this one takes
+   something away. */
 .remove {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 0;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 6px 10px;
   font: inherit;
-  font-weight: 600;
-  color: var(--color-neon-pink);
-  background: none;
-  border: none;
-  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .remove:hover {
-  color: var(--color-white);
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
 }
 
 .remove:focus-visible {
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
+}
+
+.remove svg {
+  flex-shrink: 0;
 }
 
 .groupTitle {
