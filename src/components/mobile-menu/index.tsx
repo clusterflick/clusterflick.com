@@ -1,5 +1,5 @@
 import { MenuIcon, CloseIcon } from "@/components/icons";
-import { GROUPED_NAV_LINKS } from "@/utils/nav-links";
+import { MENU_GROUPED_NAV_LINKS, MENU_TOP_LINKS } from "@/utils/nav-links";
 import MenuLink from "./menu-link";
 import { MENU_ID } from "./menu-id";
 import styles from "./mobile-menu.module.css";
@@ -64,7 +64,12 @@ export default function MobileMenu() {
            * are structure to a screen reader, not just larger text.
            */}
           <div className={styles.nav}>
-            {GROUPED_NAV_LINKS.map(({ id, label, links }) => (
+            <nav className={styles.navGroup} aria-label="Main">
+              {MENU_TOP_LINKS.map((link) => (
+                <MenuLink key={link.href} href={link.href} label={link.label} />
+              ))}
+            </nav>
+            {MENU_GROUPED_NAV_LINKS.map(({ id, label, links }) => (
               <nav key={id} className={styles.navGroup} aria-label={label}>
                 <h2 className={styles.navGroupHeading}>{label}</h2>
                 {links.map((link) => (

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import styles from "./link-card.module.css";
 
@@ -19,12 +20,24 @@ export default function LinkCard({
   "aria-label": ariaLabel,
   children,
 }: LinkCardProps) {
+  const cardClassName = clsx(styles.card, styles[variant], className);
+
+  // A site path stays in the tab, routed client-side; anywhere else opens in a
+  // new one, as every card here did before internal links existed.
+  if (href.startsWith("/")) {
+    return (
+      <Link href={href} className={cardClassName} aria-label={ariaLabel}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={clsx(styles.card, styles[variant], className)}
+      className={cardClassName}
       aria-label={ariaLabel}
     >
       {children}

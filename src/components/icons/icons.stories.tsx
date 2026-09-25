@@ -5,6 +5,8 @@ import {
   CloseIcon,
   PlayIcon,
   TickIcon,
+  BookmarkIcon,
+  EyeIcon,
   CrossIcon,
   EmailIcon,
   LetterboxdIcon,
@@ -30,7 +32,7 @@ import {
  *
  * **UI icons** (navigation, controls):
  * `ArrowLeftIcon`, `ChevronDownIcon`, `CloseIcon`, `PlayIcon`, `MenuIcon`,
- * `CalendarIcon`, `TickIcon`, `CrossIcon`
+ * `CalendarIcon`, `TickIcon`, `CrossIcon`, `BookmarkIcon`, `EyeIcon`
  *
  * **Social icons** (venue/festival profile links):
  * `LetterboxdIcon`, `InstagramIcon`, `XIcon`, `BlueskyIcon`, `ThreadsIcon`,
@@ -87,6 +89,10 @@ export const UIIcons: Story = {
         { label: "Menu", icon: <MenuIcon size={24} /> },
         { label: "Calendar", icon: <CalendarIcon size={24} /> },
         { label: "Tick", icon: <TickIcon size={24} /> },
+        { label: "Bookmark", icon: <BookmarkIcon size={24} /> },
+        { label: "Bookmark (filled)", icon: <BookmarkIcon size={24} filled /> },
+        { label: "Eye", icon: <EyeIcon size={24} /> },
+        { label: "Eye (closed)", icon: <EyeIcon size={24} closed /> },
         { label: "Cross", icon: <CrossIcon size={24} /> },
       ].map(({ label, icon }) => (
         <div key={label} style={iconStyle}>

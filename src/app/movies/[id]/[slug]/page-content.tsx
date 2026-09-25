@@ -41,6 +41,7 @@ import OutlineHeading from "@/components/outline-heading";
 import { ButtonAnchor } from "@/components/button";
 import EventPoster, { getPrimaryPosterPath } from "@/components/event-poster";
 import { PlayIcon } from "@/components/icons";
+import UserListButtons from "@/components/user-list-buttons";
 import GenresList from "./components/genres-list";
 import RatingsGrid from "./components/ratings-grid";
 import CastCrewSection from "./components/cast-crew-section";
@@ -292,6 +293,7 @@ export default function PageContent({
             size="large"
             interactive={false}
           />
+          <UserListButtons movie={movie} />
           {formats.length > 0 && (
             <div className={styles.formatsDesktop}>
               <FormatsList formats={formats} variant="poster" />

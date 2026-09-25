@@ -1,0 +1,246 @@
+/* The signed-in account bar. */
+.card {
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 12px;
+}
+
+.signIn {
+  padding: 20px 0;
+  margin-bottom: 40px;
+}
+
+/* ---- Signed out ---- */
+
+.features {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 700px) {
+  .features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.feature {
+  padding: 4px 0;
+}
+
+.featureIcon {
+  color: var(--color-neon-pink);
+  margin-bottom: 8px;
+}
+
+/* Explicit, since the global h2 is display-sized. */
+.featureTitle {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--color-white);
+}
+
+.featureText {
+  margin: 0;
+  color: var(--color-muted-gray);
+  line-height: 1.5;
+}
+
+.signInIntro {
+  margin: 0 0 12px;
+  color: var(--color-light-gray);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .row {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Same pill as SearchInput, without the search icon it can't drop. */
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 20px;
+  font-size: 16px;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+.input:hover {
+  background: rgba(var(--color-white-rgb), 0.08);
+  border-color: rgba(var(--color-white-rgb), 0.25);
+}
+
+.input:focus {
+  outline: none;
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: var(--color-neon-pink);
+  box-shadow: 0 0 0 3px rgba(var(--color-neon-pink-rgb), 0.15);
+}
+
+.input::placeholder {
+  color: var(--color-muted-gray);
+}
+
+.error {
+  margin: 12px 0 0;
+  color: var(--color-neon-pink);
+}
+
+/* ---- Signed in ---- */
+
+/* Full width, aligned the way /catalogue and /planner are: above 1200px, as
+   many poster columns as fit, centred, with every child spanning them all —
+   so the headings, the account bar and the note line up with the posters'
+   edges. Below that, the grids centre themselves within the padding. */
+.wide {
+  padding: 0 16px 80px;
+}
+
+@media (min-width: 768px) {
+  .wide {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .wide {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--film-grid-column));
+    column-gap: var(--film-grid-gap);
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .wide > * {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}
+
+.accountRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.signedInAs {
+  margin: 0;
+  color: var(--color-muted-gray);
+  overflow-wrap: anywhere;
+}
+
+.signedInAs strong {
+  color: var(--color-light-gray);
+}
+
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirmText {
+  font-size: 13px;
+  color: var(--color-light-gray);
+}
+
+.count {
+  margin-left: 12px;
+  font-size: 0.6em;
+  color: var(--color-muted-gray);
+}
+
+/* The planner's lane: a faint panel behind each group of posters. It bleeds
+   8px past the grid on each side rather than padding inside it, which would
+   narrow the grid by a column and pull the posters off the headings' edge. */
+.lane {
+  margin: 0 -8px;
+  padding: 18px 8px 8px;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.35);
+  border-radius: 10px;
+}
+
+.groupTitle {
+  margin: 24px 0 12px;
+  font-size: 16px;
+  color: var(--color-muted-gray);
+}
+
+.empty {
+  color: var(--color-muted-gray);
+  line-height: 1.5;
+}
+
+/* Kept to the column width: four cards stretched across a wide screen read
+   as a banner rather than a set of suggestions. */
+.discovery {
+  max-width: 1000px;
+  margin-top: 16px;
+}
+
+/* As the About page's partner descriptions. */
+.discoveryText {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+/* ---- Both ---- */
+
+/* A footnote, not a section: small, quiet, and last. */
+.storeNote {
+  margin: 48px 0 0;
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 12px;
+}
+
+.storeNote p {
+  margin: 0;
+}
+
+.storeNoteTitle {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+/* Signed in, the page is full width; the account bar and the note keep the
+   width of the signed-out column (1000px less its padding), centred as it is
+   there, so only the poster grids widen. */
+.wide .card,
+.wide .storeNote {
+  /* Auto margins shrink a grid item to its content; this keeps it full. */
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
