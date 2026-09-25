@@ -413,6 +413,9 @@ function UserListSection({
       title: entry.title,
       year: entry.year,
       posterPath: movies[id]?.posterPath ?? entry.posterPath,
+      // An event (a marathon, a double bill) has no poster of its own and is
+      // drawn as a stack of its films' posters.
+      includedMovies: movies[id]?.includedMovies,
     },
     performanceCount: 0,
     // Unlinked when not showing: whether its departed page still exists is
