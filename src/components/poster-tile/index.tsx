@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 import EventPoster, {
   type EventPosterIncludedMovie,
 } from "@/components/event-poster";
@@ -16,7 +17,19 @@ export interface PosterTileNote {
   label: string;
   /** When and where. */
   detail?: string;
+  /**
+   * Pink by default. Yellow is the site's "last chance" colour, as on the
+   * planner's tag, for a note that says the chance is running out.
+   */
+  color?: NoteColor;
 }
+
+type NoteColor = "pink" | "yellow";
+
+const noteColorStyles: Record<NoteColor, string> = {
+  pink: styles.notePink,
+  yellow: styles.noteYellow,
+};
 
 export interface PosterTileProps {
   title: string;
@@ -98,7 +111,12 @@ export default function PosterTile({
       {(note || action) && (
         <div className={styles.action}>
           {note && (
-            <p className={styles.note}>
+            <p
+              className={clsx(
+                styles.note,
+                noteColorStyles[note.color ?? "pink"],
+              )}
+            >
               <strong className={styles.noteLabel} title={note.label}>
                 {note.label}
               </strong>

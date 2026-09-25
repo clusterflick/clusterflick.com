@@ -93,3 +93,19 @@ export const WithNote: Story = {
     action: <Button variant="link">Remove</Button>,
   },
 };
+
+/** A yellow note, for a last chance — the planner's "Last chance" colour. */
+export const WithLastChanceNote: Story = {
+  args: {
+    title: "Apocalypse Now",
+    posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
+    href: "/movies/28/apocalypse-now",
+    details: ["1979"],
+    note: {
+      label: "Final showing",
+      detail: "Tomorrow, 20:30 · Prince Charles Cinema",
+      color: "yellow",
+    },
+    action: <Button variant="link">Remove</Button>,
+  },
+};

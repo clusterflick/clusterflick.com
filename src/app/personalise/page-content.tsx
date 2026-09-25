@@ -653,6 +653,7 @@ function UserListSection({
         toTile(entry, true, {
           label: "Final showing",
           detail: describeShowing(entry.id, finalShowing(entry.id)!),
+          color: "yellow",
         }),
       ),
     },

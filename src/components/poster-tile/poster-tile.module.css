@@ -98,8 +98,7 @@
   padding: 6px 8px;
   font-size: 12px;
   line-height: 1.35;
-  background: rgba(var(--color-neon-pink-rgb), 0.08);
-  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.35);
+  border: 1px solid;
   border-radius: 6px;
   overflow-wrap: anywhere;
 }
@@ -109,10 +108,29 @@
    the title attribute, and screen readers read it whole anyway. */
 .noteLabel {
   font-weight: 600;
-  color: var(--color-neon-pink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.notePink {
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.35);
+}
+
+.notePink .noteLabel {
+  color: var(--color-neon-pink);
+}
+
+/* The planner's "Last chance" tag: yellow is far lighter than the pink, so
+   it's softened to sit at the same weight. */
+.noteYellow {
+  background: rgba(var(--color-buttery-yellow-rgb), 0.08);
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.5);
+}
+
+.noteYellow .noteLabel {
+  color: rgba(var(--color-buttery-yellow-rgb), 0.75);
 }
 
 .noteDetail {
