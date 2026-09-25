@@ -745,8 +745,11 @@ on keyboard focus only, because focus is moved to Undo and expiring underneath
 it would drop a keyboard reader back to the top of the page.
 
 **List tools sit behind "Manage lists"** in the account bar, collapsed by
-default, since everything in them is occasional (`list-management.tsx`):
+default, since everything in them is occasional (`list-management.tsx`).
+Editing sits on its own row first; import and export pair up below it:
 
+- **Show Remove buttons** — off by default, and per visit rather than stored:
+  a Remove under every poster reads as the page's main business.
 - **Import from Letterboxd.** Reads Letterboxd's export files (`watchlist.csv`,
   `watched.csv`, `diary.csv` — `Name`, `Year`, a date) and its import format
   (`Title`, `Year`, `tmdbID`), parsed in `@/lib/user-lists/letterboxd-csv`. The
@@ -756,15 +759,15 @@ default, since everything in them is occasional (`list-management.tsx`):
   resolve has no id to key it by. Matching is `createMovieMatcher`
   (`@/utils/match-movie`), the same resolver the film lists use, pulled out of
   `get-movie-list-movies` so the page doesn't bundle every list's entries. A
-  review step shows what will be added before anything is written; films
+  review step shows what will be added before anything is written, each
+  title linking to its film page in a new tab (the review is only page state,
+  so navigating away would lose it); films
   already listed keep their entry, and an import to Seen takes films off the
   watchlist, as a single add does — in one write (`addManyToUserList`).
 - **Export** writes each list in Letterboxd's _import_ format rather than its
   export format: the `tmdbID` column makes it an exact match both in Letterboxd
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
   out and Letterboxd falls back to title and year.
-- **Show Remove buttons** — off by default, and per visit rather than stored:
-  a Remove under every poster reads as the page's main business.
 
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so

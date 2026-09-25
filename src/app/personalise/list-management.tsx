@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { Fragment, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/button";
 import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { getMovieUrl } from "@/utils/get-movie-url";
 import { UserListId, type UserListEntry } from "@/lib/user-lists";
 import {
   formatLetterboxdCsv,
@@ -48,10 +49,26 @@ function plural(count: number, noun: string) {
   return `${count.toLocaleString("en-GB")} ${noun}${count === 1 ? "" : "s"}`;
 }
 
-function formatTitles(titles: string[]) {
-  if (titles.length <= REVIEW_TITLE_LIMIT) return titles.join(", ");
-  const rest = titles.length - REVIEW_TITLE_LIMIT;
-  return `${titles.slice(0, REVIEW_TITLE_LIMIT).join(", ")} and ${rest} more`;
+/**
+ * The films an import would add, each linked to its page. In a new tab, so
+ * checking one doesn't lose the review — which lives only in this page's state.
+ */
+function ReviewTitles({ films }: { films: { id: string; title: string }[] }) {
+  const shown = films.slice(0, REVIEW_TITLE_LIMIT);
+  const rest = films.length - shown.length;
+  return (
+    <p className={styles.importTitles}>
+      {shown.map((film, index) => (
+        <Fragment key={film.id}>
+          {index > 0 && ", "}
+          <a href={getMovieUrl(film)} target="_blank" rel="noopener noreferrer">
+            {film.title}
+          </a>
+        </Fragment>
+      ))}
+      {rest > 0 && ` and ${rest.toLocaleString("en-GB")} more`}
+    </p>
+  );
 }
 
 function downloadCsv(fileName: string, csv: string) {
@@ -79,8 +96,6 @@ export default function ListManagement({
 }) {
   return (
     <div className={styles.management}>
-      <ImportSection />
-      <ExportSection />
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Editing</h3>
         <Switch
@@ -91,6 +106,8 @@ export default function ListManagement({
           className={styles.managementSwitch}
         />
       </section>
+      <ImportSection />
+      <ExportSection />
     </div>
   );
 }
@@ -229,9 +246,9 @@ function ImportReview({
   onCancel: () => void;
 }) {
   const { lists } = useUserContext();
-  const titles = Object.values(state.entries)
-    .map((entry) => entry.title)
-    .sort((a, b) => a.localeCompare(b));
+  const titles = Object.entries(state.entries)
+    .map(([id, entry]) => ({ id, title: entry.title }))
+    .sort((a, b) => a.title.localeCompare(b.title));
   const listName = LIST_NAMES[state.listId];
   // Marking seen takes a film off the watchlist, and a bulk import shouldn't
   // do that unannounced.
@@ -254,9 +271,7 @@ function ImportReview({
   return (
     <div className={styles.importReview}>
       <p className={styles.managementText}>{summary}</p>
-      {titles.length > 0 && (
-        <p className={styles.importTitles}>{formatTitles(titles)}</p>
-      )}
+      {titles.length > 0 && <ReviewTitles films={titles} />}
       {leavingWatchlist > 0 && (
         <p className={styles.managementText}>
           {plural(leavingWatchlist, "film")} will come off your Watchlist, as
@@ -313,7 +328,7 @@ function ExportSection() {
 
   return (
     <section className={styles.managementSection}>
-      <h3 className={styles.managementTitle}>Export</h3>
+      <h3 className={styles.managementTitle}>Export from Clusterflick</h3>
       <p className={styles.managementText}>
         A CSV of each list, in the format{" "}
         <a

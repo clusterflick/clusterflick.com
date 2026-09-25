@@ -165,8 +165,9 @@
   color: var(--color-light-gray);
 }
 
-/* List tools, opened from the account bar: sections side by side where they
-   fit, divided from the account row above. */
+/* List tools, opened from the account bar, divided from the account row
+   above: editing first, then import and export side by side where they fit.
+   Each keeps to its own column, so a review under the import grows only it. */
 .management {
   display: grid;
   gap: 24px;
@@ -181,8 +182,7 @@
     column-gap: 32px;
   }
 
-  /* The import can grow a review; it takes the full row so it never
-     stretches the export beside it. */
+  /* Editing takes a row of its own above import and export, which pair up. */
   .managementSection:first-child {
     grid-column: 1 / -1;
   }
