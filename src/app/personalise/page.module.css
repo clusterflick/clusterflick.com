@@ -186,6 +186,14 @@
   .managementSection:first-child {
     grid-column: 1 / -1;
   }
+
+  /* An import's review follows the import in the markup, which is where it
+     belongs stacked on a phone. Side by side, it drops below both columns and
+     takes the full width. */
+  .importReview {
+    grid-column: 1 / -1;
+    order: 1;
+  }
 }
 
 .managementSection {

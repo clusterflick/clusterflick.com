@@ -120,7 +120,6 @@ function ImportSection() {
   const targetRef = useRef<UserListId>(UserListId.Watchlist);
   // Matching is against what's showing, so it waits for the data.
   const ready = !!lists && hasAttemptedLoad && !isLoading && !error;
-  const busy = state.step === "importing";
 
   const choose = (listId: UserListId) => {
     targetRef.current = listId;
@@ -174,65 +173,70 @@ function ImportSection() {
     }
   };
 
+  const reviewing = state.step === "review" || state.step === "importing";
+
+  // The review is a sibling of the section rather than inside it, so it can
+  // take the panel's full width below import and export — a long file's
+  // titles run to many lines in half of it.
   return (
-    <section className={styles.managementSection}>
-      <h3 className={styles.managementTitle}>Import from Letterboxd</h3>
-      <p className={styles.managementText}>
-        In Letterboxd, export your data from{" "}
-        <a
-          href="https://letterboxd.com/settings/data/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Settings → Data
-        </a>{" "}
-        and unzip it. Add <code>{LETTERBOXD_FILES[UserListId.Watchlist]}</code>{" "}
-        to your Watchlist and <code>{LETTERBOXD_FILES[UserListId.Seen]}</code>{" "}
-        to Seen. We add the films that are showing in London now.
-      </p>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".csv,text/csv"
-        hidden
-        onChange={onFile}
-      />
-      {state.step === "review" || state.step === "importing" ? (
+    <>
+      <section className={styles.managementSection}>
+        <h3 className={styles.managementTitle}>Import from Letterboxd</h3>
+        <p className={styles.managementText}>
+          In Letterboxd, export your data from{" "}
+          <a
+            href="https://letterboxd.com/settings/data/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Settings → Data
+          </a>{" "}
+          and unzip it. Add{" "}
+          <code>{LETTERBOXD_FILES[UserListId.Watchlist]}</code> to your
+          Watchlist and <code>{LETTERBOXD_FILES[UserListId.Seen]}</code> to
+          Seen. We add the films that are showing in London now.
+        </p>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".csv,text/csv"
+          hidden
+          onChange={onFile}
+        />
+        <div className={styles.managementActions}>
+          {[UserListId.Watchlist, UserListId.Seen].map((listId) => (
+            <Button
+              key={listId}
+              variant="secondary"
+              size="sm"
+              disabled={!ready || reviewing}
+              onClick={() => choose(listId)}
+            >
+              Import to {LIST_NAMES[listId]}
+            </Button>
+          ))}
+        </div>
+        {state.step === "done" && (
+          <p className={styles.managementStatus} role="status">
+            {state.count === 0
+              ? "Nothing new to add."
+              : `Added ${plural(state.count, "film")} to your ${LIST_NAMES[state.listId]}.`}
+          </p>
+        )}
+        {state.step === "error" && (
+          <p className={styles.error} role="alert">
+            {state.message}
+          </p>
+        )}
+      </section>
+      {reviewing && (
         <ImportReview
           state={state}
           onConfirm={onConfirm}
           onCancel={() => setState({ step: "idle" })}
         />
-      ) : (
-        <>
-          <div className={styles.managementActions}>
-            {[UserListId.Watchlist, UserListId.Seen].map((listId) => (
-              <Button
-                key={listId}
-                variant="secondary"
-                size="sm"
-                disabled={!ready || busy}
-                onClick={() => choose(listId)}
-              >
-                Import to {LIST_NAMES[listId]}
-              </Button>
-            ))}
-          </div>
-          {state.step === "done" && (
-            <p className={styles.managementStatus} role="status">
-              {state.count === 0
-                ? "Nothing new to add."
-                : `Added ${plural(state.count, "film")} to your ${LIST_NAMES[state.listId]}.`}
-            </p>
-          )}
-          {state.step === "error" && (
-            <p className={styles.error} role="alert">
-              {state.message}
-            </p>
-          )}
-        </>
       )}
-    </section>
+    </>
   );
 }
 
