@@ -29,7 +29,7 @@ interface VenueQuickAddProps {
 
 /**
  * A search-and-toggle combobox for adding or removing a single venue from the
- * filter without scrolling the grouped list.
+ * filter by name — the counterpart to picking an area on the venue map.
  *
  * The behaviour lives in {@link EntityQuickAdd}, which the people filters share;
  * this is the venue-shaped door onto it, keeping the venue vocabulary in the
