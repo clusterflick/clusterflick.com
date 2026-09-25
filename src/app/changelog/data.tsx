@@ -85,7 +85,7 @@ export const CHANGELOG: ChangelogDay[] = [
             moment it turns up. Marking a film seen takes it off the watchlist.
             There&rsquo;s no password or sign-up form: enter your email and
             follow the link it sends you, which creates the account the first
-            time. And nobody who doesn&rsquo;t sign in downloads any of it.
+            time.
           </>
         ),
       },
