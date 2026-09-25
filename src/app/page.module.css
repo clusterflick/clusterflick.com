@@ -22,12 +22,17 @@
   margin: 0 auto 28px auto;
 }
 
+/* Card chrome matches the "What we store" note on /personalise. */
 .summary {
-  margin: 24px auto 0;
-  font-size: 16px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  font-size: 15px;
   line-height: 1.7;
-  color: var(--color-white);
+  color: var(--color-light-gray);
   text-align: left;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 12px;
 }
 
 .summary p {
