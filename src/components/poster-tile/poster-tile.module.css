@@ -104,9 +104,15 @@
   overflow-wrap: anywhere;
 }
 
+/* One line, cut short rather than wrapped: "Live score by Hugo Max" over two
+   lines made one note taller than the rest of its row. The full label is in
+   the title attribute, and screen readers read it whole anyway. */
 .noteLabel {
   font-weight: 600;
   color: var(--color-neon-pink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .noteDetail {

@@ -99,7 +99,9 @@ export default function PosterTile({
         <div className={styles.action}>
           {note && (
             <p className={styles.note}>
-              <strong className={styles.noteLabel}>{note.label}</strong>
+              <strong className={styles.noteLabel} title={note.label}>
+                {note.label}
+              </strong>
               {note.detail && (
                 <span className={styles.noteDetail}>{note.detail}</span>
               )}

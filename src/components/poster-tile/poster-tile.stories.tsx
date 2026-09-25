@@ -87,7 +87,7 @@ export const WithNote: Story = {
     href: "/movies/28/apocalypse-now",
     details: ["1979"],
     note: {
-      label: "Q&A with Eleanor Coppola",
+      label: "Live score by the Hugo Max Quartet",
       detail: "Sat 3 Oct, 18:30 · BFI Southbank",
     },
     action: <Button variant="link">Remove</Button>,
