@@ -698,6 +698,52 @@ link — the pill the film page's list buttons use, pink on hover. Signed in, th
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
+**The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
+two groups above Showing now, each soonest first:
+
+- **Last chance** — the last bookable showing is within the home page's Last
+  Chance window. The definition is shared, so a film can't be ending on one
+  page and not the other.
+- **More than a screening** — an upcoming occasion (a Q&A, a live score). This
+  is the home row's scoring with no end date: scored over the whole dataset
+  (house style is judged per venue) and then filtered to the watchlist, so
+  what the home row wouldn't call rare isn't flagged here either. Sold-out
+  occasions are skipped.
+
+A film can be in both, and each group then says its own thing about it; either
+takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
+above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
+plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). It sits
+at the foot of the tile rather than among the details, where it pushed that
+tile's title out of line with the rest of the row.
+
+The two groups **share a row while they fit**. Each is a flex item whose
+basis is the width its own tiles need. When both fit they sit side by side (8
+films beside 2 fits a 12-poster width) and split the leftover space equally, so
+a lone group fills the row and two equal ones go 50/50. A group too long to
+share wraps onto a row of its own. Each has a floor at the width of the longest
+heading, since a wrapped heading drops its lane out of line with its
+neighbour's, and the lanes stretch so neighbours end on the same line.
+
+**Tiles are the same size in every group.** PosterTileList's tracks stretch to
+fill whatever width they're given, so a group taking a share of the row would
+size its tiles differently from its neighbour and from Showing now. The groups
+instead get fixed tracks at `--tile`, the width a full-width list produces,
+computed from the measured row width (`useElementWidth`,
+`getFullWidthTileWidth`). The space a group grows into stays empty at the end of
+its lane.
+
+**Removing offers an undo in place** (`RemovedPosterTile`). The removal is
+written straight away — closing the tab never loses it — and the page holds the
+entry locally so its tile keeps its place, with **Undo** where **Remove** was.
+Undo writes the entry back as it was (`restoreToList`: original `addedAt`, and
+none of `addToList`'s side effects, which for Seen would take the film off the
+watchlist). The countdown is a 3s CSS animation whose end is the expiry. It
+does **not** pause on hover: the pointer is on Undo the moment the tile
+appears, so hover-pausing held it open until the reader moved away. It pauses
+on keyboard focus only, because focus is moved to Undo and expiring underneath
+it would drop a keyboard reader back to the top of the page.
+
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so
 signed-out, browser-held lists that merge on sign-in remain an option.

@@ -5,6 +5,19 @@ import EventPoster, {
 } from "@/components/event-poster";
 import styles from "./poster-tile.module.css";
 
+export {
+  default as RemovedPosterTile,
+  type RemovedPosterTileProps,
+} from "./removed-poster-tile";
+
+/** A boxed note above a tile's control — what makes the film time-sensitive. */
+export interface PosterTileNote {
+  /** What it is — "Final showing", "Q&A with Mike Leigh". */
+  label: string;
+  /** When and where. */
+  detail?: string;
+}
+
 export interface PosterTileProps {
   title: string;
   posterPath?: string;
@@ -25,6 +38,12 @@ export interface PosterTileProps {
    * the link, since a button can't sit inside one.
    */
   action?: ReactNode;
+  /**
+   * Something to act on — a final showing, a Q&A — boxed at the foot of the
+   * tile, above the action. At the foot rather than with the details, so tiles
+   * with and without one keep their titles in line across the row.
+   */
+  note?: PosterTileNote;
 }
 
 /**
@@ -38,6 +57,7 @@ export default function PosterTile({
   href,
   details = [],
   action,
+  note,
 }: PosterTileProps) {
   const body = (
     <>
@@ -75,7 +95,21 @@ export default function PosterTile({
       ) : (
         body
       )}
-      {action && <div className={styles.action}>{action}</div>}
+      {(note || action) && (
+        <div className={styles.action}>
+          {note && (
+            <p className={styles.note}>
+              <strong className={styles.noteLabel} title={note.label}>
+                {note.label}
+              </strong>
+              {note.detail && (
+                <span className={styles.noteDetail}>{note.detail}</span>
+              )}
+            </p>
+          )}
+          {action}
+        </div>
+      )}
     </li>
   );
 }

@@ -78,3 +78,18 @@ export const Unlinked: Story = {
     action: <Button variant="link">Remove</Button>,
   },
 };
+
+/** With a note above the control — what makes the film time-sensitive. */
+export const WithNote: Story = {
+  args: {
+    title: "Apocalypse Now",
+    posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
+    href: "/movies/28/apocalypse-now",
+    details: ["1979"],
+    note: {
+      label: "Live score by the Hugo Max Quartet",
+      detail: "Sat 3 Oct, 18:30 · BFI Southbank",
+    },
+    action: <Button variant="link">Remove</Button>,
+  },
+};

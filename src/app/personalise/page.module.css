@@ -218,6 +218,46 @@
   flex-shrink: 0;
 }
 
+/* The watchlist's time-sensitive groups share a row while they fit. Each
+   group's basis is the width its own tiles need (--tiles of them at --tile,
+   the width tiles come out at in a full-width list, set from the page). If both
+   fit, they sit side by side (8 films beside 2 still fits a 12-poster width)
+   and split the leftover space equally, so a lone group fills the row and two
+   equal ones go 50/50. A group too long to share wraps onto a row of its own
+   and shrinks to the full width. */
+.highlightGroups {
+  --tile: 140px;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 32px;
+}
+
+/* A column, so the lane can stretch: two groups sharing a row end on the same
+   line even when one has taller notes. The basis has a floor at the width of
+   the longest heading. Without it, a one-film group in a tight row wraps its
+   heading and its lane drops out of line with its neighbour's. */
+.highlightGroup {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 max(calc(var(--tiles) * (var(--tile) + 16px) - 16px), 190px);
+  min-width: 0;
+}
+
+.highlightGroup .lane {
+  flex: 1;
+}
+
+.highlightGroup .groupTitle {
+  white-space: nowrap;
+}
+
+/* Fixed tracks rather than PosterTileList's stretching ones, so tiles are the
+   same size here as in Showing now, whatever share of the row a group gets.
+   The space a group grows into stays empty at the end of its lane. */
+.highlightGroup .lane > ul {
+  grid-template-columns: repeat(auto-fill, var(--tile));
+}
+
 .groupTitle {
   margin: 24px 0 12px;
   font-size: 16px;

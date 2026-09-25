@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from "react";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import PosterTile, { PosterTileList } from "@/components/poster-tile";
+import PosterTile, {
+  PosterTileList,
+  RemovedPosterTile,
+  type PosterTileNote,
+} from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
@@ -12,8 +22,16 @@ import Button from "@/components/button";
 import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { UserListId, type UserLists } from "@/lib/user-lists";
+import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
+import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
+import type { MoviePerformance } from "@/types";
+import {
+  UserListId,
+  type UserListEntry,
+  type UserLists,
+} from "@/lib/user-lists";
 import styles from "./page.module.css";
 
 const LIST_TITLES: Record<UserListId, string> = {
@@ -64,6 +82,41 @@ function getSortTitle(title: string) {
     .replace(/^the /, "")
     .normalize("NFD")
     .replace(/[^a-z0-9]/g, "");
+}
+
+const dayFormatter = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  timeZone: "Europe/London",
+});
+
+/**
+ * "Tomorrow, 20:30 · Prince Charles Cinema". A note is read to decide whether
+ * to book, so it names the day plainly where it can, and says where.
+ */
+function formatShowing(time: number, venueName?: string) {
+  const days = getDaysFromNow(time, 1);
+  const day =
+    days === 0 ? "Today" : days === 1 ? "Tomorrow" : dayFormatter.format(time);
+  const when = `${day}, ${formatShowingTime(time)}`;
+  return venueName ? `${when} · ${venueName}` : when;
+}
+
+/** PosterTileList's track minimum and gap. */
+const TILE_MIN_WIDTH = 140;
+const TILE_GAP = 16;
+
+/**
+ * The width PosterTileList's `auto-fill, minmax(140px, 1fr)` gives each tile
+ * across a full-width list — the width the tiles in Showing now come out at.
+ */
+function getFullWidthTileWidth(width: number) {
+  const columns = Math.max(
+    1,
+    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
+  );
+  return (width - (columns - 1) * TILE_GAP) / columns;
 }
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
@@ -373,16 +426,57 @@ function UserListSection({
   listId: UserListId;
   lists: UserLists;
 }) {
-  const { removeFromList } = useUserContext();
-  const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
+  const { removeFromList, restoreToList } = useUserContext();
+  const { movies, metaData, hasAttemptedLoad, isLoading, error } =
+    useCinemaData();
+  const [highlightGroupsRef, highlightGroupsWidth] =
+    useElementWidth<HTMLDivElement>();
+  // Held while their undo is on offer, so each keeps its place in the grid
+  // rather than the films after it closing up under the pointer.
+  const [removed, setRemoved] = useState<Record<string, UserListEntry>>({});
+  // Fixed for the visit: the page isn't left open long enough for "ending
+  // soon" to drift, and a moving value would defeat the occasion cache.
+  const [now] = useState(() => Date.now());
   const title = LIST_TITLES[listId];
-  const entries = Object.entries(lists[listId])
+  const listed = lists[listId];
+  const entries = Object.entries({ ...removed, ...listed })
     .map(([id, entry]) => ({
       id,
       entry,
+      isRemoved: !(id in listed),
       sortTitle: movies[id]?.normalizedTitle ?? getSortTitle(entry.title),
     }))
     .sort((a, b) => a.sortTitle.localeCompare(b.sortTitle));
+  const listedCount = Object.keys(listed).length;
+
+  // Only the watchlist is news: nobody needs telling a film they've seen is
+  // ending. Removed films are included so an undo keeps its group. The
+  // dataset-wide occasion pass is cached, so this is cheap to redo.
+  const highlights = getWatchlistHighlights(
+    movies,
+    listId === UserListId.Watchlist ? entries.map(({ id }) => id) : [],
+    now,
+  );
+
+  const forget = (id: string) =>
+    setRemoved((current) => {
+      const rest = { ...current };
+      delete rest[id];
+      return rest;
+    });
+
+  const onRemove = (id: string, entry: UserListEntry) => {
+    setRemoved((current) => ({ ...current, [id]: entry }));
+    // A failed write puts the film back in the list, so the placeholder goes.
+    removeFromList(listId, id).catch(() => forget(id));
+  };
+
+  const onUndo = (id: string, entry: UserListEntry) => {
+    forget(id);
+    restoreToList(listId, id, entry).catch((error) =>
+      console.error("Failed to restore list entry", error),
+    );
+  };
 
   if (entries.length === 0) {
     return (
@@ -416,38 +510,59 @@ function UserListSection({
     );
   }
 
-  const toTile = (
-    { id, entry }: (typeof entries)[number],
-    showing: boolean,
-  ) => (
-    <PosterTile
-      key={id}
-      title={entry.title}
-      // The snapshot is all a film that's left the dataset has; one that's
-      // still in it may have gained a poster since it was added.
-      posterPath={movies[id]?.posterPath ?? entry.posterPath}
-      // An event (a marathon, a double bill) has no poster of its own and is
-      // drawn as a stack of its films' posters.
-      includedMovies={movies[id]?.includedMovies}
-      // Unlinked when not showing: whether its departed page still exists is
-      // only known at build time, and a dead link is worse than none.
-      href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
-      details={entry.year ? [entry.year] : undefined}
-      action={
-        <button
-          type="button"
-          className={styles.remove}
-          onClick={() => removeFromList(listId, id)}
-          aria-label={`Remove ${entry.title} from ${title}`}
-        >
-          <CloseIcon size={14} />
-          Remove
-        </button>
-      }
-    />
-  );
+  const describeShowing = (id: string, performance: MoviePerformance) => {
+    const venueId = movies[id]?.showings[performance.showingId]?.venueId;
+    const venueName = venueId ? metaData?.venues[venueId]?.name : undefined;
+    return formatShowing(performance.time, venueName);
+  };
 
-  const count = <span className={styles.count}>{entries.length}</span>;
+  const toTile = (
+    { id, entry, isRemoved }: (typeof entries)[number],
+    showing: boolean,
+    note?: PosterTileNote,
+  ) => {
+    if (isRemoved) {
+      return (
+        <RemovedPosterTile
+          key={id}
+          title={entry.title}
+          message={`Removed from ${title}`}
+          onUndo={() => onUndo(id, entry)}
+          onExpire={() => forget(id)}
+        />
+      );
+    }
+    return (
+      <PosterTile
+        key={id}
+        title={entry.title}
+        // The snapshot is all a film that's left the dataset has; one that's
+        // still in it may have gained a poster since it was added.
+        posterPath={movies[id]?.posterPath ?? entry.posterPath}
+        // An event (a marathon, a double bill) has no poster of its own and is
+        // drawn as a stack of its films' posters.
+        includedMovies={movies[id]?.includedMovies}
+        // Unlinked when not showing: whether its departed page still exists is
+        // only known at build time, and a dead link is worse than none.
+        href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
+        details={entry.year ? [entry.year] : undefined}
+        note={note}
+        action={
+          <button
+            type="button"
+            className={styles.remove}
+            onClick={() => onRemove(id, entry)}
+            aria-label={`Remove ${entry.title} from ${title}`}
+          >
+            <CloseIcon size={14} />
+            Remove
+          </button>
+        }
+      />
+    );
+  };
+
+  const count = <span className={styles.count}>{listedCount}</span>;
 
   if (!hasAttemptedLoad || isLoading) {
     return (
@@ -471,11 +586,82 @@ function UserListSection({
     );
   }
 
-  const showing = entries.filter(({ id }) => movies[id]);
+  // Each soonest first: the order to book them in. A film can be in both —
+  // ending this week with a Q&A on its last night — and each group then says
+  // its own thing about it. Either takes it out of Showing now.
+  const finalShowing = (id: string) => highlights.get(id)?.finalShowing;
+  const occasion = (id: string) => highlights.get(id)?.occasion;
+  const ending = entries
+    .filter(({ id }) => movies[id] && finalShowing(id))
+    .sort((a, b) => finalShowing(a.id)!.time - finalShowing(b.id)!.time);
+  const occasions = entries
+    .filter(({ id }) => movies[id] && occasion(id))
+    .sort(
+      (a, b) =>
+        occasion(a.id)!.performance.time - occasion(b.id)!.performance.time,
+    );
+  const showing = entries.filter(
+    ({ id }) => movies[id] && !finalShowing(id) && !occasion(id),
+  );
   const notShowing = entries.filter(({ id }) => !movies[id]);
+
+  const highlightGroups = [
+    {
+      key: "ending",
+      title: "Last chance",
+      tiles: ending.map((entry) =>
+        toTile(entry, true, {
+          label: "Final showing",
+          detail: describeShowing(entry.id, finalShowing(entry.id)!),
+        }),
+      ),
+    },
+    {
+      key: "occasions",
+      title: "More than a screening",
+      tiles: occasions.map((entry) => {
+        const { label, performance } = occasion(entry.id)!;
+        return toTile(entry, true, {
+          label,
+          detail: describeShowing(entry.id, performance),
+        });
+      }),
+    },
+  ].filter(({ tiles }) => tiles.length > 0);
 
   return (
     <ContentSection title={title} titleBadge={count}>
+      {highlightGroups.length > 0 && (
+        // Side by side while both are short, each on its own row once either
+        // needs the width. See `.highlightGroup`.
+        <div
+          ref={highlightGroupsRef}
+          className={styles.highlightGroups}
+          // A group narrower than the page would size its tiles to its own
+          // width, so each would come out a different size from the others and
+          // from Showing now. They're given the full-width size instead.
+          style={
+            highlightGroupsWidth
+              ? ({
+                  "--tile": `${getFullWidthTileWidth(highlightGroupsWidth)}px`,
+                } as CSSProperties)
+              : undefined
+          }
+        >
+          {highlightGroups.map((group) => (
+            <section
+              key={group.key}
+              className={styles.highlightGroup}
+              style={{ "--tiles": group.tiles.length } as CSSProperties}
+            >
+              <h3 className={styles.groupTitle}>{group.title}</h3>
+              <div className={styles.lane}>
+                <PosterTileList>{group.tiles}</PosterTileList>
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
       {showing.length > 0 && (
         <>
           <h3 className={styles.groupTitle}>Showing now</h3>
