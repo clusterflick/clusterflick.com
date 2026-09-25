@@ -26,6 +26,7 @@ import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
+import ListManagement from "./list-management";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -344,14 +345,25 @@ function SignInForm() {
 
 function SignedIn() {
   const { lists } = useUserContext();
+  // Off by default, and for each visit: removing is occasional, and a Remove
+  // under every poster reads as the page's main business.
+  const [showRemove, setShowRemove] = useState(false);
 
   return (
     <div className={styles.wide}>
-      <AccountBar />
+      <AccountBar showRemove={showRemove} onShowRemoveChange={setShowRemove} />
       {lists ? (
         <>
-          <UserListSection listId={UserListId.Watchlist} lists={lists} />
-          <UserListSection listId={UserListId.Seen} lists={lists} />
+          <UserListSection
+            listId={UserListId.Watchlist}
+            lists={lists}
+            showRemove={showRemove}
+          />
+          <UserListSection
+            listId={UserListId.Seen}
+            lists={lists}
+            showRemove={showRemove}
+          />
         </>
       ) : (
         <LoadingIndicator message="Loading your lists…" />
@@ -361,8 +373,15 @@ function SignedIn() {
   );
 }
 
-function AccountBar() {
+function AccountBar({
+  showRemove,
+  onShowRemoveChange,
+}: {
+  showRemove: boolean;
+  onShowRemoveChange: (show: boolean) => void;
+}) {
   const { email, signOut, deleteAccount } = useUserContext();
+  const [managing, setManaging] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -400,6 +419,14 @@ function AccountBar() {
             </>
           ) : (
             <>
+              <Button
+                variant="link"
+                onClick={() => setManaging((open) => !open)}
+                aria-expanded={managing}
+                aria-controls="personalise-manage"
+              >
+                {managing ? "Hide list tools" : "Manage lists"}
+              </Button>
               <Button variant="link" onClick={signOut}>
                 Sign out
               </Button>
@@ -415,6 +442,14 @@ function AccountBar() {
           {deleteError}
         </p>
       )}
+      <div id="personalise-manage" hidden={!managing}>
+        {managing && (
+          <ListManagement
+            showRemove={showRemove}
+            onShowRemoveChange={onShowRemoveChange}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -422,9 +457,12 @@ function AccountBar() {
 function UserListSection({
   listId,
   lists,
+  showRemove,
 }: {
   listId: UserListId;
   lists: UserLists;
+  /** Remove buttons are hidden until asked for, from the account bar. */
+  showRemove: boolean;
 }) {
   const { removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
@@ -548,15 +586,17 @@ function UserListSection({
         details={entry.year ? [entry.year] : undefined}
         note={note}
         action={
-          <button
-            type="button"
-            className={styles.remove}
-            onClick={() => onRemove(id, entry)}
-            aria-label={`Remove ${entry.title} from ${title}`}
-          >
-            <CloseIcon size={14} />
-            Remove
-          </button>
+          showRemove && (
+            <button
+              type="button"
+              className={styles.remove}
+              onClick={() => onRemove(id, entry)}
+              aria-label={`Remove ${entry.title} from ${title}`}
+            >
+              <CloseIcon size={14} />
+              Remove
+            </button>
+          )
         }
       />
     );
@@ -613,6 +653,7 @@ function UserListSection({
         toTile(entry, true, {
           label: "Final showing",
           detail: describeShowing(entry.id, finalShowing(entry.id)!),
+          color: "yellow",
         }),
       ),
     },

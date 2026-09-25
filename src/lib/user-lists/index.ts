@@ -88,6 +88,34 @@ export async function addToUserList(
   );
 }
 
+/**
+ * Adds many films in one write — an import. Films in `removeFrom` leave it in
+ * the same write, as with a single add.
+ */
+export async function addManyToUserList(
+  db: Firestore,
+  uid: string,
+  listId: UserListId,
+  entries: Record<Movie["id"], UserListEntry>,
+  removeFrom: UserListId[] = [],
+): Promise<void> {
+  const { setDoc, deleteField } = await import("firebase/firestore/lite");
+  const ids = Object.keys(entries);
+  await setDoc(
+    await getUserDocRef(db, uid),
+    {
+      [listId]: entries,
+      ...Object.fromEntries(
+        removeFrom.map((otherId) => [
+          otherId,
+          Object.fromEntries(ids.map((id) => [id, deleteField()])),
+        ]),
+      ),
+    },
+    { merge: true },
+  );
+}
+
 export async function removeFromUserList(
   db: Firestore,
   uid: string,

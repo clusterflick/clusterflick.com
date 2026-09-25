@@ -713,7 +713,9 @@ two groups above Showing now, each soonest first:
 A film can be in both, and each group then says its own thing about it; either
 takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
 above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
-plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). It sits
+plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). Final
+showing is yellow, the colour of the planner's "Last chance" tag, so the two
+read as the same warning; occasions keep the pink. It sits
 at the foot of the tile rather than among the details, where it pushed that
 tile's title out of line with the rest of the row.
 
@@ -743,6 +745,31 @@ does **not** pause on hover: the pointer is on Undo the moment the tile
 appears, so hover-pausing held it open until the reader moved away. It pauses
 on keyboard focus only, because focus is moved to Undo and expiring underneath
 it would drop a keyboard reader back to the top of the page.
+
+**List tools sit behind "Manage lists"** in the account bar, collapsed by
+default, since everything in them is occasional (`list-management.tsx`).
+Editing sits on its own row first; import and export pair up below it:
+
+- **Show Remove buttons** — off by default, and per visit rather than stored:
+  a Remove under every poster reads as the page's main business.
+- **Import from Letterboxd.** Reads Letterboxd's export files (`watchlist.csv`,
+  `watched.csv`, `diary.csv` — `Name`, `Year`, a date) and its import format
+  (`Title`, `Year`, `tmdbID`), parsed in `@/lib/user-lists/letterboxd-csv`. The
+  reader picks the target list; the file's contents can't tell a watchlist from
+  a watched list. Only films **in the current dataset** are added. Letterboxd's
+  URI is a boxd.it short link with nothing to match on, and a film we can't
+  resolve has no id to key it by. Matching is `createMovieMatcher`
+  (`@/utils/match-movie`), the same resolver the film lists use, pulled out of
+  `get-movie-list-movies` so the page doesn't bundle every list's entries. A
+  review step shows what will be added before anything is written, each
+  title linking to its film page in a new tab (the review is only page state,
+  so navigating away would lose it); films
+  already listed keep their entry, and an import to Seen takes films off the
+  watchlist, as a single add does — in one write (`addManyToUserList`).
+- **Export** writes each list in Letterboxd's _import_ format rather than its
+  export format: the `tmdbID` column makes it an exact match both in Letterboxd
+  and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
+  out and Letterboxd falls back to title and year.
 
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so
