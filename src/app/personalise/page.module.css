@@ -176,9 +176,46 @@
    narrow the grid by a column and pull the posters off the headings' edge. */
 .lane {
   margin: 0 -8px;
-  padding: 18px 8px 8px;
+  padding: 18px 8px 12px;
   background-color: rgba(var(--color-dark-navy-rgb), 0.35);
   border-radius: 10px;
+}
+
+/* The pill the film page's "Want to see" and "Seen it" use, as this is the
+   same control's other half. Pink on hover rather than white: this one takes
+   something away. */
+.remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove:hover {
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+.remove:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.remove svg {
+  flex-shrink: 0;
 }
 
 .groupTitle {

@@ -4,21 +4,16 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import FilmPosterGrid, {
-  type FilmPosterGridMovie,
-} from "@/components/film-poster-grid";
+import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button from "@/components/button";
-import { BookmarkIcon, EyeIcon } from "@/components/icons";
+import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import {
-  UserListId,
-  type UserListEntry,
-  type UserLists,
-} from "@/lib/user-lists";
+import { getMovieUrl } from "@/utils/get-movie-url";
+import { UserListId, type UserLists } from "@/lib/user-lists";
 import styles from "./page.module.css";
 
 const LIST_TITLES: Record<UserListId, string> = {
@@ -55,6 +50,21 @@ const DISCOVERY_LINKS = [
     detail: "Cinemas, film clubs and festivals close to wherever you are",
   },
 ];
+
+/**
+ * The key a film sorts by. A film still in the dataset has the pipeline's
+ * `normalizedTitle`, which /catalogue and /planner sort by too; one that has
+ * left it has only its snapshot, so this folds that the same way the build's
+ * `simplifySorting` does. Each group is drawn wholly from one or the other.
+ */
+function getSortTitle(title: string) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/^the /, "")
+    .normalize("NFD")
+    .replace(/[^a-z0-9]/g, "");
+}
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
 function isSignInLink(url: URL) {
@@ -366,9 +376,13 @@ function UserListSection({
   const { removeFromList } = useUserContext();
   const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
   const title = LIST_TITLES[listId];
-  const entries = Object.entries(lists[listId]).sort(
-    ([, a], [, b]) => b.addedAt - a.addedAt,
-  );
+  const entries = Object.entries(lists[listId])
+    .map(([id, entry]) => ({
+      id,
+      entry,
+      sortTitle: movies[id]?.normalizedTitle ?? getSortTitle(entry.title),
+    }))
+    .sort((a, b) => a.sortTitle.localeCompare(b.sortTitle));
 
   if (entries.length === 0) {
     return (
@@ -402,36 +416,36 @@ function UserListSection({
     );
   }
 
-  const toGridMovie = (
-    [id, entry]: [string, UserListEntry],
+  const toTile = (
+    { id, entry }: (typeof entries)[number],
     showing: boolean,
-  ): FilmPosterGridMovie => ({
-    // The snapshot is all a film that's left the dataset has; one that's
-    // still in it may have gained a poster since it was added.
-    movie: {
-      id,
-      title: entry.title,
-      year: entry.year,
-      posterPath: movies[id]?.posterPath ?? entry.posterPath,
+  ) => (
+    <PosterTile
+      key={id}
+      title={entry.title}
+      // The snapshot is all a film that's left the dataset has; one that's
+      // still in it may have gained a poster since it was added.
+      posterPath={movies[id]?.posterPath ?? entry.posterPath}
       // An event (a marathon, a double bill) has no poster of its own and is
       // drawn as a stack of its films' posters.
-      includedMovies: movies[id]?.includedMovies,
-    },
-    performanceCount: 0,
-    // Unlinked when not showing: whether its departed page still exists is
-    // only known at build time, and a dead link is worse than none.
-    unavailable: !showing,
-    notice: showing ? undefined : "Not showing",
-    action: (
-      <Button
-        variant="link"
-        onClick={() => removeFromList(listId, id)}
-        aria-label={`Remove ${entry.title} from ${title}`}
-      >
-        Remove
-      </Button>
-    ),
-  });
+      includedMovies={movies[id]?.includedMovies}
+      // Unlinked when not showing: whether its departed page still exists is
+      // only known at build time, and a dead link is worse than none.
+      href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
+      details={entry.year ? [entry.year] : undefined}
+      action={
+        <button
+          type="button"
+          className={styles.remove}
+          onClick={() => removeFromList(listId, id)}
+          aria-label={`Remove ${entry.title} from ${title}`}
+        >
+          <CloseIcon size={14} />
+          Remove
+        </button>
+      }
+    />
+  );
 
   const count = <span className={styles.count}>{entries.length}</span>;
 
@@ -449,16 +463,16 @@ function UserListSection({
     return (
       <ContentSection title={title} titleBadge={count}>
         <div className={styles.lane}>
-          <FilmPosterGrid
-            movies={entries.map((entry) => toGridMovie(entry, true))}
-          />
+          <PosterTileList>
+            {entries.map((entry) => toTile(entry, true))}
+          </PosterTileList>
         </div>
       </ContentSection>
     );
   }
 
-  const showing = entries.filter(([id]) => movies[id]);
-  const notShowing = entries.filter(([id]) => !movies[id]);
+  const showing = entries.filter(({ id }) => movies[id]);
+  const notShowing = entries.filter(({ id }) => !movies[id]);
 
   return (
     <ContentSection title={title} titleBadge={count}>
@@ -466,9 +480,9 @@ function UserListSection({
         <>
           <h3 className={styles.groupTitle}>Showing now</h3>
           <div className={styles.lane}>
-            <FilmPosterGrid
-              movies={showing.map((entry) => toGridMovie(entry, true))}
-            />
+            <PosterTileList>
+              {showing.map((entry) => toTile(entry, true))}
+            </PosterTileList>
           </div>
         </>
       )}
@@ -476,9 +490,9 @@ function UserListSection({
         <>
           <h3 className={styles.groupTitle}>Not showing</h3>
           <div className={styles.lane}>
-            <FilmPosterGrid
-              movies={notShowing.map((entry) => toGridMovie(entry, false))}
-            />
+            <PosterTileList>
+              {notShowing.map((entry) => toTile(entry, false))}
+            </PosterTileList>
           </div>
         </>
       )}

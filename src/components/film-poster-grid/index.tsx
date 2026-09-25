@@ -51,11 +51,6 @@ export interface FilmPosterGridMovie {
    * a detour rather than a dead end.
    */
   notice?: string;
-  /**
-   * A control drawn under the poster — removing a film from a reader's list.
-   * Outside the poster's link, since a button can't sit inside one.
-   */
-  action?: ReactNode;
 }
 
 interface FilmPosterGridProps {
@@ -84,16 +79,7 @@ export default function FilmPosterGrid({
   venueId,
 }: FilmPosterGridProps) {
   const items: FilmPosterGridItem[] = movies.map(
-    ({
-      movie,
-      linkTo,
-      subtitle,
-      badge,
-      badgeVariant,
-      unavailable,
-      notice,
-      action,
-    }) => {
+    ({ movie, linkTo, subtitle, badge, badgeVariant, unavailable, notice }) => {
       const includedMovies = movie.includedMovies;
       const includedWithPosters =
         includedMovies?.filter((m) => m.posterPath) || [];
@@ -172,14 +158,7 @@ export default function FilmPosterGrid({
       return {
         id: target.id,
         unavailable,
-        node: action ? (
-          <div key={movie.id} className={styles.filmGridItem}>
-            {film}
-            <div className={styles.action}>{action}</div>
-          </div>
-        ) : (
-          film
-        ),
+        node: film,
       };
     },
   );

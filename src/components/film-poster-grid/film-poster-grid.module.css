@@ -37,17 +37,6 @@
   border-bottom: none;
 }
 
-/* A poster with a control under it — see `action`. */
-.filmGridItem {
-  width: 200px;
-}
-
-.action {
-  display: flex;
-  justify-content: center;
-  padding: 4px 0 8px;
-}
-
 /* A film listed for completeness with nothing to book — the rest of a
    collection. Held back from the films you can actually go and see, and
    deliberately inert: no lift, no brightening, no pointer. The title overlay

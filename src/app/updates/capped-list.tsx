@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Button from "@/components/button";
+import { PosterTileList } from "@/components/poster-tile";
 import styles from "./updates.module.css";
 
 /**
@@ -21,12 +22,15 @@ export default function CappedList({
   items,
   initialCount,
   showAllLabel,
+  layout,
   className,
 }: {
   items: ReactNode[];
   initialCount: number;
   /** e.g. "Show all 109 new films" */
   showAllLabel: string;
+  /** "tiles" for a grid of `PosterTile`s; otherwise a plain list. */
+  layout?: "tiles";
   className?: string;
 }) {
   const [showAll, setShowAll] = useState(false);
@@ -38,7 +42,11 @@ export default function CappedList({
 
   return (
     <>
-      <ul className={className}>{visible}</ul>
+      {layout === "tiles" ? (
+        <PosterTileList>{visible}</PosterTileList>
+      ) : (
+        <ul className={className}>{visible}</ul>
+      )}
       {isCollapsed && (
         // Outlined rather than a link: it sits between a poster grid and a
         // section of blue title links, where a bare link read as one more
