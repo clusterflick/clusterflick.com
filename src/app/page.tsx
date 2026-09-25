@@ -4,12 +4,10 @@ import PageWrapper from "@/components/page-wrapper";
 import MainHeader from "@/components/main-header";
 import SiteFooter from "@/components/site-footer";
 import OutlineHeading from "@/components/outline-heading";
-import Divider from "@/components/divider";
 import { ButtonLink } from "@/components/button";
 import { getStaticData } from "@/utils/get-static-data";
 import { computeDiscoveryRows } from "@/utils/get-discovery-movies";
 import { getEditorialSummary } from "@/utils/get-editorial-summary";
-import { getNearMeVenues, getNearMeFilmClubs } from "@/utils/get-near-me-data";
 import {
   linkifySummary,
   type SummaryLinkTarget,
@@ -20,7 +18,6 @@ import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
 import DiscoverySections from "./discovery-sections";
 import DiscoveryRowsView from "./discovery-rows-view";
-import NearYouSection from "./near-you-section";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -29,7 +26,7 @@ export const metadata: Metadata = {
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
   description:
-    "Discover what's worth seeing across London's 400+ cinemas — the films showing most widely, new additions, last chance screenings, and what's on near you. Every London cinema listing in one place.",
+    "Discover what's worth seeing across London's 400+ cinemas — the films showing most widely, new additions and last chance screenings. Every London cinema listing in one place.",
   alternates: {
     canonical: "/",
   },
@@ -82,11 +79,6 @@ export default async function Home() {
     collections: data.collections,
   });
 
-  const nearMeVenues = getNearMeVenues(data);
-  // Count all of a club's current films (matching the club page), not just this
-  // week's — otherwise the tile count differs from the club page on click-through.
-  const nearMeFilmClubs = await getNearMeFilmClubs(data);
-
   return (
     <>
       <script
@@ -122,17 +114,14 @@ export default async function Home() {
             cinemas.
           </p>
           {summary && (
-            <>
-              <Divider />
-              <div className={styles.summary} data-source={summary.source}>
-                {summary.text
-                  .split(/(?:\\n|\n)+/)
-                  .filter((para) => para.trim().length > 0)
-                  .map((para, index) => (
-                    <p key={index}>{linkifySummary(para, summaryTargets)}</p>
-                  ))}
-              </div>
-            </>
+            <div className={styles.summary} data-source={summary.source}>
+              {summary.text
+                .split(/(?:\\n|\n)+/)
+                .filter((para) => para.trim().length > 0)
+                .map((para, index) => (
+                  <p key={index}>{linkifySummary(para, summaryTargets)}</p>
+                ))}
+            </div>
           )}
         </header>
 
@@ -148,10 +137,6 @@ export default async function Home() {
           <div className={styles.browseCta}>
             <ButtonLink href="/catalogue">Browse all films →</ButtonLink>
           </div>
-
-          <Divider />
-
-          <NearYouSection venues={nearMeVenues} filmClubs={nearMeFilmClubs} />
         </div>
         <SiteFooter />
       </PageWrapper>
