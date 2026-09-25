@@ -717,12 +717,21 @@ plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). It sits
 at the foot of the tile rather than among the details, where it pushed that
 tile's title out of line with the rest of the row.
 
-The two groups **share a row while they're short**: each is a flex item sized
-for its own tiles (`--tiles` × PosterTileList's 140px minimum plus gaps), with
-no growth, so two small groups hug their films side by side and a long one
-wraps onto a row of its own and shrinks to the full width. Each has a floor at
-the width of the longest heading, since a wrapped heading drops its lane out
-of line with its neighbour's.
+The two groups **share a row while they fit**. Each is a flex item whose
+basis is the width its own tiles need. When both fit they sit side by side (8
+films beside 2 fits a 12-poster width) and split the leftover space equally, so
+a lone group fills the row and two equal ones go 50/50. A group too long to
+share wraps onto a row of its own. Each has a floor at the width of the longest
+heading, since a wrapped heading drops its lane out of line with its
+neighbour's, and the lanes stretch so neighbours end on the same line.
+
+**Tiles are the same size in every group.** PosterTileList's tracks stretch to
+fill whatever width they're given, so a group taking a share of the row would
+size its tiles differently from its neighbour and from Showing now. The groups
+instead get fixed tracks at `--tile`, the width a full-width list produces,
+computed from the measured row width (`useElementWidth`,
+`getFullWidthTileWidth`). The space a group grows into stays empty at the end of
+its lane.
 
 **Removing offers an undo in place** (`RemovedPosterTile`). The removal is
 written straight away — closing the tab never loses it — and the page holds the

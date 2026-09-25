@@ -22,6 +22,7 @@ import Button from "@/components/button";
 import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
@@ -100,6 +101,22 @@ function formatShowing(time: number, venueName?: string) {
     days === 0 ? "Today" : days === 1 ? "Tomorrow" : dayFormatter.format(time);
   const when = `${day}, ${formatShowingTime(time)}`;
   return venueName ? `${when} · ${venueName}` : when;
+}
+
+/** PosterTileList's track minimum and gap. */
+const TILE_MIN_WIDTH = 140;
+const TILE_GAP = 16;
+
+/**
+ * The width PosterTileList's `auto-fill, minmax(140px, 1fr)` gives each tile
+ * across a full-width list — the width the tiles in Showing now come out at.
+ */
+function getFullWidthTileWidth(width: number) {
+  const columns = Math.max(
+    1,
+    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
+  );
+  return (width - (columns - 1) * TILE_GAP) / columns;
 }
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
@@ -412,6 +429,8 @@ function UserListSection({
   const { removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
     useCinemaData();
+  const [highlightGroupsRef, highlightGroupsWidth] =
+    useElementWidth<HTMLDivElement>();
   // Held while their undo is on offer, so each keeps its place in the grid
   // rather than the films after it closing up under the pointer.
   const [removed, setRemoved] = useState<Record<string, UserListEntry>>({});
@@ -615,7 +634,20 @@ function UserListSection({
       {highlightGroups.length > 0 && (
         // Side by side while both are short, each on its own row once either
         // needs the width. See `.highlightGroup`.
-        <div className={styles.highlightGroups}>
+        <div
+          ref={highlightGroupsRef}
+          className={styles.highlightGroups}
+          // A group narrower than the page would size its tiles to its own
+          // width, so each would come out a different size from the others and
+          // from Showing now. They're given the full-width size instead.
+          style={
+            highlightGroupsWidth
+              ? ({
+                  "--tile": `${getFullWidthTileWidth(highlightGroupsWidth)}px`,
+                } as CSSProperties)
+              : undefined
+          }
+        >
           {highlightGroups.map((group) => (
             <section
               key={group.key}

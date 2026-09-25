@@ -218,36 +218,44 @@
   flex-shrink: 0;
 }
 
-/* The watchlist's time-sensitive groups share a row while they fit. Each is
-   sized for its own tiles — --tiles columns of PosterTileList's 140px minimum
-   plus its 16px gaps — so two short groups sit side by side, each hugging its
-   films. A group too long to share wraps onto a row of its own and shrinks to
-   the full width. They don't grow: growing a two-film group into half the
-   page left a lane mostly empty. */
+/* The watchlist's time-sensitive groups share a row while they fit. Each
+   group's basis is the width its own tiles need (--tiles of them at --tile,
+   the width tiles come out at in a full-width list, set from the page). If both
+   fit, they sit side by side (8 films beside 2 still fits a 12-poster width)
+   and split the leftover space equally, so a lone group fills the row and two
+   equal ones go 50/50. A group too long to share wraps onto a row of its own
+   and shrinks to the full width. */
 .highlightGroups {
+  --tile: 140px;
   display: flex;
   flex-wrap: wrap;
   column-gap: 32px;
 }
 
-/* Floored at the width of the longest heading, so a one-film group doesn't
-   wrap its heading onto two lines and drop its lane out of line with its
-   neighbour's. */
+/* A column, so the lane can stretch: two groups sharing a row end on the same
+   line even when one has taller notes. The basis has a floor at the width of
+   the longest heading. Without it, a one-film group in a tight row wraps its
+   heading and its lane drops out of line with its neighbour's. */
 .highlightGroup {
-  flex: 0 1 max(calc(var(--tiles) * 156px - 16px), 190px);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 max(calc(var(--tiles) * (var(--tile) + 16px) - 16px), 190px);
   min-width: 0;
+}
+
+.highlightGroup .lane {
+  flex: 1;
 }
 
 .highlightGroup .groupTitle {
   white-space: nowrap;
 }
 
-/* …and the spare width that floor leaves stays spare, rather than stretching
-   a tile past the 160px its poster stops at. On the tile rather than the
-   track: auto-fill counts tracks at their maximum, so a 160px cap there fits
-   one column where the group was sized for two. */
-.highlightGroup .lane > ul > li {
-  max-width: 160px;
+/* Fixed tracks rather than PosterTileList's stretching ones, so tiles are the
+   same size here as in Showing now, whatever share of the row a group gets.
+   The space a group grows into stays empty at the end of its lane. */
+.highlightGroup .lane > ul {
+  grid-template-columns: repeat(auto-fill, var(--tile));
 }
 
 .groupTitle {
