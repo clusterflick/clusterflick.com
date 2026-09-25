@@ -80,12 +80,10 @@ export const CHANGELOG: ChangelogDay[] = [
             You can now keep a watchlist and a list of films you&rsquo;ve seen.
             Every film&rsquo;s page has buttons under the poster to add it to
             either, and <Link href="/personalise">Personalise</Link> shows both
-            lists split into what&rsquo;s showing now and what isn&rsquo;t
-            &mdash; so a film you&rsquo;ve been waiting for is easy to spot the
-            moment it turns up. Marking a film seen takes it off the watchlist.
-            There&rsquo;s no password or sign-up form: enter your email and
-            follow the link it sends you, which creates the account the first
-            time.
+            lists split into what&rsquo;s showing now and what isn&rsquo;t.
+            Marking a film seen takes it off the watchlist. There&rsquo;s no
+            password or sign-up form: enter your email and follow the link it
+            sends you, which creates the account the first time.
           </>
         ),
       },
