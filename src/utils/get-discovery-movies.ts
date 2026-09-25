@@ -7,7 +7,7 @@ import {
 } from "@/lib/filters/modules/categories";
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
 import { getRating, isEvergreen } from "@/utils/movie-ratings.mjs";
-import { findBestOccasionPerMovie } from "@/lib/occasions";
+import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
 
 export { getRating };
 
@@ -49,7 +49,7 @@ const NEW_RELEASE_MAX_AGE_DAYS = 60;
 const CLASSIC_MIN_AGE_YEARS = 15;
 const YEAR_MS = 365.25 * MS_PER_DAY;
 // A film is "last chance" if its final non-sold-out showing is within this many days.
-const LAST_CHANCE_DAYS = 7;
+export const LAST_CHANCE_DAYS = 7;
 
 // The Critics' Picks acclaim bar (review-count floors + the evergreen guard live
 // in @/utils/movie-ratings.mjs, shared with the editorial summary script).
@@ -345,8 +345,26 @@ function formatDayAndDate(time: number): string {
   });
 }
 
-function formatLastShowing(time: number): string {
+export function formatLastShowing(time: number): string {
   return `Last showing ${formatDayAndDate(time)}`;
+}
+
+/**
+ * When the film's last bookable showing is: the final upcoming performance
+ * that isn't sold out, or null when there is none.
+ */
+export function getFinalShowingTime(
+  movie: Movie,
+  now: number = Date.now(),
+): number | null {
+  let finalTime: number | null = null;
+  for (const performance of movie.performances) {
+    if (performance.time < now || performance.status?.soldOut) continue;
+    if (finalTime === null || performance.time > finalTime) {
+      finalTime = performance.time;
+    }
+  }
+  return finalTime;
 }
 
 /**
@@ -550,12 +568,21 @@ export function getOccasionMovies(
     .map(({ movie, performance, label, filmPerformanceCount }) => ({
       movie,
       performanceCount: filmPerformanceCount,
-      // Non-breaking spaces inside the date: these subtitles are long enough to
-      // wrap ("Intro by Lillian Crawford · Mon 24 Aug"), and a date broken
-      // across two lines reads as two facts. The separator is bound to the date
-      // as well, so it travels with it rather than dangling at a line end.
-      subtitle: `${label} ·\u00A0${formatDayAndDate(performance.time).replace(/ /g, "\u00A0")}`,
+      subtitle: formatOccasion({ label, performance }),
     }));
+}
+
+/**
+ * "Q&A with Mike Leigh · Mon 24 Aug". Non-breaking spaces inside the date:
+ * these are long enough to wrap, and a date broken across two lines reads as
+ * two facts. The separator is bound to the date as well, so it travels with it
+ * rather than dangling at a line end.
+ */
+export function formatOccasion({
+  label,
+  performance,
+}: Pick<Occasion, "label" | "performance">): string {
+  return `${label} ·\u00A0${formatDayAndDate(performance.time).replace(/ /g, "\u00A0")}`;
 }
 
 /**

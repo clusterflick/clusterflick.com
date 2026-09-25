@@ -5,6 +5,11 @@ import EventPoster, {
 } from "@/components/event-poster";
 import styles from "./poster-tile.module.css";
 
+export {
+  default as RemovedPosterTile,
+  type RemovedPosterTileProps,
+} from "./removed-poster-tile";
+
 export interface PosterTileProps {
   title: string;
   posterPath?: string;
@@ -15,6 +20,11 @@ export interface PosterTileProps {
   includedMovies?: EventPosterIncludedMovie[];
   /** Where the tile leads. Without one, the tile is drawn unlinked. */
   href?: string;
+  /**
+   * Something the reader should act on — a Q&A, a last showing — drawn in the
+   * accent colour above the details.
+   */
+  highlight?: string;
   /**
    * Short lines under the title — a venue, a count, a year. The first reads
    * more strongly than the rest.
@@ -36,9 +46,11 @@ export default function PosterTile({
   posterPath,
   includedMovies,
   href,
+  highlight,
   details = [],
   action,
 }: PosterTileProps) {
+  const lines = highlight ? [highlight, ...details] : details;
   const body = (
     <>
       <EventPoster
@@ -49,6 +61,7 @@ export default function PosterTile({
         interactive={!!href}
       />
       <h4 className={styles.title}>{title}</h4>
+      {highlight && <p className={styles.highlight}>{highlight}</p>}
       {details.map((detail, index) => (
         <p key={index} className={styles.detail}>
           {detail}
@@ -67,7 +80,7 @@ export default function PosterTile({
           href={href}
           className={styles.link}
           aria-label={
-            details.length > 0 ? `${title} — ${details.join(", ")}` : title
+            lines.length > 0 ? `${title} — ${lines.join(", ")}` : title
           }
         >
           {body}

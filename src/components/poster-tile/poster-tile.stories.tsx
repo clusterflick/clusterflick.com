@@ -78,3 +78,15 @@ export const Unlinked: Story = {
     action: <Button variant="link">Remove</Button>,
   },
 };
+
+/** With a highlight — an occasion worth planning around — above the details. */
+export const WithHighlight: Story = {
+  args: {
+    title: "Apocalypse Now",
+    posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
+    href: "/movies/28/apocalypse-now",
+    highlight: "Q&A with Eleanor Coppola · Sat 3 Oct",
+    details: ["Last showing Sun 4 Oct", "1979"],
+    action: <Button variant="link">Remove</Button>,
+  },
+};

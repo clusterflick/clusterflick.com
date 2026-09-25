@@ -4,7 +4,10 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import PosterTile, { PosterTileList } from "@/components/poster-tile";
+import PosterTile, {
+  PosterTileList,
+  RemovedPosterTile,
+} from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
@@ -13,7 +16,16 @@ import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { UserListId, type UserLists } from "@/lib/user-lists";
+import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
+import {
+  formatLastShowing,
+  formatOccasion,
+} from "@/utils/get-discovery-movies";
+import {
+  UserListId,
+  type UserListEntry,
+  type UserLists,
+} from "@/lib/user-lists";
 import styles from "./page.module.css";
 
 const LIST_TITLES: Record<UserListId, string> = {
@@ -373,16 +385,54 @@ function UserListSection({
   listId: UserListId;
   lists: UserLists;
 }) {
-  const { removeFromList } = useUserContext();
+  const { removeFromList, restoreToList } = useUserContext();
   const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
+  // Held while their undo is on offer, so each keeps its place in the grid
+  // rather than the films after it closing up under the pointer.
+  const [removed, setRemoved] = useState<Record<string, UserListEntry>>({});
+  // Fixed for the visit: the page isn't left open long enough for "ending
+  // soon" to drift, and a moving value would defeat the occasion cache.
+  const [now] = useState(() => Date.now());
   const title = LIST_TITLES[listId];
-  const entries = Object.entries(lists[listId])
+  const listed = lists[listId];
+  const entries = Object.entries({ ...removed, ...listed })
     .map(([id, entry]) => ({
       id,
       entry,
+      isRemoved: !(id in listed),
       sortTitle: movies[id]?.normalizedTitle ?? getSortTitle(entry.title),
     }))
     .sort((a, b) => a.sortTitle.localeCompare(b.sortTitle));
+  const listedCount = Object.keys(listed).length;
+
+  // Only the watchlist is news: nobody needs telling a film they've seen is
+  // ending. Removed films are included so an undo keeps its group. The
+  // dataset-wide occasion pass is cached, so this is cheap to redo.
+  const highlights = getWatchlistHighlights(
+    movies,
+    listId === UserListId.Watchlist ? entries.map(({ id }) => id) : [],
+    now,
+  );
+
+  const forget = (id: string) =>
+    setRemoved((current) => {
+      const rest = { ...current };
+      delete rest[id];
+      return rest;
+    });
+
+  const onRemove = (id: string, entry: UserListEntry) => {
+    setRemoved((current) => ({ ...current, [id]: entry }));
+    // A failed write puts the film back in the list, so the placeholder goes.
+    removeFromList(listId, id).catch(() => forget(id));
+  };
+
+  const onUndo = (id: string, entry: UserListEntry) => {
+    forget(id);
+    restoreToList(listId, id, entry).catch((error) =>
+      console.error("Failed to restore list entry", error),
+    );
+  };
 
   if (entries.length === 0) {
     return (
@@ -417,37 +467,60 @@ function UserListSection({
   }
 
   const toTile = (
-    { id, entry }: (typeof entries)[number],
+    { id, entry, isRemoved }: (typeof entries)[number],
     showing: boolean,
-  ) => (
-    <PosterTile
-      key={id}
-      title={entry.title}
-      // The snapshot is all a film that's left the dataset has; one that's
-      // still in it may have gained a poster since it was added.
-      posterPath={movies[id]?.posterPath ?? entry.posterPath}
-      // An event (a marathon, a double bill) has no poster of its own and is
-      // drawn as a stack of its films' posters.
-      includedMovies={movies[id]?.includedMovies}
-      // Unlinked when not showing: whether its departed page still exists is
-      // only known at build time, and a dead link is worse than none.
-      href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
-      details={entry.year ? [entry.year] : undefined}
-      action={
-        <button
-          type="button"
-          className={styles.remove}
-          onClick={() => removeFromList(listId, id)}
-          aria-label={`Remove ${entry.title} from ${title}`}
-        >
-          <CloseIcon size={14} />
-          Remove
-        </button>
-      }
-    />
-  );
+  ) => {
+    if (isRemoved) {
+      return (
+        <RemovedPosterTile
+          key={id}
+          title={entry.title}
+          message={`Removed from ${title}`}
+          onUndo={() => onUndo(id, entry)}
+          onExpire={() => forget(id)}
+        />
+      );
+    }
+    const highlight = highlights.get(id);
+    const details = [
+      ...(highlight?.endsAt ? [formatLastShowing(highlight.endsAt)] : []),
+      ...(entry.year ? [entry.year] : []),
+    ];
+    return (
+      <PosterTile
+        key={id}
+        title={entry.title}
+        // The snapshot is all a film that's left the dataset has; one that's
+        // still in it may have gained a poster since it was added.
+        posterPath={movies[id]?.posterPath ?? entry.posterPath}
+        // An event (a marathon, a double bill) has no poster of its own and is
+        // drawn as a stack of its films' posters.
+        includedMovies={movies[id]?.includedMovies}
+        // Unlinked when not showing: whether its departed page still exists is
+        // only known at build time, and a dead link is worse than none.
+        href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
+        // A Q&A or a live score is the one thing here worth rearranging an
+        // evening for, so it reads first and in the accent colour.
+        highlight={
+          highlight?.occasion ? formatOccasion(highlight.occasion) : undefined
+        }
+        details={details.length > 0 ? details : undefined}
+        action={
+          <button
+            type="button"
+            className={styles.remove}
+            onClick={() => onRemove(id, entry)}
+            aria-label={`Remove ${entry.title} from ${title}`}
+          >
+            <CloseIcon size={14} />
+            Remove
+          </button>
+        }
+      />
+    );
+  };
 
-  const count = <span className={styles.count}>{entries.length}</span>;
+  const count = <span className={styles.count}>{listedCount}</span>;
 
   if (!hasAttemptedLoad || isLoading) {
     return (
@@ -471,11 +544,26 @@ function UserListSection({
     );
   }
 
-  const showing = entries.filter(({ id }) => movies[id]);
+  // Soonest to end first: the order to book them in.
+  const endsAt = (id: string) => highlights.get(id)?.endsAt ?? null;
+  const ending = entries
+    .filter(({ id }) => movies[id] && endsAt(id) !== null)
+    .sort((a, b) => endsAt(a.id)! - endsAt(b.id)!);
+  const showing = entries.filter(({ id }) => movies[id] && endsAt(id) === null);
   const notShowing = entries.filter(({ id }) => !movies[id]);
 
   return (
     <ContentSection title={title} titleBadge={count}>
+      {ending.length > 0 && (
+        <>
+          <h3 className={styles.groupTitle}>Last chance</h3>
+          <div className={styles.lane}>
+            <PosterTileList>
+              {ending.map((entry) => toTile(entry, true))}
+            </PosterTileList>
+          </div>
+        </>
+      )}
       {showing.length > 0 && (
         <>
           <h3 className={styles.groupTitle}>Showing now</h3>

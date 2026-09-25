@@ -24,6 +24,7 @@ import {
   removeFromUserList,
   toUserListEntry,
   UserListId,
+  type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
 
@@ -64,6 +65,15 @@ export type UserContextType = {
     movie: Pick<Movie, "id" | "title" | "year" | "posterPath">,
   ) => Promise<void>;
   removeFromList: (listId: UserListId, movieId: Movie["id"]) => Promise<void>;
+  /**
+   * Puts a removed entry back exactly as it was — its original `addedAt`, and
+   * none of `addToList`'s side effects on other lists. For undo.
+   */
+  restoreToList: (
+    listId: UserListId,
+    movieId: Movie["id"],
+    entry: UserListEntry,
+  ) => Promise<void>;
 };
 
 /**
@@ -279,6 +289,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user, lists],
   );
 
+  const restoreToList = useCallback<UserContextType["restoreToList"]>(
+    async (listId, movieId, entry) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      const previous = lists;
+      setLists((current) =>
+        current
+          ? { ...current, [listId]: { ...current[listId], [movieId]: entry } }
+          : current,
+      );
+      try {
+        await addToUserList(db, user.uid, listId, movieId, entry);
+      } catch (error) {
+        setLists(previous);
+        throw error;
+      }
+    },
+    [getServices, user, lists],
+  );
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -291,6 +321,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       deleteAccount,
       addToList,
       removeFromList,
+      restoreToList,
     }),
     [
       status,
@@ -302,6 +333,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       deleteAccount,
       addToList,
       removeFromList,
+      restoreToList,
     ],
   );
 
@@ -331,6 +363,7 @@ export function MockUserProvider({
     deleteAccount: noop,
     addToList: noop,
     removeFromList: noop,
+    restoreToList: noop,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

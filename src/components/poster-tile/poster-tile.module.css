@@ -87,3 +87,107 @@
   margin-top: auto;
   padding-top: 8px;
 }
+
+.highlight {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-neon-pink);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Removed ---- */
+
+/* The poster's footprint, as an outline: present enough to hold the place,
+   empty enough to read as gone. */
+.removed {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  padding: 10px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px dashed rgba(var(--color-white-rgb), 0.2);
+  border-radius: 6px;
+}
+
+.removedMessage {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-muted-gray);
+}
+
+.removed + .title {
+  color: var(--color-muted-gray);
+}
+
+/* Drains from full to empty; its end is the expiry. */
+.countdown {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-neon-pink);
+  transform-origin: left;
+  animation-name: countdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.tile:hover .countdown,
+.tile:has(:focus-visible) .countdown {
+  animation-play-state: paused;
+}
+
+/* Still running — it is the timer — but not moving. */
+@media (prefers-reduced-motion: reduce) {
+  .countdown {
+    visibility: hidden;
+  }
+}
+
+@keyframes countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* The personalise page's Remove pill, in the accent colour: this one puts
+   something back. */
+.undo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.undo:hover {
+  color: var(--color-white);
+  background: rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.undo:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
