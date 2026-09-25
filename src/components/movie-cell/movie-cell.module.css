@@ -1,4 +1,6 @@
+/* Positioned so status markers can sit over the poster's corner. */
 .movieLink {
+  position: relative;
   text-decoration: none;
   border-bottom: none;
   color: var(--color-light-gray);

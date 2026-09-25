@@ -6,6 +6,7 @@ import { formatCategory } from "@/app/utils";
 import { getPrimaryCategory } from "@/lib/filters";
 import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import EventPoster from "@/components/event-poster";
+import PosterStatusMarkers from "@/components/poster-status-markers";
 import styles from "./movie-cell.module.css";
 
 export default function MovieCell({
@@ -37,6 +38,7 @@ export default function MovieCell({
         }
       }}
     >
+      <PosterStatusMarkers movieId={movie.id} />
       <EventPoster
         title={movie.title}
         posterPath={movie.posterPath}

@@ -1,0 +1,51 @@
+/* Top-right: the rank chip holds top-left and award emblems bottom-right, and
+   the title overlay covers the bottom edge on touch screens. */
+.stack {
+  position: absolute;
+  top: var(--status-markers-top, 8px);
+  right: 8px;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* A dark disc with the icon in the saved-film yellow the film page's list
+   buttons use. Each later marker is tucked up under the one before it, leaving
+   a sliver showing, and earlier ones sit on top — a pile of chips. */
+.marker {
+  position: relative;
+  z-index: calc(10 - var(--index));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(var(--color-buttery-yellow-rgb), 0.5);
+  color: var(--color-buttery-yellow);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transform: translateY(calc(var(--index) * -20px));
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fan out while the poster's link (the stack's parent) is hovered or focused. */
+:hover > .stack > .marker,
+:focus-visible > .stack > .marker {
+  transform: none;
+}
+
+/* No hover to reveal them with, so touch screens always see them spread. */
+@media (hover: none) {
+  .marker {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    transition: none;
+  }
+}

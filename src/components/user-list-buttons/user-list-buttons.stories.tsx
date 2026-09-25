@@ -35,8 +35,8 @@ function Wrapper({ user }: { user: Partial<UserContextType> }) {
  *   one film.
  *
  * **When NOT to use:**
- * - On posters in a grid. Every grid would then need the reader's lists,
- *   which means loading Firebase on every page for a signed-in reader.
+ * - On posters in a grid. Grids show status with `PosterStatusMarkers`;
+ *   lists are changed on the film's own page.
  *
  * **Behaviour:**
  * - Signed out (or while the sign-in state is being checked), both buttons

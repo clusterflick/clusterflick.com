@@ -671,9 +671,18 @@ slug is derived from the title, as `getMovieUrl` does. The rules restrict the
 document to the list fields, so a new list needs a rules change too.
 
 **Controls live under the poster on the film's page only**
-(`UserListButtons`), never on grid posters: marking every grid would mean
-loading the SDK on every page for a signed-in reader. Signed out, the buttons link to `/personalise`, which makes
-them the way in to personalisation. **Marking a film seen takes it off the
+(`UserListButtons`), never on grid posters. Signed out, the buttons link to `/personalise`, which makes
+them the way in to personalisation.
+
+**Grid posters carry markers instead** (`PosterStatusMarkers`, in
+`FilmPosterGrid` and `MovieCell`): small discs top-right for each list the film
+is on — top-right because the rank chip holds top-left, award emblems
+bottom-right, and the title overlay the bottom edge on touch. They cost nothing
+extra: `UserProvider` sits in the root layout, so a signed-in reader's lists
+are already loaded on every page. Statuses are independent (a film can be seen
+and back on the watchlist), so markers stack like chips and fan out on hover;
+a new status such as an alert is one more entry in its `MARKERS`. They render
+only once signed in with lists loaded, so the static HTML is unchanged. **Marking a film seen takes it off the
 watchlist**, in the same write so the two can't disagree; the reverse doesn't
 hold, since wanting to see a film again doesn't undo having seen it.
 

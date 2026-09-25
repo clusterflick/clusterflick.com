@@ -37,6 +37,12 @@
   border-bottom: none;
 }
 
+/* Status markers sit top-right; a notice bar takes the top edge, so they
+   start below it. */
+.hasNotice {
+  --status-markers-top: 32px;
+}
+
 /* A film listed for completeness with nothing to book — the rest of a
    collection. Held back from the films you can actually go and see, and
    deliberately inert: no lift, no brightening, no pointer. The title overlay

@@ -5,6 +5,7 @@ import type { Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
+import PosterStatusMarkers from "@/components/poster-status-markers";
 import FilmPosterGridClient, {
   type FilmPosterGridItem,
 } from "./film-poster-grid-client";
@@ -134,23 +135,32 @@ export default function FilmPosterGrid({
         </span>
       ) : null;
 
+      // The reader's own status on the film shown, not the event it links to.
+      const markers = <PosterStatusMarkers movieId={movie.id} />;
+
       const target = linkTo ?? movie;
 
       const film = unavailable ? (
         <div
           key={movie.id}
-          className={clsx(styles.filmGridLink, styles.unavailable)}
+          className={clsx(
+            styles.filmGridLink,
+            styles.unavailable,
+            notice && styles.hasNotice,
+          )}
         >
           {noticeBar}
+          {markers}
           <div className={styles.unavailableFilm}>{poster}</div>
         </div>
       ) : (
         <Link
           key={movie.id}
           href={`${getMovieUrl(target)}${movieUrlParams ? `?${movieUrlParams}` : ""}${showAll ? "#show-all" : ""}`}
-          className={styles.filmGridLink}
+          className={clsx(styles.filmGridLink, notice && styles.hasNotice)}
         >
           {noticeBar}
+          {markers}
           {poster}
         </Link>
       );
