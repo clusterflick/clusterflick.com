@@ -9,7 +9,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button from "@/components/button";
-import { BookmarkIcon, EyeIcon } from "@/components/icons";
+import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
@@ -434,13 +434,15 @@ function UserListSection({
       href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
       details={entry.year ? [entry.year] : undefined}
       action={
-        <Button
-          variant="link"
+        <button
+          type="button"
+          className={styles.remove}
           onClick={() => removeFromList(listId, id)}
           aria-label={`Remove ${entry.title} from ${title}`}
         >
+          <CloseIcon size={12} />
           Remove
-        </Button>
+        </button>
       }
     />
   );

@@ -181,6 +181,32 @@
   border-radius: 10px;
 }
 
+/* Pink and paired with a cross, so it reads as an action rather than one more
+   line of detail beside the year. Sized to that line so the two share it. */
+.remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-neon-pink);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.remove:hover {
+  color: var(--color-white);
+}
+
+.remove:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
 .groupTitle {
   margin: 24px 0 12px;
   font-size: 16px;

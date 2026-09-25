@@ -684,8 +684,9 @@ exists is only known at build time. Each group is sorted by normalised title,
 as /catalogue and /planner are — the pipeline's `normalizedTitle` for a film
 still in the dataset, the same folding applied to the snapshot's title for one
 that has left it. Films are `PosterTile`s, as on /updates, so the title reads
-under the poster and the Remove button sits beneath it, outside the tile's
-link. Signed in, the page renders in `StandardPageLayout`'s
+under the poster and Remove sits at the end of the year's line, outside the
+tile's link — pink with a cross, so it reads as an action rather than more
+detail. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
