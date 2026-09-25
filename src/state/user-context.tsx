@@ -51,6 +51,11 @@ export type UserContextType = {
    * browser or device — so the caller must ask for it and call again.
    */
   completeSignIn: (email?: string) => Promise<"done" | "needs-email">;
+  /**
+   * The address a link was last sent to, while it's still held (up to an hour
+   * after sending) — lets a failed link prefill the form for a resend.
+   */
+  getPendingEmail: () => string | null;
   signOut: () => Promise<void>;
   /** Deletes the user's lists and then their account. */
   deleteAccount: () => Promise<void>;
@@ -281,6 +286,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       lists,
       sendSignInLink,
       completeSignIn,
+      getPendingEmail: readPendingEmail,
       signOut,
       deleteAccount,
       addToList,
@@ -320,6 +326,7 @@ export function MockUserProvider({
     lists: null,
     sendSignInLink: noop,
     completeSignIn: async () => "done",
+    getPendingEmail: () => null,
     signOut: noop,
     deleteAccount: noop,
     addToList: noop,

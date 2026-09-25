@@ -12,6 +12,8 @@
  * because HeaderNav drops links from the end as the header runs out of room —
  * so its order decides what disappears first on a narrow desktop.
  */
+import { isFirebaseConfigured } from "@/lib/firebase";
+
 export type NavGroupId = "discover" | "places" | "programmes" | "site";
 
 interface NavLink {
@@ -29,6 +31,17 @@ export const NAV_GROUPS: readonly { id: NavGroupId; label: string }[] = [
 
 export const NAV_LINKS: readonly NavLink[] = [
   { href: "/", label: "Home", group: "discover" },
+  // Left out when the build has no Firebase config, where the page would only
+  // say it's switched off.
+  ...(isFirebaseConfigured
+    ? [
+        {
+          href: "/personalise",
+          label: "Personalise",
+          group: "discover" as const,
+        },
+      ]
+    : []),
   { href: "/catalogue", label: "Films", group: "discover" },
   { href: "/planner", label: "Planner", group: "discover" },
   { href: "/near-me", label: "Near Me", group: "discover" },
@@ -65,6 +78,23 @@ export const NAV_LINKS: readonly NavLink[] = [
 export const GROUPED_NAV_LINKS = NAV_GROUPS.map((group) => ({
   ...group,
   links: NAV_LINKS.filter((link) => link.group === group.id),
+}));
+
+/**
+ * Links shown above the groups in the menu, under no heading: the site's front
+ * door and the reader's own page. The footer keeps both at the top of Discover,
+ * where a full map of the site expects them.
+ */
+const MENU_TOP_HREFS: readonly string[] = ["/", "/personalise"];
+
+export const MENU_TOP_LINKS = NAV_LINKS.filter((link) =>
+  MENU_TOP_HREFS.includes(link.href),
+);
+
+/** `GROUPED_NAV_LINKS` without the links the menu lifts to the top. */
+export const MENU_GROUPED_NAV_LINKS = GROUPED_NAV_LINKS.map((group) => ({
+  ...group,
+  links: group.links.filter((link) => !MENU_TOP_HREFS.includes(link.href)),
 }));
 
 /**

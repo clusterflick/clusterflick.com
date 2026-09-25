@@ -8,26 +8,53 @@ import FilmPosterGrid, {
   type FilmPosterGridMovie,
 } from "@/components/film-poster-grid";
 import LoadingIndicator from "@/components/loading-indicator";
+import CardGrid from "@/components/card-grid";
+import LinkCard, { CardContent } from "@/components/link-card";
 import Button from "@/components/button";
+import { BookmarkIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
+import { useCinemaData } from "@/state/cinema-data-context";
 import {
   UserListId,
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
-import { useCinemaData } from "@/state/cinema-data-context";
 import styles from "./page.module.css";
 
-const LIST_LABELS: Record<UserListId, { title: string; empty: string }> = {
-  [UserListId.Watchlist]: {
-    title: "Watchlist",
-    empty: "Films you want to catch will appear here.",
-  },
-  [UserListId.Seen]: {
-    title: "Seen",
-    empty: "Films you've watched will appear here.",
-  },
+const LIST_TITLES: Record<UserListId, string> = {
+  [UserListId.Watchlist]: "Watchlist",
+  [UserListId.Seen]: "Seen",
 };
+
+/** Where to find films to add, offered while the watchlist is empty. */
+const DISCOVERY_LINKS = [
+  {
+    key: "lists",
+    href: "/lists",
+    label: "Film Lists",
+    detail: "Classics and award winners from the big lists, showing in London",
+  },
+  {
+    key: "festivals",
+    href: "/festivals",
+    label: "Festivals",
+    detail:
+      "Film festivals running across London, from the big names to the niche",
+  },
+  {
+    key: "film-clubs",
+    href: "/film-clubs",
+    label: "Film Clubs",
+    detail:
+      "Screenings put on by London's film clubs, in venues across the city",
+  },
+  {
+    key: "near-me",
+    href: "/near-me",
+    label: "Near Me",
+    detail: "Cinemas, film clubs and festivals close to wherever you are",
+  },
+];
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
 function isSignInLink(url: URL) {
@@ -49,7 +76,7 @@ function describeError(error: unknown): string {
       return "That doesn't look like an email address.";
     case "auth/invalid-action-code":
     case "auth/expired-action-code":
-      return "That link has expired or has already been used. Send yourself a new one below.";
+      return "That link has expired or has already been used. Send yourself a new one.";
     case "auth/quota-exceeded":
     case "auth/too-many-requests":
       return "We can't send any more links right now. Please try again later.";
@@ -71,10 +98,13 @@ type LinkState =
 export default function PersonalisePageContent() {
   const { status } = useUserContext();
 
+  // Signed in, the page is mostly poster grids, so it takes the full width
+  // rather than the 1000px column, which fits only four posters across.
   return (
     <StandardPageLayout
       title="Personalise"
       subtitle="Keep track of the films you want to see, and the ones you have."
+      afterContent={status === "signed-in" ? <SignedIn /> : undefined}
     >
       {status === "unavailable" ? (
         <EmptyState
@@ -88,18 +118,46 @@ export default function PersonalisePageContent() {
         />
       ) : status === "checking" ? (
         <LoadingIndicator message="Checking whether you're signed in…" />
-      ) : status === "signed-in" ? (
-        <SignedIn />
-      ) : (
-        <SignIn />
+      ) : status === "signed-in" ? null : (
+        <SignedOut />
       )}
     </StandardPageLayout>
   );
 }
 
-function SignIn() {
-  const { sendSignInLink, completeSignIn } = useUserContext();
-  const [email, setEmail] = useState("");
+function SignedOut() {
+  return (
+    <>
+      <ul className={styles.features}>
+        <li className={styles.feature}>
+          <BookmarkIcon size={28} className={styles.featureIcon} />
+          <h2 className={styles.featureTitle}>Build a watchlist</h2>
+          <p className={styles.featureText}>
+            Save the films you want to see, and spot at a glance which of them
+            are showing now.
+          </p>
+        </li>
+        <li className={styles.feature}>
+          <EyeIcon size={28} className={styles.featureIcon} />
+          <h2 className={styles.featureTitle}>
+            Remember what you&apos;ve seen
+          </h2>
+          <p className={styles.featureText}>
+            Mark films as seen, and they come off your watchlist.
+          </p>
+        </li>
+      </ul>
+      <SignInForm />
+      <WhatWeStore />
+    </>
+  );
+}
+
+function SignInForm() {
+  const { sendSignInLink, completeSignIn, getPendingEmail } = useUserContext();
+  // Prefilled while an address is still held from a link sent within the
+  // hour, so a failed or expired link is one click from a fresh one.
+  const [email, setEmail] = useState(() => getPendingEmail() ?? "");
   // Only ever mounted client-side, once the status is known, so reading the
   // URL here can't mismatch the server render.
   const [state, setState] = useState<LinkState>(() =>
@@ -186,52 +244,62 @@ function SignIn() {
   const confirming = state.step === "needs-email";
 
   return (
-    <>
-      <ContentSection
-        title={confirming ? "Confirm your email" : "Sign in or sign up"}
-        intro={
-          confirming
-            ? "This link was opened in a different browser from the one it was requested in. Enter the email address you sent it to, to finish signing in."
-            : "Enter your email and we'll send you a link — no password needed. If you're new here, the same link sets you up."
-        }
-      >
-        <form className={styles.form} onSubmit={onSubmit}>
-          <label htmlFor="personalise-email" className={styles.label}>
-            Email address
-          </label>
-          <div className={styles.row}>
-            <input
-              id="personalise-email"
-              className={styles.input}
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-            />
-            <Button type="submit" disabled={state.step === "sending"}>
-              {confirming
-                ? "Sign in"
-                : state.step === "sending"
-                  ? "Sending…"
-                  : "Email me a link"}
-            </Button>
-          </div>
-          {state.step === "error" && (
-            <p className={styles.error} role="alert">
-              {state.message}
-            </p>
-          )}
-        </form>
-      </ContentSection>
-      <WhatWeStore />
-    </>
+    <form className={styles.signIn} onSubmit={onSubmit}>
+      <p id="personalise-email-intro" className={styles.signInIntro}>
+        {confirming
+          ? "This link was opened in a different browser from the one it was sent from. Enter your email to finish signing in."
+          : "Enter your email to sign in, or to create an account if you're new."}
+      </p>
+      <div className={styles.row}>
+        <input
+          className={styles.input}
+          type="email"
+          autoComplete="email"
+          required
+          aria-label="Email address"
+          aria-describedby="personalise-email-intro"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+        />
+        <Button type="submit" disabled={state.step === "sending"}>
+          {confirming
+            ? "Sign in"
+            : state.step === "sending"
+              ? "Sending…"
+              : "Email me a link"}
+        </Button>
+      </div>
+      {state.step === "error" && (
+        <p className={styles.error} role="alert">
+          {state.message}
+        </p>
+      )}
+    </form>
   );
 }
 
 function SignedIn() {
-  const { email, lists, signOut, deleteAccount } = useUserContext();
+  const { lists } = useUserContext();
+
+  return (
+    <div className={styles.wide}>
+      <AccountBar />
+      {lists ? (
+        <>
+          <UserListSection listId={UserListId.Watchlist} lists={lists} />
+          <UserListSection listId={UserListId.Seen} lists={lists} />
+        </>
+      ) : (
+        <LoadingIndicator message="Loading your lists…" />
+      )}
+      <WhatWeStore />
+    </div>
+  );
+}
+
+function AccountBar() {
+  const { email, signOut, deleteAccount } = useUserContext();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -249,47 +317,42 @@ function SignedIn() {
   };
 
   return (
-    <>
-      <p className={styles.signedInAs}>
-        Signed in as <strong>{email}</strong>
-      </p>
-
-      {lists ? (
-        Object.values(UserListId).map((listId) => (
-          <UserListSection key={listId} listId={listId} lists={lists} />
-        ))
-      ) : (
-        <LoadingIndicator message="Loading your lists…" />
-      )}
-
-      <ContentSection title="Your account">
+    <div className={styles.card}>
+      <div className={styles.accountRow}>
+        <p className={styles.signedInAs}>
+          Signed in as <strong>{email}</strong>
+        </p>
         <div className={styles.accountActions}>
-          <Button variant="secondary" onClick={signOut}>
-            Sign out
-          </Button>
           {confirmingDelete ? (
             <>
-              <Button onClick={onDelete}>
-                Yes, delete my account and lists
+              <span className={styles.confirmText}>
+                Delete your account and lists?
+              </span>
+              <Button size="sm" onClick={onDelete}>
+                Delete
               </Button>
               <Button variant="link" onClick={() => setConfirmingDelete(false)}>
                 Cancel
               </Button>
             </>
           ) : (
-            <Button variant="link" onClick={() => setConfirmingDelete(true)}>
-              Delete my account
-            </Button>
+            <>
+              <Button variant="link" onClick={signOut}>
+                Sign out
+              </Button>
+              <Button variant="link" onClick={() => setConfirmingDelete(true)}>
+                Delete account
+              </Button>
+            </>
           )}
         </div>
-        {deleteError && (
-          <p className={styles.error} role="alert">
-            {deleteError}
-          </p>
-        )}
-      </ContentSection>
-      <WhatWeStore />
-    </>
+      </div>
+      {deleteError && (
+        <p className={styles.error} role="alert">
+          {deleteError}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -302,7 +365,7 @@ function UserListSection({
 }) {
   const { removeFromList } = useUserContext();
   const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
-  const { title, empty } = LIST_LABELS[listId];
+  const title = LIST_TITLES[listId];
   const entries = Object.entries(lists[listId]).sort(
     ([, a], [, b]) => b.addedAt - a.addedAt,
   );
@@ -310,7 +373,31 @@ function UserListSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        <p className={styles.empty}>{empty}</p>
+        {listId === UserListId.Watchlist ? (
+          <>
+            <p className={styles.empty}>
+              Nothing here yet. Press <strong>Want to see</strong> on any
+              film&apos;s page to save it. Looking for somewhere to start?
+            </p>
+            {/* The "Built with Clusterflick" card from the About page, minus
+                the logo: none of these sections has an icon of its own. */}
+            <CardGrid size="md" className={styles.discovery}>
+              {DISCOVERY_LINKS.map((link) => (
+                <LinkCard key={link.key} href={link.href} variant="social">
+                  <CardContent>
+                    <strong>{link.label}</strong>
+                    <span className={styles.discoveryText}>{link.detail}</span>
+                  </CardContent>
+                </LinkCard>
+              ))}
+            </CardGrid>
+          </>
+        ) : (
+          <p className={styles.empty}>
+            Nothing here yet. Press <strong>Seen it</strong> on a film&apos;s
+            page once you&apos;ve watched it.
+          </p>
+        )}
       </ContentSection>
     );
   }
@@ -358,9 +445,11 @@ function UserListSection({
   if (error) {
     return (
       <ContentSection title={title} titleBadge={count}>
-        <FilmPosterGrid
-          movies={entries.map((entry) => toGridMovie(entry, true))}
-        />
+        <div className={styles.lane}>
+          <FilmPosterGrid
+            movies={entries.map((entry) => toGridMovie(entry, true))}
+          />
+        </div>
       </ContentSection>
     );
   }
@@ -373,17 +462,21 @@ function UserListSection({
       {showing.length > 0 && (
         <>
           <h3 className={styles.groupTitle}>Showing now</h3>
-          <FilmPosterGrid
-            movies={showing.map((entry) => toGridMovie(entry, true))}
-          />
+          <div className={styles.lane}>
+            <FilmPosterGrid
+              movies={showing.map((entry) => toGridMovie(entry, true))}
+            />
+          </div>
         </>
       )}
       {notShowing.length > 0 && (
         <>
           <h3 className={styles.groupTitle}>Not showing</h3>
-          <FilmPosterGrid
-            movies={notShowing.map((entry) => toGridMovie(entry, false))}
-          />
+          <div className={styles.lane}>
+            <FilmPosterGrid
+              movies={notShowing.map((entry) => toGridMovie(entry, false))}
+            />
+          </div>
         </>
       )}
     </ContentSection>
@@ -392,12 +485,13 @@ function UserListSection({
 
 function WhatWeStore() {
   return (
-    <ContentSection title="What we store" as="h3">
-      <p className={styles.small}>
+    <aside className={styles.storeNote}>
+      <h2 className={styles.storeNoteTitle}>What we store</h2>
+      <p>
         Your email address, so we can send you sign-in links, and the films you
         add to your lists. Nothing else, and we never share it. You can delete
         your account, and everything in it, from this page at any time.
       </p>
-    </ContentSection>
+    </aside>
   );
 }

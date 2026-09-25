@@ -1,28 +1,73 @@
 .wrapper {
-  margin-bottom: 24px;
+  margin-top: 12px;
+  width: 100%;
 }
 
+/* Two equal halves spanning the poster above. */
 .buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-/* Doubled to outrank Button's display, which may load after this module. */
-.button.button {
-  display: inline-flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.error {
-  margin-top: 12px;
-  color: var(--color-neon-pink);
+/* After Chip: a quiet pill that only takes a colour when on. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-/* The movie hero centres its content below tablet width. */
-@media (max-width: 900px) {
-  .buttons {
-    justify-content: center;
-  }
+.button:hover:not(:disabled) {
+  color: var(--color-white);
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: rgba(var(--color-white-rgb), 0.3);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Buttery yellow rather than the accent pink: the hero around these is
+   already pink and blue, and a saved film should stand apart from both. */
+.button.on {
+  color: var(--color-buttery-yellow);
+  background: rgba(var(--color-buttery-yellow-rgb), 0.12);
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.6);
+}
+
+.button.on:hover:not(:disabled) {
+  color: var(--color-buttery-yellow);
+  background: rgba(var(--color-buttery-yellow-rgb), 0.2);
+  border-color: var(--color-buttery-yellow);
+}
+
+.button svg {
+  flex-shrink: 0;
+}
+
+.error {
+  margin-top: 8px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-neon-pink);
 }

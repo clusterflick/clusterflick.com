@@ -293,6 +293,7 @@ export default function PageContent({
             size="large"
             interactive={false}
           />
+          <UserListButtons movie={movie} />
           {formats.length > 0 && (
             <div className={styles.formatsDesktop}>
               <FormatsList formats={formats} variant="poster" />
@@ -349,8 +350,6 @@ export default function PageContent({
               ) : undefined
             }
           />
-
-          <UserListButtons movie={movie} />
 
           {movie.overview && (
             <p className={styles.overview}>{movie.overview}</p>

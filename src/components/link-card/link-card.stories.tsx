@@ -18,8 +18,8 @@ import {
 } from "@/components/icons";
 
 /**
- * `LinkCard` is a compound component for clickable external-link cards. It
- * always opens in a new tab.
+ * `LinkCard` is a compound component for clickable link cards. An external
+ * `href` opens in a new tab; a site path (starting `/`) navigates in place.
  *
  * **Variants:**
  * - `"rating"` — External rating source card (Letterboxd, IMDb, RT, etc.).
@@ -40,11 +40,14 @@ import {
  * - `CardArrow` — trailing → arrow (used in feature)
  *
  * **When to use:**
- * - Any external link that should look like a card tile rather than inline text.
+ * - Any link that should look like a card tile rather than inline text —
+ *   external, or a site section described in a sentence (the `"feature"`
+ *   variant, as on the empty watchlist).
  * - Pair with `CardGrid` when showing multiple cards side by side.
  *
  * **When NOT to use:**
- * - For internal navigation cards — use `NavCard` instead.
+ * - For entity cards with their own layout (venues, events, collections) —
+ *   build on `NavCard` instead.
  * - For plain inline text links — use a standard `<a>` element.
  */
 const meta = {
@@ -196,6 +199,21 @@ export const Feature: Story = {
         <CardDescription>
           Full combined dataset as a compressed JSON file, updated each morning.
         </CardDescription>
+        <CardArrow />
+      </>
+    ),
+  },
+};
+
+/** A feature card pointing within the site, which navigates in place. */
+export const FeatureInternal: Story = {
+  args: {
+    href: "/festivals",
+    variant: "feature",
+    children: (
+      <>
+        <CardTitle>Festivals</CardTitle>
+        <CardDescription>Film festivals on around the city</CardDescription>
         <CardArrow />
       </>
     ),

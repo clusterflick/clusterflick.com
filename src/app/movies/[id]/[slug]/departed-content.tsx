@@ -70,6 +70,7 @@ export default function DepartedContent({
             title={movie.title}
             size="large"
           />
+          <UserListButtons movie={movie} />
         </div>
 
         <div className={styles.mainInfo}>
@@ -109,8 +110,6 @@ export default function DepartedContent({
               ) : undefined
             }
           />
-
-          <UserListButtons movie={movie} />
 
           {movie.overview && (
             <p className={styles.overview}>{movie.overview}</p>

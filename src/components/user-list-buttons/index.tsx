@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import Link from "next/link";
+import clsx from "clsx";
 import type { Movie } from "@/types";
-import Button, { ButtonLink } from "@/components/button";
-import { TickIcon } from "@/components/icons";
+import { BookmarkIcon, EyeIcon } from "@/components/icons";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import styles from "./user-list-buttons.module.css";
 
-const LABELS: Record<UserListId, string> = {
-  [UserListId.Watchlist]: "Want to see",
-  [UserListId.Seen]: "Seen it",
+const LISTS: Record<
+  UserListId,
+  { label: string; icon: (isOn: boolean) => ReactNode }
+> = {
+  [UserListId.Watchlist]: {
+    label: "Want to see",
+    icon: (isOn) => <BookmarkIcon size={16} filled={isOn} />,
+  },
+  [UserListId.Seen]: {
+    label: "Seen it",
+    icon: (isOn) => <EyeIcon size={16} closed={isOn} />,
+  },
 };
 
 interface UserListButtonsProps {
@@ -19,14 +29,20 @@ interface UserListButtonsProps {
 }
 
 /**
- * Toggles for putting a film on the reader's watchlist or seen list.
+ * Toggles for putting a film on the reader's watchlist or seen list, sized to
+ * sit under the film's poster.
  *
- * Signed out (or not yet known to be signed in), each button is a link to
+ * Signed out (or not yet known to be signed in), each is a link to
  * `/personalise`, which is how most readers will find out personalisation
  * exists. Signed in, they're toggle buttons. Either way the labels stay the
- * same, so the static HTML (always rendered signed out) barely moves when the
+ * same, so the static HTML (always rendered signed out) doesn't move when the
  * sign-in state resolves after hydration. When the build has no Firebase
  * config, they don't render at all.
+ *
+ * Styled after `Chip` — a quiet pill, tinted when on — rather than `Button`,
+ * whose blue outline disappeared among the hero's other blue controls. Not
+ * `Chip` itself: that is a checkbox, which can neither carry an icon nor be the
+ * link these need to be when signed out.
  */
 export default function UserListButtons({ movie }: UserListButtonsProps) {
   const { status, lists, addToList, removeFromList } = useUserContext();
@@ -41,9 +57,10 @@ export default function UserListButtons({ movie }: UserListButtonsProps) {
       <div className={styles.wrapper}>
         <div className={styles.buttons}>
           {listIds.map((listId) => (
-            <ButtonLink key={listId} href="/personalise" variant="secondary">
-              {LABELS[listId]}
-            </ButtonLink>
+            <Link key={listId} href="/personalise" className={styles.button}>
+              {LISTS[listId].icon(false)}
+              {LISTS[listId].label}
+            </Link>
           ))}
         </div>
       </div>
@@ -70,19 +87,19 @@ export default function UserListButtons({ movie }: UserListButtonsProps) {
         {listIds.map((listId) => {
           const isOn = !!lists?.[listId][movie.id];
           return (
-            <Button
+            <button
               key={listId}
-              variant={isOn ? "primary" : "secondary"}
+              type="button"
               aria-pressed={isOn}
               // Lists still loading: the state isn't known, so neither is
               // what a press would do.
               disabled={!lists}
               onClick={() => toggle(listId, isOn)}
-              className={styles.button}
+              className={clsx(styles.button, isOn && styles.on)}
             >
-              {isOn && <TickIcon size={16} aria-hidden="true" />}
-              {LABELS[listId]}
-            </Button>
+              {LISTS[listId].icon(isOn)}
+              {LISTS[listId].label}
+            </button>
           );
         })}
       </div>

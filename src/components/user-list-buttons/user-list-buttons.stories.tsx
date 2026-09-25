@@ -18,7 +18,10 @@ const entry: UserListEntry = {
 function Wrapper({ user }: { user: Partial<UserContextType> }) {
   return (
     <MockUserProvider value={user}>
-      <UserListButtons movie={movie} />
+      {/* The width of the film page's poster column, which they fill. */}
+      <div style={{ width: 308 }}>
+        <UserListButtons movie={movie} />
+      </div>
     </MockUserProvider>
   );
 }
@@ -28,7 +31,8 @@ function Wrapper({ user }: { user: Partial<UserContextType> }) {
  * seen list ("Seen it"). It reads the user from `UserProvider`.
  *
  * **When to use:**
- * - On a film's own page, where the reader has decided about one film.
+ * - Under the poster on a film's own page, where the reader has decided about
+ *   one film.
  *
  * **When NOT to use:**
  * - On posters in a grid. Every grid would then need the reader's lists,
