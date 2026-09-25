@@ -18,6 +18,7 @@ import {
   type FirebaseServices,
 } from "@/lib/firebase";
 import {
+  addManyToUserList,
   addToUserList,
   deleteUserLists,
   fetchUserLists,
@@ -66,6 +67,15 @@ export type UserContextType = {
   ) => Promise<void>;
   removeFromList: (listId: UserListId, movieId: Movie["id"]) => Promise<void>;
   /**
+   * Adds many entries in one write, for an import. Films already on the list
+   * keep their entry; the rest follow `addToList`'s rule, so importing films
+   * as seen takes them off the watchlist. Resolves the ids actually added.
+   */
+  importToList: (
+    listId: UserListId,
+    entries: Record<Movie["id"], UserListEntry>,
+  ) => Promise<Movie["id"][]>;
+  /**
    * Puts a removed entry back exactly as it was — its original `addedAt`, and
    * none of `addToList`'s side effects on other lists. For undo.
    */
@@ -91,6 +101,15 @@ const SIGNED_IN_FLAG_KEY = "clusterflick-signed-in";
  */
 const PENDING_EMAIL_KEY = "clusterflick-sign-in-email";
 const PENDING_EMAIL_MAX_AGE_MS = 60 * 60 * 1000;
+
+/**
+ * The lists a film leaves on being added to `listId`. Seeing a film fulfils
+ * wanting to see it. The reverse doesn't hold: wanting to see something again
+ * leaves the record that you have.
+ */
+function getListsLeftOnAdd(listId: UserListId): UserListId[] {
+  return listId === UserListId.Seen ? [UserListId.Watchlist] : [];
+}
 
 /** Error code Firebase gives when deleting an account needs a fresh sign-in. */
 export const REQUIRES_RECENT_LOGIN = "auth/requires-recent-login";
@@ -241,10 +260,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
       const entry = toUserListEntry(movie);
-      // Seeing a film fulfils wanting to see it. The reverse doesn't hold:
-      // wanting to see something again leaves the record that you have.
-      const removeFrom =
-        listId === UserListId.Seen ? [UserListId.Watchlist] : [];
+      const removeFrom = getListsLeftOnAdd(listId);
       const previous = lists;
       setLists((current) => {
         if (!current) return current;
@@ -289,6 +305,41 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user, lists],
   );
 
+  const importToList = useCallback<UserContextType["importToList"]>(
+    async (listId, entries) => {
+      const { db } = await getServices();
+      if (!user || !lists) throw new Error("Not signed in");
+      // Already listed keeps its entry, and with it when it was added.
+      const added = Object.fromEntries(
+        Object.entries(entries).filter(([id]) => !(id in lists[listId])),
+      );
+      const ids = Object.keys(added);
+      if (ids.length === 0) return [];
+      const removeFrom = getListsLeftOnAdd(listId);
+      const previous = lists;
+      setLists((current) => {
+        if (!current) return current;
+        const next = {
+          ...current,
+          [listId]: { ...current[listId], ...added },
+        };
+        for (const otherId of removeFrom) {
+          next[otherId] = { ...current[otherId] };
+          for (const id of ids) delete next[otherId][id];
+        }
+        return next;
+      });
+      try {
+        await addManyToUserList(db, user.uid, listId, added, removeFrom);
+      } catch (error) {
+        setLists(previous);
+        throw error;
+      }
+      return ids;
+    },
+    [getServices, user, lists],
+  );
+
   const restoreToList = useCallback<UserContextType["restoreToList"]>(
     async (listId, movieId, entry) => {
       const { db } = await getServices();
@@ -321,6 +372,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       deleteAccount,
       addToList,
       removeFromList,
+      importToList,
       restoreToList,
     }),
     [
@@ -333,6 +385,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       deleteAccount,
       addToList,
       removeFromList,
+      importToList,
       restoreToList,
     ],
   );
@@ -363,6 +416,7 @@ export function MockUserProvider({
     deleteAccount: noop,
     addToList: noop,
     removeFromList: noop,
+    importToList: async () => [],
     restoreToList: noop,
     ...value,
   };

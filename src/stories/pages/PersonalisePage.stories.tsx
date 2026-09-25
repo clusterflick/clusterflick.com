@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, userEvent } from "storybook/test";
 import PersonalisePageContent from "@/app/personalise/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
@@ -81,6 +82,22 @@ export const SignedInWithLists: Story = {
         },
       },
     },
+  },
+};
+
+/** The list tools opened from the account bar, with Remove buttons shown. */
+export const SignedInManagingLists: Story = {
+  args: SignedInWithLists.args,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Manage lists" }),
+    );
+    await userEvent.click(
+      canvas.getByRole("checkbox", {
+        name: "Show Remove buttons on your lists",
+      }),
+    );
   },
 };
 

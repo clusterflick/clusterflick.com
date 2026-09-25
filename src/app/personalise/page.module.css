@@ -165,6 +165,84 @@
   color: var(--color-light-gray);
 }
 
+/* List tools, opened from the account bar: sections side by side where they
+   fit, divided from the account row above. */
+.management {
+  display: grid;
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+@media (min-width: 768px) {
+  .management {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+  }
+
+  /* The import can grow a review; it takes the full row so it never
+     stretches the export beside it. */
+  .managementSection:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.managementSection {
+  min-width: 0;
+}
+
+/* Explicit, since the global h3 is display-sized. */
+.managementTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--color-light-gray);
+}
+
+.managementText {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
+.managementText code {
+  font-size: 13px;
+  color: var(--color-light-gray);
+}
+
+.managementActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.managementStatus {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+/* The switch stretches to its container; kept beside its label here. */
+.managementSwitch {
+  justify-content: flex-start;
+}
+
+.importReview {
+  padding: 16px;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 10px;
+}
+
+.importTitles {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
 .count {
   margin-left: 12px;
   font-size: 0.6em;
