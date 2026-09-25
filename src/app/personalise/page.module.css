@@ -176,7 +176,7 @@
    narrow the grid by a column and pull the posters off the headings' edge. */
 .lane {
   margin: 0 -8px;
-  padding: 18px 8px 8px;
+  padding: 18px 8px 12px;
   background-color: rgba(var(--color-dark-navy-rgb), 0.35);
   border-radius: 10px;
 }

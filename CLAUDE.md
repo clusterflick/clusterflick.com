@@ -64,6 +64,9 @@ covers the need. The canonical components are:
   `LinkCard` (rich card with icon/description)
 - **Buttons:** `Button` (`<button>`), `ButtonLink` (internal `<Link>`),
   `ButtonAnchor` (external `<a>`)
+- **Posters:** `FilmPosterGrid` (browsing grid, title on hover),
+  `PosterTile` + `PosterTileList` (compact tile with title and detail below,
+  plus an optional control)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
 - **Feedback:** `EmptyState`
@@ -676,10 +679,13 @@ hold, since wanting to see a film again doesn't undo having seen it.
 
 **`/personalise` splits each list into showing now and not showing**, using
 the client cinema data, since what's on is the question a watchlist is
-brought to. Films not showing are drawn `unavailable` and unlinked: whether a
-departed page still exists is only known at build time. Each poster carries a
-Remove button through `FilmPosterGrid`'s `action` slot, which sits outside the
-poster's link. Signed in, the page renders in `StandardPageLayout`'s
+brought to. Films not showing are unlinked: whether a departed page still
+exists is only known at build time. Each group is sorted by normalised title,
+as /catalogue and /planner are — the pipeline's `normalizedTitle` for a film
+still in the dataset, the same folding applied to the snapshot's title for one
+that has left it. Films are `PosterTile`s, as on /updates, so the title reads
+under the poster and the Remove button sits beneath it, outside the tile's
+link. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 

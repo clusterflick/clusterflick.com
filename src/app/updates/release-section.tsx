@@ -1,6 +1,6 @@
 import Link from "next/link";
 import OutlineHeading from "@/components/outline-heading";
-import EventPoster from "@/components/event-poster";
+import PosterTile from "@/components/poster-tile";
 import { pluralise, summariseRelease } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
 import { formatDateLong, formatShowingTime } from "@/utils/format-date";
@@ -19,14 +19,8 @@ const INITIAL_FILMS = 24;
 const INITIAL_SHOWINGS = 30;
 
 /**
- * A compact poster tile. Venues collapse to a count past the first so a season
- * announcement of thirty films stays scannable rather than filling the page
- * with venue lists.
- *
- * Multi-film events never carry artwork of their own, so they take it from the
- * films inside — stacked when there is more than one to show, as everywhere
- * else on the site, and otherwise the single poster that exists. Only an event
- * with no poster anywhere falls back to the placeholder.
+ * Venues collapse to a count past the first so a season announcement of thirty
+ * films stays scannable rather than filling the page with venue lists.
  */
 function FilmTile({ film }: { film: UpdateFilm }) {
   const venueLabel =
@@ -34,40 +28,14 @@ function FilmTile({ film }: { film: UpdateFilm }) {
       ? film.venues[0].name
       : pluralise(film.venues.length, "venue");
 
-  const meta = pluralise(film.performanceCount, "showing");
-
-  const body = (
-    <>
-      <EventPoster
-        title={film.title}
-        posterPath={film.posterPath}
-        includedMovies={film.includedMovies}
-        size="xsmall"
-        interactive={!!film.href}
-      />
-      <h4 className={styles.tileTitle}>{film.title}</h4>
-      <p className={styles.tileVenue}>{venueLabel}</p>
-      <p className={styles.tileMeta}>{meta}</p>
-    </>
-  );
-
   return (
-    <li className={styles.tile}>
-      {film.href ? (
-        // The whole tile is one target rather than separate poster and title
-        // links. The label replaces the accessible name so a screen reader
-        // reads it once, instead of the poster's alt text and the title in turn.
-        <Link
-          href={film.href}
-          className={styles.tileLink}
-          aria-label={`${film.title} — ${venueLabel}, ${meta}`}
-        >
-          {body}
-        </Link>
-      ) : (
-        body
-      )}
-    </li>
+    <PosterTile
+      title={film.title}
+      posterPath={film.posterPath}
+      includedMovies={film.includedMovies}
+      href={film.href ?? undefined}
+      details={[venueLabel, pluralise(film.performanceCount, "showing")]}
+    />
   );
 }
 
@@ -109,7 +77,7 @@ export default function ReleaseSection({
             {pluralise(release.newFilms.length, "new film")}
           </h3>
           <CappedList
-            className={styles.tiles}
+            layout="tiles"
             initialCount={INITIAL_FILMS}
             showAllLabel={`Show all ${pluralise(release.newFilms.length, "new film")}`}
             items={release.newFilms.map((film) => (
