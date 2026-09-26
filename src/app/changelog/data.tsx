@@ -71,6 +71,24 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-26",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Palestine Film Festival"
+              url="https://www.palestinefilm.org.uk/"
+            />
+            , which returns to cinemas across London from 13 to 27 November.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-25",
     changes: [
       {

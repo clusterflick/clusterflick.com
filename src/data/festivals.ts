@@ -724,4 +724,31 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-palestine-film-festival",
+    name: "London Palestine Film Festival",
+    url: "https://www.palestinefilm.org.uk/",
+    aliases: ["lpff", "palestine-film-festival"],
+    matchers: [
+      {
+        // The festival brands itself LPFF (#LPFF2026), so venues tend to
+        // title screenings "LPFF: …" or "LPFF 2026: …". Left unscoped, as the
+        // abbreviation is distinctive and the festival's venues change from
+        // year to year.
+        [FilterId.ShowingTitleSearch]: "LPFF",
+      },
+      {
+        // The full name rather than "Palestine Film Festival" alone, which
+        // other cities' festivals share and which could arrive as a touring
+        // programme at a London venue.
+        [FilterId.ShowingTitleSearch]: "London Palestine Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Palestine Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LPFF",
+      },
+    ],
+  },
 ];
