@@ -12,7 +12,7 @@ import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
 export type VenueGroup = {
   id: string;
   label: string;
-  venues: { id: string; name: string; count: number }[];
+  venues: { id: string; name: string; count: number; geo: Position }[];
 };
 
 type UseVenueGroupsReturn = {
@@ -75,6 +75,7 @@ export function useVenueGroups(
         id: venue.id,
         name: venue.name,
         count: venueCounts.get(venue.id) || 0,
+        geo: venue.geo,
       });
     });
 

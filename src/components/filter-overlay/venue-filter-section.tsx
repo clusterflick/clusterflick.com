@@ -6,12 +6,12 @@ import { VenueOption, VENUE_OPTIONS } from "@/state/filter-config-context";
 import { VenueGroup } from "@/hooks/use-venue-groups";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
-import ExpandableSection from "@/components/expandable-section";
-import SearchInput from "@/components/search-input";
 import VenueQuickAdd, {
   VenueQuickAddHandle,
 } from "@/components/venue-quick-add";
-import { getVenueDisplayName } from "@/utils/get-venue-display-name";
+import VenueMapPicker, {
+  VenueMapPickerItem,
+} from "@/components/venue-map-picker";
 import styles from "./filter-overlay.module.css";
 
 interface VenueFilterSectionProps {
@@ -48,7 +48,7 @@ export default function VenueFilterSection({
   selectVenues,
   clearVenues,
 }: VenueFilterSectionProps) {
-  const [venueSearchQuery, setVenueSearchQuery] = useState("");
+  const [mapOpen, setMapOpen] = useState(false);
   const quickAddRef = useRef<VenueQuickAddHandle>(null);
 
   // Focus the quick-add input on the next frame. Deferring past the current
@@ -58,26 +58,9 @@ export default function VenueFilterSection({
     requestAnimationFrame(() => quickAddRef.current?.focus());
   };
 
-  // Filter venue groups based on search query
-  const filteredVenueGroups = useMemo(() => {
-    if (!venueSearchQuery.trim()) return venueGroups;
-
-    const query = venueSearchQuery.toLowerCase().trim();
-    return venueGroups
-      .map((group) => ({
-        ...group,
-        venues: group.venues.filter((venue) =>
-          venue.name.toLowerCase().includes(query),
-        ),
-      }))
-      .filter((group) => group.venues.length > 0);
-  }, [venueGroups, venueSearchQuery]);
-
-  const hasVenueSearchFilter = venueSearchQuery.trim().length > 0;
-
-  // Flat list of every venue (full names) for the quick-add combobox. Unlike
-  // the grouped chips, names are kept intact so near-duplicates stay
-  // distinguishable in a flat suggestion list.
+  // Flat list of every venue (full names) for the quick-add combobox. Names
+  // are kept intact so near-duplicates stay distinguishable in a flat
+  // suggestion list.
   const allVenues = useMemo(
     () =>
       venueGroups.flatMap((group) =>
@@ -85,6 +68,20 @@ export default function VenueFilterSection({
           id: venue.id,
           name: venue.name,
           count: venue.count,
+        })),
+      ),
+    [venueGroups],
+  );
+
+  const mapVenues = useMemo<VenueMapPickerItem[]>(
+    () =>
+      venueGroups.flatMap((group) =>
+        group.venues.map((venue) => ({
+          id: venue.id,
+          name: venue.name,
+          lat: venue.geo.lat,
+          lon: venue.geo.lon,
+          filmCount: venue.count,
         })),
       ),
     [venueGroups],
@@ -171,7 +168,7 @@ export default function VenueFilterSection({
         </div>
       </div>
       <p className={styles.sectionDescription}>
-        Choose which venues to include.
+        Choose which venues to include: by name, or by area on a map.
         <br />
         <Link href="/venues" className={styles.sectionLink}>
           See a list of all venues
@@ -238,118 +235,25 @@ export default function VenueFilterSection({
         isVenueSelected={isVenueSelected}
         onToggleVenue={(venueId) => toggleVenue(venueId, allVenueIds)}
       />
-      <ExpandableSection title="Individual Venues">
-        <div className={styles.advancedFilters}>
-          {/* Venue search filter */}
-          <SearchInput
-            id="venue-filter-search"
-            className={styles.venueSearchWrapper}
-            placeholder="Filter venues..."
-            ariaLabel="Filter venues"
-            value={venueSearchQuery}
-            onChange={setVenueSearchQuery}
-          />
-
-          {filteredVenueGroups.map((group) => {
-            const groupVenueIds = group.venues.map((v) => v.id);
-            const allGroupSelected =
-              selectedVenues === null ||
-              groupVenueIds.every((id) => selectedVenues.includes(id));
-            const noneGroupSelected =
-              selectedVenues !== null &&
-              groupVenueIds.every((id) => !selectedVenues.includes(id));
-
-            const selectAllInGroup = () => {
-              if (selectedVenues === null) {
-                // Already all selected, do nothing
-                return;
-              }
-              const newSelection = [...selectedVenues];
-              groupVenueIds.forEach((id) => {
-                if (!newSelection.includes(id)) {
-                  newSelection.push(id);
-                }
-              });
-              // If all venues now selected, clear to represent "all"
-              if (newSelection.length === allVenueIds.length) {
-                clearVenues();
-              } else {
-                selectVenues(newSelection);
-              }
-            };
-
-            const clearAllInGroup = () => {
-              if (selectedVenues === null) {
-                // Currently all selected, select all except this group
-                const allExceptGroup = allVenueIds.filter(
-                  (id) => !groupVenueIds.includes(id),
-                );
-                selectVenues(allExceptGroup);
-              } else {
-                const newSelection = selectedVenues.filter(
-                  (id) => !groupVenueIds.includes(id),
-                );
-                selectVenues(newSelection);
-              }
-            };
-
-            return (
-              <div key={group.id} className={styles.advancedFilterGroup}>
-                <div className={styles.advancedFilterHeader}>
-                  <h4 className={styles.advancedFilterTitle}>
-                    {group.label}{" "}
-                    <span className={styles.venueGroupCount}>
-                      ({group.venues.length})
-                    </span>
-                  </h4>
-                  {!hasVenueSearchFilter && group.venues.length > 3 && (
-                    <div className={styles.selectionControls}>
-                      <Button
-                        variant="link"
-                        onClick={selectAllInGroup}
-                        disabled={allGroupSelected}
-                        aria-label={`Select all ${group.label} venues`}
-                      >
-                        Select All
-                      </Button>
-                      <span className={styles.controlDivider}>/</span>
-                      <Button
-                        variant="link"
-                        onClick={clearAllInGroup}
-                        disabled={noneGroupSelected}
-                        aria-label={`Clear all ${group.label} venues`}
-                      >
-                        Clear All
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <div className={styles.chipGroup} role="group">
-                  {group.venues.map((venue) => {
-                    // For group-structured venues, strip the redundant group
-                    // name (and any configured extra) prefix from the name.
-                    const isGroupStructured = group.id.startsWith("group-");
-                    const displayName = isGroupStructured
-                      ? getVenueDisplayName(venue.name, group.label)
-                      : venue.name;
-                    return (
-                      <Chip
-                        key={venue.id}
-                        type="checkbox"
-                        name="venue"
-                        label={displayName}
-                        count={venue.count}
-                        checked={isVenueSelected(venue.id)}
-                        onChange={() => toggleVenue(venue.id, allVenueIds)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </ExpandableSection>
+      <Button
+        variant="secondary"
+        className={styles.venueMapButton}
+        onClick={() => setMapOpen(true)}
+      >
+        Choose on a map
+      </Button>
+      {mapOpen && (
+        <VenueMapPicker
+          venues={mapVenues}
+          selectedVenues={selectedVenues}
+          onApply={(venueIds) => {
+            if (venueIds === null) clearVenues();
+            else selectVenues(venueIds);
+            setMapOpen(false);
+          }}
+          onClose={() => setMapOpen(false)}
+        />
+      )}
     </section>
   );
 }

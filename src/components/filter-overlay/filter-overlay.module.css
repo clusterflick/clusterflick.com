@@ -427,12 +427,6 @@
   color: var(--color-muted-gray);
 }
 
-.venueGroupCount {
-  font-weight: 400;
-  color: var(--color-muted-gray);
-  text-transform: none;
-}
-
 /* Location Filter */
 .locationFilter {
   display: flex;
@@ -583,8 +577,8 @@
 }
 
 /* Venue Search Filter */
-.venueSearchWrapper {
-  margin-bottom: 8px;
+.venueMapButton {
+  align-self: flex-start;
 }
 
 /* Year Range Inputs */
