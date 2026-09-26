@@ -85,9 +85,10 @@ function downloadCsv(fileName: string, csv: string) {
 }
 
 /**
- * Whether the lists show their Remove buttons, adding a film that isn't
- * showing, and importing from and exporting to Letterboxd. Tucked under the
- * account bar: all of it is occasional.
+ * Whether the lists show their Remove buttons, importing from and exporting to
+ * Letterboxd, and adding a film that isn't showing. Tucked under the account
+ * bar: all of it is occasional. The search comes last as the one part that
+ * grows, so its results push nothing else down.
  */
 export default function ListManagement({
   showRemove,
@@ -108,9 +109,9 @@ export default function ListManagement({
           className={styles.managementSwitch}
         />
       </section>
-      <FilmSearch />
       <ImportSection />
       <ExportSection />
+      <FilmSearch />
     </div>
   );
 }

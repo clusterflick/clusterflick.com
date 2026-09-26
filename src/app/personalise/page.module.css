@@ -182,8 +182,8 @@
     column-gap: 32px;
   }
 
-  /* Editing and film search take rows of their own above import and
-     export, which pair up. */
+  /* Editing takes a row of its own above import and export, which pair up;
+     film search takes one below them. */
   .managementSection:first-child,
   .managementWide {
     grid-column: 1 / -1;
@@ -195,6 +195,11 @@
   .importReview {
     grid-column: 1 / -1;
     order: 1;
+  }
+
+  /* After the review, which belongs next to the import that opened it. */
+  .managementWide {
+    order: 2;
   }
 }
 

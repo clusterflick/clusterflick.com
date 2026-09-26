@@ -822,8 +822,8 @@ it would drop a keyboard reader back to the top of the page.
 
 **List tools sit behind "Manage lists"** in the account bar, collapsed by
 default, since everything in them is occasional (`list-management.tsx`).
-Editing and "Add a film" (below) each take a row of their own; import and
-export pair up under them:
+Editing takes a row of its own first, import and export pair up below it, and
+"Add a film" (below) comes last, as the one part whose results grow:
 
 - **Show Remove buttons** — off by default, and per visit rather than stored:
   a Remove under every poster reads as the page's main business.
