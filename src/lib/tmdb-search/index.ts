@@ -23,9 +23,6 @@ export type TmdbSearchResponse = {
   results: TmdbSearchResult[];
 };
 
-/** Below this many characters a search isn't sent. */
-export const MIN_QUERY_LENGTH = 2;
-
 export class TmdbSearchError extends Error {
   constructor(
     readonly reason: "rate-limited" | "unavailable",

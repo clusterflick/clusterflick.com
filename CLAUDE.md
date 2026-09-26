@@ -855,9 +855,10 @@ signed-in readers: `@/lib/tmdb-search` sends the Firebase ID token
 reports a 429 rather than retrying. The Worker's results already have a list
 entry's shape, keyed by TMDB id — the same id a matched film has here — so a
 result that is showing is the dataset's film (linked, and added as its page
-would add it) and the rest are added from TMDB's snapshot. Typing is debounced
-300ms and waits for two characters, to stay inside the Worker's per-reader rate
-limit. TMDB asks for attribution in an About or Credits section, not beside
+would add it) and the rest are added from TMDB's snapshot. It searches on
+submit, not as the reader types: they're after a title they already know, the
+answer is a grid rather than a menu, and every request counts against the
+Worker's per-reader rate limit. TMDB asks for attribution in an About or Credits section, not beside
 its results, so the About page's covers this. `next dev` rewrites
 `/api/tmdb/*` to the Worker's `wrangler dev` on port 8787; a static export can
 have no rewrites, so the build leaves them out.

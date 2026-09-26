@@ -144,8 +144,8 @@ export const SignedInSearching: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.type(
-      await canvas.findByRole("textbox", { name: "Search for a film" }),
-      "love",
+      await canvas.findByRole("textbox", { name: "Film title" }),
+      "love{enter}",
     );
     await canvas.findByRole("heading", { name: "Punch-Drunk Love" });
   },
@@ -167,9 +167,10 @@ export const SignedInSearchRateLimited: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.type(
-      await canvas.findByRole("textbox", { name: "Search for a film" }),
+      await canvas.findByRole("textbox", { name: "Film title" }),
       "dune",
     );
+    await userEvent.click(canvas.getByRole("button", { name: "Search" }));
     await canvas.findByRole("alert");
   },
 };

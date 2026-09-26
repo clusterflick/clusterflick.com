@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import clsx from "clsx";
 import ContentSection from "@/components/content-section";
 import SearchInput from "@/components/search-input";
+import Button from "@/components/button";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
 import UserListButtons from "@/components/user-list-buttons";
@@ -10,98 +12,114 @@ import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import {
-  MIN_QUERY_LENGTH,
   searchTmdb,
   TmdbSearchError,
   type TmdbSearchResult,
 } from "@/lib/tmdb-search";
 import styles from "./page.module.css";
 
-/** Long enough to wait out typing, so a search is one request, not one a key. */
-const DEBOUNCE_MS = 300;
-
-/** The last search to come back, for the query it answered. */
-type Answer =
-  | { query: string; results: TmdbSearchResult[] }
-  | { query: string; error: string };
+type SearchState =
+  | { step: "idle" }
+  | { step: "searching" }
+  | { step: "done"; query: string; results: TmdbSearchResult[] }
+  | { step: "error"; message: string };
 
 /**
  * Finds any film on TheMovieDB, so one that isn't showing — or never will be —
  * can go on a list. A film that is showing links to its page.
+ *
+ * Searches on submit rather than as the reader types: they're after a title
+ * they already know, the answer is a grid rather than a menu to pick from, and
+ * every request counts against the Worker's per-reader rate limit.
  */
 export default function FilmSearch() {
   const { getIdToken } = useUserContext();
   const { movies } = useCinemaData();
   const [query, setQuery] = useState("");
-  const [answer, setAnswer] = useState<Answer | null>(null);
-  const trimmed = query.trim();
-  const isActive = trimmed.length >= MIN_QUERY_LENGTH;
-  // The previous answer stays up until the next arrives, so the results
-  // don't blank on every pause in typing.
-  const isSearching = isActive && answer?.query !== trimmed;
+  const [state, setState] = useState<SearchState>({ step: "idle" });
+  const inFlight = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    if (!isActive) return;
-    // Aborted when the query changes, so a slow earlier answer can't land
-    // over a later one.
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    // A later search replaces an earlier one still waiting on its answer.
+    inFlight.current?.abort();
     const controller = new AbortController();
-    const timer = setTimeout(() => {
-      searchTmdb(trimmed, getIdToken, controller.signal).then(
-        ({ results }) => setAnswer({ query: trimmed, results }),
-        (error) => {
-          if (controller.signal.aborted) return;
-          console.error("Film search failed", error);
-          setAnswer({
-            query: trimmed,
-            error:
-              error instanceof TmdbSearchError
-                ? error.message
-                : "We couldn't reach the server. Check your connection and try again.",
-          });
-        },
+    inFlight.current = controller;
+    setState({ step: "searching" });
+    try {
+      const { results } = await searchTmdb(
+        trimmed,
+        getIdToken,
+        controller.signal,
       );
-    }, DEBOUNCE_MS);
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [trimmed, isActive, getIdToken]);
+      setState({ step: "done", query: trimmed, results });
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      if (error instanceof TmdbSearchError) {
+        setState({ step: "error", message: error.message });
+        return;
+      }
+      console.error("Film search failed", error);
+      setState({
+        step: "error",
+        message:
+          "We couldn't reach the server. Check your connection and try again.",
+      });
+    }
+  };
 
-  const shown = isActive ? answer : null;
-  const results = shown && "results" in shown ? shown.results : null;
+  const onChange = (value: string) => {
+    setQuery(value);
+    // Clearing the box clears what it found.
+    if (!value) {
+      inFlight.current?.abort();
+      setState({ step: "idle" });
+    }
+  };
 
   return (
     <ContentSection
       title="Add any film"
       intro="Not everything is showing. Find a film to add it to your watchlist, or to the films you've seen."
     >
-      <SearchInput
-        id="personalise-film-search"
-        value={query}
-        onChange={setQuery}
-        placeholder="Search by title"
-        ariaLabel="Search for a film"
-        className={styles.filmSearch}
-      />
+      <form
+        role="search"
+        className={clsx(styles.row, styles.filmSearch)}
+        onSubmit={onSubmit}
+      >
+        <SearchInput
+          id="personalise-film-search"
+          value={query}
+          onChange={onChange}
+          placeholder="Search by title"
+          ariaLabel="Film title"
+          className={styles.filmSearchInput}
+        />
+        <Button type="submit" disabled={state.step === "searching"}>
+          Search
+        </Button>
+      </form>
       <div aria-live="polite">
-        {isSearching ? (
+        {state.step === "searching" && (
           <LoadingIndicator message="Searching…" size="sm" />
-        ) : shown && "error" in shown ? (
+        )}
+        {state.step === "error" && (
           <p className={styles.error} role="alert">
-            {shown.error}
+            {state.message}
           </p>
-        ) : (
-          results?.length === 0 && (
-            <p className={styles.empty}>
-              No films match <strong>{shown!.query}</strong>.
-            </p>
-          )
+        )}
+        {state.step === "done" && state.results.length === 0 && (
+          <p className={styles.empty}>
+            No films match <strong>{state.query}</strong>.
+          </p>
         )}
       </div>
-      {results && results.length > 0 && (
+      {state.step === "done" && state.results.length > 0 && (
         <div className={styles.lane}>
           <PosterTileList>
-            {results.map((result) => {
+            {state.results.map((result) => {
               // A film that's showing is ours as well as TMDB's: it links to
               // its page, and goes on a list as its page would put it there.
               const showing = movies[result.id];

@@ -421,3 +421,7 @@
   max-width: 640px;
   margin-bottom: 16px;
 }
+
+.filmSearchInput {
+  flex: 1;
+}
