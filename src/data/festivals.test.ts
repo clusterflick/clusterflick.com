@@ -21,6 +21,10 @@ const GARDEN_NOTES: [note: string, festivalId: string][] = [
   ],
   ["Part of Tibet Film Festival London 2026", "tibet-film-festival"],
   ["Part of London Latino Film Festival", "london-latino-film-festival"],
+  [
+    "Part of London Palestine Film Festival 2026",
+    "london-palestine-film-festival",
+  ],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
