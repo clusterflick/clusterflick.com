@@ -78,8 +78,9 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             Your lists aren&rsquo;t limited to what&rsquo;s showing any more.
-            Search for any film on <Link href="/personalise">Personalise</Link>{" "}
-            and add it to your watchlist, or to the films you&rsquo;ve seen.
+            Search for any film under Manage lists on{" "}
+            <Link href="/personalise">Personalise</Link> and add it to your
+            watchlist, or to the films you&rsquo;ve seen.
           </>
         ),
       },
