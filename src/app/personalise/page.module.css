@@ -421,18 +421,3 @@
   max-width: 640px;
   margin-bottom: 16px;
 }
-
-/* TMDB asks for its logo wherever its data is searched. Quiet, under the
-   results, so it credits rather than competes. */
-.searchAttribution {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 16px;
-  font-size: 13px;
-  color: var(--color-muted-gray);
-}
-
-.searchAttribution img {
-  flex-shrink: 0;
-}

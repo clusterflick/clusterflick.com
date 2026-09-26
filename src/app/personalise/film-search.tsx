@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import ContentSection from "@/components/content-section";
 import SearchInput from "@/components/search-input";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -124,11 +123,6 @@ export default function FilmSearch() {
           </PosterTileList>
         </div>
       )}
-      <p className={styles.searchAttribution}>
-        <Image src="/images/tmdb-logo.svg" alt="TMDB" width={46} height={20} />
-        Search by The Movie Database. Clusterflick uses the TMDB API but is not
-        endorsed or certified by TMDB.
-      </p>
     </ContentSection>
   );
 }
