@@ -357,16 +357,27 @@ const CROWDING_DECAY = 0.95;
  * highest after {@link CROWDING_DECAY} is applied once per entry already taken
  * from its venue. A venue running an outstanding season keeps its places; one
  * running a merely good one gives them up.
+ *
+ * `venueIds` narrows the result to occasions at those venues (the near-me
+ * rows). It filters the scored occasions rather than the movies going in,
+ * because rarity is a judgement about the whole city: a Q&A is no less of an
+ * occasion for the film screening plainly three miles away. The filter runs
+ * before a film is claimed, so one whose best occasion is elsewhere still
+ * appears through the best one nearby.
  */
 export function findBestOccasionPerMovie(
   movies: MoviesRecord,
   window: OccasionWindow,
-  crowdingDecay: number = CROWDING_DECAY,
+  {
+    crowdingDecay = CROWDING_DECAY,
+    venueIds,
+  }: { crowdingDecay?: number; venueIds?: ReadonlySet<string> } = {},
 ): Occasion[] {
   const seenMovies = new Set<string>();
   const remaining: Occasion[] = [];
   for (const occasion of findOccasions(movies, window)) {
     if (occasion.performance.status?.soldOut) continue;
+    if (venueIds && !venueIds.has(occasion.venueId)) continue;
     if (seenMovies.has(occasion.movie.id)) continue;
     seenMovies.add(occasion.movie.id);
     remaining.push(occasion);

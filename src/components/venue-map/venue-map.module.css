@@ -80,6 +80,15 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
+.venuePinHighlighted {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+  box-shadow:
+    0 0 0 4px rgba(var(--color-neon-pink-rgb), 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
 /* --- User location dot --- */
 .userDot {
   display: block;

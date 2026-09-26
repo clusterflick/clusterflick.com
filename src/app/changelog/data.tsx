@@ -74,6 +74,22 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-26",
     changes: [
       {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/near-me">Near Me</Link> page now starts with your
+            locals: the closest cinemas with more than five screenings this
+            week, what&rsquo;s on at each next, and the film clubs they host.
+            Under them are the home page&rsquo;s critics&rsquo; picks, one-off
+            screenings, new additions, double bills and last chances, all
+            limited to cinemas near you. A &ldquo;What&rsquo;s on near me
+            today&rdquo; button opens the catalogue with that filter already
+            set. The map now zooms to your nearest cinemas rather than a
+            two-mile circle.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>

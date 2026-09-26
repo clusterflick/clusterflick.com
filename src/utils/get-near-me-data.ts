@@ -8,9 +8,8 @@ import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { FILM_CLUBS } from "@/data/film-clubs";
 
 /**
- * Shared build-time precompute for location-aware sections. Used by both the
- * full `/near-me` page and the home page's "Near You" teaser so the two never
- * diverge.
+ * Build-time precompute for the `/near-me` page: everything it needs to sort
+ * and filter by distance once the reader's position is known on the client.
  */
 
 export type NearMeVenue = {

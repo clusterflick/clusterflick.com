@@ -25,12 +25,10 @@ export function getDistanceInMiles(from: Position, to: Position): number {
   return R * c;
 }
 
-/**
- * Fixed radius in miles used by the standalone "/near-me" page, which lists
- * cinemas with their exact distances under a "within 2 miles" label. The
- * adaptive filter-chip logic below does not use this.
- */
-export const NEARBY_RADIUS_MILES = 2;
+/** A short distance label for a nearby venue: "0.4 mi", or "< 0.1 mi". */
+export function formatShortDistance(miles: number): string {
+  return miles < 0.1 ? "< 0.1 mi" : `${miles.toFixed(1)} mi`;
+}
 
 /**
  * Starting radius in miles for "nearby" venue detection. Everything within this
@@ -73,7 +71,7 @@ export const NEARBY_RADIUS_STEP_MILES = 0.1;
  */
 export function getNearbyVenueIds(
   from: Position,
-  venues: Venue[],
+  venues: Pick<Venue, "id" | "geo">[],
   venueIdsWithShowings: Set<string>,
 ): string[] {
   const distances = venues
