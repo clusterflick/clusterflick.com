@@ -422,10 +422,7 @@
   gap: 8px;
 }
 
-/* Held to the column width: a search box across a wide screen reads as a
-   banner. */
 .filmSearch {
-  max-width: 640px;
   margin-bottom: 16px;
 }
 
