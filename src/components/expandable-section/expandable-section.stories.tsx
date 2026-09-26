@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within } from "storybook/test";
 import ExpandableSection from "@/components/expandable-section";
 
 /**
@@ -15,6 +17,10 @@ import ExpandableSection from "@/components/expandable-section";
  * - Secondary content on detail pages that most users do not need immediately
  *   (e.g. accessibility info, extended descriptions).
  * - Any block of content that benefits from progressive disclosure.
+ *
+ * Pass `expandWhen` when the section holds something the reader must not miss
+ * while it is set — a filter that is narrowing results. The section opens when
+ * it turns true and is never closed by it.
  *
  * **When NOT to use:**
  * - For a "show more / show less" on a list of pills/names — use `PillList`.
@@ -75,5 +81,51 @@ export const WithList: Story = {
         <li>Large print programmes available on request</li>
       </ul>
     ),
+  },
+};
+
+/**
+ * Opens itself when `expandWhen` turns true — here, when the filter the section
+ * holds is switched on from outside it — and stays open once it turns false.
+ */
+function ExpandWhenDemo() {
+  const [filtering, setFiltering] = useState(false);
+  return (
+    <div>
+      <button type="button" onClick={() => setFiltering((value) => !value)}>
+        {filtering ? "Clear the filter" : "Set a filter elsewhere"}
+      </button>
+      <ExpandableSection title="More Event Options" expandWhen={filtering}>
+        <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.8 }}>
+          Genre: Horror
+        </p>
+      </ExpandableSection>
+    </div>
+  );
+}
+
+export const ExpandWhen: Story = {
+  args: { title: "More Event Options", children: null },
+  render: () => <ExpandWhenDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("button", { name: "Show More Event Options" }),
+    ).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Set a filter elsewhere" }),
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Hide More Event Options" }),
+    ).toHaveAttribute("aria-expanded", "true");
+
+    // Clearing the filter leaves the section as the reader has it.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Clear the filter" }),
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Hide More Event Options" }),
+    ).toBeInTheDocument();
   },
 };

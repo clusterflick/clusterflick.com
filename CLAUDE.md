@@ -306,6 +306,15 @@ section supplies it (`standaloneQuickAdd` for the venue one, which sits in a
 section with no gap). Two CSS modules cannot override one another by class
 order, so the margin has to live at one end or the other, not both.
 
+**The section opens itself while anything in it is narrowing** — films,
+directors, cast, genres, formats or accessibility. Those arrive from outside
+the overlay (a name on a film page, a watchlist link, a genre left over from
+an earlier visit), and behind a closed trigger they read as no filter at all.
+`ExpandableSection`'s `expandWhen` opens it on mount or whenever it turns
+true, and never closes it: snapping shut under a reader mid-edit is worse than
+staying open. It is adjusted during render rather than in an effect, so the
+section never paints closed for a frame first.
+
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
 already used, generalised. Matching is case-insensitive substring, and results
 stop at `maxResults` **in list order** — so the vocabulary must arrive

@@ -10,6 +10,7 @@ import {
   FilterId,
   getPeopleVocabulary,
   getMovieVocabulary,
+  getActiveFilterIds,
 } from "@/lib/filters";
 import { useFilterConfig, QuickFilter } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
@@ -26,6 +27,19 @@ import MovieFilterSection from "./movie-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
+
+// The filters inside "More Event Options". Each defaults to no filter, so
+// active is the same as narrowing here — unlike categories or dates.
+const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
+  FilterId.Movies,
+  FilterId.Directors,
+  FilterId.Cast,
+  FilterId.Genres,
+  FilterId.Accessibility,
+  FilterId.FormatSource,
+  FilterId.FormatPresentation,
+  FilterId.FormatDimension,
+]);
 
 // How long the "link copied" confirmation stays up. Long enough to read the
 // explanation, short enough that it's gone before you next look at the counts.
@@ -370,6 +384,13 @@ export default function FilterOverlay({
   // Memoised on the dataset for the same reason: a sort over every film.
   const movieVocabulary = useMemo(() => getMovieVocabulary(movies), [movies]);
 
+  // Opened while any of its filters is narrowing, so one set elsewhere — a
+  // watchlist link, a director's name on a film page, a leftover genre — is
+  // never hidden behind the trigger when the reader comes looking for it.
+  const hasAdvancedEventFilter = getActiveFilterIds(filterState).some((id) =>
+    ADVANCED_EVENT_FILTERS.has(id),
+  );
+
   return (
     <div
       ref={overlayRef}
@@ -502,6 +523,7 @@ export default function FilterOverlay({
         <div className={styles.categorySection}>
           <CategoryFilterSection
             movies={movies}
+            expandAdvanced={hasAdvancedEventFilter}
             beforeGenres={
               <>
                 <MovieFilterSection
