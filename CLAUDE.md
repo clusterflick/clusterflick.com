@@ -822,7 +822,8 @@ it would drop a keyboard reader back to the top of the page.
 
 **List tools sit behind "Manage lists"** in the account bar, collapsed by
 default, since everything in them is occasional (`list-management.tsx`).
-Editing sits on its own row first; import and export pair up below it:
+Editing and "Add a film" (below) each take a row of their own; import and
+export pair up under them:
 
 - **Show Remove buttons** — off by default, and per visit rather than stored:
   a Remove under every poster reads as the page's main business.
@@ -845,8 +846,10 @@ Editing sits on its own row first; import and export pair up below it:
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
   out and Letterboxd falls back to title and year.
 
-**Any film can be added, showing or not** ("Add any film", `film-search.tsx`),
-by searching TheMovieDB above the lists. The site can't call TMDB itself — the
+**Any film can be added, showing or not** ("Add a film", `film-search.tsx`),
+by searching TheMovieDB in the list tools. It sits there rather than at the top
+of the page because the usual way to add a film is from its own page; the empty
+watchlist points to it. The site can't call TMDB itself — the
 key would ship to every browser — so the search goes through a Cloudflare
 Worker, [clusterflick/api-tmdb-search](https://github.com/clusterflick/api-tmdb-search),
 on `clusterflick.com/api/tmdb/*` in front of the static site. It answers only

@@ -2,7 +2,6 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import clsx from "clsx";
-import ContentSection from "@/components/content-section";
 import SearchInput from "@/components/search-input";
 import Button from "@/components/button";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -26,7 +25,8 @@ type SearchState =
 
 /**
  * Finds any film on TheMovieDB, so one that isn't showing — or never will be —
- * can go on a list. A film that is showing links to its page.
+ * can go on a list. A film that is showing links to its page. In the list
+ * tools, since the usual way to add a film is from its own page.
  *
  * Searches on submit rather than as the reader types: they're after a title
  * they already know, the answer is a grid rather than a menu to pick from, and
@@ -80,10 +80,12 @@ export default function FilmSearch() {
   };
 
   return (
-    <ContentSection
-      title="Add any film"
-      intro="Not everything is showing. Find a film to add it to your watchlist, or to the films you've seen."
-    >
+    <section className={clsx(styles.managementSection, styles.managementWide)}>
+      <h3 className={styles.managementTitle}>Add a film</h3>
+      <p className={styles.managementText}>
+        Want to add a film that&apos;s not currently showing? Search for it
+        here.
+      </p>
       <form
         role="search"
         className={clsx(styles.row, styles.filmSearch)}
@@ -141,6 +143,6 @@ export default function FilmSearch() {
           </PosterTileList>
         </div>
       )}
-    </ContentSection>
+    </section>
   );
 }

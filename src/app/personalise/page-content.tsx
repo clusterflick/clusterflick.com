@@ -29,7 +29,6 @@ import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
 import ListManagement from "./list-management";
-import FilmSearch from "./film-search";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -357,7 +356,6 @@ function SignedIn() {
       <AccountBar showRemove={showRemove} onShowRemoveChange={setShowRemove} />
       {lists ? (
         <>
-          <FilmSearch />
           <UserListSection
             listId={UserListId.Watchlist}
             lists={lists}
@@ -527,8 +525,9 @@ function UserListSection({
           <>
             <p className={styles.empty}>
               Nothing here yet. Press <strong>Want to see</strong> on any
-              film&apos;s page to save it, or find one above. Looking for
-              somewhere to start?
+              film&apos;s page to save it, or search for one that isn&apos;t
+              showing under <strong>Manage lists</strong>. Looking for somewhere
+              to start?
             </p>
             {/* The "Built with Clusterflick" card from the About page, minus
                 the logo: none of these sections has an icon of its own. */}

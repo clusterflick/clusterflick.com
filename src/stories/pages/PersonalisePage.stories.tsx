@@ -131,7 +131,7 @@ const searchResults = {
   ],
 };
 
-/** Adding a film that isn't showing, found through the TMDB search. */
+/** Adding a film that isn't showing, from the TMDB search in the list tools. */
 export const SignedInSearching: Story = {
   args: SignedInWithLists.args,
   parameters: {
@@ -143,8 +143,11 @@ export const SignedInSearching: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Manage lists" }),
+    );
     await userEvent.type(
-      await canvas.findByRole("textbox", { name: "Film title" }),
+      canvas.getByRole("textbox", { name: "Film title" }),
       "love{enter}",
     );
     await canvas.findByRole("heading", { name: "Punch-Drunk Love" });
@@ -166,8 +169,11 @@ export const SignedInSearchRateLimited: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Manage lists" }),
+    );
     await userEvent.type(
-      await canvas.findByRole("textbox", { name: "Film title" }),
+      canvas.getByRole("textbox", { name: "Film title" }),
       "dune",
     );
     await userEvent.click(canvas.getByRole("button", { name: "Search" }));

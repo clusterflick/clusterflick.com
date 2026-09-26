@@ -13,6 +13,7 @@ import {
   matchLetterboxdRows,
   parseLetterboxdCsv,
 } from "@/lib/user-lists/letterboxd-csv";
+import FilmSearch from "./film-search";
 import styles from "./page.module.css";
 
 const LIST_NAMES: Record<UserListId, string> = {
@@ -84,8 +85,9 @@ function downloadCsv(fileName: string, csv: string) {
 }
 
 /**
- * Importing from and exporting to Letterboxd, and whether the lists show their
- * Remove buttons. Tucked under the account bar: all of it is occasional.
+ * Whether the lists show their Remove buttons, adding a film that isn't
+ * showing, and importing from and exporting to Letterboxd. Tucked under the
+ * account bar: all of it is occasional.
  */
 export default function ListManagement({
   showRemove,
@@ -106,6 +108,7 @@ export default function ListManagement({
           className={styles.managementSwitch}
         />
       </section>
+      <FilmSearch />
       <ImportSection />
       <ExportSection />
     </div>
