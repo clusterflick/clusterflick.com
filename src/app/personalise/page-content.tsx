@@ -95,15 +95,14 @@ const dayFormatter = new Intl.DateTimeFormat("en-GB", {
 });
 
 /**
- * "Tomorrow, 20:30 · Prince Charles Cinema". A note is read to decide whether
- * to book, so it names the day plainly where it can, and says where.
+ * "Tomorrow, 20:30". A note is read to decide whether to book, so it names the
+ * day plainly where it can. The venue goes on a line of its own.
  */
-function formatShowing(time: number, venueName?: string) {
+function formatShowing(time: number) {
   const days = getDaysFromNow(time, 1);
   const day =
     days === 0 ? "Today" : days === 1 ? "Tomorrow" : dayFormatter.format(time);
-  const when = `${day}, ${formatShowingTime(time)}`;
-  return venueName ? `${when} · ${venueName}` : when;
+  return `${day}, ${formatShowingTime(time)}`;
 }
 
 /** PosterTileList's track minimum and gap. */
@@ -555,7 +554,7 @@ function UserListSection({
   const describeShowing = (id: string, performance: MoviePerformance) => {
     const venueId = movies[id]?.showings[performance.showingId]?.venueId;
     const venueName = venueId ? metaData?.venues[venueId]?.name : undefined;
-    return formatShowing(performance.time, venueName);
+    return { detail: formatShowing(performance.time), venue: venueName };
   };
 
   const toTile = (
@@ -679,7 +678,7 @@ function UserListSection({
       tiles: ending.map((entry) =>
         toTile(entry, true, {
           label: "Final showing",
-          detail: describeShowing(entry.id, finalShowing(entry.id)!),
+          ...describeShowing(entry.id, finalShowing(entry.id)!),
           color: "yellow",
         }),
       ),
@@ -691,7 +690,7 @@ function UserListSection({
         const { label, performance } = occasion(entry.id)!;
         return toTile(entry, true, {
           label,
-          detail: describeShowing(entry.id, performance),
+          ...describeShowing(entry.id, performance),
         });
       }),
     },

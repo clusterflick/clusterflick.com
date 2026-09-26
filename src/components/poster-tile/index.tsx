@@ -15,8 +15,13 @@ export {
 export interface PosterTileNote {
   /** What it is — "Final showing", "Q&A with Mike Leigh". */
   label: string;
-  /** When and where. */
+  /** When — "Tomorrow, 20:30". */
   detail?: string;
+  /**
+   * Where, on a line of its own that truncates rather than wraps, so a long
+   * venue name doesn't make one note taller than the rest of its row.
+   */
+  venue?: string;
   /**
    * Pink by default. Yellow is the site's "last chance" colour, as on the
    * planner's tag, for a note that says the chance is running out.
@@ -122,6 +127,11 @@ export default function PosterTile({
               </strong>
               {note.detail && (
                 <span className={styles.noteDetail}>{note.detail}</span>
+              )}
+              {note.venue && (
+                <span className={styles.noteVenue} title={note.venue}>
+                  {note.venue}
+                </span>
               )}
             </p>
           )}

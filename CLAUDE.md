@@ -787,7 +787,9 @@ two groups above Showing now, each soonest first:
 A film can be in both, and each group then says its own thing about it; either
 takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
 above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
-plain day, time and venue ("Tomorrow, 20:30 · Prince Charles Cinema"). Final
+plain day and time ("Tomorrow, 20:30") with the venue on a line of its own,
+which truncates rather than wraps so a long name can't make one note taller
+than its row. Final
 showing is yellow, the colour of the planner's "Last chance" tag, so the two
 read as the same warning; occasions keep the pink. It sits
 at the foot of the tile rather than among the details, where it pushed that
