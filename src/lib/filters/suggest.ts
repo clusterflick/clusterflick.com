@@ -179,6 +179,10 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     action: "Search all directors",
   },
   { id: FilterId.Cast, label: "All cast", action: "Search all cast" },
+  // Beside the people for the same reason: the films were the reader's
+  // subject. Mostly a watchlist left over from another page, which is exactly
+  // the invisible blocker this list exists to name.
+  { id: FilterId.Movies, label: "All films", action: "Search all films" },
   {
     id: FilterId.Accessibility,
     label: "Any accessibility requirement",

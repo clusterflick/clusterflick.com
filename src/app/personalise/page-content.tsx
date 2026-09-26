@@ -18,12 +18,14 @@ import PosterTile, {
 import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
-import Button from "@/components/button";
+import Button, { ButtonLink } from "@/components/button";
 import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
+// Direct from the module: the filters barrel would bundle the whole engine.
+import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
 import ListManagement from "./list-management";
@@ -604,9 +606,32 @@ function UserListSection({
 
   const count = <span className={styles.count}>{listedCount}</span>;
 
+  // Every id on the list, not just the ones showing now: the link is a
+  // snapshot that can be bookmarked or shared, and a film that has finished its
+  // run can come back. The filter keeps ids it can't resolve for that reason.
+  const listedIds = Object.keys(listed);
+  const action =
+    listId === UserListId.Watchlist && listedIds.length > 0 ? (
+      <div className={styles.listActions}>
+        <ButtonLink
+          href={getMoviesFilterUrl("/catalogue", listedIds)}
+          size="sm"
+        >
+          Explore watchlist
+        </ButtonLink>
+        <ButtonLink
+          href={getMoviesFilterUrl("/planner", listedIds)}
+          variant="secondary"
+          size="sm"
+        >
+          Plan watchlist
+        </ButtonLink>
+      </div>
+    ) : undefined;
+
   if (!hasAttemptedLoad || isLoading) {
     return (
-      <ContentSection title={title} titleBadge={count}>
+      <ContentSection title={title} titleBadge={count} action={action}>
         <LoadingIndicator message="Checking what's showing…" size="sm" />
       </ContentSection>
     );
@@ -616,7 +641,7 @@ function UserListSection({
   // listed and linked as it is — the grid doesn't prune on an error either.
   if (error) {
     return (
-      <ContentSection title={title} titleBadge={count}>
+      <ContentSection title={title} titleBadge={count} action={action}>
         <div className={styles.lane}>
           <PosterTileList>
             {entries.map((entry) => toTile(entry, true))}
@@ -671,7 +696,7 @@ function UserListSection({
   ].filter(({ tiles }) => tiles.length > 0);
 
   return (
-    <ContentSection title={title} titleBadge={count}>
+    <ContentSection title={title} titleBadge={count} action={action}>
       {highlightGroups.length > 0 && (
         // Side by side while both are short, each on its own row once either
         // needs the width. See `.highlightGroup`.

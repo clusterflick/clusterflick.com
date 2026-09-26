@@ -407,3 +407,10 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+/* Explore / Plan watchlist, beside the list's heading. */
+.listActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

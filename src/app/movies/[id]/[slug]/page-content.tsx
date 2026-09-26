@@ -185,9 +185,18 @@ export default function PageContent({
       venues: metaData.venues || null,
       genres: metaData.genres || null,
       people: metaData.people || null,
+      // Withheld until the films have loaded; see FilterTrigger.
+      movies: hasAttemptedLoad && !isDataLoading ? movies : null,
       cinemaVenueIds,
     });
-  }, [filterState, metaData, cinemaVenueIds]);
+  }, [
+    filterState,
+    metaData,
+    movies,
+    isDataLoading,
+    hasAttemptedLoad,
+    cinemaVenueIds,
+  ]);
 
   // What would bring back showings the filters hide, when they hide all of
   // them. Probes this one film only, so unlike the films grid it runs on the

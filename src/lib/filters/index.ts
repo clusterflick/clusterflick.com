@@ -22,6 +22,9 @@ export {
   getPeopleVocabulary,
   buildPeopleIndex,
   resolvePeopleQuery,
+  moviesFilter,
+  getMovieVocabulary,
+  getMoviesFilterUrl,
   formatSourceFilter,
   formatPresentationFilter,
   formatDimensionFilter,
@@ -37,6 +40,7 @@ export type {
   PeopleGroupConfig,
   PersonOption,
   PeopleIndex,
+  MovieOption,
 } from "./modules";
 
 // Manager functions and object
