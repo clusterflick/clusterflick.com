@@ -3,6 +3,7 @@ import type { Movie } from "@/types";
 import {
   formatLetterboxdCsv,
   LetterboxdCsvError,
+  getTitleYearKey,
   matchLetterboxdRows,
   parseCsv,
   parseLetterboxdCsv,
@@ -84,7 +85,7 @@ describe("matchLetterboxdRows", () => {
   ];
 
   it("matches by TMDB id, then by title and year", () => {
-    const matched = matchLetterboxdRows(
+    const { matched, unmatched } = matchLetterboxdRows(
       [
         { title: "Something else entirely", tmdbId: "843" },
         { title: "Alien", year: 1979, date: Date.UTC(2020, 0, 1) },
@@ -107,10 +108,13 @@ describe("matchLetterboxdRows", () => {
         addedAt: Date.UTC(2020, 0, 1),
       },
     });
+    expect(unmatched).toEqual([
+      { title: "Not Showing", year: 1990, date: NOW },
+    ]);
   });
 
   it("keeps a film named twice once, at its earliest date", () => {
-    const matched = matchLetterboxdRows(
+    const { matched } = matchLetterboxdRows(
       [
         { title: "Alien", year: 1979, date: Date.UTC(2022, 0, 1) },
         { title: "Alien", year: 1979, date: Date.UTC(2020, 0, 1) },
@@ -120,6 +124,34 @@ describe("matchLetterboxdRows", () => {
     );
     expect(Object.keys(matched)).toEqual(["348"]);
     expect(matched["348"].addedAt).toBe(Date.UTC(2020, 0, 1));
+  });
+
+  it("gives each unmatched title and year once, at its earliest date", () => {
+    const { unmatched } = matchLetterboxdRows(
+      [
+        { title: "Amélie", year: 2001, date: Date.UTC(2022, 0, 1) },
+        { title: "AMELIE", year: 2001, date: Date.UTC(2019, 0, 1) },
+        { title: "Amélie", year: 2002 },
+      ],
+      movies,
+      NOW,
+    );
+    expect(unmatched).toEqual([
+      { title: "AMELIE", year: 2001, date: Date.UTC(2019, 0, 1) },
+      { title: "Amélie", year: 2002, date: NOW },
+    ]);
+  });
+});
+
+describe("getTitleYearKey", () => {
+  it("folds case, accents and punctuation, in any script", () => {
+    expect(getTitleYearKey("Amélie!", 2001)).toBe(
+      getTitleYearKey("amelie", "2001"),
+    );
+    expect(getTitleYearKey("千と千尋の神隠し")).not.toBe(
+      getTitleYearKey("ハウルの動く城"),
+    );
+    expect(getTitleYearKey("Heat", 1995)).not.toBe(getTitleYearKey("Heat"));
   });
 });
 

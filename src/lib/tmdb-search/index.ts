@@ -32,25 +32,43 @@ export class TmdbSearchError extends Error {
   }
 }
 
+type GetIdToken = (forceRefresh?: boolean) => Promise<string>;
+
 /**
- * Searches TheMovieDB. A 401 means the token went stale, so it's refreshed and
- * the search tried once more; a 429 is surfaced rather than retried, since
- * retrying is what got it limited.
+ * A request to the Worker with the reader's token. A 401 means the token went
+ * stale, so it's refreshed and the request tried once more.
+ */
+async function fetchWithToken(
+  url: string,
+  init: RequestInit,
+  getIdToken: GetIdToken,
+) {
+  const request = async (forceRefresh: boolean) =>
+    fetch(url, {
+      ...init,
+      headers: {
+        ...init.headers,
+        Authorization: `Bearer ${await getIdToken(forceRefresh)}`,
+      },
+    });
+  const response = await request(false);
+  return response.status === 401 ? request(true) : response;
+}
+
+/**
+ * Searches TheMovieDB. A 429 is surfaced rather than retried, since retrying
+ * is what got it limited.
  */
 export async function searchTmdb(
   query: string,
-  getIdToken: (forceRefresh?: boolean) => Promise<string>,
+  getIdToken: GetIdToken,
   signal?: AbortSignal,
 ): Promise<TmdbSearchResponse> {
-  const url = `/api/tmdb/search?${new URLSearchParams({ q: query.trim() })}`;
-  const request = async (forceRefresh: boolean) =>
-    fetch(url, {
-      headers: { Authorization: `Bearer ${await getIdToken(forceRefresh)}` },
-      signal,
-    });
-
-  let response = await request(false);
-  if (response.status === 401) response = await request(true);
+  const response = await fetchWithToken(
+    `/api/tmdb/search?${new URLSearchParams({ q: query.trim() })}`,
+    { signal },
+    getIdToken,
+  );
 
   if (response.status === 429) {
     throw new TmdbSearchError(
@@ -65,4 +83,46 @@ export async function searchTmdb(
     );
   }
   return response.json();
+}
+
+/**
+ * The most films one match call takes: what the Worker can look up within a
+ * Workers Free request's 50 subrequests. The Worker rejects a bigger batch.
+ */
+export const MATCH_BATCH_SIZE = 15;
+
+/** A film as an import names it. */
+export type TmdbMatchQuery = { title: string; year?: number };
+
+/**
+ * Finds each film on TheMovieDB, strictly — a title that matches, or the only
+ * result for that year — and gives its match or null, in the order asked.
+ * Throws `TmdbSearchError`, with `rate-limited` for a 429, rather than
+ * reporting films it couldn't look up as missing.
+ */
+export async function matchTmdb(
+  films: TmdbMatchQuery[],
+  getIdToken: GetIdToken,
+  signal?: AbortSignal,
+): Promise<(TmdbSearchResult | null)[]> {
+  const response = await fetchWithToken(
+    "/api/tmdb/match",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ films }),
+      signal,
+    },
+    getIdToken,
+  );
+  if (response.status === 429) {
+    throw new TmdbSearchError("rate-limited", "Too many lookups at once.");
+  }
+  if (!response.ok) {
+    throw new TmdbSearchError(
+      "unavailable",
+      "We couldn't reach TheMovieDB. Please try again later.",
+    );
+  }
+  return (await response.json()).results;
 }

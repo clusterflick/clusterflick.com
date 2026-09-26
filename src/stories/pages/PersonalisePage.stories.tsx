@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { http, HttpResponse } from "msw";
-import { within, userEvent } from "storybook/test";
+import { delay, http, HttpResponse } from "msw";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import PersonalisePageContent from "@/app/personalise/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
@@ -178,6 +178,89 @@ export const SignedInSearchRateLimited: Story = {
     );
     await userEvent.click(canvas.getByRole("button", { name: "Search" }));
     await canvas.findByRole("alert");
+  },
+};
+
+/**
+ * A Letterboxd watchlist export: one film showing against the current data
+ * (We All Loved Each Other So Much), one already on the list (Cinema
+ * Paradiso), two that aren't showing and one TheMovieDB doesn't know.
+ */
+const letterboxdWatchlist = new File(
+  [
+    [
+      "Date,Name,Year,Letterboxd URI",
+      "2024-01-01,We All Loved Each Other So Much,1974,https://boxd.it/a",
+      "2024-01-02,Cinema Paradiso,1988,https://boxd.it/b",
+      "2024-01-03,Punch-Drunk Love,2002,https://boxd.it/c",
+      '2024-01-04,"Paris, Texas",1984,https://boxd.it/d',
+      "2024-01-05,A Film Nobody Made,1999,https://boxd.it/e",
+    ].join("\n"),
+  ],
+  "watchlist.csv",
+  { type: "text/csv" },
+);
+
+/** What the Worker's match endpoint finds for the films not showing. */
+const tmdbMatches: Record<string, object> = {
+  "Punch-Drunk Love": { id: "8051", title: "Punch-Drunk Love", year: "2002" },
+  "Paris, Texas": { id: "655", title: "Paris, Texas", year: "1984" },
+};
+
+async function importWatchlist(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "Manage lists" }),
+  );
+  // The data has to load before an import can start.
+  const button = await canvas.findByRole("button", {
+    name: "Import to Watchlist",
+  });
+  await waitFor(() => expect(button).toBeEnabled(), { timeout: 10000 });
+  const input =
+    canvasElement.querySelector<HTMLInputElement>('input[type="file"]')!;
+  await userEvent.upload(input, letterboxdWatchlist);
+  return canvas;
+}
+
+/** A Letterboxd import, with films that aren't showing found on TheMovieDB. */
+export const SignedInImportReview: Story = {
+  args: SignedInWithLists.args,
+  parameters: {
+    msw: {
+      handlers: [
+        http.post("/api/tmdb/match", async ({ request }) => {
+          const { films } = (await request.json()) as {
+            films: { title: string }[];
+          };
+          return HttpResponse.json({
+            results: films.map(({ title }) => tmdbMatches[title] ?? null),
+          });
+        }),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await importWatchlist(canvasElement);
+    await canvas.findByText(/lists 5 films/);
+  },
+};
+
+/** Looking films up on TheMovieDB, which is paced and can take minutes. */
+export const SignedInImportLookingUp: Story = {
+  args: SignedInWithLists.args,
+  parameters: {
+    msw: {
+      handlers: [
+        http.post("/api/tmdb/match", async () => {
+          await delay("infinite");
+        }),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await importWatchlist(canvasElement);
+    await canvas.findByRole("progressbar");
   },
 };
 

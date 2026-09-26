@@ -831,16 +831,36 @@ Editing takes a row of its own first, import and export pair up below it, and
   `watched.csv`, `diary.csv` — `Name`, `Year`, a date) and its import format
   (`Title`, `Year`, `tmdbID`), parsed in `@/lib/user-lists/letterboxd-csv`. The
   reader picks the target list; the file's contents can't tell a watchlist from
-  a watched list. Only films **in the current dataset** are added. Letterboxd's
-  URI is a boxd.it short link with nothing to match on, and a film we can't
-  resolve has no id to key it by. Matching is `createMovieMatcher`
-  (`@/utils/match-movie`), the same resolver the film lists use, pulled out of
-  `get-movie-list-movies` so the page doesn't bundle every list's entries. A
-  review step shows what will be added before anything is written, each
-  title linking to its film page in a new tab (the review is only page state,
-  so navigating away would lose it); films
-  already listed keep their entry, and an import to Seen takes films off the
-  watchlist, as a single add does — in one write (`addManyToUserList`).
+  a watched list. Letterboxd's URI is a boxd.it short link with nothing to
+  match on, and its own export carries no TMDB id, so films are found by title
+  and year in two passes:
+  1. **The dataset**, with `createMovieMatcher` (`@/utils/match-movie`), the
+     same resolver the film lists use, pulled out of `get-movie-list-movies` so
+     the page doesn't bundle every list's entries.
+  2. **TheMovieDB, for the rest**, through the search Worker's batch endpoint
+     (`lookUpRowsOnTmdb`, `@/lib/user-lists/tmdb-lookup`). Rows are grouped by
+     folded title and year first, so a diary's rewatches are one lookup, and a
+     row already on the list by title and year isn't looked up just to be
+     skipped. Batches of 15 (what the Worker fits in Workers Free's 50
+     subrequests) go one every 60s / 13, the Worker's per-reader limit, so a
+     2,000-film diary takes about 10 minutes; the page shows progress and can
+     cancel. Matching is strict — a title that matches, or the only result for
+     that year — and a film it can't find is listed in the review for the
+     reader to search for, never guessed. A 429 is waited out; any other
+     failure is retried twice and then **fails the whole import**, since
+     counting a film that couldn't be looked up as missing would drop it
+     without the reader knowing.
+
+  A review step shows what will be added before anything is written: how many
+  are showing (linked to their pages in a new tab, since the review is only
+  page state and navigating away would lose it), the rest unlinked, and the
+  films TMDB couldn't find. Films already listed keep their entry, and an
+  import to Seen takes films off the watchlist, as a single add does — in one
+  write (`addManyToUserList`). All of a reader's lists live in one Firestore
+  document, so a very large import (several thousand films) could hit its
+  1 MiB or 40,000-index-entry limits; excluding the list fields from indexing
+  is the fix if anyone does.
+
 - **Export** writes each list in Letterboxd's _import_ format rather than its
   export format: the `tmdbID` column makes it an exact match both in Letterboxd
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left

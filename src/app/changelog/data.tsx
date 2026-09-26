@@ -71,6 +71,23 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-27",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Importing from Letterboxd now brings in your whole watchlist or
+            watched list, not just the films showing now. Films that
+            aren&rsquo;t showing are looked up on TheMovieDB, and any it
+            can&rsquo;t find are listed so you can search for them. Find it
+            under Manage lists on <Link href="/personalise">Personalise</Link>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-26",
     changes: [
       {

@@ -6,13 +6,23 @@ import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { UserListId, type UserListEntry } from "@/lib/user-lists";
+import {
+  toUserListEntry,
+  UserListId,
+  type UserListEntry,
+} from "@/lib/user-lists";
 import {
   formatLetterboxdCsv,
+  getTitleYearKey,
   LetterboxdCsvError,
   matchLetterboxdRows,
   parseLetterboxdCsv,
+  type LetterboxdRow,
 } from "@/lib/user-lists/letterboxd-csv";
+import {
+  estimateLookupMinutes,
+  lookUpRowsOnTmdb,
+} from "@/lib/user-lists/tmdb-lookup";
 import FilmSearch from "./film-search";
 import styles from "./page.module.css";
 
@@ -30,19 +40,32 @@ const LETTERBOXD_FILES: Record<UserListId, string> = {
 /** Titles listed in an import's review before the rest become "and N more". */
 const REVIEW_TITLE_LIMIT = 12;
 
+type ImportReviewState = {
+  listId: UserListId;
+  fileName: string;
+  /** Films the file names. */
+  total: number;
+  /** Films not already on the list, whether showing or not. */
+  entries: Record<string, UserListEntry>;
+  /** How many of `entries` are showing now. */
+  showing: number;
+  /** Named by the file but on the list already. */
+  alreadyListed: number;
+  /** Films TheMovieDB has no match for. */
+  missing: LetterboxdRow[];
+};
+
 type ImportState =
   | { step: "idle" }
   | {
-      step: "review" | "importing";
+      step: "looking-up";
       listId: UserListId;
       fileName: string;
-      /** Films the file names. */
+      /** Films being looked up on TheMovieDB, and how many are done. */
       total: number;
-      /** Those showing now and not already on the list. */
-      entries: Record<string, UserListEntry>;
-      /** Showing now but on the list already. */
-      alreadyListed: number;
+      done: number;
     }
+  | ({ step: "review" | "importing" } & ImportReviewState)
   | { step: "done"; listId: UserListId; count: number }
   | { step: "error"; message: string };
 
@@ -51,10 +74,15 @@ function plural(count: number, noun: string) {
 }
 
 /**
- * The films an import would add, each linked to its page. In a new tab, so
- * checking one doesn't lose the review — which lives only in this page's state.
+ * The films an import would add. Those showing link to their pages, in a new
+ * tab so checking one doesn't lose the review — which lives only in this
+ * page's state. The rest have no page to link to.
  */
-function ReviewTitles({ films }: { films: { id: string; title: string }[] }) {
+function ReviewTitles({
+  films,
+}: {
+  films: { id: string; title: string; href?: string }[];
+}) {
   const shown = films.slice(0, REVIEW_TITLE_LIMIT);
   const rest = films.length - shown.length;
   return (
@@ -62,9 +90,13 @@ function ReviewTitles({ films }: { films: { id: string; title: string }[] }) {
       {shown.map((film, index) => (
         <Fragment key={film.id}>
           {index > 0 && ", "}
-          <a href={getMovieUrl(film)} target="_blank" rel="noopener noreferrer">
-            {film.title}
-          </a>
+          {film.href ? (
+            <a href={film.href} target="_blank" rel="noopener noreferrer">
+              {film.title}
+            </a>
+          ) : (
+            film.title
+          )}
         </Fragment>
       ))}
       {rest > 0 && ` and ${rest.toLocaleString("en-GB")} more`}
@@ -117,12 +149,13 @@ export default function ListManagement({
 }
 
 function ImportSection() {
-  const { lists, importToList } = useUserContext();
+  const { lists, importToList, getIdToken } = useUserContext();
   const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
   const [state, setState] = useState<ImportState>({ step: "idle" });
   const inputRef = useRef<HTMLInputElement>(null);
   const targetRef = useRef<UserListId>(UserListId.Watchlist);
-  // Matching is against what's showing, so it waits for the data.
+  const lookupRef = useRef<AbortController | null>(null);
+  // Matching starts with what's showing, so it waits for the data.
   const ready = !!lists && hasAttemptedLoad && !isLoading && !error;
 
   const choose = (listId: UserListId) => {
@@ -136,22 +169,11 @@ function ImportSection() {
     event.target.value = "";
     if (!file || !lists) return;
     const listId = targetRef.current;
+    const listed = lists[listId];
+
+    let rows: LetterboxdRow[];
     try {
-      const rows = parseLetterboxdCsv(await file.text());
-      const matched = matchLetterboxdRows(rows, Object.values(movies));
-      const listed = lists[listId];
-      const entries = Object.fromEntries(
-        Object.entries(matched).filter(([id]) => !(id in listed)),
-      );
-      setState({
-        step: "review",
-        listId,
-        fileName: file.name,
-        total: rows.length,
-        entries,
-        alreadyListed:
-          Object.keys(matched).length - Object.keys(entries).length,
-      });
+      rows = parseLetterboxdCsv(await file.text());
     } catch (caught) {
       setState({
         step: "error",
@@ -160,7 +182,97 @@ function ImportSection() {
             ? `${file.name} doesn't look like a Letterboxd export — it has no Name or Title column.`
             : `We couldn't read ${file.name}.`,
       });
+      return;
     }
+
+    // Films showing now resolve against the dataset. The rest go to
+    // TheMovieDB, except those already on the list by title and year, which
+    // would only be looked up to be skipped.
+    const { matched, unmatched } = matchLetterboxdRows(
+      rows,
+      Object.values(movies),
+    );
+    const listedKeys = new Set(
+      Object.values(listed).map((entry) =>
+        getTitleYearKey(entry.title, entry.year),
+      ),
+    );
+    const toLookUp = unmatched.filter(
+      (row) => !listedKeys.has(getTitleYearKey(row.title, row.year)),
+    );
+
+    const entries: Record<string, UserListEntry> = {};
+    const alreadyListedIds = new Set<string>();
+    const add = (id: string, entry: UserListEntry) => {
+      if (id in listed) {
+        alreadyListedIds.add(id);
+        return;
+      }
+      // Two titles can find one film; it's kept at its earliest date.
+      const existing = entries[id];
+      if (!existing || existing.addedAt > entry.addedAt) entries[id] = entry;
+    };
+    for (const [id, entry] of Object.entries(matched)) add(id, entry);
+
+    let missing: LetterboxdRow[] = [];
+    if (toLookUp.length > 0) {
+      const controller = new AbortController();
+      lookupRef.current = controller;
+      setState({
+        step: "looking-up",
+        listId,
+        fileName: file.name,
+        total: toLookUp.length,
+        done: 0,
+      });
+      try {
+        const lookup = await lookUpRowsOnTmdb(toLookUp, {
+          getIdToken,
+          signal: controller.signal,
+          onProgress: (done) =>
+            setState((current) =>
+              current.step === "looking-up" ? { ...current, done } : current,
+            ),
+        });
+        const now = Date.now();
+        for (const { row, film } of lookup.found) {
+          // A film TMDB found that the dataset has after all is the
+          // dataset's, as its page would add it.
+          add(film.id, {
+            ...toUserListEntry(movies[film.id] ?? film),
+            addedAt: row.date ?? now,
+          });
+        }
+        missing = lookup.missing;
+      } catch {
+        if (controller.signal.aborted) return;
+        setState({
+          step: "error",
+          message:
+            "We couldn't reach TheMovieDB to look up the films that aren't showing, so nothing has been added. Please try again later.",
+        });
+        return;
+      } finally {
+        lookupRef.current = null;
+      }
+    }
+
+    setState({
+      step: "review",
+      listId,
+      fileName: file.name,
+      total: rows.length,
+      entries,
+      showing: Object.keys(entries).filter((id) => movies[id]).length,
+      alreadyListed:
+        alreadyListedIds.size + (unmatched.length - toLookUp.length),
+      missing,
+    });
+  };
+
+  const onCancelLookup = () => {
+    lookupRef.current?.abort();
+    setState({ step: "idle" });
   };
 
   const onConfirm = async () => {
@@ -178,6 +290,7 @@ function ImportSection() {
   };
 
   const reviewing = state.step === "review" || state.step === "importing";
+  const busy = reviewing || state.step === "looking-up";
 
   // The review is a sibling of the section rather than inside it, so it can
   // take the panel's full width below import and export — a long file's
@@ -198,7 +311,8 @@ function ImportSection() {
           and unzip it. Add{" "}
           <code>{LETTERBOXD_FILES[UserListId.Watchlist]}</code> to your
           Watchlist and <code>{LETTERBOXD_FILES[UserListId.Seen]}</code> to
-          Seen. We add the films that are showing in London now.
+          Seen. Films that aren&apos;t showing are looked up on TheMovieDB,
+          which takes about a minute for every 200.
         </p>
         <input
           ref={inputRef}
@@ -213,7 +327,7 @@ function ImportSection() {
               key={listId}
               variant="secondary"
               size="sm"
-              disabled={!ready || reviewing}
+              disabled={!ready || busy}
               onClick={() => choose(listId)}
             >
               Import to {LIST_NAMES[listId]}
@@ -233,6 +347,9 @@ function ImportSection() {
           </p>
         )}
       </section>
+      {state.step === "looking-up" && (
+        <ImportProgress state={state} onCancel={onCancelLookup} />
+      )}
       {reviewing && (
         <ImportReview
           state={state}
@@ -241,6 +358,41 @@ function ImportSection() {
         />
       )}
     </>
+  );
+}
+
+/**
+ * Where a long lookup has got to. It's paced to the Worker's rate limit, so a
+ * big file takes minutes, and says so.
+ */
+function ImportProgress({
+  state,
+  onCancel,
+}: {
+  state: Extract<ImportState, { step: "looking-up" }>;
+  onCancel: () => void;
+}) {
+  const minutes = estimateLookupMinutes(state.total - state.done);
+  return (
+    <div className={styles.importReview}>
+      <p className={styles.managementText} role="status">
+        Looking up {plural(state.total, "film")} that{" "}
+        {state.total === 1 ? "isn't" : "aren't"} showing on TheMovieDB:{" "}
+        {state.done.toLocaleString("en-GB")} done, about{" "}
+        {plural(minutes, "minute")} to go. Keep this page open.
+      </p>
+      <progress
+        className={styles.importProgress}
+        value={state.done}
+        max={state.total}
+        aria-label="Films looked up"
+      />
+      <div className={styles.managementActions}>
+        <Button variant="link" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -254,8 +406,13 @@ function ImportReview({
   onCancel: () => void;
 }) {
   const { lists } = useUserContext();
+  const { movies } = useCinemaData();
   const titles = Object.entries(state.entries)
-    .map(([id, entry]) => ({ id, title: entry.title }))
+    .map(([id, entry]) => ({
+      id,
+      title: entry.title,
+      href: movies[id] ? getMovieUrl({ id, title: entry.title }) : undefined,
+    }))
     .sort((a, b) => a.title.localeCompare(b.title));
   const listName = LIST_NAMES[state.listId];
   // Marking seen takes a film off the watchlist, and a bulk import shouldn't
@@ -267,19 +424,47 @@ function ImportReview({
         ).length
       : 0;
 
+  const count = titles.length;
+  const already = state.alreadyListed;
+  // Said only when some are, and without "of them" for a single film.
+  const showingNote =
+    state.showing === 0
+      ? ""
+      : count === 1
+        ? ", and it's showing now"
+        : `, ${state.showing.toLocaleString("en-GB")} of them showing now`;
   const summary = [
-    `${state.fileName} lists ${plural(state.total, "film")}.`,
-    titles.length === 0 && state.alreadyListed === 0
-      ? "None of them are showing in London right now."
-      : titles.length === 0
-        ? `The ${plural(state.alreadyListed, "film")} showing now ${state.alreadyListed === 1 ? "is" : "are"} already on your ${listName}.`
-        : `${plural(titles.length, "film")} showing now ${titles.length === 1 ? "isn't" : "aren't"} on your ${listName} yet${state.alreadyListed > 0 ? ` (${state.alreadyListed.toLocaleString("en-GB")} more already ${state.alreadyListed === 1 ? "is" : "are"})` : ""}:`,
-  ].join(" ");
+    `${state.fileName} lists ${plural(state.total, "film")}${already > 0 ? `, ${already.toLocaleString("en-GB")} of them already on your ${listName}` : ""}.`,
+    count > 0
+      ? `${plural(count, "film")} ${count === 1 ? "isn't" : "aren't"} on ${already > 0 ? "it" : `your ${listName}`} yet${showingNote}:`
+      : already === 0
+        ? "We couldn't find any of them."
+        : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={styles.importReview}>
       <p className={styles.managementText}>{summary}</p>
-      {titles.length > 0 && <ReviewTitles films={titles} />}
+      {count > 0 && <ReviewTitles films={titles} />}
+      {state.missing.length > 0 && (
+        <details className={styles.importMissing}>
+          <summary>
+            We couldn&apos;t find {plural(state.missing.length, "film")} on
+            TheMovieDB
+          </summary>
+          <p className={styles.importTitles}>
+            {state.missing
+              .map(({ title, year }) => (year ? `${title} (${year})` : title))
+              .join(", ")}
+          </p>
+          <p className={styles.managementText}>
+            Try searching for {state.missing.length === 1 ? "it" : "them"} under
+            Add a film: the title may differ from Letterboxd&apos;s.
+          </p>
+        </details>
+      )}
       {leavingWatchlist > 0 && (
         <p className={styles.managementText}>
           {plural(leavingWatchlist, "film")} will come off your Watchlist, as
@@ -287,7 +472,7 @@ function ImportReview({
         </p>
       )}
       <div className={styles.managementActions}>
-        {titles.length > 0 ? (
+        {count > 0 ? (
           <>
             <Button
               size="sm"
@@ -296,7 +481,7 @@ function ImportReview({
             >
               {state.step === "importing"
                 ? "Adding…"
-                : `Add ${plural(titles.length, "film")} to ${listName}`}
+                : `Add ${plural(count, "film")} to ${listName}`}
             </Button>
             <Button
               variant="link"

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { searchTmdb, TmdbSearchError } from "./index";
+import { matchTmdb, searchTmdb, TmdbSearchError } from "./index";
 
 const RESPONSE = {
   page: 1,
@@ -76,4 +76,46 @@ describe("searchTmdb", () => {
       });
     },
   );
+});
+
+describe("matchTmdb", () => {
+  const films = [{ title: "Amélie", year: 2001 }, { title: "Nowhere" }];
+  const results = [{ id: "194", title: "Amélie", year: "2001" }, null];
+
+  it("posts the batch with the reader's token and returns the results", async () => {
+    fetchMock.mockResolvedValue(reply(200, { results }));
+    await expect(matchTmdb(films, async () => "token-1")).resolves.toEqual(
+      results,
+    );
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("/api/tmdb/match");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body)).toEqual({ films });
+    expect(init.headers).toEqual({
+      "Content-Type": "application/json",
+      Authorization: "Bearer token-1",
+    });
+  });
+
+  it("refreshes the token and retries once on a 401", async () => {
+    fetchMock
+      .mockResolvedValueOnce(reply(401))
+      .mockResolvedValueOnce(reply(200, { results }));
+    await expect(matchTmdb(films, async () => "t")).resolves.toEqual(results);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports a 429 as rate-limited, for the caller to wait out", async () => {
+    fetchMock.mockResolvedValue(reply(429));
+    await expect(matchTmdb(films, async () => "t")).rejects.toMatchObject({
+      reason: "rate-limited",
+    });
+  });
+
+  it("reports a failed batch rather than missing films", async () => {
+    fetchMock.mockResolvedValue(reply(502));
+    await expect(matchTmdb(films, async () => "t")).rejects.toMatchObject({
+      reason: "unavailable",
+    });
+  });
 });

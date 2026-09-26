@@ -136,26 +136,51 @@ export function parseLetterboxdCsv(text: string): LetterboxdRow[] {
 }
 
 /**
- * The rows that name a film in `movies`, each as the entry a list would keep,
- * keyed by movie id. A film named twice (a diary logs every rewatch) is kept
- * once, at its earliest date.
+ * A title and year folded so two spellings of one film agree — case, accents
+ * and punctuation aside. For telling rows apart before they have an id.
+ */
+export function getTitleYearKey(title: string, year?: number | string) {
+  const folded = title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]/gu, "");
+  return `${folded}|${year ?? ""}`;
+}
+
+/**
+ * `matched`: the rows that name a film in `movies`, each as the entry a list
+ * would keep, keyed by movie id. `unmatched`: the rest, one per title and
+ * year, for looking up elsewhere. Either way a film named twice (a diary logs
+ * every rewatch) is kept once, at its earliest date.
  */
 export function matchLetterboxdRows(
   rows: LetterboxdRow[],
   movies: Movie[],
   now = Date.now(),
-): Record<Movie["id"], UserListEntry> {
+): {
+  matched: Record<Movie["id"], UserListEntry>;
+  unmatched: LetterboxdRow[];
+} {
   const match = createMovieMatcher(movies);
   const matched: Record<Movie["id"], UserListEntry> = {};
+  const unmatched = new Map<string, LetterboxdRow>();
   for (const row of rows) {
+    const date = Math.min(row.date ?? now, now);
     const movie = match(row);
-    if (!movie) continue;
-    const addedAt = Math.min(row.date ?? now, now);
+    if (!movie) {
+      const key = getTitleYearKey(row.title, row.year);
+      const existing = unmatched.get(key);
+      if (!existing || (existing.date ?? now) > date) {
+        unmatched.set(key, { ...row, date });
+      }
+      continue;
+    }
     const existing = matched[movie.id];
-    if (existing && existing.addedAt <= addedAt) continue;
-    matched[movie.id] = { ...toUserListEntry(movie), addedAt };
+    if (existing && existing.addedAt <= date) continue;
+    matched[movie.id] = { ...toUserListEntry(movie), addedAt: date };
   }
-  return matched;
+  return { matched, unmatched: [...unmatched.values()] };
 }
 
 function escapeCsvField(value: string) {
