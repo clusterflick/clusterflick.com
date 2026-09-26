@@ -10,6 +10,10 @@
   gap: 8px;
 }
 
+.buttons.stacked {
+  grid-template-columns: 1fr;
+}
+
 /* After Chip: a quiet pill that only takes a colour when on. */
 .button {
   display: inline-flex;

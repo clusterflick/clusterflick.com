@@ -743,9 +743,10 @@ the same one the film's URL is built from, so it is stable across releases; the
 slug is derived from the title, as `getMovieUrl` does. The rules restrict the
 document to the list fields, so a new list needs a rules change too.
 
-**Controls live under the poster on the film's page only**
-(`UserListButtons`), never on grid posters. Signed out, the buttons link to `/personalise`, which makes
-them the way in to personalisation. **Marking a film seen takes it off the
+**Controls live under the poster on the film's page** (`UserListButtons`),
+and under film search results, never on browsing-grid posters. Signed out, the
+buttons link to `/personalise`, which makes them the way in to
+personalisation. **Marking a film seen takes it off the
 watchlist**, in the same write so the two can't disagree; the reverse doesn't
 hold, since wanting to see a film again doesn't undo having seen it.
 
@@ -843,6 +844,22 @@ Editing sits on its own row first; import and export pair up below it:
   export format: the `tmdbID` column makes it an exact match both in Letterboxd
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
   out and Letterboxd falls back to title and year.
+
+**Any film can be added, showing or not** ("Add any film", `film-search.tsx`),
+by searching TheMovieDB above the lists. The site can't call TMDB itself — the
+key would ship to every browser — so the search goes through a Cloudflare
+Worker, [clusterflick/api-tmdb-search](https://github.com/clusterflick/api-tmdb-search),
+on `clusterflick.com/api/tmdb/*` in front of the static site. It answers only
+signed-in readers: `@/lib/tmdb-search` sends the Firebase ID token
+(`getIdToken` on the user context), refreshes it and retries once on a 401, and
+reports a 429 rather than retrying. The Worker's results already have a list
+entry's shape, keyed by TMDB id — the same id a matched film has here — so a
+result that is showing is the dataset's film (linked, and added as its page
+would add it) and the rest are added from TMDB's snapshot. Typing is debounced
+300ms and waits for two characters, to stay inside the Worker's per-reader rate
+limit. TMDB's attribution sits under the results. `next dev` rewrites
+`/api/tmdb/*` to the Worker's `wrangler dev` on port 8787; a static export can
+have no rewrites, so the build leaves them out.
 
 **The watchlist opens on the grid.** "Explore watchlist" and "Plan watchlist"
 beside its heading link to `/catalogue` and `/planner` with the films filter

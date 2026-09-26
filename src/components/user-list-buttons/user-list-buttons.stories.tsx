@@ -15,12 +15,19 @@ const entry: UserListEntry = {
   addedAt: 1_758_000_000_000,
 };
 
-function Wrapper({ user }: { user: Partial<UserContextType> }) {
+function Wrapper({
+  user,
+  layout = "inline",
+}: {
+  user: Partial<UserContextType>;
+  layout?: "inline" | "stacked";
+}) {
   return (
     <MockUserProvider value={user}>
-      {/* The width of the film page's poster column, which they fill. */}
-      <div style={{ width: 308 }}>
-        <UserListButtons movie={movie} />
+      {/* The width of the film page's poster column, or of a narrow
+          PosterTile, which they fill. */}
+      <div style={{ width: layout === "stacked" ? 140 : 308 }}>
+        <UserListButtons movie={movie} layout={layout} />
       </div>
     </MockUserProvider>
   );
@@ -33,10 +40,13 @@ function Wrapper({ user }: { user: Partial<UserContextType> }) {
  * **When to use:**
  * - Under the poster on a film's own page, where the reader has decided about
  *   one film.
+ * - Under each result of the film search on `/personalise`, stacked
+ *   (`layout="stacked"`) to fit a `PosterTile`: those films mostly have no
+ *   page of their own to go to.
  *
  * **When NOT to use:**
- * - On posters in a grid. Grids show status with `PosterStatusMarkers`;
- *   lists are changed on the film's own page.
+ * - On posters in a browsing grid. Grids show status with
+ *   `PosterStatusMarkers`; lists are changed on the film's own page.
  *
  * **Behaviour:**
  * - Signed out (or while the sign-in state is being checked), both buttons
@@ -97,6 +107,11 @@ export const Seen: Story = {
       },
     },
   },
+};
+
+/** One above the other, under a search result's `PosterTile`. */
+export const Stacked: Story = {
+  args: { ...OnWatchlist.args, layout: "stacked" },
 };
 
 /** Signed in but the lists haven't loaded, so the buttons are disabled. */

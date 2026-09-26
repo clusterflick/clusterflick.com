@@ -26,6 +26,11 @@ const LISTS: Record<
 interface UserListButtonsProps {
   /** What the lists keep about the film — see `UserListEntry`. */
   movie: Pick<Movie, "id" | "title" | "year" | "posterPath">;
+  /**
+   * Side by side, spanning a film page's poster (the default), or one above
+   * the other, for a tile too narrow to fit both labels across.
+   */
+  layout?: "inline" | "stacked";
 }
 
 /**
@@ -44,7 +49,10 @@ interface UserListButtonsProps {
  * `Chip` itself: that is a checkbox, which can neither carry an icon nor be the
  * link these need to be when signed out.
  */
-export default function UserListButtons({ movie }: UserListButtonsProps) {
+export default function UserListButtons({
+  movie,
+  layout = "inline",
+}: UserListButtonsProps) {
   const { status, lists, addToList, removeFromList } = useUserContext();
   const [error, setError] = useState(false);
 
@@ -55,7 +63,12 @@ export default function UserListButtons({ movie }: UserListButtonsProps) {
   if (status !== "signed-in") {
     return (
       <div className={styles.wrapper}>
-        <div className={styles.buttons}>
+        <div
+          className={clsx(
+            styles.buttons,
+            layout === "stacked" && styles.stacked,
+          )}
+        >
           {listIds.map((listId) => (
             <Link key={listId} href="/personalise" className={styles.button}>
               {LISTS[listId].icon(false)}
@@ -83,7 +96,9 @@ export default function UserListButtons({ movie }: UserListButtonsProps) {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.buttons}>
+      <div
+        className={clsx(styles.buttons, layout === "stacked" && styles.stacked)}
+      >
         {listIds.map((listId) => {
           const isOn = !!lists?.[listId][movie.id];
           return (

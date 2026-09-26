@@ -74,6 +74,16 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-26",
     changes: [
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            Your lists aren&rsquo;t limited to what&rsquo;s showing any more.
+            Search for any film on <Link href="/personalise">Personalise</Link>{" "}
+            and add it to your watchlist, or to the films you&rsquo;ve seen.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>

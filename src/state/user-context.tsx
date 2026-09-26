@@ -59,6 +59,12 @@ export type UserContextType = {
    */
   getPendingEmail: () => string | null;
   signOut: () => Promise<void>;
+  /**
+   * The signed-in user's Firebase ID token, for our own APIs. The SDK caches
+   * and refreshes it; `forceRefresh` fetches a new one after a server has
+   * rejected it.
+   */
+  getIdToken: (forceRefresh?: boolean) => Promise<string>;
   /** Deletes the user's lists and then their account. */
   deleteAccount: () => Promise<void>;
   addToList: (
@@ -243,6 +249,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
     await auth.signOut();
   }, [getServices]);
 
+  const getIdToken = useCallback(
+    async (forceRefresh = false) => {
+      const { auth } = await getServices();
+      if (!auth.currentUser) throw new Error("Not signed in");
+      return auth.currentUser.getIdToken(forceRefresh);
+    },
+    [getServices],
+  );
+
   const deleteAccount = useCallback(async () => {
     const { auth, db } = await getServices();
     const current = auth.currentUser;
@@ -369,6 +384,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       completeSignIn,
       getPendingEmail: readPendingEmail,
       signOut,
+      getIdToken,
       deleteAccount,
       addToList,
       removeFromList,
@@ -382,6 +398,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       sendSignInLink,
       completeSignIn,
       signOut,
+      getIdToken,
       deleteAccount,
       addToList,
       removeFromList,
@@ -413,6 +430,7 @@ export function MockUserProvider({
     completeSignIn: async () => "done",
     getPendingEmail: () => null,
     signOut: noop,
+    getIdToken: async () => "mock-token",
     deleteAccount: noop,
     addToList: noop,
     removeFromList: noop,

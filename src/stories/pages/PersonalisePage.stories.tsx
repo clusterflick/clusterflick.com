@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { http, HttpResponse } from "msw";
 import { within, userEvent } from "storybook/test";
 import PersonalisePageContent from "@/app/personalise/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
@@ -98,6 +99,78 @@ export const SignedInManagingLists: Story = {
         name: "Show Remove buttons on your lists",
       }),
     );
+  },
+};
+
+/**
+ * TMDB search results, as the Worker at /api/tmdb returns them. Against the
+ * current data the first two are showing, so they link to their pages; the
+ * last isn't, and has no poster.
+ */
+const searchResults = {
+  page: 1,
+  totalPages: 1,
+  totalResults: 3,
+  results: [
+    {
+      id: "843",
+      title: "In the Mood for Love",
+      year: "2000",
+      releaseDate: "2000-05-22",
+      posterPath: "/8BgGbbWiLNhPtkMkN0gGTnbtvBv.jpg",
+    },
+    {
+      id: "42269",
+      title: "We All Loved Each Other So Much",
+      originalTitle: "C'eravamo tanto amati",
+      year: "1974",
+      releaseDate: "1974-12-21",
+      posterPath: "/zGGWYpiKNwjpKxelPxOMqJnUgDs.jpg",
+    },
+    { id: "8051", title: "Punch-Drunk Love", year: "2002" },
+  ],
+};
+
+/** Adding a film that isn't showing, found through the TMDB search. */
+export const SignedInSearching: Story = {
+  args: SignedInWithLists.args,
+  parameters: {
+    msw: {
+      handlers: [
+        http.get("/api/tmdb/search", () => HttpResponse.json(searchResults)),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(
+      await canvas.findByRole("textbox", { name: "Search for a film" }),
+      "love",
+    );
+    await canvas.findByRole("heading", { name: "Punch-Drunk Love" });
+  },
+};
+
+/** The Worker's rate limit reached. */
+export const SignedInSearchRateLimited: Story = {
+  args: SignedInEmpty.args,
+  parameters: {
+    msw: {
+      handlers: [
+        http.get(
+          "/api/tmdb/search",
+          () => new HttpResponse(null, { status: 429 }),
+        ),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(
+      await canvas.findByRole("textbox", { name: "Search for a film" }),
+      "dune",
+    );
+    await canvas.findByRole("alert");
   },
 };
 
