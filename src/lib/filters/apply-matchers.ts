@@ -1,6 +1,11 @@
 import { FilterId, type FilterState, type MoviesRecord } from "./types";
 import { apply, getPermissiveState } from "./manager";
 
+const cache = new WeakMap<
+  MoviesRecord,
+  WeakMap<Partial<FilterState>[], MoviesRecord>
+>();
+
 /**
  * Runs a set of OR'd matchers (a film club's or festival's) over the dataset,
  * returning the movies they identify with only their matching showings and
@@ -18,8 +23,31 @@ import { apply, getPermissiveState } from "./manager";
  * Performances are unioned by identity: every filter narrows with `filter`, so a
  * performance that survives is the object the dataset holds, and rebuilding from
  * the original preserves its ordering as well as its contents.
+ *
+ * Results are memoised per dataset and matcher set. Every movie, venue and
+ * borough page asks which festivals and clubs it belongs to, and each answer
+ * used to run every registered club's and festival's matchers over the whole
+ * dataset again. Callers get a shared record and must not mutate it.
  */
 export function applyMatchers(
+  matchers: Partial<FilterState>[],
+  movies: MoviesRecord,
+): MoviesRecord {
+  let byMatchers = cache.get(movies);
+  if (!byMatchers) {
+    byMatchers = new WeakMap();
+    cache.set(movies, byMatchers);
+  }
+
+  let result = byMatchers.get(matchers);
+  if (!result) {
+    result = computeMatches(matchers, movies);
+    byMatchers.set(matchers, result);
+  }
+  return result;
+}
+
+function computeMatches(
   matchers: Partial<FilterState>[],
   movies: MoviesRecord,
 ): MoviesRecord {

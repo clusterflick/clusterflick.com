@@ -127,4 +127,13 @@ describe("applyMatchers", () => {
       }),
     ).toEqual({});
   });
+
+  it("reuses its answer for the same dataset and matchers", () => {
+    const movies = { "11239": shallWeDance };
+    const first = applyMatchers(clubMatchers, movies);
+
+    expect(applyMatchers(clubMatchers, movies)).toBe(first);
+    expect(applyMatchers(clubMatchers, { ...movies })).not.toBe(first);
+    expect(applyMatchers([...clubMatchers], movies)).not.toBe(first);
+  });
 });

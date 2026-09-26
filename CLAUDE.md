@@ -28,7 +28,11 @@ Pages at clusterflick.com.
   → GeolocationProvider)
 - **Styling:** CSS Modules exclusively (no CSS-in-JS), `clsx` for conditional
   classes
-- **Data:** Chunked JSON loaded from `/public/data/`, served with gzip compression
+- **Data:** Chunked JSON loaded from `/public/data/`, served with gzip compression.
+  At build time `getStaticData()` loads it once per worker and every page shares
+  the same object, as do `applyMatchers` results (memoised per dataset). Treat
+  both as read-only — sort a copy, never the dataset's own arrays — or the
+  change leaks into every page rendered after it
 - **Performance:** react-virtuoso for the client-rendered films grid (see Film
   Lists on why server-rendered grids must not virtualise), data chunking,
   critical CSS extraction
