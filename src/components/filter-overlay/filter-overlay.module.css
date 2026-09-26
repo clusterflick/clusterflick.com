@@ -392,6 +392,14 @@
   margin: -8px 0 0;
 }
 
+/* A line about a selection too long, or too far off, to draw as chips. The
+   group's gap spaces it, so it carries no margin of its own. */
+.selectionNote {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
 /* Standing on its own in a section with no gap, the control spaces itself.
    Inside an advancedFilterGroup the group's gap already does it. */
 .standaloneQuickAdd {

@@ -306,6 +306,15 @@ section supplies it (`standaloneQuickAdd` for the venue one, which sits in a
 section with no gap). Two CSS modules cannot override one another by class
 order, so the margin has to live at one end or the other, not both.
 
+**The section opens itself while anything in it is narrowing** — films,
+directors, cast, genres, formats or accessibility. Those arrive from outside
+the overlay (a name on a film page, a watchlist link, a genre left over from
+an earlier visit), and behind a closed trigger they read as no filter at all.
+`ExpandableSection`'s `expandWhen` opens it on mount or whenever it turns
+true, and never closes it: snapping shut under a reader mid-edit is worse than
+staying open. It is adjusted during render rather than in an effect, so the
+section never paints closed for a frame first.
+
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
 already used, generalised. Matching is case-insensitive substring, and results
 stop at `maxResults` **in list order** — so the vocabulary must arrive
@@ -348,6 +357,37 @@ the same way, behind an exact name match and the person's department.
 started emitting it carries none, and TheMovieDB has no score for some people.
 Absent is not zero — unranked, not unpopular — and the ordering falls through to
 director-first.
+
+## Films Filter
+
+`FilterId.Movies` (`src/lib/filters/modules/movies.ts`) restricts the grid to a
+chosen set of films by id. It is the people filters over again, keyed on the
+film rather than a credit: `string[] | null`, "or" across the selection, empty
+meaning no filter, a `?movies=` param, and an `EntityQuickAdd` in "More Event
+Options" above Directors (`MovieFilterSection`). Its main job is the watchlist
+links on `/personalise`; the typeahead is for picking a few films to fit
+around each other in the planner.
+
+**The selection is a snapshot, and unknown ids are kept.** "Explore watchlist"
+and "Plan watchlist" write every id on the list into the URL, not just the
+films showing now. A link can be bookmarked or shared, and it outlives the
+release it was made against — a film that has finished its run can come back,
+and dropping its id would make the link quietly miss it when it does. So
+nothing prunes the selection: not `fromUrlParams`, not sanitising session
+storage. An unknown id matches nothing until its film returns. What the link
+does _not_ follow is the list itself: films added after it was made aren't in
+it, which is accepted — the button always builds a fresh one.
+
+**Only what the dataset resolves is counted or named.** The overlay draws chips
+for the films it can find and says "Plus 3 films not currently showing" for the
+rest; `describeFilters` reads "from 12 selected films", or names up to two. It
+takes the loaded dataset as its `movies` lookup, withheld until loading has
+finished, so a selection isn't described as not showing while its films are
+still arriving. Past six chips the selection collapses to a count, since a
+watchlist would otherwise push every other filter off the screen.
+
+It widens as "All films", beside the people: a selection left over from
+another page is exactly the invisible blocker the empty state exists to name.
 
 ## Thin-Result Notice
 
@@ -770,6 +810,13 @@ Editing sits on its own row first; import and export pair up below it:
   export format: the `tmdbID` column makes it an exact match both in Letterboxd
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
   out and Letterboxd falls back to title and year.
+
+**The watchlist opens on the grid.** "Explore watchlist" and "Plan watchlist"
+beside its heading link to `/catalogue` and `/planner` with the films filter
+set to every film on the list (`getMoviesFilterUrl`, with `base=all` so the
+default week doesn't hide most of it). See Films Filter for why it carries
+films that aren't showing. The helper is imported from its module rather than
+the filters barrel, which would bundle the whole engine into this page.
 
 **Lists are account-only for now**, but the data layer takes a `UserListId`
 and a movie snapshot and knows nothing about where they're kept, so

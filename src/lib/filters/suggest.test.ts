@@ -943,6 +943,19 @@ describe("suggestFilterRelaxations", () => {
       expect(widened?.state[FilterId.Directors]).toBeNull();
     });
 
+    it("widens a films filter when it is what emptied the grid", () => {
+      const movies = makeMovies({
+        "1": { title: "Taxi Driver" },
+      });
+      // A watchlist left over from another page, none of it showing.
+      const state = set(getDefaultState(), FilterId.Movies, ["gone"]);
+
+      const widened = suggestFilterRelaxations({ movies, state }).find((s) =>
+        s.changes.some((change) => change.label === "All films"),
+      );
+      expect(widened?.state[FilterId.Movies]).toBeNull();
+    });
+
     // The uniqueness rule is people-only — the formats must keep offering both
     // "70mm" and "IMAX 70mm", which is the documented behaviour there.
     it("leaves multi-match vocabularies alone", () => {

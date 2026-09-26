@@ -24,7 +24,7 @@ export default function FilterTrigger({
   onTextHeightChange,
 }: FilterTriggerProps) {
   const { filterState } = useFilterConfig();
-  const { metaData } = useCinemaData();
+  const { metaData, movies, isLoading, hasAttemptedLoad } = useCinemaData();
   const textWrapperRef = useRef<HTMLSpanElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const flashedState = useRef<typeof filterState | null>(null);
@@ -43,9 +43,19 @@ export default function FilterTrigger({
       venues: metaData?.venues || null,
       genres: metaData?.genres || null,
       people: metaData?.people || null,
+      // Withheld until the films have loaded, so a selection isn't described
+      // as "not currently showing" while its films are still arriving.
+      movies: hasAttemptedLoad && !isLoading ? movies : null,
       cinemaVenueIds,
     });
-  }, [filterState, metaData, cinemaVenueIds]);
+  }, [
+    filterState,
+    metaData,
+    movies,
+    isLoading,
+    hasAttemptedLoad,
+    cinemaVenueIds,
+  ]);
 
   // Flash the summary whenever a filter changes. The wording updates either way,
   // but a line of text quietly rewriting itself is easy to miss — especially

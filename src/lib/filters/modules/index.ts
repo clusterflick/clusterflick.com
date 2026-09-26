@@ -27,6 +27,13 @@ export type {
   PeopleMatch,
   ResolvedPerson,
 } from "./people";
+export {
+  moviesFilter,
+  getMovieVocabulary,
+  getMoviesFilterUrl,
+  MOVIES_URL_PARAM,
+} from "./movies";
+export type { MovieOption } from "./movies";
 export { accessibilityFilter } from "./accessibility";
 export {
   formatSourceFilter,

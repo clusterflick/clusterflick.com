@@ -19,6 +19,12 @@ const PEOPLE = {
   a2: { id: "a2", name: "Harrison Ford" },
 };
 
+const MOVIES = {
+  m1: { title: "Alien" },
+  m2: { title: "Heat" },
+  m3: { title: "Paris, Texas" },
+};
+
 const events = (state = getDefaultState()) =>
   describeFilters({
     state,
@@ -26,6 +32,7 @@ const events = (state = getDefaultState()) =>
     venues: null,
     genres: GENRES,
     people: PEOPLE,
+    movies: MOVIES,
     cinemaVenueIds: [],
   }).events;
 
@@ -82,5 +89,49 @@ describe("describeFilters reads multi-select filters as or", () => {
     expect(dates(included)).toContain(", including finished");
     const both = set(included, FilterId.HideSoldOut, true);
     expect(dates(both)).toContain("and not sold out, including finished");
+  });
+});
+
+describe("describeFilters describes the films filter", () => {
+  it("names up to two films", () => {
+    const state = set(getDefaultState(), FilterId.Movies, ["m1", "m2"]);
+    expect(events(state)).toContain('for "Alien" or "Heat"');
+  });
+
+  it("counts a longer selection", () => {
+    const state = set(getDefaultState(), FilterId.Movies, ["m1", "m2", "m3"]);
+    expect(events(state)).toContain("from 3 selected films");
+  });
+
+  // A watchlist link carries films that have finished their run. Counting them
+  // would promise more than the grid can show.
+  it("counts only the films the dataset holds", () => {
+    const state = set(getDefaultState(), FilterId.Movies, [
+      "m1",
+      "m2",
+      "m3",
+      "gone",
+    ]);
+    expect(events(state)).toContain("from 3 selected films");
+    const one = set(getDefaultState(), FilterId.Movies, ["m1", "gone"]);
+    expect(events(one)).toContain('for "Alien"');
+  });
+
+  it("says so when none of the selection is showing", () => {
+    const state = set(getDefaultState(), FilterId.Movies, ["gone"]);
+    expect(events(state)).toContain("from films not currently showing");
+  });
+
+  it("stays quiet without a lookup, as the people filters do", () => {
+    const state = set(getDefaultState(), FilterId.Movies, ["m1"]);
+    const description = describeFilters({
+      state,
+      categories: CATEGORIES,
+      venues: null,
+      genres: GENRES,
+      people: PEOPLE,
+      cinemaVenueIds: [],
+    }).events;
+    expect(description).not.toContain("Alien");
   });
 });

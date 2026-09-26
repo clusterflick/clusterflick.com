@@ -45,6 +45,8 @@ interface CategoryFilterSectionProps {
    * ways to narrow an event instead of below them all.
    */
   beforeGenres?: ReactNode;
+  /** Opens "More Event Options" — set while a filter inside it is narrowing. */
+  expandAdvanced?: boolean;
   genres: Genre[] | null;
   filterState: {
     categories: Category[] | null;
@@ -73,6 +75,7 @@ interface CategoryFilterSectionProps {
 export default function CategoryFilterSection({
   movies,
   beforeGenres,
+  expandAdvanced = false,
   genres,
   filterState,
   toggleCategory,
@@ -346,7 +349,7 @@ export default function CategoryFilterSection({
           ))}
         </div>
       </div>
-      <ExpandableSection title="More Event Options">
+      <ExpandableSection title="More Event Options" expandWhen={expandAdvanced}>
         <div className={styles.advancedFilters}>
           {/* Format Filters — Source / Presentation / Dimension */}
           {FORMAT_GROUPS.map((group) => {

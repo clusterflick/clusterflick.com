@@ -209,6 +209,9 @@ type FilterConfigContextType = {
   // People (directors / cast) — keyed by filter id
   togglePerson: (filterId: PeopleFilterId, personId: string) => void;
   clearPeople: (filterId: PeopleFilterId) => void;
+  // Films — a chosen set of film ids (e.g. a watchlist)
+  toggleMovie: (movieId: string) => void;
+  clearMovies: () => void;
   // Accessibility
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
@@ -439,6 +442,27 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
 
   const clearPeople = useCallback((filterId: PeopleFilterId) => {
     setFilterState((prev) => filterManager.set(prev, filterId, null));
+  }, []);
+
+  // Films - the same value semantics as people: removing the last film returns
+  // to null, never to an empty grid. Ids the dataset doesn't hold are left in
+  // place; see `lib/filters/modules/movies.ts`.
+  const toggleMovie = useCallback((movieId: string) => {
+    setFilterState((prev) => {
+      const current = filterManager.get(prev, FilterId.Movies) ?? [];
+      const updated = current.includes(movieId)
+        ? current.filter((id) => id !== movieId)
+        : [...current, movieId];
+      return filterManager.set(
+        prev,
+        FilterId.Movies,
+        updated.length > 0 ? updated : null,
+      );
+    });
+  }, []);
+
+  const clearMovies = useCallback(() => {
+    setFilterState((prev) => filterManager.set(prev, FilterId.Movies, null));
   }, []);
 
   // Accessibility - null means all (no filter), [] means none, [...] means specific
@@ -699,6 +723,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearAllGenres,
       togglePerson,
       clearPeople,
+      toggleMovie,
+      clearMovies,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
@@ -735,6 +761,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearAllGenres,
       togglePerson,
       clearPeople,
+      toggleMovie,
+      clearMovies,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,

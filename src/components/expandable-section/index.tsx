@@ -13,14 +13,31 @@ interface ExpandableSectionProps {
   title: string;
   children: ReactNode;
   defaultExpanded?: boolean;
+  /**
+   * Opens the section whenever this turns true, including on mount — for a
+   * section holding a filter that is narrowing results, which would otherwise
+   * sit hidden behind the trigger. Never closes it: the reader may be
+   * mid-edit, and snapping shut under them is worse than staying open.
+   */
+  expandWhen?: boolean;
 }
 
 export default function ExpandableSection({
   title,
   children,
   defaultExpanded = false,
+  expandWhen = false,
 }: ExpandableSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded || expandWhen);
+
+  // Adjusted during render rather than in an effect, so the section never
+  // paints closed for a frame before opening. Only the false → true edge acts,
+  // and without the scroll a click gets: nobody asked for the page to move.
+  const [lastExpandWhen, setLastExpandWhen] = useState(expandWhen);
+  if (expandWhen !== lastExpandWhen) {
+    setLastExpandWhen(expandWhen);
+    if (expandWhen) setIsExpanded(true);
+  }
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentId = useId();
 

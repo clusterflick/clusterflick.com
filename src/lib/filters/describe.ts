@@ -33,6 +33,11 @@ export type DescribeOptions = {
   genres: Record<string, Genre> | null;
   /** Name lookup for the director and cast filters; without it they go undescribed. */
   people?: Record<string, Person> | null;
+  /**
+   * Title lookup for the films filter — the loaded dataset. Only films it
+   * holds are named or counted; without it the filter goes undescribed.
+   */
+  movies?: Record<string, { title: string }> | null;
   cinemaVenueIds: string[];
   nearbyVenueIds?: string[]; // Optional: for "Venues Near Me" detection
 };
@@ -432,6 +437,39 @@ function describePeople(
 }
 
 /**
+ * Describes the films filter as a clause to append to the events description:
+ * `"Alien" or "Heat"` by name while that reads as a sentence, a count beyond.
+ *
+ * Counts only the films the dataset holds. The rest of a selection — a
+ * watchlist's films that have finished their run — stays in the state for when
+ * they come back, but saying "12 films" over a grid of three would read as a
+ * bug. A selection holding none of them still restricts to nothing, so it is
+ * said as such rather than left out.
+ */
+function describeMovies(
+  state: FilterState,
+  moviesLookup: Record<string, { title: string }> | null | undefined,
+): string | null {
+  const selected = state.movies;
+  if (!moviesLookup || !selected || selected.length === 0) return null;
+
+  const titles = selected
+    .map((id) => moviesLookup[id]?.title)
+    .filter((title): title is string => !!title);
+
+  if (titles.length === 0) return "from films not currently showing";
+  if (titles.length <= 2) {
+    return `for ${formatList(
+      titles.map((title) => `"${title}"`),
+      2,
+      "",
+      "or",
+    )}`;
+  }
+  return `from ${titles.length} selected films`;
+}
+
+/**
  * Describes the format filters (source / presentation / dimension).
  * - `emptyTitle`: title of the first group with nothing selected (no matches)
  * - `labels`: selected option labels across all active groups
@@ -473,6 +511,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     venues,
     genres,
     people,
+    movies,
     cinemaVenueIds,
     nearbyVenueIds,
   } = options;
@@ -490,6 +529,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const { emptyTitle: formatEmptyTitle, labels: formatLabels } =
     describeFormats(state);
   const peoplePhrases = describePeople(state, people);
+  const moviesPhrase = describeMovies(state, movies);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
@@ -500,6 +540,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allAccessibility = !state.accessibility;
   const allFormats = FORMAT_GROUPS.every((group) => !state[group.filterId]);
   const allPeople = peoplePhrases.length === 0;
+  const allMovies = moviesPhrase === null;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
@@ -516,7 +557,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allGenres &&
     allAccessibility &&
     allFormats &&
-    allPeople
+    allPeople &&
+    allMovies
   ) {
     // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
@@ -551,6 +593,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   // Appended once rather than per branch: these read as clauses on whatever the
   // branches settled on, whether that is "All events" or "Films".
   if (!selectionIsEmpty) {
+    if (moviesPhrase) {
+      eventsDesc += ` ${moviesPhrase}`;
+    }
     if (peoplePhrases.length > 0) {
       eventsDesc += ` ${peoplePhrases.join(" and ")}`;
     }
