@@ -137,6 +137,15 @@
   color: var(--color-light-gray);
 }
 
+/* Truncated for the same reason as the label; the full name is in the title
+   attribute. */
+.noteVenue {
+  color: var(--color-light-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- Removed ---- */
 
 /* The poster's footprint, as an outline: present enough to hold the place,

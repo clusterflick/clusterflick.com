@@ -88,7 +88,8 @@ export const WithNote: Story = {
     details: ["1979"],
     note: {
       label: "Live score by the Hugo Max Quartet",
-      detail: "Sat 3 Oct, 18:30 · BFI Southbank",
+      detail: "Sat 3 Oct, 18:30",
+      venue: "BFI Southbank",
     },
     action: <Button variant="link">Remove</Button>,
   },
@@ -103,7 +104,8 @@ export const WithLastChanceNote: Story = {
     details: ["1979"],
     note: {
       label: "Final showing",
-      detail: "Tomorrow, 20:30 · Prince Charles Cinema",
+      detail: "Tomorrow, 20:30",
+      venue: "Prince Charles Cinema",
       color: "yellow",
     },
     action: <Button variant="link">Remove</Button>,
