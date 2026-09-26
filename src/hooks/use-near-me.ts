@@ -33,8 +33,8 @@ export interface NearMeState {
 }
 
 /**
- * Everything location-dependent on `/near-me` and the home page's Near Me
- * section, computed once in one place so the two can't disagree.
+ * Everything location-dependent on `/near-me`, computed in one place so the
+ * locals, rows, map and catalogue link can't disagree.
  *
  * The nearby set is resolved from build-time venue counts, so the map and the
  * catalogue link appear as soon as the position does. Locals list real

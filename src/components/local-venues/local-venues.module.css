@@ -116,6 +116,12 @@
   color: var(--color-muted-gray);
 }
 
+/* The venue page's "On now" board colours its times the same way. */
+.time {
+  font-weight: 600;
+  color: rgba(var(--color-buttery-yellow-rgb), 0.75);
+}
+
 .film {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -127,10 +133,10 @@
   gap: 8px;
 }
 
-.tags {
+.clubList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .footer {

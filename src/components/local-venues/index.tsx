@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import Tag from "@/components/tag";
+import FilmClubCard from "@/components/film-club-card";
 import type { LocalVenue } from "@/utils/get-local-venues";
 import { formatShortDistance } from "@/utils/geo-distance";
 import { getMovieUrl } from "@/utils/get-movie-url";
@@ -93,6 +93,7 @@ export default function LocalVenues({ locals }: LocalVenuesProps) {
                           {formatDay(performance.time)}
                         </span>{" "}
                         <time
+                          className={styles.time}
                           dateTime={new Date(performance.time).toISOString()}
                         >
                           {formatShowingTime(performance.time)}
@@ -112,16 +113,9 @@ export default function LocalVenues({ locals }: LocalVenuesProps) {
               {filmClubs.length > 0 && (
                 <div className={styles.clubs}>
                   <p className={styles.label}>Film clubs here</p>
-                  <div className={styles.tags}>
+                  <div className={styles.clubList}>
                     {filmClubs.map((club) => (
-                      <Tag
-                        key={club.id}
-                        href={club.href}
-                        color="blue"
-                        size="sm"
-                      >
-                        {club.name}
-                      </Tag>
+                      <FilmClubCard key={club.id} filmClub={club} />
                     ))}
                   </div>
                 </div>

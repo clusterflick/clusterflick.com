@@ -261,10 +261,9 @@ would render at 48px in pink.
 
 ## Near Me
 
-`/near-me` and the home page's Near Me section are two views of one hook,
-`useNearMe` (`src/hooks/use-near-me.ts`), so they cannot disagree about where
-the reader is or what is near them. Everything location-dependent is computed
-on the client; the page ships only build-time venue, club and festival counts.
+Everything location-dependent on `/near-me` comes from one hook, `useNearMe`
+(`src/hooks/use-near-me.ts`), computed on the client once the reader's position
+is known; the page ships only build-time venue, club and festival counts.
 
 **One nearby set feeds everything.** It is `getNearbyVenueIds`, the rule behind
 the filter overlay's "Venues near me", plus the reader's locals. The page's rows,

@@ -7,7 +7,7 @@ import LocalVenues from ".";
 /**
  * `LocalVenues` shows the reader's locals — the closest venues with a real week
  * of screenings — each with its next few screenings and the film clubs it
- * hosts. It is the top of the Near Me page and the home page's Near Me section.
+ * hosts. It is the top of the Near Me page.
  *
  * **When to use:**
  * - To answer "what's on at the places I'd actually go?" for a located reader.
