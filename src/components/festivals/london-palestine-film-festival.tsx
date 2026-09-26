@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 function FestivalBlurb() {
   return (
     <section>
@@ -13,16 +11,11 @@ function FestivalBlurb() {
       </p>
       <p>
         Each November the festival spends around a fortnight across cinemas
-        throughout London — regularly including{" "}
-        <Link href="/venues/the-barbican">the Barbican</Link>,{" "}
-        <Link href="/venues/curzon-soho">Curzon Soho</Link>,{" "}
-        <Link href="/venues/institute-of-contemporary-arts">the ICA</Link> and{" "}
-        <Link href="/venues/the-garden-cinema">The Garden Cinema</Link>. Its
-        programme mixes new releases and UK premieres with archival footage and
-        retrospective screenings, many followed by screen talks, Q&amp;As or
-        workshops. The festival also commissions work of its own: A Grain of
-        Sand, a one-woman play about the children of Gaza, opened its 2024
-        edition before touring the UK.
+        throughout London. Its programme mixes new releases and UK premieres
+        with archival footage and retrospective screenings, many followed by
+        screen talks, Q&amp;As or workshops. The festival also commissions work
+        of its own: A Grain of Sand, a one-woman play about the children of
+        Gaza, opened its 2024 edition before touring the UK.
       </p>
     </section>
   );

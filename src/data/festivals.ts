@@ -733,10 +733,8 @@ export const FESTIVALS: Festival[] = [
       {
         // The festival brands itself LPFF (#LPFF2026), so venues tend to
         // title screenings "LPFF: …" or "LPFF 2026: …". Left unscoped, as the
-        // abbreviation is distinctive and the festival moves around: recent
-        // editions have taken the Barbican, Curzon Soho and Hoxton, the ICA,
-        // The Garden Cinema, Genesis, Bertha DocHouse, Riverside Studios and
-        // SOAS, among others.
+        // abbreviation is distinctive and the festival's venues change from
+        // year to year.
         [FilterId.ShowingTitleSearch]: "LPFF",
       },
       {
