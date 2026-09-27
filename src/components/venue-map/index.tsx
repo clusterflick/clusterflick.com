@@ -21,18 +21,22 @@ interface VenueMapProps {
   venues: VenueMapVenue[];
   boundary?: GeoJSON.GeoJsonObject;
   distanceRingsMiles?: number[];
+  /** Fill the parent's height, e.g. inside a full-screen dialog. */
+  fill?: boolean;
 }
 
 export default function VenueMap({
   venues,
   boundary,
   distanceRingsMiles,
+  fill,
 }: VenueMapProps) {
   return (
     <LeafletVenueMap
       venues={venues}
       boundary={boundary}
       distanceRingsMiles={distanceRingsMiles}
+      fill={fill}
     />
   );
 }

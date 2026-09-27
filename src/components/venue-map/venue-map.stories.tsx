@@ -14,7 +14,9 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  * (e.g. `[1, 2]`) to draw dashed distance rings around the user and frame the
  * venues together with the user (the `/near-me` page — rings only appear once a
  * position is known). Set `highlighted` on a venue to draw it larger and keep it
- * out of the clusters, as the near-me page does for the reader's locals.
+ * out of the clusters, as the near-me page does for the reader's locals, and
+ * `detail` to replace the popup's "N films showing" line. `fill` drops the
+ * fixed in-page height so the map fills its parent (see `VenueMapDialog`).
  *
  * **When to use:** for a spatial, browse-by-location overview of many venues.
  *

@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Venue } from "@/types";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { getDistanceInMiles } from "@/utils/geo-distance";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import PillList from "@/components/pill-list";
+import Button from "@/components/button";
+import { MapPinIcon } from "@/components/icons";
+import VenueMapDialog, {
+  type VenueMapDialogVenue,
+} from "@/components/venue-map-dialog";
 import styles from "./playing-at-section.module.css";
 
 const MAX_VISIBLE_MOBILE = 2;
@@ -33,13 +38,17 @@ interface VenueEntry {
   distance: number | null;
 }
 
+function formatShowings(count: number): string {
+  return `${count} showing${count === 1 ? "" : "s"}`;
+}
+
 function formatMeta(entry: VenueEntry): string {
   if (entry.distance !== null) {
     return entry.distance < 0.05
       ? "< 0.1 miles"
       : `${entry.distance.toFixed(1)} miles`;
   }
-  return `${entry.count} showing${entry.count === 1 ? "" : "s"}`;
+  return formatShowings(entry.count);
 }
 
 export default function PlayingAtSection({
@@ -47,6 +56,7 @@ export default function PlayingAtSection({
   venues,
 }: PlayingAtSectionProps) {
   const { position } = useGeolocationContext();
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const entries = useMemo<VenueEntry[]>(() => {
     const result: VenueEntry[] = [];
@@ -72,6 +82,21 @@ export default function PlayingAtSection({
     return result;
   }, [venueCounts, venues, position]);
 
+  const mapVenues = useMemo<VenueMapDialogVenue[]>(
+    () =>
+      entries.map(({ venue, count }) => ({
+        id: venue.id,
+        name: venue.name,
+        href: getVenueUrl(venue),
+        type: venue.type,
+        lat: venue.geo.lat,
+        lon: venue.geo.lon,
+        filmCount: count,
+        detail: formatShowings(count),
+      })),
+    [entries],
+  );
+
   if (entries.length === 0) return null;
 
   return (
@@ -89,6 +114,25 @@ export default function PlayingAtSection({
           </>
         )}
       />
+      <Button
+        variant="secondary"
+        size="sm"
+        className={styles.mapButton}
+        onClick={() => setIsMapOpen(true)}
+      >
+        <MapPinIcon size={16} />
+        See on a map
+      </Button>
+      {isMapOpen && (
+        <VenueMapDialog
+          title="Where it's playing"
+          summary={`Showing at ${entries.length} ${
+            entries.length === 1 ? "venue" : "venues"
+          }`}
+          venues={mapVenues}
+          onClose={() => setIsMapOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -68,6 +68,17 @@ export default function VenueMapPicker({
   const [announcement, setAnnouncement] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
 
+  // What the filter held when the picker opened. Apply is only offered once
+  // the draft differs from it: zooming in and pressing Apply without choosing
+  // "Only these" used to close the picker having changed nothing, which read
+  // as the map having been ignored.
+  const initial = useMemo(
+    () => new Set(selectedVenues ?? venues.map((venue) => venue.id)),
+    [selectedVenues, venues],
+  );
+  const unchanged =
+    draft.size === initial.size && [...draft].every((id) => initial.has(id));
+
   const venueNames = useMemo(
     () => new Map(venues.map((venue) => [venue.id, venue.name])),
     [venues],
@@ -99,6 +110,9 @@ export default function VenueMapPicker({
   const selectedInView = inView.filter((id) => draft.has(id)).length;
   const draftIsInView =
     draft.size === inView.length && selectedInView === inView.length;
+  // Framing an area is not choosing it. When the reader has zoomed in but not
+  // yet acted on the view, say how to, beside the Apply that is waiting on it.
+  const showFramingHint = unchanged && inView.length > 0 && !draftIsInView;
 
   const selectOnlyInView = () =>
     replaceDraft(
@@ -263,12 +277,25 @@ export default function VenueMapPicker({
           </Button>
         </div>
         <div className={styles.footerActions}>
+          {showFramingHint && (
+            <p className={styles.hint} id="venue-map-picker-hint">
+              Use <strong>Only these</strong> to limit to this view
+            </p>
+          )}
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           {/* Nothing selected would empty the grid, which reads as a broken
-              filter rather than a choice — so there is nothing to apply. */}
-          <Button variant="primary" onClick={apply} disabled={draft.size === 0}>
+              filter rather than a choice — so there is nothing to apply. An
+              unchanged selection has nothing to apply either. */}
+          <Button
+            variant="primary"
+            onClick={apply}
+            disabled={draft.size === 0 || unchanged}
+            aria-describedby={
+              showFramingHint ? "venue-map-picker-hint" : undefined
+            }
+          >
             Apply
           </Button>
         </div>

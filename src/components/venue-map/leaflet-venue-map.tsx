@@ -39,6 +39,11 @@ export interface VenueMapVenue {
   filmCount: number;
   /** Drawn larger, above the clusters — the near-me page's locals. */
   highlighted?: boolean;
+  /**
+   * Replaces the popup's "N films showing" line, for a map whose venues are
+   * about something narrower — a film page's map counts that film's showings.
+   */
+  detail?: string;
 }
 
 // After the filter narrows the markers, wait for typing to settle before
@@ -133,11 +138,12 @@ function renderVenueMarker(venue: VenueMapVenue, icon: L.DivIcon) {
           {venue.name}
         </Link>
         <span className={styles.popupMeta}>
-          {venue.filmCount > 0
-            ? `${venue.filmCount.toLocaleString("en-GB")} ${
-                venue.filmCount === 1 ? "film" : "films"
-              } showing`
-            : "No showings currently listed"}
+          {venue.detail ??
+            (venue.filmCount > 0
+              ? `${venue.filmCount.toLocaleString("en-GB")} ${
+                  venue.filmCount === 1 ? "film" : "films"
+                } showing`
+              : "No showings currently listed")}
         </span>
       </Popup>
     </Marker>
@@ -163,12 +169,15 @@ interface LeafletVenueMapProps {
    * venues. Used by the near-me page.
    */
   distanceRingsMiles?: number[];
+  /** Fill the parent's height instead of the fixed in-page footprint. */
+  fill?: boolean;
 }
 
 export default function LeafletVenueMap({
   venues,
   boundary,
   distanceRingsMiles,
+  fill = false,
 }: LeafletVenueMapProps) {
   const { position, loading, error, requestLocation } = useGeolocationContext();
   const [map, setMap] = useState<L.Map | null>(null);
@@ -237,7 +246,7 @@ export default function LeafletVenueMap({
   }, [requestLocation, map]);
 
   return (
-    <div className={styles.wrapper}>
+    <div className={fill ? `${styles.wrapper} ${styles.fill}` : styles.wrapper}>
       <MapContainer
         className={styles.map}
         center={LONDON_CENTRE}

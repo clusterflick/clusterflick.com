@@ -17,7 +17,10 @@ import VenueMapPicker, {
  * It edits a draft. Nothing reaches the filter until **Apply**, which hands
  * back a snapshot of venue ids — or `null` when every venue is selected, the
  * filter's own "no restriction" value. Cancel, the close button and Escape
- * leave the selection as it was.
+ * leave the selection as it was. Apply stays disabled until the draft differs
+ * from what the picker opened with, and if the reader has framed an area
+ * without acting on it, a hint beside it points to **Only these** — zooming
+ * in is not choosing.
  *
  * **When to use:** choosing a set of venues by geography.
  *
