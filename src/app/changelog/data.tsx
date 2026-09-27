@@ -87,6 +87,28 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "London Film School",
+                  url: "https://lfs.org.uk",
+                },
+                {
+                  name: "Proposition Bethnal Green",
+                  url: "https://www.propositionstudios.com",
+                },
+              ]}
+            />
+            , the UK&rsquo;s oldest film school and an arts charity&rsquo;s
+            studios and galleries on Cambridge Heath Road.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
