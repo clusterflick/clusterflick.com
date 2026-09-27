@@ -751,4 +751,27 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "phoenix-rising-international-film-festival",
+    name: "Phoenix Rising International Film Festival",
+    url: "https://www.priff.co.uk/",
+    aliases: ["priff", "phoenix-rising"],
+    matchers: [
+      {
+        // The full name rather than "Phoenix Rising" alone, which is also the
+        // title of films that could screen anywhere in London.
+        [FilterId.ShowingTitleSearch]: "Phoenix Rising International",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Phoenix Rising International",
+      },
+      {
+        // The festival brands itself PRIFF, but search normalisation strips
+        // spacing, so the abbreviation alone would also catch titles running
+        // "…p riff…" together. It is scoped to Rich Mix, the festival's home.
+        [FilterId.ShowingTitleSearch]: "PRIFF",
+        [FilterId.Venues]: ["richmix.org.uk"],
+      },
+    ],
+  },
 ];
