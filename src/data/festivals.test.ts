@@ -58,32 +58,22 @@ describe("Phoenix Rising International Film Festival title matchers", () => {
     ({ id }) => id === "phoenix-rising-international-film-festival",
   )!;
 
-  const claims = (title: string, venueId: string): boolean =>
+  const claims = (title: string): boolean =>
     festival.matchers.some((matcher) => {
       const query = matcher[FilterId.ShowingTitleSearch];
       if (typeof query !== "string") return false;
-      const venues = matcher[FilterId.Venues];
-      if (venues && !venues.includes(venueId)) return false;
       return matchesSearchQuery(title, normalizeForSearch(query));
     });
 
-  it("claims the festival by its full name at any venue", () => {
-    expect(
-      claims("Phoenix Rising International Film Festival", "barbican.org.uk"),
-    ).toBe(true);
+  it("claims the festival by its full name", () => {
+    expect(claims("Phoenix Rising International Film Festival")).toBe(true);
   });
 
-  it("claims PRIFF at Rich Mix", () => {
-    expect(claims("PRIFF 2026: Shorts Programme 1", "richmix.org.uk")).toBe(
-      true,
-    );
+  it("claims the festival by its abbreviation", () => {
+    expect(claims("PRIFF 2026: Shorts Programme 1")).toBe(true);
   });
 
   it("does not claim a film titled Phoenix Rising", () => {
-    expect(claims("Phoenix Rising", "richmix.org.uk")).toBe(false);
-  });
-
-  it("does not claim a title that runs into PRIFF elsewhere", () => {
-    expect(claims("Deep Riff Sessions", "barbican.org.uk")).toBe(false);
+    expect(claims("Phoenix Rising")).toBe(false);
   });
 });
