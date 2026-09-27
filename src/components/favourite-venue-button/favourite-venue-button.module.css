@@ -1,8 +1,9 @@
-/* Spaced by whatever places it. */
+/* No box of its own: the button and the error join the parent's layout. In the
+   venue hero that is a wrapping flex row beside the venue type, where the
+   error's full basis puts it on a line of its own beneath both rather than
+   under the button alone, which pushed the button out of line with the type. */
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: contents;
 }
 
 /* The same quiet pill as UserListButtons, so a starred venue and a saved film
@@ -60,7 +61,8 @@
 }
 
 .error {
-  margin-top: 8px;
+  flex-basis: 100%;
+  margin: 0;
   font-size: 13px;
   text-align: center;
   color: var(--color-neon-pink);

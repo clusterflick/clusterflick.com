@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenueHeroDetails from "@/components/venue-hero-details";
+import { expect, userEvent, within } from "storybook/test";
 import FavouriteVenueButton from "@/components/favourite-venue-button";
+import { MockUserProvider } from "@/state/user-context";
 
 /**
  * `VenueHeroDetails` is the metadata that sits beneath the title inside a
@@ -99,5 +101,32 @@ export const NothingShowing: Story = {
     movieCount: 0,
     performanceCount: 0,
     lastPerformance: Date.UTC(2026, 7, 14),
+  },
+};
+
+/** A failed save: the error goes on a line of its own beneath the row. */
+export const MyVenueSaveFailed: Story = {
+  args: {
+    socials: null,
+    children: (
+      <MockUserProvider
+        value={{
+          status: "signed-in",
+          favouriteVenues: {},
+          addFavouriteVenue: () => Promise.reject(new Error("Denied")),
+        }}
+      >
+        <FavouriteVenueButton
+          venue={{ id: "actonecinema.co.uk", name: "ActOne Cinema" }}
+        />
+      </MockUserProvider>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: /my venue/i }));
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "That didn't save",
+    );
   },
 };
