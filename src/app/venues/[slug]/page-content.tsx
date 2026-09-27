@@ -12,6 +12,7 @@ import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import VenueHeroDetails from "@/components/venue-hero-details";
+import FavouriteVenueButton from "@/components/favourite-venue-button";
 import { ButtonLink } from "@/components/button";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
@@ -169,6 +170,7 @@ export default function VenueDetailPageContent({
             venueType={venue.type}
             socials={venue.socials}
           />
+          <FavouriteVenueButton venue={{ id: venue.id, name: venue.name }} />
         </DetailPageHero>
       }
       afterContent={

@@ -26,6 +26,7 @@ import PeopleFilterSection from "./people-filter-section";
 import MovieFilterSection from "./movie-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
+import { useUserContext } from "@/state/user-context";
 import styles from "./filter-overlay.module.css";
 
 // The filters inside "More Event Options". Each defaults to no filter, so
@@ -112,6 +113,19 @@ export default function FilterOverlay({
     smallScreeningVenueIds,
     nearbyVenueIds,
   } = useVenueGroups(metaData, movies, userPosition);
+
+  // "My Venues", limited to the venues this dataset knows. The stored set keeps
+  // a venue that has dropped out (it may come back), but a preset that selects
+  // it would count a venue the reader can't see and never match a selection
+  // made from the chips.
+  const { favouriteVenues } = useUserContext();
+  const favouriteVenueIds = useMemo(
+    () =>
+      Object.keys(favouriteVenues ?? {}).filter(
+        (id) => metaData?.venues[id] !== undefined,
+      ),
+    [favouriteVenues, metaData],
+  );
 
   // Compute filtered movie and performance counts
   const { movieCount, performanceCount } = useMemo(() => {
@@ -576,6 +590,7 @@ export default function FilterOverlay({
             cinemaVenueIds={cinemaVenueIds}
             smallScreeningVenueIds={smallScreeningVenueIds}
             nearbyVenueIds={nearbyVenueIds}
+            favouriteVenueIds={favouriteVenueIds}
             selectedVenues={filterState.venues}
             geoLoading={geoLoading}
             geoError={geoError}

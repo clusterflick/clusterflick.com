@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie, Venue } from "@/types";
 import type { Firestore } from "firebase/firestore/lite";
 
 export enum UserListId {
@@ -41,6 +41,31 @@ export function toUserListEntry(
   };
 }
 
+/**
+ * The field holding the reader's favourite venues ("My Venues"). Not a
+ * `UserListId`: those are films, keyed by movie id, and everything built on
+ * them — markers, import and export, the watchlist links — assumes so.
+ */
+export const FAVOURITE_VENUES_FIELD = "favouriteVenues";
+
+/**
+ * What a favourite keeps about its venue. The name is a snapshot for the same
+ * reason a film's title is: a venue can close or drop out of the dataset, and
+ * the entry is kept (it may come back), so it has to be nameable without it.
+ */
+export type FavouriteVenueEntry = {
+  name: string;
+  /** Epoch milliseconds. */
+  addedAt: number;
+};
+
+export type FavouriteVenues = Record<Venue["id"], FavouriteVenueEntry>;
+
+export type UserData = {
+  lists: UserLists;
+  favouriteVenues: FavouriteVenues;
+};
+
 /*
  * Storage: one document per user at `users/{uid}`, holding every list as a
  * map. One read per session, and a list would need thousands of films to near
@@ -52,16 +77,19 @@ async function getUserDocRef(db: Firestore, uid: string) {
   return doc(db, "users", uid);
 }
 
-export async function fetchUserLists(
+export async function fetchUserData(
   db: Firestore,
   uid: string,
-): Promise<UserLists> {
+): Promise<UserData> {
   const { getDoc } = await import("firebase/firestore/lite");
   const snapshot = await getDoc(await getUserDocRef(db, uid));
   const data = snapshot.data() ?? {};
   return {
-    [UserListId.Watchlist]: data[UserListId.Watchlist] ?? {},
-    [UserListId.Seen]: data[UserListId.Seen] ?? {},
+    lists: {
+      [UserListId.Watchlist]: data[UserListId.Watchlist] ?? {},
+      [UserListId.Seen]: data[UserListId.Seen] ?? {},
+    },
+    favouriteVenues: data[FAVOURITE_VENUES_FIELD] ?? {},
   };
 }
 
@@ -129,6 +157,35 @@ export async function removeFromUserList(
   await updateDoc(
     await getUserDocRef(db, uid),
     new FieldPath(listId, movieId),
+    deleteField(),
+  );
+}
+
+export async function addFavouriteVenue(
+  db: Firestore,
+  uid: string,
+  venueId: Venue["id"],
+  entry: FavouriteVenueEntry,
+): Promise<void> {
+  const { setDoc } = await import("firebase/firestore/lite");
+  // Merge rather than update: the document doesn't exist until the first add.
+  await setDoc(
+    await getUserDocRef(db, uid),
+    { [FAVOURITE_VENUES_FIELD]: { [venueId]: entry } },
+    { merge: true },
+  );
+}
+
+export async function removeFavouriteVenue(
+  db: Firestore,
+  uid: string,
+  venueId: Venue["id"],
+): Promise<void> {
+  const { updateDoc, deleteField, FieldPath } =
+    await import("firebase/firestore/lite");
+  await updateDoc(
+    await getUserDocRef(db, uid),
+    new FieldPath(FAVOURITE_VENUES_FIELD, venueId),
     deleteField(),
   );
 }

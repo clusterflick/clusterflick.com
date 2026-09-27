@@ -7,6 +7,8 @@ import {
   type CSSProperties,
   type FormEvent,
 } from "react";
+import Link from "next/link";
+import clsx from "clsx";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
@@ -19,11 +21,12 @@ import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button, { ButtonLink } from "@/components/button";
-import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
+import { BookmarkIcon, CloseIcon, EyeIcon, StarIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
+import { getVenueUrl } from "@/utils/get-venue-url";
 // Direct from the module: the filters barrel would bundle the whole engine.
 import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
@@ -32,6 +35,8 @@ import ListManagement from "./list-management";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
+  type FavouriteVenueEntry,
+  type FavouriteVenues,
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
@@ -345,7 +350,7 @@ function SignInForm() {
 }
 
 function SignedIn() {
-  const { lists } = useUserContext();
+  const { lists, favouriteVenues } = useUserContext();
   // Off by default, and for each visit: removing is occasional, and a Remove
   // under every poster reads as the page's main business.
   const [showRemove, setShowRemove] = useState(false);
@@ -365,6 +370,12 @@ function SignedIn() {
             lists={lists}
             showRemove={showRemove}
           />
+          {favouriteVenues && (
+            <FavouriteVenuesSection
+              favouriteVenues={favouriteVenues}
+              showRemove={showRemove}
+            />
+          )}
         </>
       ) : (
         <LoadingIndicator message="Loading your lists…" />
@@ -753,14 +764,165 @@ function UserListSection({
   );
 }
 
+/**
+ * "My Venues": the venues behind the filter overlay's My Venues pill. A plain
+ * list rather than tiles, since a venue has nothing to show but its name.
+ */
+function FavouriteVenuesSection({
+  favouriteVenues,
+  showRemove,
+}: {
+  favouriteVenues: FavouriteVenues;
+  showRemove: boolean;
+}) {
+  const { addFavouriteVenue, removeFavouriteVenue } = useUserContext();
+  const { movies, metaData } = useCinemaData();
+  // Kept in place with an Undo until the reader leaves, rather than on a
+  // timer like a film's: a row of text is no trouble to leave behind.
+  const [removed, setRemoved] = useState<Record<string, FavouriteVenueEntry>>(
+    {},
+  );
+
+  const filmCounts = new Map<string, number>();
+  for (const movie of Object.values(movies)) {
+    const venueIds = new Set(
+      Object.values(movie.showings).map(({ venueId }) => venueId),
+    );
+    for (const venueId of venueIds) {
+      filmCounts.set(venueId, (filmCounts.get(venueId) ?? 0) + 1);
+    }
+  }
+
+  const entries = Object.entries({ ...removed, ...favouriteVenues })
+    .map(([id, entry]) => ({
+      id,
+      // The dataset's name where it has one: a venue can be renamed.
+      name: metaData?.venues[id]?.name ?? entry.name,
+      entry,
+      isRemoved: !(id in favouriteVenues),
+      isKnown: metaData?.venues[id] !== undefined,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const count = Object.keys(favouriteVenues).length;
+  const knownIds = Object.keys(favouriteVenues).filter(
+    (id) => metaData?.venues[id] !== undefined,
+  );
+
+  const forget = (id: string) =>
+    setRemoved((current) => {
+      const rest = { ...current };
+      delete rest[id];
+      return rest;
+    });
+
+  const onRemove = (id: string, entry: FavouriteVenueEntry) => {
+    setRemoved((current) => ({ ...current, [id]: entry }));
+    removeFavouriteVenue(id).catch(() => forget(id));
+  };
+
+  const onUndo = (id: string, name: string) => {
+    forget(id);
+    addFavouriteVenue({ id, name }).catch((error) =>
+      console.error("Failed to restore venue", error),
+    );
+  };
+
+  const title = "My Venues";
+
+  if (entries.length === 0) {
+    return (
+      <ContentSection title={title}>
+        <p className={styles.empty}>
+          Nothing here yet. Press <strong>My venue</strong> on a{" "}
+          <Link href="/venues">venue&apos;s page</Link> to add it, then pick{" "}
+          <strong>My Venues</strong> under Venues in the filters to see only
+          what&apos;s on at yours.
+        </p>
+      </ContentSection>
+    );
+  }
+
+  return (
+    <ContentSection
+      title={title}
+      titleBadge={<span className={styles.count}>{count}</span>}
+      action={
+        knownIds.length > 0 ? (
+          <div className={styles.listActions}>
+            <ButtonLink
+              href={`/catalogue?venues=${knownIds.map(encodeURIComponent).join(",")}`}
+              size="sm"
+            >
+              What&apos;s on at my venues
+            </ButtonLink>
+          </div>
+        ) : undefined
+      }
+    >
+      <ul className={styles.venueList}>
+        {entries.map(({ id, name, entry, isRemoved, isKnown }) => {
+          const films = filmCounts.get(id) ?? 0;
+          return (
+            <li
+              key={id}
+              className={clsx(styles.venueItem, isRemoved && styles.removed)}
+            >
+              <StarIcon
+                size={14}
+                filled={!isRemoved}
+                className={styles.venueStar}
+              />
+              {/* A venue that has left the dataset has no page to link to. */}
+              {isKnown && !isRemoved ? (
+                <Link href={getVenueUrl({ name })} className={styles.venueName}>
+                  {name}
+                </Link>
+              ) : (
+                <span className={styles.venueName}>{name}</span>
+              )}
+              {!isRemoved && isKnown && films > 0 && (
+                <span className={styles.venueDetail}>
+                  {films} {films === 1 ? "film" : "films"}
+                </span>
+              )}
+              {isRemoved ? (
+                <Button
+                  variant="link"
+                  onClick={() => onUndo(id, entry.name)}
+                  aria-label={`Undo removing ${name} from My Venues`}
+                >
+                  Undo
+                </Button>
+              ) : (
+                showRemove && (
+                  <button
+                    type="button"
+                    className={clsx(styles.remove, styles.venueRemove)}
+                    onClick={() => onRemove(id, entry)}
+                    aria-label={`Remove ${name} from My Venues`}
+                  >
+                    <CloseIcon size={14} />
+                    Remove
+                  </button>
+                )
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </ContentSection>
+  );
+}
+
 function WhatWeStore() {
   return (
     <aside className={styles.storeNote}>
       <h2 className={styles.storeNoteTitle}>What we store</h2>
       <p>
-        Your email address, so we can send you sign-in links, and the films you
-        add to your lists. Nothing else, and we never share it. You can delete
-        your account, and everything in it, from this page at any time.
+        Your email address, so we can send you sign-in links, and the films and
+        venues you add to your lists. Nothing else, and we never share it. You
+        can delete your account, and everything in it, from this page at any
+        time.
       </p>
     </aside>
   );

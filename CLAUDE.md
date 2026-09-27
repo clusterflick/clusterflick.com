@@ -899,9 +899,20 @@ default week doesn't hide most of it). See Films Filter for why it carries
 films that aren't showing. The helper is imported from its module rather than
 the filters barrel, which would bundle the whole engine into this page.
 
-**Lists are account-only for now**, but the data layer takes a `UserListId`
-and a movie snapshot and knows nothing about where they're kept, so
-signed-out, browser-held lists that merge on sign-in remain an option.
+**Venues can be starred into "My Venues"** (`FavouriteVenueButton` in a venue
+page's hero), which the filter overlay offers as a Venues pill beside Near Me.
+They are kept in a `favouriteVenues` field of the same document, not as a
+`UserListId`: those are films, and markers, import, export and the watchlist
+links all assume it. Each entry snapshots the venue's name, since a venue can
+leave the dataset; like the films filter, a departed venue's id is kept in case
+it returns. The pill selects only the favourites the dataset knows, so its
+count is what the reader gets and a selection made from it matches it again.
+It is hidden while signed out or with none known, and it is checked before the
+other presets, so a favourite set that happens to equal one still reads as
+My Venues. `/personalise` lists them after Seen, with the same Remove toggle.
+
+**Personalisation is account-only**, lists and venues alike, so that it syncs
+across devices. Don't add a signed-out, browser-held copy of any of it.
 
 **Deleting an account deletes the lists first**: once the account is gone, the
 rules let nobody delete its document. Firebase may refuse the account deletion
