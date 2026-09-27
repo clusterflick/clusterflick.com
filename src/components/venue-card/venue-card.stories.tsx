@@ -16,7 +16,7 @@ import Button from "@/components/button";
  *   page's "Screening as part of" festival card uses it with `detail` set to
  *   the festival's date range.
  * - "My Venues" on `/personalise`, with Remove (or Undo) as its `action`: a
- *   control beside the card, outside its link. A removal waiting on Undo is
+ *   control beneath the card, outside its link. A removal waiting on Undo is
  *   `muted`, and a venue that has left the dataset has no `href`.
  *
  * **When NOT to use:**
@@ -120,7 +120,7 @@ export const CardGridExample: Story = {
   ),
 };
 
-/** With a control beside it, as under My Venues with Remove buttons shown. */
+/** With a control beneath it, as under My Venues with Remove buttons shown. */
 export const WithAction: Story = {
   args: {
     ...WithCounts.args,

@@ -15,7 +15,7 @@ interface VenueCardProps {
   performanceCount?: number;
   /** Leading item on the stats line, before the counts (e.g. a date range) */
   detail?: string;
-  /** A control beside the card, outside its link (e.g. Remove). */
+  /** A control beneath the card, outside its link (e.g. Remove). */
   action?: ReactNode;
   /** Greyed out, e.g. while a removal can still be undone. */
   muted?: boolean;

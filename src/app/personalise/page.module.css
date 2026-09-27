@@ -448,7 +448,7 @@
   flex: 1;
 }
 
-/* My Venues: venue cards in columns, each with Remove (or Undo) beside it. */
+/* My Venues: venue cards in columns, each with Remove (or Undo) beneath it. */
 .venueList {
   list-style: none;
   padding: 0;

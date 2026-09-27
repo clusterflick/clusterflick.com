@@ -74,18 +74,17 @@ a.card:hover .name {
   opacity: 0.5;
 }
 
+/* The control goes beneath the card, right-aligned, as a poster tile's goes
+   beneath its poster: beside it, it took width from the card and squeezed the
+   name whenever the control appeared. */
 .withAction {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.withAction > .card {
-  flex: 1;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
 }
 
 .action {
-  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
 }
