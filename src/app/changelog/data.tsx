@@ -74,6 +74,26 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-27",
     changes: [
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "London Film School", url: "https://lfs.org.uk" },
+                {
+                  name: "Proposition Bethnal Green",
+                  url: "https://www.propositionstudios.com",
+                },
+              ]}
+            />
+            , two venues hosting this year&rsquo;s PRIFF programmes that also
+            put on screenings of their own — the film school above The Garden
+            Cinema, and an arts hub beside Bethnal Green station.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
