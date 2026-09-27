@@ -909,7 +909,7 @@ it returns. The pill selects only the favourites the dataset knows, so its
 count is what the reader gets and a selection made from it matches it again.
 It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
-My Venues. `/personalise` lists them after Seen, with the same Remove toggle.
+My Venues. `/personalise` lists them between the watchlist and Seen, with the same Remove toggle.
 
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.

@@ -365,17 +365,17 @@ function SignedIn() {
             lists={lists}
             showRemove={showRemove}
           />
-          <UserListSection
-            listId={UserListId.Seen}
-            lists={lists}
-            showRemove={showRemove}
-          />
           {favouriteVenues && (
             <FavouriteVenuesSection
               favouriteVenues={favouriteVenues}
               showRemove={showRemove}
             />
           )}
+          <UserListSection
+            listId={UserListId.Seen}
+            lists={lists}
+            showRemove={showRemove}
+          />
         </>
       ) : (
         <LoadingIndicator message="Loading your lists…" />
