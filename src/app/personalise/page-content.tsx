@@ -7,7 +7,7 @@ import {
   type CSSProperties,
   type FormEvent,
 } from "react";
-import Link from "next/link";
+import clsx from "clsx";
 import StandardPageLayout from "@/components/standard-page-layout";
 import VenueCard from "@/components/venue-card";
 import ContentSection from "@/components/content-section";
@@ -21,7 +21,12 @@ import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button, { ButtonLink } from "@/components/button";
-import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
+import {
+  BookmarkIcon,
+  ChevronDownIcon,
+  CloseIcon,
+  EyeIcon,
+} from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useElementWidth } from "@/hooks/use-element-width";
@@ -47,8 +52,15 @@ const LIST_TITLES: Record<UserListId, string> = {
   [UserListId.Seen]: "Seen",
 };
 
+interface DiscoveryLink {
+  key: string;
+  href: string;
+  label: string;
+  detail: string;
+}
+
 /** Where to find films to add, offered while the watchlist is empty. */
-const DISCOVERY_LINKS = [
+const FILM_DISCOVERY_LINKS: DiscoveryLink[] = [
   {
     key: "lists",
     href: "/lists",
@@ -76,6 +88,53 @@ const DISCOVERY_LINKS = [
     detail: "Cinemas, film clubs and festivals close to wherever you are",
   },
 ];
+
+/** Where to find venues to add, offered while My Venues is empty. */
+const VENUE_DISCOVERY_LINKS: DiscoveryLink[] = [
+  {
+    key: "venues",
+    href: "/venues",
+    label: "All Venues",
+    detail: "Every cinema and screening venue in London, from A to Z",
+  },
+  {
+    key: "near-me",
+    href: "/near-me",
+    label: "Near Me",
+    detail: "The cinemas closest to wherever you are",
+  },
+  {
+    key: "london-cinemas",
+    href: "/london-cinemas",
+    label: "London Cinemas",
+    detail: "Cinemas across London, borough by borough",
+  },
+  {
+    key: "cinema-groups",
+    href: "/cinema-groups",
+    label: "Cinema Groups",
+    detail: "The chains and groups, and every venue in each",
+  },
+];
+
+/**
+ * The "Built with Clusterflick" card from the About page, minus the logo: none
+ * of these sections has an icon of its own.
+ */
+function DiscoveryLinks({ links }: { links: DiscoveryLink[] }) {
+  return (
+    <CardGrid size="md" className={styles.discovery}>
+      {links.map((link) => (
+        <LinkCard key={link.key} href={link.href} variant="social">
+          <CardContent>
+            <strong>{link.label}</strong>
+            <span className={styles.discoveryText}>{link.detail}</span>
+          </CardContent>
+        </LinkCard>
+      ))}
+    </CardGrid>
+  );
+}
 
 /**
  * The key a film sorts by. A film still in the dataset has the pipeline's
@@ -132,6 +191,9 @@ function isSignInLink(url: URL) {
     url.searchParams.get("mode") === "signIn" && url.searchParams.has("oobCode")
   );
 }
+
+const STORE_NOTE =
+  "Your email address, so we can send you sign-in links, and the films and venues you add to your lists. Nothing else, and we never share it. You can delete your account, and everything in it, from this page at any time.";
 
 function getErrorCode(error: unknown): string | undefined {
   return typeof error === "object" && error && "code" in error
@@ -394,10 +456,11 @@ function SignedIn({
       ) : (
         <LoadingIndicator message="Loading your lists…" />
       )}
-      <WhatWeStore />
     </div>
   );
 }
+
+type AccountPanel = "lists" | "account";
 
 function AccountBar({
   showRemove,
@@ -406,8 +469,64 @@ function AccountBar({
   showRemove: boolean;
   onShowRemoveChange: (show: boolean) => void;
 }) {
-  const { email, signOut, deleteAccount } = useUserContext();
-  const [managing, setManaging] = useState(false);
+  const { email, signOut } = useUserContext();
+  // One panel at a time: both open below the toolbar, and two stacked would
+  // push the lists a screen down.
+  const [panel, setPanel] = useState<AccountPanel | null>(null);
+
+  const toggle = (next: AccountPanel) =>
+    setPanel((current) => (current === next ? null : next));
+
+  const panelToggle = (id: AccountPanel, label: string) => (
+    <Button
+      variant="link"
+      className={clsx(
+        styles.toolbarToggle,
+        panel === id && styles.toolbarToggleOpen,
+      )}
+      onClick={() => toggle(id)}
+      aria-expanded={panel === id}
+      aria-controls={`personalise-${id}`}
+    >
+      {label}
+      <ChevronDownIcon size={14} aria-hidden="true" />
+    </Button>
+  );
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarGroup}>
+          {panelToggle("lists", "Manage lists")}
+          {panelToggle("account", "Manage account")}
+        </div>
+        <div className={clsx(styles.toolbarGroup, styles.toolbarAccount)}>
+          <p className={styles.signedInAs}>
+            Signed in as <strong>{email}</strong>
+          </p>
+          <Button variant="link" onClick={signOut}>
+            Sign out
+          </Button>
+        </div>
+      </div>
+      <div id="personalise-lists" hidden={panel !== "lists"}>
+        {panel === "lists" && (
+          <ListManagement
+            showRemove={showRemove}
+            onShowRemoveChange={onShowRemoveChange}
+          />
+        )}
+      </div>
+      <div id="personalise-account" hidden={panel !== "account"}>
+        {panel === "account" && <AccountManagement />}
+      </div>
+    </div>
+  );
+}
+
+/** Opened from the account bar: what's kept, and how to get rid of it. */
+function AccountManagement() {
+  const { deleteAccount } = useUserContext();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -425,12 +544,17 @@ function AccountBar({
   };
 
   return (
-    <div className={styles.card}>
-      <div className={styles.accountRow}>
-        <p className={styles.signedInAs}>
-          Signed in as <strong>{email}</strong>
+    <div className={clsx(styles.management, styles.accountManagement)}>
+      <section className={styles.managementSection}>
+        <h3 className={styles.managementTitle}>What we store</h3>
+        <p className={styles.managementText}>{STORE_NOTE}</p>
+      </section>
+      <section className={styles.managementSection}>
+        <h3 className={styles.managementTitle}>Delete account</h3>
+        <p className={styles.managementText}>
+          Deletes your account and every list in it. This can&apos;t be undone.
         </p>
-        <div className={styles.accountActions}>
+        <div className={styles.managementActions}>
           {confirmingDelete ? (
             <>
               <span className={styles.confirmText}>
@@ -444,38 +568,21 @@ function AccountBar({
               </Button>
             </>
           ) : (
-            <>
-              <Button
-                variant="link"
-                onClick={() => setManaging((open) => !open)}
-                aria-expanded={managing}
-                aria-controls="personalise-manage"
-              >
-                {managing ? "Hide list tools" : "Manage lists"}
-              </Button>
-              <Button variant="link" onClick={signOut}>
-                Sign out
-              </Button>
-              <Button variant="link" onClick={() => setConfirmingDelete(true)}>
-                Delete account
-              </Button>
-            </>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setConfirmingDelete(true)}
+            >
+              Delete account
+            </Button>
           )}
         </div>
-      </div>
-      {deleteError && (
-        <p className={styles.error} role="alert">
-          {deleteError}
-        </p>
-      )}
-      <div id="personalise-manage" hidden={!managing}>
-        {managing && (
-          <ListManagement
-            showRemove={showRemove}
-            onShowRemoveChange={onShowRemoveChange}
-          />
+        {deleteError && (
+          <p className={styles.error} role="alert">
+            {deleteError}
+          </p>
         )}
-      </div>
+      </section>
     </div>
   );
 }
@@ -545,33 +652,24 @@ function UserListSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        {listId === UserListId.Watchlist ? (
-          <>
+        <div className={styles.emptyLane}>
+          {listId === UserListId.Watchlist ? (
+            <>
+              <p className={styles.empty}>
+                Nothing here yet. Press <strong>Want to see</strong> on any
+                film&apos;s page to save it, or search for one that isn&apos;t
+                showing under <strong>Manage lists</strong>. Looking for
+                somewhere to start?
+              </p>
+              <DiscoveryLinks links={FILM_DISCOVERY_LINKS} />
+            </>
+          ) : (
             <p className={styles.empty}>
-              Nothing here yet. Press <strong>Want to see</strong> on any
-              film&apos;s page to save it, or search for one that isn&apos;t
-              showing under <strong>Manage lists</strong>. Looking for somewhere
-              to start?
+              Nothing here yet. Press <strong>Seen it</strong> on a film&apos;s
+              page once you&apos;ve watched it.
             </p>
-            {/* The "Built with Clusterflick" card from the About page, minus
-                the logo: none of these sections has an icon of its own. */}
-            <CardGrid size="md" className={styles.discovery}>
-              {DISCOVERY_LINKS.map((link) => (
-                <LinkCard key={link.key} href={link.href} variant="social">
-                  <CardContent>
-                    <strong>{link.label}</strong>
-                    <span className={styles.discoveryText}>{link.detail}</span>
-                  </CardContent>
-                </LinkCard>
-              ))}
-            </CardGrid>
-          </>
-        ) : (
-          <p className={styles.empty}>
-            Nothing here yet. Press <strong>Seen it</strong> on a film&apos;s
-            page once you&apos;ve watched it.
-          </p>
-        )}
+          )}
+        </div>
       </ContentSection>
     );
   }
@@ -858,12 +956,15 @@ function FavouriteVenuesSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        <p className={styles.empty}>
-          Nothing here yet. Press <strong>My venue</strong> on a{" "}
-          <Link href="/venues">venue&apos;s page</Link> to add it, then pick{" "}
-          <strong>My Venues</strong> under Venues in the filters to see only
-          what&apos;s on at yours.
-        </p>
+        <div className={styles.emptyLane}>
+          <p className={styles.empty}>
+            Nothing here yet. Press <strong>My venue</strong> on a venue&apos;s
+            page to add it, then pick <strong>My Venues</strong> under Venues in
+            the filters to see only what&apos;s on at yours. Looking for
+            somewhere to start?
+          </p>
+          <DiscoveryLinks links={VENUE_DISCOVERY_LINKS} />
+        </div>
       </ContentSection>
     );
   }
@@ -939,12 +1040,7 @@ function WhatWeStore() {
   return (
     <aside className={styles.storeNote}>
       <h2 className={styles.storeNoteTitle}>What we store</h2>
-      <p>
-        Your email address, so we can send you sign-in links, and the films and
-        venues you add to your lists. Nothing else, and we never share it. You
-        can delete your account, and everything in it, from this page at any
-        time.
-      </p>
+      <p>{STORE_NOTE}</p>
     </aside>
   );
 }

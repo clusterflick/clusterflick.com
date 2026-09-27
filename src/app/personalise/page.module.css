@@ -135,29 +135,56 @@
   }
 }
 
-.accountRow {
+/* The account bar is a toolbar: the panels it opens on the left, who's
+   signed in on the right. Stacked on a phone, the account side first. */
+.toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
 }
 
+.toolbarGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.toolbarAccount {
+  margin-left: auto;
+}
+
+.toolbarToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbarToggle svg {
+  transition: transform 0.2s ease;
+}
+
+.toolbarToggleOpen {
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+}
+
+.toolbarToggleOpen svg {
+  transform: rotate(180deg);
+}
+
 .signedInAs {
   margin: 0;
+  font-size: 14px;
   color: var(--color-muted-gray);
   overflow-wrap: anywhere;
 }
 
 .signedInAs strong {
   color: var(--color-light-gray);
-}
-
-.accountActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
 }
 
 .confirmText {
@@ -200,6 +227,11 @@
   /* After the review, which belongs next to the import that opened it. */
   .managementWide {
     order: 2;
+  }
+
+  /* The account panel has two short sections, side by side. */
+  .accountManagement .managementSection:first-child {
+    grid-column: auto;
   }
 }
 
@@ -375,7 +407,16 @@
   color: var(--color-muted-gray);
 }
 
+/* The lane the lists sit in, behind an empty one too, so an empty section
+   reads as a place waiting to be filled rather than a stray paragraph. */
+.emptyLane {
+  padding: 20px 24px;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.35);
+  border-radius: 10px;
+}
+
 .empty {
+  margin: 0;
   color: var(--color-muted-gray);
   line-height: 1.5;
 }

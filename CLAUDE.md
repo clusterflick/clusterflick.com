@@ -826,8 +826,13 @@ appears, so hover-pausing held it open until the reader moved away. It pauses
 on keyboard focus only, because focus is moved to Undo and expiring underneath
 it would drop a keyboard reader back to the top of the page.
 
-**List tools sit behind "Manage lists"** in the account bar, collapsed by
-default, since everything in them is occasional (`list-management.tsx`).
+**The account bar is a toolbar**: "Manage lists" and "Manage account" on the
+left, each opening a panel below it (one at a time), and who's signed in with
+Sign out on the right. "Manage account" holds the What we store note and Delete
+account; signed out, the note is a footnote under the sign-in form instead.
+
+**List tools sit behind "Manage lists"**, collapsed by default, since
+everything in them is occasional (`list-management.tsx`).
 Editing takes a row of its own first, import and export pair up below it, and
 "Add a film" (below) comes last, as the one part whose results grow:
 
@@ -910,7 +915,9 @@ count is what the reader gets and a selection made from it matches it again.
 It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
 My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
-same Remove toggle. The page is client-rendered and can't know which venues it
+same Remove toggle. Empty, it offers the venue indexes (`/venues`, `/near-me`,
+`/london-cinemas`, `/cinema-groups`) as the empty watchlist offers places to
+find films, and every empty list sits in the same lane panel the full ones do. The page is client-rendered and can't know which venues it
 will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 
