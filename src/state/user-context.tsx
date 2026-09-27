@@ -11,20 +11,23 @@ import {
   ReactNode,
 } from "react";
 import type { User } from "firebase/auth";
-import type { Movie } from "@/types";
+import type { Movie, Venue } from "@/types";
 import {
   isFirebaseConfigured,
   loadFirebase,
   type FirebaseServices,
 } from "@/lib/firebase";
 import {
+  addFavouriteVenue as addFavouriteVenueToDoc,
   addManyToUserList,
   addToUserList,
   deleteUserLists,
-  fetchUserLists,
+  fetchUserData,
+  removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
   toUserListEntry,
   UserListId,
+  type FavouriteVenues,
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
@@ -45,6 +48,8 @@ export type UserContextType = {
   email: string | null;
   /** Null until fetched after sign-in, and whenever signed out. */
   lists: UserLists | null;
+  /** "My Venues". Null exactly when `lists` is. */
+  favouriteVenues: FavouriteVenues | null;
   /** Emails a sign-in link. Signing up and signing in are the same action. */
   sendSignInLink: (email: string) => Promise<void>;
   /**
@@ -90,6 +95,8 @@ export type UserContextType = {
     movieId: Movie["id"],
     entry: UserListEntry,
   ) => Promise<void>;
+  addFavouriteVenue: (venue: Pick<Venue, "id" | "name">) => Promise<void>;
+  removeFavouriteVenue: (venueId: Venue["id"]) => Promise<void>;
 };
 
 /**
@@ -169,6 +176,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
   const [user, setUser] = useState<User | null>(null);
   const [lists, setLists] = useState<UserLists | null>(null);
+  const [favouriteVenues, setFavouriteVenues] =
+    useState<FavouriteVenues | null>(null);
   const servicesRef = useRef<FirebaseServices | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -187,6 +196,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         } else {
           storageRemove(SIGNED_IN_FLAG_KEY);
           setLists(null);
+          setFavouriteVenues(null);
         }
       });
     }
@@ -206,8 +216,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user || !servicesRef.current) return;
     let cancelled = false;
-    fetchUserLists(servicesRef.current.db, user.uid).then(
-      (fetched) => !cancelled && setLists(fetched),
+    fetchUserData(servicesRef.current.db, user.uid).then(
+      (fetched) => {
+        if (cancelled) return;
+        setLists(fetched.lists);
+        setFavouriteVenues(fetched.favouriteVenues);
+      },
       (error) => console.error("Failed to load lists", error),
     );
     return () => {
@@ -267,6 +281,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // the lists are already gone and the caller asks for one.
     await deleteUserLists(db, current.uid);
     setLists(null);
+    setFavouriteVenues(null);
     await current.delete();
   }, [getServices]);
 
@@ -375,11 +390,54 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user, lists],
   );
 
+  const addFavouriteVenue = useCallback<UserContextType["addFavouriteVenue"]>(
+    async (venue) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      const entry = { name: venue.name, addedAt: Date.now() };
+      const previous = favouriteVenues;
+      setFavouriteVenues((current) =>
+        current ? { ...current, [venue.id]: entry } : current,
+      );
+      try {
+        await addFavouriteVenueToDoc(db, user.uid, venue.id, entry);
+      } catch (error) {
+        setFavouriteVenues(previous);
+        throw error;
+      }
+    },
+    [getServices, user, favouriteVenues],
+  );
+
+  const removeFavouriteVenue = useCallback<
+    UserContextType["removeFavouriteVenue"]
+  >(
+    async (venueId) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      const previous = favouriteVenues;
+      setFavouriteVenues((current) => {
+        if (!current) return current;
+        const rest = { ...current };
+        delete rest[venueId];
+        return rest;
+      });
+      try {
+        await removeFavouriteVenueFromDoc(db, user.uid, venueId);
+      } catch (error) {
+        setFavouriteVenues(previous);
+        throw error;
+      }
+    },
+    [getServices, user, favouriteVenues],
+  );
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
       email: user?.email ?? null,
       lists,
+      favouriteVenues,
       sendSignInLink,
       completeSignIn,
       getPendingEmail: readPendingEmail,
@@ -390,11 +448,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       removeFromList,
       importToList,
       restoreToList,
+      addFavouriteVenue,
+      removeFavouriteVenue,
     }),
     [
       status,
       user,
       lists,
+      favouriteVenues,
       sendSignInLink,
       completeSignIn,
       signOut,
@@ -404,6 +465,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       removeFromList,
       importToList,
       restoreToList,
+      addFavouriteVenue,
+      removeFavouriteVenue,
     ],
   );
 
@@ -426,6 +489,7 @@ export function MockUserProvider({
     status: "signed-out",
     email: null,
     lists: null,
+    favouriteVenues: null,
     sendSignInLink: noop,
     completeSignIn: async () => "done",
     getPendingEmail: () => null,
@@ -436,6 +500,8 @@ export function MockUserProvider({
     removeFromList: noop,
     importToList: async () => [],
     restoreToList: noop,
+    addFavouriteVenue: noop,
+    removeFavouriteVenue: noop,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

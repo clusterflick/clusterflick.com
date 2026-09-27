@@ -12,6 +12,7 @@ import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";
 import Divider from "@/components/divider";
 import VenueHeroDetails from "@/components/venue-hero-details";
+import FavouriteVenueButton from "@/components/favourite-venue-button";
 import { ButtonLink } from "@/components/button";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
@@ -156,6 +157,7 @@ export default function VenueDetailPageContent({
       backText="All venues"
       hero={
         <DetailPageHero
+          showStatusCard={false}
           name={venue.name}
           imagePath={imagePath}
           url={venue.url}
@@ -168,7 +170,12 @@ export default function VenueDetailPageContent({
             venueName={venue.name}
             venueType={venue.type}
             socials={venue.socials}
-          />
+            movieCount={movieCount}
+            performanceCount={performanceCount}
+            lastPerformance={venue.lastPerformance}
+          >
+            <FavouriteVenueButton venue={{ id: venue.id, name: venue.name }} />
+          </VenueHeroDetails>
         </DetailPageHero>
       }
       afterContent={

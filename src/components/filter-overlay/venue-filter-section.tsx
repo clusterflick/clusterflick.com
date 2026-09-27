@@ -20,6 +20,11 @@ interface VenueFilterSectionProps {
   cinemaVenueIds: string[];
   smallScreeningVenueIds: string[];
   nearbyVenueIds: string[];
+  /**
+   * The reader's "My Venues" that are in the dataset. Empty when signed out or
+   * when they have none, which hides the pill.
+   */
+  favouriteVenueIds: string[];
   selectedVenues: string[] | null;
   geoLoading: boolean;
   geoError: string | null;
@@ -38,6 +43,7 @@ export default function VenueFilterSection({
   cinemaVenueIds,
   smallScreeningVenueIds,
   nearbyVenueIds,
+  favouriteVenueIds,
   selectedVenues,
   geoLoading,
   geoError,
@@ -94,6 +100,7 @@ export default function VenueFilterSection({
       cinemas: cinemaVenueIds.length,
       small: smallScreeningVenueIds.length,
       nearby: nearbyVenueIds.length > 0 ? nearbyVenueIds.length : undefined,
+      favourites: favouriteVenueIds.length,
       // No count badge — "custom" is a bespoke selection, not a fixed set.
       custom: undefined,
     };
@@ -112,32 +119,24 @@ export default function VenueFilterSection({
   const currentVenueOption: VenueOption = useMemo(() => {
     // All venues selected (null means no filter = all)
     if (selectedVenues === null) return "all";
-    // Check if current selection matches cinema venues exactly
-    if (
-      cinemaVenueIds.length > 0 &&
-      selectedVenues.length === cinemaVenueIds.length &&
-      selectedVenues.every((id) => cinemaVenueIds.includes(id))
-    ) {
-      return "cinemas";
-    }
-    // Check if current selection matches small screening venues exactly
-    if (
-      smallScreeningVenueIds.length > 0 &&
-      selectedVenues.length === smallScreeningVenueIds.length &&
-      selectedVenues.every((id) => smallScreeningVenueIds.includes(id))
-    ) {
-      return "small";
-    }
-    // Check if current selection matches nearby venues exactly
-    if (
-      nearbyVenueIds.length > 0 &&
-      selectedVenues.length === nearbyVenueIds.length &&
-      selectedVenues.every((id) => nearbyVenueIds.includes(id))
-    ) {
-      return "nearby";
-    }
+    // The reader's own set first: if it happens to equal a preset, it's still
+    // the one they picked.
+    if (matchesExactly(selectedVenues, favouriteVenueIds)) return "favourites";
+    if (matchesExactly(selectedVenues, cinemaVenueIds)) return "cinemas";
+    if (matchesExactly(selectedVenues, smallScreeningVenueIds)) return "small";
+    if (matchesExactly(selectedVenues, nearbyVenueIds)) return "nearby";
     return "custom";
-  }, [selectedVenues, cinemaVenueIds, smallScreeningVenueIds, nearbyVenueIds]);
+  }, [
+    selectedVenues,
+    favouriteVenueIds,
+    cinemaVenueIds,
+    smallScreeningVenueIds,
+    nearbyVenueIds,
+  ]);
+
+  const venueOptions = VENUE_OPTIONS.filter(
+    ({ value }) => value !== "favourites" || favouriteVenueIds.length > 0,
+  );
 
   return (
     <section className={styles.section} aria-labelledby="venues-heading">
@@ -179,7 +178,7 @@ export default function VenueFilterSection({
         role="radiogroup"
         aria-label="Venue quick filters"
       >
-        {VENUE_OPTIONS.map(({ value, label }) => (
+        {venueOptions.map(({ value, label }) => (
           <Chip
             key={value}
             type="radio"
@@ -199,6 +198,8 @@ export default function VenueFilterSection({
                 onVenueOptionChange(option, smallScreeningVenueIds);
               } else if (option === "nearby") {
                 onNearbyClick();
+              } else if (option === "favourites") {
+                onVenueOptionChange(option, favouriteVenueIds);
               } else if (option === "custom") {
                 // onChange only fires when switching *into* Custom from a
                 // preset, so this clear is never destructive to an existing
@@ -255,5 +256,14 @@ export default function VenueFilterSection({
         />
       )}
     </section>
+  );
+}
+
+/** Whether a selection is exactly a (non-empty) preset's venues. */
+function matchesExactly(selected: string[], preset: string[]): boolean {
+  return (
+    preset.length > 0 &&
+    selected.length === preset.length &&
+    selected.every((id) => preset.includes(id))
   );
 }

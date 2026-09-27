@@ -3,7 +3,8 @@ import clsx from "clsx";
 import styles from "./nav-card.module.css";
 
 interface NavCardProps {
-  href: string;
+  /** Without one, the card is drawn as a plain box with no hover. */
+  href?: string;
   className?: string;
   children: React.ReactNode;
 }
@@ -14,6 +15,9 @@ interface NavCardProps {
  * Pass a className for page-specific layout (padding, border-radius, flex direction).
  */
 export default function NavCard({ href, className, children }: NavCardProps) {
+  if (!href) {
+    return <div className={clsx(styles.card, className)}>{children}</div>;
+  }
   return (
     <Link href={href} className={clsx(styles.card, className)}>
       {children}

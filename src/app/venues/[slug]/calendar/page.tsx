@@ -114,6 +114,7 @@ export default async function VenueCalendarPage({
       hideFooter
       hero={
         <DetailPageHero
+          showStatusCard={false}
           name={venue.name}
           imagePath={imagePath}
           url={venue.url}
@@ -125,6 +126,8 @@ export default async function VenueCalendarPage({
             venueName={venue.name}
             venueType={venue.type}
             socials={venue.socials}
+            movieCount={movieCount}
+            performanceCount={performanceCount}
           />
         </DetailPageHero>
       }

@@ -1,13 +1,14 @@
 rules_version = '2';
 
-// Each user may read and write only their own document, and only the list
-// fields the site writes. Everything else is denied by default.
+// Each user may read and write only their own document, and only the fields
+// the site writes: the film lists and the favourite venues. Everything else is
+// denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId)
-        && request.resource.data.keys().hasOnly(['watchlist', 'seen']);
+        && request.resource.data.keys().hasOnly(['watchlist', 'seen', 'favouriteVenues']);
     }
   }
 

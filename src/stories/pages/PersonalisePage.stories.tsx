@@ -14,7 +14,12 @@ function PersonalisePageWrapper({ user }: { user: Partial<UserContextType> }) {
       <FilterConfigProvider>
         <GeolocationProvider>
           <MockUserProvider value={user}>
-            <PersonalisePageContent />
+            <PersonalisePageContent
+              venueImagePaths={{
+                "riocinema.org.uk": "/images/venues/riocinema.org.uk.png",
+                "actonecinema.co.uk": "/images/venues/actonecinema.co.uk.jpg",
+              }}
+            />
           </MockUserProvider>
         </GeolocationProvider>
       </FilterConfigProvider>
@@ -52,6 +57,7 @@ export const SignedInEmpty: Story = {
       status: "signed-in",
       email: "reader@example.com",
       lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+      favouriteVenues: {},
     },
   },
 };
@@ -80,6 +86,13 @@ export const SignedInWithLists: Story = {
             year: "2001",
             addedAt: 1_757_000_000_000,
           },
+        },
+      },
+      favouriteVenues: {
+        "riocinema.org.uk": { name: "Rio Cinema", addedAt: 1_758_000_000_000 },
+        "actonecinema.co.uk": {
+          name: "ActOne Cinema",
+          addedAt: 1_758_100_000_000,
         },
       },
     },

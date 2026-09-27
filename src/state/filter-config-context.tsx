@@ -49,6 +49,8 @@ export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
 export const VENUE_OPTIONS = [
   { value: "all", label: "All Venues" },
   { value: "nearby", label: "Venues Near Me" },
+  // Only offered while signed in with at least one starred venue.
+  { value: "favourites", label: "My Venues" },
   { value: "cinemas", label: "Cinemas" },
   { value: "small", label: "Screening Spaces" },
   { value: "custom", label: "Custom" },
@@ -592,6 +594,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
           case "cinemas":
           case "small":
           case "nearby":
+          case "favourites":
             return filterManager.set(prev, FilterId.Venues, venueIds);
           default:
             return prev;

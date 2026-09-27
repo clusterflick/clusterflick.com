@@ -1,0 +1,69 @@
+/* No box of its own: the button and the error join the parent's layout. In the
+   venue hero that is a wrapping flex row beside the venue type, where the
+   error's full basis puts it on a line of its own beneath both rather than
+   under the button alone, which pushed the button out of line with the type. */
+.wrapper {
+  display: contents;
+}
+
+/* The same quiet pill as UserListButtons, so a starred venue and a saved film
+   read as the same kind of thing. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.05);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  color: var(--color-white);
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: rgba(var(--color-white-rgb), 0.3);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.button.on {
+  color: var(--color-buttery-yellow);
+  background: rgba(var(--color-buttery-yellow-rgb), 0.12);
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.6);
+}
+
+.button.on:hover:not(:disabled) {
+  color: var(--color-buttery-yellow);
+  background: rgba(var(--color-buttery-yellow-rgb), 0.2);
+  border-color: var(--color-buttery-yellow);
+}
+
+.button svg {
+  flex-shrink: 0;
+}
+
+.error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-neon-pink);
+}

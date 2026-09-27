@@ -48,7 +48,12 @@
   transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card:hover .name {
+/* Blue marks a link; a card without one keeps its name plain. */
+div.card .name {
+  color: var(--color-light-gray);
+}
+
+a.card:hover .name {
   color: var(--color-neon-pink);
 }
 
@@ -63,4 +68,23 @@
   font-size: 13px;
   color: var(--color-muted-gray);
   margin-top: 2px;
+}
+
+.muted {
+  opacity: 0.5;
+}
+
+/* The control goes beneath the card, right-aligned, as a poster tile's goes
+   beneath its poster: beside it, it took width from the card and squeezed the
+   name whenever the control appeared. */
+.withAction {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
 }

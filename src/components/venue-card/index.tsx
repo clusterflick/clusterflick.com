@@ -1,10 +1,13 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 import NavCard from "@/components/nav-card";
 import Tag from "@/components/tag";
 import styles from "./venue-card.module.css";
 
 interface VenueCardProps {
-  href: string;
+  /** Omitted for a venue with no page, e.g. one that has left the dataset. */
+  href?: string;
   name: string;
   type?: string;
   imagePath: string | null;
@@ -12,6 +15,10 @@ interface VenueCardProps {
   performanceCount?: number;
   /** Leading item on the stats line, before the counts (e.g. a date range) */
   detail?: string;
+  /** A control beneath the card, outside its link (e.g. Remove). */
+  action?: ReactNode;
+  /** Greyed out, e.g. while a removal can still be undone. */
+  muted?: boolean;
 }
 
 export default function VenueCard({
@@ -22,6 +29,8 @@ export default function VenueCard({
   filmCount,
   performanceCount,
   detail,
+  action,
+  muted = false,
 }: VenueCardProps) {
   const hasCounts = filmCount !== undefined && performanceCount !== undefined;
   const countText = !hasCounts
@@ -31,8 +40,8 @@ export default function VenueCard({
       : "No showings currently listed";
   const stats = [detail, countText].filter(Boolean).join(" · ");
 
-  return (
-    <NavCard href={href} className={styles.card}>
+  const card = (
+    <NavCard href={href} className={clsx(styles.card, muted && styles.muted)}>
       <div className={styles.logo}>
         {imagePath ? (
           <Image
@@ -58,5 +67,13 @@ export default function VenueCard({
         {stats && <span className={styles.stats}>{stats}</span>}
       </div>
     </NavCard>
+  );
+
+  if (!action) return card;
+  return (
+    <div className={styles.withAction}>
+      {card}
+      <div className={styles.action}>{action}</div>
+    </div>
   );
 }
