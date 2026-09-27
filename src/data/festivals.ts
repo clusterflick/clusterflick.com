@@ -766,11 +766,13 @@ export const FESTIVALS: Festival[] = [
         [FilterId.PerformanceNotesSearch]: "Phoenix Rising International",
       },
       {
-        // The festival brands itself PRIFF, but search normalisation strips
-        // spacing, so the abbreviation alone would also catch titles running
-        // "…p riff…" together. It is scoped to Rich Mix, the festival's home.
+        // The festival brands itself PRIFF. Left unscoped, as the
+        // abbreviation is distinctive and the festival spreads its programme
+        // across more than one venue.
         [FilterId.ShowingTitleSearch]: "PRIFF",
-        [FilterId.Venues]: ["richmix.org.uk"],
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "PRIFF",
       },
     ],
   },
