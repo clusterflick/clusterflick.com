@@ -74,6 +74,19 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-27",
     changes: [
       {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Phoenix Rising International Film Festival"
+              url="https://www.priff.co.uk/"
+            />
+            , three days of independent short films from 12 to 15 November.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
