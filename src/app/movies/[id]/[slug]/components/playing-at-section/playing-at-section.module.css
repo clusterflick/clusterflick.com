@@ -8,3 +8,10 @@
   font-size: 13px;
   white-space: nowrap;
 }
+
+.mapButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
