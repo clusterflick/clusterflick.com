@@ -6,7 +6,11 @@ import {
   useState,
   type CSSProperties,
   type FormEvent,
+  type ReactNode,
+  type RefObject,
 } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import clsx from "clsx";
 import StandardPageLayout from "@/components/standard-page-layout";
 import VenueCard from "@/components/venue-card";
@@ -26,6 +30,7 @@ import {
   ChevronDownIcon,
   CloseIcon,
   EyeIcon,
+  StarIcon,
 } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
@@ -34,9 +39,11 @@ import { getMovieUrl } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 // Direct from the module: the filters barrel would bundle the whole engine.
 import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
+import { OPEN_FILTERS_HASH } from "@/hooks/use-open-filters-hash";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
 import ListManagement from "./list-management";
+import { FILM_SEARCH_INPUT_ID } from "./film-search";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -133,6 +140,48 @@ function DiscoveryLinks({ links }: { links: DiscoveryLink[] }) {
         </LinkCard>
       ))}
     </CardGrid>
+  );
+}
+
+/**
+ * An empty list: its own neon icon beside "Nothing here yet", then how to fill
+ * it. In the lane the full lists sit in, so it reads as a place waiting to be
+ * filled rather than a stray paragraph.
+ */
+function EmptyList({ icon, children }: { icon: string; children: ReactNode }) {
+  return (
+    <div className={styles.emptyLane}>
+      <Image
+        src={icon}
+        alt=""
+        width={96}
+        height={96}
+        className={styles.emptyIcon}
+      />
+      <div className={styles.emptyBody}>
+        <p className={styles.emptyTitle}>Nothing here yet</p>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A button named in running text, with the icon it carries elsewhere on the
+ * site, so the reader knows it when they see it.
+ */
+function ControlName({
+  icon,
+  children,
+}: {
+  icon?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <strong className={styles.controlName}>
+      {icon}
+      {children}
+    </strong>
   );
 }
 
@@ -429,16 +478,46 @@ function SignedIn({
   // Off by default, and for each visit: removing is occasional, and a Remove
   // under every poster reads as the page's main business.
   const [showRemove, setShowRemove] = useState(false);
+  // One panel at a time: both open below the toolbar, and two stacked would
+  // push the lists a screen down.
+  const [panel, setPanel] = useState<AccountPanel | null>(null);
+  const accountBarRef = useRef<HTMLDivElement>(null);
+  const [filmSearchRequest, setFilmSearchRequest] = useState(0);
+
+  // The empty watchlist's "Manage lists" opens the list tools and takes the
+  // reader to the film search in them. After the render that mounts it.
+  useEffect(() => {
+    if (!filmSearchRequest) return;
+    accountBarRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    document
+      .getElementById(FILM_SEARCH_INPUT_ID)
+      ?.focus({ preventScroll: true });
+  }, [filmSearchRequest]);
+
+  const openFilmSearch = () => {
+    setPanel("lists");
+    setFilmSearchRequest((count) => count + 1);
+  };
 
   return (
     <div className={styles.wide}>
-      <AccountBar showRemove={showRemove} onShowRemoveChange={setShowRemove} />
+      <AccountBar
+        ref={accountBarRef}
+        panel={panel}
+        onPanelChange={setPanel}
+        showRemove={showRemove}
+        onShowRemoveChange={setShowRemove}
+      />
       {lists ? (
         <>
           <UserListSection
             listId={UserListId.Watchlist}
             lists={lists}
             showRemove={showRemove}
+            onOpenFilmSearch={openFilmSearch}
           />
           {favouriteVenues && (
             <FavouriteVenuesSection
@@ -463,19 +542,22 @@ function SignedIn({
 type AccountPanel = "lists" | "account";
 
 function AccountBar({
+  ref,
+  panel,
+  onPanelChange,
   showRemove,
   onShowRemoveChange,
 }: {
+  ref: RefObject<HTMLDivElement | null>;
+  panel: AccountPanel | null;
+  onPanelChange: (panel: AccountPanel | null) => void;
   showRemove: boolean;
   onShowRemoveChange: (show: boolean) => void;
 }) {
   const { email, signOut } = useUserContext();
-  // One panel at a time: both open below the toolbar, and two stacked would
-  // push the lists a screen down.
-  const [panel, setPanel] = useState<AccountPanel | null>(null);
 
   const toggle = (next: AccountPanel) =>
-    setPanel((current) => (current === next ? null : next));
+    onPanelChange(panel === next ? null : next);
 
   const panelToggle = (id: AccountPanel, label: string) => (
     <Button
@@ -494,7 +576,7 @@ function AccountBar({
   );
 
   return (
-    <div className={styles.card}>
+    <div ref={ref} className={styles.card}>
       <div className={styles.toolbar}>
         <div className={styles.toolbarGroup}>
           {panelToggle("lists", "Manage lists")}
@@ -591,11 +673,14 @@ function UserListSection({
   listId,
   lists,
   showRemove,
+  onOpenFilmSearch,
 }: {
   listId: UserListId;
   lists: UserLists;
   /** Remove buttons are hidden until asked for, from the account bar. */
   showRemove: boolean;
+  /** Opens the list tools at the film search, from the empty watchlist. */
+  onOpenFilmSearch?: () => void;
 }) {
   const { removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
@@ -652,24 +737,38 @@ function UserListSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        <div className={styles.emptyLane}>
-          {listId === UserListId.Watchlist ? (
-            <>
-              <p className={styles.empty}>
-                Nothing here yet. Press <strong>Want to see</strong> on any
-                film&apos;s page to save it, or search for one that isn&apos;t
-                showing under <strong>Manage lists</strong>. Looking for
-                somewhere to start?
-              </p>
-              <DiscoveryLinks links={FILM_DISCOVERY_LINKS} />
-            </>
-          ) : (
-            <p className={styles.empty}>
-              Nothing here yet. Press <strong>Seen it</strong> on a film&apos;s
-              page once you&apos;ve watched it.
+        {listId === UserListId.Watchlist ? (
+          <EmptyList icon="/images/icons/neon-ticket.svg">
+            <p className={styles.emptyLine}>
+              Press{" "}
+              <ControlName icon={<BookmarkIcon size={16} />}>
+                Want to see
+              </ControlName>{" "}
+              on any film&apos;s page to save it.
             </p>
-          )}
-        </div>
+            <p className={styles.emptyLine}>
+              Or search for one that isn&apos;t showing under{" "}
+              <button
+                type="button"
+                className={styles.inlineButton}
+                onClick={onOpenFilmSearch}
+              >
+                Manage lists
+              </button>
+              .
+            </p>
+            <p className={styles.emptyLead}>Looking for somewhere to start?</p>
+            <DiscoveryLinks links={FILM_DISCOVERY_LINKS} />
+          </EmptyList>
+        ) : (
+          <EmptyList icon="/images/icons/neon-3d-glasses.svg">
+            <p className={styles.emptyLine}>
+              Press{" "}
+              <ControlName icon={<EyeIcon size={16} />}>Seen it</ControlName> on
+              a film&apos;s page once you&apos;ve watched it.
+            </p>
+          </EmptyList>
+        )}
       </ContentSection>
     );
   }
@@ -956,15 +1055,20 @@ function FavouriteVenuesSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        <div className={styles.emptyLane}>
-          <p className={styles.empty}>
-            Nothing here yet. Press <strong>My venue</strong> on a venue&apos;s
-            page to add it, then pick <strong>My Venues</strong> under Venues in
-            the filters to see only what&apos;s on at yours. Looking for
-            somewhere to start?
+        <EmptyList icon="/images/icons/neon-projector.svg">
+          <p className={styles.emptyLine}>
+            Press{" "}
+            <ControlName icon={<StarIcon size={16} />}>My venue</ControlName> on
+            a venue&apos;s page to add it.
           </p>
+          <p className={styles.emptyLine}>
+            Then use <ControlName>My Venues</ControlName> in the{" "}
+            <Link href={`/catalogue#${OPEN_FILTERS_HASH}`}>filters</Link> to see
+            only what&apos;s on at your favourites.
+          </p>
+          <p className={styles.emptyLead}>Looking for somewhere to start?</p>
           <DiscoveryLinks links={VENUE_DISCOVERY_LINKS} />
-        </div>
+        </EmptyList>
       </ContentSection>
     );
   }

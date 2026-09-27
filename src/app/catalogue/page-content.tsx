@@ -25,6 +25,7 @@ import MainHeader from "@/components/main-header";
 import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
 import FilterSuggestions from "@/components/filter-suggestions";
+import { useOpenFiltersHash } from "@/hooks/use-open-filters-hash";
 import styles from "./page.module.css";
 
 const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
@@ -51,6 +52,10 @@ export default function PageContent() {
     applyUrlParams,
   } = useFilterConfig();
 
+  const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
+  // Ahead of `applyUrlParams`, which would clear the hash.
+  useOpenFiltersHash(() => setIsFilterOverlayOpen(true));
+
   // Apply any URL params on mount — FilterConfigProvider stays mounted across
   // client-side navigations, so its useState initialiser never re-reads URL
   // params. Without this, navigating to /catalogue?venues=… via a client-side link
@@ -65,7 +70,6 @@ export default function PageContent() {
     getData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
   const [filterTextHeight, setFilterTextHeight] = useState(0);
 
   const moviesList = useMemo(() => {

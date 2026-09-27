@@ -917,7 +917,17 @@ other presets, so a favourite set that happens to equal one still reads as
 My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
 same Remove toggle. Empty, it offers the venue indexes (`/venues`, `/near-me`,
 `/london-cinemas`, `/cinema-groups`) as the empty watchlist offers places to
-find films, and every empty list sits in the same lane panel the full ones do. The page is client-rendered and can't know which venues it
+find films.
+
+**Empty lists** (`EmptyList`) sit in the same lane panel the full ones do, each
+with its own neon icon (ticket, projector, 3D glasses). The button that fills
+a list is named in yellow with the icon it carries on the site
+(`ControlName`), so the reader knows it when they see it. The empty
+watchlist's "Manage lists" opens the list tools and focuses the film search.
+The empty My Venues links to `/catalogue#open-filters`, which opens the filter
+overlay on arrival (`useOpenFiltersHash`, on /catalogue and /planner) — the My
+Venues pill lives there and no page describes it better. The hook must run
+before `applyUrlParams`, which replaces the whole address, hash included. The page is client-rendered and can't know which venues it
 will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 

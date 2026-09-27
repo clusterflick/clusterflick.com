@@ -1,5 +1,7 @@
 /* The signed-in account bar. */
 .card {
+  /* Clear of the fixed header when the empty watchlist scrolls to it. */
+  scroll-margin-top: 80px;
   padding: 20px 24px;
   margin-bottom: 40px;
   background: rgba(var(--color-white-rgb), 0.04);
@@ -407,25 +409,108 @@
   color: var(--color-muted-gray);
 }
 
-/* The lane the lists sit in, behind an empty one too, so an empty section
-   reads as a place waiting to be filled rather than a stray paragraph. */
+.empty {
+  color: var(--color-muted-gray);
+  line-height: 1.5;
+}
+
+/* An empty list, in the lane the full lists sit in: its neon icon beside
+   "Nothing here yet" and how to fill it. Stacked and centred on a phone. */
 .emptyLane {
-  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px 32px;
+  padding: 28px 20px;
+  text-align: center;
   background-color: rgba(var(--color-dark-navy-rgb), 0.35);
   border-radius: 10px;
 }
 
-.empty {
-  margin: 0;
+@media (min-width: 700px) {
+  .emptyLane {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 32px;
+    text-align: left;
+  }
+}
+
+.emptyIcon {
+  flex-shrink: 0;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 16px rgba(var(--color-neon-pink-rgb), 0.35));
+}
+
+/* Stretched: centred in the phone's column, it would size to its longest line
+   and run off both edges. */
+.emptyBody {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+}
+
+/* The EmptyState title's glow, at a section's scale. */
+.emptyTitle {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+  text-shadow: 0 0 30px rgba(var(--color-neon-pink-rgb), 0.3);
+}
+
+.emptyLine {
+  margin: 0 0 6px;
   color: var(--color-muted-gray);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+.emptyLead {
+  margin: 20px 0 0;
+  color: var(--color-light-gray);
+  font-weight: 500;
+}
+
+/* A button named in the text: yellow, with the icon it wears on the site. */
+.controlName {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-buttery-yellow);
+  white-space: nowrap;
+}
+
+.controlName svg {
+  flex-shrink: 0;
+}
+
+/* "Manage lists" in the empty watchlist: a link in the text that opens the
+   panel above rather than going anywhere. */
+.inlineButton {
+  padding: 0;
+  font: inherit;
+  color: var(--color-electric-blue);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.inlineButton:hover {
+  color: var(--color-neon-pink);
+}
+
+.inlineButton:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
 }
 
 /* Kept to the column width: four cards stretched across a wide screen read
    as a banner rather than a set of suggestions. */
 .discovery {
   max-width: 1000px;
-  margin-top: 16px;
+  margin-top: 12px;
+  text-align: left;
 }
 
 /* As the About page's partner descriptions. */
@@ -460,18 +545,6 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--color-light-gray);
-}
-
-/* Signed in, the page is full width; the account bar and the note keep the
-   width of the signed-out column (1000px less its padding), centred as it is
-   there, so only the poster grids widen. */
-.wide .card,
-.wide .storeNote {
-  /* Auto margins shrink a grid item to its content; this keeps it full. */
-  width: 100%;
-  max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* Explore / Plan watchlist, beside the list's heading. */
