@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getVenueImagePaths } from "@/utils/get-venue-image";
 import PersonalisePageContent from "./page-content";
 
 export const metadata: Metadata = {
@@ -13,5 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default function PersonalisePage() {
-  return <PersonalisePageContent />;
+  // Which venues are favourites is only known in the browser, so every logo's
+  // path ships: a few KB, on a page nobody reaches by accident.
+  return <PersonalisePageContent venueImagePaths={getVenueImagePaths()} />;
 }

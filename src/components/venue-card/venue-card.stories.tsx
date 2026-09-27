@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenueCard from "@/components/venue-card";
+import Button from "@/components/button";
 
 /**
  * `VenueCard` is a horizontal navigation card for a single venue. It shows a
@@ -14,6 +15,9 @@ import VenueCard from "@/components/venue-card";
  * - Any single-line entity link that wants the same horizontal card — the movie
  *   page's "Screening as part of" festival card uses it with `detail` set to
  *   the festival's date range.
+ * - "My Venues" on `/personalise`, with Remove (or Undo) as its `action`: a
+ *   control beside the card, outside its link. A removal waiting on Undo is
+ *   `muted`, and a venue that has left the dataset has no `href`.
  *
  * **When NOT to use:**
  * - For plain link lists of venues — use `LinkGrid` instead.
@@ -114,4 +118,43 @@ export const CardGridExample: Story = {
       ))}
     </div>
   ),
+};
+
+/** With a control beside it, as under My Venues with Remove buttons shown. */
+export const WithAction: Story = {
+  args: {
+    ...WithCounts.args,
+    imagePath: "/images/venues/riocinema.org.uk.png",
+    name: "Rio Cinema",
+    action: (
+      <Button variant="secondary" size="sm">
+        Remove
+      </Button>
+    ),
+  },
+};
+
+/** Greyed out, while a removal can still be undone. */
+export const Muted: Story = {
+  args: {
+    ...WithAction.args,
+    href: undefined,
+    muted: true,
+    action: (
+      <Button variant="secondary" size="sm">
+        Undo
+      </Button>
+    ),
+  },
+};
+
+/** No `href`: a plain box, for a venue with no page to link to. */
+export const WithoutLink: Story = {
+  args: {
+    href: undefined,
+    name: "The Closed Picturehouse",
+    type: "Cinema",
+    imagePath: null,
+    detail: "No longer listed",
+  },
 };

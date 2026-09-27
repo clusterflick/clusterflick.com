@@ -10,7 +10,7 @@
     box-shadow 0.2s ease;
 }
 
-.card:hover {
+a.card:hover {
   background: rgba(var(--color-white-rgb), 0.07);
   border-color: var(--color-electric-blue);
   transform: translateY(-3px);

@@ -909,7 +909,10 @@ it returns. The pill selects only the favourites the dataset knows, so its
 count is what the reader gets and a selection made from it matches it again.
 It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
-My Venues. `/personalise` lists them between the watchlist and Seen, with the same Remove toggle.
+My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
+same Remove toggle. The page is client-rendered and can't know which venues it
+will show, so its server component passes every logo path in
+(`getVenueImagePaths`), as `/near-me` passes its venues.
 
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.

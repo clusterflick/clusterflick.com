@@ -448,55 +448,16 @@
   flex: 1;
 }
 
-/* My Venues: names in columns, like /venues, with the film count beside each
-   and Remove, when shown, at the end of the row. */
+/* My Venues: venue cards in columns, each with Remove (or Undo) beside it. */
 .venueList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 4px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px 16px;
 }
 
-.venueItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  padding: 6px 0;
-}
-
-.venueStar {
-  flex-shrink: 0;
-  color: var(--color-buttery-yellow);
-}
-
-.venueName {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-
-.venueDetail {
-  flex-shrink: 0;
-  font-size: 13px;
-  color: var(--color-muted-gray);
-}
-
-.venueRemove {
+.venueList .remove {
   width: auto;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.removed .venueName,
-.removed .venueStar {
-  color: var(--color-muted-gray);
-}
-
-.removed button {
-  margin-left: auto;
-  flex-shrink: 0;
 }

@@ -8,8 +8,8 @@ import {
   type FormEvent,
 } from "react";
 import Link from "next/link";
-import clsx from "clsx";
 import StandardPageLayout from "@/components/standard-page-layout";
+import VenueCard from "@/components/venue-card";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
 import PosterTile, {
@@ -21,7 +21,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button, { ButtonLink } from "@/components/button";
-import { BookmarkIcon, CloseIcon, EyeIcon, StarIcon } from "@/components/icons";
+import { BookmarkIcon, CloseIcon, EyeIcon } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useElementWidth } from "@/hooks/use-element-width";
@@ -165,7 +165,12 @@ type LinkState =
   | { step: "needs-email" }
   | { step: "error"; message: string };
 
-export default function PersonalisePageContent() {
+export default function PersonalisePageContent({
+  venueImagePaths = {},
+}: {
+  /** Venue id → logo, from the build (`getVenueImagePaths`). */
+  venueImagePaths?: Record<string, string>;
+}) {
   const { status } = useUserContext();
 
   // Signed in, the page is mostly poster grids, so it takes the full width
@@ -174,7 +179,11 @@ export default function PersonalisePageContent() {
     <StandardPageLayout
       title="Personalise"
       subtitle="Keep track of the films you want to see, and the ones you have."
-      afterContent={status === "signed-in" ? <SignedIn /> : undefined}
+      afterContent={
+        status === "signed-in" ? (
+          <SignedIn venueImagePaths={venueImagePaths} />
+        ) : undefined
+      }
     >
       {status === "unavailable" ? (
         <EmptyState
@@ -349,7 +358,11 @@ function SignInForm() {
   );
 }
 
-function SignedIn() {
+function SignedIn({
+  venueImagePaths,
+}: {
+  venueImagePaths: Record<string, string>;
+}) {
   const { lists, favouriteVenues } = useUserContext();
   // Off by default, and for each visit: removing is occasional, and a Remove
   // under every poster reads as the page's main business.
@@ -369,6 +382,7 @@ function SignedIn() {
             <FavouriteVenuesSection
               favouriteVenues={favouriteVenues}
               showRemove={showRemove}
+              venueImagePaths={venueImagePaths}
             />
           )}
           <UserListSection
@@ -765,31 +779,43 @@ function UserListSection({
 }
 
 /**
- * "My Venues": the venues behind the filter overlay's My Venues pill. A plain
- * list rather than tiles, since a venue has nothing to show but its name.
+ * "My Venues": the venues behind the filter overlay's My Venues pill, as the
+ * venue cards the cinema-group and borough pages use: logo, type and what's on.
  */
 function FavouriteVenuesSection({
   favouriteVenues,
   showRemove,
+  venueImagePaths,
 }: {
   favouriteVenues: FavouriteVenues;
   showRemove: boolean;
+  venueImagePaths: Record<string, string>;
 }) {
   const { addFavouriteVenue, removeFavouriteVenue } = useUserContext();
   const { movies, metaData } = useCinemaData();
   // Kept in place with an Undo until the reader leaves, rather than on a
-  // timer like a film's: a row of text is no trouble to leave behind.
+  // timer like a film's: a greyed-out card is no trouble to leave behind.
   const [removed, setRemoved] = useState<Record<string, FavouriteVenueEntry>>(
     {},
   );
 
-  const filmCounts = new Map<string, number>();
+  // Films and showings per venue, as the venue cards elsewhere count them.
+  const venueCounts = new Map<
+    string,
+    { films: number; performances: number }
+  >();
   for (const movie of Object.values(movies)) {
-    const venueIds = new Set(
-      Object.values(movie.showings).map(({ venueId }) => venueId),
-    );
-    for (const venueId of venueIds) {
-      filmCounts.set(venueId, (filmCounts.get(venueId) ?? 0) + 1);
+    const seen = new Set<string>();
+    for (const performance of movie.performances) {
+      const venueId = movie.showings[performance.showingId]?.venueId;
+      if (!venueId) continue;
+      const counts = venueCounts.get(venueId) ?? { films: 0, performances: 0 };
+      counts.performances++;
+      if (!seen.has(venueId)) {
+        seen.add(venueId);
+        counts.films++;
+      }
+      venueCounts.set(venueId, counts);
     }
   }
 
@@ -861,51 +887,46 @@ function FavouriteVenuesSection({
     >
       <ul className={styles.venueList}>
         {entries.map(({ id, name, entry, isRemoved, isKnown }) => {
-          const films = filmCounts.get(id) ?? 0;
+          const counts = venueCounts.get(id);
           return (
-            <li
-              key={id}
-              className={clsx(styles.venueItem, isRemoved && styles.removed)}
-            >
-              <StarIcon
-                size={14}
-                filled={!isRemoved}
-                className={styles.venueStar}
+            <li key={id}>
+              <VenueCard
+                // A venue that has left the dataset has no page to link to.
+                href={isKnown && !isRemoved ? getVenueUrl({ name }) : undefined}
+                name={name}
+                type={metaData?.venues[id]?.type}
+                imagePath={venueImagePaths[id] ?? null}
+                filmCount={isKnown ? (counts?.films ?? 0) : undefined}
+                performanceCount={
+                  isKnown ? (counts?.performances ?? 0) : undefined
+                }
+                detail={isKnown ? undefined : "No longer listed"}
+                muted={isRemoved}
+                action={
+                  isRemoved ? (
+                    <button
+                      type="button"
+                      className={styles.remove}
+                      onClick={() => onUndo(id, entry.name)}
+                      aria-label={`Undo removing ${name} from My Venues`}
+                    >
+                      Undo
+                    </button>
+                  ) : (
+                    showRemove && (
+                      <button
+                        type="button"
+                        className={styles.remove}
+                        onClick={() => onRemove(id, entry)}
+                        aria-label={`Remove ${name} from My Venues`}
+                      >
+                        <CloseIcon size={14} />
+                        Remove
+                      </button>
+                    )
+                  )
+                }
               />
-              {/* A venue that has left the dataset has no page to link to. */}
-              {isKnown && !isRemoved ? (
-                <Link href={getVenueUrl({ name })} className={styles.venueName}>
-                  {name}
-                </Link>
-              ) : (
-                <span className={styles.venueName}>{name}</span>
-              )}
-              {!isRemoved && isKnown && films > 0 && (
-                <span className={styles.venueDetail}>
-                  {films} {films === 1 ? "film" : "films"}
-                </span>
-              )}
-              {isRemoved ? (
-                <Button
-                  variant="link"
-                  onClick={() => onUndo(id, entry.name)}
-                  aria-label={`Undo removing ${name} from My Venues`}
-                >
-                  Undo
-                </Button>
-              ) : (
-                showRemove && (
-                  <button
-                    type="button"
-                    className={clsx(styles.remove, styles.venueRemove)}
-                    onClick={() => onRemove(id, entry)}
-                    aria-label={`Remove ${name} from My Venues`}
-                  >
-                    <CloseIcon size={14} />
-                    Remove
-                  </button>
-                )
-              )}
             </li>
           );
         })}
