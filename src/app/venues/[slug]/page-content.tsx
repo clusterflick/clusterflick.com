@@ -157,6 +157,7 @@ export default function VenueDetailPageContent({
       backText="All venues"
       hero={
         <DetailPageHero
+          showStatusCard={false}
           name={venue.name}
           imagePath={imagePath}
           url={venue.url}
@@ -169,8 +170,12 @@ export default function VenueDetailPageContent({
             venueName={venue.name}
             venueType={venue.type}
             socials={venue.socials}
-          />
-          <FavouriteVenueButton venue={{ id: venue.id, name: venue.name }} />
+            movieCount={movieCount}
+            performanceCount={performanceCount}
+            lastPerformance={venue.lastPerformance}
+          >
+            <FavouriteVenueButton venue={{ id: venue.id, name: venue.name }} />
+          </VenueHeroDetails>
         </DetailPageHero>
       }
       afterContent={

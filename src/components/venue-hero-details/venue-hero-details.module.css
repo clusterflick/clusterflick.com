@@ -1,9 +1,13 @@
+/* Socials, status card, calendars. The card is too wide to sit between both
+   sets of icons on a phone, so there the icons share one centred line and the
+   card takes the next. */
 .heroTagRow {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   margin-top: 18px;
-  gap: 16px;
+  gap: 8px 16px;
 }
 
 .heroTagRowSide {
@@ -12,8 +16,44 @@
   gap: 16px;
 }
 
-.heroTagRowSide:first-child {
-  justify-content: flex-end;
+.heroStatus {
+  order: 1;
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .heroTagRow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+  }
+
+  .heroTagRowSide:first-child {
+    justify-content: flex-end;
+  }
+
+  .heroStatus {
+    order: 0;
+  }
+}
+
+/* The card carries the hero's top margin for when it ends the hero; here the
+   grid spaces it. A descendant selector, because two modules can't override
+   one another by order. */
+.heroStatus > * {
+  margin-top: 0;
+}
+
+/* The venue type, and the My venue button beside it on the venue page. */
+.heroTypeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .heroSocialLink {

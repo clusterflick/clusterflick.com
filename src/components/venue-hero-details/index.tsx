@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import type { SocialHandles } from "@/utils/build-social-links";
 import Tag from "@/components/tag";
 import SocialLinks from "@/components/social-links";
+import { DetailPageStatusCard } from "@/components/detail-page-hero";
 import {
   GoogleCalendarIcon,
   OutlookCalendarIcon,
@@ -15,11 +17,19 @@ interface VenueHeroDetailsProps {
   /** The venue's `type` from the dataset, rendered as-is. */
   venueType: string;
   socials?: SocialHandles;
+  movieCount: number;
+  performanceCount: number;
+  /** See `DetailPageHero`'s prop of the same name. */
+  lastPerformance?: number;
+  /** Drawn beside the venue type, under the status card. */
+  children?: ReactNode;
 }
 
 /**
- * The row that sits under the title in a venue's DetailPageHero: social links,
- * the venue type, and the three calendar subscription targets.
+ * What sits under the title in a venue's DetailPageHero: a row of social links,
+ * the status card and the three calendar subscription targets, with the venue
+ * type (and any `children`) beneath it. The hero's own status card is turned
+ * off (`showStatusCard={false}`), since this places it.
  *
  * Shared by the venue page and its calendar page so the two carry an identical
  * header — the calendar page differs only in where its back link points.
@@ -29,46 +39,60 @@ export default function VenueHeroDetails({
   venueName,
   venueType,
   socials,
+  movieCount,
+  performanceCount,
+  lastPerformance,
+  children,
 }: VenueHeroDetailsProps) {
   const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venueId}`;
   const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venueId}`;
 
   return (
-    <div className={styles.heroTagRow}>
-      <div className={styles.heroTagRowSide}>
-        <SocialLinks socials={socials} />
+    <>
+      <div className={styles.heroTagRow}>
+        <div className={styles.heroTagRowSide}>
+          <SocialLinks socials={socials} />
+        </div>
+        <div className={styles.heroStatus}>
+          <DetailPageStatusCard
+            movieCount={movieCount}
+            performanceCount={performanceCount}
+            lastPerformance={lastPerformance}
+          />
+        </div>
+        <div className={styles.heroTagRowSide}>
+          <a
+            href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.heroSocialLink}
+            title="Add to Google Calendar"
+          >
+            <GoogleCalendarIcon size={20} />
+          </a>
+          <a
+            href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venueName)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.heroSocialLink}
+            style={{ padding: 4 }}
+            title="Add to Outlook Calendar"
+          >
+            <OutlookCalendarIcon size={28} />
+          </a>
+          <a
+            href={webcalUrl}
+            className={styles.heroSocialLink}
+            title="Subscribe to calendar"
+          >
+            <CalendarIcon size={20} />
+          </a>
+        </div>
       </div>
-      <div>
+      <div className={styles.heroTypeRow}>
         <Tag color="blue">{venueType}</Tag>
+        {children}
       </div>
-      <div className={styles.heroTagRowSide}>
-        <a
-          href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.heroSocialLink}
-          title="Add to Google Calendar"
-        >
-          <GoogleCalendarIcon size={20} />
-        </a>
-        <a
-          href={`https://outlook.live.com/calendar/0/addfromweb/?url=${encodeURIComponent(calendarUrl)}&name=${encodeURIComponent(venueName)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.heroSocialLink}
-          style={{ padding: 4 }}
-          title="Add to Outlook Calendar"
-        >
-          <OutlookCalendarIcon size={28} />
-        </a>
-        <a
-          href={webcalUrl}
-          className={styles.heroSocialLink}
-          title="Subscribe to calendar"
-        >
-          <CalendarIcon size={20} />
-        </a>
-      </div>
-    </div>
+    </>
   );
 }
