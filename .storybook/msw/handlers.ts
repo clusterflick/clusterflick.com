@@ -38,11 +38,23 @@ export const loadingHandlers = [
   }),
 ];
 
-// Handlers for error state
+// Handlers for error state. A 404 rather than a 500: a 5xx is retried with
+// backoff, which would hold the story on its loading state for several seconds
+// before the error appears — longer than a visual snapshot waits.
 export const errorHandlers = [
   http.get("/data/*", () => {
-    return HttpResponse.json({ error: "Failed to load data" }, { status: 500 });
+    return HttpResponse.json({ error: "Failed to load data" }, { status: 404 });
   }),
+];
+
+// Handlers for a partial failure: everything loads except one movie chunk,
+// which is refused outright (404, so it isn't retried), leaving the dataset
+// with a gap and the data-load notice on screen.
+export const chunkFailureHandlers = [
+  http.get("/data/data.1.*.json", () => {
+    return HttpResponse.json({ error: "Failed to load data" }, { status: 404 });
+  }),
+  http.get("/data/*", () => passthrough()),
 ];
 
 // Handlers for empty data state

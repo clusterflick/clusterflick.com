@@ -5,6 +5,7 @@ import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
 import { UserProvider } from "@/state/user-context";
+import DataLoadNoticeClient from "@/components/data-load-notice/data-load-notice-client";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -115,6 +116,7 @@ export default function RootLayout({
               <UserProvider>{children}</UserProvider>
             </GeolocationProvider>
           </FilterConfigProvider>
+          <DataLoadNoticeClient />
         </CinemaDataProvider>
       </body>
     </html>

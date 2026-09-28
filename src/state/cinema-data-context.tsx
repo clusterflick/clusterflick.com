@@ -13,6 +13,7 @@ import { CinemaData, MetaData } from "@/types";
 import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { hydrateUrl as hydrateUrlWithPrefixes } from "@/utils/hydrate-url";
 import { pruneByPerformances } from "@/utils/prune-movies";
+import { fetchWithRetry, FetchRetryError } from "@/utils/fetch-with-retry";
 
 /**
  * Custom error class for data fetching errors with additional context.
@@ -35,10 +36,24 @@ type ContextType = {
   isEmpty: boolean;
   hasAttemptedLoad: boolean;
   error: DataFetchError | null;
+  /**
+   * Movie chunks that still failed after every retry. The load carries on
+   * without them, so the dataset is missing a run of titles (chunks are cut in
+   * title order) — anything reading a film's absence as "not showing" must
+   * check this first.
+   */
+  failedFiles: string[];
+  /** Whether `retryFailedFiles` is refetching them. */
+  isRetryingFailedFiles: boolean;
   getData: () => Promise<void>;
   getDataWithPriority: (movieId: string) => Promise<void>;
   hydrateUrl: (truncatedUrl: string) => string;
   retry: () => Promise<void>;
+  /**
+   * Refetch only the chunks in `failedFiles`, merging them into what is
+   * already loaded. Unlike `retry` nothing on screen is cleared first.
+   */
+  retryFailedFiles: () => Promise<void>;
 };
 
 /**
@@ -117,6 +132,28 @@ function stripPastPerformances(
   return pruneByPerformances(movies, (perf) => perf.time >= todayMidnight);
 }
 
+/**
+ * Turn a fetch that failed every retry into the error the pages show. A status
+ * means the server answered and refused; no status means the request never got
+ * an answer (offline, dropped, timed out) or the body could not be parsed.
+ */
+function toDataFetchError(err: unknown, what: string): DataFetchError {
+  if (err instanceof FetchRetryError && err.status !== undefined) {
+    return new DataFetchError(
+      `Failed to load ${what}: Server returned ${err.status}`,
+      err,
+      err.status,
+    );
+  }
+  if (err instanceof FetchRetryError && err.cause instanceof SyntaxError) {
+    return new DataFetchError(`Data error: Failed to parse ${what}`, err);
+  }
+  return new DataFetchError(
+    "Network error: Unable to connect to the server. Please check your internet connection.",
+    err,
+  );
+}
+
 export async function getMetaData(): Promise<MetaData> {
   const metaFilename = process.env.NEXT_PUBLIC_DATA_FILENAME;
 
@@ -126,34 +163,13 @@ export async function getMetaData(): Promise<MetaData> {
     );
   }
 
-  const url = `/data/${metaFilename}`;
-  let response: Response;
-
-  try {
-    response = await fetch(url);
-  } catch (err) {
-    throw new DataFetchError(
-      "Network error: Unable to connect to the server. Please check your internet connection.",
-      err,
-    );
-  }
-
-  if (!response.ok) {
-    throw new DataFetchError(
-      `Failed to load metadata: ${response.status} ${response.statusText}`,
-      undefined,
-      response.status,
-    );
-  }
-
   let metaData: MetaData;
   try {
-    metaData = await response.json();
-  } catch (err) {
-    throw new DataFetchError(
-      "Data error: Failed to parse metadata response",
-      err,
+    metaData = await fetchWithRetry(`/data/${metaFilename}`, (response) =>
+      response.json(),
     );
+  } catch (err) {
+    throw toDataFetchError(err, "metadata");
   }
 
   return {
@@ -168,34 +184,13 @@ export async function getMetaData(): Promise<MetaData> {
 export async function getMovieData(
   filename: string,
 ): Promise<CinemaData["movies"]> {
-  const url = `/data/${filename}`;
-  let response: Response;
-
-  try {
-    response = await fetch(url);
-  } catch (err) {
-    throw new DataFetchError(
-      `Network error: Unable to fetch movie data from ${filename}`,
-      err,
-    );
-  }
-
-  if (!response.ok) {
-    throw new DataFetchError(
-      `Failed to load movie data: Server returned ${response.status} ${response.statusText}`,
-      undefined,
-      response.status,
-    );
-  }
-
   let movies: CinemaData["movies"];
   try {
-    movies = await response.json();
-  } catch (err) {
-    throw new DataFetchError(
-      `Data error: Failed to parse movie data from ${filename}`,
-      err,
+    movies = await fetchWithRetry(`/data/${filename}`, (response) =>
+      response.json(),
     );
+  } catch (err) {
+    throw toDataFetchError(err, `movie data from ${filename}`);
   }
 
   return expandData<CinemaData["movies"]>(movies);
@@ -203,12 +198,67 @@ export async function getMovieData(
 
 const Context = createContext<ContextType | undefined>(undefined);
 
+/**
+ * Build the per-chunk step that strips past performances, fills in the
+ * "Uncategorised" genre and merges the chunk into state. Shared by the first
+ * load and by `retryFailedFiles`, so a recovered chunk is processed exactly as
+ * it would have been had it arrived first time.
+ */
+function createChunkProcessor(
+  metaData: MetaData,
+  updateMovies: (movies: CinemaData["movies"]) => void,
+) {
+  // Idempotent: finds the genre by name once it exists
+  const uncategorisedId = ensureUncategorisedGenre(metaData.genres);
+  const validGenreIds = new Set(Object.keys(metaData.genres));
+
+  return (newMovies: CinemaData["movies"]) => {
+    const withoutPast = stripPastPerformances(newMovies);
+    const processed = assignUncategorisedGenre(
+      withoutPast,
+      uncategorisedId,
+      validGenreIds,
+    );
+    updateMovies(processed);
+  };
+}
+
+/**
+ * Fetch each chunk, merging it as it arrives, and return the ones that failed
+ * every retry. Settled rather than `Promise.all`, so one bad chunk never stops
+ * the rest from loading.
+ */
+async function loadChunks(
+  filenames: string[],
+  processChunk: (movies: CinemaData["movies"]) => void,
+): Promise<string[]> {
+  const results = await Promise.allSettled(
+    filenames.map((filename) => getMovieData(filename).then(processChunk)),
+  );
+
+  const failed: string[] = [];
+  results.forEach((result, index) => {
+    if (result.status === "rejected") failed.push(filenames[index]);
+  });
+  if (failed.length > 0) {
+    console.error(
+      `Failed to load ${failed.length} data file(s):`,
+      results
+        .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+        .map((r) => r.reason),
+    );
+  }
+  return failed;
+}
+
 export function CinemaDataProvider({ children }: { children: ReactNode }) {
   const [metaData, setMetaData] = useState<MetaData | null>(null);
   const [movies, setMovies] = useState<CinemaData["movies"]>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasAttemptedLoad, setHasAttemptedLoad] = useState<boolean>(false);
   const [error, setError] = useState<DataFetchError | null>(null);
+  const [failedFiles, setFailedFiles] = useState<string[]>([]);
+  const [isRetryingFailedFiles, setIsRetryingFailedFiles] = useState(false);
 
   // Ref for synchronous loading check to prevent race conditions
   // State updates are async, so rapid calls could both pass the isLoading check
@@ -237,26 +287,14 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setHasAttemptedLoad(true);
       setError(null);
+      setFailedFiles([]);
 
       try {
         // Get the meta data first
         const metaData = await getMetaData();
         setMetaData(metaData);
 
-        // Ensure "Uncategorised" genre exists and get its ID
-        const uncategorisedId = ensureUncategorisedGenre(metaData.genres);
-        const validGenreIds = new Set(Object.keys(metaData.genres));
-
-        // Helper to process and update movies
-        const processAndUpdateMovies = (newMovies: CinemaData["movies"]) => {
-          const withoutPast = stripPastPerformances(newMovies);
-          const processed = assignUncategorisedGenre(
-            withoutPast,
-            uncategorisedId,
-            validGenreIds,
-          );
-          updateMovies(processed);
-        };
+        const processChunk = createChunkProcessor(metaData, updateMovies);
 
         // Find the filename for the prioritised movie
         // If no movieId is provided, no matching filename will be found
@@ -270,36 +308,27 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
         let prioritisedFilename: string | undefined;
         if (filenameKey !== undefined) {
           prioritisedFilename = metaData.filenames[filenameKey];
-          await getMovieData(prioritisedFilename).then(processAndUpdateMovies);
+          await getMovieData(prioritisedFilename).then(processChunk);
         }
 
-        // Get the remaining data files
-        // Use Promise.allSettled to continue loading even if some files fail
-        const results = await Promise.allSettled(
-          metaData.filenames
-            .filter((filename: string) => filename !== prioritisedFilename)
-            .map((filename: string) =>
-              getMovieData(filename).then(processAndUpdateMovies),
-            ),
+        // Get the remaining data files, carrying on past any that fail
+        const remaining = metaData.filenames.filter(
+          (filename: string) => filename !== prioritisedFilename,
         );
+        const failed = await loadChunks(remaining, processChunk);
 
-        // Check for any failures and log them (but don't fail completely)
-        const failures = results.filter(
-          (result): result is PromiseRejectedResult =>
-            result.status === "rejected",
-        );
-        if (failures.length > 0) {
-          console.error(
-            `Failed to load ${failures.length} data file(s):`,
-            failures.map((f) => f.reason),
+        // Nothing loaded at all is an outage, not a gap — show the error
+        // state rather than a notice over an empty page
+        if (
+          failed.length > 0 &&
+          failed.length === remaining.length &&
+          !prioritisedFilename
+        ) {
+          throw new DataFetchError(
+            "Failed to load movie data. Please try again later.",
           );
-          // If all files failed, set an error
-          if (failures.length === results.length && !prioritisedFilename) {
-            throw new DataFetchError(
-              "Failed to load movie data. Please try again later.",
-            );
-          }
         }
+        setFailedFiles(failed);
       } catch (err) {
         const dataError =
           err instanceof DataFetchError
@@ -343,6 +372,22 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
     await loadData();
   }, [loadData]);
 
+  const retryFailedFiles = useCallback(async () => {
+    if (!metaData || failedFiles.length === 0) return;
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
+    setIsRetryingFailedFiles(true);
+
+    try {
+      const processChunk = createChunkProcessor(metaData, updateMovies);
+      const stillFailed = await loadChunks(failedFiles, processChunk);
+      setFailedFiles(stillFailed);
+    } finally {
+      isLoadingRef.current = false;
+      setIsRetryingFailedFiles(false);
+    }
+  }, [metaData, failedFiles, updateMovies]);
+
   const isEmpty = useMemo(() => Object.keys(movies).length === 0, [movies]);
 
   const contextValue = useMemo(
@@ -353,10 +398,13 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       isEmpty,
       hasAttemptedLoad,
       error,
+      failedFiles,
+      isRetryingFailedFiles,
       getData,
       getDataWithPriority,
       hydrateUrl,
       retry,
+      retryFailedFiles,
     }),
     [
       metaData,
@@ -365,10 +413,13 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       isEmpty,
       hasAttemptedLoad,
       error,
+      failedFiles,
+      isRetryingFailedFiles,
       getData,
       getDataWithPriority,
       hydrateUrl,
       retry,
+      retryFailedFiles,
     ],
   );
 

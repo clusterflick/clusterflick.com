@@ -34,12 +34,16 @@ export default function FilmPosterGridClient({
   exploreLabel,
   venueId,
 }: FilmPosterGridClientProps) {
-  const { movies, isLoading, hasAttemptedLoad, error } = useCinemaData();
+  const { movies, isLoading, hasAttemptedLoad, error, failedFiles } =
+    useCinemaData();
 
   // Only prune once the load has fully settled — pruning mid-load (while chunks
   // are still arriving) would flicker items out and back in. On error, keep the
-  // static list rather than hiding everything.
-  const ready = hasAttemptedLoad && !isLoading && !error;
+  // static list rather than hiding everything. Likewise when some chunks
+  // failed: a film missing from the dataset may only be missing from them, and
+  // hiding it would claim it isn't showing.
+  const ready =
+    hasAttemptedLoad && !isLoading && !error && failedFiles.length === 0;
 
   const venueIds =
     venueId === undefined
