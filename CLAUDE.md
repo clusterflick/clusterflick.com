@@ -764,10 +764,16 @@ and back on the watchlist), so markers stack like chips and fan out on hover;
 a new status such as an alert is one more entry in its `MARKERS`. They render
 only once signed in with lists loaded, so the static HTML is unchanged.
 
-**`/personalise` splits each list into showing now and not showing**, using
-the client cinema data, since what's on is the question a watchlist is
+**`/personalise` splits the watchlist into showing now and not showing**,
+using the client cinema data, since what's on is the question a watchlist is
 brought to. Films not showing are unlinked: whether a departed page still
-exists is only known at build time. Each group is sorted by normalised title,
+exists is only known at build time. With nothing to follow up, they fold
+behind an `ExpandableSection`, open from the start only when nothing on the
+list is showing, so the watchlist never looks empty. **Seen is one list**,
+showing or not: having seen a film is what matters, and a showing one still
+reads as such by being linked. It opens cut to three rows
+(`TruncatedTileList`, which counts columns from the measured lane width so
+the cut is always whole rows) with a "Show all" button. Each group is sorted by normalised title,
 as /catalogue and /planner are — the pipeline's `normalizedTitle` for a film
 still in the dataset, the same folding applied to the snapshot's title for one
 that has left it. Films are `PosterTile`s, as on /updates, so the title reads
@@ -915,7 +921,8 @@ count is what the reader gets and a selection made from it matches it again.
 It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
 My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
-same Remove toggle. Empty, it offers the venue indexes (`/venues`, `/near-me`,
+same Remove toggle, and "See on a map" opens the film page's `VenueMapDialog`
+over the ones the dataset still knows. Empty, it offers the venue indexes (`/venues`, `/near-me`,
 `/london-cinemas`, `/cinema-groups`) as the empty watchlist offers places to
 find films.
 

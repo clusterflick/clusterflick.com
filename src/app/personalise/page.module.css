@@ -572,3 +572,16 @@
 .venueList .remove {
   width: auto;
 }
+
+/* Under the lane it cuts short. */
+.showAll {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.mapButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

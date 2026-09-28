@@ -16,12 +16,16 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import VenueCard from "@/components/venue-card";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
+import ExpandableSection from "@/components/expandable-section";
 import PosterTile, {
   PosterTileList,
   RemovedPosterTile,
   type PosterTileNote,
 } from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
+import VenueMapDialog, {
+  type VenueMapDialogVenue,
+} from "@/components/venue-map-dialog";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardContent } from "@/components/link-card";
 import Button, { ButtonLink } from "@/components/button";
@@ -30,6 +34,7 @@ import {
   ChevronDownIcon,
   CloseIcon,
   EyeIcon,
+  MapPinIcon,
   StarIcon,
 } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
@@ -222,16 +227,64 @@ function formatShowing(time: number) {
 const TILE_MIN_WIDTH = 140;
 const TILE_GAP = 16;
 
+/** How many tiles PosterTileList fits across a list this wide. */
+function getColumnCount(width: number) {
+  return Math.max(
+    1,
+    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
+  );
+}
+
 /**
  * The width PosterTileList's `auto-fill, minmax(140px, 1fr)` gives each tile
  * across a full-width list — the width the tiles in Showing now come out at.
  */
 function getFullWidthTileWidth(width: number) {
-  const columns = Math.max(
-    1,
-    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
-  );
+  const columns = getColumnCount(width);
   return (width - (columns - 1) * TILE_GAP) / columns;
+}
+
+/** How many rows of Seen show before "Show all". */
+const SEEN_ROWS = 3;
+
+/**
+ * Tiles cut to their first few rows, with a button for the rest. The cut
+ * follows the column count, so it is always whole rows whatever the width.
+ */
+function TruncatedTileList({
+  tiles,
+  rows,
+}: {
+  tiles: ReactNode[];
+  rows: number;
+}) {
+  const [laneRef, laneWidth] = useElementWidth<HTMLDivElement>();
+  const [showAll, setShowAll] = useState(false);
+  // Before the lane is measured, six across: the 960px column's count.
+  const columns = laneWidth ? getColumnCount(laneWidth) : 6;
+  const limit = columns * rows;
+  const hasMore = tiles.length > limit;
+
+  return (
+    <>
+      <div ref={laneRef} className={styles.lane}>
+        <PosterTileList>
+          {hasMore && !showAll ? tiles.slice(0, limit) : tiles}
+        </PosterTileList>
+      </div>
+      {hasMore && (
+        <div className={styles.showAll}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Show fewer" : `Show all ${tiles.length}`}
+          </Button>
+        </div>
+      )}
+    </>
+  );
 }
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
@@ -874,6 +927,20 @@ function UserListSection({
     );
   }
 
+  // Seen is one list, showing or not: what matters is having seen it, and a
+  // film that's showing still reads as one by being linked. Long, and rarely
+  // the reason for a visit, so it opens cut to its first few rows.
+  if (listId === UserListId.Seen) {
+    return (
+      <ContentSection title={title} titleBadge={count} action={action}>
+        <TruncatedTileList
+          tiles={entries.map((entry) => toTile(entry, !!movies[entry.id]))}
+          rows={SEEN_ROWS}
+        />
+      </ContentSection>
+    );
+  }
+
   // Each soonest first: the order to book them in. A film can be in both —
   // ending this week with a Q&A on its last night — and each group then says
   // its own thing about it. Either takes it out of Showing now.
@@ -962,14 +1029,19 @@ function UserListSection({
         </>
       )}
       {notShowing.length > 0 && (
-        <>
-          <h3 className={styles.groupTitle}>Not showing</h3>
+        // Folded away, as there's nothing to follow up: they're unlinked, with
+        // nowhere to book. Open from the start when it's all the list holds,
+        // so a watchlist of departed films doesn't look empty.
+        <ExpandableSection
+          title={`${notShowing.length} ${notShowing.length === 1 ? "film" : "films"} not showing`}
+          defaultExpanded={showing.length === 0 && highlightGroups.length === 0}
+        >
           <div className={styles.lane}>
             <PosterTileList>
               {notShowing.map((entry) => toTile(entry, false))}
             </PosterTileList>
           </div>
-        </>
+        </ExpandableSection>
       )}
     </ContentSection>
   );
@@ -995,6 +1067,7 @@ function FavouriteVenuesSection({
   const [removed, setRemoved] = useState<Record<string, FavouriteVenueEntry>>(
     {},
   );
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   // Films and showings per venue, as the venue cards elsewhere count them.
   const venueCounts = new Map<
@@ -1030,6 +1103,19 @@ function FavouriteVenuesSection({
   const knownIds = Object.keys(favouriteVenues).filter(
     (id) => metaData?.venues[id] !== undefined,
   );
+  // Only what the dataset knows: a venue that has left it has no location.
+  const mapVenues: VenueMapDialogVenue[] = knownIds.map((id) => {
+    const venue = metaData!.venues[id];
+    return {
+      id,
+      name: venue.name,
+      href: getVenueUrl(venue),
+      type: venue.type,
+      lat: venue.geo.lat,
+      lon: venue.geo.lon,
+      filmCount: venueCounts.get(id)?.films ?? 0,
+    };
+  });
 
   const forget = (id: string) =>
     setRemoved((current) => {
@@ -1086,6 +1172,15 @@ function FavouriteVenuesSection({
             >
               What&apos;s on at my venues
             </ButtonLink>
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.mapButton}
+              onClick={() => setIsMapOpen(true)}
+            >
+              <MapPinIcon size={16} />
+              See on a map
+            </Button>
           </div>
         ) : undefined
       }
@@ -1140,6 +1235,14 @@ function FavouriteVenuesSection({
           })}
         </ul>
       </div>
+      {isMapOpen && (
+        <VenueMapDialog
+          title="My Venues"
+          summary={`${mapVenues.length} ${mapVenues.length === 1 ? "venue" : "venues"}`}
+          venues={mapVenues}
+          onClose={() => setIsMapOpen(false)}
+        />
+      )}
     </ContentSection>
   );
 }
