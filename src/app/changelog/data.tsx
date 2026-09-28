@@ -71,6 +71,44 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-28",
+    changes: [
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/window-seat-cinema-club">
+              Window Seat Cinema Club
+            </Link>
+            , which screens world cinema in its original language with English
+            subtitles at venues across London. Next up is Amélie at{" "}
+            <Venue name="London Film School" url="https://lfs.org.uk" /> on 12
+            October.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added the{" "}
+            <Link href="/film-clubs/london-australian-film-society">
+              London Australian Film Society
+            </Link>
+            , screening Australian films in London since 1973. Next up is its
+            All My Friends double bill at{" "}
+            <Venue
+              name="Finsbury Park Picturehouse"
+              url="https://www.picturehouses.com/cinema/finsbury-park"
+            />{" "}
+            on 4 October, with a Q&amp;A.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-27",
     changes: [
       {

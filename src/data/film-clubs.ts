@@ -552,4 +552,32 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Deptford Cinema" },
     ],
   },
+  {
+    id: "london-australian-film-society",
+    name: "London Australian Film Society",
+    url: "https://www.londonaustfilm.com",
+    aliases: ["lafs"],
+    matchers: [
+      // Listings lead with the initials ("LAFS PRESENTS: …"). "lafs" appears
+      // nowhere else in the data. The festival's "LAFF" screenings belong to
+      // the London Australian Film Festival, not here.
+      { [FilterId.ShowingTitleSearch]: "LAFS" },
+      { [FilterId.PerformanceNotesSearch]: "LAFS" },
+      { [FilterId.ShowingTitleSearch]: "London Australian Film Society" },
+      { [FilterId.PerformanceNotesSearch]: "London Australian Film Society" },
+    ],
+  },
+  {
+    id: "window-seat-cinema-club",
+    name: "Window Seat Cinema Club",
+    url: "https://www.windowseatcinema.com",
+    aliases: ["window-seat-cinema", "window-seat"],
+    matchers: [
+      // Host venues credit the screenings in performance notes ("Presented by
+      // Window Seat Cinema Club"). "Window Seat Cinema" rather than "Window
+      // Seat", which is also the title of more than one film.
+      { [FilterId.ShowingTitleSearch]: "Window Seat Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Window Seat Cinema" },
+    ],
+  },
 ];
