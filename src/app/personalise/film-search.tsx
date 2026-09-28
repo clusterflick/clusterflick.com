@@ -17,6 +17,9 @@ import {
 } from "@/lib/tmdb-search";
 import styles from "./page.module.css";
 
+/** For the empty watchlist, which sends the reader here. */
+export const FILM_SEARCH_INPUT_ID = "personalise-film-search";
+
 type SearchState =
   | { step: "idle" }
   | { step: "searching" }
@@ -92,7 +95,7 @@ export default function FilmSearch() {
         onSubmit={onSubmit}
       >
         <SearchInput
-          id="personalise-film-search"
+          id={FILM_SEARCH_INPUT_ID}
           value={query}
           onChange={onChange}
           placeholder="Search by title"

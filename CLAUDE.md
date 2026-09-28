@@ -826,8 +826,13 @@ appears, so hover-pausing held it open until the reader moved away. It pauses
 on keyboard focus only, because focus is moved to Undo and expiring underneath
 it would drop a keyboard reader back to the top of the page.
 
-**List tools sit behind "Manage lists"** in the account bar, collapsed by
-default, since everything in them is occasional (`list-management.tsx`).
+**The account bar is a toolbar**: "Manage lists" and "Manage account" on the
+left, each opening a panel below it (one at a time), and who's signed in with
+Sign out on the right. "Manage account" holds the What we store note and Delete
+account; signed out, the note is a footnote under the sign-in form instead.
+
+**List tools sit behind "Manage lists"**, collapsed by default, since
+everything in them is occasional (`list-management.tsx`).
 Editing takes a row of its own first, import and export pair up below it, and
 "Add a film" (below) comes last, as the one part whose results grow:
 
@@ -910,7 +915,19 @@ count is what the reader gets and a selection made from it matches it again.
 It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
 My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
-same Remove toggle. The page is client-rendered and can't know which venues it
+same Remove toggle. Empty, it offers the venue indexes (`/venues`, `/near-me`,
+`/london-cinemas`, `/cinema-groups`) as the empty watchlist offers places to
+find films.
+
+**Empty lists** (`EmptyList`) sit in the same lane panel the full ones do, each
+with its own neon icon (ticket, projector, 3D glasses). The button that fills
+a list is named in yellow with the icon it carries on the site
+(`ControlName`), so the reader knows it when they see it. The empty
+watchlist's "Manage lists" opens the list tools and focuses the film search.
+The empty My Venues links to `/catalogue#open-filters`, which opens the filter
+overlay on arrival (`useOpenFiltersHash`, on /catalogue and /planner) — the My
+Venues pill lives there and no page describes it better. The hook must run
+before `applyUrlParams`, which replaces the whole address, hash included. The page is client-rendered and can't know which venues it
 will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 

@@ -53,6 +53,7 @@ import {
   type PlannerHourSection,
   type PlannerRowData,
 } from "@/utils/get-planner-day";
+import { useOpenFiltersHash } from "@/hooks/use-open-filters-hash";
 import styles from "./page.module.css";
 
 const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
@@ -165,6 +166,10 @@ export default function PageContent() {
   const listView = useDeferredValue(view);
   const isSwitchingView = listView !== view;
 
+  const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
+  // Ahead of `applyUrlParams`, which would clear the hash.
+  useOpenFiltersHash(() => setIsFilterOverlayOpen(true));
+
   // With the filter params gone the provider's own strip-on-mount (which runs
   // after this, parent effects following child ones) has nothing to do, so a
   // day written back to the URL survives it.
@@ -178,7 +183,6 @@ export default function PageContent() {
     typeof window === "undefined" ? null : takeSavedScroll(),
   );
 
-  const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
   const [filterTextHeight, setFilterTextHeight] = useState(0);
 
   // One pass of the real filter pipeline over the whole date range; the day is
