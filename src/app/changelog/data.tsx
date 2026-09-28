@@ -152,6 +152,69 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Bird House Brewery",
+                  url: "https://birdhousebrewing.com",
+                },
+                {
+                  name: "Blondies Brewery",
+                  url: "https://blondiesbar.co.uk",
+                },
+                {
+                  name: "Blown Away Studios",
+                  url: "https://www.instagram.com/blownawaystudios/",
+                },
+                {
+                  name: "Canada Water Library",
+                  url: "https://www.southwark.gov.uk/culture-and-sport/libraries/find-library/canada-water-library",
+                },
+                {
+                  name: "Gunnersbury Park Museum",
+                  url: "https://www.visitgunnersbury.org/museum",
+                },
+                {
+                  name: "Institute of Advanced Legal Studies",
+                  url: "https://ials.sas.ac.uk",
+                },
+                {
+                  name: "London College of Communication",
+                  url: "https://www.arts.ac.uk/colleges/london-college-of-communication",
+                },
+                {
+                  name: "Moylett's",
+                  url: "https://moyletts.co.uk",
+                },
+                {
+                  name: "Nell of Old Drury",
+                  url: "https://www.nellofolddrury.co.uk",
+                },
+                {
+                  name: "Osterley Park and House",
+                  url: "https://www.nationaltrust.org.uk/visit/london/osterley-park-and-house",
+                },
+                {
+                  name: "The Natural Philosopher",
+                  url: "https://www.naturalphilosopher.co.uk",
+                },
+                {
+                  name: "UCL Garwood Lecture Theatre",
+                  url: "https://studentsunionucl.org/whats-on/venue/garwood-lecture-theatre-south-wing",
+                },
+              ]}
+            />
+            : pubs, breweries, libraries, universities, a museum and a National
+            Trust estate, all hosting film nights, from horror seasons to
+            outdoor cinema.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: ({ Festival }) => (
           <>
