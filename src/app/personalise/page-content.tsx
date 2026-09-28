@@ -1090,52 +1090,56 @@ function FavouriteVenuesSection({
         ) : undefined
       }
     >
-      <ul className={styles.venueList}>
-        {entries.map(({ id, name, entry, isRemoved, isKnown }) => {
-          const counts = venueCounts.get(id);
-          return (
-            <li key={id}>
-              <VenueCard
-                // A venue that has left the dataset has no page to link to.
-                href={isKnown && !isRemoved ? getVenueUrl({ name }) : undefined}
-                name={name}
-                type={metaData?.venues[id]?.type}
-                imagePath={venueImagePaths[id] ?? null}
-                filmCount={isKnown ? (counts?.films ?? 0) : undefined}
-                performanceCount={
-                  isKnown ? (counts?.performances ?? 0) : undefined
-                }
-                detail={isKnown ? undefined : "No longer listed"}
-                muted={isRemoved}
-                action={
-                  isRemoved ? (
-                    <button
-                      type="button"
-                      className={styles.remove}
-                      onClick={() => onUndo(id, entry.name)}
-                      aria-label={`Undo removing ${name} from My Venues`}
-                    >
-                      Undo
-                    </button>
-                  ) : (
-                    showRemove && (
+      <div className={styles.lane}>
+        <ul className={styles.venueList}>
+          {entries.map(({ id, name, entry, isRemoved, isKnown }) => {
+            const counts = venueCounts.get(id);
+            return (
+              <li key={id}>
+                <VenueCard
+                  // A venue that has left the dataset has no page to link to.
+                  href={
+                    isKnown && !isRemoved ? getVenueUrl({ name }) : undefined
+                  }
+                  name={name}
+                  type={metaData?.venues[id]?.type}
+                  imagePath={venueImagePaths[id] ?? null}
+                  filmCount={isKnown ? (counts?.films ?? 0) : undefined}
+                  performanceCount={
+                    isKnown ? (counts?.performances ?? 0) : undefined
+                  }
+                  detail={isKnown ? undefined : "No longer listed"}
+                  muted={isRemoved}
+                  action={
+                    isRemoved ? (
                       <button
                         type="button"
                         className={styles.remove}
-                        onClick={() => onRemove(id, entry)}
-                        aria-label={`Remove ${name} from My Venues`}
+                        onClick={() => onUndo(id, entry.name)}
+                        aria-label={`Undo removing ${name} from My Venues`}
                       >
-                        <CloseIcon size={14} />
-                        Remove
+                        Undo
                       </button>
+                    ) : (
+                      showRemove && (
+                        <button
+                          type="button"
+                          className={styles.remove}
+                          onClick={() => onRemove(id, entry)}
+                          aria-label={`Remove ${name} from My Venues`}
+                        >
+                          <CloseIcon size={14} />
+                          Remove
+                        </button>
+                      )
                     )
-                  )
-                }
-              />
-            </li>
-          );
-        })}
-      </ul>
+                  }
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </ContentSection>
   );
 }
