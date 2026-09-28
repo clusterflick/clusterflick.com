@@ -99,6 +99,73 @@ export const SignedInWithLists: Story = {
   },
 };
 
+const SEEN_TITLES = [
+  "Alien",
+  "Amélie",
+  "Brazil",
+  "Casablanca",
+  "Chinatown",
+  "Days of Heaven",
+  "Do the Right Thing",
+  "Fargo",
+  "Heat",
+  "Jaws",
+  "La Haine",
+  "Le Samouraï",
+  "Magnolia",
+  "Mulholland Drive",
+  "Nashville",
+  "Paris, Texas",
+  "Persona",
+  "Playtime",
+  "Rashomon",
+  "Ran",
+  "Stalker",
+  "Taxi Driver",
+  "The Conversation",
+  "Tokyo Story",
+  "Vertigo",
+  "Yi Yi",
+];
+
+/**
+ * A long Seen list, cut to its first three rows with a "Show all" button, and a
+ * watchlist whose films that aren't showing are folded behind a toggle.
+ */
+export const SignedInLongLists: Story = {
+  args: {
+    user: {
+      status: "signed-in",
+      email: "reader@example.com",
+      lists: {
+        [UserListId.Watchlist]: {
+          ...SignedInWithLists.args.user.lists![UserListId.Watchlist],
+          "not-showing-1": {
+            title: "Wanda",
+            year: "1970",
+            addedAt: 1_758_200_000_000,
+          },
+          "not-showing-2": {
+            title: "Killer of Sheep",
+            year: "1978",
+            addedAt: 1_758_300_000_000,
+          },
+        },
+        [UserListId.Seen]: {
+          ...SignedInWithLists.args.user.lists![UserListId.Seen],
+          ...Object.fromEntries(
+            SEEN_TITLES.map((title, index) => [
+              `seen-${index}`,
+              { title, addedAt: 1_757_000_000_000 + index },
+            ]),
+          ),
+        },
+      },
+      favouriteVenues: SignedInWithLists.args.user.favouriteVenues,
+    },
+  },
+};
+
 /** The list tools opened from the account bar, with Remove buttons shown. */
 export const SignedInManagingLists: Story = {
   args: SignedInWithLists.args,
