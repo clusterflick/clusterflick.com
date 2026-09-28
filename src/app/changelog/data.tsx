@@ -71,6 +71,29 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-28",
+    changes: [
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added the{" "}
+            <Link href="/film-clubs/london-australian-film-society">
+              London Australian Film Society
+            </Link>
+            , screening Australian films in London since 1973. Next up is its
+            All My Friends double bill at{" "}
+            <Venue
+              name="Finsbury Park Picturehouse"
+              url="https://www.picturehouses.com/cinema/finsbury-park"
+            />{" "}
+            on 4 October, with a Q&amp;A.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-27",
     changes: [
       {

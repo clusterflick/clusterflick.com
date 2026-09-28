@@ -552,4 +552,19 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Deptford Cinema" },
     ],
   },
+  {
+    id: "london-australian-film-society",
+    name: "London Australian Film Society",
+    url: "https://www.londonaustfilm.com",
+    aliases: ["lafs"],
+    matchers: [
+      // Listings lead with the initials ("LAFS PRESENTS: …"). "lafs" appears
+      // nowhere else in the data. The festival's "LAFF" screenings belong to
+      // the London Australian Film Festival, not here.
+      { [FilterId.ShowingTitleSearch]: "LAFS" },
+      { [FilterId.PerformanceNotesSearch]: "LAFS" },
+      { [FilterId.ShowingTitleSearch]: "London Australian Film Society" },
+      { [FilterId.PerformanceNotesSearch]: "London Australian Film Society" },
+    ],
+  },
 ];
