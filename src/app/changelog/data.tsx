@@ -74,6 +74,19 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-09-27",
     changes: [
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added My Venues. Press My venue on any{" "}
+            <Link href="/venues">venue&rsquo;s page</Link> to save it, then pick
+            My Venues under Venues in the filters to see only what&rsquo;s on at
+            your favourites. They&rsquo;re listed on{" "}
+            <Link href="/personalise">Personalise</Link>, with a link to
+            everything showing at them.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
