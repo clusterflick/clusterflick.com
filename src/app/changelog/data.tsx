@@ -232,7 +232,7 @@ export const CHANGELOG: ChangelogDay[] = [
                 },
                 {
                   name: "St Gabriel's Church Aldersbrook",
-                  url: "https://www.achurchnearyou.com/church/6141/",
+                  url: "https://www.stgabrielsaldersbrook.org.uk",
                 },
                 {
                   name: "Swiss Cottage Library",
