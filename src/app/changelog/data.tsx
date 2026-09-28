@@ -159,6 +159,10 @@ export const CHANGELOG: ChangelogDay[] = [
             <VenueList
               items={[
                 {
+                  name: "Armenian Institute",
+                  url: "https://www.armenianinstitute.org.uk",
+                },
+                {
                   name: "Bird House Brewery",
                   url: "https://birdhousebrewing.com",
                 },
@@ -175,16 +179,40 @@ export const CHANGELOG: ChangelogDay[] = [
                   url: "https://www.southwark.gov.uk/culture-and-sport/libraries/find-library/canada-water-library",
                 },
                 {
+                  name: "Central Saint Martins",
+                  url: "https://www.arts.ac.uk/colleges/central-saint-martins/student-life-at-csm/facilities/platform-theatre",
+                },
+                {
+                  name: "Enfield Town Library",
+                  url: "https://www.enfield.gov.uk/services/libraries/library-meeting-rooms-for-hire/enfield-town-library",
+                },
+                {
                   name: "Gunnersbury Park Museum",
                   url: "https://www.visitgunnersbury.org/museum",
+                },
+                {
+                  name: "Hundred Years Gallery",
+                  url: "http://hundredyearsgallery.co.uk",
                 },
                 {
                   name: "Institute of Advanced Legal Studies",
                   url: "https://ials.sas.ac.uk",
                 },
                 {
+                  name: "Karamel N22",
+                  url: "https://www.collage-arts.org/karamel-n22/",
+                },
+                {
+                  name: "Live At St Giles",
+                  url: "https://www.liveatstgiles.com/whats-on",
+                },
+                {
                   name: "London College of Communication",
                   url: "https://www.arts.ac.uk/colleges/london-college-of-communication",
+                },
+                {
+                  name: "Minet Library",
+                  url: "https://www.lambeth.gov.uk/libraries-0/minet-library",
                 },
                 {
                   name: "Moylett's",
@@ -199,6 +227,18 @@ export const CHANGELOG: ChangelogDay[] = [
                   url: "https://www.nationaltrust.org.uk/visit/london/osterley-park-and-house",
                 },
                 {
+                  name: "SOAS University of London",
+                  url: "https://www.soas.ac.uk",
+                },
+                {
+                  name: "St Gabriel's Church Aldersbrook",
+                  url: "https://www.achurchnearyou.com/church/6141/",
+                },
+                {
+                  name: "Swiss Cottage Library",
+                  url: "https://www.camden.gov.uk/swiss-cottage-library",
+                },
+                {
                   name: "The Natural Philosopher",
                   url: "https://www.naturalphilosopher.co.uk",
                 },
@@ -208,9 +248,9 @@ export const CHANGELOG: ChangelogDay[] = [
                 },
               ]}
             />
-            : pubs, breweries, libraries, universities, a museum and a National
-            Trust estate, all hosting film nights, from horror seasons to
-            outdoor cinema.
+            : pubs, breweries, libraries, universities, galleries, churches, a
+            museum and a National Trust estate, all hosting film nights, from
+            horror seasons and live silent films to outdoor cinema.
           </>
         ),
       },
