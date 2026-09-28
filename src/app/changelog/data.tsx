@@ -106,6 +106,37 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Art Hub Studios",
+                  url: "https://www.arthub.org.uk",
+                },
+                {
+                  name: "Central Film School",
+                  url: "https://www.centralfilmschool.com",
+                },
+                {
+                  name: "House of Annetta",
+                  url: "https://houseofannetta.org",
+                },
+                {
+                  name: "Palestine House",
+                  url: "https://palestinehouse.org",
+                },
+              ]}
+            />
+            : artist-run studios in New Cross, a film school in a former
+            Stockwell music hall, a Spitalfields house exploring land and
+            ownership, and a Palestinian cultural hub on High Holborn.
+          </>
+        ),
+      },
     ],
   },
   {
