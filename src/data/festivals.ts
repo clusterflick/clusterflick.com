@@ -35,6 +35,7 @@ const londonFilmFestivalVenues = [
   "ica.art",
   "princecharlescinema.com",
   "myvue.com-leicester-square",
+  "southbankcentre.co.uk",
 ];
 
 export const FESTIVALS: Festival[] = [

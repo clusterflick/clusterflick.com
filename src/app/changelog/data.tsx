@@ -137,6 +137,36 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added the{" "}
+            <Venue
+              name="Southbank Centre"
+              url="https://www.southbankcentre.co.uk"
+            />
+            , whose Royal Festival Hall hosts the London Film Festival&apos;s
+            gala screenings.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: ({ Festival }) => (
+          <>
+            The{" "}
+            <Festival
+              name="BFI London Film Festival"
+              url="https://www.bfi.org.uk/london-film-festival"
+            />{" "}
+            programme now comes straight from the festival, so every screening
+            is listed at BFI Southbank, the BFI IMAX, Curzon Soho, Vue West End
+            and the Royal Festival Hall, not only at the venues that publish the
+            festival themselves.
+          </>
+        ),
+      },
     ],
   },
   {
