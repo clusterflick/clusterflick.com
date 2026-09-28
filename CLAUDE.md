@@ -764,6 +764,25 @@ and back on the watchlist), so markers stack like chips and fan out on hover;
 a new status such as an alert is one more entry in its `MARKERS`. They render
 only once signed in with lists loaded, so the static HTML is unchanged.
 
+**The home page opens with "From Your Watchlist"** (`WatchlistRow`,
+`getWatchlistRow`), above Showing Across London: watchlist films with a
+bookable showing in the next fortnight — a fortnight, as for occasions, since a
+watchlist is small and worth planning around. It is **ordered by favourite
+venues, not filtered to them**: a handful of venues against a handful of films
+usually intersect in nothing, and a one-poster row reads as broken. Films at a
+favourite come first, soonest there first, subtitled with the venue and date;
+then the rest, with the Last Chance row's "Last showing" when the run is ending
+and "Next showing" otherwise. Every category counts, since the reader chose the
+films. Hidden when empty and while signed out, so the static HTML is unchanged.
+
+It arrives seconds after paint, above every other row, so its slot **reserves
+the height the row last had**: an inline script sets it before paint, only for
+a reader carrying the signed-in flag (which is why `SIGNED_IN_FLAG_KEY` lives
+in `@/lib/user-lists`, readable from a server component, not in the user
+context). The reservation comes off in a layout effect once the row settles,
+which also stores the new height — or clears it when the row is empty, so a
+reader with nothing showing reserves nothing next time.
+
 **`/personalise` splits the watchlist into showing now and not showing**,
 using the client cinema data, since what's on is the question a watchlist is
 brought to. Films not showing are unlinked: whether a departed page still

@@ -707,3 +707,93 @@ export function computeNearMeRows(
     lastChance: getLastChanceMovies(nearby, now, LAST_CHANCE_LIMIT),
   };
 }
+
+// A watchlist is small and a film on it is worth planning around, so the row
+// looks a fortnight ahead, as occasions do.
+const WATCHLIST_WINDOW_DAYS = 14;
+const WATCHLIST_LIMIT = 24;
+
+/**
+ * "From Your Watchlist": the reader's watchlist films with a bookable showing
+ * in the next fortnight. Films showing at one of their favourite venues come
+ * first, soonest there first, and then the rest, soonest anywhere first.
+ *
+ * Ordered by favourites, not filtered to them: a handful of venues against a
+ * handful of films showing usually intersect in nothing, and a row of one
+ * poster reads as broken. A reader with no favourites gets the watchlist by
+ * date.
+ *
+ * Every category counts — the reader chose these films, so the default-grid
+ * categories that keep one-off events out of the curated rows don't apply.
+ *
+ * Subtitles say why a film is where it is: the favourite venue and date for
+ * the first group; for the rest, the Last Chance row's "Last showing" when its
+ * run ends inside that window (the same definition), and otherwise when it is
+ * next on. `venueNames` supplies the venue name; without it a favourite
+ * showing falls back to the date.
+ */
+export function getWatchlistRow(
+  movies: MoviesRecord,
+  watchlistIds: Iterable<string>,
+  favouriteVenueIds: ReadonlySet<string>,
+  options: {
+    now?: number;
+    venueNames?: Record<string, { name: string }>;
+    limit?: number;
+  } = {},
+): ScoredMovie[] {
+  const now = options.now ?? Date.now();
+  const rangeEnd = now + WATCHLIST_WINDOW_DAYS * MS_PER_DAY;
+  const lastChanceDeadline = now + LAST_CHANCE_DAYS * MS_PER_DAY;
+
+  const scored: (ScoredMovie & { atFavourite: boolean; sortTime: number })[] =
+    [];
+  for (const id of new Set(watchlistIds)) {
+    const movie = movies[id];
+    if (!movie) continue;
+    const bookable = movie.performances
+      .filter((p) => p.time >= now && p.time < rangeEnd && !p.status?.soldOut)
+      .sort((a, b) => a.time - b.time);
+    if (bookable.length === 0) continue;
+
+    const atFavourite = bookable.find((p) => {
+      const venueId = movie.showings[p.showingId]?.venueId;
+      return venueId !== undefined && favouriteVenueIds.has(venueId);
+    });
+
+    let subtitle: string;
+    if (atFavourite) {
+      const venueId = movie.showings[atFavourite.showingId].venueId;
+      const venueName = options.venueNames?.[venueId]?.name;
+      const date = formatDayAndDate(atFavourite.time).replace(/ /g, " ");
+      subtitle = venueName ? `${venueName} · ${date}` : date;
+    } else {
+      const final = getFinalShowing(movie, now);
+      subtitle =
+        final && final.time <= lastChanceDeadline
+          ? formatLastShowing(final.time)
+          : `Next showing ${formatDayAndDate(bookable[0].time)}`;
+    }
+
+    scored.push({
+      movie,
+      performanceCount: bookable.length,
+      subtitle,
+      atFavourite: atFavourite !== undefined,
+      sortTime: (atFavourite ?? bookable[0]).time,
+    });
+  }
+
+  return scored
+    .sort(
+      (a, b) =>
+        Number(b.atFavourite) - Number(a.atFavourite) ||
+        a.sortTime - b.sortTime,
+    )
+    .slice(0, options.limit ?? WATCHLIST_LIMIT)
+    .map(({ movie, performanceCount, subtitle }) => ({
+      movie,
+      performanceCount,
+      subtitle,
+    }));
+}

@@ -25,6 +25,7 @@ import {
   fetchUserData,
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
+  SIGNED_IN_FLAG_KEY,
   toUserListEntry,
   UserListId,
   type FavouriteVenues,
@@ -98,13 +99,6 @@ export type UserContextType = {
   addFavouriteVenue: (venue: Pick<Venue, "id" | "name">) => Promise<void>;
   removeFavouriteVenue: (venueId: Venue["id"]) => Promise<void>;
 };
-
-/**
- * Set on sign-in, cleared on sign-out. Carries no personal data: it exists so
- * a visitor who has never signed in never downloads the SDK just to be told
- * so. If it outlives the session, the SDK loads, reports nobody, and clears it.
- */
-const SIGNED_IN_FLAG_KEY = "clusterflick-signed-in";
 
 /**
  * The address a link was sent to, needed again to redeem it — the link itself

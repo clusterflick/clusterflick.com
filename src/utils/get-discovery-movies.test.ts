@@ -16,6 +16,7 @@ import {
   getOccasionMovies,
   getRating,
   computeNearMeRows,
+  getWatchlistRow,
   type DiscoveryWindow,
 } from "./get-discovery-movies";
 
@@ -606,5 +607,87 @@ describe("computeNearMeRows", () => {
 
     const { occasions } = computeNearMeRows(movies, NEAR, NOW);
     expect(occasions.map((s) => s.movie.id)).toEqual(["qa-here"]);
+  });
+});
+
+describe("getWatchlistRow", () => {
+  const FAVOURITES = new Set(["fav"]);
+  const VENUES = { fav: { name: "Rio" }, other: { name: "Elsewhere" } };
+
+  it("keeps only watchlist films with a bookable showing in the fortnight", () => {
+    const movies = asRecord([
+      makeMovie("listed", [{ venueId: "other" }]),
+      makeMovie("unlisted", [{ venueId: "other" }]),
+      makeMovie("later", [{ venueId: "other", times: [NOW + 20 * DAY] }]),
+      makeMovie("sold-out", [{ venueId: "other", soldOut: true }]),
+      makeMovie("past", [{ venueId: "other", times: [NOW - DAY] }]),
+    ]);
+
+    const row = getWatchlistRow(
+      movies,
+      ["listed", "later", "sold-out", "past", "departed"],
+      FAVOURITES,
+      { now: NOW },
+    );
+    expect(row.map((s) => s.movie.id)).toEqual(["listed"]);
+  });
+
+  it("puts favourite-venue films first, each group soonest first", () => {
+    const movies = asRecord([
+      makeMovie("soon-elsewhere", [{ venueId: "other", times: [NOW + DAY] }]),
+      makeMovie("late-fav", [
+        { venueId: "other", times: [NOW + DAY] },
+        { venueId: "fav", times: [NOW + 9 * DAY] },
+      ]),
+      makeMovie("early-fav", [{ venueId: "fav", times: [NOW + 3 * DAY] }]),
+      makeMovie("late-elsewhere", [
+        { venueId: "other", times: [NOW + 2 * DAY, NOW + 12 * DAY] },
+      ]),
+    ]);
+
+    const row = getWatchlistRow(
+      movies,
+      ["soon-elsewhere", "late-fav", "early-fav", "late-elsewhere"],
+      FAVOURITES,
+      { now: NOW },
+    );
+    expect(row.map((s) => s.movie.id)).toEqual([
+      "early-fav",
+      "late-fav",
+      "soon-elsewhere",
+      "late-elsewhere",
+    ]);
+  });
+
+  it("falls back to the watchlist by date with no favourites", () => {
+    const movies = asRecord([
+      makeMovie("b", [{ venueId: "fav", times: [NOW + 4 * DAY] }]),
+      makeMovie("a", [{ venueId: "other", times: [NOW + 2 * DAY] }]),
+    ]);
+
+    const row = getWatchlistRow(movies, ["b", "a"], new Set(), { now: NOW });
+    expect(row.map((s) => s.movie.id)).toEqual(["a", "b"]);
+  });
+
+  it("says where and when for a favourite, and when otherwise", () => {
+    const movies = asRecord([
+      makeMovie("fav-film", [{ venueId: "fav", times: [NOW + DAY] }]),
+      makeMovie("ending", [{ venueId: "other", times: [NOW + 2 * DAY] }]),
+      makeMovie("running", [
+        { venueId: "other", times: [NOW + 2 * DAY, NOW + 30 * DAY] },
+      ]),
+    ]);
+
+    const [fav, ...rest] = getWatchlistRow(
+      movies,
+      ["fav-film", "ending", "running"],
+      FAVOURITES,
+      { now: NOW, venueNames: VENUES },
+    );
+    expect(fav.subtitle).toMatch(/^Rio ·\u00A0Wed\u00A015\u00A0Nov$/);
+    expect(rest.map((s) => s.subtitle)).toEqual([
+      "Last showing Thu 16 Nov",
+      "Next showing Thu 16 Nov",
+    ]);
   });
 });
