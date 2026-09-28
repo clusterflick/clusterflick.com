@@ -567,4 +567,17 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "London Australian Film Society" },
     ],
   },
+  {
+    id: "window-seat-cinema-club",
+    name: "Window Seat Cinema Club",
+    url: "https://www.windowseatcinema.com",
+    aliases: ["window-seat-cinema", "window-seat"],
+    matchers: [
+      // Host venues credit the screenings in performance notes ("Presented by
+      // Window Seat Cinema Club"). "Window Seat Cinema" rather than "Window
+      // Seat", which is also the title of more than one film.
+      { [FilterId.ShowingTitleSearch]: "Window Seat Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Window Seat Cinema" },
+    ],
+  },
 ];
