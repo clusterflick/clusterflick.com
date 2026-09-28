@@ -289,7 +289,7 @@ export default function PersonalisePageContent({
   return (
     <StandardPageLayout
       title="Personalise"
-      subtitle="Keep track of the films you want to see, and the ones you have."
+      subtitle="Keep track of the films you want to see, where you like to see them, and the ones you've already seen."
       afterContent={
         status === "signed-in" ? (
           <SignedIn venueImagePaths={venueImagePaths} />
