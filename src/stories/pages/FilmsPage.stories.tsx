@@ -7,12 +7,14 @@ import {
   useFilterConfig,
 } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
+import DataLoadNoticeClient from "@/components/data-load-notice/data-load-notice-client";
 import {
   handlers,
   loadingHandlers,
   errorHandlers,
   emptyHandlers,
   partialHandlers,
+  chunkFailureHandlers,
 } from "../../../.storybook/msw/handlers";
 
 // Wrapper that provides all required contexts (using real providers)
@@ -24,6 +26,21 @@ function HomePageWrapper() {
           <PageContent />
         </GeolocationProvider>
       </FilterConfigProvider>
+    </CinemaDataProvider>
+  );
+}
+
+// As the root layout places it: the notice sits beside the page, inside the
+// cinema data provider
+function HomePageWithDataLoadNotice() {
+  return (
+    <CinemaDataProvider>
+      <FilterConfigProvider>
+        <GeolocationProvider>
+          <PageContent />
+        </GeolocationProvider>
+      </FilterConfigProvider>
+      <DataLoadNoticeClient />
     </CinemaDataProvider>
   );
 }
@@ -114,6 +131,20 @@ export const Error: Story = {
   parameters: {
     msw: {
       handlers: errorHandlers,
+    },
+  },
+};
+
+/**
+ * One movie chunk failed while the rest loaded. The grid shows what arrived,
+ * and the data-load notice says the listings are incomplete, with a Try Again
+ * that refetches only the missing chunk.
+ */
+export const ChunkFailed: Story = {
+  render: () => <HomePageWithDataLoadNotice />,
+  parameters: {
+    msw: {
+      handlers: chunkFailureHandlers,
     },
   },
 };

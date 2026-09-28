@@ -184,6 +184,25 @@ a reader sees. It does _not_ affect the `/lists` index, which sorts by film coun
 Virtuoso renders no items during SSR without `initialItemCount`, which would leave the films out of
 the static HTML. List pages use `FilmPosterGrid`, which lays out identically.
 
+## Loading the Listings
+
+`CinemaDataProvider` fetches the meta blob, then every movie chunk at once.
+Each fetch goes through `fetchWithRetry` (`@/utils/fetch-with-retry`), the
+client twin of the calendar script's: jittered exponential backoff under a
+request timeout, the body parsed _inside_ the retried attempt (a truncated
+response is the likely cause of bad JSON), and no retry on a 4xx other than
+408/429.
+
+**A chunk that still fails is a gap, not an error.** The rest load, and its
+filename goes in `failedFiles`. Chunks are cut in title order, so a gap is a
+run of titles that would otherwise read as simply not showing — which is why
+`DataLoadNotice` (in the root layout) says the listings are incomplete, and
+why `FilmPosterGridClient` stops pruning its static list while `failedFiles`
+is non-empty. Anything else that reads a film's absence from `movies` as "not
+showing" should check it too. The notice's Try again is `retryFailedFiles`,
+which refetches only those chunks and merges them in without clearing the
+page. Only a load where _nothing_ arrived sets `error`, the full-page state.
+
 ## Venue Calendars
 
 `/venues/<slug>/calendar` renders the venue's published ICS feed in a month grid or agenda.
