@@ -130,7 +130,7 @@ const VENUE_DISCOVERY_LINKS: DiscoveryLink[] = [
  */
 function DiscoveryLinks({ links }: { links: DiscoveryLink[] }) {
   return (
-    <CardGrid size="md" className={styles.discovery}>
+    <CardGrid size="lg" className={styles.discovery}>
       {links.map((link) => (
         <LinkCard key={link.key} href={link.href} variant="social">
           <CardContent>
@@ -1062,7 +1062,7 @@ function FavouriteVenuesSection({
             a venue&apos;s page to add it.
           </p>
           <p className={styles.emptyLine}>
-            Then use <ControlName>My Venues</ControlName> in the{" "}
+            Then use <strong>My Venues</strong> in the{" "}
             <Link href={`/catalogue#${OPEN_FILTERS_HASH}`}>filters</Link> to see
             only what&apos;s on at your favourites.
           </p>
