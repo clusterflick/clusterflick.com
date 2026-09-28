@@ -18,6 +18,7 @@ import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
 import DiscoverySections from "./discovery-sections";
 import DiscoveryRowsView from "./discovery-rows-view";
+import WatchlistRow from "./watchlist-row";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -129,6 +130,8 @@ export default async function Home() {
           <div className={styles.browseCta}>
             <ButtonLink href="/catalogue">Browse all films →</ButtonLink>
           </div>
+
+          <WatchlistRow />
 
           <DiscoverySections
             fallback={<DiscoveryRowsView rows={serverRows} />}

@@ -1,6 +1,16 @@
 import type { Movie, Venue } from "@/types";
 import type { Firestore } from "firebase/firestore/lite";
 
+/**
+ * Set on sign-in, cleared on sign-out. Carries no personal data: it exists so
+ * a visitor who has never signed in never downloads the SDK just to be told
+ * so. If it outlives the session, the SDK loads, reports nobody, and clears it.
+ *
+ * Lives here rather than in the user context so server components can read it:
+ * the home page's inline script checks it before the page paints.
+ */
+export const SIGNED_IN_FLAG_KEY = "clusterflick-signed-in";
+
 export enum UserListId {
   Watchlist = "watchlist",
   Seen = "seen",

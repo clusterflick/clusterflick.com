@@ -71,3 +71,13 @@
   justify-content: center;
   margin: 8px 0 64px;
 }
+
+/*
+ * Holds the watchlist row's last height until the row settles (see
+ * watchlist-row-reservation.ts). flow-root keeps the row's bottom margin
+ * inside the slot, so the stored height includes it.
+ */
+.watchlistSlot {
+  display: flow-root;
+  min-height: var(--reserved-height, 0);
+}
