@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef } from "react";
+import LoadingIndicator from "@/components/loading-indicator";
 import PosterRow from "@/components/poster-row";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
@@ -78,6 +79,7 @@ export default function WatchlistRow() {
   useLayoutEffect(() => {
     if (!settled || !slotRef.current) return;
     slotRef.current.style.removeProperty("--reserved-height");
+    slotRef.current.removeAttribute("data-reserved");
     if (signedIn) storeHeight(slotRef.current.offsetHeight);
   }, [settled, signedIn, row]);
 
@@ -90,6 +92,14 @@ export default function WatchlistRow() {
         // The reservation script sets a style React doesn't know about.
         suppressHydrationWarning
       >
+        {/* Shown by CSS only while the slot is reserved. */}
+        {!settled && (
+          <LoadingIndicator
+            size="sm"
+            message="Loading your watchlist…"
+            className={styles.watchlistLoading}
+          />
+        )}
         {row && (
           <PosterRow
             title="From Your Watchlist"
