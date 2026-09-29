@@ -40,7 +40,9 @@ h3.title {
   white-space: nowrap;
 }
 
+/* Positioned so the status markers can sit over the poster's corner. */
 .posterLink {
+  position: relative;
   flex-shrink: 0;
   text-decoration: none;
   border-bottom: none;

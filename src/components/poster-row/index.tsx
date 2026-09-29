@@ -4,6 +4,7 @@ import type { Movie } from "@/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
+import PosterStatusMarkers from "@/components/poster-status-markers";
 import PosterScroller from "./scroller";
 import styles from "./poster-row.module.css";
 
@@ -83,6 +84,7 @@ export default function PosterRow({
               href={`${getMovieUrl(movie)}${query}${showAll ? "#show-all" : ""}`}
               className={styles.posterLink}
             >
+              <PosterStatusMarkers movieId={movie.id} />
               {useStackedPoster ? (
                 <StackedPoster
                   mainPosterPath={movie.posterPath}

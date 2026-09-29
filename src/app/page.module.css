@@ -78,6 +78,21 @@
  * inside the slot, so the stored height includes it.
  */
 .watchlistSlot {
+  position: relative;
   display: flow-root;
   min-height: var(--reserved-height, 0);
+}
+
+/*
+ * The spinner fills the reserved space and is hidden when nothing is
+ * reserved. Two classes deep so it outranks LoadingIndicator's own display.
+ */
+.watchlistSlot .watchlistLoading {
+  display: none;
+}
+
+.watchlistSlot[data-reserved] .watchlistLoading {
+  display: flex;
+  position: absolute;
+  inset: 0;
 }
