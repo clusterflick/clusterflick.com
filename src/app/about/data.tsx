@@ -92,6 +92,13 @@ export const partnerSites = [
     url: "https://everycinema.london",
     logo: "/images/partners/everycinema.svg",
   },
+  {
+    name: "Cultur Vultur",
+    description:
+      "Q&As, filmmaker talks, premieres and special screenings at London cinemas.",
+    url: "https://culturvultur.com",
+    logo: "/images/partners/culturvultur.svg",
+  },
 ];
 
 /**
