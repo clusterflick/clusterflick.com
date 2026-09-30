@@ -25,8 +25,6 @@ import MainHeader from "@/components/main-header";
 import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
 import FilterSuggestions from "@/components/filter-suggestions";
-import ScopeBanner from "@/components/scope-banner";
-import { useProgrammeScope } from "@/hooks/use-programme-scope";
 import { useOpenFiltersHash } from "@/hooks/use-open-filters-hash";
 import styles from "./page.module.css";
 
@@ -53,8 +51,6 @@ export default function PageContent() {
     applyFilterState,
     applyUrlParams,
   } = useFilterConfig();
-
-  const programmeScope = useProgrammeScope();
 
   const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
   // Ahead of `applyUrlParams`, which would clear the hash.
@@ -336,9 +332,6 @@ export default function PageContent() {
       <div className={styles.announcer} role="status">
         {announcement}
       </div>
-      {hasAttemptedLoad && !error && !isEmpty && (
-        <ScopeBanner items={programmeScope} />
-      )}
       {renderEmptyState()}
       {!hiddenByDate && renderValueOffers()}
       {moviesList.length > 0 && (

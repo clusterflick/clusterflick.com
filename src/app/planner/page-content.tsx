@@ -22,8 +22,6 @@ import { filterManager } from "@/lib/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import DayStepper from "@/components/day-stepper";
-import ScopeBanner from "@/components/scope-banner";
-import { useProgrammeScope } from "@/hooks/use-programme-scope";
 import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import MainHeader from "@/components/main-header";
@@ -150,7 +148,6 @@ export default function PageContent() {
   } = useCinemaData();
   const { filterState, resetFilters, hasActiveFilters, applyUrlParams } =
     useFilterConfig();
-  const programmeScope = useProgrammeScope();
 
   // The day the reader chose, or null to follow the start of the range. Kept
   // unclamped so a filter change that narrows the range and then widens it
@@ -587,9 +584,6 @@ export default function PageContent() {
             </Button>
           </div>
         </StickyBar>
-      )}
-      {hasAttemptedLoad && !isLoading && !error && !isEmpty && (
-        <ScopeBanner items={programmeScope} className={styles.scopeBanner} />
       )}
       <div className={styles.content}>
         {/* The outgoing list stays up, dimmed, while the next one renders. */}

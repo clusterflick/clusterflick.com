@@ -73,7 +73,7 @@ covers the need. The canonical components are:
   plus an optional control)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
-- **Feedback:** `EmptyState`, `ScopeBanner` (what a grid is narrowed _to_, with a way off)
+- **Feedback:** `EmptyState`
 
 Only create a new component when no existing one fits. When you do:
 
@@ -496,12 +496,14 @@ server-side.
   button onto an empty grid reads as broken. Links use `getProgrammeFilterUrl`, with `base=all` —
   clubs are often listed as events, which the default categories hide, and a monthly club shows
   nothing in most weeks' default window.
-- **A `ScopeBanner` above the catalogue and planner** ("Only showing: Film club · Japanese Film
-  Club ✕"), fed by `useProgrammeScope`. A programme changes what the page _is_, not how narrow it
-  is, so it is named where the reader is looking, links back to its page, and comes off in one
-  click — rather than being left to the overlay and the trigger's description.
 - **The overlay**, in "More Event Options" above Films (`ProgrammeFilterSection`), one
   `EntityQuickAdd` per group. It opens itself while either is set, as the other filters in it do.
+
+**No banner above the grid.** One was built and taken out: the trigger's description already names
+the club ("Events from Japanese Film Club"), and the watchlist and people filters — also set from
+another page, also deciding what the grid is about — have none. A banner for programmes alone would
+be inconsistent. Where the description truncates on a phone the selection is hard to see, but that
+is true of all of those filters and wants one answer for them all.
 
 **The typeahead carries no counts.** Counting a programme means running its matchers over the
 dataset, and each matcher pass is 3–6ms whatever the matcher: against a live release (2,193 films,
