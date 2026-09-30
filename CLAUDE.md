@@ -549,8 +549,8 @@ its own "acclaimed gem" idea.
 between 3.5 and 4.3 — in a live week 226 films were 3.5+, 80 were 4.0+ and 6 were 4.5+, so half-point
 steps jump straight across the useful range. The slider's lowest position, one step below 3.0,
 reads "Any rating" and clears it: a slider has no off switch, and a second control for one setting
-is worse. A note under it says only films with 2,000+ reviews have a rating, so an unrated film
-dropping out isn't read as a verdict on it. Ratings are compared at one decimal, as posters show
+is worse. A one-line note under it ("Only films with 2,000+ reviews are counted") says why an
+unrated film drops out, so it isn't read as a verdict on it. Ratings are compared at one decimal, as posters show
 them: a film averaging 3.96 reads "4.0/5", and "4.0+" leaving it out would contradict the poster.
 
 When a filtered grid returns a handful of films and widening the dates would

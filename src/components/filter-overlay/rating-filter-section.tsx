@@ -73,8 +73,7 @@ export default function RatingFilterSection({
 
       <p className={styles.selectionNote}>
         Only films with {LETTERBOXD_MIN_REVIEWS.toLocaleString("en-GB")}+
-        reviews on Letterboxd have a rating here, so a narrower search leaves
-        out films that are too new or too obscure to have one.
+        reviews are counted
       </p>
     </div>
   );
