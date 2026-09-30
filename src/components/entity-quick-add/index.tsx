@@ -16,7 +16,11 @@ export interface EntityQuickAddItem {
   id: string;
   /** Full, unabbreviated name, so near-duplicates stay distinguishable. */
   name: string;
-  count: number;
+  /**
+   * Shown beside the name, and breaks ties between fuzzy matches. Optional for
+   * a vocabulary where counting every entry up front costs too much.
+   */
+  count?: number;
 }
 
 /** Imperative handle for parents to focus the search input. */
@@ -76,7 +80,10 @@ function fuzzyMatches(
   }
 
   return scored
-    .sort((a, b) => a.distance - b.distance || b.item.count - a.item.count)
+    .sort(
+      (a, b) =>
+        a.distance - b.distance || (b.item.count ?? 0) - (a.item.count ?? 0),
+    )
     .slice(0, limit)
     .map(({ item }) => item);
 }
@@ -248,7 +255,9 @@ export default function EntityQuickAdd({
                     )}
                   </span>
                   <span className={styles.itemName}>{item.name}</span>
-                  <span className={styles.itemCount}>{item.count}</span>
+                  {item.count !== undefined && (
+                    <span className={styles.itemCount}>{item.count}</span>
+                  )}
                   <span className={styles.visuallyHidden}>
                     {selected
                       ? " (selected, activate to remove)"

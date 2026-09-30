@@ -130,12 +130,15 @@ and regular cinemas simultaneously.
 
 Because each matcher returns the movie pruned to _its own_ matches, a film matching two matchers
 arrives once per matcher, each copy carrying a different slice of the same film.
-`applyMatchers` (`@/lib/filters/apply-matchers`, shared with festivals) therefore unions those
-slices per movie; keeping the last copy silently drops the venues the earlier matchers found. The
+`unionMatches` (`@/lib/filters/match-any`, shared with festivals and the programme filters) therefore
+unions those slices per movie; keeping the last copy silently drops the venues the earlier matchers found. The
 Japanese Film Club is the case to keep in mind: the Phoenix lists "Shall We Dance?" under the club's
 name and hands booking to the club, so its own listing is what we hold (the club's copy is
 deduplicated away upstream) and only the _title_ matcher finds it — while the note matcher finds the
 club-sourced showings at other venues.
+
+`applyMatchers` (`@/lib/filters/apply-matchers`) is the page-side entry point: `matchAny` from the
+manager, then finished performances pruned.
 
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
 named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.
@@ -444,6 +447,70 @@ watchlist would otherwise push every other filter off the screen.
 
 It widens as "All films", beside the people: a selection left over from
 another page is exactly the invisible blocker the empty state exists to name.
+
+## Film Club & Festival Filters
+
+`FilterId.FilmClubs` and `FilterId.Festivals` (`src/lib/filters/modules/programmes.ts`) restrict
+the grid to the showings of chosen clubs or festivals. They are how a club's programme reaches the
+catalogue and planner, which otherwise had no way to express a set of OR'd matchers.
+
+**The selection is registry ids, not film ids.** Each id's matchers are run when the filter is
+applied, so a link follows the club as the listings change — next month's screenings appear with
+no change to the link. A button selecting the club's current films would go stale the day after it
+was made. Otherwise it is the films filter over again: `string[] | null`, "or" within the
+selection, empty meaning no filter, duplicates dropped by `fromUrlParams`, and ids the registry no
+longer holds kept (a festival leaving between editions is a film finishing its run) and matching
+nothing meanwhile. `describeFilters` names only what the registry holds.
+
+**Two filters, not one**, built from one factory as directors and cast are. A club recurs with no
+end and a festival is a bounded event, and the rest of the site keeps them apart. As with the
+people filters, a selection within one is "or" and the two together are "and" — a club's
+screenings that are part of a festival.
+
+**Matchers run through the pipeline itself**, over `getPermissiveState()`, so a club's filter means
+exactly what its page shows. That makes the manager both the thing running the matchers and the
+owner of the modules that call it, so `createMatchAny` takes the pipeline as an argument and the
+two modules are built in `manager.ts` — importing the manager from a module would be a cycle.
+Unlike `applyMatchers`, `matchAny` prunes nothing by time: inside the grid, finished showings are
+the reader's hide-finished setting.
+
+**They run first, and everything is memoised by record identity.** The grid re-runs the pipeline
+on every keystroke, and the suggestion engine probes it dozens of times. Running first means they
+always receive the dataset itself, which `matchAny` caches on; each filter also caches its union
+per input record and (sorted) selection, so the festival filter, which receives the club filter's
+output, sees the same record every pass and hits its own cache.
+
+**Suggestions widen them last among the subjects**, after films: a club or festival is usually why
+the reader is looking, and a monthly club outside the date window wants the dates widened, not
+the club dropped.
+
+**The registries ship to the client**, since the pipeline is synchronous and runs everywhere the
+filter state does. Minified and gzipped they are ~4.5KB together; the blurb components stay
+server-side.
+
+**Where it surfaces:**
+
+- **Club and festival pages** carry "Explore in the catalogue" and "Plan in the planner" under the
+  hero title (`EventDetailPageContent`'s `browseLinks`), and point the grid's explore link at the
+  filtered catalogue — as genre and format pages do. Both only while something is showing; a hero
+  button onto an empty grid reads as broken. Links use `getProgrammeFilterUrl`, with `base=all` —
+  clubs are often listed as events, which the default categories hide, and a monthly club shows
+  nothing in most weeks' default window.
+- **The overlay**, in "More Event Options" above Films (`ProgrammeFilterSection`), one
+  `EntityQuickAdd` per group. It opens itself while either is set, as the other filters in it do.
+
+**No banner above the grid.** One was built and taken out: the trigger's description already names
+the club ("Events from Japanese Film Club"), and the watchlist and people filters — also set from
+another page, also deciding what the grid is about — have none. A banner for programmes alone would
+be inconsistent. Where the description truncates on a phone the selection is hard to see, but that
+is true of all of those filters and wants one answer for them all.
+
+**The typeahead carries no counts.** Counting a programme means running its matchers over the
+dataset, and each matcher pass is 3–6ms whatever the matcher: against a live release (2,193 films,
+36,163 performances) counting all ~90 clubs and festivals took 1.4s, 1s with the search variants
+already cached — far too long for opening an overlay, on a phone several times longer. The names
+are listed alphabetically instead, and only the selected chips are counted, from the cache the
+filter itself has just filled. `EntityQuickAdd`'s `count` is optional for this.
 
 ## Thin-Result Notice
 

@@ -18,13 +18,36 @@ import {
   formatDimensionFilter,
   hideFinishedFilter,
   hideSoldOutFilter,
+  buildProgrammeFilter,
+  PROGRAMME_GROUPS,
 } from "./modules";
+import { createMatchAny } from "./match-any";
+
+/**
+ * Runs a set of OR'd matchers (a film club's or festival's) over a set of
+ * movies: each matcher is this pipeline over a fully permissive state, so only
+ * the matcher itself constrains what it finds. See `createMatchAny`.
+ */
+export const matchAny = createMatchAny((movies, matcher) =>
+  apply(movies, { ...getPermissiveState(), ...matcher }),
+);
+
+// Built here rather than in ./modules because a programme is a set of matchers
+// run through this pipeline, which is what `matchAny` hands them.
+const [filmClubsFilter, festivalsFilter] = PROGRAMME_GROUPS.map((group) =>
+  buildProgrammeFilter(group, matchAny),
+);
 
 /**
  * All registered filter modules.
  * Order matters: filters are applied in this order.
  */
 const modules: AnyFilterModule[] = [
+  // First, so they always see the record handed to the pipeline — on the grid,
+  // the dataset itself — which is what their matcher caches are keyed on. They
+  // are also the narrowest filters when set, leaving little for the rest.
+  filmClubsFilter,
+  festivalsFilter,
   searchFilter,
   showingTitleSearchFilter,
   showingUrlSearchFilter,

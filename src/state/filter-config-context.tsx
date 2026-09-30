@@ -20,6 +20,7 @@ import {
   FilterId,
   FormatFilterId,
   PeopleFilterId,
+  ProgrammeFilterId,
   filterManager,
 } from "@/lib/filters";
 import {
@@ -214,6 +215,9 @@ type FilterConfigContextType = {
   // Films — a chosen set of film ids (e.g. a watchlist)
   toggleMovie: (movieId: string) => void;
   clearMovies: () => void;
+  // Film clubs / festivals — registry ids, keyed by filter id
+  toggleProgramme: (filterId: ProgrammeFilterId, programmeId: string) => void;
+  clearProgrammes: (filterId: ProgrammeFilterId) => void;
   // Accessibility
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
@@ -465,6 +469,30 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
 
   const clearMovies = useCallback(() => {
     setFilterState((prev) => filterManager.set(prev, FilterId.Movies, null));
+  }, []);
+
+  // Film clubs and festivals - the same value semantics again, and ids the
+  // registry no longer holds are left in place; see
+  // `lib/filters/modules/programmes.ts`.
+  const toggleProgramme = useCallback(
+    (filterId: ProgrammeFilterId, programmeId: string) => {
+      setFilterState((prev) => {
+        const current = filterManager.get(prev, filterId) ?? [];
+        const updated = current.includes(programmeId)
+          ? current.filter((id) => id !== programmeId)
+          : [...current, programmeId];
+        return filterManager.set(
+          prev,
+          filterId,
+          updated.length > 0 ? updated : null,
+        );
+      });
+    },
+    [],
+  );
+
+  const clearProgrammes = useCallback((filterId: ProgrammeFilterId) => {
+    setFilterState((prev) => filterManager.set(prev, filterId, null));
   }, []);
 
   // Accessibility - null means all (no filter), [] means none, [...] means specific
@@ -728,6 +756,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearPeople,
       toggleMovie,
       clearMovies,
+      toggleProgramme,
+      clearProgrammes,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
@@ -766,6 +796,8 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearPeople,
       toggleMovie,
       clearMovies,
+      toggleProgramme,
+      clearProgrammes,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,

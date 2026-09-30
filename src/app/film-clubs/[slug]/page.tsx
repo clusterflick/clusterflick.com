@@ -10,6 +10,8 @@ import { getVenueImagePath } from "@/utils/get-venue-image";
 import { FILM_CLUBS, type FilmClub } from "@/data/film-clubs";
 import { AccessibilityFeature, type Movie } from "@/types";
 import EventDetailPageContent from "@/components/event-detail-page-content";
+import { FilterId } from "@/lib/filters/types";
+import { getProgrammeFilterUrl } from "@/lib/filters/modules/programmes";
 
 export const dynamicParams = false;
 
@@ -292,6 +294,33 @@ export default async function FilmClubDetailPage({
         Blurb={FilmClubBlurb}
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
+        // Only while there is something to see: the links would work either
+        // way, but a hero button onto an empty grid reads as broken.
+        browseLinks={
+          movieCount > 0
+            ? {
+                catalogueHref: getProgrammeFilterUrl(
+                  "/catalogue",
+                  FilterId.FilmClubs,
+                  club.id,
+                ),
+                plannerHref: getProgrammeFilterUrl(
+                  "/planner",
+                  FilterId.FilmClubs,
+                  club.id,
+                ),
+              }
+            : undefined
+        }
+        // Falls back to the whole catalogue when the programme has nothing on.
+        filmsExploreHref={
+          movieCount > 0
+            ? getProgrammeFilterUrl("/catalogue", FilterId.FilmClubs, club.id)
+            : undefined
+        }
+        filmsExploreLabel={
+          movieCount > 0 ? "See these films in the catalogue" : undefined
+        }
         venues={clubVenues}
         accessibilityStats={clubAccessibilityStats}
       />

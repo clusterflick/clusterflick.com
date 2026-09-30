@@ -25,6 +25,9 @@ export {
   moviesFilter,
   getMovieVocabulary,
   getMoviesFilterUrl,
+  PROGRAMME_GROUPS,
+  getProgrammeName,
+  getProgrammeFilterUrl,
   formatSourceFilter,
   formatPresentationFilter,
   formatDimensionFilter,
@@ -41,6 +44,9 @@ export type {
   PersonOption,
   PeopleIndex,
   MovieOption,
+  ProgrammeFilterId,
+  ProgrammeGroupConfig,
+  Programme,
 } from "./modules";
 
 // Manager functions and object
@@ -48,6 +54,7 @@ export {
   filterManager,
   getDefaultState,
   getPermissiveState,
+  matchAny,
   get,
   set,
   hasActiveFilters,

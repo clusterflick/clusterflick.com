@@ -6,6 +6,15 @@
   margin-bottom: 16px;
 }
 
+/* Between the hero's links and its status card, centred as both are. */
+.browseLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
 .filmsSection {
   width: 100%;
   padding: 0 20px 80px;

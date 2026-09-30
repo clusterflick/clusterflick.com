@@ -1543,3 +1543,29 @@ describe("suggestShowingRelaxations", () => {
     expect(suggestShowingRelaxations({ movie, state, limit: 10 })).toEqual([]);
   });
 });
+
+describe("suggestFilterRelaxations with a film club selected", () => {
+  // A monthly club outside the date window wants the dates widened; dropping
+  // the club would answer a different question.
+  it("widens the dates before the club", () => {
+    const movies = makeMovies({
+      "1": {
+        title: "Tampopo",
+        showingTitle: "Cinebug: Tampopo",
+        time: BEYOND_WINDOW,
+      },
+      "2": { title: "Heat" },
+    });
+    const state = set(getDefaultState(), FilterId.FilmClubs, ["cinebug"]);
+
+    const offers = suggestFilterRelaxations({ movies, state });
+    const labelsOf = (offer: FilterSuggestion) =>
+      offer.changes.map((change) => change.label);
+
+    expect(labelsOf(offers[0])).toEqual(["Any date"]);
+    const dropped = offers.find((offer) =>
+      labelsOf(offer).includes("All film clubs"),
+    );
+    expect(dropped?.state[FilterId.FilmClubs]).toBeNull();
+  });
+});

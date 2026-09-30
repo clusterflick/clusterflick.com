@@ -24,6 +24,7 @@ import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import PeopleFilterSection from "./people-filter-section";
 import MovieFilterSection from "./movie-filter-section";
+import ProgrammeFilterSection from "./programme-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import { useUserContext } from "@/state/user-context";
@@ -32,6 +33,8 @@ import styles from "./filter-overlay.module.css";
 // The filters inside "More Event Options". Each defaults to no filter, so
 // active is the same as narrowing here — unlike categories or dates.
 const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
+  FilterId.FilmClubs,
+  FilterId.Festivals,
   FilterId.Movies,
   FilterId.Directors,
   FilterId.Cast,
@@ -72,6 +75,8 @@ export default function FilterOverlay({
     clearPeople,
     toggleMovie,
     clearMovies,
+    toggleProgramme,
+    clearProgrammes,
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
@@ -540,6 +545,15 @@ export default function FilterOverlay({
             expandAdvanced={hasAdvancedEventFilter}
             beforeGenres={
               <>
+                <ProgrammeFilterSection
+                  movies={movies}
+                  selected={{
+                    [FilterId.FilmClubs]: filterState.filmClubs,
+                    [FilterId.Festivals]: filterState.festivals,
+                  }}
+                  toggleProgramme={toggleProgramme}
+                  clearProgrammes={clearProgrammes}
+                />
                 <MovieFilterSection
                   vocabulary={movieVocabulary}
                   selected={filterState.movies}
