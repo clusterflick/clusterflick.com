@@ -502,8 +502,10 @@ server-side.
 **No banner above the grid.** One was built and taken out: the trigger's description already names
 the club ("Events from Japanese Film Club"), and the watchlist and people filters — also set from
 another page, also deciding what the grid is about — have none. A banner for programmes alone would
-be inconsistent. Where the description truncates on a phone the selection is hard to see, but that
-is true of all of those filters and wants one answer for them all.
+be inconsistent. On a phone the description is what has to carry it, so there it fills the space
+between the logo and the hamburger and runs to two lines at 14px — still inside the 40px trigger,
+so the header keeps its height and the sticky bar under it doesn't move. One line at the old width
+read "Events fro…" at 360px.
 
 **The typeahead carries no counts.** Counting a programme means running its matchers over the
 dataset, and each matcher pass is 3–6ms whatever the matcher: against a live release (2,193 films,
