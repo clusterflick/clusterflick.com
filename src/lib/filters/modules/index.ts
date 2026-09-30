@@ -12,6 +12,16 @@ export {
 } from "./time-range";
 export { genresFilter } from "./genres";
 export {
+  letterboxdRatingFilter,
+  meetsLetterboxdRating,
+  getHighlyRatedUrl,
+  HIGHLY_RATED_MIN_LETTERBOXD,
+  LETTERBOXD_RATING_MIN,
+  LETTERBOXD_RATING_MAX,
+  LETTERBOXD_RATING_STEP,
+  LETTERBOXD_RATING_URL_PARAM,
+} from "./letterboxd-rating";
+export {
   directorsFilter,
   castFilter,
   PEOPLE_GROUPS,

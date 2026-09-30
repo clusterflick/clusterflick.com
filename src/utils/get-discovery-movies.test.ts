@@ -11,7 +11,7 @@ import {
   getNewAdditions,
   getLastChanceMovies,
   getMarathonMovies,
-  getCriticsPicks,
+  getHighlyRated,
   getCollectionRow,
   getOccasionMovies,
   getRating,
@@ -373,8 +373,8 @@ describe("getRating", () => {
   });
 });
 
-describe("getCriticsPicks", () => {
-  it("ranks well-reviewed acclaimed films by rating", () => {
+describe("getHighlyRated", () => {
+  it("ranks films by their Letterboxd rating", () => {
     const great = makeMovie("great", [{ venueId: "v1" }], {
       lb: { rating: 4.6, reviews: 100000 },
     });
@@ -382,32 +382,45 @@ describe("getCriticsPicks", () => {
       lb: { rating: 4.1, reviews: 100000 },
     });
 
-    const result = getCriticsPicks(asRecord([good, great]), WINDOW, 12, NOW);
+    const result = getHighlyRated(asRecord([good, great]), WINDOW, 12);
     expect(result.map((r) => r.movie.id)).toEqual(["great", "good"]);
     expect(result[0].subtitle).toBe("4.6/5 on Letterboxd");
   });
 
-  it("excludes high scores backed by too few reviews", () => {
+  it("excludes ratings backed by too few reviews", () => {
     const thin = makeMovie("thin", [{ venueId: "v1" }], {
-      rt: { score: 95, reviews: 10 },
+      lb: { rating: 4.8, reviews: 500 },
     });
-    expect(getCriticsPicks(asRecord([thin]), WINDOW, 12, NOW)).toHaveLength(0);
+    expect(getHighlyRated(asRecord([thin]), WINDOW, 12)).toHaveLength(0);
   });
 
-  it("excludes films below the acclaim threshold", () => {
-    const ok = makeMovie("ok", [{ venueId: "v1" }], {
-      lb: { rating: 3.7, reviews: 100000 }, // norm 0.74 < 0.8
+  // Letterboxd only: a Rotten Tomatoes score is a share of critics, not an
+  // average, and one threshold across the two sorts films inconsistently.
+  it("reads Letterboxd alone", () => {
+    const rtOnly = makeMovie("rt", [{ venueId: "v1" }], {
+      rt: { score: 98, reviews: 300 },
     });
-    expect(getCriticsPicks(asRecord([ok]), WINDOW, 12, NOW)).toHaveLength(0);
+    expect(getHighlyRated(asRecord([rtOnly]), WINDOW, 12)).toHaveLength(0);
   });
 
-  it("excludes unmatched, evergreen, and not-showing-this-week films", () => {
-    const unmatched = makeMovie("unmatched", [{ venueId: "v1" }], {
-      lb: { rating: 4.5, reviews: 100000 },
-      isUnmatched: true,
+  // The poster says "4.0/5", so "4.0+" must include it.
+  it("compares the rating as it is shown", () => {
+    const shown = makeMovie("shown", [{ venueId: "v1" }], {
+      lb: { rating: 3.96, reviews: 100000 },
     });
-    const evergreen = makeMovie(
-      "evergreen",
+    const below = makeMovie("below", [{ venueId: "v1" }], {
+      lb: { rating: 3.94, reviews: 100000 },
+    });
+    expect(
+      getHighlyRated(asRecord([shown, below]), WINDOW, 12).map(
+        (r) => r.movie.id,
+      ),
+    ).toEqual(["shown"]);
+  });
+
+  it("keeps long runs but drops films not showing this week", () => {
+    const longRun = makeMovie(
+      "long-run",
       [
         {
           venueId: "v1",
@@ -419,18 +432,14 @@ describe("getCriticsPicks", () => {
     const notThisWeek = makeMovie(
       "later",
       [{ venueId: "v1", times: [NOW + 100 * DAY] }],
-      {
-        lb: { rating: 4.5, reviews: 100000 },
-      },
+      { lb: { rating: 4.5, reviews: 100000 } },
     );
 
-    const result = getCriticsPicks(
-      asRecord([unmatched, evergreen, notThisWeek]),
-      WINDOW,
-      12,
-      NOW,
-    );
-    expect(result).toHaveLength(0);
+    expect(
+      getHighlyRated(asRecord([longRun, notThisWeek]), WINDOW, 12).map(
+        (r) => r.movie.id,
+      ),
+    ).toEqual(["long-run"]);
   });
 });
 
@@ -563,8 +572,8 @@ describe("computeNearMeRows", () => {
       makeMovie("there", [{ venueId: "far" }], GOOD),
     ]);
 
-    const { criticsPicks } = computeNearMeRows(movies, NEAR, NOW);
-    expect(criticsPicks.map((s) => s.movie.id)).toEqual(["here"]);
+    const { highlyRated } = computeNearMeRows(movies, NEAR, NOW);
+    expect(highlyRated.map((s) => s.movie.id)).toEqual(["here"]);
   });
 
   it("calls a film's last nearby showing its last chance", () => {

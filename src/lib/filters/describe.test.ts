@@ -163,3 +163,10 @@ describe("describeFilters describes the film club and festival filters", () => {
     expect(events(none)).toContain("at festivals no longer listed");
   });
 });
+
+describe("describeFilters describes the rating filter", () => {
+  it("names the minimum and its source", () => {
+    const state = set(getDefaultState(), FilterId.LetterboxdRating, 4);
+    expect(events(state)).toBe("Films rated 4.0+ on Letterboxd");
+  });
+});

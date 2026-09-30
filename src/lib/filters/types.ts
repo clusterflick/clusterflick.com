@@ -13,6 +13,7 @@ export enum FilterId {
   DateRange = "dateRange",
   TimeRange = "timeRange",
   Genres = "genres",
+  LetterboxdRating = "letterboxdRating",
   Directors = "directors",
   Cast = "cast",
   Movies = "movies",
@@ -41,6 +42,8 @@ export type FilterState = {
   [FilterId.DateRange]: { start: number | null; end: number | null };
   [FilterId.TimeRange]: { start: number; end: number };
   [FilterId.Genres]: string[] | null;
+  /** Minimum Letterboxd average, out of 5; `null` means no filter. */
+  [FilterId.LetterboxdRating]: number | null;
   [FilterId.Directors]: string[] | null;
   [FilterId.Cast]: string[] | null;
   [FilterId.Movies]: string[] | null;
@@ -112,6 +115,7 @@ export type AnyFilterModule =
   | FilterModule<FilterId.DateRange>
   | FilterModule<FilterId.TimeRange>
   | FilterModule<FilterId.Genres>
+  | FilterModule<FilterId.LetterboxdRating>
   | FilterModule<FilterId.Directors>
   | FilterModule<FilterId.Cast>
   | FilterModule<FilterId.Movies>

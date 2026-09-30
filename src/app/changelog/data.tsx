@@ -77,6 +77,28 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
+            Added a Letterboxd rating filter to the{" "}
+            <Link href="/catalogue">catalogue</Link> and{" "}
+            <Link href="/planner">planner</Link>: set a minimum average under
+            More Event Options to see only the films rated above it.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Critics&rsquo; Picks on the <Link href="/">home page</Link> is now
+            Highly Rated, and it and Marathons &amp; Double Bills each have a
+            See all link to everything they&rsquo;re picked from, not just the
+            handful that fit in the row.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
             Film clubs and festivals can now be explored in the{" "}
             <Link href="/catalogue">catalogue</Link> and the{" "}
             <Link href="/planner">planner</Link>. Every{" "}

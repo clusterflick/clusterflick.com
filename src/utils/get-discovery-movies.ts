@@ -6,7 +6,11 @@ import {
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
 } from "@/lib/filters/modules/categories";
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
-import { getRating, isEvergreen } from "@/utils/movie-ratings.mjs";
+import { getRating, getLetterboxdRating } from "@/utils/movie-ratings.mjs";
+import {
+  meetsLetterboxdRating,
+  HIGHLY_RATED_MIN_LETTERBOXD,
+} from "@/lib/filters/modules/letterboxd-rating";
 import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
 import { pruneByShowings } from "@/utils/prune-movies";
 
@@ -21,6 +25,8 @@ export { getRating };
  * - New Additions: screenings newly tracked by Clusterflick (earliest `seen`
  *   within the last week), split by film age into new releases / returning /
  *   classics.
+ * - Highly Rated: films rated HIGHLY_RATED_MIN_LETTERBOXD+ on Letterboxd, the
+ *   films grid's rating filter at a fixed threshold.
  * - Last Chance: matched films whose final non-sold-out showing is within 3 days.
  * - Marathons: multi-film events (double bills, all-nighters) showing soon.
  * - More Than a Screening: performances carrying an occasion — a Q&A, a live
@@ -52,17 +58,13 @@ const YEAR_MS = 365.25 * MS_PER_DAY;
 // A film is "last chance" if its final non-sold-out showing is within this many days.
 export const LAST_CHANCE_DAYS = 7;
 
-// The Critics' Picks acclaim bar (review-count floors + the evergreen guard live
-// in @/utils/movie-ratings.mjs, shared with the editorial summary script).
-const CRITICS_PICK_MIN_RATING = 0.8; // ~4.0/5 Letterboxd, 80% RT, 8.0 IMDb
-
 const DEFAULT_LIMIT = 12;
 // Per-row display caps. These are curated highlight rows on horizontal-scroll
 // strips, so the caps trade off "enough to browse" against "not the whole tail".
 // Marathons are deliberately uncapped — the full set is small and inherently
 // special, so we show all of them.
 const POPULAR_LIMIT = 18;
-const CRITICS_LIMIT = 18;
+const HIGHLY_RATED_LIMIT = 18;
 const NEW_ADDITIONS_LIMIT = 24; // per age bucket
 const LAST_CHANCE_LIMIT = 24;
 // Occasions look a fortnight ahead rather than a week: a one-off with a guest
@@ -104,7 +106,7 @@ export interface ScoredCollection {
 
 export interface DiscoveryRows {
   popular: ScoredMovie[];
-  criticsPicks: ScoredMovie[];
+  highlyRated: ScoredMovie[];
   newAdditions: NewAdditions;
   lastChance: ScoredMovie[];
   marathons: ScoredMovie[];
@@ -433,6 +435,21 @@ function isMarathon(movie: Movie): boolean {
 }
 
 /**
+ * The link behind the Marathons row's "See all": the Multiple Films and Short
+ * Films categories in the catalogue's default week.
+ *
+ * A superset of the row, knowingly. The row is multi-film events, which is all
+ * of Multiple Films plus the shorts programmes — but Short Films also holds
+ * single shorts (15 of 32 in a live week), and no filter tells a programme of
+ * shorts from one short. Accepted over a filter of its own: the data can't
+ * reliably tell them apart either ("Short Stories, Big Voices" carries no list
+ * of its films), and a short on a marathon page is a small surprise.
+ */
+export function getMarathonsUrl(): string {
+  return `/catalogue?categories=${[Category.MultipleMovies, Category.Shorts].join(",")}`;
+}
+
+/**
  * Multi-film events (double bills, marathons, all-nighters) with upcoming
  * performances. Sorted by how widely they're showing. Subtitle is the number of
  * films when known.
@@ -475,38 +492,40 @@ export function getMarathonMovies(
 }
 
 /**
- * Critics' picks: matched films showing this week with a genuinely strong rating
- * (above CRITICS_PICK_MIN_RATING and backed by enough reviews). Permanent
- * attractions are excluded. Best-rated first; the subtitle is the rating itself.
+ * Highly rated: films showing this week rated at least
+ * HIGHLY_RATED_MIN_LETTERBOXD on Letterboxd, with enough reviews for the
+ * average to count. Best-rated first; the subtitle is the rating itself.
+ *
+ * The test is the films grid's rating filter (`meetsLetterboxdRating`), so the
+ * row's "See all" shows exactly the films this row is a slice of. The row once
+ * also left out "permanent fixtures" — films with more than 30 upcoming
+ * showings — meant for museum IMAX attractions; it was catching wide
+ * re-releases like Coraline and Casino Royale instead, and the filter has no
+ * such rule, so it went.
  */
-export function getCriticsPicks(
+export function getHighlyRated(
   movies: MoviesRecord,
   window: DiscoveryWindow = getDiscoveryWindow(),
   limit: number = DEFAULT_LIMIT,
-  now: number = Date.now(),
 ): ScoredMovie[] {
   return Object.values(movies)
     .filter(
       (movie) =>
-        isDiscoverable(movie) && isMatched(movie) && !isEvergreen(movie, now),
+        isDiscoverable(movie) &&
+        meetsLetterboxdRating(movie, HIGHLY_RATED_MIN_LETTERBOXD),
     )
     .map((movie) => ({
       movie,
-      rating: getRating(movie),
+      rating: getLetterboxdRating(movie)!,
       performanceCount: upcomingPerformances(movie, window).length,
     }))
-    .filter(
-      (s): s is { movie: Movie; rating: Rating; performanceCount: number } =>
-        s.rating !== null &&
-        s.rating.norm >= CRITICS_PICK_MIN_RATING &&
-        s.performanceCount > 0,
-    )
-    .sort((a, b) => b.rating.norm - a.rating.norm)
+    .filter((s) => s.performanceCount > 0)
+    .sort((a, b) => b.rating - a.rating)
     .slice(0, limit)
     .map(({ movie, rating, performanceCount }) => ({
       movie,
       performanceCount,
-      subtitle: rating.text,
+      subtitle: `${rating.toFixed(1)}/5 on Letterboxd`,
     }));
 }
 
@@ -634,7 +653,7 @@ export function computeDiscoveryRows(
   );
   return {
     popular: getPopularMovies(movies, window, POPULAR_LIMIT),
-    criticsPicks: getCriticsPicks(movies, window, CRITICS_LIMIT, now),
+    highlyRated: getHighlyRated(movies, window, HIGHLY_RATED_LIMIT),
     newAdditions: getNewAdditions(
       movies,
       window,
@@ -655,7 +674,7 @@ export function computeDiscoveryRows(
 
 /** The discovery rows scoped to the venues near a reader (the near-me page). */
 export interface NearMeRows {
-  criticsPicks: ScoredMovie[];
+  highlyRated: ScoredMovie[];
   occasions: ScoredMovie[];
   justAdded: ScoredMovie[];
   marathons: ScoredMovie[];
@@ -665,7 +684,7 @@ export interface NearMeRows {
 /**
  * The home page's rows, answered for the venues near the reader rather than the
  * whole city. Most rows run over the dataset pruned to those venues, which is
- * what makes them local: a critics' pick counts only nearby showings, and "last
+ * what makes them local: a highly rated film counts only nearby showings, and "last
  * chance" becomes the last chance to catch a film *nearby*, which is the more
  * useful thing to know when the reader is choosing where to go.
  *
@@ -689,7 +708,7 @@ export function computeNearMeRows(
     venueIds.has(showing.venueId),
   );
   return {
-    criticsPicks: getCriticsPicks(nearby, window, CRITICS_LIMIT, now),
+    highlyRated: getHighlyRated(nearby, window, HIGHLY_RATED_LIMIT),
     occasions: getOccasionMovies(
       movies,
       getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),

@@ -23,7 +23,7 @@ import {
   minutesToShortTime,
   MS_PER_DAY,
 } from "@/utils/format-date";
-import { FilterState } from "./types";
+import { FilterId, FilterState } from "./types";
 
 /**
  * Options for describing filters
@@ -472,6 +472,16 @@ function describeMovies(
 }
 
 /**
+ * Describes the rating filter as a clause to append to the events description:
+ * "rated 4.0+ on Letterboxd". The source is named because the threshold only
+ * means something on its own scale.
+ */
+function describeLetterboxdRating(state: FilterState): string | null {
+  const min = state[FilterId.LetterboxdRating];
+  return min === null ? null : `rated ${min.toFixed(1)}+ on Letterboxd`;
+}
+
+/**
  * Describes the film club and festival filters as clauses to append to the
  * events description: "from Cinebug", "at BFI Flare or Fringe!".
  *
@@ -562,6 +572,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const peoplePhrases = describePeople(state, people);
   const moviesPhrase = describeMovies(state, movies);
   const programmePhrases = describeProgrammes(state);
+  const ratingPhrase = describeLetterboxdRating(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
@@ -574,6 +585,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allPeople = peoplePhrases.length === 0;
   const allMovies = moviesPhrase === null;
   const allProgrammes = programmePhrases.length === 0;
+  const allRatings = ratingPhrase === null;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
@@ -592,7 +604,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allFormats &&
     allPeople &&
     allMovies &&
-    allProgrammes
+    allProgrammes &&
+    allRatings
   ) {
     // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
@@ -632,6 +645,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
     if (moviesPhrase) {
       eventsDesc += ` ${moviesPhrase}`;
+    }
+    if (ratingPhrase) {
+      eventsDesc += ` ${ratingPhrase}`;
     }
     if (peoplePhrases.length > 0) {
       eventsDesc += ` ${peoplePhrases.join(" and ")}`;

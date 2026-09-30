@@ -80,3 +80,29 @@ export function isEvergreen(movie, now) {
   }
   return future > EVERGREEN_MAX_FUTURE;
 }
+
+/**
+ * The film's Letterboxd average (out of 5), or null when it has fewer than
+ * LETTERBOXD_MIN_REVIEWS reviews. What the Highly Rated row and the films
+ * grid's rating filter read, so the row and its "See all" always agree.
+ *
+ * Letterboxd alone rather than `getRating`'s best-available source: the sources
+ * don't measure the same thing — a Rotten Tomatoes score is the share of
+ * critics who liked a film, not an average — so one threshold across them
+ * sorts films inconsistently. In practice `getRating` resolved to Letterboxd
+ * for 307 of 312 rated films in a live release anyway.
+ *
+ * @param {{ letterboxd?: { rating?: number | null; reviews?: number } }} movie
+ * @returns {number | null}
+ */
+export function getLetterboxdRating(movie) {
+  const lb = movie.letterboxd;
+  if (
+    lb &&
+    typeof lb.rating === "number" &&
+    (lb.reviews ?? 0) >= LETTERBOXD_MIN_REVIEWS
+  ) {
+    return lb.rating;
+  }
+  return null;
+}

@@ -514,7 +514,44 @@ already cached — far too long for opening an overlay, on a phone several times
 are listed alphabetically instead, and only the selected chips are counted, from the cache the
 filter itself has just filled. `EntityQuickAdd`'s `count` is optional for this.
 
-## Thin-Result Notice
+## Home Row "See All" Links
+
+A home row is a slice: a rule, cut to its top dozen or so for a horizontal row. Where the rule can be
+said as filters, the row's "See all" (`PosterRow`'s `seeAllHref`) opens the catalogue on **all** of
+it, not a snapshot of the slice. They sit on the default base, because the catalogue's default week
+and categories are the rows' own.
+
+- **Highly Rated** → `/catalogue?letterboxd=4.0` (`getHighlyRatedUrl`). The row and the filter share
+  one test, `meetsLetterboxdRating`, so the grid is exactly what the row is a slice of.
+- **Marathons & Double Bills** → Multiple Films plus Short Films (`getMarathonsUrl`). A superset,
+  knowingly: the row is multi-film events, and Short Films also holds single shorts (15 of 32 in a
+  live week). No filter tells a shorts programme from one short, and the data can't reliably either
+  — some programmes carry no list of their films — so a short on that page was accepted over a
+  filter of its own.
+
+The rest need filters that don't exist yet (last chance, just added), a sort (Showing Across
+London), or a costlier probe (More Than a Screening). Lists and collections need no link: their
+pages already show every member that is showing.
+
+**Highly Rated is Letterboxd alone, at 4.0+** with `LETTERBOXD_MIN_REVIEWS` behind it
+(`getLetterboxdRating` in `@/utils/movie-ratings.mjs`). It used to be `getRating`'s best available
+source normalised to 0–1, but the sources don't measure the same thing — a Rotten Tomatoes score is
+the share of critics who liked a film, not an average — and of 193 films carrying both, 73 fell on
+opposite sides of the 80% line. `getRating` had resolved to Letterboxd for 307 of 312 rated films
+anyway. It was renamed from Critics' Picks, being audience averages, and **the heading names no
+source** so the source can change without it; the posters' subtitles name it. It no longer drops
+"permanent fixtures" (30+ upcoming showings): meant for museum IMAX attractions, that was catching
+wide re-releases like Coraline and Casino Royale. The editorial summary still uses `getRating`, for
+its own "acclaimed gem" idea.
+
+**The rating filter** (`FilterId.LetterboxdRating`, `?letterboxd=`) is a minimum average on a
+`Slider` in "More Event Options", above Genre. Steps of 0.1 from 3.0 to 4.5, because averages bunch
+between 3.5 and 4.3 — in a live week 226 films were 3.5+, 80 were 4.0+ and 6 were 4.5+, so half-point
+steps jump straight across the useful range. The slider's lowest position, one step below 3.0,
+reads "Any rating" and clears it: a slider has no off switch, and a second control for one setting
+is worse. A note under it says only films with 2,000+ reviews have a rating, so an unrated film
+dropping out isn't read as a verdict on it. Ratings are compared at one decimal, as posters show
+them: a film averaging 3.96 reads "4.0/5", and "4.0+" leaving it out would contradict the poster.
 
 When a filtered grid returns a handful of films and widening the dates would
 return meaningfully more, `getHiddenByDate` (`src/lib/filters/hidden-by-date.ts`)

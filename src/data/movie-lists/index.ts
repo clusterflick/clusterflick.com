@@ -36,9 +36,10 @@ export * from "./types";
  * - **Computed** lists are derived from rating data already in the dataset, so
  *   they re-evaluate on every build and never go stale.
  *
- * The review-count floors are shared with the Critics' Picks row and the
- * editorial summary via `@/utils/movie-ratings.mjs`, so "acclaimed" means the
- * same thing everywhere on the site.
+ * The review-count floors are shared with the Highly Rated row, the films
+ * grid's rating filter and the editorial summary via
+ * `@/utils/movie-ratings.mjs`, so a rating counts on the same evidence
+ * everywhere on the site.
  *
  * To add a curated list, drop a `MovieListEntry[]` alongside
  * `rt-best-of-all-time.ts` and register it here. Entries match on `imdbId`
