@@ -36,6 +36,15 @@
   }
 }
 
+/* Below the inline nav's breakpoint the header gives the filter a row of its
+   own between the logo and the hamburger, sized to clear both, so the trigger
+   fills it rather than stopping 200px short of the viewport. */
+@media (max-width: 1180px) {
+  .trigger {
+    max-width: 100%;
+  }
+}
+
 .trigger:hover {
   border-color: var(--color-neon-pink);
   background: rgba(var(--color-neon-pink-rgb), 0.1);
@@ -108,6 +117,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+
+/*
+ * On a phone one line holds a clause at best ("Events from Ja…"), and what it
+ * cuts is usually the part that says why the grid looks as it does — a club, a
+ * watchlist, a director. Two lines at a smaller size still fit the 40px
+ * trigger, so the header keeps its height and nothing under it moves.
+ */
+@media (max-width: 768px) {
+  .trigger:not(.open) .text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    white-space: normal;
+    font-size: 14px;
+    line-height: 1.2;
+  }
 }
 
 .trigger.open .text {

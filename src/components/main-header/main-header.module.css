@@ -61,3 +61,14 @@
     padding: 0 60px;
   }
 }
+
+/*
+ * Once the logo is only its 32px mark (from 20px) and the hamburger its 40px
+ * button (to 16px from the right), 48px each side of the header's own padding
+ * clears both by 12px, symmetrically so the trigger stays centred.
+ */
+@media (max-width: 768px) {
+  .filter {
+    padding: 0 48px;
+  }
+}
