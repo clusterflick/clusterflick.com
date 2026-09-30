@@ -212,6 +212,14 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     label: "All festivals",
     action: "Search all festivals",
   },
+  // After every subject: hiding what they've seen is the reader's standing
+  // preference, not part of this search, so the terms of the search give way
+  // first. Still above accessibility, which is a requirement.
+  {
+    id: FilterId.HideSeen,
+    label: "Films you've seen shown",
+    action: "Include films you've seen",
+  },
   {
     id: FilterId.Accessibility,
     label: "Any accessibility requirement",

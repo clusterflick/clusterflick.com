@@ -590,6 +590,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allMovies = moviesPhrase === null;
   const allProgrammes = programmePhrases.length === 0;
   const allRatings = ratingPhrase === null;
+  const allSeen = state.hideSeen === null;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
@@ -609,7 +610,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allPeople &&
     allMovies &&
     allProgrammes &&
-    allRatings
+    allRatings &&
+    allSeen
   ) {
     // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
@@ -664,6 +666,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
     if (performanceNotesQuery) {
       eventsDesc += ` with notes "${performanceNotesQuery}"`;
+    }
+    if (!allSeen) {
+      eventsDesc += " you haven't seen";
     }
   }
 

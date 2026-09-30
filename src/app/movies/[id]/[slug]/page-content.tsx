@@ -26,6 +26,7 @@ import {
   EVENT_CATEGORIES,
 } from "@/state/filter-config-context";
 import {
+  FilterId,
   filterManager,
   describeFilters,
   suggestShowingRelaxations,
@@ -93,7 +94,17 @@ export default function PageContent({
     isLoading: isDataLoading,
     hasAttemptedLoad,
   } = useCinemaData();
-  const { filterState, applyUrlParams, applyFilterState } = useFilterConfig();
+  const {
+    filterState: globalFilterState,
+    applyUrlParams,
+    applyFilterState,
+  } = useFilterConfig();
+  // Hiding seen films is for browsing. A reader who opens a film they've seen
+  // came for it, and hiding every showing would answer them with nothing.
+  const filterState = useMemo(
+    () => ({ ...globalFilterState, [FilterId.HideSeen]: null }),
+    [globalFilterState],
+  );
   const [showAll, setShowAll] = useState(false);
 
   // Initialise from hash and sync on back/forward navigation.
@@ -232,8 +243,12 @@ export default function PageContent({
   // the grid disagree with what the reader just chose. "Show all" remains the
   // way to look past the filters without changing them.
   const applySuggestion = useCallback(
-    (suggestion: FilterSuggestion) => applyFilterState(suggestion.state),
-    [applyFilterState],
+    (suggestion: FilterSuggestion) =>
+      applyFilterState({
+        ...suggestion.state,
+        [FilterId.HideSeen]: globalFilterState[FilterId.HideSeen],
+      }),
+    [applyFilterState, globalFilterState],
   );
 
   const handleShowAllToggle = useCallback(() => {

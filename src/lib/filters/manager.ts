@@ -21,6 +21,7 @@ import {
   formatDimensionFilter,
   hideFinishedFilter,
   hideSoldOutFilter,
+  hideSeenFilter,
   buildProgrammeFilter,
   PROGRAMME_GROUPS,
 } from "./modules";
@@ -68,6 +69,7 @@ const modules: AnyFilterModule[] = [
   directorsFilter,
   castFilter,
   moviesFilter,
+  hideSeenFilter,
   accessibilityFilter,
   formatSourceFilter,
   formatPresentationFilter,
@@ -129,6 +131,26 @@ export function getBrowseAllState(): FilterState {
     [FilterId.Categories]: null, // all categories, including Events
     [FilterId.DateRange]: { start: null, end: null }, // all dates
   };
+}
+
+/**
+ * `next` with every personal filter (see {@link FilterModule.personal}) taken
+ * from `current`. For whole-state replacements that stand for a search rather
+ * than a reset — a shared link, a quick filter — which would otherwise switch
+ * off a reader's own setting on their behalf.
+ */
+export function keepPersonalFilters(
+  next: FilterState,
+  current: FilterState,
+): FilterState {
+  const state = { ...next };
+  for (const filterModule of modules) {
+    if (filterModule.personal) {
+      (state as Record<string, unknown>)[filterModule.id] =
+        filterModule.get(current);
+    }
+  }
+  return state;
 }
 
 /**
@@ -347,7 +369,10 @@ export function resolveFilterStateFromUrl(
   }
 
   const base = hasBase ? baseParam : "default";
-  return { ...getBaseState(base, currentState), ...overrides };
+  return keepPersonalFilters(
+    { ...getBaseState(base, currentState), ...overrides },
+    currentState,
+  );
 }
 
 /**
@@ -382,6 +407,7 @@ export const filterManager = {
   getDefaultState,
   getPermissiveState,
   sanitizeFilterState,
+  keepPersonalFilters,
   get,
   set,
   hasActiveFilters,

@@ -448,6 +448,33 @@ watchlist would otherwise push every other filter off the screen.
 It widens as "All films", beside the people: a selection left over from
 another page is exactly the invisible blocker the empty state exists to name.
 
+## Hide Seen Films
+
+`FilterId.HideSeen` (`src/lib/filters/modules/hide-seen.ts`) takes the films on
+the reader's Seen list off the grid. It is a "Hide films I've seen" switch under
+the event types in the filter overlay, shown only once a signed-in reader's
+lists have loaded.
+
+**The state holds the ids, not a flag.** The pipeline is a pure function of the
+dataset and the state, and it runs where the user context can't reach —
+suggestion probes, the thin-result notice, the overlay's counts — so the Seen
+ids ride in the state as `string[] | null`. A flag would also leave everything
+memoised on the state blind to a film being marked seen. `SeenFilterSync`
+(`src/state/seen-filter-sync.tsx`, rendered inside `UserProvider`, which is
+nested in `FilterConfigProvider` so neither can read the other) keeps the ids
+equal to the Seen list while it is on, and switches it off on sign out.
+
+**It is personal** (`personal: true` on the module): never written to a URL,
+since a shared link is for someone with a different list, and carried across
+whole-state replacements that stand for a search — a followed link, a quick
+filter — by `keepPersonalFilters`. Reset Filters still clears it.
+
+**Film pages ignore it.** Opening a film you've seen means you came for it;
+hiding every showing would answer with nothing. The page applies the filters
+with `hideSeen` nulled and puts the reader's setting back on any suggestion it
+applies. Suggestions on the grid widen it after every subject and before
+accessibility — it is a standing preference, not part of the search.
+
 ## Film Club & Festival Filters
 
 `FilterId.FilmClubs` and `FilterId.Festivals` (`src/lib/filters/modules/programmes.ts`) restrict
