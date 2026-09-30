@@ -77,10 +77,11 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "New feature",
         body: () => (
           <>
-            Added a Letterboxd rating filter to the{" "}
-            <Link href="/catalogue">catalogue</Link> and{" "}
-            <Link href="/planner">planner</Link>: set a minimum average under
-            More Event Options to see only the films rated above it.
+            Added rating filters to the <Link href="/catalogue">catalogue</Link>{" "}
+            and <Link href="/planner">planner</Link>: set a minimum Letterboxd,
+            IMDb or Rotten Tomatoes score under More Event Options to see only
+            the films rated above it. The <Link href="/lists">lists</Link> from
+            each site now link to everything showing that it rates highly.
           </>
         ),
       },

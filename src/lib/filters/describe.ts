@@ -11,6 +11,7 @@ import {
   FORMAT_GROUPS,
   PEOPLE_GROUPS,
   PROGRAMME_GROUPS,
+  RATING_GROUPS,
   getProgrammeName,
   DAY_START_MINUTES,
   DAY_END_MINUTES,
@@ -23,7 +24,7 @@ import {
   minutesToShortTime,
   MS_PER_DAY,
 } from "@/utils/format-date";
-import { FilterId, FilterState } from "./types";
+import { FilterState } from "./types";
 
 /**
  * Options for describing filters
@@ -472,13 +473,16 @@ function describeMovies(
 }
 
 /**
- * Describes the rating filter as a clause to append to the events description:
- * "rated 4.0+ on Letterboxd". The source is named because the threshold only
- * means something on its own scale.
+ * Describes the rating filters as one clause to append to the events
+ * description: "rated 4.0+ on Letterboxd and 95%+ on Rotten Tomatoes". Each
+ * source is named because a threshold only means something on its own scale.
  */
-function describeLetterboxdRating(state: FilterState): string | null {
-  const min = state[FilterId.LetterboxdRating];
-  return min === null ? null : `rated ${min.toFixed(1)}+ on Letterboxd`;
+function describeRatings(state: FilterState): string | null {
+  const parts = RATING_GROUPS.flatMap((group) => {
+    const min = state[group.filterId];
+    return min === null ? [] : [`${group.formatMin(min)} on ${group.source}`];
+  });
+  return parts.length === 0 ? null : `rated ${formatList(parts, 3, "", "and")}`;
 }
 
 /**
@@ -572,7 +576,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const peoplePhrases = describePeople(state, people);
   const moviesPhrase = describeMovies(state, movies);
   const programmePhrases = describeProgrammes(state);
-  const ratingPhrase = describeLetterboxdRating(state);
+  const ratingPhrase = describeRatings(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();

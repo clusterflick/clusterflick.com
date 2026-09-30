@@ -40,6 +40,8 @@ const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
   FilterId.Directors,
   FilterId.Cast,
   FilterId.LetterboxdRating,
+  FilterId.ImdbRating,
+  FilterId.RottenTomatoesRating,
   FilterId.Genres,
   FilterId.Accessibility,
   FilterId.FormatSource,
@@ -79,7 +81,7 @@ export default function FilterOverlay({
     clearMovies,
     toggleProgramme,
     clearProgrammes,
-    setLetterboxdRating,
+    setRating,
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
@@ -573,8 +575,13 @@ export default function FilterOverlay({
                   clearPeople={clearPeople}
                 />
                 <RatingFilterSection
-                  value={filterState.letterboxdRating}
-                  setLetterboxdRating={setLetterboxdRating}
+                  selected={{
+                    [FilterId.LetterboxdRating]: filterState.letterboxdRating,
+                    [FilterId.ImdbRating]: filterState.imdbRating,
+                    [FilterId.RottenTomatoesRating]:
+                      filterState.rottenTomatoesRating,
+                  }}
+                  setRating={setRating}
                 />
               </>
             }

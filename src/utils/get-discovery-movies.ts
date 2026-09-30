@@ -6,11 +6,9 @@ import {
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
 } from "@/lib/filters/modules/categories";
 import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
-import { getRating, getLetterboxdRating } from "@/utils/movie-ratings.mjs";
-import {
-  meetsLetterboxdRating,
-  HIGHLY_RATED_MIN_LETTERBOXD,
-} from "@/lib/filters/modules/letterboxd-rating";
+import { getRating } from "@/utils/movie-ratings.mjs";
+import { getRatingGroup, meetsRating } from "@/lib/filters/modules/ratings";
+import { FilterId } from "@/lib/filters/types";
 import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
 import { pruneByShowings } from "@/utils/prune-movies";
 
@@ -25,8 +23,8 @@ export { getRating };
  * - New Additions: screenings newly tracked by Clusterflick (earliest `seen`
  *   within the last week), split by film age into new releases / returning /
  *   classics.
- * - Highly Rated: films rated HIGHLY_RATED_MIN_LETTERBOXD+ on Letterboxd, the
- *   films grid's rating filter at a fixed threshold.
+ * - Highly Rated: films over HIGHLY_RATED's "highly rated" line, the films
+ *   grid's rating filter at a fixed threshold.
  * - Last Chance: matched films whose final non-sold-out showing is within 3 days.
  * - Marathons: multi-film events (double bills, all-nighters) showing soon.
  * - More Than a Screening: performances carrying an occasion — a Q&A, a live
@@ -492,16 +490,24 @@ export function getMarathonMovies(
 }
 
 /**
- * Highly rated: films showing this week rated at least
- * HIGHLY_RATED_MIN_LETTERBOXD on Letterboxd, with enough reviews for the
- * average to count. Best-rated first; the subtitle is the rating itself.
+ * The source the Highly Rated row reads. Letterboxd, because it rates the most
+ * of what's showing (307 of 448 films in a live week, against 191 on IMDb and
+ * 198 on Rotten Tomatoes). The row's heading names no source, so this can
+ * change without it.
+ */
+export const HIGHLY_RATED = getRatingGroup(FilterId.LetterboxdRating);
+
+/**
+ * Highly rated: films showing this week over HIGHLY_RATED's "highly rated"
+ * line, with enough reviews for the score to count. Best-rated first; the
+ * subtitle is the rating itself.
  *
- * The test is the films grid's rating filter (`meetsLetterboxdRating`), so the
- * row's "See all" shows exactly the films this row is a slice of. The row once
- * also left out "permanent fixtures" — films with more than 30 upcoming
- * showings — meant for museum IMAX attractions; it was catching wide
- * re-releases like Coraline and Casino Royale instead, and the filter has no
- * such rule, so it went.
+ * The test is the films grid's rating filter (`meetsRating`), so the row's
+ * "See all" shows exactly the films this row is a slice of. The row once also
+ * left out "permanent fixtures" — films with more than 30 upcoming showings —
+ * meant for museum IMAX attractions; it was catching wide re-releases like
+ * Coraline and Casino Royale instead, and the filter has no such rule, so it
+ * went.
  */
 export function getHighlyRated(
   movies: MoviesRecord,
@@ -512,11 +518,11 @@ export function getHighlyRated(
     .filter(
       (movie) =>
         isDiscoverable(movie) &&
-        meetsLetterboxdRating(movie, HIGHLY_RATED_MIN_LETTERBOXD),
+        meetsRating(HIGHLY_RATED, movie, HIGHLY_RATED.highlyRated),
     )
     .map((movie) => ({
       movie,
-      rating: getLetterboxdRating(movie)!,
+      rating: HIGHLY_RATED.read(movie)!,
       performanceCount: upcomingPerformances(movie, window).length,
     }))
     .filter((s) => s.performanceCount > 0)
@@ -525,7 +531,7 @@ export function getHighlyRated(
     .map(({ movie, rating, performanceCount }) => ({
       movie,
       performanceCount,
-      subtitle: `${rating.toFixed(1)}/5 on Letterboxd`,
+      subtitle: `${HIGHLY_RATED.formatScore(rating)} on ${HIGHLY_RATED.source}`,
     }));
 }
 

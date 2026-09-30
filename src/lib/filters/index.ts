@@ -16,12 +16,10 @@ export {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
-  letterboxdRatingFilter,
+  RATING_GROUPS,
+  getRatingGroup,
+  meetsRating,
   getHighlyRatedUrl,
-  HIGHLY_RATED_MIN_LETTERBOXD,
-  LETTERBOXD_RATING_MIN,
-  LETTERBOXD_RATING_MAX,
-  LETTERBOXD_RATING_STEP,
   directorsFilter,
   castFilter,
   PEOPLE_GROUPS,
@@ -53,6 +51,8 @@ export type {
   ProgrammeFilterId,
   ProgrammeGroupConfig,
   Programme,
+  RatingFilterId,
+  RatingGroupConfig,
 } from "./modules";
 
 // Manager functions and object

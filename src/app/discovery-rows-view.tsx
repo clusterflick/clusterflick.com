@@ -2,9 +2,10 @@ import PosterRow from "@/components/poster-row";
 import CollectionRow from "@/components/collection-row";
 import {
   getMarathonsUrl,
+  HIGHLY_RATED,
   type DiscoveryRows,
 } from "@/utils/get-discovery-movies";
-import { getHighlyRatedUrl } from "@/lib/filters/modules/letterboxd-rating";
+import { getHighlyRatedUrl } from "@/lib/filters/modules/ratings";
 import styles from "./page.module.css";
 
 /**
@@ -43,7 +44,7 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         intro="The best-reviewed films showing this week."
         movies={highlyRated}
         showAll
-        seeAllHref={getHighlyRatedUrl()}
+        seeAllHref={getHighlyRatedUrl(HIGHLY_RATED.filterId)}
       />
 
       <PosterRow

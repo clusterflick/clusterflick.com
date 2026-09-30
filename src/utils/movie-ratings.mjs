@@ -106,3 +106,41 @@ export function getLetterboxdRating(movie) {
   }
   return null;
 }
+
+/**
+ * The film's IMDb rating (out of 10), or null with fewer than IMDB_MIN_REVIEWS
+ * votes.
+ *
+ * @param {{ imdb?: { rating?: number | null; reviews?: number } }} movie
+ * @returns {number | null}
+ */
+export function getImdbRating(movie) {
+  const imdb = movie.imdb;
+  if (
+    imdb &&
+    typeof imdb.rating === "number" &&
+    (imdb.reviews ?? 0) >= IMDB_MIN_REVIEWS
+  ) {
+    return imdb.rating;
+  }
+  return null;
+}
+
+/**
+ * The film's Rotten Tomatoes critics score (0–100, the share of critics who
+ * liked it), or null with fewer than RT_MIN_REVIEWS critic reviews.
+ *
+ * @param {{ rottenTomatoes?: { critics?: { all?: { score?: number | null; reviews?: number } } } }} movie
+ * @returns {number | null}
+ */
+export function getRottenTomatoesScore(movie) {
+  const rt = movie.rottenTomatoes?.critics?.all;
+  if (
+    rt &&
+    typeof rt.score === "number" &&
+    (rt.reviews ?? 0) >= RT_MIN_REVIEWS
+  ) {
+    return rt.score;
+  }
+  return null;
+}

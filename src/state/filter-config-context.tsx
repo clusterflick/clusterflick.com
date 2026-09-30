@@ -21,6 +21,7 @@ import {
   FormatFilterId,
   PeopleFilterId,
   ProgrammeFilterId,
+  RatingFilterId,
   filterManager,
 } from "@/lib/filters";
 import {
@@ -215,8 +216,8 @@ type FilterConfigContextType = {
   // Films — a chosen set of film ids (e.g. a watchlist)
   toggleMovie: (movieId: string) => void;
   clearMovies: () => void;
-  // Minimum Letterboxd rating (out of 5); null clears it
-  setLetterboxdRating: (min: number | null) => void;
+  // Minimum score on one rating source; null clears it
+  setRating: (filterId: RatingFilterId, min: number | null) => void;
   // Film clubs / festivals — registry ids, keyed by filter id
   toggleProgramme: (filterId: ProgrammeFilterId, programmeId: string) => void;
   clearProgrammes: (filterId: ProgrammeFilterId) => void;
@@ -473,11 +474,12 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState((prev) => filterManager.set(prev, FilterId.Movies, null));
   }, []);
 
-  const setLetterboxdRating = useCallback((min: number | null) => {
-    setFilterState((prev) =>
-      filterManager.set(prev, FilterId.LetterboxdRating, min),
-    );
-  }, []);
+  const setRating = useCallback(
+    (filterId: RatingFilterId, min: number | null) => {
+      setFilterState((prev) => filterManager.set(prev, filterId, min));
+    },
+    [],
+  );
 
   // Film clubs and festivals - the same value semantics again, and ids the
   // registry no longer holds are left in place; see
@@ -766,7 +768,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearMovies,
       toggleProgramme,
       clearProgrammes,
-      setLetterboxdRating,
+      setRating,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
@@ -807,7 +809,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearMovies,
       toggleProgramme,
       clearProgrammes,
-      setLetterboxdRating,
+      setRating,
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,

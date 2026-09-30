@@ -10,7 +10,38 @@ import {
   isRanked,
   type MovieList,
 } from "@/data/movie-lists";
-import ListDetailPageContent from "./page-content";
+import { MovieListSource } from "@/data/movie-lists/types";
+import { FilterId } from "@/lib/filters/types";
+import {
+  getHighlyRatedUrl,
+  getRatingGroup,
+  type RatingFilterId,
+} from "@/lib/filters/modules/ratings";
+import ListDetailPageContent, { type RatingLink } from "./page-content";
+
+/**
+ * The rating filter behind each source's lists. A list drawn from a rating
+ * site links to everything that site rates highly — a wider net than the list
+ * itself, in the same terms. Editorial lists have no scale to widen along.
+ */
+const RATING_FILTER_BY_SOURCE: Partial<
+  Record<MovieListSource, RatingFilterId>
+> = {
+  [MovieListSource.Letterboxd]: FilterId.LetterboxdRating,
+  [MovieListSource.Imdb]: FilterId.ImdbRating,
+  [MovieListSource.RottenTomatoes]: FilterId.RottenTomatoesRating,
+};
+
+function getRatingLink(list: MovieList): RatingLink | undefined {
+  const filterId = RATING_FILTER_BY_SOURCE[list.source];
+  if (!filterId) return undefined;
+  const group = getRatingGroup(filterId);
+  return {
+    href: getHighlyRatedUrl(filterId, "all"),
+    source: group.source,
+    threshold: group.formatMin(group.highlyRated),
+  };
+}
 
 export const dynamicParams = false;
 
@@ -161,6 +192,7 @@ export default async function MovieListDetailPage({
         ranked={isRanked(list)}
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
+        ratingLink={getRatingLink(list)}
       />
     </>
   );
