@@ -73,7 +73,7 @@ covers the need. The canonical components are:
   plus an optional control)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
-- **Feedback:** `EmptyState`
+- **Feedback:** `EmptyState`, `ScopeBanner` (what a grid is narrowed _to_, with a way off)
 
 Only create a new component when no existing one fits. When you do:
 
@@ -486,8 +486,29 @@ the club dropped.
 
 **The registries ship to the client**, since the pipeline is synchronous and runs everywhere the
 filter state does. Minified and gzipped they are ~4.5KB together; the blurb components stay
-server-side. Links use `getProgrammeFilterUrl`, with `base=all` — clubs are often listed as events,
-which the default categories hide.
+server-side.
+
+**Where it surfaces:**
+
+- **Club and festival pages** carry "Explore in the catalogue" and "Plan in the planner" under the
+  hero title (`EventDetailPageContent`'s `browseLinks`), and point the grid's explore link at the
+  filtered catalogue — as genre and format pages do. Both only while something is showing; a hero
+  button onto an empty grid reads as broken. Links use `getProgrammeFilterUrl`, with `base=all` —
+  clubs are often listed as events, which the default categories hide, and a monthly club shows
+  nothing in most weeks' default window.
+- **A `ScopeBanner` above the catalogue and planner** ("Only showing: Film club · Japanese Film
+  Club ✕"), fed by `useProgrammeScope`. A programme changes what the page _is_, not how narrow it
+  is, so it is named where the reader is looking, links back to its page, and comes off in one
+  click — rather than being left to the overlay and the trigger's description.
+- **The overlay**, in "More Event Options" above Films (`ProgrammeFilterSection`), one
+  `EntityQuickAdd` per group. It opens itself while either is set, as the other filters in it do.
+
+**The typeahead carries no counts.** Counting a programme means running its matchers over the
+dataset, and each matcher pass is 3–6ms whatever the matcher: against a live release (2,193 films,
+36,163 performances) counting all ~90 clubs and festivals took 1.4s, 1s with the search variants
+already cached — far too long for opening an overlay, on a phone several times longer. The names
+are listed alphabetically instead, and only the selected chips are counted, from the cache the
+filter itself has just filled. `EntityQuickAdd`'s `count` is optional for this.
 
 ## Thin-Result Notice
 

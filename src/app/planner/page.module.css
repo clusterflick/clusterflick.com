@@ -56,6 +56,12 @@
   margin-top: -17px;
 }
 
+/* The catalogue's bar carries a gap beneath it and this one doesn't, since the
+   list below spaces itself; the banner between them supplies its own. */
+.scopeBanner {
+  margin-top: 16px;
+}
+
 /* Phone: the stepper takes the first line, and the view switch and More
    Filters share the second, left and right. Two equal columns rather than auto
    ones: auto tracks under space-between don't stretch, which left the stepper

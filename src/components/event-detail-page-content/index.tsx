@@ -16,6 +16,7 @@ import FilmPosterGrid, {
 import VenueCard from "@/components/venue-card";
 import LinkedList from "@/components/linked-list";
 import CanonicalRedirect from "@/components/canonical-redirect";
+import { ButtonLink } from "@/components/button";
 import styles from "./event-detail-page-content.module.css";
 
 export type EventVenueItem = {
@@ -63,6 +64,12 @@ export interface EventDetailPageContentProps {
    * format). When set, the "show all" hash is omitted so the filter applies.
    */
   movieUrlParams?: string;
+  /**
+   * Links opening the catalogue and planner filtered to this programme, drawn
+   * as a pair of buttons under the hero title. A filter rather than a list of
+   * today's films, so the pages they open follow the programme as it changes.
+   */
+  browseLinks?: { catalogueHref: string; plannerHref: string };
   /** Background image for the hero. Defaults to the decorative light circles. */
   heroBackgroundImage?: string;
   /** Alt text for a custom hero background image. */
@@ -123,6 +130,7 @@ export default function EventDetailPageContent({
   filmsExploreHref = "/catalogue",
   filmsExploreLabel = "Or start exploring all films",
   movieUrlParams,
+  browseLinks,
   heroBackgroundImage,
   heroBackgroundImageAlt,
   heroChildren,
@@ -235,6 +243,20 @@ export default function EventDetailPageContent({
             backgroundImageAlt={heroBackgroundImageAlt}
           >
             {heroChildren}
+            {browseLinks && (
+              <div className={styles.browseLinks}>
+                <ButtonLink href={browseLinks.catalogueHref} size="sm">
+                  Explore in the catalogue
+                </ButtonLink>
+                <ButtonLink
+                  href={browseLinks.plannerHref}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Plan in the planner
+                </ButtonLink>
+              </div>
+            )}
           </DetailPageHero>
         }
         afterContent={

@@ -54,6 +54,7 @@ export {
   filterManager,
   getDefaultState,
   getPermissiveState,
+  matchAny,
   get,
   set,
   hasActiveFilters,

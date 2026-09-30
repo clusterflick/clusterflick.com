@@ -134,3 +134,36 @@ export const Venues: Story = {
     />
   ),
 };
+
+const SAMPLE_FILM_CLUBS: EntityQuickAddItem[] = [
+  { id: "cinebug", name: "Cinebug" },
+  { id: "japanese-film-club", name: "Japanese Film Club" },
+  { id: "pink-palace", name: "Pink Palace" },
+  { id: "taste-film", name: "Taste Film" },
+  { id: "wimbledon-film-club", name: "Wimbledon Film Club" },
+];
+
+/**
+ * Without counts, as the film club and festival filters use it: counting a
+ * programme means running its matchers over the dataset, too slow to do for
+ * every entry up front. Try "film".
+ */
+export const WithoutCounts: Story = {
+  args: {
+    items: SAMPLE_FILM_CLUBS,
+    isSelected: () => false,
+    onToggle: () => {},
+    inputId: "story-film-clubs",
+    placeholder: "Search for a film club…",
+    ariaLabel: "Search for a film club",
+  },
+  render: () => (
+    <Interactive
+      items={SAMPLE_FILM_CLUBS}
+      initial={["cinebug"]}
+      inputId="story-film-clubs"
+      placeholder="Search for a film club…"
+      ariaLabel="Search for a film club"
+    />
+  ),
+};

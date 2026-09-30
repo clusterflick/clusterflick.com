@@ -86,3 +86,17 @@ export const AliasRedirect: Story = {
     canonicalUrl: "/film-clubs/ghibliotheque",
   },
 };
+
+/**
+ * With the "Explore" and "Plan" buttons a film club or festival page carries,
+ * opening the catalogue and planner filtered to its programme.
+ */
+export const WithBrowseLinks: Story = {
+  args: {
+    ...baseArgs,
+    browseLinks: {
+      catalogueHref: "/catalogue?base=all&filmClubs=ghibliotheque",
+      plannerHref: "/planner?base=all&filmClubs=ghibliotheque",
+    },
+  },
+};
