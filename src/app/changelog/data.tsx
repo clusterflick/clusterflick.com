@@ -71,6 +71,37 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-09-30",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Film clubs and festivals can now be explored in the{" "}
+            <Link href="/catalogue">catalogue</Link> and the{" "}
+            <Link href="/planner">planner</Link>. Every{" "}
+            <Link href="/film-clubs">film club</Link> and{" "}
+            <Link href="/festivals">festival</Link> page has Explore and Plan
+            buttons, and the links keep up as new screenings are announced. You
+            can also pick clubs and festivals under More Event Options in the
+            filters, alongside everything else there.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            On a phone, the summary of your filters at the top of the catalogue
+            and planner now uses the full width of the header and runs to two
+            lines, so a club, festival or director you&rsquo;ve picked is no
+            longer cut off after a couple of words.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-28",
     changes: [
       {
