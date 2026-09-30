@@ -27,6 +27,7 @@ export enum FilterId {
   FormatDimension = "formatDimension",
   HideFinished = "hideFinished",
   HideSoldOut = "hideSoldOut",
+  HideSeen = "hideSeen",
 }
 
 /**
@@ -61,6 +62,8 @@ export type FilterState = {
   [FilterId.FormatDimension]: string[] | null;
   [FilterId.HideFinished]: boolean;
   [FilterId.HideSoldOut]: boolean;
+  /** Film ids to hide (the reader's Seen list); `null` means no filter. */
+  [FilterId.HideSeen]: string[] | null;
 };
 
 /**
@@ -75,6 +78,12 @@ export type MoviesRecord = Record<string, Movie>;
 export interface FilterModule<K extends FilterId> {
   /** Unique identifier, matches the key in FilterState */
   id: K;
+
+  /**
+   * A reader's own setting rather than part of the search: never written to a
+   * URL, and kept when a link or preset replaces the rest of the state.
+   */
+  personal?: boolean;
 
   /** Returns the default value for this filter (no filter applied) */
   getDefault: () => FilterState[K];
@@ -134,4 +143,5 @@ export type AnyFilterModule =
   | FilterModule<FilterId.FormatPresentation>
   | FilterModule<FilterId.FormatDimension>
   | FilterModule<FilterId.HideFinished>
-  | FilterModule<FilterId.HideSoldOut>;
+  | FilterModule<FilterId.HideSoldOut>
+  | FilterModule<FilterId.HideSeen>;

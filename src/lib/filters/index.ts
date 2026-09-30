@@ -60,6 +60,7 @@ export {
   filterManager,
   getDefaultState,
   getPermissiveState,
+  keepPersonalFilters,
   matchAny,
   get,
   set,

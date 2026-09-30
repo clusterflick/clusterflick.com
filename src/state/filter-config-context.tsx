@@ -248,6 +248,8 @@ type FilterConfigContextType = {
   toggleHideFinished: () => void;
   // Hide sold out showings
   toggleHideSoldOut: () => void;
+  // Hide seen films: the Seen list's ids to switch it on, null to switch it off
+  setHideSeen: (seenIds: string[] | null) => void;
   // Quick filters (one-tap presets)
   applyQuickFilter: (quickFilter: QuickFilter) => void;
   isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
@@ -706,10 +708,23 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Hide seen films
+  const setHideSeen = useCallback((seenIds: string[] | null) => {
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.HideSeen, seenIds),
+    );
+  }, []);
+
   // Quick filters — apply a preset atomically on top of a clean default state
-  // so results never depend on whatever filters were previously set.
+  // so results never depend on whatever filters were previously set. Personal
+  // settings (hide seen films) are the reader's, not the search's, so they stay.
   const applyQuickFilter = useCallback((quickFilter: QuickFilter) => {
-    setFilterState(buildQuickFilterState(quickFilter));
+    setFilterState((prev) =>
+      filterManager.keepPersonalFilters(
+        buildQuickFilterState(quickFilter),
+        prev,
+      ),
+    );
   }, []);
 
   // True when the current filter state exactly matches what applying this quick
@@ -718,7 +733,10 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     (quickFilter: QuickFilter) =>
       filterManager.statesEqual(
         filterState,
-        buildQuickFilterState(quickFilter),
+        filterManager.keepPersonalFilters(
+          buildQuickFilterState(quickFilter),
+          filterState,
+        ),
       ),
     [filterState],
   );
@@ -785,6 +803,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearVenues,
       toggleHideFinished,
       toggleHideSoldOut,
+      setHideSeen,
       applyQuickFilter,
       isQuickFilterActive,
       applyFilterState,
@@ -826,6 +845,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       clearVenues,
       toggleHideFinished,
       toggleHideSoldOut,
+      setHideSeen,
       applyQuickFilter,
       isQuickFilterActive,
       applyFilterState,

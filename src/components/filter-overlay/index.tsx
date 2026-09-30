@@ -29,6 +29,7 @@ import RatingFilterSection from "./rating-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import { useUserContext } from "@/state/user-context";
+import { UserListId } from "@/lib/user-lists";
 import styles from "./filter-overlay.module.css";
 
 // The filters inside "More Event Options". Each defaults to no filter, so
@@ -98,6 +99,7 @@ export default function FilterOverlay({
     clearVenues,
     toggleHideFinished,
     toggleHideSoldOut,
+    setHideSeen,
     applyQuickFilter,
     isQuickFilterActive,
     resetFilters,
@@ -128,13 +130,31 @@ export default function FilterOverlay({
   // a venue that has dropped out (it may come back), but a preset that selects
   // it would count a venue the reader can't see and never match a selection
   // made from the chips.
-  const { favouriteVenues } = useUserContext();
+  const { favouriteVenues, lists } = useUserContext();
   const favouriteVenueIds = useMemo(
     () =>
       Object.keys(favouriteVenues ?? {}).filter(
         (id) => metaData?.venues[id] !== undefined,
       ),
     [favouriteVenues, metaData],
+  );
+
+  // "Hide films I've seen", offered once the Seen list has loaded. Switching it
+  // on stores the list's ids; SeenFilterSync keeps them current from then on.
+  const seenIds = useMemo(
+    () => (lists ? Object.keys(lists[UserListId.Seen]) : null),
+    [lists],
+  );
+  const hideSeen = useMemo(
+    () =>
+      seenIds
+        ? {
+            checked: filterState.hideSeen !== null,
+            onChange: (checked: boolean) =>
+              setHideSeen(checked ? seenIds : null),
+          }
+        : undefined,
+    [seenIds, filterState.hideSeen, setHideSeen],
   );
 
   // Compute filtered movie and performance counts
@@ -586,6 +606,7 @@ export default function FilterOverlay({
               </>
             }
             genres={genres}
+            hideSeen={hideSeen}
             filterState={{
               categories: filterState.categories,
               genres: filterState.genres,

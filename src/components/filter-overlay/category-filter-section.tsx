@@ -19,6 +19,7 @@ import { EVENT_CATEGORIES } from "@/state/filter-config-context";
 import Link from "next/link";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
+import Switch from "@/components/switch";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
 
@@ -54,6 +55,11 @@ interface CategoryFilterSectionProps {
     accessibility: AccessibilityFilterValue[] | null;
     formats: Record<FormatFilterId, string[] | null>;
   };
+  /**
+   * The "Hide films I've seen" switch. Absent while signed out: it hides the
+   * films on the reader's Seen list, and there is no list without an account.
+   */
+  hideSeen?: { checked: boolean; onChange: (checked: boolean) => void };
   toggleCategory: (category: Category) => void;
   selectAllCategories: () => void;
   clearAllCategories: () => void;
@@ -78,6 +84,7 @@ export default function CategoryFilterSection({
   expandAdvanced = false,
   genres,
   filterState,
+  hideSeen,
   toggleCategory,
   selectAllCategories,
   clearAllCategories,
@@ -304,6 +311,16 @@ export default function CategoryFilterSection({
           />
         ))}
       </div>
+      {hideSeen && (
+        <div className={styles.seenSwitch}>
+          <Switch
+            id="hide-seen"
+            label="Hide films I've seen"
+            checked={hideSeen.checked}
+            onChange={hideSeen.onChange}
+          />
+        </div>
+      )}
       {/* Accessibility Filter */}
       <div className={styles.advancedFilterGroup}>
         <div className={styles.advancedFilterHeader}>
