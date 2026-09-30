@@ -135,3 +135,31 @@ describe("describeFilters describes the films filter", () => {
     expect(description).not.toContain("Alien");
   });
 });
+
+describe("describeFilters describes the film club and festival filters", () => {
+  it("names the club, from the registry", () => {
+    const state = set(getDefaultState(), FilterId.FilmClubs, ["cinebug"]);
+    expect(events(state)).toBe("Films from Cinebug");
+  });
+
+  it("reads 'or' within a filter and 'and' across the two", () => {
+    let state = set(getDefaultState(), FilterId.Categories, null);
+    state = set(state, FilterId.FilmClubs, ["cinebug", "japanese-film-club"]);
+    state = set(state, FilterId.Festivals, ["bfi-flare"]);
+    expect(events(state)).toBe(
+      "Events from Cinebug or Japanese Film Club and at BFI Flare: London LGBTQIA+ Film Festival",
+    );
+  });
+
+  it("leaves out ids the registry no longer holds", () => {
+    const state = set(getDefaultState(), FilterId.Festivals, [
+      "gone",
+      "bfi-flare",
+    ]);
+    expect(events(state)).toContain(
+      "at BFI Flare: London LGBTQIA+ Film Festival",
+    );
+    const none = set(getDefaultState(), FilterId.Festivals, ["gone"]);
+    expect(events(none)).toContain("at festivals no longer listed");
+  });
+});

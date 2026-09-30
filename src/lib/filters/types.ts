@@ -16,6 +16,8 @@ export enum FilterId {
   Directors = "directors",
   Cast = "cast",
   Movies = "movies",
+  FilmClubs = "filmClubs",
+  Festivals = "festivals",
   Accessibility = "accessibility",
   FormatSource = "formatSource",
   FormatPresentation = "formatPresentation",
@@ -42,6 +44,8 @@ export type FilterState = {
   [FilterId.Directors]: string[] | null;
   [FilterId.Cast]: string[] | null;
   [FilterId.Movies]: string[] | null;
+  [FilterId.FilmClubs]: string[] | null;
+  [FilterId.Festivals]: string[] | null;
   [FilterId.Accessibility]: AccessibilityFilterValue[] | null;
   [FilterId.FormatSource]: string[] | null;
   [FilterId.FormatPresentation]: string[] | null;
@@ -111,6 +115,8 @@ export type AnyFilterModule =
   | FilterModule<FilterId.Directors>
   | FilterModule<FilterId.Cast>
   | FilterModule<FilterId.Movies>
+  | FilterModule<FilterId.FilmClubs>
+  | FilterModule<FilterId.Festivals>
   | FilterModule<FilterId.Accessibility>
   | FilterModule<FilterId.FormatSource>
   | FilterModule<FilterId.FormatPresentation>

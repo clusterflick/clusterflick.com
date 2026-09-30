@@ -10,6 +10,8 @@ import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import {
   FORMAT_GROUPS,
   PEOPLE_GROUPS,
+  PROGRAMME_GROUPS,
+  getProgrammeName,
   DAY_START_MINUTES,
   DAY_END_MINUTES,
 } from "./modules";
@@ -470,6 +472,35 @@ function describeMovies(
 }
 
 /**
+ * Describes the film club and festival filters as clauses to append to the
+ * events description: "from Cinebug", "at BFI Flare or Fringe!".
+ *
+ * Names come from the registry, so unlike the films filter no lookup is needed.
+ * Ids the registry no longer holds are left out of the names, as films that
+ * have finished their run are; a selection holding none of them still
+ * restricts to nothing, so it is said as such.
+ */
+function describeProgrammes(state: FilterState): string[] {
+  const phrases: string[] = [];
+  for (const group of PROGRAMME_GROUPS) {
+    const selected = state[group.filterId];
+    if (!selected || selected.length === 0) continue;
+
+    const names = selected
+      .map((id) => group.programmes.find((p) => p.id === id))
+      .filter((programme) => !!programme)
+      .map(getProgrammeName);
+
+    phrases.push(
+      names.length === 0
+        ? `${group.verb} ${group.plural} no longer listed`
+        : `${group.verb} ${formatList(names, 2, group.plural, "or")}`,
+    );
+  }
+  return phrases;
+}
+
+/**
  * Describes the format filters (source / presentation / dimension).
  * - `emptyTitle`: title of the first group with nothing selected (no matches)
  * - `labels`: selected option labels across all active groups
@@ -530,6 +561,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     describeFormats(state);
   const peoplePhrases = describePeople(state, people);
   const moviesPhrase = describeMovies(state, movies);
+  const programmePhrases = describeProgrammes(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
@@ -541,6 +573,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allFormats = FORMAT_GROUPS.every((group) => !state[group.filterId]);
   const allPeople = peoplePhrases.length === 0;
   const allMovies = moviesPhrase === null;
+  const allProgrammes = programmePhrases.length === 0;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
@@ -558,7 +591,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allAccessibility &&
     allFormats &&
     allPeople &&
-    allMovies
+    allMovies &&
+    allProgrammes
   ) {
     // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
@@ -593,6 +627,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   // Appended once rather than per branch: these read as clauses on whatever the
   // branches settled on, whether that is "All events" or "Films".
   if (!selectionIsEmpty) {
+    if (programmePhrases.length > 0) {
+      eventsDesc += ` ${programmePhrases.join(" and ")}`;
+    }
     if (moviesPhrase) {
       eventsDesc += ` ${moviesPhrase}`;
     }

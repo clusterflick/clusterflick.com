@@ -34,6 +34,17 @@ export {
   MOVIES_URL_PARAM,
 } from "./movies";
 export type { MovieOption } from "./movies";
+export {
+  buildProgrammeFilter,
+  PROGRAMME_GROUPS,
+  getProgrammeName,
+  getProgrammeFilterUrl,
+} from "./programmes";
+export type {
+  ProgrammeFilterId,
+  ProgrammeGroupConfig,
+  Programme,
+} from "./programmes";
 export { accessibilityFilter } from "./accessibility";
 export {
   formatSourceFilter,

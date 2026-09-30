@@ -183,6 +183,19 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
   // subject. Mostly a watchlist left over from another page, which is exactly
   // the invisible blocker this list exists to name.
   { id: FilterId.Movies, label: "All films", action: "Search all films" },
+  // Last of the subjects: a club or festival is usually why the reader is
+  // looking at all, so every widening around it comes first — a monthly club
+  // outside the date window wants the dates widened, not the club dropped.
+  {
+    id: FilterId.FilmClubs,
+    label: "All film clubs",
+    action: "Search all film clubs",
+  },
+  {
+    id: FilterId.Festivals,
+    label: "All festivals",
+    action: "Search all festivals",
+  },
   {
     id: FilterId.Accessibility,
     label: "Any accessibility requirement",
