@@ -14,6 +14,11 @@ interface SliderProps {
   onChange: (value: number) => void;
   /** Renders the value beside the label and as its accessible text. */
   formatValue: (value: number) => string;
+  /**
+   * Shows the value in grey, for a position that means "no setting" (the
+   * rating filter's "Any rating"), so a set slider stands out from unset ones.
+   */
+  muted?: boolean;
   /** Layout only, as for `Switch`. */
   className?: string;
 }
@@ -33,6 +38,7 @@ export default function Slider({
   value,
   onChange,
   formatValue,
+  muted = false,
   className,
 }: SliderProps) {
   const formatted = formatValue(value);
@@ -44,7 +50,10 @@ export default function Slider({
         <label htmlFor={id} className={styles.label}>
           {label}
         </label>
-        <output htmlFor={id} className={styles.value}>
+        <output
+          htmlFor={id}
+          className={clsx(styles.value, muted && styles.valueMuted)}
+        >
           {formatted}
         </output>
       </div>

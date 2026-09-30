@@ -24,6 +24,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+.valueMuted {
+  font-weight: 500;
+  color: var(--color-muted-gray);
+}
+
 /*
  * The native input, restyled. The filled part of the track is a gradient
  * stopped at --fill, set inline from the value, since only Firefox has a

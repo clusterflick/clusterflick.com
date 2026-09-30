@@ -34,6 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 function Interactive({ initial }: { initial: number }) {
   const [value, setValue] = useState(initial);
+  const isAny = value < 2.95;
   return (
     <div style={{ maxWidth: 360 }}>
       <Slider
@@ -44,7 +45,8 @@ function Interactive({ initial }: { initial: number }) {
         step={0.1}
         value={value}
         onChange={setValue}
-        formatValue={(v) => (v < 3 ? "Any rating" : `${v.toFixed(1)}+`)}
+        formatValue={(v) => (v < 2.95 ? "Any rating" : `${v.toFixed(1)}+`)}
+        muted={isAny}
       />
     </div>
   );
@@ -58,7 +60,7 @@ const args = {
   step: 0.1,
   value: 4,
   onChange: () => {},
-  formatValue: (v: number) => (v < 3 ? "Any rating" : `${v.toFixed(1)}+`),
+  formatValue: (v: number) => (v < 2.95 ? "Any rating" : `${v.toFixed(1)}+`),
 };
 
 /** Set to the Highly Rated row's threshold. */
@@ -67,8 +69,11 @@ export const AtThreshold: Story = {
   render: () => <Interactive initial={4} />,
 };
 
-/** At its lowest position, which the rating filter reads as no filter. */
+/**
+ * At its lowest position, which the rating filter reads as no filter, so the
+ * value is muted.
+ */
 export const AnyRating: Story = {
-  args: { ...args, value: 2.9 },
+  args: { ...args, value: 2.9, muted: true },
   render: () => <Interactive initial={2.9} />,
 };

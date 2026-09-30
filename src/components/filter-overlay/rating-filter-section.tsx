@@ -86,6 +86,7 @@ function RatingSlider({
         max={group.max}
         step={group.step}
         value={value ?? anyPosition}
+        muted={value === null}
         onChange={(next) =>
           setRating(
             group.filterId,
