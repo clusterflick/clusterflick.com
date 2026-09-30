@@ -514,6 +514,68 @@ already cached — far too long for opening an overlay, on a phone several times
 are listed alphabetically instead, and only the selected chips are counted, from the cache the
 filter itself has just filled. `EntityQuickAdd`'s `count` is optional for this.
 
+## Home Row "See All" Links
+
+A home row is a slice: a rule, cut to its top dozen or so for a horizontal row. Where the rule can be
+said as filters, the row's "See all" (`PosterRow`'s `seeAllHref`) opens the catalogue on **all** of
+it, not a snapshot of the slice. They sit on the default base, because the catalogue's default week
+and categories are the rows' own.
+
+- **Highly Rated** → `/catalogue?letterboxd=4.0` (`getHighlyRatedUrl`). The row and the filter share
+  one test, `meetsRating`, so the grid is exactly what the row is a slice of.
+- **Marathons & Double Bills** → Multiple Films plus Short Films (`getMarathonsUrl`). A superset,
+  knowingly: the row is multi-film events, and Short Films also holds single shorts (15 of 32 in a
+  live week). No filter tells a shorts programme from one short, and the data can't reliably either
+  — some programmes carry no list of their films — so a short on that page was accepted over a
+  filter of its own.
+
+The rest need filters that don't exist yet (last chance, just added), a sort (Showing Across
+London), or a costlier probe (More Than a Screening). Lists and collections need no link: their
+pages already show every member that is showing.
+
+**The rating filters** (`src/lib/filters/modules/ratings.ts`) are three, one per source, built from
+one factory as the people and format filters are: Letterboxd (`?letterboxd=`, out of 5), IMDb
+(`?imdb=`, out of 10) and Rotten Tomatoes (`?rottenTomatoes=`, 0–100). Each is a minimum on a
+`Slider` in "More Event Options", above Genre, grouped under one "Ratings" heading. They are not
+one blended score, because the sources don't measure the same thing: Letterboxd and IMDb publish an
+average, Rotten Tomatoes the share of critics who liked a film, and of 193 films carrying both a
+Letterboxd average and a Tomatometer score, 73 fell on opposite sides of an 80% line.
+
+- **Review floors are the site's existing ones** (`@/utils/movie-ratings.mjs`: 2,000 Letterboxd
+  reviews, 10,000 IMDb votes, 40 critic reviews), read by `getLetterboxdRating`, `getImdbRating` and
+  `getRottenTomatoesScore`. A film under the floor has no score, so any minimum excludes it, and a
+  one-line note under each slider ("Only films with 2,000+ reviews are counted") says so, so an
+  unrated film dropping out isn't read as a verdict on it.
+- **Ranges cover where a threshold separates films**, not the whole scale: Letterboxd 3.0–4.5 and
+  IMDb 6.0–9.0 in 0.1 steps, Rotten Tomatoes 60–100% in steps of 1. Scores bunch — Letterboxd
+  between 3.5 and 4.3, Rotten Tomatoes between 85 and 98 — so coarser steps jump straight across
+  the useful range. Each slider's lowest position, one step below its range, reads "Any rating" and
+  clears it: a slider has no off switch, and a second control for one setting is worse.
+- **Scores compare at the precision they're shown at**: a film averaging 3.96 reads "4.0/5", and
+  "4.0+" leaving it out would contradict the poster.
+- **"Highly rated" is set per source at roughly its top quarter**, measured on the films showing in
+  one live week: Letterboxd 4.0+ (80 of 307, 26%), IMDb 8.0+ (45 of 191, 24%), Rotten Tomatoes 95%+
+  (43 of 198, 22%). Not a shared fraction of each maximum: 80% matched the first two but let in 66%
+  of Rotten Tomatoes' films, since well-known films with 40+ critic reviews are mostly well liked.
+
+**Highly Rated is the Letterboxd filter at its line**, through the same `meetsRating`. Letterboxd
+because it rates the most of what's showing (307 of 448 films that week). It used to be
+`getRating`'s best available source normalised to 0–1, which the scales above rule out; `getRating`
+had resolved to Letterboxd for 307 of 312 rated films anyway. It was renamed from Critics' Picks,
+being audience averages, and **the heading names no source** (`HIGHLY_RATED` in
+`get-discovery-movies.ts` picks it), so the source can change without it; the posters' subtitles name
+it. It no longer drops "permanent fixtures" (30+ upcoming showings): meant for museum IMAX
+attractions, that was catching wide re-releases like Coraline and Casino Royale. The editorial
+summary still uses `getRating`, for its own "acclaimed gem" idea.
+
+**Lists from a rating site link to its line** — "Browse all films highly rated on IMDb (8.0+)" on
+the IMDb Top 250, the Letterboxd line on the Letterboxd Top 500, the Rotten Tomatoes line on its
+lists — by the list's `source` (`RATING_FILTER_BY_SOURCE` on the list page). It's a wider net than
+the list in the same terms, which is exploration the list page itself can't offer. `base=all`,
+unlike the home row, since a list page shows every member whenever it's showing. It's shown even
+when nothing from the list is on, when it's the most useful thing on the page. Editorial lists
+(Oscars, Cannes, Empire…) have no scale to widen along, and no link.
+
 ## Thin-Result Notice
 
 When a filtered grid returns a handful of films and widening the dates would

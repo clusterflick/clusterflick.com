@@ -1,6 +1,11 @@
 import PosterRow from "@/components/poster-row";
 import CollectionRow from "@/components/collection-row";
-import type { DiscoveryRows } from "@/utils/get-discovery-movies";
+import {
+  getMarathonsUrl,
+  HIGHLY_RATED,
+  type DiscoveryRows,
+} from "@/utils/get-discovery-movies";
+import { getHighlyRatedUrl } from "@/lib/filters/modules/ratings";
 import styles from "./page.module.css";
 
 /**
@@ -11,7 +16,7 @@ import styles from "./page.module.css";
 export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
   const {
     popular,
-    criticsPicks,
+    highlyRated,
     newAdditions,
     lastChance,
     marathons,
@@ -32,11 +37,14 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         movies={popular}
       />
 
+      {/* Named for what the films are, not where the score comes from, so
+          the source can change without the heading. */}
       <PosterRow
-        title="Critics' Picks"
-        intro="Highly rated films worth seeking out this week."
-        movies={criticsPicks}
+        title="Highly Rated"
+        intro="The best-reviewed films showing this week."
+        movies={highlyRated}
         showAll
+        seeAllHref={getHighlyRatedUrl(HIGHLY_RATED.filterId)}
       />
 
       <PosterRow
@@ -58,6 +66,7 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         intro="Multi-film events and double bills showing this week."
         movies={marathons}
         showAll
+        seeAllHref={getMarathonsUrl()}
       />
 
       {hasNewAdditions && (

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import EmptyState from "@/components/empty-state";
@@ -8,6 +9,15 @@ import FilmPosterGrid from "@/components/film-poster-grid";
 import type { Movie } from "@/types";
 import type { MovieList } from "@/data/movie-lists";
 import styles from "./page.module.css";
+
+/** The catalogue at the list's rating source's "highly rated" line. */
+export type RatingLink = {
+  href: string;
+  /** "IMDb" */
+  source: string;
+  /** "8.0+" */
+  threshold: string;
+};
 
 export type ListFilm = {
   movie: Movie;
@@ -33,6 +43,8 @@ interface ListDetailPageContentProps {
   ranked: boolean;
   isAlias: boolean;
   canonicalUrl: string;
+  /** For lists drawn from a rating site; editorial lists have none. */
+  ratingLink?: RatingLink;
 }
 
 export default function ListDetailPageContent({
@@ -49,6 +61,7 @@ export default function ListDetailPageContent({
   ranked,
   isAlias,
   canonicalUrl,
+  ratingLink,
 }: ListDetailPageContentProps) {
   const showingCount = films.length;
   const countLabel =
@@ -149,6 +162,16 @@ export default function ListDetailPageContent({
                 </>
               )}
             </p>
+            {/* Shown whether or not anything from the list is on: when
+                nothing is, this is the most useful thing on the page. */}
+            {ratingLink && (
+              <p className={styles.about}>
+                <Link href={ratingLink.href}>
+                  Browse all films highly rated on {ratingLink.source} (
+                  {ratingLink.threshold}) →
+                </Link>
+              </p>
+            )}
           </div>
         </div>
 

@@ -163,3 +163,18 @@ describe("describeFilters describes the film club and festival filters", () => {
     expect(events(none)).toContain("at festivals no longer listed");
   });
 });
+
+describe("describeFilters describes the rating filters", () => {
+  it("names the minimum and its source", () => {
+    const state = set(getDefaultState(), FilterId.LetterboxdRating, 4);
+    expect(events(state)).toBe("Films rated 4.0+ on Letterboxd");
+  });
+
+  it("names each source on its own scale", () => {
+    let state = set(getDefaultState(), FilterId.ImdbRating, 8);
+    state = set(state, FilterId.RottenTomatoesRating, 95);
+    expect(events(state)).toBe(
+      "Films rated 8.0+ on IMDb and 95%+ on Rotten Tomatoes",
+    );
+  });
+});

@@ -16,6 +16,10 @@ export {
   venuesFilter,
   dateRangeFilter,
   genresFilter,
+  RATING_GROUPS,
+  getRatingGroup,
+  meetsRating,
+  getHighlyRatedUrl,
   directorsFilter,
   castFilter,
   PEOPLE_GROUPS,
@@ -47,6 +51,8 @@ export type {
   ProgrammeFilterId,
   ProgrammeGroupConfig,
   Programme,
+  RatingFilterId,
+  RatingGroupConfig,
 } from "./modules";
 
 // Manager functions and object

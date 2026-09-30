@@ -13,6 +13,9 @@ export enum FilterId {
   DateRange = "dateRange",
   TimeRange = "timeRange",
   Genres = "genres",
+  LetterboxdRating = "letterboxdRating",
+  ImdbRating = "imdbRating",
+  RottenTomatoesRating = "rottenTomatoesRating",
   Directors = "directors",
   Cast = "cast",
   Movies = "movies",
@@ -41,6 +44,12 @@ export type FilterState = {
   [FilterId.DateRange]: { start: number | null; end: number | null };
   [FilterId.TimeRange]: { start: number; end: number };
   [FilterId.Genres]: string[] | null;
+  /** Minimum Letterboxd average, out of 5; `null` means no filter. */
+  [FilterId.LetterboxdRating]: number | null;
+  /** Minimum IMDb rating, out of 10; `null` means no filter. */
+  [FilterId.ImdbRating]: number | null;
+  /** Minimum Tomatometer score, 0–100; `null` means no filter. */
+  [FilterId.RottenTomatoesRating]: number | null;
   [FilterId.Directors]: string[] | null;
   [FilterId.Cast]: string[] | null;
   [FilterId.Movies]: string[] | null;
@@ -112,6 +121,9 @@ export type AnyFilterModule =
   | FilterModule<FilterId.DateRange>
   | FilterModule<FilterId.TimeRange>
   | FilterModule<FilterId.Genres>
+  | FilterModule<FilterId.LetterboxdRating>
+  | FilterModule<FilterId.ImdbRating>
+  | FilterModule<FilterId.RottenTomatoesRating>
   | FilterModule<FilterId.Directors>
   | FilterModule<FilterId.Cast>
   | FilterModule<FilterId.Movies>

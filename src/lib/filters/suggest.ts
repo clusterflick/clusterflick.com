@@ -143,6 +143,22 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     action: "Search all times of day",
   },
   { id: FilterId.Genres, label: "All genres", action: "Search all genres" },
+  // Beside genre: a rating is a taste in films, and as elastic as one.
+  {
+    id: FilterId.LetterboxdRating,
+    label: "Any Letterboxd rating",
+    action: "Search films at any Letterboxd rating",
+  },
+  {
+    id: FilterId.ImdbRating,
+    label: "Any IMDb rating",
+    action: "Search films at any IMDb rating",
+  },
+  {
+    id: FilterId.RottenTomatoesRating,
+    label: "Any Rotten Tomatoes score",
+    action: "Search films at any Rotten Tomatoes score",
+  },
   {
     id: FilterId.FormatSource,
     label: "Any source format",

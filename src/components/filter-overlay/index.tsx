@@ -25,6 +25,7 @@ import VenueFilterSection from "./venue-filter-section";
 import PeopleFilterSection from "./people-filter-section";
 import MovieFilterSection from "./movie-filter-section";
 import ProgrammeFilterSection from "./programme-filter-section";
+import RatingFilterSection from "./rating-filter-section";
 import DateFilterSection from "./date-filter-section";
 import ExpandableSection from "@/components/expandable-section";
 import { useUserContext } from "@/state/user-context";
@@ -38,6 +39,9 @@ const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
   FilterId.Movies,
   FilterId.Directors,
   FilterId.Cast,
+  FilterId.LetterboxdRating,
+  FilterId.ImdbRating,
+  FilterId.RottenTomatoesRating,
   FilterId.Genres,
   FilterId.Accessibility,
   FilterId.FormatSource,
@@ -77,6 +81,7 @@ export default function FilterOverlay({
     clearMovies,
     toggleProgramme,
     clearProgrammes,
+    setRating,
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
@@ -568,6 +573,15 @@ export default function FilterOverlay({
                   }}
                   togglePerson={togglePerson}
                   clearPeople={clearPeople}
+                />
+                <RatingFilterSection
+                  selected={{
+                    [FilterId.LetterboxdRating]: filterState.letterboxdRating,
+                    [FilterId.ImdbRating]: filterState.imdbRating,
+                    [FilterId.RottenTomatoesRating]:
+                      filterState.rottenTomatoesRating,
+                  }}
+                  setRating={setRating}
                 />
               </>
             }

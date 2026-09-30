@@ -1,0 +1,104 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted-gray);
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-neon-pink);
+  font-variant-numeric: tabular-nums;
+}
+
+.valueMuted {
+  font-weight: 500;
+  color: var(--color-muted-gray);
+}
+
+/*
+ * The native input, restyled. The filled part of the track is a gradient
+ * stopped at --fill, set inline from the value, since only Firefox has a
+ * pseudo-element for it. 24px tall so the whole track is an easy touch target
+ * while the drawn track stays thin.
+ */
+.input {
+  --track-height: 4px;
+  --thumb-size: 18px;
+
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.input::-webkit-slider-runnable-track {
+  height: var(--track-height);
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-neon-pink) var(--fill),
+    rgba(var(--color-white-rgb), 0.15) var(--fill)
+  );
+}
+
+.input::-moz-range-track {
+  height: var(--track-height);
+  border-radius: 2px;
+  background: rgba(var(--color-white-rgb), 0.15);
+}
+
+.input::-moz-range-progress {
+  height: var(--track-height);
+  border-radius: 2px;
+  background: var(--color-neon-pink);
+}
+
+.input::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  margin-top: calc((var(--track-height) - var(--thumb-size)) / 2);
+  border: 2px solid var(--color-midnight-navy);
+  border-radius: 50%;
+  background: var(--color-neon-pink);
+  transition: box-shadow 0.2s ease;
+}
+
+.input::-moz-range-thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border: 2px solid var(--color-midnight-navy);
+  border-radius: 50%;
+  background: var(--color-neon-pink);
+  transition: box-shadow 0.2s ease;
+}
+
+.input:hover::-webkit-slider-thumb,
+.input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 6px rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.input:hover::-moz-range-thumb,
+.input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 6px rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.input:focus-visible {
+  outline: none;
+}

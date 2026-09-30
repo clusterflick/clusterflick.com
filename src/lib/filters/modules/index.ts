@@ -12,6 +12,16 @@ export {
 } from "./time-range";
 export { genresFilter } from "./genres";
 export {
+  letterboxdRatingFilter,
+  imdbRatingFilter,
+  rottenTomatoesRatingFilter,
+  RATING_GROUPS,
+  getRatingGroup,
+  meetsRating,
+  getHighlyRatedUrl,
+} from "./ratings";
+export type { RatingFilterId, RatingGroupConfig } from "./ratings";
+export {
   directorsFilter,
   castFilter,
   PEOPLE_GROUPS,

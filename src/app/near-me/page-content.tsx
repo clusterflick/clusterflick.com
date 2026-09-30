@@ -338,9 +338,9 @@ export default function NearMePageContent({
           {rows && (
             <div className={styles.rows}>
               <PosterRow
-                title="Critics' Picks Near Me"
-                intro="Highly rated films showing nearby this week."
-                movies={rows.criticsPicks}
+                title="Highly Rated Near Me"
+                intro="The best-reviewed films showing nearby this week."
+                movies={rows.highlyRated}
                 movieUrlParams={movieUrlParams}
               />
               <PosterRow

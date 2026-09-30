@@ -80,3 +80,67 @@ export function isEvergreen(movie, now) {
   }
   return future > EVERGREEN_MAX_FUTURE;
 }
+
+/**
+ * The film's Letterboxd average (out of 5), or null when it has fewer than
+ * LETTERBOXD_MIN_REVIEWS reviews. What the Highly Rated row and the films
+ * grid's rating filter read, so the row and its "See all" always agree.
+ *
+ * Letterboxd alone rather than `getRating`'s best-available source: the sources
+ * don't measure the same thing — a Rotten Tomatoes score is the share of
+ * critics who liked a film, not an average — so one threshold across them
+ * sorts films inconsistently. In practice `getRating` resolved to Letterboxd
+ * for 307 of 312 rated films in a live release anyway.
+ *
+ * @param {{ letterboxd?: { rating?: number | null; reviews?: number } }} movie
+ * @returns {number | null}
+ */
+export function getLetterboxdRating(movie) {
+  const lb = movie.letterboxd;
+  if (
+    lb &&
+    typeof lb.rating === "number" &&
+    (lb.reviews ?? 0) >= LETTERBOXD_MIN_REVIEWS
+  ) {
+    return lb.rating;
+  }
+  return null;
+}
+
+/**
+ * The film's IMDb rating (out of 10), or null with fewer than IMDB_MIN_REVIEWS
+ * votes.
+ *
+ * @param {{ imdb?: { rating?: number | null; reviews?: number } }} movie
+ * @returns {number | null}
+ */
+export function getImdbRating(movie) {
+  const imdb = movie.imdb;
+  if (
+    imdb &&
+    typeof imdb.rating === "number" &&
+    (imdb.reviews ?? 0) >= IMDB_MIN_REVIEWS
+  ) {
+    return imdb.rating;
+  }
+  return null;
+}
+
+/**
+ * The film's Rotten Tomatoes critics score (0–100, the share of critics who
+ * liked it), or null with fewer than RT_MIN_REVIEWS critic reviews.
+ *
+ * @param {{ rottenTomatoes?: { critics?: { all?: { score?: number | null; reviews?: number } } } }} movie
+ * @returns {number | null}
+ */
+export function getRottenTomatoesScore(movie) {
+  const rt = movie.rottenTomatoes?.critics?.all;
+  if (
+    rt &&
+    typeof rt.score === "number" &&
+    (rt.reviews ?? 0) >= RT_MIN_REVIEWS
+  ) {
+    return rt.score;
+  }
+  return null;
+}

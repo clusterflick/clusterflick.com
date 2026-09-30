@@ -1569,3 +1569,15 @@ describe("suggestFilterRelaxations with a film club selected", () => {
     expect(dropped?.state[FilterId.FilmClubs]).toBeNull();
   });
 });
+
+describe("suggestFilterRelaxations with a rating set", () => {
+  it("offers any rating when the minimum is what emptied the grid", () => {
+    const movies = makeMovies({ "1": { title: "Heat" } });
+    const state = set(getDefaultState(), FilterId.ImdbRating, 8.5);
+
+    const widened = suggestFilterRelaxations({ movies, state }).find((s) =>
+      s.changes.some((change) => change.label === "Any IMDb rating"),
+    );
+    expect(widened?.state[FilterId.ImdbRating]).toBeNull();
+  });
+});

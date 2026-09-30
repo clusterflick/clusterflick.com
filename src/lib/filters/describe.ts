@@ -11,6 +11,7 @@ import {
   FORMAT_GROUPS,
   PEOPLE_GROUPS,
   PROGRAMME_GROUPS,
+  RATING_GROUPS,
   getProgrammeName,
   DAY_START_MINUTES,
   DAY_END_MINUTES,
@@ -472,6 +473,19 @@ function describeMovies(
 }
 
 /**
+ * Describes the rating filters as one clause to append to the events
+ * description: "rated 4.0+ on Letterboxd and 95%+ on Rotten Tomatoes". Each
+ * source is named because a threshold only means something on its own scale.
+ */
+function describeRatings(state: FilterState): string | null {
+  const parts = RATING_GROUPS.flatMap((group) => {
+    const min = state[group.filterId];
+    return min === null ? [] : [`${group.formatMin(min)} on ${group.source}`];
+  });
+  return parts.length === 0 ? null : `rated ${formatList(parts, 3, "", "and")}`;
+}
+
+/**
  * Describes the film club and festival filters as clauses to append to the
  * events description: "from Cinebug", "at BFI Flare or Fringe!".
  *
@@ -562,6 +576,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const peoplePhrases = describePeople(state, people);
   const moviesPhrase = describeMovies(state, movies);
   const programmePhrases = describeProgrammes(state);
+  const ratingPhrase = describeRatings(state);
   const searchQuery = state.search?.trim();
   const showingTitleQuery = state.showingTitleSearch?.trim();
   const performanceNotesQuery = state.performanceNotesSearch?.trim();
@@ -574,6 +589,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allPeople = peoplePhrases.length === 0;
   const allMovies = moviesPhrase === null;
   const allProgrammes = programmePhrases.length === 0;
+  const allRatings = ratingPhrase === null;
 
   // Handle no genres / accessibility / format values selected case
   if (genreDesc === "none") {
@@ -592,7 +608,8 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allFormats &&
     allPeople &&
     allMovies &&
-    allProgrammes
+    allProgrammes &&
+    allRatings
   ) {
     // All categories, genres, accessibility, formats and people selected
     eventsDesc = "All events";
@@ -632,6 +649,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
     if (moviesPhrase) {
       eventsDesc += ` ${moviesPhrase}`;
+    }
+    if (ratingPhrase) {
+      eventsDesc += ` ${ratingPhrase}`;
     }
     if (peoplePhrases.length > 0) {
       eventsDesc += ` ${peoplePhrases.join(" and ")}`;
