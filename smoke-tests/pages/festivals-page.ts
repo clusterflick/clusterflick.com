@@ -6,7 +6,10 @@ const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 // first in the DOM. Excluding the section index itself leaves only real cards.
 const FESTIVAL_CARD_SELECTOR =
   'a[href^="/festivals/"]:not([href="/festivals/"])';
-const FESTIVAL_CARD_NAME_SELECTOR = '[data-testid="event-card-name"]';
+// The page leads with a featured festival whenever any festival is listed —
+// the cards below leave it out, and with only one festival there are no cards
+// at all — so its heading link is the one festival link always present.
+const FEATURED_FESTIVAL_LINK_SELECTOR = "#featured-festival a";
 
 export class FestivalsPage {
   constructor(private page: Page) {}
@@ -20,12 +23,12 @@ export class FestivalsPage {
     return (await this.page.locator(FESTIVAL_CARD_SELECTOR).count()) > 0;
   }
 
-  async getFirstFestivalName(): Promise<string | null> {
-    return this.page.locator(FESTIVAL_CARD_NAME_SELECTOR).first().textContent();
+  async getFeaturedFestivalName(): Promise<string | null> {
+    return this.page.locator(FEATURED_FESTIVAL_LINK_SELECTOR).textContent();
   }
 
-  async clickFirstFestival() {
-    await this.page.locator(FESTIVAL_CARD_SELECTOR).first().click();
+  async clickFeaturedFestival() {
+    await this.page.locator(FEATURED_FESTIVAL_LINK_SELECTOR).click();
   }
 
   async screenshot(name: string) {

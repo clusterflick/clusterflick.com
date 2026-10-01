@@ -119,11 +119,15 @@ export class FilmsPage {
   }
 
   async closeFilterOverlay() {
-    await this.page.keyboard.press("Escape");
-    await this.page.waitForSelector(SEARCH_INPUT_SELECTOR, {
-      state: "hidden",
-      timeout: 2000,
-    });
+    // Typing a title runs the filter pipeline and the search menu's matching,
+    // so on a slow runner the overlay can still be busy when Escape lands and
+    // stay open. Press again until it closes rather than failing on the first.
+    await expect(async () => {
+      await this.page.keyboard.press("Escape");
+      await expect(this.page.locator(SEARCH_INPUT_SELECTOR)).toBeHidden({
+        timeout: 2000,
+      });
+    }).toPass({ timeout: 10000 });
   }
 
   async searchForMovie(title: string) {

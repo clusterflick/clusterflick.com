@@ -168,10 +168,10 @@ test.describe("Festival Pages", () => {
       return;
     }
 
-    const firstName = await festivalsPage.getFirstFestivalName();
+    const firstName = await festivalsPage.getFeaturedFestivalName();
     expect(firstName).toBeTruthy();
 
-    await festivalsPage.clickFirstFestival();
+    await festivalsPage.clickFeaturedFestival();
 
     const detailPage = new FestivalDetailPage(page);
     await detailPage.waitForPage(firstName!);
