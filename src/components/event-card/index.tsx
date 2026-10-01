@@ -19,9 +19,11 @@ export interface EventCardProps {
  * row supplied by the caller.
  *
  * **When to use:**
- * - Listing pages for festivals, film clubs, or any named film programme.
+ * - An entry on a festival, film club or film list index with nothing
+ *   showing, where there are no posters to show.
  *
  * **When NOT to use:**
+ * - An entry with films showing — use `ProgrammeCard`, which leads with them.
  * - Venue listings — use `VenueCard` instead.
  * - Movie posters — use `FilmPosterGrid`.
  * - External links — use `LinkCard`.

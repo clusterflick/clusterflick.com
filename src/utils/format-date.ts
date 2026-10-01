@@ -311,6 +311,16 @@ export function formatDateShort(
   return d.toLocaleDateString("en-GB", formatOptions);
 }
 
+/** "Sat 23 Aug" — the weekday earns its place when a date is a fortnight out. */
+export function formatDayAndDate(time: number): string {
+  return new Date(time).toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: LONDON_TIMEZONE,
+  });
+}
+
 /**
  * Get the number of days from now (in London time) to a given timestamp.
  * Uses London timezone to ensure consistency with showings display.

@@ -1,0 +1,184 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Header: logo beside the name. Smaller than EventCard's centred logo — here
+   the posters are the picture, and the logo only says whose they are. */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(var(--color-white-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.logoImage {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.logoPlaceholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(var(--color-white-rgb), 0.12);
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-wrap: balance;
+  color: var(--color-electric-blue);
+  transition: color 0.2s ease;
+}
+
+.card:hover .name {
+  color: var(--color-neon-pink);
+}
+
+/* Posters: a fan of overlapping posters that spreads out on hover. Each poster
+   is a fixed share of the strip so one film and four take the same height,
+   keeping the cards in a row level. Four at 30% overlapping by 10% fill 90%
+   of the width, and still fit when they spread on hover. */
+
+.posters {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 2px;
+}
+
+.poster {
+  position: relative;
+  width: 30%;
+  max-width: 112px;
+  flex-shrink: 0;
+  margin-left: -10%;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(var(--color-black-rgb), 0.55);
+  transition:
+    transform 0.25s ease,
+    margin 0.25s ease;
+}
+
+.poster:first-child {
+  margin-left: 0;
+}
+
+.poster:nth-child(1) {
+  transform: rotate(-6deg) translateY(4px);
+}
+
+.poster:nth-child(2) {
+  transform: rotate(-2deg);
+}
+
+.poster:nth-child(3) {
+  transform: rotate(2deg);
+}
+
+.poster:nth-child(4) {
+  transform: rotate(6deg) translateY(4px);
+}
+
+/* A lone poster has nothing to fan against. */
+.poster:only-child {
+  transform: none;
+}
+
+.card:hover .poster {
+  margin-left: -7%;
+}
+
+.card:hover .poster:first-child {
+  margin-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster {
+    transition: none;
+  }
+}
+
+/* Body */
+
+.description {
+  font-size: 13px;
+  color: rgba(var(--color-white-rgb), 0.6);
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Pinned to the bottom so the next screening and counts line up across a row
+   whatever the description's length. */
+.footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.next {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(var(--color-white-rgb), 0.75);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nextLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neon-pink);
+}
+
+.nextTitle {
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.nextWhen {
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}

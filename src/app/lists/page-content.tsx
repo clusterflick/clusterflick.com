@@ -1,4 +1,5 @@
 import EventCard from "@/components/event-card";
+import ProgrammeCard from "@/components/programme-card";
 import StandardPageLayout from "@/components/standard-page-layout";
 import type { MovieListItem } from "./page";
 import styles from "./page.module.css";
@@ -31,11 +32,12 @@ export default function ListsPageContent({
           <ul className={styles.listGrid}>
             {activeLists.map((list) => (
               <li key={list.id}>
-                <EventCard
+                <ProgrammeCard
                   href={list.href}
                   name={list.name}
                   imagePath={list.imagePath}
                   description={list.description}
+                  posters={list.posters}
                   meta={
                     <>
                       <span className={styles.filmCount}>

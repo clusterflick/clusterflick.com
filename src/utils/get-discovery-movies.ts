@@ -5,7 +5,11 @@ import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
 } from "@/lib/filters/modules/categories";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import {
+  formatDayAndDate,
+  getLondonMidnightTimestamp,
+  MS_PER_DAY,
+} from "@/utils/format-date";
 import { getRating } from "@/utils/movie-ratings.mjs";
 import { getRatingGroup, meetsRating } from "@/lib/filters/modules/ratings";
 import { FilterId } from "@/lib/filters/types";
@@ -72,7 +76,6 @@ const OCCASIONS_WINDOW_DAYS = 14;
 // judged: the row scrolls, so entries past the first screenful cost a reader
 // nothing and give us more of the tail to look at.
 const OCCASIONS_LIMIT = 20;
-const LONDON_TIMEZONE = "Europe/London";
 
 export interface DiscoveryWindow {
   rangeStart: number;
@@ -357,16 +360,6 @@ export function getNewAdditionsAtVenues(
     .sort((a, b) => b.earliestSeen - a.earliestSeen)
     .slice(0, limit)
     .map(({ movie, performanceCount }) => ({ movie, performanceCount }));
-}
-
-/** "Sat 23 Aug" — the weekday earns its place when a date is a fortnight out. */
-function formatDayAndDate(time: number): string {
-  return new Date(time).toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    timeZone: LONDON_TIMEZONE,
-  });
 }
 
 function formatLastShowing(time: number): string {

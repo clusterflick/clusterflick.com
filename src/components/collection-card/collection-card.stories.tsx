@@ -10,7 +10,8 @@ import CollectionCard from "@/components/collection-card";
  * - Listing pages for collections.
  *
  * **When NOT to use:**
- * - Festivals and film clubs — use `EventCard`, which is built around a logo.
+ * - Festivals, film clubs and film lists — use `ProgrammeCard`, which pairs a
+ *   logo with posters from the programme.
  * - Individual films — use `FilmPosterGrid`.
  */
 const meta = {

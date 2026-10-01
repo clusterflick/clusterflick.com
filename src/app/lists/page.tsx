@@ -3,6 +3,10 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getMovieListImagePath } from "@/utils/get-movie-list-image";
 import { getMovieListFilms } from "@/utils/get-movie-list-movies";
+import {
+  pickPosters,
+  type ProgrammePoster,
+} from "@/utils/get-programme-summary";
 import { MOVIE_LISTS } from "@/data/movie-lists";
 import ListsPageContent from "./page-content";
 
@@ -37,20 +41,26 @@ export type MovieListItem = {
   sourceName: string;
   imagePath: string | null;
   movieCount: number;
+  /** The first few films showing, in the list's own order. */
+  posters: ProgrammePoster[];
 };
 
 export default async function ListsPage() {
   const data = await getStaticData();
 
-  const listItems: MovieListItem[] = MOVIE_LISTS.map((list) => ({
-    id: list.id,
-    name: list.name,
-    href: getMovieListUrl(list),
-    description: list.description,
-    sourceName: list.sourceName,
-    imagePath: getMovieListImagePath(list.id),
-    movieCount: getMovieListFilms(list, data.movies).length,
-  }));
+  const listItems: MovieListItem[] = MOVIE_LISTS.map((list) => {
+    const films = getMovieListFilms(list, data.movies);
+    return {
+      id: list.id,
+      name: list.name,
+      href: getMovieListUrl(list),
+      description: list.description,
+      sourceName: list.sourceName,
+      imagePath: getMovieListImagePath(list.id),
+      movieCount: films.length,
+      posters: pickPosters(films.map(({ movie }) => movie)),
+    };
+  });
 
   const activeLists = listItems
     .filter((list) => list.movieCount > 0)

@@ -9,9 +9,11 @@ import EventCard from "@/components/event-card";
  * domain-specific information such as dates or film counts.
  *
  * **When to use:**
- * - Listing pages for festivals, film clubs, or any curated film programme.
+ * - An entry on a festival, film club or film list index with nothing
+ *   showing, where there are no posters to show.
  *
  * **When NOT to use:**
+ * - An entry with films showing — use `ProgrammeCard`, which leads with them.
  * - Venue listings — use `VenueCard` instead.
  * - Movie posters — use `FilmPosterGrid`.
  * - External links — use `LinkCard`.
