@@ -179,11 +179,9 @@
   /* Pinned so the counts stay in view while the filters below them change.
      It starts at the top of the overlay and sticks at 0, so it never moves and
      nothing can scroll through a gap between it and the site header (which
-     sits above the overlay). 120px clears that header with a one-line
-     description; --counts-offset, set inline, adds room as the description
-     wraps. The space under the description isn't slack: the open trigger
-     draws a dark box-shadow ~60px below its text to stay legible, and the
-     header sits above the overlay, so anything closer is dimmed by it. */
+     sits above the overlay) and its open description: 78px plus
+     --counts-offset, set inline from the description's height, leaves the
+     counts 24px under it at every width. */
   position: sticky;
   top: 0;
   z-index: 2;
@@ -192,7 +190,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: calc(120px + var(--counts-offset, 0px)) 20px 14px;
+  padding: calc(78px + var(--counts-offset, 0px)) 20px 14px;
   margin-bottom: 32px;
   background: var(--color-midnight-navy);
   border-bottom: 1px solid rgba(var(--color-white-rgb), 0.08);
@@ -1057,6 +1055,11 @@
      the live count instead. */
   .countsSection {
     position: relative;
+    /* 66px under the description rather than 24: here the open trigger keeps
+       its dark box-shadow, ~60px deep, since filters scroll up under the
+       description once this bar has gone, and the shadow is drawn above the
+       overlay — anything closer is dimmed by it. */
+    padding-top: calc(120px + var(--counts-offset, 0px));
   }
 
   /* No bottom padding: sticky offsets are measured from the scroll

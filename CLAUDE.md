@@ -386,9 +386,13 @@ overlay has no bottom padding on a phone, because sticky offsets are measured
 from the scroll container's content edge and its 60px left the button
 floating above the bottom of the screen.
 
-The gap between the open trigger's description and the counts is not slack:
-the trigger draws a dark box-shadow ~60px below its text to stay legible, and
-the header sits above the overlay, so counts moved closer are dimmed by it.
+The open trigger's description draws a dark box-shadow ~60px deep to stay
+legible over what scrolls beneath it, and the header sits above the overlay,
+so the shadow dims anything that close. Above 700px the pinned counts bar
+already backs the description, so the trigger drops the shadow there and the
+counts sit 24px under it; on a phone the bar scrolls away, the shadow stays,
+and the counts keep a 66px gap. The trigger's media query is tied to the
+overlay's 700px breakpoint.
 
 **Presets are slim pills in the bar**: "Near me today" and "This week".
 "Show everything" is the third preset, but as the way out of every filter it
