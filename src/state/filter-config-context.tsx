@@ -255,6 +255,8 @@ type FilterConfigContextType = {
   isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
   // Whole-state replacement (zero-result suggestions)
   applyFilterState: (state: FilterState) => void;
+  // Take filters back to fully permissive (the overlay's active-filters strip)
+  widenFilters: (filterIds: FilterId[]) => void;
   // General
   resetFilters: () => void;
   hasActiveFilters: boolean;
@@ -749,6 +751,13 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState(filterManager.sanitizeFilterState(state));
   }, []);
 
+  // Removing a chip from the active-filters strip. Widened to permissive
+  // rather than reset to the default, so removing "This Week" shows every date
+  // instead of quietly putting the default window back.
+  const widenFilters = useCallback((filterIds: FilterId[]) => {
+    setFilterState((prev) => filterManager.widenFilters(prev, filterIds));
+  }, []);
+
   // General
   const resetFilters = useCallback(() => {
     setFilterState(filterManager.getDefaultState);
@@ -807,6 +816,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       applyQuickFilter,
       isQuickFilterActive,
       applyFilterState,
+      widenFilters,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,
@@ -849,6 +859,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       applyQuickFilter,
       isQuickFilterActive,
       applyFilterState,
+      widenFilters,
       resetFilters,
       hasActiveFilters,
       applyUrlParams,

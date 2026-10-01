@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  type CSSProperties,
+} from "react";
 import clsx from "clsx";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
@@ -11,15 +18,25 @@ import {
   getPeopleVocabulary,
   getMovieVocabulary,
   getActiveFilterIds,
+  getChangedFilterIds,
+  describeFilterChips,
+  FilterChip,
+  FilterState,
 } from "@/lib/filters";
-import { useFilterConfig, QuickFilter } from "@/state/filter-config-context";
+import {
+  useFilterConfig,
+  QuickFilter,
+  EVENT_CATEGORIES,
+} from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
 import { getNearbyVenueIds } from "@/utils/geo-distance";
 import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
+import { trackEvent } from "@/utils/track-event";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import QuickFiltersSection from "./quick-filters-section";
+import ActiveFiltersSection from "./active-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import PeopleFilterSection from "./people-filter-section";
@@ -102,12 +119,13 @@ export default function FilterOverlay({
     setHideSeen,
     applyQuickFilter,
     isQuickFilterActive,
+    widenFilters,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
 
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { movies, metaData } = useCinemaData();
+  const { movies, metaData, isLoading, hasAttemptedLoad } = useCinemaData();
 
   // Geolocation context (persists across overlay open/close)
   const {
@@ -295,6 +313,7 @@ export default function FilterOverlay({
     }
 
     applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
+    trackEvent("filter-preset", { preset: "near-me-today" });
     onClose();
   }, [
     userPosition,
@@ -310,12 +329,14 @@ export default function FilterOverlay({
   // Quick filter: what's on this week, all venues.
   const handleThisWeek = useCallback(() => {
     applyQuickFilter(thisWeekPreset);
+    trackEvent("filter-preset", { preset: "this-week" });
     onClose();
   }, [applyQuickFilter, thisWeekPreset, onClose]);
 
   // Quick filter: show me everything (all event types, all venues, any time).
   const handleEverything = useCallback(() => {
     applyQuickFilter(everythingPreset);
+    trackEvent("filter-preset", { preset: "everything" });
     onClose();
   }, [applyQuickFilter, everythingPreset, onClose]);
 
@@ -369,9 +390,14 @@ export default function FilterOverlay({
     const handleFocusTrap = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
 
-      const focusableElements = overlay.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
+      // Only what Tab can actually reach: the phone-only results button is
+      // taken out of the tab order, and counting it as the last stop would
+      // let Tab walk out of the overlay.
+      const focusableElements = Array.from(
+        overlay.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.tabIndex >= 0);
 
       if (focusableElements.length === 0) return;
 
@@ -396,6 +422,7 @@ export default function FilterOverlay({
   }, [isOpen]);
 
   const handleShareFilters = useCallback(async () => {
+    trackEvent("filter-share");
     const url = buildFilterUrl(filterState);
     try {
       await navigator.clipboard.writeText(url);
@@ -413,6 +440,73 @@ export default function FilterOverlay({
       if (shareTimer.current) clearTimeout(shareTimer.current);
     };
   }, []);
+
+  const handleReset = useCallback(() => {
+    trackEvent("filter-reset");
+    resetFilters();
+  }, [resetFilters]);
+
+  // The active-filters strip. Films are withheld until loading has finished,
+  // as the header's description does, so a selection isn't named as not
+  // showing while its films are still arriving. Venue sets are the ones the
+  // venue pills select, so a pill's selection is named after the pill.
+  const filterChips = useMemo(
+    () =>
+      describeFilterChips({
+        state: filterState,
+        categories: EVENT_CATEGORIES,
+        venues: metaData?.venues ?? null,
+        genres: metaData?.genres ?? null,
+        people: metaData?.people ?? null,
+        movies: hasAttemptedLoad && !isLoading ? movies : null,
+        cinemaVenueIds,
+        nearbyVenueIds,
+      }),
+    [
+      filterState,
+      metaData,
+      movies,
+      isLoading,
+      hasAttemptedLoad,
+      cinemaVenueIds,
+      nearbyVenueIds,
+    ],
+  );
+
+  const handleRemoveChip = useCallback(
+    (chip: FilterChip) => {
+      trackEvent("filter-chip-remove", {
+        filter: chip.key,
+        isDefault: chip.isDefault,
+      });
+      widenFilters(chip.filterIds);
+    },
+    [widenFilters],
+  );
+
+  // Which filters a visit to the overlay changed, recorded once when it
+  // closes rather than per tap, so a reader dragging a slider or typing a
+  // name is one visit and not thirty. Only filter ids are sent, never their
+  // values: what a reader searched for is theirs.
+  const latestFilterState = useRef(filterState);
+  useEffect(() => {
+    latestFilterState.current = filterState;
+  });
+  const openedWithState = useRef<FilterState | null>(null);
+  useEffect(() => {
+    if (isOpen) {
+      openedWithState.current = latestFilterState.current;
+      return;
+    }
+    const before = openedWithState.current;
+    if (!before) return;
+    openedWithState.current = null;
+    const changed = getChangedFilterIds(before, latestFilterState.current);
+    trackEvent("filter-overlay-close", {
+      changed: changed.length > 0 ? changed.join(",") : "none",
+      count: changed.length,
+    });
+  }, [isOpen]);
 
   // Get genres array from metadata
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
@@ -447,47 +541,71 @@ export default function FilterOverlay({
       {/* Counts Section */}
       <div
         className={styles.countsSection}
-        style={{
-          paddingTop:
-            filterTextHeight > 0 ? `${countsPaddingTop}px` : undefined,
-        }}
+        style={
+          filterTextHeight > 0
+            ? ({ "--counts-offset": `${countsPaddingTop}px` } as CSSProperties)
+            : undefined
+        }
       >
         <div className={styles.counts} aria-live="polite" aria-atomic="true">
           {movieCount.toLocaleString("en-GB")} events,{" "}
           {performanceCount.toLocaleString("en-GB")} showings
         </div>
         <div className={styles.filterControls}>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={resetFilters}
-            disabled={!hasActiveFilters}
-            aria-label="Reset all filters to defaults"
-          >
-            Reset Filters
-          </Button>
-          <span className={styles.countsDivider} aria-hidden="true">
-            •
-          </span>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={handleShareFilters}
-            aria-label="Copy shareable filter URL to clipboard"
-          >
-            Share Filters
-          </Button>
-          <span className={styles.countsDivider} aria-hidden="true">
-            •
-          </span>
-          {/* No aria-label: "Close Filters" is already a good accessible name,
-              and an aria-label that doesn't contain the visible text breaks
-              voice control (WCAG 2.5.3, Label in Name). It also collided with
-              the header trigger, whose own label reads "Close filter options"
-              while the overlay is open. */}
-          <Button variant="link" size="sm" onClick={handleClose}>
-            Close Filters
-          </Button>
+          <QuickFiltersSection
+            onNearMeToday={handleNearMeToday}
+            onThisWeek={handleThisWeek}
+            geoLoading={geoLoading}
+            nearMeTodayActive={nearMeTodayActive}
+            thisWeekActive={thisWeekActive}
+          />
+          <div className={styles.filterLinks}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleReset}
+              disabled={!hasActiveFilters}
+              aria-label="Reset all filters to defaults"
+            >
+              Reset
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            {/* The "everything" preset: all event types, venues and dates.
+                Beside Reset because it is the other way out of the current
+                filters — wider than the defaults rather than back to them. */}
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleEverything}
+              disabled={everythingActive}
+            >
+              Show everything
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleShareFilters}
+              aria-label="Copy shareable filter URL to clipboard"
+            >
+              Share
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            {/* No aria-label: "Close Filters" is already a good accessible
+                name, and an aria-label that doesn't contain the visible text
+                breaks voice control (WCAG 2.5.3, Label in Name). It also
+                collided with the header trigger, whose own label reads "Close
+                filter options" while the overlay is open. */}
+            <Button variant="link" size="sm" onClick={handleClose}>
+              Close Filters
+            </Button>
+          </div>
         </div>
         {share && (
           <div className={styles.shareToast} role="status">
@@ -516,17 +634,6 @@ export default function FilterOverlay({
           </div>
         )}
       </div>
-
-      {/* Quick Filters */}
-      <QuickFiltersSection
-        onNearMeToday={handleNearMeToday}
-        onThisWeek={handleThisWeek}
-        onEverything={handleEverything}
-        geoLoading={geoLoading}
-        nearMeTodayActive={nearMeTodayActive}
-        thisWeekActive={thisWeekActive}
-        everythingActive={everythingActive}
-      />
 
       {/* Search Section */}
       <div className={styles.searchSection}>
@@ -561,6 +668,7 @@ export default function FilterOverlay({
             />
           </div>
         </ExpandableSection>
+        <ActiveFiltersSection chips={filterChips} onRemove={handleRemoveChip} />
       </div>
 
       <div className={styles.content}>
@@ -667,6 +775,22 @@ export default function FilterOverlay({
             onToggleHideSoldOut={toggleHideSoldOut}
           />
         </div>
+      </div>
+
+      {/* Phones only: the header's Close is a small link at the top of a long
+          scroll, so the way back to the results sits under the thumb and says
+          what it will show. Hidden from assistive tech, which already has the
+          header's Close Filters and the live counts. */}
+      <div className={styles.showResults} aria-hidden="true">
+        <button
+          type="button"
+          className={styles.showResultsButton}
+          onClick={handleClose}
+          tabIndex={-1}
+        >
+          Show {movieCount.toLocaleString("en-GB")}{" "}
+          {movieCount === 1 ? "event" : "events"}
+        </button>
       </div>
     </div>
   );

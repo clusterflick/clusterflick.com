@@ -252,6 +252,44 @@ export function statesEqual(a: FilterState, b: FilterState): boolean {
 }
 
 /**
+ * The filters whose values differ between two states, in pipeline order. Used
+ * to record which filters a visit to the overlay actually changed.
+ */
+export function getChangedFilterIds(
+  a: FilterState,
+  b: FilterState,
+): FilterId[] {
+  return modules
+    .filter((module) => !valuesEqual(module.get(a), module.get(b)))
+    .map((module) => module.id);
+}
+
+/**
+ * Whether every one of `ids` holds its `/catalogue` default value — i.e. the
+ * reader didn't set it, the defaults did.
+ */
+export function filtersAtDefault(state: FilterState, ids: FilterId[]): boolean {
+  const defaults = getDefaultState();
+  return ids.every((id) =>
+    valuesEqual(getModule(id).get(state), getModule(id).get(defaults)),
+  );
+}
+
+/**
+ * `state` with each of `ids` taken back to its fully permissive value — the
+ * same widening the zero-result suggestions apply, so a removed filter stops
+ * narrowing at all rather than falling back to a restrictive default.
+ */
+export function widenFilters(state: FilterState, ids: FilterId[]): FilterState {
+  const permissive = getPermissiveState();
+  let next = state;
+  for (const id of ids) {
+    next = set(next, id, get(permissive, id));
+  }
+  return next;
+}
+
+/**
  * Gets the IDs of all active filters.
  */
 export function getActiveFilterIds(state: FilterState): FilterId[] {
@@ -412,6 +450,9 @@ export const filterManager = {
   set,
   hasActiveFilters,
   statesEqual,
+  getChangedFilterIds,
+  filtersAtDefault,
+  widenFilters,
   apply,
   resolveFilterStateFromUrl,
   hasUrlFilterParams,

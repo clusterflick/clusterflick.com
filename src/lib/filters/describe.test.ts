@@ -1,8 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { Category } from "@/types";
 import { FilterId } from "./types";
-import { getDefaultState, set } from "./manager";
-import { describeFilters, formatList } from "./describe";
+import {
+  getDefaultState,
+  getPermissiveState,
+  set,
+  widenFilters,
+} from "./manager";
+import { describeFilterChips, describeFilters, formatList } from "./describe";
 
 const CATEGORIES = [
   { value: Category.Movie, label: "Films" },
@@ -176,5 +181,95 @@ describe("describeFilters describes the rating filters", () => {
     expect(events(state)).toBe(
       "Films rated 8.0+ on IMDb and 95%+ on Rotten Tomatoes",
     );
+  });
+});
+
+const chips = (state = getDefaultState()) =>
+  describeFilterChips({
+    state,
+    categories: CATEGORIES,
+    venues: null,
+    genres: GENRES,
+    people: PEOPLE,
+    movies: MOVIES,
+    cinemaVenueIds: [],
+  });
+
+describe("describeFilterChips", () => {
+  it("lists the restrictive defaults, marked as defaults", () => {
+    expect(chips()).toEqual([
+      {
+        key: "dateRange",
+        filterIds: [FilterId.DateRange],
+        label: "Next 7 Days",
+        isDefault: true,
+      },
+      {
+        key: "categories",
+        filterIds: [FilterId.Categories],
+        label: "Films",
+        isDefault: true,
+      },
+    ]);
+  });
+
+  it("lists nothing once every filter is permissive", () => {
+    expect(chips(getPermissiveState())).toEqual([]);
+  });
+
+  it("leaves out hiding finished showings, which is on in every visit", () => {
+    const state = set(getPermissiveState(), FilterId.HideFinished, true);
+    expect(chips(state)).toEqual([]);
+  });
+
+  it("names what the reader set, not as defaults", () => {
+    let state = set(getPermissiveState(), FilterId.Directors, ["d1"]);
+    state = set(state, FilterId.LetterboxdRating, 4);
+    state = set(state, FilterId.Genres, ["27", "35"]);
+    state = set(state, FilterId.Search, " alien ");
+    expect(
+      chips(state).map(({ label, isDefault }) => ({ label, isDefault })),
+    ).toEqual([
+      { label: 'Title "alien"', isDefault: false },
+      { label: "Directed by Ridley Scott", isDefault: false },
+      { label: "Letterboxd 4.0+", isDefault: false },
+      { label: "Horror or Comedy", isDefault: false },
+    ]);
+  });
+
+  it("folds the three format groups into one chip covering only those set", () => {
+    let state = set(getPermissiveState(), FilterId.FormatSource, [
+      "35mm",
+      "70mm",
+    ]);
+    state = set(state, FilterId.FormatDimension, ["3d"]);
+    const [formats] = chips(state);
+    expect(formats.key).toBe("formats");
+    expect(formats.filterIds).toEqual([
+      FilterId.FormatSource,
+      FilterId.FormatDimension,
+    ]);
+  });
+
+  it("still lists a filter whose names haven't loaded, under its own name", () => {
+    const state = set(getPermissiveState(), FilterId.Cast, ["unknown"]);
+    expect(chips(state).map((chip) => chip.label)).toEqual(["Cast"]);
+  });
+
+  it("names a film selection only from the films the dataset holds", () => {
+    const two = set(getPermissiveState(), FilterId.Movies, ["m1", "gone"]);
+    expect(chips(two).map((chip) => chip.label)).toEqual(['"Alien"']);
+    const none = set(getPermissiveState(), FilterId.Movies, ["gone"]);
+    expect(chips(none).map((chip) => chip.label)).toEqual([
+      "Films not currently showing",
+    ]);
+  });
+
+  it("is cleared by widening the filters a chip names", () => {
+    const state = set(getDefaultState(), FilterId.Genres, ["27"]);
+    const genre = chips(state).find((chip) => chip.key === "genres")!;
+    expect(
+      chips(widenFilters(state, genre.filterIds)).map((chip) => chip.key),
+    ).toEqual(["dateRange", "categories"]);
   });
 });

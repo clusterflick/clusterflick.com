@@ -66,6 +66,10 @@ export {
   set,
   hasActiveFilters,
   getActiveFilterIds,
+  getRestrictiveFilterIds,
+  getChangedFilterIds,
+  filtersAtDefault,
+  widenFilters,
   apply,
   resolveFilterStateFromUrl,
   hasUrlFilterParams,
@@ -74,8 +78,12 @@ export {
 export type { FilterBase } from "./manager";
 
 // Description utilities
-export { describeFilters } from "./describe";
-export type { DescribeOptions, FilterDescription } from "./describe";
+export { describeFilters, describeFilterChips } from "./describe";
+export type {
+  DescribeOptions,
+  FilterDescription,
+  FilterChip,
+} from "./describe";
 
 // Thin-result notice
 export { getHiddenByDate, THIN_RESULT_LIMIT } from "./hidden-by-date";

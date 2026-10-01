@@ -318,6 +318,36 @@ two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
 Locals are drawn larger and outside the cluster group, so they never fold into a
 bubble.
 
+## Filter Overlay
+
+`FilterOverlay` (`src/components/filter-overlay/`) is being reorganised in stages
+around progressive disclosure: the most used filters in front, every filter
+findable, and a filter that is set never hidden. Done so far:
+
+**The counts bar is pinned** on desktop and tablet. It reaches up to the top of
+the overlay and sticks at 0, carrying the room under the site header as its own
+padding: a sticky element can't be pulled up into its container's padding with
+a negative margin, which slid it down over the search box. Not pinned on a
+phone, where under the trigger's wrapped description it took over half the
+screen; there a "Show N events" button sticks to the bottom instead.
+
+**Presets are slim pills in the bar**: "Near me today" and "This week".
+"Show everything" is the third preset, but as the way out of every filter it
+sits beside Reset as a link.
+
+**The active-filters strip** (`describeFilterChips` in `@/lib/filters/describe`)
+lists every filter narrowing the results as a removable chip, driven by
+`getRestrictiveFilterIds` so the restrictive defaults (date window, event
+types) appear too, marked Default. Removing a chip widens its filters to
+permissive (`widenFilters`), not back to the default, so removing "Next 7 Days"
+shows every date. Hide finished showings is left out, being on in every visit
+and hiding only what nobody can go to.
+
+**Usage is tracked** to decide what belongs in front: `filter-preset`,
+`filter-reset`, `filter-share`, `filter-chip-remove`, and `filter-overlay-close`
+with the ids of the filters that visit changed (`getChangedFilterIds`), sent
+once per visit rather than per tap. Filter ids only, never values.
+
 ## Cast & Crew Filters
 
 Directors and cast are **filters on the films grid, not pages of their own**
