@@ -95,7 +95,9 @@ export default function FestivalTimeline({
           return (
             <li key={item.id} className={styles.row}>
               <Link href={item.href} className={styles.label}>
-                <span className={styles.name}>{item.name}</span>
+                <span className={styles.name} title={item.name}>
+                  {item.name}
+                </span>
                 <span className={styles.dates}>{dates}</span>
               </Link>
               <div className={styles.track} aria-hidden="true">

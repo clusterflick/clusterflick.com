@@ -147,6 +147,12 @@ manager, then finished performances pruned.
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
 named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.
 
+Each club also has a `kind` (`FilmClubKind`), which files it under a heading on `/film-clubs`. Pick
+the one a reader browsing for the club would look under first; a club that fits two goes where its
+programme mostly sits (Queer Horror Nights is queer, Sick Girl Films is horror). The kind applies
+whether or not the club has anything on: a dormant club is listed by name only, and moves into its
+group as soon as a screening matches.
+
 ## Festival & Film Club Indexes
 
 `/festivals` and `/film-clubs` lead with what's on, not who runs it. Both are

@@ -59,7 +59,12 @@
   text-decoration: none;
 }
 
+/* Capped at the label's width so a long name ("Windrush International
+   Caribbean Film Festival") ends in an ellipsis rather than running over the
+   bars. Without the cap, the stacked layout sizes the name to its text. */
 .name {
+  max-width: 100%;
+  min-width: 0;
   font-size: 14px;
   font-weight: 600;
   overflow: hidden;
