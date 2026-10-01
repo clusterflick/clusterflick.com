@@ -542,9 +542,11 @@ another page is exactly the invisible blocker the empty state exists to name.
 ## Hide Seen Films
 
 `FilterId.HideSeen` (`src/lib/filters/modules/hide-seen.ts`) takes the films on
-the reader's Seen list off the grid. It is a "Hide films I've seen" switch under
-the event types in the filter overlay, shown only once a signed-in reader's
-lists have loaded.
+the reader's Seen list off the grid. It is a "Hide films I've seen" switch at
+the top of the filter overlay's core column, above Dates, shown only once a
+signed-in reader's lists have loaded. It used to sit under the event types,
+below everything, where it was easy to miss; a standing preference leads the
+filters rather than belonging to any one of them.
 
 **The state holds the ids, not a flag.** The pipeline is a pure function of the
 dataset and the state, and it runs where the user context can't reach —

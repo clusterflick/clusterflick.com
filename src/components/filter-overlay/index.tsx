@@ -898,6 +898,20 @@ export default function FilterOverlay({
           core filters down. One column below 1200px. */}
       <div className={styles.content}>
         <div className={styles.coreColumn}>
+          {/* First in the column rather than under the event types, where it
+              sat below everything and read as an afterthought. It is a
+              standing preference rather than part of a search, so it leads
+              what follows instead of belonging to any one section. */}
+          {hideSeen && (
+            <div className={styles.seenSwitch}>
+              <Switch
+                id="hide-seen"
+                label="Hide films I've seen"
+                checked={hideSeen.checked}
+                onChange={hideSeen.onChange}
+              />
+            </div>
+          )}
           <DateFilterSection
             movies={movies}
             dateRange={filterState.dateRange}
@@ -927,7 +941,6 @@ export default function FilterOverlay({
           <CategoryFilterSection
             movies={movies}
             categories={filterState.categories}
-            hideSeen={hideSeen}
             toggleCategory={toggleCategory}
             selectAllCategories={selectAllCategories}
             clearAllCategories={clearAllCategories}

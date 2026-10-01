@@ -650,11 +650,11 @@
   padding: 4px;
 }
 
-/* A flex row so the switch sits at its own width under the chips, rather than
-   stretching its label and track to opposite edges of the column. */
+/* "Hide films I've seen", at the head of the core column. A flex row so the
+   switch sits at its own width, rather than stretching its label and track to
+   opposite edges of the column. */
 .seenSwitch {
   display: flex;
-  margin-top: 12px;
   padding: 0 4px;
 }
 

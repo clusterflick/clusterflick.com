@@ -40,7 +40,7 @@ export const FILTER_TARGETS: Record<FilterId, FilterTarget> = {
   [FilterId.TimeRange]: DATES,
   [FilterId.Venues]: { kind: "core", elementId: "venues-heading" },
   [FilterId.Categories]: { kind: "core", elementId: "events-heading" },
-  [FilterId.HideSeen]: { kind: "core", elementId: "events-heading" },
+  [FilterId.HideSeen]: { kind: "core", elementId: "hide-seen" },
   [FilterId.Accessibility]: row("accessibility"),
   [FilterId.FormatSource]: row("format"),
   [FilterId.FormatPresentation]: row("format"),
