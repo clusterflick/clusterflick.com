@@ -71,6 +71,75 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-01",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Redesigned the filters on the{" "}
+            <Link href="/catalogue">catalogue</Link> and{" "}
+            <Link href="/planner">planner</Link>. Dates, venues and event types
+            are always in view, and everything that used to be tucked under More
+            Event Options now has a row of its own beside them, each saying what
+            it&rsquo;s set to, so every filter can be found without opening
+            anything. A strip along the top shows every filter narrowing your
+            results, including the default date window, and each can be removed
+            or jumped to with a tap.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The search box in the filters now finds filters as well as films.
+            Type &ldquo;subs&rdquo;, &ldquo;70mm&rdquo;, &ldquo;horror&rdquo;, a
+            director, a film club or a venue and it offers the matching filter
+            to pick, while still searching titles as you type.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Signed in, you can now hide the films you&rsquo;ve seen from the{" "}
+            <Link href="/catalogue">catalogue</Link> and{" "}
+            <Link href="/planner">planner</Link>, with a switch at the top of
+            the filters. Film pages still show every showing, since opening a
+            film you&rsquo;ve seen means you came for it.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/film-clubs">film clubs</Link> page now leads with
+            what&rsquo;s on: a Next up row of each club&rsquo;s next screening,
+            then the clubs with films showing, grouped by the kind of club and
+            each with a fan of posters from its programme and its next date.
+            Clubs with nothing on for now are listed by name at the end.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/festivals">festivals</Link> page now opens with the
+            biggest festival on this week (or the next to start) and its films,
+            followed by a timeline of the festivals in the coming weeks, then
+            what&rsquo;s on this week and what&rsquo;s coming up. The{" "}
+            <Link href="/lists">lists</Link> page uses the same poster cards for
+            lists with films showing.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-09-30",
     changes: [
       {
