@@ -20,7 +20,10 @@ import {
   getMovieVocabulary,
   getChangedFilterIds,
   describeFilterChips,
+  buildFilterSearchGroups,
+  applyFilterSearchEntry,
   FilterChip,
+  FilterSearchEntry,
   FilterState,
 } from "@/lib/filters";
 import {
@@ -48,6 +51,7 @@ import AccessibilityFilterSection from "./accessibility-filter-section";
 import FormatFilterSection from "./format-filter-section";
 import GenreFilterSection from "./genre-filter-section";
 import RefineRow from "./refine-row";
+import FilterSearch, { SearchRedirect } from "./filter-search";
 import {
   FILTER_TARGETS,
   REFINE_ROWS,
@@ -113,6 +117,7 @@ export default function FilterOverlay({
     applyQuickFilter,
     isQuickFilterActive,
     widenFilters,
+    applyFilterState,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
@@ -589,6 +594,47 @@ export default function FilterOverlay({
     [movies, metaData],
   );
 
+  // Everything the search menu can offer, memoised on the dataset. Venues go
+  // busiest first, as people do, so a short query meets the likeliest ones.
+  const filterSearchGroups = useMemo(
+    () =>
+      buildFilterSearchGroups({
+        categories: EVENT_CATEGORIES,
+        genres: metaData?.genres ?? null,
+        people: peopleVocabulary,
+        venues: venueGroups
+          .flatMap((group) => group.venues)
+          .sort((a, b) => b.count - a.count),
+      }),
+    [metaData, peopleVocabulary, venueGroups],
+  );
+
+  const handlePickSearchEntry = useCallback(
+    (entry: FilterSearchEntry) => {
+      trackEvent("filter-search-pick", { filter: entry.filterId });
+      applyFilterState(applyFilterSearchEntry(filterState, entry));
+    },
+    [applyFilterState, filterState],
+  );
+
+  // Moves the title query into one of the other text fields, as the
+  // suggestion engine's redirect does.
+  const handleSearchRedirect = useCallback(
+    (field: SearchRedirect) => {
+      trackEvent("filter-search-redirect", { field });
+      const query = filterState.search;
+      if (field === "showingTitleSearch") setShowingTitleSearchQuery(query);
+      else setPerformanceNotesSearchQuery(query);
+      setSearchQuery("");
+    },
+    [
+      filterState.search,
+      setSearchQuery,
+      setShowingTitleSearchQuery,
+      setPerformanceNotesSearchQuery,
+    ],
+  );
+
   // Memoised on the dataset for the same reason: a sort over every film.
   const movieVocabulary = useMemo(() => getMovieVocabulary(movies), [movies]);
 
@@ -797,16 +843,18 @@ export default function FilterOverlay({
 
       {/* Search Section */}
       <div className={styles.searchSection}>
-        <SearchInput
-          id="filter-search"
-          placeholder="Search event title..."
-          ariaLabel="Search event title"
-          value={filterState.search}
-          onChange={setSearchQuery}
+        <FilterSearch
+          active={isOpen}
+          query={filterState.search}
+          onQueryChange={setSearchQuery}
+          groups={filterSearchGroups}
+          filterState={filterState}
+          onPick={handlePickSearchEntry}
+          onRedirect={handleSearchRedirect}
         />
         <ExpandableSection
           title="More Search Options"
-          defaultExpanded={
+          expandWhen={
             filterState.showingTitleSearch.length > 0 ||
             filterState.performanceNotesSearch.length > 0
           }

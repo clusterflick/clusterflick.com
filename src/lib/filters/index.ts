@@ -85,6 +85,17 @@ export type {
   FilterChip,
 } from "./describe";
 
+// The filter overlay's search menu
+export {
+  buildFilterSearchGroups,
+  searchFilterGroups,
+  prepareFilterSearch,
+  isFilterSearchEntrySelected,
+  applyFilterSearchEntry,
+  MIN_FILTER_SEARCH_LENGTH,
+} from "./filter-search";
+export type { FilterSearchEntry, FilterSearchSources } from "./filter-search";
+
 // Thin-result notice
 export { getHiddenByDate, THIN_RESULT_LIMIT } from "./hidden-by-date";
 export type { HiddenByDate } from "./hidden-by-date";

@@ -312,6 +312,92 @@
 }
 
 /* ==========================================================================
+   Search Menu
+   ========================================================================== */
+
+/* Positioning context for the menu, which floats over the filters below
+   rather than pushing them down on every keystroke. */
+.filterSearch {
+  position: relative;
+}
+
+.searchMenu {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: 400px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--color-midnight-navy);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(var(--color-black-rgb), 0.45);
+}
+
+/* Downshift needs the menu element rendered at all times. */
+.searchMenuOpen {
+  display: block;
+}
+
+.searchMenuItem {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--color-light-gray);
+  cursor: pointer;
+}
+
+.searchMenuHighlighted {
+  background: rgba(var(--color-white-rgb), 0.08);
+}
+
+.searchMenuSelected .searchMenuName {
+  color: var(--color-neon-pink);
+}
+
+/* The redirects are a different kind of answer — the same words searched
+   somewhere else — so a rule sets them apart from the filter values. */
+.searchMenuDivider {
+  margin-top: 4px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 0 0 10px 10px;
+}
+
+.searchMenuName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchMenuKind {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.searchMenuCount {
+  flex-shrink: 0;
+  min-width: 2ch;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
    Active Filters
    ========================================================================== */
 

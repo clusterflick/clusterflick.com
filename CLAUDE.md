@@ -344,6 +344,36 @@ whole bucket. The overlay owns which rows are open, so the strip can open one.
 a row and its chip can't describe a filter differently. Showings is worded on
 its own, since its default has no chip.
 
+**The search box also finds filters** (`FilterSearch`, matching in
+`@/lib/filters/filter-search`). Typing still searches titles live; a menu
+under it offers the filter values the query names — event types, genres,
+formats, accessibility (with the suggestion engine's aliases, so "subs" finds
+Subtitles), directors, cast, clubs, festivals and venues — plus the two other
+text fields to search instead. Nothing is highlighted until the reader arrows
+down, so Enter and typing mean what they always did. A pick toggles the value
+into its filter and clears the box (the query was the value's name); picking
+into a filter at everything or its default selects just that value, so
+"Quizzes" means quizzes rather than films and quizzes. Downshift's blur-picks
+and Escape-clears are overridden: this box is also the title search.
+
+- **Venues are in, unlike the suggestion engine**: there a name colliding
+  with a title would be read as the answer; here it is one candidate of
+  several and the reader picks. **Films are out**: the box already searches
+  titles, so a film row would offer the same thing twice.
+- **Matching is per word**: the query's words must be a run of the name's
+  words, the last one possibly a prefix ("alfred hitch", never "cock"). The
+  last word is compared folded only when it ends in an inflection
+  ("subtitled", "dramas"); folding a word still being typed made "mar" a whole
+  match for Kenneth Mars.
+- **Whole-word matches rank first**, then group order (enumerated
+  vocabularies, directors, cast, clubs, festivals, venues), so "rio" lists Rio
+  Cinema above Louise Rioton. Up to three per group, ten in all.
+- **It runs off a sorted word index**, built in idle time when the overlay
+  opens (`prepareFilterSearch`). Scanning the 13,000 names cost ~12ms a
+  keystroke whatever was typed; the index answers in 0–3ms. Building it is
+  ~175ms, which is why it's done before the first keystroke rather than on it,
+  and only for readers who open the overlay.
+
 **The counts bar is pinned** on desktop and tablet. It reaches up to the top of
 the overlay and sticks at 0, carrying the room under the site header as its own
 padding: a sticky element can't be pulled up into its container's padding with
@@ -367,7 +397,8 @@ taller than the screen and put its heading under the bar) and focusing it.
 
 **Usage is tracked** to decide what belongs in front: `filter-preset`,
 `filter-reset`, `filter-share`, `filter-chip-remove`, `filter-chip-open`,
-`filter-row-open`, and `filter-overlay-close`
+`filter-row-open`, `filter-search-pick`, `filter-search-redirect`, and
+`filter-overlay-close`
 with the ids of the filters that visit changed (`getChangedFilterIds`), sent
 once per visit rather than per tap. Filter ids only, never values.
 
@@ -712,7 +743,8 @@ no second implementation of the filter logic to drift out of sync.
   is against **whole words, with folded endings and aliases** — never an edit budget. The
   words people actually type for a value are mostly not spellings of its label: "subs",
   "captioned" and "SDH" all mean Subtitles and no distance reaches any of them, so they are
-  aliases (`ACCESSIBILITY_ALIASES`, `GENRE_ALIASES`, `CATEGORY_ALIASES` in `suggest.ts`).
+  aliases (`ACCESSIBILITY_ALIASES`, `GENRE_ALIASES`, `CATEGORY_ALIASES` in `value-aliases.ts`,
+  shared with the filter overlay's search menu).
   `foldSuffix` strips -s/-es/-ies/-ed from both sides, which covers "subtitle", "subtitled"
   and "dramas" without an entry. Matching a _run_ of words is what lets "70mm" find both
   "70mm" and "IMAX 70mm"; both are offered, each with its own probed count. Vocabularies are the format groups,
