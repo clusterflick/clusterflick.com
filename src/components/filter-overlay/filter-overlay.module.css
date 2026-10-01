@@ -9,7 +9,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 200px 0 60px;
+  /* No top padding: the counts bar supplies the room under the site header,
+     since a sticky element can't be pulled up into its container's padding. */
+  padding: 0 0 60px;
   background: rgba(var(--color-midnight-navy-rgb), 0.97);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -34,13 +36,23 @@
    Filter Sections Grid
    ========================================================================== */
 
+/* The core filters and the Refine list, side by side. Capped narrower than
+   the old three columns: two columns stretched across a wide screen leave the
+   chips a long way from their headings. */
 .content {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 64px;
   width: 100%;
-  max-width: 1800px;
+  max-width: 1440px;
   padding: 0 48px;
+}
+
+.coreColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
 }
 
 .section {
@@ -102,17 +114,13 @@
   flex-shrink: 0;
 }
 
-/* Availability toggles in a section header ("Hide past showings", "Hide sold
-   out showings"). Stacked so their tracks line up in a column rather than
-   competing with the heading for the same row. */
-.switchGroup {
+/* "Hide past showings" and "Hide sold out showings", in the Showings row.
+   Stacked at their own width, so the tracks line up in a column. */
+.showingSwitches {
   display: flex;
   flex-direction: column;
-  /* Stretch, not flex-end: each switch is a space-between row, so full-width
-     rows put every track against the same right edge. */
-  align-items: stretch;
-  gap: 8px;
-  flex-shrink: 0;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .controlDivider {
@@ -125,72 +133,42 @@
    Quick Filters
    ========================================================================== */
 
-.quickSection {
-  width: 100%;
-  max-width: 1800px;
-  padding: 0 48px;
-  margin-bottom: 39px;
-}
-
-.quickGrid {
+.quickPills {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
 }
 
-.quickCard {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  min-width: 140px;
-  max-width: 320px;
-  padding: 16px 24px;
+/* A compact take on Chip: a preset is a button, not a checkbox, so it can't be
+   a Chip itself, but it should read as one of the same family. */
+.quickPill {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-light-gray);
   background: rgba(var(--color-white-rgb), 0.04);
-  border: 1px solid rgba(var(--color-white-rgb), 0.1);
-  border-radius: 12px;
+  border: 1px solid rgba(var(--color-white-rgb), 0.2);
+  border-radius: 100px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.quickCard:hover,
-.quickCardActive,
-.quickCardActive:hover {
+.quickPill:hover,
+.quickPillActive,
+.quickPillActive:hover {
   background: rgba(var(--color-neon-pink-rgb), 0.1);
   border-color: rgba(var(--color-neon-pink-rgb), 0.4);
 }
 
-.quickCard:hover {
-  transform: translateY(-2px);
-}
-
-.quickCard:focus-visible {
+.quickPill:focus-visible {
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
 }
 
-.quickCard:active {
-  transform: translateY(0);
-}
-
-.quickIcon {
-  font-size: 28px;
-  line-height: 1;
-}
-
-.quickLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-light-gray);
-}
-
-.quickDescription {
-  font-size: 11px;
-  color: var(--color-muted-gray);
-  text-align: center;
-  line-height: 1.3;
+.quickPill:disabled {
+  cursor: progress;
+  opacity: 0.6;
 }
 
 /* ==========================================================================
@@ -198,15 +176,24 @@
    ========================================================================== */
 
 .countsSection {
-  position: relative;
+  /* Pinned so the counts stay in view while the filters below them change.
+     It starts at the top of the overlay and sticks at 0, so it never moves and
+     nothing can scroll through a gap between it and the site header (which
+     sits above the overlay). 120px clears that header with a one-line
+     description; --counts-offset, set inline, adds room as the description
+     wraps. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   width: 100%;
-  padding-top: 0;
-  margin-top: -80px;
+  padding: calc(120px + var(--counts-offset, 0px)) 20px 14px;
   margin-bottom: 32px;
+  background: var(--color-midnight-navy);
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.08);
 }
 
 /* The running total of what the current filters match — the one number people
@@ -219,15 +206,25 @@
   white-space: nowrap;
 }
 
-/* Reset / Share / Close, dot-separated. Centred as a row rather than balanced
-   around a middle column, so the set stays centred whatever it holds. */
+/* The presets, then Reset / Show everything / Share / Close. One row while
+   it fits, the links wrapping under the presets when it doesn't. Centred
+   rather than balanced around a middle column, so the set stays centred
+   whatever it holds. */
 .filterControls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 10px 24px;
   width: 100%;
+}
+
+.filterLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .countsDivider {
@@ -241,7 +238,7 @@
    ========================================================================== */
 
 /* Absolutely positioned so appearing and disappearing never reflows the filters
-   underneath it — it floats over the quick-filter cards for its few seconds. */
+   underneath it — it floats over the filters for its few seconds. */
 .shareToast {
   position: absolute;
   top: 100%;
@@ -314,12 +311,332 @@
   margin: 0 0 72px 0;
 }
 
+/* ==========================================================================
+   Search Menu
+   ========================================================================== */
+
+/* Positioning context for the menu, which floats over the filters below
+   rather than pushing them down on every keystroke. */
+.filterSearch {
+  position: relative;
+}
+
+.searchMenu {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: 400px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--color-midnight-navy);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(var(--color-black-rgb), 0.45);
+}
+
+/* Downshift needs the menu element rendered at all times. */
+.searchMenuOpen {
+  display: block;
+}
+
+.searchMenuItem {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--color-light-gray);
+  cursor: pointer;
+}
+
+.searchMenuHighlighted {
+  background: rgba(var(--color-white-rgb), 0.08);
+}
+
+.searchMenuSelected .searchMenuName {
+  color: var(--color-neon-pink);
+}
+
+/* The redirects are a different kind of answer — the same words searched
+   somewhere else — so a rule sets them apart from the filter values. */
+.searchMenuDivider {
+  margin-top: 4px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+  border-radius: 0 0 10px 10px;
+}
+
+.searchMenuName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchMenuKind {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.searchMenuCount {
+  flex-shrink: 0;
+  min-width: 2ch;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Active Filters
+   ========================================================================== */
+
+.activeSection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 20px;
+}
+
+.activeHeading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.activeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One pill holding two buttons: the label goes to the filter's controls,
+   the × removes it. */
+.activeChip {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  font-size: 13px;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 100px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activeChip:hover {
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+/* Set by the defaults rather than the reader: still narrowing, so still
+   listed, but quieter than something they chose. */
+.activeChipDefault {
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-white-rgb), 0.04);
+  border-color: rgba(var(--color-white-rgb), 0.16);
+}
+
+.activeChipDefault:hover {
+  border-color: rgba(var(--color-white-rgb), 0.3);
+}
+
+.activeChipOpen,
+.activeChipRemove {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.activeChipOpen {
+  gap: 8px;
+  min-width: 0;
+  padding: 5px 4px 5px 14px;
+}
+
+.activeChipRemove {
+  padding: 5px 10px 5px 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.activeChipOpen:hover,
+.activeChipRemove:hover {
+  color: var(--color-white);
+}
+
+.activeChipOpen:focus-visible,
+.activeChipRemove:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 1px;
+}
+
+.activeChipTag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.activeChipLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   Show Results (phones only)
+   ========================================================================== */
+
+.showResults {
+  display: none;
+}
+
 /* Extra search inputs (inside expandable section) */
 .showingTitleSearchWrapper {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding-top: 4px;
+}
+
+/* ==========================================================================
+   Refine Rows
+   ========================================================================== */
+
+.refineList {
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 12px;
+  background: rgba(var(--color-white-rgb), 0.02);
+}
+
+.refineRow + .refineRow {
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.06);
+}
+
+/* A heading for the outline, not for looks: the global h4 face, size and
+   case would otherwise reach the trigger's summary. */
+.refineRowHeading {
+  margin: 0;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Name on the left, what it's set to on the right, so the list reads as a
+   column of names and a column of values. */
+.refineRowTrigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  font: inherit;
+  text-align: left;
+  color: var(--color-light-gray);
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.refineRowTrigger:hover {
+  background: rgba(var(--color-white-rgb), 0.04);
+}
+
+.refineRowTrigger:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: -2px;
+}
+
+.refineRowTitle {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.refineRowSummary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.refineRowSummarySet {
+  color: var(--color-neon-pink);
+}
+
+.refineRowChevron {
+  flex-shrink: 0;
+  color: var(--color-muted-gray);
+  transition: transform 0.2s ease;
+}
+
+.refineRowOpen .refineRowChevron {
+  transform: rotate(180deg);
+}
+
+.refineRowBody {
+  padding: 4px 18px 20px;
+}
+
+/* A row's link and its Select All / Clear All, sharing one line. */
+.refineRowLead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.refineRowLead > .sectionDescription {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refineRowChevron {
+    transition: none;
+  }
 }
 
 /* ==========================================================================
@@ -714,31 +1031,13 @@
    ========================================================================== */
 
 @media (max-width: 1200px) {
-  .quickSection,
   .content {
     padding: 0 32px;
   }
 
-  .quickSection {
-    margin-bottom: 24px;
-  }
-
   .content {
     grid-template-columns: 1fr;
-    gap: 64px;
-  }
-
-  /* Reverse order on mobile: Dates, Venues, Events */
-  .dateSection {
-    order: 1;
-  }
-
-  .venueSection {
-    order: 2;
-  }
-
-  .categorySection {
-    order: 3;
+    gap: 56px;
   }
 }
 
@@ -747,36 +1046,44 @@
    ========================================================================== */
 
 @media (max-width: 700px) {
-  .quickSection,
   .content {
     padding: 0 20px;
   }
 
-  .quickSection {
-    margin-bottom: 18px;
+  /* Not pinned on a phone: under the open trigger's wrapped description it
+     would hold over half the screen. The Show results button below carries
+     the live count instead. */
+  .countsSection {
+    position: relative;
   }
 
-  .quickGrid {
-    gap: 10px;
+  /* Sticky to the bottom of the overlay's scroll, so it is always under the
+     thumb; the fade lets the last filters read as continuing beneath it. */
+  .showResults {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    margin-top: 32px;
+    padding: 24px 20px 16px;
+    background: linear-gradient(
+      to top,
+      var(--color-midnight-navy) 70%,
+      transparent
+    );
   }
 
-  .quickCard {
-    flex: 1 1 calc(50% - 5px);
-    max-width: calc(50% - 5px);
-    min-width: 120px;
-    padding: 12px 16px;
-  }
-
-  .quickIcon {
-    font-size: 24px;
-  }
-
-  .quickLabel {
-    font-size: 13px;
-  }
-
-  .quickDescription {
-    font-size: 10px;
+  .showResultsButton {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-white);
+    background: var(--color-neon-pink);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
   }
 
   .sectionTitle {

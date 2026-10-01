@@ -49,7 +49,7 @@ export default function PeopleFilterSection({
         return (
           <div key={group.filterId} className={styles.advancedFilterGroup}>
             <div className={styles.advancedFilterHeader}>
-              <h4 className={styles.advancedFilterTitle}>{group.title}</h4>
+              <h5 className={styles.advancedFilterTitle}>{group.title}</h5>
               <div className={styles.selectionControls}>
                 <Button
                   variant="link"

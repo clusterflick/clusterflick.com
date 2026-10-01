@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import clsx from "clsx";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
@@ -10,16 +18,28 @@ import {
   FilterId,
   getPeopleVocabulary,
   getMovieVocabulary,
-  getActiveFilterIds,
+  getChangedFilterIds,
+  describeFilterChips,
+  buildFilterSearchGroups,
+  applyFilterSearchEntry,
+  FilterChip,
+  FilterSearchEntry,
+  FilterState,
 } from "@/lib/filters";
-import { useFilterConfig, QuickFilter } from "@/state/filter-config-context";
+import {
+  useFilterConfig,
+  QuickFilter,
+  EVENT_CATEGORIES,
+} from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
 import { getNearbyVenueIds } from "@/utils/geo-distance";
 import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
+import { trackEvent } from "@/utils/track-event";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import QuickFiltersSection from "./quick-filters-section";
+import ActiveFiltersSection from "./active-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
 import PeopleFilterSection from "./people-filter-section";
@@ -27,28 +47,22 @@ import MovieFilterSection from "./movie-filter-section";
 import ProgrammeFilterSection from "./programme-filter-section";
 import RatingFilterSection from "./rating-filter-section";
 import DateFilterSection from "./date-filter-section";
+import AccessibilityFilterSection from "./accessibility-filter-section";
+import FormatFilterSection from "./format-filter-section";
+import GenreFilterSection from "./genre-filter-section";
+import RefineRow from "./refine-row";
+import FilterSearch, { SearchRedirect } from "./filter-search";
+import {
+  FILTER_TARGETS,
+  REFINE_ROWS,
+  RefineRowId,
+  getRowStatuses,
+} from "./filter-targets";
 import ExpandableSection from "@/components/expandable-section";
+import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import styles from "./filter-overlay.module.css";
-
-// The filters inside "More Event Options". Each defaults to no filter, so
-// active is the same as narrowing here — unlike categories or dates.
-const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
-  FilterId.FilmClubs,
-  FilterId.Festivals,
-  FilterId.Movies,
-  FilterId.Directors,
-  FilterId.Cast,
-  FilterId.LetterboxdRating,
-  FilterId.ImdbRating,
-  FilterId.RottenTomatoesRating,
-  FilterId.Genres,
-  FilterId.Accessibility,
-  FilterId.FormatSource,
-  FilterId.FormatPresentation,
-  FilterId.FormatDimension,
-]);
 
 // How long the "link copied" confirmation stays up. Long enough to read the
 // explanation, short enough that it's gone before you next look at the counts.
@@ -102,12 +116,14 @@ export default function FilterOverlay({
     setHideSeen,
     applyQuickFilter,
     isQuickFilterActive,
+    widenFilters,
+    applyFilterState,
     resetFilters,
     hasActiveFilters,
   } = useFilterConfig();
 
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { movies, metaData } = useCinemaData();
+  const { movies, metaData, isLoading, hasAttemptedLoad } = useCinemaData();
 
   // Geolocation context (persists across overlay open/close)
   const {
@@ -295,6 +311,7 @@ export default function FilterOverlay({
     }
 
     applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
+    trackEvent("filter-preset", { preset: "near-me-today" });
     onClose();
   }, [
     userPosition,
@@ -310,12 +327,14 @@ export default function FilterOverlay({
   // Quick filter: what's on this week, all venues.
   const handleThisWeek = useCallback(() => {
     applyQuickFilter(thisWeekPreset);
+    trackEvent("filter-preset", { preset: "this-week" });
     onClose();
   }, [applyQuickFilter, thisWeekPreset, onClose]);
 
   // Quick filter: show me everything (all event types, all venues, any time).
   const handleEverything = useCallback(() => {
     applyQuickFilter(everythingPreset);
+    trackEvent("filter-preset", { preset: "everything" });
     onClose();
   }, [applyQuickFilter, everythingPreset, onClose]);
 
@@ -369,9 +388,14 @@ export default function FilterOverlay({
     const handleFocusTrap = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
 
-      const focusableElements = overlay.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
+      // Only what Tab can actually reach: the phone-only results button is
+      // taken out of the tab order, and counting it as the last stop would
+      // let Tab walk out of the overlay.
+      const focusableElements = Array.from(
+        overlay.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.tabIndex >= 0);
 
       if (focusableElements.length === 0) return;
 
@@ -396,6 +420,7 @@ export default function FilterOverlay({
   }, [isOpen]);
 
   const handleShareFilters = useCallback(async () => {
+    trackEvent("filter-share");
     const url = buildFilterUrl(filterState);
     try {
       await navigator.clipboard.writeText(url);
@@ -414,6 +439,150 @@ export default function FilterOverlay({
     };
   }, []);
 
+  const handleReset = useCallback(() => {
+    trackEvent("filter-reset");
+    resetFilters();
+  }, [resetFilters]);
+
+  // The active-filters strip. Films are withheld until loading has finished,
+  // as the header's description does, so a selection isn't named as not
+  // showing while its films are still arriving. Venue sets are the ones the
+  // venue pills select, so a pill's selection is named after the pill.
+  const filterChips = useMemo(
+    () =>
+      describeFilterChips({
+        state: filterState,
+        categories: EVENT_CATEGORIES,
+        venues: metaData?.venues ?? null,
+        genres: metaData?.genres ?? null,
+        people: metaData?.people ?? null,
+        movies: hasAttemptedLoad && !isLoading ? movies : null,
+        cinemaVenueIds,
+        nearbyVenueIds,
+      }),
+    [
+      filterState,
+      metaData,
+      movies,
+      isLoading,
+      hasAttemptedLoad,
+      cinemaVenueIds,
+      nearbyVenueIds,
+    ],
+  );
+
+  const handleRemoveChip = useCallback(
+    (chip: FilterChip) => {
+      trackEvent("filter-chip-remove", {
+        filter: chip.key,
+        isDefault: chip.isDefault,
+      });
+      widenFilters(chip.filterIds);
+    },
+    [widenFilters],
+  );
+
+  // Refine rows. Each opens by itself when its filter becomes set — on mount
+  // too, so a filter arriving from a link is never behind a closed row — and
+  // never closes by itself: snapping shut under a reader mid-edit is worse
+  // than staying open. Adjusted during render rather than in an effect, so a
+  // row never paints closed for a frame first.
+  const rowStatuses = useMemo(
+    () => getRowStatuses(filterChips, filterState),
+    [filterChips, filterState],
+  );
+  const setRows = REFINE_ROWS.filter(({ id }) => rowStatuses[id].isSet)
+    .map(({ id }) => id)
+    .join(",");
+  const [openRows, setOpenRows] = useState<ReadonlySet<RefineRowId>>(
+    () =>
+      new Set(
+        REFINE_ROWS.filter(({ id }) => rowStatuses[id].isSet).map(
+          ({ id }) => id,
+        ),
+      ),
+  );
+  const [lastSetRows, setLastSetRows] = useState(setRows);
+  if (setRows !== lastSetRows) {
+    const wasSet = new Set(lastSetRows.split(","));
+    setLastSetRows(setRows);
+    const newlySet = REFINE_ROWS.filter(
+      ({ id }) => rowStatuses[id].isSet && !wasSet.has(id),
+    ).map(({ id }) => id);
+    if (newlySet.length > 0) {
+      setOpenRows((open) => new Set([...open, ...newlySet]));
+    }
+  }
+
+  const toggleRow = useCallback((row: RefineRowId) => {
+    setOpenRows((open) => {
+      const next = new Set(open);
+      if (next.has(row)) {
+        next.delete(row);
+      } else {
+        next.add(row);
+        trackEvent("filter-row-open", { row });
+      }
+      return next;
+    });
+  }, []);
+
+  // A chip's label goes to its controls: opens its row if it has one, then
+  // brings it to the middle of the screen (clear of the pinned bar above and
+  // the phone's results button below) and moves focus there, so a keyboard
+  // reader lands on what they asked for.
+  const handleOpenChip = useCallback((chip: FilterChip) => {
+    trackEvent("filter-chip-open", { filter: chip.key });
+    const target = FILTER_TARGETS[chip.filterIds[0]];
+    const elementId =
+      target.kind === "row" ? `refine-${target.row}` : target.elementId;
+    if (target.kind === "row") {
+      setOpenRows((open) => new Set([...open, target.row]));
+    }
+    requestAnimationFrame(() => {
+      const element = overlayRef.current?.querySelector<HTMLElement>(
+        `#${elementId}`,
+      );
+      if (!element) return;
+      // A row's trigger rather than the row: an open row can be taller than
+      // the screen, and centring all of it put its heading under the bar.
+      const focusTarget = element.matches("input")
+        ? element
+        : element.querySelector("button");
+      (focusTarget ?? element).scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
+      focusTarget?.focus({ preventScroll: true });
+    });
+  }, []);
+
+  // Which filters a visit to the overlay changed, recorded once when it
+  // closes rather than per tap, so a reader dragging a slider or typing a
+  // name is one visit and not thirty. Only filter ids are sent, never their
+  // values: what a reader searched for is theirs.
+  const latestFilterState = useRef(filterState);
+  useEffect(() => {
+    latestFilterState.current = filterState;
+  });
+  const openedWithState = useRef<FilterState | null>(null);
+  useEffect(() => {
+    if (isOpen) {
+      openedWithState.current = latestFilterState.current;
+      return;
+    }
+    const before = openedWithState.current;
+    if (!before) return;
+    openedWithState.current = null;
+    const changed = getChangedFilterIds(before, latestFilterState.current);
+    trackEvent("filter-overlay-close", {
+      changed: changed.length > 0 ? changed.join(",") : "none",
+      count: changed.length,
+    });
+  }, [isOpen]);
+
   // Get genres array from metadata
   const genres = metaData?.genres ? Object.values(metaData.genres) : null;
 
@@ -425,15 +594,146 @@ export default function FilterOverlay({
     [movies, metaData],
   );
 
+  // Everything the search menu can offer, memoised on the dataset. Venues go
+  // busiest first, as people do, so a short query meets the likeliest ones.
+  const filterSearchGroups = useMemo(
+    () =>
+      buildFilterSearchGroups({
+        categories: EVENT_CATEGORIES,
+        genres: metaData?.genres ?? null,
+        people: peopleVocabulary,
+        venues: venueGroups
+          .flatMap((group) => group.venues)
+          .sort((a, b) => b.count - a.count),
+      }),
+    [metaData, peopleVocabulary, venueGroups],
+  );
+
+  const handlePickSearchEntry = useCallback(
+    (entry: FilterSearchEntry) => {
+      trackEvent("filter-search-pick", { filter: entry.filterId });
+      applyFilterState(applyFilterSearchEntry(filterState, entry));
+    },
+    [applyFilterState, filterState],
+  );
+
+  // Moves the title query into one of the other text fields, as the
+  // suggestion engine's redirect does.
+  const handleSearchRedirect = useCallback(
+    (field: SearchRedirect) => {
+      trackEvent("filter-search-redirect", { field });
+      const query = filterState.search;
+      if (field === "showingTitleSearch") setShowingTitleSearchQuery(query);
+      else setPerformanceNotesSearchQuery(query);
+      setSearchQuery("");
+    },
+    [
+      filterState.search,
+      setSearchQuery,
+      setShowingTitleSearchQuery,
+      setPerformanceNotesSearchQuery,
+    ],
+  );
+
   // Memoised on the dataset for the same reason: a sort over every film.
   const movieVocabulary = useMemo(() => getMovieVocabulary(movies), [movies]);
 
-  // Opened while any of its filters is narrowing, so one set elsewhere — a
-  // watchlist link, a director's name on a film page, a leftover genre — is
-  // never hidden behind the trigger when the reader comes looking for it.
-  const hasAdvancedEventFilter = getActiveFilterIds(filterState).some((id) =>
-    ADVANCED_EVENT_FILTERS.has(id),
-  );
+  const refineRowContent: Record<RefineRowId, ReactNode> = {
+    accessibility: (
+      <AccessibilityFilterSection
+        movies={movies}
+        selected={filterState.accessibility}
+        toggleAccessibility={toggleAccessibility}
+        selectAllAccessibility={selectAllAccessibility}
+        clearAllAccessibility={clearAllAccessibility}
+      />
+    ),
+    format: (
+      <FormatFilterSection
+        movies={movies}
+        selected={{
+          [FilterId.FormatSource]: filterState.formatSource,
+          [FilterId.FormatPresentation]: filterState.formatPresentation,
+          [FilterId.FormatDimension]: filterState.formatDimension,
+        }}
+        toggleFormat={toggleFormat}
+        selectAllFormat={selectAllFormat}
+        clearAllFormat={clearAllFormat}
+      />
+    ),
+    genre: (
+      <GenreFilterSection
+        movies={movies}
+        genres={genres}
+        selected={filterState.genres}
+        toggleGenre={toggleGenre}
+        selectAllGenres={selectAllGenres}
+        clearAllGenres={clearAllGenres}
+      />
+    ),
+    ratings: (
+      <RatingFilterSection
+        selected={{
+          [FilterId.LetterboxdRating]: filterState.letterboxdRating,
+          [FilterId.ImdbRating]: filterState.imdbRating,
+          [FilterId.RottenTomatoesRating]: filterState.rottenTomatoesRating,
+        }}
+        setRating={setRating}
+      />
+    ),
+    people: (
+      <div className={styles.advancedFilters}>
+        <PeopleFilterSection
+          vocabulary={peopleVocabulary}
+          selected={{
+            [FilterId.Directors]: filterState.directors,
+            [FilterId.Cast]: filterState.cast,
+          }}
+          togglePerson={togglePerson}
+          clearPeople={clearPeople}
+        />
+      </div>
+    ),
+    films: (
+      <MovieFilterSection
+        vocabulary={movieVocabulary}
+        selected={filterState.movies}
+        toggleMovie={toggleMovie}
+        clearMovies={clearMovies}
+      />
+    ),
+    programmes: (
+      <div className={styles.advancedFilters}>
+        <ProgrammeFilterSection
+          movies={movies}
+          selected={{
+            [FilterId.FilmClubs]: filterState.filmClubs,
+            [FilterId.Festivals]: filterState.festivals,
+          }}
+          toggleProgramme={toggleProgramme}
+          clearProgrammes={clearProgrammes}
+        />
+      </div>
+    ),
+    // Both answer "don't show me screenings I can't go to", so they sit
+    // together. Settings about which showings count rather than about dates.
+    showings: (
+      <div className={styles.showingSwitches}>
+        <Switch
+          id="hide-finished"
+          label="Hide past showings"
+          checked={filterState.hideFinished}
+          onChange={toggleHideFinished}
+        />
+        <Switch
+          id="hide-sold-out"
+          label="Hide sold out showings"
+          checked={filterState.hideSoldOut}
+          onChange={toggleHideSoldOut}
+        />
+      </div>
+    ),
+  };
 
   return (
     <div
@@ -447,47 +747,71 @@ export default function FilterOverlay({
       {/* Counts Section */}
       <div
         className={styles.countsSection}
-        style={{
-          paddingTop:
-            filterTextHeight > 0 ? `${countsPaddingTop}px` : undefined,
-        }}
+        style={
+          filterTextHeight > 0
+            ? ({ "--counts-offset": `${countsPaddingTop}px` } as CSSProperties)
+            : undefined
+        }
       >
         <div className={styles.counts} aria-live="polite" aria-atomic="true">
           {movieCount.toLocaleString("en-GB")} events,{" "}
           {performanceCount.toLocaleString("en-GB")} showings
         </div>
         <div className={styles.filterControls}>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={resetFilters}
-            disabled={!hasActiveFilters}
-            aria-label="Reset all filters to defaults"
-          >
-            Reset Filters
-          </Button>
-          <span className={styles.countsDivider} aria-hidden="true">
-            •
-          </span>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={handleShareFilters}
-            aria-label="Copy shareable filter URL to clipboard"
-          >
-            Share Filters
-          </Button>
-          <span className={styles.countsDivider} aria-hidden="true">
-            •
-          </span>
-          {/* No aria-label: "Close Filters" is already a good accessible name,
-              and an aria-label that doesn't contain the visible text breaks
-              voice control (WCAG 2.5.3, Label in Name). It also collided with
-              the header trigger, whose own label reads "Close filter options"
-              while the overlay is open. */}
-          <Button variant="link" size="sm" onClick={handleClose}>
-            Close Filters
-          </Button>
+          <QuickFiltersSection
+            onNearMeToday={handleNearMeToday}
+            onThisWeek={handleThisWeek}
+            geoLoading={geoLoading}
+            nearMeTodayActive={nearMeTodayActive}
+            thisWeekActive={thisWeekActive}
+          />
+          <div className={styles.filterLinks}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleReset}
+              disabled={!hasActiveFilters}
+              aria-label="Reset all filters to defaults"
+            >
+              Reset
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            {/* The "everything" preset: all event types, venues and dates.
+                Beside Reset because it is the other way out of the current
+                filters — wider than the defaults rather than back to them. */}
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleEverything}
+              disabled={everythingActive}
+            >
+              Show everything
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={handleShareFilters}
+              aria-label="Copy shareable filter URL to clipboard"
+            >
+              Share
+            </Button>
+            <span className={styles.countsDivider} aria-hidden="true">
+              •
+            </span>
+            {/* No aria-label: "Close Filters" is already a good accessible
+                name, and an aria-label that doesn't contain the visible text
+                breaks voice control (WCAG 2.5.3, Label in Name). It also
+                collided with the header trigger, whose own label reads "Close
+                filter options" while the overlay is open. */}
+            <Button variant="link" size="sm" onClick={handleClose}>
+              Close Filters
+            </Button>
+          </div>
         </div>
         {share && (
           <div className={styles.shareToast} role="status">
@@ -517,29 +841,20 @@ export default function FilterOverlay({
         )}
       </div>
 
-      {/* Quick Filters */}
-      <QuickFiltersSection
-        onNearMeToday={handleNearMeToday}
-        onThisWeek={handleThisWeek}
-        onEverything={handleEverything}
-        geoLoading={geoLoading}
-        nearMeTodayActive={nearMeTodayActive}
-        thisWeekActive={thisWeekActive}
-        everythingActive={everythingActive}
-      />
-
       {/* Search Section */}
       <div className={styles.searchSection}>
-        <SearchInput
-          id="filter-search"
-          placeholder="Search event title..."
-          ariaLabel="Search event title"
-          value={filterState.search}
-          onChange={setSearchQuery}
+        <FilterSearch
+          active={isOpen}
+          query={filterState.search}
+          onQueryChange={setSearchQuery}
+          groups={filterSearchGroups}
+          filterState={filterState}
+          onPick={handlePickSearchEntry}
+          onRedirect={handleSearchRedirect}
         />
         <ExpandableSection
           title="More Search Options"
-          defaultExpanded={
+          expandWhen={
             filterState.showingTitleSearch.length > 0 ||
             filterState.performanceNotesSearch.length > 0
           }
@@ -561,78 +876,28 @@ export default function FilterOverlay({
             />
           </div>
         </ExpandableSection>
+        <ActiveFiltersSection
+          chips={filterChips}
+          onOpen={handleOpenChip}
+          onRemove={handleRemoveChip}
+        />
       </div>
 
+      {/* Core filters on the left, always in view; the Refine list on the
+          right, one line per specialist filter. Side by side so the Refine
+          list is on screen from the start, and opening a row can't push the
+          core filters down. One column below 1200px. */}
       <div className={styles.content}>
-        <div className={styles.categorySection}>
-          <CategoryFilterSection
+        <div className={styles.coreColumn}>
+          <DateFilterSection
             movies={movies}
-            expandAdvanced={hasAdvancedEventFilter}
-            beforeGenres={
-              <>
-                <ProgrammeFilterSection
-                  movies={movies}
-                  selected={{
-                    [FilterId.FilmClubs]: filterState.filmClubs,
-                    [FilterId.Festivals]: filterState.festivals,
-                  }}
-                  toggleProgramme={toggleProgramme}
-                  clearProgrammes={clearProgrammes}
-                />
-                <MovieFilterSection
-                  vocabulary={movieVocabulary}
-                  selected={filterState.movies}
-                  toggleMovie={toggleMovie}
-                  clearMovies={clearMovies}
-                />
-                <PeopleFilterSection
-                  vocabulary={peopleVocabulary}
-                  selected={{
-                    [FilterId.Directors]: filterState.directors,
-                    [FilterId.Cast]: filterState.cast,
-                  }}
-                  togglePerson={togglePerson}
-                  clearPeople={clearPeople}
-                />
-                <RatingFilterSection
-                  selected={{
-                    [FilterId.LetterboxdRating]: filterState.letterboxdRating,
-                    [FilterId.ImdbRating]: filterState.imdbRating,
-                    [FilterId.RottenTomatoesRating]:
-                      filterState.rottenTomatoesRating,
-                  }}
-                  setRating={setRating}
-                />
-              </>
-            }
-            genres={genres}
-            hideSeen={hideSeen}
-            filterState={{
-              categories: filterState.categories,
-              genres: filterState.genres,
-              accessibility: filterState.accessibility,
-              formats: {
-                [FilterId.FormatSource]: filterState.formatSource,
-                [FilterId.FormatPresentation]: filterState.formatPresentation,
-                [FilterId.FormatDimension]: filterState.formatDimension,
-              },
-            }}
-            toggleCategory={toggleCategory}
-            selectAllCategories={selectAllCategories}
-            clearAllCategories={clearAllCategories}
-            toggleGenre={toggleGenre}
-            selectAllGenres={selectAllGenres}
-            clearAllGenres={clearAllGenres}
-            toggleAccessibility={toggleAccessibility}
-            selectAllAccessibility={selectAllAccessibility}
-            clearAllAccessibility={clearAllAccessibility}
-            toggleFormat={toggleFormat}
-            selectAllFormat={selectAllFormat}
-            clearAllFormat={clearAllFormat}
+            dateRange={filterState.dateRange}
+            setDateRange={setDateRange}
+            setDateOption={setDateOption}
+            timeRange={filterState.timeRange}
+            setTimeRange={setTimeRange}
+            setTimeOption={setTimeOption}
           />
-        </div>
-
-        <div className={styles.venueSection}>
           <VenueFilterSection
             venueGroups={venueGroups}
             allVenueIds={allVenueIds}
@@ -650,23 +915,57 @@ export default function FilterOverlay({
             selectVenues={selectVenues}
             clearVenues={clearVenues}
           />
-        </div>
-
-        <div className={styles.dateSection}>
-          <DateFilterSection
+          <CategoryFilterSection
             movies={movies}
-            dateRange={filterState.dateRange}
-            setDateRange={setDateRange}
-            setDateOption={setDateOption}
-            timeRange={filterState.timeRange}
-            setTimeRange={setTimeRange}
-            setTimeOption={setTimeOption}
-            hideFinished={filterState.hideFinished}
-            onToggleHideFinished={toggleHideFinished}
-            hideSoldOut={filterState.hideSoldOut}
-            onToggleHideSoldOut={toggleHideSoldOut}
+            categories={filterState.categories}
+            hideSeen={hideSeen}
+            toggleCategory={toggleCategory}
+            selectAllCategories={selectAllCategories}
+            clearAllCategories={clearAllCategories}
           />
         </div>
+
+        <section className={styles.section} aria-labelledby="refine-heading">
+          <div className={styles.sectionHeader}>
+            <h3 id="refine-heading" className={styles.sectionTitle}>
+              Refine
+            </h3>
+          </div>
+          <p className={styles.sectionDescription}>
+            More ways to narrow down what&apos;s showing
+          </p>
+          <div className={styles.refineList}>
+            {REFINE_ROWS.map(({ id, title }) => (
+              <RefineRow
+                key={id}
+                id={id}
+                title={title}
+                summary={rowStatuses[id].summary}
+                isSet={rowStatuses[id].isSet}
+                open={openRows.has(id)}
+                onToggle={() => toggleRow(id)}
+              >
+                {refineRowContent[id]}
+              </RefineRow>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* Phones only: the header's Close is a small link at the top of a long
+          scroll, so the way back to the results sits under the thumb and says
+          what it will show. Hidden from assistive tech, which already has the
+          header's Close Filters and the live counts. */}
+      <div className={styles.showResults} aria-hidden="true">
+        <button
+          type="button"
+          className={styles.showResultsButton}
+          onClick={handleClose}
+          tabIndex={-1}
+        >
+          Show {movieCount.toLocaleString("en-GB")}{" "}
+          {movieCount === 1 ? "event" : "events"}
+        </button>
       </div>
     </div>
   );

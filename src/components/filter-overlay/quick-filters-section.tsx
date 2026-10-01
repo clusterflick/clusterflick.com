@@ -8,92 +8,56 @@ interface QuickFiltersSectionProps {
   onNearMeToday: () => void;
   /** Films/shorts/multi-film events across all venues, this week. */
   onThisWeek: () => void;
-  /** All event types, all venues, any time. */
-  onEverything: () => void;
   /** True while the browser is resolving the user's location for "near me". */
   geoLoading: boolean;
   /** True when the current filters match the "near me today" preset. */
   nearMeTodayActive?: boolean;
   /** True when the current filters match the "this week" preset. */
   thisWeekActive?: boolean;
-  /** True when the current filters match the "everything" preset. */
-  everythingActive?: boolean;
 }
 
 /**
- * One-tap preset filters shown at the very top of the filter overlay. Each card
- * applies a whole preset atomically (event types + venues + dates), giving users
- * a fast path to the most common views without touching individual controls.
+ * One-tap preset filters, as slim pills in the overlay's sticky header. Each
+ * applies a whole preset atomically (event types + venues + dates) and closes
+ * the overlay. They were cards with an icon and a description, which cost a
+ * band of the overlay for two buttons. "Show everything" is the third preset,
+ * but it is the way out of every filter rather than a view of its own, so it
+ * sits beside Reset instead.
  */
 export default function QuickFiltersSection({
   onNearMeToday,
   onThisWeek,
-  onEverything,
   geoLoading,
   nearMeTodayActive = false,
   thisWeekActive = false,
-  everythingActive = false,
 }: QuickFiltersSectionProps) {
   return (
-    <section className={styles.quickSection} aria-label="Quick filters">
-      <div className={styles.quickGrid}>
-        <button
-          type="button"
-          className={clsx(
-            styles.quickCard,
-            nearMeTodayActive && styles.quickCardActive,
-          )}
-          onClick={onNearMeToday}
-          disabled={geoLoading}
-          aria-pressed={nearMeTodayActive}
-        >
-          <span className={styles.quickIcon} aria-hidden="true">
-            📍
-          </span>
-          <span className={styles.quickLabel}>
-            {geoLoading ? "Locating…" : "What's on near me today"}
-          </span>
-          <span className={styles.quickDescription}>
-            Films, shorts &amp; multi-films showing nearby today
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className={clsx(
-            styles.quickCard,
-            thisWeekActive && styles.quickCardActive,
-          )}
-          onClick={onThisWeek}
-          aria-pressed={thisWeekActive}
-        >
-          <span className={styles.quickIcon} aria-hidden="true">
-            🗓️
-          </span>
-          <span className={styles.quickLabel}>What&apos;s on this week</span>
-          <span className={styles.quickDescription}>
-            Films, shorts &amp; multi-film across all venues
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className={clsx(
-            styles.quickCard,
-            everythingActive && styles.quickCardActive,
-          )}
-          onClick={onEverything}
-          aria-pressed={everythingActive}
-        >
-          <span className={styles.quickIcon} aria-hidden="true">
-            🎬
-          </span>
-          <span className={styles.quickLabel}>Show me everything</span>
-          <span className={styles.quickDescription}>
-            All event types, all venues, any time
-          </span>
-        </button>
-      </div>
-    </section>
+    <div className={styles.quickPills} role="group" aria-label="Quick filters">
+      <button
+        type="button"
+        className={clsx(
+          styles.quickPill,
+          nearMeTodayActive && styles.quickPillActive,
+        )}
+        onClick={onNearMeToday}
+        disabled={geoLoading}
+        aria-pressed={nearMeTodayActive}
+        title="Films, shorts & multi-film events showing nearby today"
+      >
+        {geoLoading ? "Locating…" : "Near me today"}
+      </button>
+      <button
+        type="button"
+        className={clsx(
+          styles.quickPill,
+          thisWeekActive && styles.quickPillActive,
+        )}
+        onClick={onThisWeek}
+        aria-pressed={thisWeekActive}
+        title="Films, shorts & multi-film events across all venues this week"
+      >
+        This week
+      </button>
+    </div>
   );
 }

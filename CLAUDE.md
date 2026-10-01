@@ -318,6 +318,90 @@ two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
 Locals are drawn larger and outside the cluster group, so they never fold into a
 bubble.
 
+## Filter Overlay
+
+`FilterOverlay` (`src/components/filter-overlay/`) is being reorganised in stages
+around progressive disclosure: the most used filters in front, every filter
+findable, and a filter that is set never hidden.
+
+**Core filters and Refine.** Dates, Venues and Events are always in view, in
+a left column; everything else is a Refine row on the right, one line each
+naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
+Accessibility, Format, Genre, Ratings, Directors & cast, Films, Clubs &
+festivals and Showings (hide past / sold out, moved out of the Dates header).
+Side by side so the Refine list is on screen from the start and opening a row
+can't push the core down; one column below 1200px. Every name is readable
+without opening anything, which is what makes a filter findable, and opening
+one reveals one filter rather than the dozen "More Event Options" held.
+Accessibility comes first: it is a requirement for those who use it.
+
+**Rows open themselves** when their filter becomes set, on mount included, and
+never close themselves — the old `expandWhen` rule, per row instead of for the
+whole bucket. The overlay owns which rows are open, so the strip can open one.
+
+**Row summaries are the strip's chip labels**, grouped by `FILTER_TARGETS` (a
+`Record<FilterId, …>`, so a new filter won't compile until it has a place), so
+a row and its chip can't describe a filter differently. Showings is worded on
+its own, since its default has no chip.
+
+**The search box also finds filters** (`FilterSearch`, matching in
+`@/lib/filters/filter-search`). Typing still searches titles live; a menu
+under it offers the filter values the query names — event types, genres,
+formats, accessibility (with the suggestion engine's aliases, so "subs" finds
+Subtitles), directors, cast, clubs, festivals and venues — plus the two other
+text fields to search instead. Nothing is highlighted until the reader arrows
+down, so Enter and typing mean what they always did. A pick toggles the value
+into its filter and clears the box (the query was the value's name); picking
+into a filter at everything or its default selects just that value, so
+"Quizzes" means quizzes rather than films and quizzes. Downshift's blur-picks
+and Escape-clears are overridden: this box is also the title search.
+
+- **Venues are in, unlike the suggestion engine**: there a name colliding
+  with a title would be read as the answer; here it is one candidate of
+  several and the reader picks. **Films are out**: the box already searches
+  titles, so a film row would offer the same thing twice.
+- **Matching is per word**: the query's words must be a run of the name's
+  words, the last one possibly a prefix ("alfred hitch", never "cock"). The
+  last word is compared folded only when it ends in an inflection
+  ("subtitled", "dramas"); folding a word still being typed made "mar" a whole
+  match for Kenneth Mars.
+- **Whole-word matches rank first**, then group order (enumerated
+  vocabularies, directors, cast, clubs, festivals, venues), so "rio" lists Rio
+  Cinema above Louise Rioton. Up to three per group, ten in all.
+- **It runs off a sorted word index**, built in idle time when the overlay
+  opens (`prepareFilterSearch`). Scanning the 13,000 names cost ~12ms a
+  keystroke whatever was typed; the index answers in 0–3ms. Building it is
+  ~175ms, which is why it's done before the first keystroke rather than on it,
+  and only for readers who open the overlay.
+
+**The counts bar is pinned** on desktop and tablet. It reaches up to the top of
+the overlay and sticks at 0, carrying the room under the site header as its own
+padding: a sticky element can't be pulled up into its container's padding with
+a negative margin, which slid it down over the search box. Not pinned on a
+phone, where under the trigger's wrapped description it took over half the
+screen; there a "Show N events" button sticks to the bottom instead.
+
+**Presets are slim pills in the bar**: "Near me today" and "This week".
+"Show everything" is the third preset, but as the way out of every filter it
+sits beside Reset as a link.
+
+**The active-filters strip** (`describeFilterChips` in `@/lib/filters/describe`)
+lists every filter narrowing the results as a chip, driven by
+`getRestrictiveFilterIds` so the restrictive defaults (date window, event
+types) appear too, marked Default. Removing a chip widens its filters to
+permissive (`widenFilters`), not back to the default, so removing "Next 7 Days"
+shows every date. Hide finished showings is left out, being on in every visit
+and hiding only what nobody can go to. A chip's label goes to its controls —
+opening its Refine row, centring the row's trigger (not the row, which can be
+taller than the screen and put its heading under the bar) and focusing it.
+
+**Usage is tracked** to decide what belongs in front: `filter-preset`,
+`filter-reset`, `filter-share`, `filter-chip-remove`, `filter-chip-open`,
+`filter-row-open`, `filter-search-pick`, `filter-search-redirect`, and
+`filter-overlay-close`
+with the ids of the filters that visit changed (`getChangedFilterIds`), sent
+once per visit rather than per tap. Filter ids only, never values.
+
 ## Cast & Crew Filters
 
 Directors and cast are **filters on the films grid, not pages of their own**
@@ -357,22 +441,17 @@ looking for a filter they don't know exists. Links carry `base=all`, since the
 today→+7d default would answer a director with one film three weeks out by
 showing nothing.
 
-**It sits inside "More Event Options", above Genre**, as two
-`advancedFilterGroup`s rather than a section of its own — cast and crew are
-another way to narrow an event, not a separate idea. Those groups space their
+**It is the "Directors & cast" Refine row** (see Filter Overlay), as two
+`advancedFilterGroup`s in one row — cast and crew are one way to narrow an
+event, not two. Those groups space their
 own children, so `EntityQuickAdd` carries no margin of its own and each placing
 section supplies it (`standaloneQuickAdd` for the venue one, which sits in a
 section with no gap). Two CSS modules cannot override one another by class
 order, so the margin has to live at one end or the other, not both.
 
-**The section opens itself while anything in it is narrowing** — films,
-directors, cast, genres, formats or accessibility. Those arrive from outside
-the overlay (a name on a film page, a watchlist link, a genre left over from
-an earlier visit), and behind a closed trigger they read as no filter at all.
-`ExpandableSection`'s `expandWhen` opens it on mount or whenever it turns
-true, and never closes it: snapping shut under a reader mid-edit is worse than
-staying open. It is adjusted during render rather than in an effect, so the
-section never paints closed for a frame first.
+**The row opens itself while a director or cast member is set**, as every
+Refine row does: these arrive from outside the overlay (a name on a film
+page), and behind a closed row they would read as no filter at all.
 
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
 already used, generalised. Matching is case-insensitive substring, and results
@@ -422,8 +501,7 @@ director-first.
 `FilterId.Movies` (`src/lib/filters/modules/movies.ts`) restricts the grid to a
 chosen set of films by id. It is the people filters over again, keyed on the
 film rather than a credit: `string[] | null`, "or" across the selection, empty
-meaning no filter, a `?movies=` param, and an `EntityQuickAdd` in "More Event
-Options" above Directors (`MovieFilterSection`). Its main job is the watchlist
+meaning no filter, a `?movies=` param, and an `EntityQuickAdd` in the "Films" Refine row (`MovieFilterSection`). Its main job is the watchlist
 links on `/personalise`; the typeahead is for picking a few films to fit
 around each other in the planner.
 
@@ -523,8 +601,8 @@ server-side.
   button onto an empty grid reads as broken. Links use `getProgrammeFilterUrl`, with `base=all` —
   clubs are often listed as events, which the default categories hide, and a monthly club shows
   nothing in most weeks' default window.
-- **The overlay**, in "More Event Options" above Films (`ProgrammeFilterSection`), one
-  `EntityQuickAdd` per group. It opens itself while either is set, as the other filters in it do.
+- **The overlay**, in the "Clubs & festivals" Refine row (`ProgrammeFilterSection`), one
+  `EntityQuickAdd` per group. The row opens itself while either is set, as every Refine row does.
 
 **No banner above the grid.** One was built and taken out: the trigger's description already names
 the club ("Events from Japanese Film Club"), and the watchlist and people filters — also set from
@@ -563,7 +641,7 @@ pages already show every member that is showing.
 **The rating filters** (`src/lib/filters/modules/ratings.ts`) are three, one per source, built from
 one factory as the people and format filters are: Letterboxd (`?letterboxd=`, out of 5), IMDb
 (`?imdb=`, out of 10) and Rotten Tomatoes (`?rottenTomatoes=`, 0–100). Each is a minimum on a
-`Slider` in "More Event Options", above Genre, grouped under one "Ratings" heading. They are not
+`Slider` in the overlay's "Ratings" Refine row. They are not
 one blended score, because the sources don't measure the same thing: Letterboxd and IMDb publish an
 average, Rotten Tomatoes the share of critics who liked a film, and of 193 films carrying both a
 Letterboxd average and a Tomatometer score, 73 fell on opposite sides of an 80% line.
@@ -665,7 +743,8 @@ no second implementation of the filter logic to drift out of sync.
   is against **whole words, with folded endings and aliases** — never an edit budget. The
   words people actually type for a value are mostly not spellings of its label: "subs",
   "captioned" and "SDH" all mean Subtitles and no distance reaches any of them, so they are
-  aliases (`ACCESSIBILITY_ALIASES`, `GENRE_ALIASES`, `CATEGORY_ALIASES` in `suggest.ts`).
+  aliases (`ACCESSIBILITY_ALIASES`, `GENRE_ALIASES`, `CATEGORY_ALIASES` in `value-aliases.ts`,
+  shared with the filter overlay's search menu).
   `foldSuffix` strips -s/-es/-ies/-ed from both sides, which covers "subtitle", "subtitled"
   and "dramas" without an entry. Matching a _run_ of words is what lets "70mm" find both
   "70mm" and "IMAX 70mm"; both are offered, each with its own probed count. Vocabularies are the format groups,

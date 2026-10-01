@@ -24,7 +24,8 @@ import {
   minutesToShortTime,
   MS_PER_DAY,
 } from "@/utils/format-date";
-import { FilterState } from "./types";
+import { FilterId, FilterState } from "./types";
+import { filtersAtDefault, getRestrictiveFilterIds } from "./manager";
 
 /**
  * Options for describing filters
@@ -259,7 +260,8 @@ function describeVenues(
 }
 
 /**
- * Detects if a date range matches a known preset using timestamp comparisons.
+ * Detects if a date range matches a known preset using timestamp comparisons,
+ * returning the preset's own name ("This Week").
  */
 function matchDatePreset(range: {
   start: number | null;
@@ -273,26 +275,26 @@ function matchDatePreset(range: {
 
   // Today
   if (start === todayMidnight && end === todayMidnight) {
-    return "Showing Today";
+    return "Today";
   }
 
   // Tomorrow
   const tomorrowMidnight = todayMidnight + MS_PER_DAY;
   if (start === tomorrowMidnight && end === tomorrowMidnight) {
-    return "Showing Tomorrow";
+    return "Tomorrow";
   }
 
   // This Week (today to Sunday)
   const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
   const endOfWeekMidnight = todayMidnight + daysUntilSunday * MS_PER_DAY;
   if (start === todayMidnight && end === endOfWeekMidnight) {
-    return "Showing This Week";
+    return "This Week";
   }
 
   // Next 7 Days
   const next7Midnight = todayMidnight + 7 * MS_PER_DAY;
   if (start === todayMidnight && end === next7Midnight) {
-    return "Showing in Next 7 Days";
+    return "Next 7 Days";
   }
 
   // This Weekend
@@ -311,13 +313,13 @@ function matchDatePreset(range: {
   const saturdayMidnight = todayMidnight + saturdayOffset * MS_PER_DAY;
   const sundayMidnight = todayMidnight + sundayOffset * MS_PER_DAY;
   if (start === saturdayMidnight && end === sundayMidnight) {
-    return "Showing This Weekend";
+    return "This Weekend";
   }
 
   // Any Time (~5 years)
   const allTimeEnd = todayMidnight + 5 * 365 * MS_PER_DAY;
   if (start === todayMidnight && end === allTimeEnd) {
-    return "Showing Any Time";
+    return "Any Time";
   }
 
   return null;
@@ -336,7 +338,9 @@ function describeDateRange(state: FilterState): string {
   // Check for preset match
   const preset = matchDatePreset(range);
   if (preset) {
-    return preset;
+    return preset === "Next 7 Days"
+      ? `Showing in ${preset}`
+      : `Showing ${preset}`;
   }
 
   // Custom range - convert timestamps to strings for display
@@ -697,4 +701,219 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     venues: venuesDesc,
     dates: datesDesc,
   };
+}
+
+/**
+ * One removable entry in the filter overlay's active-filters strip.
+ */
+export type FilterChip = {
+  /** Names the chip rather than its value, so it is stable as the value changes. */
+  key: string;
+  /** The filters the chip stands for, all widened together when it's removed. */
+  filterIds: FilterId[];
+  label: string;
+  /**
+   * Its filters hold the catalogue defaults (today→+7d, Films/Multiple/Shorts):
+   * narrowing, but not something the reader chose.
+   */
+  isDefault: boolean;
+};
+
+/**
+ * Describes every filter that is narrowing the results as a short, removable
+ * chip ("This Week", "35mm or 70mm", "Letterboxd 4.0+").
+ *
+ * Driven by {@link getRestrictiveFilterIds} rather than the active filters, so
+ * the restrictive defaults — the date window and event types, the filters
+ * people most often don't notice — are listed too. A filter whose name can't
+ * be resolved yet (people before the metadata arrives) still gets a chip under
+ * a generic label: a strip that leaves out something narrowing is worse than
+ * one that names it plainly.
+ *
+ * Two restrictive filters are left out. Hiding finished showings is on by
+ * default and hides only what nobody can go to any more, so a chip for it on
+ * every visit would be noise. The showing URL search is internal to club and
+ * festival matchers and never reaches the grid's state.
+ */
+export function describeFilterChips(options: DescribeOptions): FilterChip[] {
+  const {
+    state,
+    categories,
+    venues,
+    genres,
+    people,
+    movies,
+    cinemaVenueIds,
+    nearbyVenueIds,
+  } = options;
+
+  const restrictive = new Set(getRestrictiveFilterIds(state));
+  const chips: FilterChip[] = [];
+  const add = (key: string, filterIds: FilterId[], label: string) => {
+    const narrowing = filterIds.filter((id) => restrictive.has(id));
+    if (narrowing.length === 0) return;
+    chips.push({
+      key,
+      filterIds: narrowing,
+      label,
+      isDefault: filtersAtDefault(state, narrowing),
+    });
+  };
+
+  add("search", [FilterId.Search], `Title "${state.search.trim()}"`);
+  add(
+    "showingTitleSearch",
+    [FilterId.ShowingTitleSearch],
+    `Venue title "${state.showingTitleSearch.trim()}"`,
+  );
+  add(
+    "performanceNotesSearch",
+    [FilterId.PerformanceNotesSearch],
+    `Notes "${state.performanceNotesSearch.trim()}"`,
+  );
+
+  add("dateRange", [FilterId.DateRange], describeDateChip(state));
+  add(
+    "timeRange",
+    [FilterId.TimeRange],
+    capitalise(describeTimeRange(state) ?? "Time of day"),
+  );
+  add(
+    "venues",
+    [FilterId.Venues],
+    capitalise(
+      describeVenues(state, venues, cinemaVenueIds, nearbyVenueIds).replace(
+        /^At /,
+        "",
+      ),
+    ),
+  );
+  const categoryDesc = describeCategories(state, categories);
+  add(
+    "categories",
+    [FilterId.Categories],
+    categoryDesc === "No events" ? "No event types" : (categoryDesc ?? ""),
+  );
+
+  for (const group of PROGRAMME_GROUPS) {
+    const selected = state[group.filterId] ?? [];
+    const names = selected
+      .map((id) => group.programmes.find((p) => p.id === id))
+      .filter((programme) => !!programme)
+      .map(getProgrammeName);
+    add(
+      group.filterId,
+      [group.filterId],
+      names.length === 0
+        ? `${group.title} no longer listed`
+        : formatList(names, 2, group.plural, "or"),
+    );
+  }
+
+  add("movies", [FilterId.Movies], describeMoviesChip(state, movies));
+
+  for (const group of PEOPLE_GROUPS) {
+    const names = (state[group.filterId] ?? [])
+      .map((id) => people?.[id]?.name)
+      .filter((name): name is string => !!name);
+    add(
+      group.filterId,
+      [group.filterId],
+      names.length === 0
+        ? group.title
+        : `${capitalise(group.verb)} ${formatList(names, 2, "people", "or")}`,
+    );
+  }
+
+  for (const group of RATING_GROUPS) {
+    const min = state[group.filterId];
+    add(
+      group.filterId,
+      [group.filterId],
+      min === null ? "" : `${group.source} ${group.formatMin(min)}`,
+    );
+  }
+
+  const genreDesc = describeGenres(state, genres);
+  add(
+    "genres",
+    [FilterId.Genres],
+    genreDesc === "none" ? "No genres" : (genreDesc ?? "Genres"),
+  );
+
+  const accessibilityDesc = describeAccessibility(state);
+  add(
+    "accessibility",
+    [FilterId.Accessibility],
+    accessibilityDesc === "none"
+      ? "No accessibility features"
+      : (accessibilityDesc ?? ""),
+  );
+
+  const { emptyTitle, labels } = describeFormats(state);
+  add(
+    "formats",
+    FORMAT_GROUPS.map((group) => group.filterId),
+    emptyTitle ? `No ${emptyTitle}` : formatList(labels, 3, "", "or"),
+  );
+
+  add("hideSoldOut", [FilterId.HideSoldOut], "Not sold out");
+  add("hideSeen", [FilterId.HideSeen], "Films I haven't seen");
+
+  return chips;
+}
+
+/**
+ * The date window as a chip label: the preset's name where it is one, the
+ * dates otherwise.
+ */
+function describeDateChip(state: FilterState): string {
+  const range = state.dateRange;
+  const preset = matchDatePreset(range);
+  if (preset) return preset;
+
+  const formatOpts = { includeYearIfDifferent: true };
+  const format = (timestamp: number) =>
+    formatDateShort(timestampToLondonDateString(timestamp), formatOpts);
+
+  if (range.start !== null && range.end !== null) {
+    return range.start === range.end
+      ? format(range.start)
+      : `${format(range.start)} – ${format(range.end)}`;
+  }
+  if (range.start !== null) return `From ${format(range.start)}`;
+  if (range.end !== null) return `Until ${format(range.end)}`;
+  return "Any date";
+}
+
+/**
+ * The films filter as a chip label. Like {@link describeMovies}, only films
+ * the dataset holds are named or counted; without the dataset the selection
+ * is counted as stored.
+ */
+function describeMoviesChip(
+  state: FilterState,
+  moviesLookup: Record<string, { title: string }> | null | undefined,
+): string {
+  const selected = state.movies ?? [];
+  if (!moviesLookup) return `${selected.length} selected films`;
+
+  const titles = selected
+    .map((id) => moviesLookup[id]?.title)
+    .filter((title): title is string => !!title);
+
+  if (titles.length === 0) return "Films not currently showing";
+  if (titles.length <= 2) {
+    return formatList(
+      titles.map((title) => `"${title}"`),
+      2,
+      "",
+      "or",
+    );
+  }
+  return `${titles.length} selected films`;
+}
+
+function capitalise(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }

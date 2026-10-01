@@ -66,6 +66,10 @@ export {
   set,
   hasActiveFilters,
   getActiveFilterIds,
+  getRestrictiveFilterIds,
+  getChangedFilterIds,
+  filtersAtDefault,
+  widenFilters,
   apply,
   resolveFilterStateFromUrl,
   hasUrlFilterParams,
@@ -74,8 +78,23 @@ export {
 export type { FilterBase } from "./manager";
 
 // Description utilities
-export { describeFilters } from "./describe";
-export type { DescribeOptions, FilterDescription } from "./describe";
+export { describeFilters, describeFilterChips } from "./describe";
+export type {
+  DescribeOptions,
+  FilterDescription,
+  FilterChip,
+} from "./describe";
+
+// The filter overlay's search menu
+export {
+  buildFilterSearchGroups,
+  searchFilterGroups,
+  prepareFilterSearch,
+  isFilterSearchEntrySelected,
+  applyFilterSearchEntry,
+  MIN_FILTER_SEARCH_LENGTH,
+} from "./filter-search";
+export type { FilterSearchEntry, FilterSearchSources } from "./filter-search";
 
 // Thin-result notice
 export { getHiddenByDate, THIN_RESULT_LIMIT } from "./hidden-by-date";

@@ -18,9 +18,9 @@ interface RatingFilterSectionProps {
 
 /**
  * The rating filters: one slider per source, since the sources don't share a
- * scale (see RATING_GROUPS). Grouped under one heading because together they
- * are one idea — how well a film is thought of — and three headings would
- * give ratings more of the overlay than genre gets.
+ * scale (see RATING_GROUPS). One Refine row because together they are one
+ * idea — how well a film is thought of — and three rows would give ratings
+ * more of the overlay than genre gets.
  */
 export default function RatingFilterSection({
   selected,
@@ -33,7 +33,6 @@ export default function RatingFilterSection({
   return (
     <div className={styles.advancedFilterGroup}>
       <div className={styles.advancedFilterHeader}>
-        <h4 className={styles.advancedFilterTitle}>Ratings</h4>
         <div className={styles.selectionControls}>
           <Button
             variant="link"

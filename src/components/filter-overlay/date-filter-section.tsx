@@ -19,7 +19,6 @@ import {
   MS_PER_DAY,
 } from "@/utils/format-date";
 import Chip from "@/components/chip";
-import Switch from "@/components/switch";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";
 
@@ -31,10 +30,6 @@ interface DateFilterSectionProps {
   timeRange: { start: number; end: number };
   setTimeRange: (start: number, end: number) => void;
   setTimeOption: (option: TimeOption) => void;
-  hideFinished: boolean;
-  onToggleHideFinished: () => void;
-  hideSoldOut: boolean;
-  onToggleHideSoldOut: () => void;
 }
 
 export default function DateFilterSection({
@@ -45,10 +40,6 @@ export default function DateFilterSection({
   timeRange,
   setTimeRange,
   setTimeOption,
-  hideFinished,
-  onToggleHideFinished,
-  hideSoldOut,
-  onToggleHideSoldOut,
 }: DateFilterSectionProps) {
   // Calculate date range from performance data
   const { minDateStr, maxDateStr } = useMemo(() => {
@@ -203,22 +194,6 @@ export default function DateFilterSection({
         <h3 id="dates-heading" className={styles.sectionTitle}>
           Dates
         </h3>
-        {/* Both toggles answer "don't show me screenings I can't go to", so
-            they sit together rather than being split across sections. */}
-        <div className={styles.switchGroup}>
-          <Switch
-            id="hide-finished"
-            label="Hide past showings"
-            checked={hideFinished}
-            onChange={onToggleHideFinished}
-          />
-          <Switch
-            id="hide-sold-out"
-            label="Hide sold out showings"
-            checked={hideSoldOut}
-            onChange={onToggleHideSoldOut}
-          />
-        </div>
       </div>
       <p className={styles.sectionDescription}>When do you want to go?</p>
       <div
