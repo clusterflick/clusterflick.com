@@ -102,6 +102,17 @@
   background: rgba(var(--color-midnight-navy-rgb), 1);
 }
 
+/* Above 700px the filter overlay's counts bar is pinned and solid from the
+   top of the overlay, so it already backs the description and the shadow only
+   dims the counts beneath it (the header sits above the overlay). Below that
+   the bar scrolls away and filters pass under the description, so the shadow
+   stays. Keep in step with the overlay's 700px breakpoint. */
+@media (min-width: 701px) {
+  .trigger.open .textWrapper::before {
+    box-shadow: none;
+  }
+}
+
 .trigger.open .textWrapper {
   margin-top: var(--text-margin-top);
   font-size: var(--trigger-open-font-size);

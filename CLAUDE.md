@@ -327,8 +327,10 @@ findable, and a filter that is set never hidden.
 **Core filters and Refine.** Dates, Venues and Events are always in view, in
 a left column; everything else is a Refine row on the right, one line each
 naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
-Accessibility, Format, Genre, Ratings, Directors & cast, Films, Clubs &
-festivals and Showings (hide past / sold out, moved out of the Dates header).
+Accessibility, Showings (hide past / sold out, moved out of the Dates
+header), Format, Genre, Ratings, Directors & cast, Films, and Clubs &
+festivals. Rows with an index page (formats, genres, clubs, festivals) link to
+it at the top of the row.
 Side by side so the Refine list is on screen from the start and opening a row
 can't push the core down; one column below 1200px. Every name is readable
 without opening anything, which is what makes a filter findable, and opening
@@ -379,7 +381,18 @@ the overlay and sticks at 0, carrying the room under the site header as its own
 padding: a sticky element can't be pulled up into its container's padding with
 a negative margin, which slid it down over the search box. Not pinned on a
 phone, where under the trigger's wrapped description it took over half the
-screen; there a "Show N events" button sticks to the bottom instead.
+screen; there a "Show N events" button sticks to the bottom instead. The
+overlay has no bottom padding on a phone, because sticky offsets are measured
+from the scroll container's content edge and its 60px left the button
+floating above the bottom of the screen.
+
+The open trigger's description draws a dark box-shadow ~60px deep to stay
+legible over what scrolls beneath it, and the header sits above the overlay,
+so the shadow dims anything that close. Above 700px the pinned counts bar
+already backs the description, so the trigger drops the shadow there and the
+counts sit 24px under it; on a phone the bar scrolls away, the shadow stays,
+and the counts keep a 66px gap. The trigger's media query is tied to the
+overlay's 700px breakpoint.
 
 **Presets are slim pills in the bar**: "Near me today" and "This week".
 "Show everything" is the third preset, but as the way out of every filter it

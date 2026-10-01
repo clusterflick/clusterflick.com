@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import clsx from "clsx";
+import Link from "next/link";
 import { Category } from "@/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
@@ -704,6 +705,14 @@ export default function FilterOverlay({
     ),
     programmes: (
       <div className={styles.advancedFilters}>
+        <div className={styles.refineRowLead}>
+          <p className={styles.sectionDescription}>
+            <Link href="/film-clubs">See all film clubs</Link>
+          </p>
+          <p className={styles.sectionDescription}>
+            <Link href="/festivals">See all festivals</Link>
+          </p>
+        </div>
         <ProgrammeFilterSection
           movies={movies}
           selected={{

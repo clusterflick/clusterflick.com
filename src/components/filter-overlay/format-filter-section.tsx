@@ -65,6 +65,11 @@ export default function FormatFilterSection({
 
   return (
     <div className={styles.advancedFilters}>
+      <div className={styles.refineRowLead}>
+        <p className={styles.sectionDescription}>
+          <Link href="/formats">See a list of all formats</Link>
+        </p>
+      </div>
       {FORMAT_GROUPS.map((group) => {
         const chosen = selected[group.filterId];
         const allValues = group.options.map((o) => o.value);
@@ -116,9 +121,6 @@ export default function FormatFilterSection({
           </div>
         );
       })}
-      <p className={styles.sectionDescription}>
-        <Link href="/formats">See a list of all formats</Link>
-      </p>
     </div>
   );
 }
