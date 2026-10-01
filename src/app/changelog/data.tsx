@@ -74,6 +74,16 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-01",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Joe Allen" url="https://www.joeallen.co.uk" />,
+            the Covent Garden theatreland brasserie, for its Sunday mystery
+            movie screenings.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
