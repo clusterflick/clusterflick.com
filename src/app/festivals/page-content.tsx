@@ -150,6 +150,9 @@ function FeaturedFestivalSection({
         movies={films}
         seeAllHref={festival.href}
         seeAllLabel="Full programme"
+        // As on the festival's own page: its screenings can sit outside the
+        // reader's filters, which would hide every showing of the film.
+        showAll
       />
     </section>
   );

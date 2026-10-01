@@ -47,6 +47,11 @@ export default function FilmClubsPageContent({
         title="Next up"
         intro="The next screening from each club, soonest first."
         movies={nextUp}
+        // A club's next screening is often outside the reader's filters (the
+        // default week, or events hidden by category), which would open the
+        // film on "No showings match your current filters". The club and
+        // festival pages link their posters the same way.
+        showAll
       />
 
       {groups.map((group) => (
