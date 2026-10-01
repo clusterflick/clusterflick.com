@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import clsx from "clsx";
 import { Category } from "@/types";
@@ -17,7 +18,6 @@ import {
   FilterId,
   getPeopleVocabulary,
   getMovieVocabulary,
-  getActiveFilterIds,
   getChangedFilterIds,
   describeFilterChips,
   FilterChip,
@@ -44,28 +44,21 @@ import MovieFilterSection from "./movie-filter-section";
 import ProgrammeFilterSection from "./programme-filter-section";
 import RatingFilterSection from "./rating-filter-section";
 import DateFilterSection from "./date-filter-section";
+import AccessibilityFilterSection from "./accessibility-filter-section";
+import FormatFilterSection from "./format-filter-section";
+import GenreFilterSection from "./genre-filter-section";
+import RefineRow from "./refine-row";
+import {
+  FILTER_TARGETS,
+  REFINE_ROWS,
+  RefineRowId,
+  getRowStatuses,
+} from "./filter-targets";
 import ExpandableSection from "@/components/expandable-section";
+import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import styles from "./filter-overlay.module.css";
-
-// The filters inside "More Event Options". Each defaults to no filter, so
-// active is the same as narrowing here — unlike categories or dates.
-const ADVANCED_EVENT_FILTERS = new Set<FilterId>([
-  FilterId.FilmClubs,
-  FilterId.Festivals,
-  FilterId.Movies,
-  FilterId.Directors,
-  FilterId.Cast,
-  FilterId.LetterboxdRating,
-  FilterId.ImdbRating,
-  FilterId.RottenTomatoesRating,
-  FilterId.Genres,
-  FilterId.Accessibility,
-  FilterId.FormatSource,
-  FilterId.FormatPresentation,
-  FilterId.FormatDimension,
-]);
 
 // How long the "link copied" confirmation stays up. Long enough to read the
 // explanation, short enough that it's gone before you next look at the counts.
@@ -484,6 +477,83 @@ export default function FilterOverlay({
     [widenFilters],
   );
 
+  // Refine rows. Each opens by itself when its filter becomes set — on mount
+  // too, so a filter arriving from a link is never behind a closed row — and
+  // never closes by itself: snapping shut under a reader mid-edit is worse
+  // than staying open. Adjusted during render rather than in an effect, so a
+  // row never paints closed for a frame first.
+  const rowStatuses = useMemo(
+    () => getRowStatuses(filterChips, filterState),
+    [filterChips, filterState],
+  );
+  const setRows = REFINE_ROWS.filter(({ id }) => rowStatuses[id].isSet)
+    .map(({ id }) => id)
+    .join(",");
+  const [openRows, setOpenRows] = useState<ReadonlySet<RefineRowId>>(
+    () =>
+      new Set(
+        REFINE_ROWS.filter(({ id }) => rowStatuses[id].isSet).map(
+          ({ id }) => id,
+        ),
+      ),
+  );
+  const [lastSetRows, setLastSetRows] = useState(setRows);
+  if (setRows !== lastSetRows) {
+    const wasSet = new Set(lastSetRows.split(","));
+    setLastSetRows(setRows);
+    const newlySet = REFINE_ROWS.filter(
+      ({ id }) => rowStatuses[id].isSet && !wasSet.has(id),
+    ).map(({ id }) => id);
+    if (newlySet.length > 0) {
+      setOpenRows((open) => new Set([...open, ...newlySet]));
+    }
+  }
+
+  const toggleRow = useCallback((row: RefineRowId) => {
+    setOpenRows((open) => {
+      const next = new Set(open);
+      if (next.has(row)) {
+        next.delete(row);
+      } else {
+        next.add(row);
+        trackEvent("filter-row-open", { row });
+      }
+      return next;
+    });
+  }, []);
+
+  // A chip's label goes to its controls: opens its row if it has one, then
+  // brings it to the middle of the screen (clear of the pinned bar above and
+  // the phone's results button below) and moves focus there, so a keyboard
+  // reader lands on what they asked for.
+  const handleOpenChip = useCallback((chip: FilterChip) => {
+    trackEvent("filter-chip-open", { filter: chip.key });
+    const target = FILTER_TARGETS[chip.filterIds[0]];
+    const elementId =
+      target.kind === "row" ? `refine-${target.row}` : target.elementId;
+    if (target.kind === "row") {
+      setOpenRows((open) => new Set([...open, target.row]));
+    }
+    requestAnimationFrame(() => {
+      const element = overlayRef.current?.querySelector<HTMLElement>(
+        `#${elementId}`,
+      );
+      if (!element) return;
+      // A row's trigger rather than the row: an open row can be taller than
+      // the screen, and centring all of it put its heading under the bar.
+      const focusTarget = element.matches("input")
+        ? element
+        : element.querySelector("button");
+      (focusTarget ?? element).scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
+      focusTarget?.focus({ preventScroll: true });
+    });
+  }, []);
+
   // Which filters a visit to the overlay changed, recorded once when it
   // closes rather than per tap, so a reader dragging a slider or typing a
   // name is one visit and not thirty. Only filter ids are sent, never their
@@ -522,12 +592,102 @@ export default function FilterOverlay({
   // Memoised on the dataset for the same reason: a sort over every film.
   const movieVocabulary = useMemo(() => getMovieVocabulary(movies), [movies]);
 
-  // Opened while any of its filters is narrowing, so one set elsewhere — a
-  // watchlist link, a director's name on a film page, a leftover genre — is
-  // never hidden behind the trigger when the reader comes looking for it.
-  const hasAdvancedEventFilter = getActiveFilterIds(filterState).some((id) =>
-    ADVANCED_EVENT_FILTERS.has(id),
-  );
+  const refineRowContent: Record<RefineRowId, ReactNode> = {
+    accessibility: (
+      <AccessibilityFilterSection
+        movies={movies}
+        selected={filterState.accessibility}
+        toggleAccessibility={toggleAccessibility}
+        selectAllAccessibility={selectAllAccessibility}
+        clearAllAccessibility={clearAllAccessibility}
+      />
+    ),
+    format: (
+      <FormatFilterSection
+        movies={movies}
+        selected={{
+          [FilterId.FormatSource]: filterState.formatSource,
+          [FilterId.FormatPresentation]: filterState.formatPresentation,
+          [FilterId.FormatDimension]: filterState.formatDimension,
+        }}
+        toggleFormat={toggleFormat}
+        selectAllFormat={selectAllFormat}
+        clearAllFormat={clearAllFormat}
+      />
+    ),
+    genre: (
+      <GenreFilterSection
+        movies={movies}
+        genres={genres}
+        selected={filterState.genres}
+        toggleGenre={toggleGenre}
+        selectAllGenres={selectAllGenres}
+        clearAllGenres={clearAllGenres}
+      />
+    ),
+    ratings: (
+      <RatingFilterSection
+        selected={{
+          [FilterId.LetterboxdRating]: filterState.letterboxdRating,
+          [FilterId.ImdbRating]: filterState.imdbRating,
+          [FilterId.RottenTomatoesRating]: filterState.rottenTomatoesRating,
+        }}
+        setRating={setRating}
+      />
+    ),
+    people: (
+      <div className={styles.advancedFilters}>
+        <PeopleFilterSection
+          vocabulary={peopleVocabulary}
+          selected={{
+            [FilterId.Directors]: filterState.directors,
+            [FilterId.Cast]: filterState.cast,
+          }}
+          togglePerson={togglePerson}
+          clearPeople={clearPeople}
+        />
+      </div>
+    ),
+    films: (
+      <MovieFilterSection
+        vocabulary={movieVocabulary}
+        selected={filterState.movies}
+        toggleMovie={toggleMovie}
+        clearMovies={clearMovies}
+      />
+    ),
+    programmes: (
+      <div className={styles.advancedFilters}>
+        <ProgrammeFilterSection
+          movies={movies}
+          selected={{
+            [FilterId.FilmClubs]: filterState.filmClubs,
+            [FilterId.Festivals]: filterState.festivals,
+          }}
+          toggleProgramme={toggleProgramme}
+          clearProgrammes={clearProgrammes}
+        />
+      </div>
+    ),
+    // Both answer "don't show me screenings I can't go to", so they sit
+    // together. Settings about which showings count rather than about dates.
+    showings: (
+      <div className={styles.showingSwitches}>
+        <Switch
+          id="hide-finished"
+          label="Hide past showings"
+          checked={filterState.hideFinished}
+          onChange={toggleHideFinished}
+        />
+        <Switch
+          id="hide-sold-out"
+          label="Hide sold out showings"
+          checked={filterState.hideSoldOut}
+          onChange={toggleHideSoldOut}
+        />
+      </div>
+    ),
+  };
 
   return (
     <div
@@ -668,79 +828,28 @@ export default function FilterOverlay({
             />
           </div>
         </ExpandableSection>
-        <ActiveFiltersSection chips={filterChips} onRemove={handleRemoveChip} />
+        <ActiveFiltersSection
+          chips={filterChips}
+          onOpen={handleOpenChip}
+          onRemove={handleRemoveChip}
+        />
       </div>
 
+      {/* Core filters on the left, always in view; the Refine list on the
+          right, one line per specialist filter. Side by side so the Refine
+          list is on screen from the start, and opening a row can't push the
+          core filters down. One column below 1200px. */}
       <div className={styles.content}>
-        <div className={styles.categorySection}>
-          <CategoryFilterSection
+        <div className={styles.coreColumn}>
+          <DateFilterSection
             movies={movies}
-            expandAdvanced={hasAdvancedEventFilter}
-            beforeGenres={
-              <>
-                <ProgrammeFilterSection
-                  movies={movies}
-                  selected={{
-                    [FilterId.FilmClubs]: filterState.filmClubs,
-                    [FilterId.Festivals]: filterState.festivals,
-                  }}
-                  toggleProgramme={toggleProgramme}
-                  clearProgrammes={clearProgrammes}
-                />
-                <MovieFilterSection
-                  vocabulary={movieVocabulary}
-                  selected={filterState.movies}
-                  toggleMovie={toggleMovie}
-                  clearMovies={clearMovies}
-                />
-                <PeopleFilterSection
-                  vocabulary={peopleVocabulary}
-                  selected={{
-                    [FilterId.Directors]: filterState.directors,
-                    [FilterId.Cast]: filterState.cast,
-                  }}
-                  togglePerson={togglePerson}
-                  clearPeople={clearPeople}
-                />
-                <RatingFilterSection
-                  selected={{
-                    [FilterId.LetterboxdRating]: filterState.letterboxdRating,
-                    [FilterId.ImdbRating]: filterState.imdbRating,
-                    [FilterId.RottenTomatoesRating]:
-                      filterState.rottenTomatoesRating,
-                  }}
-                  setRating={setRating}
-                />
-              </>
-            }
-            genres={genres}
-            hideSeen={hideSeen}
-            filterState={{
-              categories: filterState.categories,
-              genres: filterState.genres,
-              accessibility: filterState.accessibility,
-              formats: {
-                [FilterId.FormatSource]: filterState.formatSource,
-                [FilterId.FormatPresentation]: filterState.formatPresentation,
-                [FilterId.FormatDimension]: filterState.formatDimension,
-              },
-            }}
-            toggleCategory={toggleCategory}
-            selectAllCategories={selectAllCategories}
-            clearAllCategories={clearAllCategories}
-            toggleGenre={toggleGenre}
-            selectAllGenres={selectAllGenres}
-            clearAllGenres={clearAllGenres}
-            toggleAccessibility={toggleAccessibility}
-            selectAllAccessibility={selectAllAccessibility}
-            clearAllAccessibility={clearAllAccessibility}
-            toggleFormat={toggleFormat}
-            selectAllFormat={selectAllFormat}
-            clearAllFormat={clearAllFormat}
+            dateRange={filterState.dateRange}
+            setDateRange={setDateRange}
+            setDateOption={setDateOption}
+            timeRange={filterState.timeRange}
+            setTimeRange={setTimeRange}
+            setTimeOption={setTimeOption}
           />
-        </div>
-
-        <div className={styles.venueSection}>
           <VenueFilterSection
             venueGroups={venueGroups}
             allVenueIds={allVenueIds}
@@ -758,23 +867,41 @@ export default function FilterOverlay({
             selectVenues={selectVenues}
             clearVenues={clearVenues}
           />
-        </div>
-
-        <div className={styles.dateSection}>
-          <DateFilterSection
+          <CategoryFilterSection
             movies={movies}
-            dateRange={filterState.dateRange}
-            setDateRange={setDateRange}
-            setDateOption={setDateOption}
-            timeRange={filterState.timeRange}
-            setTimeRange={setTimeRange}
-            setTimeOption={setTimeOption}
-            hideFinished={filterState.hideFinished}
-            onToggleHideFinished={toggleHideFinished}
-            hideSoldOut={filterState.hideSoldOut}
-            onToggleHideSoldOut={toggleHideSoldOut}
+            categories={filterState.categories}
+            hideSeen={hideSeen}
+            toggleCategory={toggleCategory}
+            selectAllCategories={selectAllCategories}
+            clearAllCategories={clearAllCategories}
           />
         </div>
+
+        <section className={styles.section} aria-labelledby="refine-heading">
+          <div className={styles.sectionHeader}>
+            <h3 id="refine-heading" className={styles.sectionTitle}>
+              Refine
+            </h3>
+          </div>
+          <p className={styles.sectionDescription}>
+            More ways to narrow down what&apos;s showing
+          </p>
+          <div className={styles.refineList}>
+            {REFINE_ROWS.map(({ id, title }) => (
+              <RefineRow
+                key={id}
+                id={id}
+                title={title}
+                summary={rowStatuses[id].summary}
+                isSet={rowStatuses[id].isSet}
+                open={openRows.has(id)}
+                onToggle={() => toggleRow(id)}
+              >
+                {refineRowContent[id]}
+              </RefineRow>
+            ))}
+          </div>
+        </section>
       </div>
 
       {/* Phones only: the header's Close is a small link at the top of a long

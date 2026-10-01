@@ -51,7 +51,6 @@ export default function MovieFilterSection({
   return (
     <div className={styles.advancedFilterGroup}>
       <div className={styles.advancedFilterHeader}>
-        <h4 className={styles.advancedFilterTitle}>Films</h4>
         <div className={styles.selectionControls}>
           <Button
             variant="link"

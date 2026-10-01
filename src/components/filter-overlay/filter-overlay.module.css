@@ -36,13 +36,23 @@
    Filter Sections Grid
    ========================================================================== */
 
+/* The core filters and the Refine list, side by side. Capped narrower than
+   the old three columns: two columns stretched across a wide screen leave the
+   chips a long way from their headings. */
 .content {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 64px;
   width: 100%;
-  max-width: 1800px;
+  max-width: 1440px;
   padding: 0 48px;
+}
+
+.coreColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
 }
 
 .section {
@@ -104,17 +114,13 @@
   flex-shrink: 0;
 }
 
-/* Availability toggles in a section header ("Hide past showings", "Hide sold
-   out showings"). Stacked so their tracks line up in a column rather than
-   competing with the heading for the same row. */
-.switchGroup {
+/* "Hide past showings" and "Hide sold out showings", in the Showings row.
+   Stacked at their own width, so the tracks line up in a column. */
+.showingSwitches {
   display: flex;
   flex-direction: column;
-  /* Stretch, not flex-end: each switch is a space-between row, so full-width
-     rows put every track against the same right edge. */
-  align-items: stretch;
-  gap: 8px;
-  flex-shrink: 0;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .controlDivider {
@@ -335,29 +341,22 @@
   list-style: none;
 }
 
+/* One pill holding two buttons: the label goes to the filter's controls,
+   the × removes it. */
 .activeChip {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
   max-width: 100%;
-  padding: 5px 10px 5px 14px;
   font-size: 13px;
   color: var(--color-light-gray);
   background: rgba(var(--color-neon-pink-rgb), 0.1);
   border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
   border-radius: 100px;
-  cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .activeChip:hover {
-  background: rgba(var(--color-neon-pink-rgb), 0.18);
   border-color: rgba(var(--color-neon-pink-rgb), 0.6);
-}
-
-.activeChip:focus-visible {
-  outline: 2px solid var(--color-electric-blue);
-  outline-offset: 2px;
 }
 
 /* Set by the defaults rather than the reader: still narrowing, so still
@@ -369,9 +368,42 @@
 }
 
 .activeChipDefault:hover {
-  color: var(--color-light-gray);
-  background: rgba(var(--color-white-rgb), 0.08);
   border-color: rgba(var(--color-white-rgb), 0.3);
+}
+
+.activeChipOpen,
+.activeChipRemove {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.activeChipOpen {
+  gap: 8px;
+  min-width: 0;
+  padding: 5px 4px 5px 14px;
+}
+
+.activeChipRemove {
+  padding: 5px 10px 5px 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.activeChipOpen:hover,
+.activeChipRemove:hover {
+  color: var(--color-white);
+}
+
+.activeChipOpen:focus-visible,
+.activeChipRemove:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 1px;
 }
 
 .activeChipTag {
@@ -385,12 +417,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.activeChipRemove {
-  font-size: 16px;
-  line-height: 1;
-  color: var(--color-muted-gray);
 }
 
 .visuallyHidden {
@@ -419,6 +445,112 @@
   flex-direction: column;
   gap: 12px;
   padding-top: 4px;
+}
+
+/* ==========================================================================
+   Refine Rows
+   ========================================================================== */
+
+.refineList {
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  border-radius: 12px;
+  background: rgba(var(--color-white-rgb), 0.02);
+}
+
+.refineRow + .refineRow {
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.06);
+}
+
+/* A heading for the outline, not for looks: the global h4 face, size and
+   case would otherwise reach the trigger's summary. */
+.refineRowHeading {
+  margin: 0;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Name on the left, what it's set to on the right, so the list reads as a
+   column of names and a column of values. */
+.refineRowTrigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  font: inherit;
+  text-align: left;
+  color: var(--color-light-gray);
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.refineRowTrigger:hover {
+  background: rgba(var(--color-white-rgb), 0.04);
+}
+
+.refineRowTrigger:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: -2px;
+}
+
+.refineRowTitle {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.refineRowSummary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.refineRowSummarySet {
+  color: var(--color-neon-pink);
+}
+
+.refineRowChevron {
+  flex-shrink: 0;
+  color: var(--color-muted-gray);
+  transition: transform 0.2s ease;
+}
+
+.refineRowOpen .refineRowChevron {
+  transform: rotate(180deg);
+}
+
+.refineRowBody {
+  padding: 4px 18px 20px;
+}
+
+/* A row's link and its Select All / Clear All, sharing one line. */
+.refineRowLead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.refineRowLead > .sectionDescription {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refineRowChevron {
+    transition: none;
+  }
 }
 
 /* ==========================================================================
@@ -819,20 +951,7 @@
 
   .content {
     grid-template-columns: 1fr;
-    gap: 64px;
-  }
-
-  /* Reverse order on mobile: Dates, Venues, Events */
-  .dateSection {
-    order: 1;
-  }
-
-  .venueSection {
-    order: 2;
-  }
-
-  .categorySection {
-    order: 3;
+    gap: 56px;
   }
 }
 
