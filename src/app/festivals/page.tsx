@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { getFestivalUrl } from "@/utils/get-festival-url";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getFestivalMovies } from "@/utils/get-festival-movies";
 import {
-  getFestivalMovies,
-  getFestivalDateRange,
-} from "@/utils/get-festival-movies";
+  getFestivalsIndex,
+  type FestivalListItem,
+} from "@/utils/get-festivals-index";
+import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { FESTIVALS } from "@/data/festivals";
 import FestivalsPageContent from "./page-content";
+
+export type { FestivalListItem };
 
 export const metadata: Metadata = {
   title: "Film Festivals",
@@ -33,51 +36,27 @@ export const metadata: Metadata = {
   },
 };
 
-export type FestivalListItem = {
-  id: string;
-  name: string;
-  href: string;
-  externalUrl?: string;
-  imagePath: string | null;
-  movieCount: number;
-  dateFrom: number | null;
-  dateTo: number | null;
-  seoDescription: string | null;
-};
-
 export default async function FestivalsPage() {
   const data = await getStaticData();
+  const now = Date.now();
 
-  const festivalItems: FestivalListItem[] = await Promise.all(
-    FESTIVALS.flatMap((festival) => {
-      const movies = getFestivalMovies(festival, data.movies);
-      if (Object.keys(movies).length === 0) return [];
+  const descriptions: Record<string, string | null> = Object.fromEntries(
+    await Promise.all(
+      FESTIVALS.map(async (festival) => {
+        try {
+          const mod = await import(`@/components/festivals/${festival.id}`);
+          return [festival.id, mod.seoDescription ?? null];
+        } catch {
+          // No blurb component for this festival
+          return [festival.id, null];
+        }
+      }),
+    ),
+  );
 
-      const { dateFrom, dateTo } = getFestivalDateRange(movies);
-
-      return [
-        (async () => {
-          let seoDescription: string | null = null;
-          try {
-            const mod = await import(`@/components/festivals/${festival.id}`);
-            seoDescription = mod.seoDescription ?? null;
-          } catch {
-            // No blurb component for this festival
-          }
-          return {
-            id: festival.id,
-            name: festival.name,
-            href: getFestivalUrl(festival),
-            externalUrl: festival.url,
-            imagePath: getFestivalImagePath(festival.id),
-            movieCount: Object.keys(movies).length,
-            dateFrom,
-            dateTo,
-            seoDescription,
-          };
-        })(),
-      ];
-    }),
+  const { festivals: festivalItems, featured } = getFestivalsIndex(
+    data.movies,
+    { now, getImagePath: getFestivalImagePath, descriptions },
   );
 
   // Collect unique venue names across all active festivals
@@ -152,7 +131,13 @@ export default async function FestivalsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <FestivalsPageContent festivals={festivalItems} venues={venues} />
+      <FestivalsPageContent
+        festivals={festivalItems}
+        featured={featured}
+        venues={venues}
+        now={now}
+        today={getLondonMidnightTimestamp()}
+      />
     </>
   );
 }

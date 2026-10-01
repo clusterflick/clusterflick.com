@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import FestivalsPageContent from "@/app/festivals/page-content";
-import type { FestivalListItem } from "@/app/festivals/page";
-import { FESTIVALS } from "@/data/festivals";
 import {
-  getFestivalMovies,
-  getFestivalDateRange,
-} from "@/utils/get-festival-movies";
-import { getFestivalUrl } from "@/utils/get-festival-url";
+  getFestivalsIndex,
+  type FestivalListItem,
+  type FeaturedFestival,
+} from "@/utils/get-festivals-index";
+import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import {
@@ -35,38 +34,41 @@ const FESTIVAL_IMAGE_PATHS: Record<string, string> = {
   "animation-in-love": "/images/festivals/animation-in-love.jpg",
 };
 
-async function loadFestivalsListData(): Promise<FestivalListItem[]> {
+type FestivalsListData = {
+  festivals: FestivalListItem[];
+  featured: FeaturedFestival | null;
+  now: number;
+  today: number;
+};
+
+async function loadFestivalsListData(): Promise<FestivalsListData> {
   const metaData = await fetchMetaData();
   const allMovies = await fetchAllMovies(metaData);
-
-  return FESTIVALS.flatMap((festival) => {
-    const movies = getFestivalMovies(festival, allMovies);
-    if (Object.keys(movies).length === 0) return [];
-
-    const { dateFrom, dateTo } = getFestivalDateRange(movies);
-    return [
-      {
-        id: festival.id,
-        name: festival.name,
-        href: getFestivalUrl(festival),
-        imagePath: FESTIVAL_IMAGE_PATHS[festival.id] ?? null,
-        movieCount: Object.keys(movies).length,
-        dateFrom,
-        dateTo,
-        seoDescription: null,
-      },
-    ];
-  });
+  const now = Date.now();
+  return {
+    ...getFestivalsIndex(allMovies, {
+      now,
+      getImagePath: (id) => FESTIVAL_IMAGE_PATHS[id] ?? null,
+    }),
+    now,
+    today: getLondonMidnightTimestamp(),
+  };
 }
 
 function FestivalsListWithRealData() {
   return (
-    <StoryDataLoader<FestivalListItem[]>
+    <StoryDataLoader<FestivalsListData>
       loader={loadFestivalsListData}
       loadingMessage="Loading festivals..."
     >
-      {(festivals) => (
-        <FestivalsPageContent festivals={festivals} venues={[]} />
+      {({ festivals, featured, now, today }) => (
+        <FestivalsPageContent
+          festivals={festivals}
+          featured={featured}
+          venues={[]}
+          now={now}
+          today={today}
+        />
       )}
     </StoryDataLoader>
   );

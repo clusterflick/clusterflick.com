@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import FilmClubsPageContent from "@/app/film-clubs/page-content";
-import type { FilmClubListItem } from "@/app/film-clubs/page";
+import {
+  getFilmClubsIndex,
+  type FilmClubListItem,
+} from "@/utils/get-film-clubs-index";
 import { FILM_CLUBS } from "@/data/film-clubs";
-import { getFilmClubMovies } from "@/utils/get-film-club-movies";
-import { getFilmClubUrl } from "@/utils/get-film-club-url";
+import type { PosterRowItem } from "@/components/poster-row";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import {
@@ -47,6 +49,7 @@ const FILM_CLUB_IMAGE_PATHS: Record<string, string> = {
 };
 
 type FilmClubsListData = {
+  nextUp: PosterRowItem[];
   activeClubs: FilmClubListItem[];
   inactiveClubs: FilmClubListItem[];
   activeCount: number;
@@ -56,33 +59,16 @@ type FilmClubsListData = {
 async function loadFilmClubsListData(): Promise<FilmClubsListData> {
   const metaData = await fetchMetaData();
   const allMovies = await fetchAllMovies(metaData);
-
-  const filmClubItems: FilmClubListItem[] = FILM_CLUBS.map((club) => {
-    const currentMovies = getFilmClubMovies(club, allMovies);
-    return {
-      id: club.id,
-      name: club.name,
-      href: getFilmClubUrl(club),
-      imagePath: FILM_CLUB_IMAGE_PATHS[club.id] ?? null,
-      movieCount: Object.keys(currentMovies).length,
-      seoDescription: null,
-    };
+  const { nextUp, activeClubs, inactiveClubs } = getFilmClubsIndex(allMovies, {
+    getImagePath: (id) => FILM_CLUB_IMAGE_PATHS[id] ?? null,
   });
 
-  const activeClubs = filmClubItems
-    .filter((c) => c.movieCount > 0)
-    .sort(
-      (a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name),
-    );
-  const inactiveClubs = filmClubItems
-    .filter((c) => c.movieCount === 0)
-    .sort((a, b) => a.name.localeCompare(b.name));
-
   return {
+    nextUp,
     activeClubs,
     inactiveClubs,
     activeCount: activeClubs.length,
-    totalCount: filmClubItems.length,
+    totalCount: FILM_CLUBS.length,
   };
 }
 
@@ -94,6 +80,7 @@ function FilmClubsListWithRealData() {
     >
       {(data) => (
         <FilmClubsPageContent
+          nextUp={data.nextUp}
           activeClubs={data.activeClubs}
           inactiveClubs={data.inactiveClubs}
           activeCount={data.activeCount}
@@ -135,9 +122,9 @@ export const Loading: Story = {
 };
 
 /**
- * Film clubs list page fully loaded, split into "Currently showing"
- * and "All clubs" sections based on whether each club has active
- * screenings in the current dataset.
+ * Film clubs list page fully loaded: a "Next up" row of each club's next
+ * screening, the clubs showing films grouped by kind, and the rest as a
+ * compact list of names.
  */
 export const Loaded: Story = {
   parameters: {
@@ -148,9 +135,8 @@ export const Loaded: Story = {
 };
 
 /**
- * Film clubs list page with no active screenings — all clubs appear
- * in the grid with "No films currently showing" (e.g. outside the
- * normal screening season or with an empty dataset).
+ * Film clubs list page with no active screenings — no "Next up" row, and
+ * every club listed by name under "All clubs".
  */
 export const Empty: Story = {
   parameters: {

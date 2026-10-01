@@ -6,6 +6,117 @@
   margin-bottom: 32px;
 }
 
+/* Sections */
+
+.section {
+  margin-bottom: 48px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+/* Sized as PosterRow's titles, so the sections and the featured festival's
+   row read as one hierarchy. */
+.sectionHeading {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+/* Featured festival */
+
+.featured {
+  margin-bottom: 48px;
+  padding: 20px 16px 0;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      ellipse at top left,
+      rgba(var(--color-neon-pink-rgb), 0.16),
+      transparent 60%
+    ),
+    rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.3);
+}
+
+.featuredHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.featuredLogo {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(var(--color-white-rgb), 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.featuredLogoImage {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.featuredText {
+  min-width: 0;
+}
+
+.featuredStatus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.featuredDates {
+  font-size: 14px;
+  color: rgba(var(--color-white-rgb), 0.7);
+}
+
+/* globals.css styles h2 as the large pink display heading; this one is a
+   name inside a panel, so it's sized down and coloured by its link. */
+.featuredName {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 8px 0;
+}
+
+.featuredDescription {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(var(--color-white-rgb), 0.8);
+  margin: 0 0 16px;
+  max-width: 60ch;
+}
+
+.featuredLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .featured {
+    padding: 24px 24px 0;
+  }
+
+  .featuredHeader {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+  }
+}
+
 /* Festival grid */
 
 .festivalGrid {
@@ -23,7 +134,7 @@
   }
 }
 
-/* Meta row items passed to EventCard */
+/* Meta row items passed to ProgrammeCard */
 
 .metaItem {
   display: flex;

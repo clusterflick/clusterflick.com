@@ -1,9 +1,33 @@
 import { FilterId } from "@/lib/filters/types";
 import type { FilterState } from "@/lib/filters/types";
 
+/**
+ * What a club is mostly about, which groups the clubs on `/film-clubs`. One
+ * each: a club that fits two is filed where a reader browsing for it would
+ * look first — Queer Horror Nights under queer, Sick Girl Films under horror.
+ */
+export type FilmClubKind =
+  | "cult"
+  | "world"
+  | "queer"
+  | "rare"
+  | "community"
+  | "experience";
+
+/** Headings for each kind, in the order the index page lists them. */
+export const FILM_CLUB_KINDS: { id: FilmClubKind; label: string }[] = [
+  { id: "cult", label: "Cult, horror & trash" },
+  { id: "world", label: "World cinema" },
+  { id: "queer", label: "Queer & feminist" },
+  { id: "rare", label: "Rare & rediscovered" },
+  { id: "community", label: "Community & local" },
+  { id: "experience", label: "Something different" },
+];
+
 export type FilmClub = {
   id: string;
   name: string;
+  kind: FilmClubKind;
   url: string;
   aliases: string[];
   matchers: Partial<FilterState>[];
@@ -13,6 +37,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "acton-film-club",
     name: "Acton Film Club",
+    kind: "community",
     url: "https://actonfilmclub.com",
     aliases: [],
     matchers: [
@@ -23,6 +48,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "arab-film-club",
     name: "The Arab Film Club",
+    kind: "world",
     url: "https://www.instagram.com/thearabfilmclub/",
     aliases: ["arabic-cinema-club"],
     matchers: [
@@ -35,6 +61,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "bloody-mary-film-club",
     name: "Bloody Mary Film Club",
+    kind: "cult",
     url: "https://www.facebook.com/thebmfc",
     aliases: ["bloody-mary"],
     matchers: [
@@ -46,6 +73,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "bar-trash",
     name: "Bar Trash",
+    kind: "cult",
     url: "https://tokenhomo.com/bar-trash/",
     aliases: [],
     matchers: [
@@ -56,6 +84,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "cinebug",
     name: "Cinebug",
+    kind: "rare",
     url: "https://www.instagram.com/cinebugldn/",
     aliases: [],
     matchers: [
@@ -66,6 +95,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "bounce-cinema",
     name: "Bounce Cinema",
+    kind: "community",
     url: "https://www.bouncecinema.com",
     aliases: [],
     matchers: [
@@ -77,6 +107,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "distorted-frame",
     name: "Distorted Frame",
+    kind: "rare",
     url: "https://www.instagram.com/distortedframefilmclub/",
     aliases: [],
     matchers: [
@@ -87,6 +118,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "double-wonderful-events",
     name: "Double Wonderful Events",
+    kind: "rare",
     url: "https://www.instagram.com/doublewonderfulevents/",
     aliases: ["double-wonderful"],
     matchers: [
@@ -102,6 +134,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "ghibliotheque",
     name: "Ghibliotheque",
+    kind: "world",
     url: "https://linktr.ee/ghibliotheque",
     aliases: [],
     matchers: [
@@ -112,6 +145,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "gothique-film-society",
     name: "Gothique Film Society",
+    kind: "cult",
     url: "http://www.thegothiquefilmsociety.org.uk/",
     aliases: ["gothique"],
     matchers: [
@@ -122,6 +156,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "japanese-film-club",
     name: "Japanese Film Club",
+    kind: "world",
     url: "https://japanesefilm.club",
     aliases: [],
     matchers: [
@@ -132,6 +167,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "kung-fu-cinema",
     name: "Kung Fu Cinema / Drunken Scorpion",
+    kind: "cult",
     url: "https://www.instagram.com/kungfucinema/",
     aliases: ["Kung Fu Cinema", "Drunken Scorpion"],
     matchers: [
@@ -143,6 +179,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "lost-reels",
     name: "Lost Reels",
+    kind: "rare",
     url: "https://lostreels.co.uk/",
     aliases: [],
     matchers: [
@@ -153,6 +190,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "new-east-cinema",
     name: "New East Cinema",
+    kind: "world",
     url: "https://neweastcinema.co.uk",
     aliases: [],
     matchers: [
@@ -163,6 +201,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "queer-horror-nights",
     name: "Queer Horror Nights",
+    kind: "queer",
     url: "https://tokenhomo.com/queer-horror-nights/",
     aliases: [],
     matchers: [
@@ -173,6 +212,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "pitchblack-playback",
     name: "Pitchblack Playback",
+    kind: "experience",
     url: "https://pitchblackplayback.com",
     aliases: [],
     matchers: [
@@ -186,6 +226,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "rebel-reel",
     name: "Rebel Reel",
+    kind: "rare",
     url: "https://www.rebelreelcineclub.com/",
     aliases: [],
     matchers: [
@@ -196,6 +237,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "reel-talk",
     name: "Reel Talk",
+    kind: "community",
     url: "https://eastcroydoncool.co.uk/reel-talk/",
     aliases: [],
     matchers: [
@@ -206,6 +248,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "rio-feminist-film-group",
     name: "Rio Feminist Film Group",
+    kind: "queer",
     url: "https://www.instagram.com/riofeminists/",
     aliases: [],
     matchers: [
@@ -219,6 +262,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "richmond-film-society",
     name: "Richmond Film Society",
+    kind: "world",
     url: "https://www.richmondfilmsoc.org.uk/",
     aliases: ["richmond"],
     matchers: [
@@ -229,6 +273,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "violet-hour",
     name: "Violet Hour",
+    kind: "cult",
     url: "https://www.instagram.com/violethour.cinema/",
     aliases: [],
     matchers: [
@@ -239,6 +284,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "wimbledon-film-club",
     name: "Wimbledon Film Club",
+    kind: "world",
     url: "https://wimbledonfilmclub.co.uk",
     aliases: [],
     matchers: [
@@ -250,6 +296,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "category-h-film-club",
     name: "Category H Film Club",
+    kind: "cult",
     url: "https://www.instagram.com/categoryhfilms/",
     aliases: [],
     matchers: [
@@ -261,6 +308,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "sapphic-cinema",
     name: "Sapphic Cinema",
+    kind: "queer",
     url: "https://16collective.org",
     aliases: [],
     matchers: [
@@ -271,6 +319,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "cine-real",
     name: "Cine Real",
+    kind: "rare",
     url: "https://www.cine-real.com",
     aliases: ["Cine-Real"],
     matchers: [
@@ -283,6 +332,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "pink-palace",
     name: "Pink Palace",
+    kind: "queer",
     url: "https://www.riocinema.org.uk/pink-palace/",
     aliases: [],
     matchers: [
@@ -296,6 +346,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "funeral-parade",
     name: "Funeral Parade",
+    kind: "queer",
     url: "https://www.instagram.com/funeralparadepresents/",
     aliases: ["Funeral Parade Presents"],
     matchers: [
@@ -306,6 +357,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "lexi-seniors-film-club",
     name: "Lexi Seniors' Film Club",
+    kind: "community",
     url: "https://thelexicinema.co.uk",
     aliases: [],
     matchers: [
@@ -318,6 +370,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "supakino",
     name: "Supakino",
+    kind: "world",
     url: "https://www.supakino.com",
     aliases: [],
     matchers: [
@@ -328,6 +381,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "sick-girl-films",
     name: "Sick Girl Films",
+    kind: "cult",
     url: "https://www.instagram.com/sickgirlfilms",
     aliases: [],
     matchers: [
@@ -338,6 +392,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "sincerely-camp",
     name: "Sincerely Camp",
+    kind: "cult",
     url: "https://www.instagram.com/sincerelycamp",
     aliases: [],
     matchers: [
@@ -348,6 +403,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "offbeat-folk-film-club",
     name: "OffBeat Folk Film Club",
+    kind: "rare",
     url: "https://offbeat.film/",
     aliases: ["OffBeat"],
     matchers: [
@@ -359,6 +415,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "transmissions",
     name: "Transmissions",
+    kind: "queer",
     url: "https://www.instagram.com/wearetransmissions",
     aliases: [],
     matchers: [
@@ -369,6 +426,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "video-bazaar",
     name: "Video Bazaar",
+    kind: "cult",
     url: "https://www.instagram.com/videobazaarpresents",
     aliases: [],
     matchers: [
@@ -379,6 +437,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "jellied-reels",
     name: "Jellied Reels",
+    kind: "rare",
     url: "https://www.jellied-reels.com",
     aliases: [],
     matchers: [
@@ -390,6 +449,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "frame-by-frame",
     name: "Frame By Frame",
+    kind: "community",
     url: "https://www.instagram.com/frame_by_frame_cinema/",
     aliases: [],
     matchers: [
@@ -400,6 +460,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "trash-film-club",
     name: "Trash Film Club",
+    kind: "cult",
     url: "https://www.instagram.com/trash.film.club/",
     aliases: [],
     matchers: [
@@ -410,6 +471,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "waltham-forest-cinema-project",
     name: "Waltham Forest Cinema Project",
+    kind: "community",
     url: "https://walthamforestcinemaproject.com",
     aliases: ["WFCP"],
     matchers: [
@@ -420,6 +482,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "midweek-cinema",
     name: "Midweek Cinema",
+    kind: "community",
     url: "https://www.instagram.com/midweekcinema/",
     aliases: [],
     matchers: [
@@ -431,6 +494,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "club-des-femmes",
     name: "Club des Femmes",
+    kind: "queer",
     url: "https://clubdesfemmes.com",
     aliases: [],
     matchers: [
@@ -442,6 +506,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "taste-film",
     name: "Taste Film",
+    kind: "experience",
     url: "https://www.tastefilm.co.uk",
     aliases: [],
     matchers: [
@@ -452,6 +517,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "lucilas-film-club",
     name: "Lucila's Film Club",
+    kind: "queer",
     url: "https://www.instagram.com/lucilasfilmclub/",
     aliases: ["lucila-safdie-film-club"],
     matchers: [
@@ -469,6 +535,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "deeper-into-movies",
     name: "Deeper Into Movies",
+    kind: "rare",
     url: "https://deepermovies.com",
     aliases: [],
     matchers: [
@@ -482,6 +549,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "never-watching-movies",
     name: "Never Watching Movies",
+    kind: "world",
     url: "https://www.instagram.com/neverwatchingmovies/",
     aliases: ["neverwatchingmovies"],
     matchers: [
@@ -495,6 +563,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "witch-of-popcorn",
     name: "The Witch Of Popcorn",
+    kind: "experience",
     url: "https://linktr.ee/witchofpopcorn",
     aliases: ["witchofpopcorn"],
     matchers: [
@@ -508,6 +577,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "korean-film-club",
     name: "Korean Film Club",
+    kind: "world",
     url: "https://koreanfilm.club",
     aliases: [],
     matchers: [
@@ -518,6 +588,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "ai-movie-club",
     name: "AI Movie Club",
+    kind: "experience",
     url: "https://aimc.ii.inc",
     aliases: [],
     matchers: [
@@ -528,6 +599,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "anti-brainrot-club",
     name: "ANTI-BRAINROT CLUB",
+    kind: "community",
     url: "https://www.instagram.com/abrc.london/",
     aliases: ["abrc"],
     matchers: [
@@ -543,6 +615,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "deptford-cinema",
     name: "Deptford Cinema",
+    kind: "community",
     url: "https://deptfordcinema.org",
     aliases: [],
     matchers: [
@@ -555,6 +628,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "london-australian-film-society",
     name: "London Australian Film Society",
+    kind: "world",
     url: "https://www.londonaustfilm.com",
     aliases: ["lafs"],
     matchers: [
@@ -570,6 +644,7 @@ export const FILM_CLUBS: FilmClub[] = [
   {
     id: "window-seat-cinema-club",
     name: "Window Seat Cinema Club",
+    kind: "world",
     url: "https://www.windowseatcinema.com",
     aliases: ["window-seat-cinema", "window-seat"],
     matchers: [

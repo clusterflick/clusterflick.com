@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
-import { getFilmClubMovies } from "@/utils/get-film-club-movies";
+import {
+  getFilmClubsIndex,
+  type FilmClubListItem,
+} from "@/utils/get-film-clubs-index";
 import { FILM_CLUBS } from "@/data/film-clubs";
 import FilmClubsPageContent from "./page-content";
+
+export type { FilmClubListItem };
 
 export const metadata: Metadata = {
   title: "Film Clubs",
@@ -29,50 +33,29 @@ export const metadata: Metadata = {
   },
 };
 
-export type FilmClubListItem = {
-  id: string;
-  name: string;
-  href: string;
-  imagePath: string | null;
-  movieCount: number;
-  seoDescription: string | null;
-};
-
 export default async function FilmClubsPage() {
   const data = await getStaticData();
+  const now = Date.now();
 
-  const filmClubItems: FilmClubListItem[] = await Promise.all(
-    FILM_CLUBS.map(async (club) => {
-      const currentMovies = getFilmClubMovies(club, data.movies);
-
-      let seoDescription: string | null = null;
-      try {
-        const mod = await import(`@/components/film-clubs/${club.id}`);
-        seoDescription = mod.seoDescription ?? null;
-      } catch {
-        // No blurb component for this club
-      }
-
-      return {
-        id: club.id,
-        name: club.name,
-        href: getFilmClubUrl(club),
-        imagePath: getFilmClubImagePath(club.id),
-        movieCount: Object.keys(currentMovies).length,
-        seoDescription,
-      };
-    }),
+  const descriptions: Record<string, string | null> = Object.fromEntries(
+    await Promise.all(
+      FILM_CLUBS.map(async (club) => {
+        try {
+          const mod = await import(`@/components/film-clubs/${club.id}`);
+          return [club.id, mod.seoDescription ?? null];
+        } catch {
+          // No blurb component for this club
+          return [club.id, null];
+        }
+      }),
+    ),
   );
 
-  const activeClubs = filmClubItems
-    .filter((c) => c.movieCount > 0)
-    .sort(
-      (a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name),
-    );
-  const inactiveClubs = filmClubItems
-    .filter((c) => c.movieCount === 0)
-    .sort((a, b) => a.name.localeCompare(b.name));
-  const activeCount = activeClubs.length;
+  const { nextUp, activeClubs, inactiveClubs } = getFilmClubsIndex(
+    data.movies,
+    { now, getImagePath: getFilmClubImagePath, descriptions },
+  );
+  const filmClubItems = [...activeClubs, ...inactiveClubs];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -98,9 +81,10 @@ export default async function FilmClubsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <FilmClubsPageContent
+        nextUp={nextUp}
         activeClubs={activeClubs}
         inactiveClubs={inactiveClubs}
-        activeCount={activeCount}
+        activeCount={activeClubs.length}
         totalCount={filmClubItems.length}
       />
     </>

@@ -71,6 +71,10 @@ covers the need. The canonical components are:
 - **Posters:** `FilmPosterGrid` (browsing grid, title on hover),
   `PosterTile` + `PosterTileList` (compact tile with title and detail below,
   plus an optional control)
+- **Programmes:** `ProgrammeCard` (a festival, club or list with films
+  showing: logo, a fan of posters, the next screening), `EventCard` (the same
+  with nothing showing), `FestivalTimeline` (festivals as bars across the
+  coming weeks)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
 - **Feedback:** `EmptyState`
@@ -142,6 +146,43 @@ manager, then finished performances pruned.
 
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
 named `seoDescription` string), and an optional logo at `public/images/film-clubs/<id>.*`.
+
+Each club also has a `kind` (`FilmClubKind`), which files it under a heading on `/film-clubs`. Pick
+the one a reader browsing for the club would look under first; a club that fits two goes where its
+programme mostly sits (Queer Horror Nights is queer, Sick Girl Films is horror). The kind applies
+whether or not the club has anything on: a dormant club is listed by name only, and moves into its
+group as soon as a screening matches.
+
+## Festival & Film Club Indexes
+
+`/festivals` and `/film-clubs` lead with what's on, not who runs it. Both are
+assembled in a util (`getFestivalsIndex`, `getFilmClubsIndex`) that the page
+and its story share, with image paths and blurbs passed in since only the page
+can read them from disk. Cards are `ProgrammeCard`s, whose posters, film count
+and next screening come from `getProgrammeSummary`
+(`@/utils/get-programme-summary`): films soonest first, those with poster art
+ahead, the next screening skipping sold-out ones. `/lists` uses the same card
+for lists with films showing, its posters in the list's own order.
+
+**Film clubs** open with a "Next up" row: each club's next bookable screening,
+soonest first (`getNextUpRow`). One per club, since a weekly club would
+otherwise fill the row and the point is the range of what's on. The clubs
+showing films follow, grouped by `kind` (`FILM_CLUB_KINDS` sets the headings
+and their order; every club must have one, so a new club won't compile
+without it) and sorted by next screening. Clubs with nothing on are a
+`LinkGrid` of names, not cards that each say "No films currently showing".
+
+**Festivals** open with a featured festival — the biggest with a screening in
+the next seven days, else the next to start — with its films as a
+`PosterRow` and the catalogue and planner links its own page has. Then a
+`FestivalTimeline`, then "This week" and "Coming up" cards.
+
+**"This week", not "on now".** The listings hold only what venues still
+publish, so a festival's opening night drops out once it has passed and its
+earliest listed screening is not its start. A festival's range is taken from
+its unpruned matches (`matchAny`), which may still hold a screening from
+earlier today, and the featured tag says "On now" only when it does; otherwise
+"This week" or "Starts <date>".
 
 ## Film Lists
 

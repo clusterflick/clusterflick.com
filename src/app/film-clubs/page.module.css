@@ -16,13 +16,18 @@
   margin-bottom: 0;
 }
 
+/* Sized as PosterRow's titles, since the "Next up" row above is one of the
+   page's sections too and a smaller heading under it would read as a subhead. */
 .sectionHeading {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.sectionIntro {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: -12px 0 16px;
 }
 
 /* Club grid */
@@ -42,7 +47,7 @@
   }
 }
 
-/* Meta row items passed to EventCard */
+/* Meta row items passed to ProgrammeCard */
 
 .filmCount {
   font-size: 13px;
@@ -51,9 +56,4 @@
   background: rgba(49, 158, 219, 0.12);
   padding: 2px 10px;
   border-radius: 20px;
-}
-
-.noFilms {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.35);
 }
