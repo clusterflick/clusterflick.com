@@ -181,7 +181,9 @@
      nothing can scroll through a gap between it and the site header (which
      sits above the overlay). 120px clears that header with a one-line
      description; --counts-offset, set inline, adds room as the description
-     wraps. */
+     wraps. The space under the description isn't slack: the open trigger
+     draws a dark box-shadow ~60px below its text to stay legible, and the
+     header sits above the overlay, so anything closer is dimmed by it. */
   position: sticky;
   top: 0;
   z-index: 2;
@@ -1057,6 +1059,13 @@
     position: relative;
   }
 
+  /* No bottom padding: sticky offsets are measured from the scroll
+     container's content edge, so the overlay's 60px left the Show results
+     button floating 60px above the bottom of the screen. */
+  .overlay {
+    padding-bottom: 0;
+  }
+
   /* Sticky to the bottom of the overlay's scroll, so it is always under the
      thumb; the fade lets the last filters read as continuing beneath it. */
   .showResults {
@@ -1066,7 +1075,7 @@
     display: block;
     width: 100%;
     margin-top: 32px;
-    padding: 24px 20px 16px;
+    padding: 24px 20px calc(16px + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(
       to top,
       var(--color-midnight-navy) 70%,

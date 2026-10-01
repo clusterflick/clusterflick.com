@@ -3,13 +3,13 @@ import { FilterChip, FilterId, FilterState } from "@/lib/filters";
 /** The Refine rows, in display order. */
 export const REFINE_ROWS = [
   { id: "accessibility", title: "Accessibility" },
+  { id: "showings", title: "Showings" },
   { id: "format", title: "Format" },
   { id: "genre", title: "Genre" },
   { id: "ratings", title: "Ratings" },
   { id: "people", title: "Directors & cast" },
   { id: "films", title: "Films" },
   { id: "programmes", title: "Clubs & festivals" },
-  { id: "showings", title: "Showings" },
 ] as const;
 
 export type RefineRowId = (typeof REFINE_ROWS)[number]["id"];
