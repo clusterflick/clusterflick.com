@@ -71,6 +71,95 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-04",
+    changes: [
+      {
+        tag: "New source",
+        body: () => (
+          <>
+            Started pulling in screenings from the events listings of{" "}
+            <Ext href="https://haringey.gov.uk/events">Haringey</Ext>,{" "}
+            <Ext href="https://www.kingston.gov.uk/events">Kingston</Ext> and{" "}
+            <Ext href="https://www.southwark.gov.uk/southwark-presents">
+              Southwark
+            </Ext>{" "}
+            councils, and from{" "}
+            <Ext href="https://www.lovecamden.org/whats-on">Love Camden</Ext>,
+            Camden&rsquo;s culture guide, which between them carry the
+            boroughs&rsquo; library screenings and community film nights.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Camden Town Hall",
+                  url: "https://spaces.townhall.co.uk",
+                },
+                {
+                  name: "Christ Church Surbiton Hill",
+                  url: "https://www.ccsurbiton.org",
+                },
+                {
+                  name: "Hornsey Library",
+                  url: "https://haringey.gov.uk/libraries/libraries-haringey/hornsey-library",
+                },
+                {
+                  name: "Kingston Methodist Church",
+                  url: "https://www.kingstonmethodist.church",
+                },
+                {
+                  name: "Kingston University Town House",
+                  url: "https://www.kingston.ac.uk/aboutkingstonuniversity/location/penrhyn-road/town-house/",
+                },
+                {
+                  name: "Kurdish Community Centre",
+                  url: "https://www.facebook.com/KurdishCommunityCentre/",
+                },
+                {
+                  name: "Marcus Garvey Library",
+                  url: "https://haringey.gov.uk/libraries/libraries-haringey/marcus-garvey-library",
+                },
+                {
+                  name: "Muswell Hill Library",
+                  url: "https://haringey.gov.uk/libraries/libraries-haringey/muswell-hill-library",
+                },
+                {
+                  name: "New Malden Library",
+                  url: "https://libraries.kingston.gov.uk/digital-content/libraries/library-branches/new-malden",
+                },
+                {
+                  name: "Nunhead Library",
+                  url: "https://www.southwark.gov.uk/culture-and-sport/libraries/find-library/nunhead-library",
+                },
+                {
+                  name: "Tudor Drive Library",
+                  url: "https://libraries.kingston.gov.uk/digital-content/libraries/library-branches/tudor-drive",
+                },
+                {
+                  name: "Una Marson Library",
+                  url: "https://www.southwark.gov.uk/culture-and-sport/libraries/find-library/una-marson-library",
+                },
+                {
+                  name: "Wood Green Library",
+                  url: "https://haringey.gov.uk/libraries/libraries-haringey/wood-green-library",
+                },
+              ]}
+            />
+            : public libraries, churches, a community centre, a university
+            building and a restored town hall, all found through the new council
+            listings.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-01",
     changes: [
       {
