@@ -25,6 +25,11 @@ import {
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { FilterId, FilterState } from "./types";
+import {
+  describeVenueOrigin,
+  isVenueOriginCurrent,
+  type VenueOrigin,
+} from "@/lib/places";
 import { filtersAtDefault, getRestrictiveFilterIds } from "./manager";
 
 /**
@@ -43,7 +48,12 @@ export type DescribeOptions = {
    */
   movies?: Record<string, { title: string }> | null;
   cinemaVenueIds: string[];
-  nearbyVenueIds?: string[]; // Optional: for "Venues Near Me" detection
+  nearbyVenueIds?: string[]; // Optional: for "Near you" detection
+  /**
+   * The place the venue selection was picked from, which names it ("Within 2
+   * miles of Bank") while the selection is still exactly what it picked.
+   */
+  venueOrigin?: VenueOrigin | null;
 };
 
 /**
@@ -194,8 +204,15 @@ function describeVenues(
   venueLookup: Record<string, Venue> | null,
   cinemaVenueIds: string[],
   nearbyVenueIds?: string[],
+  venueOrigin?: VenueOrigin | null,
 ): string {
   const venues = state.venues;
+
+  // Before the presets: a place the reader picked from is what they asked
+  // for, even when its venues happen to equal some preset.
+  if (isVenueOriginCurrent(venueOrigin, venues)) {
+    return describeVenueOrigin(venueOrigin);
+  }
 
   // null/undefined means all venues
   if (!venues) {
@@ -222,7 +239,7 @@ function describeVenues(
   ) {
     const isNearby = venues.every((id) => nearbyVenueIds.includes(id));
     if (isNearby) {
-      return "At Venues Near Me";
+      return "Near you";
     }
   }
 
@@ -563,6 +580,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     movies,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   } = options;
 
   // Build events description
@@ -682,6 +700,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     venues,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   );
 
   // Build dates description
@@ -745,6 +764,7 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
     movies,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   } = options;
 
   const restrictive = new Set(getRestrictiveFilterIds(state));
@@ -782,10 +802,13 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
     "venues",
     [FilterId.Venues],
     capitalise(
-      describeVenues(state, venues, cinemaVenueIds, nearbyVenueIds).replace(
-        /^At /,
-        "",
-      ),
+      describeVenues(
+        state,
+        venues,
+        cinemaVenueIds,
+        nearbyVenueIds,
+        venueOrigin,
+      ).replace(/^At /, ""),
     ),
   );
   const categoryDesc = describeCategories(state, categories);

@@ -49,7 +49,7 @@
   padding: 0 48px;
 }
 
-.coreColumn {
+.column {
   display: flex;
   flex-direction: column;
   gap: 56px;
@@ -1141,4 +1141,42 @@
   margin: 0;
   font-size: 12px;
   color: var(--color-muted-gray);
+}
+
+/* The settings Near Me and Near a Station… share, under the venue pills: the
+   radius chips and the station-or-venue search. */
+.placePicker {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+}
+
+.placePicker > .standaloneQuickAdd {
+  margin: 8px 0 0;
+}
+
+.placeLocationButton {
+  align-self: flex-start;
+  margin-top: 12px;
+}
+
+/* "Somewhere else?" over the station-or-venue search. */
+.placeSearchLabel {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+/* What the near pick is: "Near King's Cross St. Pancras · 12 venues". */
+.nearSummary {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.nearSummary strong {
+  color: var(--color-white);
 }

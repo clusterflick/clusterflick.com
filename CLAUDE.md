@@ -17,6 +17,7 @@ Pages at clusterflick.com.
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
+- `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
@@ -333,7 +334,7 @@ Everything location-dependent on `/near-me` comes from one hook, `useNearMe`
 is known; the page ships only build-time venue, club and festival counts.
 
 **One nearby set feeds everything.** It is `getNearbyVenueIds`, the rule behind
-the filter overlay's "Venues near me", plus the reader's locals. The page's rows,
+the Near Me pill's Auto radius around the reader, plus the reader's locals. The page's rows,
 map, cinema list and "What's on near me today" link all read that one set, so a
 click never shows a different set of venues from the page it came from. The
 locals are added in because the overlay's rule stops at ten venues, which in
@@ -359,21 +360,85 @@ two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
 Locals are drawn larger and outside the cluster group, so they never fold into a
 bubble.
 
+## Nearby Venues
+
+Two Venues pills pick the venues around a place, which need not be where the
+reader is: a visitor plans from where they'll be. **Near Me** is one tap: it
+locates the reader and selects the venues around them on Auto, as the old
+Venues Near Me did. **Near a Station…** opens the same settings with the
+station-or-venue search focused, and never asks for the reader's location.
+
+**The ellipsis is what makes the second pill honest.** A pill that only reveals
+controls reads like an option that should select something; "…" is the usual
+mark for "needs more input first". An earlier single "Nearby" pill that only
+opened the settings was unclear for exactly that reason, and folding the
+station search behind Near Me instead meant a location prompt for readers who
+never wanted one.
+
+**The settings are shared and open under the pills while either is chosen**:
+"Near you · 10 venues", the radius chips, and "Somewhere else?" over the
+station-or-venue search; Use my location comes back once somewhere else is
+picked. **The checked pill follows the origin**, not the last tap: picking King's
+Cross (or a venue) checks Near a Station…, Use my location moves it to Near Me.
+Without a position, Near Me still checks its pill and opens the settings, says
+why, and focuses the station search. The picker owns locating
+(`VenuePlacePicker`'s `locate` handle), so the pill and Use my location can't
+handle "nothing near you" differently.
+
+**Places** (`@/lib/places`) are `here`, a `station:<slug>` or a `venue:<id>`.
+Stations are the Underground, Overground, Elizabeth line and DLR, generated
+from TfL's open data by `npm run fetch-london-stations` into
+`src/data/london-stations.json` and committed, since a build shouldn't depend on
+TfL's API. TfL's terms want their credit on the About page. The list is
+imported dynamically, when the picker first shows. Boroughs are not places: a
+borough is an area whose venues are decided by boundary, not a point, and its
+page links to its venues already.
+
+**The radius defaults to Auto**, Venues Near Me's rule (`getNearbyVenueIds`:
+half a mile, widened until there are ten venues, up to two), which suits a
+dense centre and a sparse suburb alike. ½, 1, 2 and 3 miles are the reader's
+and never grow. A pick that finds nothing leaves the selection alone and says
+so, keeping the place for a wider radius.
+
+**What it produces is an ordinary venue selection**, so a URL carries venue ids
+and nothing else. A separate filter holding the place was built first and
+taken out: it put a second "near" control beside Venues, ANDed with it, for
+the same operation Venues Near Me already did. **The place is remembered beside
+the selection instead** (`VenueOrigin`: place, label, point, radius and the
+venues it picked), per tab in session storage and never in a URL
+(`venueOrigin` and `selectVenuesNear` on the filter context). While the
+selection is still exactly those venues (`isVenueOriginCurrent`), the pill is
+checked, the picker shows the place and radius, changing either picks again
+without starting over, and descriptions read "Near King's Cross St. Pancras"
+or "Within 2 miles of …" (`describeVenueOrigin`, passed to `describeFilters`
+as `venueOrigin`). Once the reader changes the selection any other way it is
+an ordinary selection again. A shared link reads as its venues ("At Camden
+Town Hall or 110 more"), which is accepted. The "Near me today" preset
+remembers its origin too (`here`, Auto), so it reads "Near you".
+
+The point is stored with the origin, so a new radius needs no lookup and
+`here` stays where the reader was when they picked it.
+
 ## Filter Overlay
 
 `FilterOverlay` (`src/components/filter-overlay/`) is being reorganised in stages
 around progressive disclosure: the most used filters in front, every filter
 findable, and a filter that is set never hidden.
 
-**Core filters and Refine.** Dates, Venues and Events are always in view, in
-a left column; everything else is a Refine row on the right, one line each
+**Core filters and Refine.** Dates, Venues and Events are always in view:
+Dates and Venues in the left column, Events at the top of the right one;
+everything else is a Refine row below Events, one line each
 naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
 Accessibility, Showings (hide past / sold out, moved out of the Dates
 header), Format, Genre, Ratings, Directors & cast, Films, and Clubs &
 festivals. Rows with an index page (formats, genres, clubs, festivals) link to
 it at the top of the row.
-Side by side so the Refine list is on screen from the start and opening a row
-can't push the core down; one column below 1200px. Every name is readable
+Side by side so the Refine list starts on screen and opening a row can't push
+the core down; one column below 1200px, in the same order. Events moved across
+to balance the columns: with all three core filters on the left it ran ~500px
+past Refine, and now the two end within ~130px. It sits above Refine rather
+than below, since rows open downwards and some are taller than the screen —
+below them, opening one would push a core filter out of view. Every name is readable
 without opening anything, which is what makes a filter findable, and opening
 one reveals one filter rather than the dozen "More Event Options" held.
 Accessibility comes first: it is a requirement for those who use it.
@@ -1016,6 +1081,15 @@ cannot drift between the two. What differs:
   change; "Show all" is the way to look past the filters without changing them.
 
 It probes one film, so it runs on the live state rather than a deferred copy.
+
+**"Playing at" counts the showings listed below it**, not the build-time
+totals, so a venue the filters hide isn't named above a list with none of its
+showings. The static HTML keeps the build-time counts until the listings load.
+When narrowed it says "4 of 102 venues match your filters" with the showings'
+own Show all beside it, so a venue missing from the list doesn't read as the
+film not playing there. When the filters hide every showing it keeps the full
+list: the empty state below explains, and an empty "Playing at" would hide
+where the film is on.
 
 ## Personalisation
 

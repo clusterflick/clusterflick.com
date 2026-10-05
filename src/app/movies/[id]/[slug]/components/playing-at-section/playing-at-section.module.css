@@ -15,3 +15,10 @@
   gap: 6px;
   margin-top: 12px;
 }
+
+/* "3 of 12 venues match your filters · Show all", under a narrowed list. */
+.narrowed {
+  margin: 8px 0 0;
+  color: var(--color-muted-gray);
+  font-size: 13px;
+}

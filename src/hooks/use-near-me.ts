@@ -18,7 +18,7 @@ export interface NearMeState {
   requestLocation: () => Promise<Position | null>;
   /**
    * The venues near the reader, closest first: the set the filter overlay's
-   * "Venues near me" option selects (see `getNearbyVenueIds`), plus the
+   * Nearby pill selects on its Auto radius (see `getNearbyVenueIds`), plus the
    * reader's locals. The page, its rows and the catalogue link it opens all
    * read this one set, so they always agree.
    */

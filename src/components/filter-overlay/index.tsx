@@ -112,6 +112,9 @@ export default function FilterOverlay({
     toggleVenue,
     selectVenues,
     clearVenues,
+    venueOrigin,
+    selectVenuesNear,
+    rememberVenueOrigin,
     toggleHideFinished,
     toggleHideSoldOut,
     setHideSeen,
@@ -196,49 +199,9 @@ export default function FilterOverlay({
     return baseMargin + extraHeight;
   }, [filterTextHeight]);
 
-  // Shown when "Venues Near Me" resolves a location but finds nothing within
+  // Shown when "Near me today" resolves a location but finds nothing within
   // range. Distinct from geoError, which covers not getting a location at all.
   const [nearbyNotice, setNearbyNotice] = useState<string | null>(null);
-
-  // Handle nearby venue selection
-  const handleNearbyClick = useCallback(async () => {
-    setNearbyNotice(null);
-
-    // If we already have position, use cached nearby venues
-    if (userPosition && nearbyVenueIds.length > 0) {
-      setVenueOption("nearby", nearbyVenueIds);
-      return;
-    }
-
-    // Request location and calculate nearby venues
-    const position = await requestLocation();
-    if (!position || !metaData?.venues) return;
-
-    const nearby = getNearbyVenueIds(
-      position,
-      Object.values(metaData.venues),
-      getVenueIdsWithShowings(movies),
-    );
-
-    // Nothing in range. Applying this would select zero venues and empty the
-    // results, which reads as a broken filter rather than an answer — so leave
-    // the existing selection alone and say what happened instead.
-    if (nearby.length === 0) {
-      setNearbyNotice(
-        "No venues with showings found near you — your venue selection is unchanged.",
-      );
-      return;
-    }
-
-    setVenueOption("nearby", nearby);
-  }, [
-    userPosition,
-    nearbyVenueIds,
-    metaData,
-    movies,
-    setVenueOption,
-    requestLocation,
-  ]);
 
   // Event types shared by the film-focused quick filters
   const FILM_CATEGORIES = useMemo(
@@ -286,10 +249,10 @@ export default function FilterOverlay({
     setNearbyNotice(null);
 
     let nearby = nearbyVenueIds;
-    let located = Boolean(userPosition);
+    let point = userPosition;
     if (!(userPosition && nearby.length > 0)) {
       const position = await requestLocation();
-      located = Boolean(position);
+      point = position;
       if (position && metaData?.venues) {
         nearby = getNearbyVenueIds(
           position,
@@ -302,8 +265,8 @@ export default function FilterOverlay({
     // as a broken filter. A failed lookup is already explained by geoError in
     // the venue section; a successful one that simply found nothing isn't, so
     // that case says so itself.
-    if (nearby.length === 0) {
-      if (located) {
+    if (nearby.length === 0 || !point) {
+      if (point) {
         setNearbyNotice(
           "No venues with showings found near you — your filters are unchanged.",
         );
@@ -311,7 +274,18 @@ export default function FilterOverlay({
       return;
     }
 
-    applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
+    // Sorted, as the Near Me pill's are, so the same venues make the same URL.
+    const venues = [...nearby].sort();
+    applyQuickFilter({ ...nearMeTodayPreset, venues });
+    // Remembered beside the selection, so it reads "Near you" and the Near Me
+    // pill can change its radius; Venues Near Me's rule is the Auto radius.
+    rememberVenueOrigin({
+      place: "here",
+      label: "you",
+      point,
+      radius: "auto",
+      venues,
+    });
     trackEvent("filter-preset", { preset: "near-me-today" });
     onClose();
   }, [
@@ -321,6 +295,7 @@ export default function FilterOverlay({
     movies,
     requestLocation,
     applyQuickFilter,
+    rememberVenueOrigin,
     nearMeTodayPreset,
     onClose,
   ]);
@@ -460,6 +435,7 @@ export default function FilterOverlay({
         movies: hasAttemptedLoad && !isLoading ? movies : null,
         cinemaVenueIds,
         nearbyVenueIds,
+        venueOrigin,
       }),
     [
       filterState,
@@ -469,6 +445,7 @@ export default function FilterOverlay({
       hasAttemptedLoad,
       cinemaVenueIds,
       nearbyVenueIds,
+      venueOrigin,
     ],
   );
 
@@ -892,12 +869,13 @@ export default function FilterOverlay({
         />
       </div>
 
-      {/* Core filters on the left, always in view; the Refine list on the
-          right, one line per specialist filter. Side by side so the Refine
-          list is on screen from the start, and opening a row can't push the
-          core filters down. One column below 1200px. */}
+      {/* Dates and Venues on the left; Events then the Refine list on the
+          right, one line per specialist filter. Events sits above Refine
+          rather than under Venues to balance the columns, and above rather
+          than below so opening a row can't push a core filter down. One
+          column below 1200px, in the same order. */}
       <div className={styles.content}>
-        <div className={styles.coreColumn}>
+        <div className={styles.column}>
           {/* First in the column rather than under the event types, where it
               sat below everything and read as an afterthought. It is a
               standing preference rather than part of a search, so it leads
@@ -926,18 +904,22 @@ export default function FilterOverlay({
             allVenueIds={allVenueIds}
             cinemaVenueIds={cinemaVenueIds}
             smallScreeningVenueIds={smallScreeningVenueIds}
-            nearbyVenueIds={nearbyVenueIds}
             favouriteVenueIds={favouriteVenueIds}
             selectedVenues={filterState.venues}
             geoLoading={geoLoading}
             geoError={geoError}
             nearbyNotice={nearbyNotice}
+            venueOrigin={venueOrigin}
+            onPickNearPlace={selectVenuesNear}
+            onRequestLocation={requestLocation}
             onVenueOptionChange={setVenueOption}
-            onNearbyClick={handleNearbyClick}
             toggleVenue={toggleVenue}
             selectVenues={selectVenues}
             clearVenues={clearVenues}
           />
+        </div>
+
+        <div className={styles.column}>
           <CategoryFilterSection
             movies={movies}
             categories={filterState.categories}
@@ -945,33 +927,32 @@ export default function FilterOverlay({
             selectAllCategories={selectAllCategories}
             clearAllCategories={clearAllCategories}
           />
+          <section className={styles.section} aria-labelledby="refine-heading">
+            <div className={styles.sectionHeader}>
+              <h3 id="refine-heading" className={styles.sectionTitle}>
+                Refine
+              </h3>
+            </div>
+            <p className={styles.sectionDescription}>
+              More ways to narrow down what&apos;s showing
+            </p>
+            <div className={styles.refineList}>
+              {REFINE_ROWS.map(({ id, title }) => (
+                <RefineRow
+                  key={id}
+                  id={id}
+                  title={title}
+                  summary={rowStatuses[id].summary}
+                  isSet={rowStatuses[id].isSet}
+                  open={openRows.has(id)}
+                  onToggle={() => toggleRow(id)}
+                >
+                  {refineRowContent[id]}
+                </RefineRow>
+              ))}
+            </div>
+          </section>
         </div>
-
-        <section className={styles.section} aria-labelledby="refine-heading">
-          <div className={styles.sectionHeader}>
-            <h3 id="refine-heading" className={styles.sectionTitle}>
-              Refine
-            </h3>
-          </div>
-          <p className={styles.sectionDescription}>
-            More ways to narrow down what&apos;s showing
-          </p>
-          <div className={styles.refineList}>
-            {REFINE_ROWS.map(({ id, title }) => (
-              <RefineRow
-                key={id}
-                id={id}
-                title={title}
-                summary={rowStatuses[id].summary}
-                isSet={rowStatuses[id].isSet}
-                open={openRows.has(id)}
-                onToggle={() => toggleRow(id)}
-              >
-                {refineRowContent[id]}
-              </RefineRow>
-            ))}
-          </div>
-        </section>
       </div>
 
       {/* Phones only: the header's Close is a small link at the top of a long

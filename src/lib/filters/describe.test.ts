@@ -8,6 +8,7 @@ import {
   widenFilters,
 } from "./manager";
 import { describeFilterChips, describeFilters, formatList } from "./describe";
+import type { VenueOrigin } from "@/lib/places";
 
 const CATEGORIES = [
   { value: Category.Movie, label: "Films" },
@@ -271,5 +272,55 @@ describe("describeFilterChips", () => {
     expect(
       chips(widenFilters(state, genre.filterIds)).map((chip) => chip.key),
     ).toEqual(["dateRange", "categories"]);
+  });
+});
+
+// A selection picked near a place carries only venue ids; the place is
+// remembered beside it and names it while it is still what was picked.
+describe("describeFilters names a selection picked near a place", () => {
+  const origin: VenueOrigin = {
+    place: "station:kings-cross-st-pancras",
+    label: "King's Cross St. Pancras",
+    point: { lat: 51.53, lon: -0.123 },
+    radius: 2,
+    venues: ["v1", "v2"],
+  };
+  const venuesDesc = (venues: string[], venueOrigin = origin) =>
+    describeFilters({
+      state: set(getDefaultState(), FilterId.Venues, venues),
+      categories: CATEGORIES,
+      venues: null,
+      genres: GENRES,
+      // Even when the venues it picked equal a preset, the place is what the
+      // reader asked for.
+      cinemaVenueIds: ["v1", "v2"],
+      venueOrigin,
+    }).venues;
+
+  it("names the place while the selection is what it picked", () => {
+    expect(venuesDesc(["v2", "v1"])).toBe(
+      "Within 2 miles of King's Cross St. Pancras",
+    );
+    expect(venuesDesc(["v1", "v2"], { ...origin, radius: "auto" })).toBe(
+      "Near King's Cross St. Pancras",
+    );
+  });
+
+  it("forgets it once the selection changes", () => {
+    expect(venuesDesc(["v1"])).toBe("At 1 venues");
+  });
+
+  it("is the venue chip's label too", () => {
+    const chips = describeFilterChips({
+      state: set(getDefaultState(), FilterId.Venues, ["v1", "v2"]),
+      categories: CATEGORIES,
+      venues: null,
+      genres: GENRES,
+      cinemaVenueIds: [],
+      venueOrigin: origin,
+    });
+    expect(chips.find((chip) => chip.key === "venues")?.label).toBe(
+      "Within 2 miles of King's Cross St. Pancras",
+    );
   });
 });
