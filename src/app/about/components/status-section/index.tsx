@@ -56,8 +56,11 @@ export default function StatusSection() {
         }
 
         // Extract the source domain from external showing IDs
-        // Format: {sourceDomain}-{eventSpecificId}
-        const match = showingId.match(/^(.+\.[a-z]{2,})-/);
+        // Format: {sourceDomain}-{eventSpecificId}. The match is lazy because
+        // the event part can itself hold a domain — BFI festival IDs end in
+        // the host venue's ("bfi.org.uk-bfi-festivals-<uuid>-curzon.com-…"),
+        // and a greedy match counted each of those as a source of its own.
+        const match = showingId.match(/^(.+?\.[a-z]{2,})-/);
         if (match) {
           const source = match[1];
           showingCounts.set(source, (showingCounts.get(source) ?? 0) + 1);
