@@ -54,6 +54,10 @@
 }
 
 .list {
+  /* The panel caps its height and hides overflow, so the list scrolls */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   margin: 0;
   padding: 12px 24px 20px 32px;
 }
