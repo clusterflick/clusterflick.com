@@ -39,7 +39,6 @@ export const FILTER_TARGETS: Record<FilterId, FilterTarget> = {
   [FilterId.DateRange]: DATES,
   [FilterId.TimeRange]: DATES,
   [FilterId.Venues]: { kind: "core", elementId: "venues-heading" },
-  [FilterId.Near]: { kind: "core", elementId: "near-heading" },
   [FilterId.Categories]: { kind: "core", elementId: "events-heading" },
   [FilterId.HideSeen]: { kind: "core", elementId: "hide-seen" },
   [FilterId.Accessibility]: row("accessibility"),

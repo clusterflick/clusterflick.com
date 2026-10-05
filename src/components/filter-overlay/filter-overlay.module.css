@@ -1143,7 +1143,27 @@
   color: var(--color-muted-gray);
 }
 
-/* What "Near a place" is set to, above its radius chips. */
+/* The Nearby pill's picker, under the venue pills: Use my location, the
+   radius chips and the station-or-venue search. */
+.placePicker {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+}
+
+.placePicker > .standaloneQuickAdd {
+  margin-bottom: 0;
+}
+
+.placeLocationButton {
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+/* What the Nearby pick is: "Near King's Cross St. Pancras · 12 venues". */
 .nearSummary {
   margin: 0 0 12px;
   font-size: 14px;

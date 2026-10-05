@@ -19,7 +19,6 @@ import {
   FilterState,
   FilterId,
   FormatFilterId,
-  NearFilterValue,
   PeopleFilterId,
   ProgrammeFilterId,
   RatingFilterId,
@@ -31,8 +30,30 @@ import {
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { DAY_START_MINUTES, DAY_END_MINUTES } from "@/lib/filters/modules";
+import { isVenueOriginCurrent, type VenueOrigin } from "@/lib/places";
 
 const SESSION_STORAGE_KEY = "clusterflick-filters";
+// The place a venue selection was picked from. Per tab, like the filters, and
+// never in a URL: a shared link carries the venues alone.
+const VENUE_ORIGIN_STORAGE_KEY = "clusterflick-venue-origin";
+
+function readStoredVenueOrigin(): VenueOrigin | null {
+  try {
+    const stored = sessionStorage.getItem(VENUE_ORIGIN_STORAGE_KEY);
+    if (!stored) return null;
+    const origin = JSON.parse(stored) as Partial<VenueOrigin>;
+    const valid =
+      typeof origin.place === "string" &&
+      typeof origin.label === "string" &&
+      (typeof origin.radius === "number" || origin.radius === "auto") &&
+      typeof origin.point?.lat === "number" &&
+      typeof origin.point?.lon === "number" &&
+      Array.isArray(origin.venues);
+    return valid ? (origin as VenueOrigin) : null;
+  } catch {
+    return null;
+  }
+}
 
 // Event categories that can be filtered
 export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
@@ -51,7 +72,9 @@ export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
 // Venue quick-select options
 export const VENUE_OPTIONS = [
   { value: "all", label: "All Venues" },
-  { value: "nearby", label: "Venues Near Me" },
+  // Venues around the reader, a station or a venue: Venues Near Me's rule
+  // by default, or a radius the reader picks.
+  { value: "place", label: "Nearby" },
   // Only offered while signed in with at least one starred venue.
   { value: "favourites", label: "My Venues" },
   { value: "cinemas", label: "Cinemas" },
@@ -245,9 +268,15 @@ type FilterConfigContextType = {
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
   selectVenues: (venueIds: string[]) => void;
   clearVenues: () => void;
-  // Near a place: a fresh value from createNearValue, or null to clear it.
-  // NearFilterSync fills in its label and venues.
-  setNear: (value: NearFilterValue | null) => void;
+  /**
+   * The place the venue selection was picked from, while the selection is
+   * still exactly what it picked; null otherwise. Never in a URL.
+   */
+  venueOrigin: VenueOrigin | null;
+  // Select the venues near a place, remembering the place they came from
+  selectVenuesNear: (origin: VenueOrigin) => void;
+  // Remember where a selection set some other way came from (a preset)
+  rememberVenueOrigin: (origin: VenueOrigin) => void;
   // Hide finished showings
   toggleHideFinished: () => void;
   // Hide sold out showings
@@ -639,7 +668,6 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
         switch (option) {
           case "cinemas":
           case "small":
-          case "nearby":
           case "favourites":
             return filterManager.set(prev, FilterId.Venues, venueIds);
           default:
@@ -692,6 +720,46 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setFilterState((prev) => filterManager.set(prev, FilterId.Venues, null));
   }, []);
 
+  // The place a venue selection was picked from. Kept beside the filter state
+  // rather than in it, so it never reaches a URL; it only describes the
+  // selection while the selection is still what it picked.
+  const [storedVenueOrigin, setStoredVenueOrigin] =
+    useState<VenueOrigin | null>(() =>
+      typeof window === "undefined" ? null : readStoredVenueOrigin(),
+    );
+
+  useEffect(() => {
+    try {
+      if (storedVenueOrigin) {
+        sessionStorage.setItem(
+          VENUE_ORIGIN_STORAGE_KEY,
+          JSON.stringify(storedVenueOrigin),
+        );
+      } else {
+        sessionStorage.removeItem(VENUE_ORIGIN_STORAGE_KEY);
+      }
+    } catch {
+      // Silently ignore — storage may be full or disabled
+    }
+  }, [storedVenueOrigin]);
+
+  const venueOrigin = useMemo(
+    () =>
+      isVenueOriginCurrent(storedVenueOrigin, filterState[FilterId.Venues])
+        ? storedVenueOrigin
+        : null,
+    [storedVenueOrigin, filterState],
+  );
+
+  const rememberVenueOrigin = setStoredVenueOrigin;
+
+  const selectVenuesNear = useCallback((origin: VenueOrigin) => {
+    setStoredVenueOrigin(origin);
+    setFilterState((prev) =>
+      filterManager.set(prev, FilterId.Venues, origin.venues),
+    );
+  }, []);
+
   // Hide finished showings
   const toggleHideFinished = useCallback(() => {
     setFilterState((prev) =>
@@ -712,11 +780,6 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
         !filterManager.get(prev, FilterId.HideSoldOut),
       ),
     );
-  }, []);
-
-  // Near a place
-  const setNear = useCallback((value: NearFilterValue | null) => {
-    setFilterState((prev) => filterManager.set(prev, FilterId.Near, value));
   }, []);
 
   // Hide seen films
@@ -770,6 +833,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   // General
   const resetFilters = useCallback(() => {
     setFilterState(filterManager.getDefaultState);
+    setStoredVenueOrigin(null);
   }, []);
 
   const applyUrlParams = useCallback(() => {
@@ -819,7 +883,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
-      setNear,
+      venueOrigin,
+      selectVenuesNear,
+      rememberVenueOrigin,
       toggleHideFinished,
       toggleHideSoldOut,
       setHideSeen,
@@ -863,7 +929,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
-      setNear,
+      venueOrigin,
+      selectVenuesNear,
+      rememberVenueOrigin,
       toggleHideFinished,
       toggleHideSoldOut,
       setHideSeen,

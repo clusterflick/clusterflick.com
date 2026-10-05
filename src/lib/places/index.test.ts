@@ -1,18 +1,16 @@
 import { describe, it, expect } from "vitest";
 import {
+  describeVenueOrigin,
   formatPlaceRef,
-  formatRadius,
   formatRadiusLabel,
-  getPlaceFallbackLabel,
+  getVenueIdsNear,
   getVenueIdsWithin,
-  isPlaceResolvable,
+  isVenueOriginCurrent,
   loadStations,
   parsePlaceRef,
-  parseRadius,
   resolvePlace,
-  MAX_RADIUS_MILES,
-  MIN_RADIUS_MILES,
   type PlaceContext,
+  type VenueOrigin,
 } from "./index";
 
 const KINGS_CROSS = { lat: 51.53066, lon: -0.12319 };
@@ -58,70 +56,18 @@ describe("parsePlaceRef / formatPlaceRef", () => {
     "here",
     "station:kings-cross-st-pancras",
     "venue:bfi.org.uk-southbank",
-    "pin:51.531,-0.123",
   ])("round-trips %s", (raw) => {
     const ref = parsePlaceRef(raw);
     expect(ref).not.toBeNull();
     expect(formatPlaceRef(ref!)).toBe(raw);
   });
 
-  // A pin in a shared link should not say which house it was dropped on.
-  it("rounds a pin to about 100m", () => {
-    expect(parsePlaceRef("pin:51.530661,-0.123194")).toEqual({
-      kind: "pin",
-      lat: 51.531,
-      lon: -0.123,
-    });
-    expect(
-      formatPlaceRef({ kind: "pin", lat: 51.530661, lon: -0.123194 }),
-    ).toBe("pin:51.531,-0.123");
-  });
-
-  it.each([
-    "",
-    "nowhere",
-    "station:",
-    "borough:camden",
-    "pin:51.5",
-    "pin:abc,def",
-    // Paris: a typo, not a London cinema trip
-    "pin:48.857,2.352",
-  ])("rejects %j", (raw) => {
-    expect(parsePlaceRef(raw)).toBeNull();
-  });
-});
-
-describe("parseRadius", () => {
-  it("reads miles, bare or labelled", () => {
-    expect(parseRadius("1")).toBe(1);
-    expect(parseRadius("0.5mi")).toBe(0.5);
-    expect(parseRadius(" 2 MI ")).toBe(2);
-  });
-
-  it("converts kilometres to miles", () => {
-    expect(parseRadius("2km")).toBeCloseTo(1.243, 3);
-  });
-
-  // A link asking for 50 miles still means "a long way", not "ignore me".
-  it("clamps rather than rejecting an out-of-range radius", () => {
-    expect(parseRadius("50mi")).toBe(MAX_RADIUS_MILES);
-    expect(parseRadius("0.01")).toBe(MIN_RADIUS_MILES);
-  });
-
-  it.each(["", "0", "-1", "far", "2 furlongs"])("rejects %j", (raw) => {
-    expect(parseRadius(raw)).toBeNull();
-  });
-
-  it("writes miles, at the precision a link needs", () => {
-    expect(formatRadius(1)).toBe("1mi");
-    expect(formatRadius(2 / 1.609344)).toBe("1.24mi");
-  });
-
-  it("labels a radius as prose", () => {
-    expect(formatRadiusLabel(0.5)).toBe("half a mile");
-    expect(formatRadiusLabel(1)).toBe("1 mile");
-    expect(formatRadiusLabel(1.2427)).toBe("1.2 miles");
-  });
+  it.each(["", "nowhere", "station:", "borough:camden", "pin:51.5,-0.1"])(
+    "rejects %j",
+    (raw) => {
+      expect(parsePlaceRef(raw)).toBeNull();
+    },
+  );
 });
 
 describe("resolvePlace", () => {
@@ -144,33 +90,16 @@ describe("resolvePlace", () => {
   });
 
   it("places 'here' at the reader's position, once known", () => {
-    const here = { kind: "here" } as const;
-    expect(resolvePlace(here, CONTEXT)).toBeNull();
-    expect(isPlaceResolvable(here, CONTEXT)).toBe(false);
-
-    const located = { ...CONTEXT, position: KINGS_CROSS };
-    expect(resolvePlace(here, located)).toEqual({
-      label: "you",
-      point: KINGS_CROSS,
-    });
-  });
-
-  // Null either way, but only one of them means the place doesn't exist.
-  it("tells a station not yet loaded from one that isn't listed", () => {
-    const ref = { kind: "station", slug: "atlantis" } as const;
-    expect(resolvePlace(ref, CONTEXT)).toBeNull();
-    expect(isPlaceResolvable(ref, CONTEXT)).toBe(true);
-    expect(isPlaceResolvable(ref, { ...CONTEXT, stations: null })).toBe(false);
-  });
-
-  it("falls back to a readable name before resolving", () => {
+    expect(resolvePlace({ kind: "here" }, CONTEXT)).toBeNull();
     expect(
-      getPlaceFallbackLabel({
-        kind: "station",
-        slug: "kings-cross-st-pancras",
-      }),
-    ).toBe("Kings Cross St Pancras");
-    expect(getPlaceFallbackLabel({ kind: "here" })).toBe("you");
+      resolvePlace({ kind: "here" }, { ...CONTEXT, position: KINGS_CROSS }),
+    ).toEqual({ label: "you", point: KINGS_CROSS });
+  });
+
+  it("knows nothing of a station the list doesn't hold", () => {
+    expect(
+      resolvePlace({ kind: "station", slug: "atlantis" }, CONTEXT),
+    ).toBeNull();
   });
 });
 
@@ -182,9 +111,60 @@ describe("getVenueIdsWithin", () => {
     ]);
   });
 
-  // Unlike Venues Near Me, the radius is never grown to find more.
+  // A number is the reader's, never grown to find more.
   it("returns nothing rather than reaching further", () => {
     expect(getVenueIdsWithin(KINGS_CROSS, 0.1, VENUES)).toEqual([]);
+  });
+});
+
+describe("getVenueIdsNear", () => {
+  it("takes a number as a fixed radius", () => {
+    expect(getVenueIdsNear(KINGS_CROSS, 0.5, VENUES)).toEqual([
+      "everyman.co.uk-kings-cross",
+    ]);
+  });
+
+  // Auto is Venues Near Me's rule: widen from half a mile, looking for ten
+  // venues, but never past two miles.
+  it("widens on auto, up to two miles", () => {
+    expect(getVenueIdsNear(KINGS_CROSS, "auto", VENUES).sort()).toEqual([
+      "bfi.org.uk-southbank",
+      "everyman.co.uk-kings-cross",
+    ]);
+  });
+});
+
+describe("the remembered origin", () => {
+  const origin: VenueOrigin = {
+    place: "station:kings-cross-st-pancras",
+    label: "King's Cross St. Pancras",
+    point: KINGS_CROSS,
+    radius: 2,
+    venues: ["a", "b"],
+  };
+
+  // It stands for the selection only while the selection is what it picked.
+  it("is current only while the selection is exactly its venues", () => {
+    expect(isVenueOriginCurrent(origin, ["b", "a"])).toBe(true);
+    expect(isVenueOriginCurrent(origin, ["a"])).toBe(false);
+    expect(isVenueOriginCurrent(origin, ["a", "b", "c"])).toBe(false);
+    expect(isVenueOriginCurrent(origin, null)).toBe(false);
+    expect(isVenueOriginCurrent(null, ["a", "b"])).toBe(false);
+  });
+
+  it("describes a fixed radius and an automatic one", () => {
+    expect(describeVenueOrigin(origin)).toBe(
+      "Within 2 miles of King's Cross St. Pancras",
+    );
+    expect(describeVenueOrigin({ label: "you", radius: "auto" })).toBe(
+      "Near you",
+    );
+  });
+
+  it("labels a radius as prose", () => {
+    expect(formatRadiusLabel(0.5)).toBe("half a mile");
+    expect(formatRadiusLabel(1)).toBe("1 mile");
+    expect(formatRadiusLabel(3)).toBe("3 miles");
   });
 });
 
@@ -194,7 +174,10 @@ describe("the station list", () => {
     expect(stations.length).toBeGreaterThan(300);
     expect(new Set(stations.map((s) => s.slug)).size).toBe(stations.length);
     for (const station of stations) {
-      expect(parsePlaceRef(`pin:${station.lat},${station.lon}`)).not.toBeNull();
+      expect(station.lat).toBeGreaterThan(51.2);
+      expect(station.lat).toBeLessThan(51.75);
+      expect(station.lon).toBeGreaterThan(-0.6);
+      expect(station.lon).toBeLessThan(0.4);
     }
     expect(stations.find((s) => s.slug === "kings-cross-st-pancras")).toEqual(
       expect.objectContaining({ name: "King's Cross St. Pancras" }),

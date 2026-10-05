@@ -5,7 +5,6 @@ export type {
   MoviesRecord,
   FilterModule,
   AnyFilterModule,
-  NearFilterValue,
 } from "./types";
 
 // Filter modules
@@ -15,10 +14,6 @@ export {
   performanceNotesSearchFilter,
   categoriesFilter,
   venuesFilter,
-  nearFilter,
-  createNearValue,
-  NEAR_URL_PARAM,
-  RADIUS_URL_PARAM,
   dateRangeFilter,
   genresFilter,
   RATING_GROUPS,

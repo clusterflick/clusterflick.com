@@ -4,12 +4,6 @@ export { showingUrlSearchFilter } from "./showing-url-search";
 export { performanceNotesSearchFilter } from "./performance-notes-search";
 export { categoriesFilter, getPrimaryCategory } from "./categories";
 export { venuesFilter } from "./venues";
-export {
-  nearFilter,
-  createNearValue,
-  NEAR_URL_PARAM,
-  RADIUS_URL_PARAM,
-} from "./near";
 export { dateRangeFilter } from "./date-range";
 export {
   timeRangeFilter,

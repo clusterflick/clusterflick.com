@@ -1259,29 +1259,6 @@ describe("suggestFilterRelaxations", () => {
       ]);
     });
 
-    // A place with nothing on nearby is rescued by searching further out,
-    // and the offer names where the films are.
-    it("names the venues beyond a place", () => {
-      const movies = makeMovies({
-        "1": { title: "A", venueId: "venue-b" },
-      });
-      const state = set(getDefaultState(), FilterId.Near, {
-        place: "station:kings-cross-st-pancras",
-        radiusMiles: 0.5,
-        label: "King's Cross St. Pancras",
-        venues: ["venue-a"],
-      });
-
-      const [suggestion] = suggestFilterRelaxations({
-        movies,
-        state,
-        venues: VENUES,
-      });
-      expect(suggestion.changes).toEqual([
-        { label: "Anywhere in London", detail: "at BFI Southbank" },
-      ]);
-    });
-
     it("quotes the text a redirect actually matched", () => {
       const movies = makeMovies({
         "1": {

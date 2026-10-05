@@ -191,14 +191,6 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     action: "Include sold-out showings",
   },
   { id: FilterId.Venues, label: "All venues", action: "Search all venues" },
-  // After the venues: a place is where the reader will be, which bends less
-  // than which kind of venue they picked. Still a widening of the terms, so
-  // above the subjects.
-  {
-    id: FilterId.Near,
-    label: "Anywhere in London",
-    action: "Search all of London",
-  },
   // Below venues because giving up a name discards the reader's stated
   // subject rather than widening the terms around it: someone who picked
   // Scorsese would rather travel than watch somebody else. Still above
@@ -530,13 +522,13 @@ function describeNewCategories(
 
 /** The venues the widening let in, which the current selection excludes. */
 function describeNewVenues(
-  selectedIds: string[] | null,
+  state: FilterState,
   result: MoviesRecord,
   venues: Record<string, Venue> | null | undefined,
 ): string | undefined {
   if (!venues) return undefined;
 
-  const selected = new Set(selectedIds ?? []);
+  const selected = new Set(state.venues ?? []);
   const found = new Set<string>();
   for (const movie of Object.values(result)) {
     for (const showing of Object.values(movie.showings)) {
@@ -674,11 +666,7 @@ function widenDetail(
       return (result) =>
         describeNewCategories(state, result, context.categories);
     case FilterId.Venues:
-      return (result) =>
-        describeNewVenues(state.venues, result, context.venues);
-    case FilterId.Near:
-      return (result) =>
-        describeNewVenues(state.near?.venues ?? null, result, context.venues);
+      return (result) => describeNewVenues(state, result, context.venues);
     default:
       return undefined;
   }

@@ -98,6 +98,7 @@ export default function PageContent({
     filterState: globalFilterState,
     applyUrlParams,
     applyFilterState,
+    venueOrigin,
   } = useFilterConfig();
   // Hiding seen films is for browsing. A reader who opens a film they've seen
   // came for it, and hiding every showing would answer them with nothing.
@@ -215,6 +216,7 @@ export default function PageContent({
       // Withheld until the films have loaded; see FilterTrigger.
       movies: hasAttemptedLoad && !isDataLoading ? movies : null,
       cinemaVenueIds,
+      venueOrigin,
     });
   }, [
     filterState,
@@ -223,6 +225,7 @@ export default function PageContent({
     isDataLoading,
     hasAttemptedLoad,
     cinemaVenueIds,
+    venueOrigin,
   ]);
 
   // What would bring back showings the filters hide, when they hide all of

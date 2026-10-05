@@ -23,7 +23,7 @@ export default function FilterTrigger({
   isOverlayOpen,
   onTextHeightChange,
 }: FilterTriggerProps) {
-  const { filterState } = useFilterConfig();
+  const { filterState, venueOrigin } = useFilterConfig();
   const { metaData, movies, isLoading, hasAttemptedLoad } = useCinemaData();
   const textWrapperRef = useRef<HTMLSpanElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -47,6 +47,7 @@ export default function FilterTrigger({
       // as "not currently showing" while its films are still arriving.
       movies: hasAttemptedLoad && !isLoading ? movies : null,
       cinemaVenueIds,
+      venueOrigin,
     });
   }, [
     filterState,
@@ -55,6 +56,7 @@ export default function FilterTrigger({
     isLoading,
     hasAttemptedLoad,
     cinemaVenueIds,
+    venueOrigin,
   ]);
 
   // Flash the summary whenever a filter changes. The wording updates either way,

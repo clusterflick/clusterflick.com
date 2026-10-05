@@ -8,6 +8,7 @@ import {
   widenFilters,
 } from "./manager";
 import { describeFilterChips, describeFilters, formatList } from "./describe";
+import type { VenueOrigin } from "@/lib/places";
 
 const CATEGORIES = [
   { value: Category.Movie, label: "Films" },
@@ -274,74 +275,52 @@ describe("describeFilterChips", () => {
   });
 });
 
-describe("describeFilters describes a place", () => {
-  const near = {
+// A selection picked near a place carries only venue ids; the place is
+// remembered beside it and names it while it is still what was picked.
+describe("describeFilters names a selection picked near a place", () => {
+  const origin: VenueOrigin = {
     place: "station:kings-cross-st-pancras",
-    radiusMiles: 1,
     label: "King's Cross St. Pancras",
-    venues: ["v1"],
+    point: { lat: 51.53, lon: -0.123 },
+    radius: 2,
+    venues: ["v1", "v2"],
   };
-  const describeState = (state = getDefaultState()) =>
+  const venuesDesc = (venues: string[], venueOrigin = origin) =>
     describeFilters({
-      state,
+      state: set(getDefaultState(), FilterId.Venues, venues),
       categories: CATEGORIES,
       venues: null,
       genres: GENRES,
+      // Even when the venues it picked equal a preset, the place is what the
+      // reader asked for.
       cinemaVenueIds: ["v1", "v2"],
-    });
+      venueOrigin,
+    }).venues;
 
-  it("stands in for the venues on its own", () => {
-    const state = set(getDefaultState(), FilterId.Near, near);
-    expect(describeState(state).venues).toBe(
-      "Within 1 mile of King's Cross St. Pancras",
+  it("names the place while the selection is what it picked", () => {
+    expect(venuesDesc(["v2", "v1"])).toBe(
+      "Within 2 miles of King's Cross St. Pancras",
+    );
+    expect(venuesDesc(["v1", "v2"], { ...origin, radius: "auto" })).toBe(
+      "Near King's Cross St. Pancras",
     );
   });
 
-  // The venue pills and a place narrow together: "cinemas near King's Cross".
-  it("narrows a venue selection", () => {
-    let state = set(getDefaultState(), FilterId.Near, near);
-    state = set(state, FilterId.Venues, ["v1", "v2"]);
-    expect(describeState(state).venues).toBe(
-      "At Cinemas within 1 mile of King's Cross St. Pancras",
-    );
+  it("forgets it once the selection changes", () => {
+    expect(venuesDesc(["v1"])).toBe("At 1 venues");
   });
 
-  // The label arrives once the place resolves; until then it's read off the
-  // place, so the trigger never says "near null".
-  it("names an unresolved place from the place itself", () => {
-    const state = set(getDefaultState(), FilterId.Near, {
-      ...near,
-      radiusMiles: 0.5,
-      label: null,
-      venues: null,
-    });
-    expect(describeState(state).venues).toBe(
-      "Within half a mile of Kings Cross St Pancras",
-    );
-    const here = set(getDefaultState(), FilterId.Near, {
-      place: "here",
-      radiusMiles: 2,
-      label: null,
-      venues: null,
-    });
-    expect(describeState(here).venues).toBe("Within 2 miles of you");
-  });
-
-  it("is a chip of its own that widens to anywhere", () => {
-    const state = set(getDefaultState(), FilterId.Near, near);
+  it("is the venue chip's label too", () => {
     const chips = describeFilterChips({
-      state,
+      state: set(getDefaultState(), FilterId.Venues, ["v1", "v2"]),
       categories: CATEGORIES,
       venues: null,
       genres: GENRES,
       cinemaVenueIds: [],
+      venueOrigin: origin,
     });
-    const chip = chips.find((c) => c.key === "near");
-    expect(chip).toMatchObject({
-      filterIds: [FilterId.Near],
-      label: "Within 1 mile of King's Cross St. Pancras",
-      isDefault: false,
-    });
-    expect(widenFilters(state, chip!.filterIds).near).toBeNull();
+    expect(chips.find((chip) => chip.key === "venues")?.label).toBe(
+      "Within 2 miles of King's Cross St. Pancras",
+    );
   });
 });

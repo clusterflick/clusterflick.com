@@ -43,7 +43,6 @@ import QuickFiltersSection from "./quick-filters-section";
 import ActiveFiltersSection from "./active-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
-import NearFilterSection from "./near-filter-section";
 import PeopleFilterSection from "./people-filter-section";
 import MovieFilterSection from "./movie-filter-section";
 import ProgrammeFilterSection from "./programme-filter-section";
@@ -113,7 +112,9 @@ export default function FilterOverlay({
     toggleVenue,
     selectVenues,
     clearVenues,
-    setNear,
+    venueOrigin,
+    selectVenuesNear,
+    rememberVenueOrigin,
     toggleHideFinished,
     toggleHideSoldOut,
     setHideSeen,
@@ -176,21 +177,6 @@ export default function FilterOverlay({
     [seenIds, filterState.hideSeen, setHideSeen],
   );
 
-  // Places to search near: every venue with something showing, by name.
-  const nearVenues = useMemo(
-    () =>
-      venueGroups
-        .flatMap((group) =>
-          group.venues.map((venue) => ({ id: venue.id, name: venue.name })),
-        )
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    [venueGroups],
-  );
-  const handleNearLocation = useCallback(
-    async () => (await requestLocation()) !== null,
-    [requestLocation],
-  );
-
   // Compute filtered movie and performance counts
   const { movieCount, performanceCount } = useMemo(() => {
     const filteredMovies = filterManager.apply(movies, filterState);
@@ -213,49 +199,9 @@ export default function FilterOverlay({
     return baseMargin + extraHeight;
   }, [filterTextHeight]);
 
-  // Shown when "Venues Near Me" resolves a location but finds nothing within
+  // Shown when "Near me today" resolves a location but finds nothing within
   // range. Distinct from geoError, which covers not getting a location at all.
   const [nearbyNotice, setNearbyNotice] = useState<string | null>(null);
-
-  // Handle nearby venue selection
-  const handleNearbyClick = useCallback(async () => {
-    setNearbyNotice(null);
-
-    // If we already have position, use cached nearby venues
-    if (userPosition && nearbyVenueIds.length > 0) {
-      setVenueOption("nearby", nearbyVenueIds);
-      return;
-    }
-
-    // Request location and calculate nearby venues
-    const position = await requestLocation();
-    if (!position || !metaData?.venues) return;
-
-    const nearby = getNearbyVenueIds(
-      position,
-      Object.values(metaData.venues),
-      getVenueIdsWithShowings(movies),
-    );
-
-    // Nothing in range. Applying this would select zero venues and empty the
-    // results, which reads as a broken filter rather than an answer — so leave
-    // the existing selection alone and say what happened instead.
-    if (nearby.length === 0) {
-      setNearbyNotice(
-        "No venues with showings found near you — your venue selection is unchanged.",
-      );
-      return;
-    }
-
-    setVenueOption("nearby", nearby);
-  }, [
-    userPosition,
-    nearbyVenueIds,
-    metaData,
-    movies,
-    setVenueOption,
-    requestLocation,
-  ]);
 
   // Event types shared by the film-focused quick filters
   const FILM_CATEGORIES = useMemo(
@@ -303,10 +249,10 @@ export default function FilterOverlay({
     setNearbyNotice(null);
 
     let nearby = nearbyVenueIds;
-    let located = Boolean(userPosition);
+    let point = userPosition;
     if (!(userPosition && nearby.length > 0)) {
       const position = await requestLocation();
-      located = Boolean(position);
+      point = position;
       if (position && metaData?.venues) {
         nearby = getNearbyVenueIds(
           position,
@@ -319,8 +265,8 @@ export default function FilterOverlay({
     // as a broken filter. A failed lookup is already explained by geoError in
     // the venue section; a successful one that simply found nothing isn't, so
     // that case says so itself.
-    if (nearby.length === 0) {
-      if (located) {
+    if (nearby.length === 0 || !point) {
+      if (point) {
         setNearbyNotice(
           "No venues with showings found near you — your filters are unchanged.",
         );
@@ -329,6 +275,15 @@ export default function FilterOverlay({
     }
 
     applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
+    // Remembered beside the selection, so it reads "Near you" and the Nearby
+    // pill can change its radius; Venues Near Me's rule is the Auto radius.
+    rememberVenueOrigin({
+      place: "here",
+      label: "you",
+      point,
+      radius: "auto",
+      venues: nearby,
+    });
     trackEvent("filter-preset", { preset: "near-me-today" });
     onClose();
   }, [
@@ -338,6 +293,7 @@ export default function FilterOverlay({
     movies,
     requestLocation,
     applyQuickFilter,
+    rememberVenueOrigin,
     nearMeTodayPreset,
     onClose,
   ]);
@@ -477,6 +433,7 @@ export default function FilterOverlay({
         movies: hasAttemptedLoad && !isLoading ? movies : null,
         cinemaVenueIds,
         nearbyVenueIds,
+        venueOrigin,
       }),
     [
       filterState,
@@ -486,6 +443,7 @@ export default function FilterOverlay({
       hasAttemptedLoad,
       cinemaVenueIds,
       nearbyVenueIds,
+      venueOrigin,
     ],
   );
 
@@ -943,25 +901,18 @@ export default function FilterOverlay({
             allVenueIds={allVenueIds}
             cinemaVenueIds={cinemaVenueIds}
             smallScreeningVenueIds={smallScreeningVenueIds}
-            nearbyVenueIds={nearbyVenueIds}
             favouriteVenueIds={favouriteVenueIds}
             selectedVenues={filterState.venues}
             geoLoading={geoLoading}
             geoError={geoError}
             nearbyNotice={nearbyNotice}
+            venueOrigin={venueOrigin}
+            onPickNearPlace={selectVenuesNear}
+            onRequestLocation={requestLocation}
             onVenueOptionChange={setVenueOption}
-            onNearbyClick={handleNearbyClick}
             toggleVenue={toggleVenue}
             selectVenues={selectVenues}
             clearVenues={clearVenues}
-          />
-          <NearFilterSection
-            near={filterState.near}
-            venues={nearVenues}
-            geoLoading={geoLoading}
-            geoError={geoError}
-            onChange={setNear}
-            onRequestLocation={handleNearLocation}
           />
           <CategoryFilterSection
             movies={movies}

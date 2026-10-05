@@ -17,7 +17,7 @@ Pages at clusterflick.com.
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
-- `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Near a Place); commit the result
+- `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
@@ -334,7 +334,7 @@ Everything location-dependent on `/near-me` comes from one hook, `useNearMe`
 is known; the page ships only build-time venue, club and festival counts.
 
 **One nearby set feeds everything.** It is `getNearbyVenueIds`, the rule behind
-the filter overlay's "Venues near me", plus the reader's locals. The page's rows,
+the Nearby pill's Auto radius around the reader, plus the reader's locals. The page's rows,
 map, cinema list and "What's on near me today" link all read that one set, so a
 click never shows a different set of venues from the page it came from. The
 locals are added in because the overlay's rule stops at ten venues, which in
@@ -360,48 +360,46 @@ two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
 Locals are drawn larger and outside the cluster group, so they never fold into a
 bubble.
 
-## Near a Place
+## Nearby Venues
 
-`FilterId.Near` (`src/lib/filters/modules/near.ts`) restricts the grid to
-venues within a radius of a place, which need not be where the reader is: a
-visitor plans from where they'll be. "Near me" (above) only ever knew the
-device's position.
+The Venues section's **Nearby** pill picks the venues around a place, which
+need not be where the reader is: a visitor plans from where they'll be. It
+replaced "Venues Near Me", which knew only the device's position; the reader's
+position is now one place among others ("Use my location").
 
-**Places** (`@/lib/places`) are `here`, a `station:<slug>`, a `venue:<id>` or a
-`pin:<lat>,<lon>`. Stations are the Underground, Overground, Elizabeth line and
-DLR, generated from TfL's open data by `npm run fetch-london-stations` into
+**Places** (`@/lib/places`) are `here`, a `station:<slug>` or a `venue:<id>`.
+Stations are the Underground, Overground, Elizabeth line and DLR, generated
+from TfL's open data by `npm run fetch-london-stations` into
 `src/data/london-stations.json` and committed, since a build shouldn't depend on
 TfL's API. TfL's terms want their credit on the About page. The list is
-imported dynamically, only by a reader using the filter. Boroughs are not
-places: a borough is an area whose venues are decided by boundary, not a point,
-and its page links to its venues already.
+imported dynamically, when the picker first shows. Boroughs are not places: a
+borough is an area whose venues are decided by boundary, not a point, and its
+page links to its venues already.
 
-**The URL carries the place, not its venues** (`?near=station:bank&within=0.5mi`),
-so a link follows the dataset, as a club filter follows its programme. `within`
-accepts `km` too ("within 2km" is how plenty of readers think of a walk) and is
-stored in miles, which is what the site speaks; out-of-range values are clamped.
-A pin is rounded to three decimal places (~100m) when read and written, since a
-link gets shared. `here` is resolved on each reader's device, so a shared "near
-me" link means near whoever opens it and never carries the sender's location.
+**The radius defaults to Auto**, Venues Near Me's rule (`getNearbyVenueIds`:
+half a mile, widened until there are ten venues, up to two), which suits a
+dense centre and a sparse suburb alike. ½, 1, 2 and 3 miles are the reader's
+and never grow. A pick that finds nothing leaves the selection alone and says
+so, keeping the place for a wider radius.
 
-**Its venues ride in the state**, as the Seen ids do for hide-seen: the pipeline
-has no coordinates or position of its own. `NearFilterSync` (in the root layout,
-inside the cinema data, filter and geolocation providers) fills in `label` and
-`venues` once the venues have loaded, and again whenever the place, radius,
-venues or position change. Until then the filter matches nothing, since
-everything would claim to be nearby. It waits for the venue data, so a page that
-never loads the listings never asks for the reader's location; a `here` link
-asks once. A station or venue the data doesn't hold resolves to no venues, and
-the empty grid's suggestions offer "Search all of London".
+**What it produces is an ordinary venue selection**, so a URL carries venue ids
+and nothing else. A separate filter holding the place was built first and
+taken out: it put a second "near" control beside Venues, ANDed with it, for
+the same operation Venues Near Me already did. **The place is remembered beside
+the selection instead** (`VenueOrigin`: place, label, point, radius and the
+venues it picked), per tab in session storage and never in a URL
+(`venueOrigin` and `selectVenuesNear` on the filter context). While the
+selection is still exactly those venues (`isVenueOriginCurrent`), the pill is
+checked, the picker shows the place and radius, changing either picks again
+without starting over, and descriptions read "Near King's Cross St. Pancras"
+or "Within 2 miles of …" (`describeVenueOrigin`, passed to `describeFilters`
+as `venueOrigin`). Once the reader changes the selection any other way it is
+an ordinary selection again. A shared link reads as its venues ("At Camden
+Town Hall or 110 more"), which is accepted. The "Near me today" preset
+remembers its origin too (`here`, Auto), so it reads "Near you".
 
-**The radius is the reader's and never grows**, unlike the Venues Near Me pill,
-which widens until it finds ten venues. **It combines with the venue filter as
-"and"**: Cinemas plus a place is "cinemas near King's Cross", and the
-description reads that way ("At Cinemas within 1 mile of …").
-
-In the overlay it is a core section, "Near a place", under Venues: radius chips,
-a station-or-venue search (stations first, being how most people say where
-they'll be), and Use my location.
+The point is stored with the origin, so a new radius needs no lookup and
+`here` stays where the reader was when they picked it.
 
 ## Filter Overlay
 
@@ -409,8 +407,8 @@ they'll be), and Use my location.
 around progressive disclosure: the most used filters in front, every filter
 findable, and a filter that is set never hidden.
 
-**Core filters and Refine.** Dates, Venues, Near a place and Events are always
-in view, in a left column; everything else is a Refine row on the right, one line each
+**Core filters and Refine.** Dates, Venues and Events are always in view, in
+a left column; everything else is a Refine row on the right, one line each
 naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
 Accessibility, Showings (hide past / sold out, moved out of the Dates
 header), Format, Genre, Ratings, Directors & cast, Films, and Clubs &
@@ -1295,7 +1293,7 @@ films that aren't showing. The helper is imported from its module rather than
 the filters barrel, which would bundle the whole engine into this page.
 
 **Venues can be starred into "My Venues"** (`FavouriteVenueButton` in a venue
-page's hero), which the filter overlay offers as a Venues pill beside Near Me.
+page's hero), which the filter overlay offers as a Venues pill beside Nearby.
 They are kept in a `favouriteVenues` field of the same document, not as a
 `UserListId`: those are films, and markers, import, export and the watchlist
 links all assume it. Each entry snapshots the venue's name, since a venue can

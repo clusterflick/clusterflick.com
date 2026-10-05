@@ -26,9 +26,9 @@ import {
 } from "@/utils/format-date";
 import { FilterId, FilterState } from "./types";
 import {
-  formatRadiusLabel,
-  getPlaceFallbackLabel,
-  parsePlaceRef,
+  describeVenueOrigin,
+  isVenueOriginCurrent,
+  type VenueOrigin,
 } from "@/lib/places";
 import { filtersAtDefault, getRestrictiveFilterIds } from "./manager";
 
@@ -48,7 +48,12 @@ export type DescribeOptions = {
    */
   movies?: Record<string, { title: string }> | null;
   cinemaVenueIds: string[];
-  nearbyVenueIds?: string[]; // Optional: for "Venues Near Me" detection
+  nearbyVenueIds?: string[]; // Optional: for "Near you" detection
+  /**
+   * The place the venue selection was picked from, which names it ("Within 2
+   * miles of Bank") while the selection is still exactly what it picked.
+   */
+  venueOrigin?: VenueOrigin | null;
 };
 
 /**
@@ -192,21 +197,6 @@ function matchVenueGroup(
 }
 
 /**
- * "within 1 mile of King's Cross St. Pancras", or null with no place set. The
- * label is filled in once the place resolves; until then it is read off the
- * place itself.
- */
-export function describeNear(state: FilterState): string | null {
-  const near = state.near;
-  if (!near) return null;
-  const ref = parsePlaceRef(near.place);
-  const label =
-    near.label ??
-    (ref ? getPlaceFallbackLabel(ref) : "a place no longer listed");
-  return `within ${formatRadiusLabel(near.radiusMiles)} of ${label}`;
-}
-
-/**
  * Describes the venues part of the filter.
  */
 function describeVenues(
@@ -214,8 +204,15 @@ function describeVenues(
   venueLookup: Record<string, Venue> | null,
   cinemaVenueIds: string[],
   nearbyVenueIds?: string[],
+  venueOrigin?: VenueOrigin | null,
 ): string {
   const venues = state.venues;
+
+  // Before the presets: a place the reader picked from is what they asked
+  // for, even when its venues happen to equal some preset.
+  if (isVenueOriginCurrent(venueOrigin, venues)) {
+    return describeVenueOrigin(venueOrigin);
+  }
 
   // null/undefined means all venues
   if (!venues) {
@@ -242,7 +239,7 @@ function describeVenues(
   ) {
     const isNearby = venues.every((id) => nearbyVenueIds.includes(id));
     if (isNearby) {
-      return "At Venues Near Me";
+      return "Near you";
     }
   }
 
@@ -583,6 +580,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     movies,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   } = options;
 
   // Build events description
@@ -696,20 +694,14 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
   }
 
-  // Build venues description. A place narrows whatever the venues are set to,
-  // so "At Cinemas within 1 mile of Bank"; on its own it stands in for them.
-  const nearDesc = describeNear(state);
-  const venuesBase = describeVenues(
+  // Build venues description
+  const venuesDesc = describeVenues(
     state,
     venues,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   );
-  const venuesDesc = !nearDesc
-    ? venuesBase
-    : state.venues === null
-      ? capitalise(nearDesc)
-      : `${venuesBase} ${nearDesc}`;
 
   // Build dates description
   let datesDesc = describeDateRange(state);
@@ -772,6 +764,7 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
     movies,
     cinemaVenueIds,
     nearbyVenueIds,
+    venueOrigin,
   } = options;
 
   const restrictive = new Set(getRestrictiveFilterIds(state));
@@ -809,13 +802,15 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
     "venues",
     [FilterId.Venues],
     capitalise(
-      describeVenues(state, venues, cinemaVenueIds, nearbyVenueIds).replace(
-        /^At /,
-        "",
-      ),
+      describeVenues(
+        state,
+        venues,
+        cinemaVenueIds,
+        nearbyVenueIds,
+        venueOrigin,
+      ).replace(/^At /, ""),
     ),
   );
-  add("near", [FilterId.Near], capitalise(describeNear(state) ?? ""));
   const categoryDesc = describeCategories(state, categories);
   add(
     "categories",
