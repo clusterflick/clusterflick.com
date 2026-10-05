@@ -99,6 +99,16 @@ export const SignedInWithLists: Story = {
   },
 };
 
+/**
+ * The toolbar's "Manage lists" toggle. An empty watchlist draws a second
+ * "Manage lists" button inline, once the data has loaded — so a plain name
+ * query passes or fails depending on whether the data beat it. The toggle is
+ * the one carrying `aria-expanded`.
+ */
+function findManageListsToggle(canvas: ReturnType<typeof within>) {
+  return canvas.findByRole("button", { name: "Manage lists", expanded: false });
+}
+
 const SEEN_TITLES = [
   "Alien",
   "Amélie",
@@ -171,9 +181,7 @@ export const SignedInManagingLists: Story = {
   args: SignedInWithLists.args,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Manage lists" }),
-    );
+    await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.click(
       canvas.getByRole("checkbox", {
         name: "Show Remove buttons on your lists",
@@ -223,9 +231,7 @@ export const SignedInSearching: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Manage lists" }),
-    );
+    await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.type(
       canvas.getByRole("textbox", { name: "Film title" }),
       "love{enter}",
@@ -249,9 +255,7 @@ export const SignedInSearchRateLimited: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Manage lists" }),
-    );
+    await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.type(
       canvas.getByRole("textbox", { name: "Film title" }),
       "dune",
@@ -289,9 +293,7 @@ const tmdbMatches: Record<string, object> = {
 
 async function importWatchlist(canvasElement: HTMLElement) {
   const canvas = within(canvasElement);
-  await userEvent.click(
-    await canvas.findByRole("button", { name: "Manage lists" }),
-  );
+  await userEvent.click(await findManageListsToggle(canvas));
   // The data has to load before an import can start.
   const button = await canvas.findByRole("button", {
     name: "Import to Watchlist",
