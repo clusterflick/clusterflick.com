@@ -182,6 +182,22 @@ export default function PageContent({
     ? unfilteredMovie?.showings || movie.showings
     : filteredMovie?.showings || movie.showings;
 
+  // "Playing at" counts the showings listed below it, so a venue the filters
+  // hide isn't named above an empty list of its showings. Null until the
+  // listings load (the static HTML keeps the build-time counts) and while the
+  // filters hide everything: the empty state explains that, and an empty
+  // "Playing at" would hide where the film is on.
+  const listedVenueCounts = useMemo<VenuePlayCount[] | null>(() => {
+    if (!performances || performances.length === 0) return null;
+    const counts = new Map<string, number>();
+    for (const performance of performances) {
+      const venueId = filteredShowings[performance.showingId]?.venueId;
+      if (!venueId) continue;
+      counts.set(venueId, (counts.get(venueId) ?? 0) + 1);
+    }
+    return Array.from(counts, ([venueId, count]) => ({ venueId, count }));
+  }, [performances, filteredShowings]);
+
   // Compute cinema venue IDs for filter description
   const cinemaVenueIds = useMemo(() => {
     return getCinemaVenueIds(metaData?.venues);
@@ -404,7 +420,12 @@ export default function PageContent({
             actors={movie.actors}
             people={people}
           />
-          <PlayingAtSection venueCounts={venueCounts} venues={venues} />
+          <PlayingAtSection
+            venueCounts={listedVenueCounts ?? venueCounts}
+            venues={venues}
+            totalVenueCount={listedVenueCounts ? venueCounts.length : undefined}
+            onShowAll={handleShowAllToggle}
+          />
           {formats.length > 0 && (
             <div className={styles.formatsMobile}>
               <FormatsList formats={formats} variant="inline" />

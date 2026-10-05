@@ -30,6 +30,15 @@ export interface VenuePlayCount {
 interface PlayingAtSectionProps {
   venueCounts: VenuePlayCount[];
   venues: Record<string, Venue>;
+  /**
+   * How many venues the film plays at in all, when `venueCounts` has been
+   * narrowed to the showings the reader's filters let through. Said under the
+   * list, so a venue missing from it doesn't read as the film not playing
+   * there.
+   */
+  totalVenueCount?: number;
+  /** Look past the filters: the showings section's own Show all. */
+  onShowAll?: () => void;
 }
 
 interface VenueEntry {
@@ -54,6 +63,8 @@ function formatMeta(entry: VenueEntry): string {
 export default function PlayingAtSection({
   venueCounts,
   venues,
+  totalVenueCount,
+  onShowAll,
 }: PlayingAtSectionProps) {
   const { position } = useGeolocationContext();
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -114,6 +125,19 @@ export default function PlayingAtSection({
           </>
         )}
       />
+      {totalVenueCount !== undefined && totalVenueCount > entries.length && (
+        <p className={styles.narrowed}>
+          {entries.length} of {totalVenueCount} venues match your filters
+          {onShowAll && (
+            <>
+              {" · "}
+              <Button variant="link" onClick={onShowAll}>
+                Show all
+              </Button>
+            </>
+          )}
+        </p>
+      )}
       <Button
         variant="secondary"
         size="sm"

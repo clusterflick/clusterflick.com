@@ -1061,6 +1061,15 @@ cannot drift between the two. What differs:
 
 It probes one film, so it runs on the live state rather than a deferred copy.
 
+**"Playing at" counts the showings listed below it**, not the build-time
+totals, so a venue the filters hide isn't named above a list with none of its
+showings. The static HTML keeps the build-time counts until the listings load.
+When narrowed it says "4 of 102 venues match your filters" with the showings'
+own Show all beside it, so a venue missing from the list doesn't read as the
+film not playing there. When the filters hide every showing it keeps the full
+list: the empty state below explains, and an empty "Playing at" would hide
+where the film is on.
+
 ## Personalisation
 
 `/personalise` is where a reader signs in and manages their lists (watchlist,
