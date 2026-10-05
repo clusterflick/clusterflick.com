@@ -44,7 +44,7 @@ interface VenuePlacePickerProps {
   onPick: (origin: VenueOrigin) => void;
   /** Find the reader's position, or null if it can't be had. */
   onRequestLocation: () => Promise<Position | null>;
-  /** Lets the Nearby pill locate the reader as it opens the picker. */
+  /** Lets the Near Me and Near a Station… pills drive the picker as it opens. */
   ref?: Ref<VenuePlacePickerHandle>;
 }
 
@@ -55,6 +55,8 @@ export interface VenuePlacePickerHandle {
    * refused prompt still leaves a way on.
    */
   locate: (radius?: PlaceRadius) => void;
+  /** Focus the station-or-venue search. */
+  focusSearch: () => void;
 }
 
 /** The widest radius offered, past which there's nothing wider to suggest. */
@@ -186,7 +188,10 @@ export default function VenuePlacePicker({
     else searchRef.current?.focus();
   };
 
-  useImperativeHandle(ref, () => ({ locate: (radius) => void locate(radius) }));
+  useImperativeHandle(ref, () => ({
+    locate: (radius) => void locate(radius),
+    focusSearch: () => searchRef.current?.focus(),
+  }));
 
   const isHere = current?.place === "here";
 

@@ -72,9 +72,12 @@ export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
 // Venue quick-select options
 export const VENUE_OPTIONS = [
   { value: "all", label: "All Venues" },
-  // Venues around the reader, a station or a venue: Venues Near Me's rule
-  // by default, or a radius the reader picks.
-  { value: "place", label: "Nearby" },
+  // Venues around the reader, in one tap: Auto radius by default.
+  { value: "nearby", label: "Near Me" },
+  // Venues around a station or venue. The ellipsis marks it as needing more
+  // input: it opens the settings it shares with Near Me, and never asks for
+  // the reader's location.
+  { value: "place", label: "Near a Station…" },
   // Only offered while signed in with at least one starred venue.
   { value: "favourites", label: "My Venues" },
   { value: "cinemas", label: "Cinemas" },

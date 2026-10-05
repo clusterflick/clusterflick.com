@@ -65,17 +65,18 @@ export default function VenueFilterSection({
   const [mapOpen, setMapOpen] = useState(false);
   const quickAddRef = useRef<VenueQuickAddHandle>(null);
   const pickerRef = useRef<VenuePlacePickerHandle>(null);
-  // Nearby tapped but nothing picked yet — the reader's position is still
-  // being found, or couldn't be, or found nothing — so the pill shows as
-  // chosen and its settings open while the selection stays as it was.
-  const [placeChosen, setPlaceChosen] = useState(false);
+  // Near Me or Near a Station… tapped but nothing picked from it yet — the
+  // reader's position is still being found, or couldn't be, or no station has
+  // been chosen — so that pill shows as chosen and the settings they share
+  // open, while the selection stays as it was.
+  const [pendingNear, setPendingNear] = useState<NearOption | null>(null);
   // Any other change to the selection (a venue toggled by hand, a preset)
   // means the reader has moved on from the place. Adjusted during render
   // rather than in an effect, so the pill never shows a stale choice.
   const [lastSelection, setLastSelection] = useState(selectedVenues);
   if (lastSelection !== selectedVenues) {
     setLastSelection(selectedVenues);
-    if (placeChosen) setPlaceChosen(false);
+    if (pendingNear) setPendingNear(null);
   }
 
   // Focus the quick-add input on the next frame. Deferring past the current
@@ -127,7 +128,12 @@ export default function VenueFilterSection({
       all: allVenueIds.length,
       cinemas: cinemaVenueIds.length,
       small: smallScreeningVenueIds.length,
-      place: venueOrigin?.venues.length,
+      nearby:
+        venueOrigin?.place === "here" ? venueOrigin.venues.length : undefined,
+      place:
+        venueOrigin && venueOrigin.place !== "here"
+          ? venueOrigin.venues.length
+          : undefined,
       favourites: favouriteVenueIds.length,
       // No count badge — "custom" is a bespoke selection, not a fixed set.
       custom: undefined,
@@ -145,9 +151,12 @@ export default function VenueFilterSection({
   // matches none of the presets (including a hand-picked or empty selection),
   // so the pill row always reflects an active option instead of a dead state.
   const currentVenueOption: VenueOption = useMemo(() => {
-    // Picked from a place: what the reader asked for, even if the venues it
-    // found happen to equal a preset.
-    if (venueOrigin || placeChosen) return "place";
+    // A near pill just tapped, then the place the selection was picked from:
+    // what the reader asked for, even if its venues happen to equal a preset.
+    // The checked pill follows the origin, so picking King's Cross checks
+    // Near a Station… and Use my location moves it back to Near Me.
+    if (pendingNear) return pendingNear;
+    if (venueOrigin) return venueOrigin.place === "here" ? "nearby" : "place";
     // All venues selected (null means no filter = all)
     if (selectedVenues === null) return "all";
     // The reader's own set first: if it happens to equal a preset, it's still
@@ -162,7 +171,7 @@ export default function VenueFilterSection({
     cinemaVenueIds,
     smallScreeningVenueIds,
     venueOrigin,
-    placeChosen,
+    pendingNear,
   ]);
 
   const venueOptions = VENUE_OPTIONS.filter(
@@ -198,7 +207,8 @@ export default function VenueFilterSection({
         </div>
       </div>
       <p className={styles.sectionDescription}>
-        Choose which venues to include: by name, or by area on a map.
+        Choose which venues to include: near you or a station, by name, or by
+        area on a map.
         <br />
         <Link href="/venues" className={styles.sectionLink}>
           See a list of all venues
@@ -220,12 +230,16 @@ export default function VenueFilterSection({
             checked={currentVenueOption === value}
             onChange={(v) => {
               const option = v as VenueOption;
-              setPlaceChosen(option === "place");
-              if (option === "place") {
-                // One tap is near you on Auto, as Venues Near Me was: the
-                // picker opens below and locates the reader once mounted.
-                // Without a position it focuses the station search instead.
+              setPendingNear(isNearOption(option) ? option : null);
+              if (option === "nearby") {
+                // One tap is near you on Auto: the settings open below and
+                // locate the reader once mounted. Without a position they
+                // focus the station search instead.
                 requestAnimationFrame(() => pickerRef.current?.locate("auto"));
+              } else if (option === "place") {
+                // The ellipsis says it: this one needs a station first. It
+                // never asks for the reader's location.
+                requestAnimationFrame(() => pickerRef.current?.focusSearch());
               } else if (option === "all") {
                 clearVenues();
               } else if (option === "cinemas") {
@@ -253,21 +267,21 @@ export default function VenueFilterSection({
           />
         ))}
       </div>
-      {currentVenueOption === "place" && (
+      {isNearOption(currentVenueOption) && (
         <VenuePlacePicker
           origin={venueOrigin}
           venues={placeVenues}
           geoLoading={geoLoading}
           geoError={geoError}
           onPick={(origin) => {
-            setPlaceChosen(false);
+            setPendingNear(null);
             onPickNearPlace(origin);
           }}
           onRequestLocation={onRequestLocation}
           ref={pickerRef}
         />
       )}
-      {currentVenueOption !== "place" && geoError && (
+      {!isNearOption(currentVenueOption) && geoError && (
         <p className={styles.geoError} role="alert">
           {geoError}
         </p>
@@ -305,6 +319,13 @@ export default function VenueFilterSection({
       )}
     </section>
   );
+}
+
+/** The two pills that share the place settings. */
+type NearOption = Extract<VenueOption, "nearby" | "place">;
+
+function isNearOption(option: VenueOption): option is NearOption {
+  return option === "nearby" || option === "place";
 }
 
 /** Whether a selection is exactly a (non-empty) preset's venues. */

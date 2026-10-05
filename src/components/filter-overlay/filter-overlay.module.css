@@ -1143,7 +1143,7 @@
   color: var(--color-muted-gray);
 }
 
-/* The Nearby pill's picker, under the venue pills: Use my location, the
+/* The settings Near Me and Near a Station… share, under the venue pills: the
    radius chips and the station-or-venue search. */
 .placePicker {
   display: flex;
@@ -1170,7 +1170,7 @@
   color: var(--color-muted-gray);
 }
 
-/* What the Nearby pick is: "Near King's Cross St. Pancras · 12 venues". */
+/* What the near pick is: "Near King's Cross St. Pancras · 12 venues". */
 .nearSummary {
   margin: 0 0 12px;
   font-size: 14px;

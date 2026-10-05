@@ -334,7 +334,7 @@ Everything location-dependent on `/near-me` comes from one hook, `useNearMe`
 is known; the page ships only build-time venue, club and festival counts.
 
 **One nearby set feeds everything.** It is `getNearbyVenueIds`, the rule behind
-the Nearby pill's Auto radius around the reader, plus the reader's locals. The page's rows,
+the Near Me pill's Auto radius around the reader, plus the reader's locals. The page's rows,
 map, cinema list and "What's on near me today" link all read that one set, so a
 click never shows a different set of venues from the page it came from. The
 locals are added in because the overlay's rule stops at ten venues, which in
@@ -362,19 +362,26 @@ bubble.
 
 ## Nearby Venues
 
-The Venues section's **Nearby** pill picks the venues around a place, which
-need not be where the reader is: a visitor plans from where they'll be. It
-replaced "Venues Near Me", which knew only the device's position.
+Two Venues pills pick the venues around a place, which need not be where the
+reader is: a visitor plans from where they'll be. **Near Me** is one tap: it
+locates the reader and selects the venues around them on Auto, as the old
+Venues Near Me did. **Near a Station…** opens the same settings with the
+station-or-venue search focused, and never asks for the reader's location.
 
-**One tap is near you, as Venues Near Me was.** Tapping Nearby locates the
-reader and selects the venues around them on Auto, so the pill does something
-like every other pill rather than being a button that reveals more filters.
-Its settings open under the pills while it is selected — "Near you · 10
-venues", the radius chips, and "Somewhere else?" over a station-or-venue
-search — as a selected option's settings, not as a secret. Use my location
-comes back once somewhere else is picked. Without a position the tap still
-checks the pill and opens the settings, says why, and focuses the station
-search, so a refused prompt leaves a way on. The picker owns this
+**The ellipsis is what makes the second pill honest.** A pill that only reveals
+controls reads like an option that should select something; "…" is the usual
+mark for "needs more input first". An earlier single "Nearby" pill that only
+opened the settings was unclear for exactly that reason, and folding the
+station search behind Near Me instead meant a location prompt for readers who
+never wanted one.
+
+**The settings are shared and open under the pills while either is chosen**:
+"Near you · 10 venues", the radius chips, and "Somewhere else?" over the
+station-or-venue search; Use my location comes back once somewhere else is
+picked. **The checked pill follows the origin**, not the last tap: picking King's
+Cross (or a venue) checks Near a Station…, Use my location moves it to Near Me.
+Without a position, Near Me still checks its pill and opens the settings, says
+why, and focuses the station search. The picker owns locating
 (`VenuePlacePicker`'s `locate` handle), so the pill and Use my location can't
 handle "nothing near you" differently.
 
@@ -1309,7 +1316,7 @@ films that aren't showing. The helper is imported from its module rather than
 the filters barrel, which would bundle the whole engine into this page.
 
 **Venues can be starred into "My Venues"** (`FavouriteVenueButton` in a venue
-page's hero), which the filter overlay offers as a Venues pill beside Nearby.
+page's hero), which the filter overlay offers as a Venues pill beside Near Me.
 They are kept in a `favouriteVenues` field of the same document, not as a
 `UserListId`: those are films, and markers, import, export and the watchlist
 links all assume it. Each entry snapshots the venue's name, since a venue can

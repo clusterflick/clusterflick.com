@@ -275,7 +275,7 @@ export default function FilterOverlay({
     }
 
     applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
-    // Remembered beside the selection, so it reads "Near you" and the Nearby
+    // Remembered beside the selection, so it reads "Near you" and the Near Me
     // pill can change its radius; Venues Near Me's rule is the Auto radius.
     rememberVenueOrigin({
       place: "here",
