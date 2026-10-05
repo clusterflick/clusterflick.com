@@ -1155,12 +1155,19 @@
 }
 
 .placePicker > .standaloneQuickAdd {
-  margin-bottom: 0;
+  margin: 8px 0 0;
 }
 
 .placeLocationButton {
   align-self: flex-start;
-  margin-bottom: 12px;
+  margin-top: 12px;
+}
+
+/* "Somewhere else?" over the station-or-venue search. */
+.placeSearchLabel {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--color-muted-gray);
 }
 
 /* What the Nearby pick is: "Near King's Cross St. Pancras · 12 venues". */

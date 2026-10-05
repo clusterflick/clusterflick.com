@@ -12,10 +12,11 @@ import VenueQuickAdd, {
 import VenueMapPicker, {
   VenueMapPickerItem,
 } from "@/components/venue-map-picker";
-import type { EntityQuickAddHandle } from "@/components/entity-quick-add";
 import type { Position } from "@/types";
 import type { VenueOrigin } from "@/lib/places";
-import VenuePlacePicker from "./venue-place-picker";
+import VenuePlacePicker, {
+  type VenuePlacePickerHandle,
+} from "./venue-place-picker";
 import styles from "./filter-overlay.module.css";
 
 interface VenueFilterSectionProps {
@@ -63,9 +64,10 @@ export default function VenueFilterSection({
 }: VenueFilterSectionProps) {
   const [mapOpen, setMapOpen] = useState(false);
   const quickAddRef = useRef<VenueQuickAddHandle>(null);
-  const placeInputRef = useRef<EntityQuickAddHandle>(null);
-  // "Near a Place" tapped but nothing picked yet: the pill shows as chosen and
-  // the picker opens, while the selection stays as it was until a place is.
+  const pickerRef = useRef<VenuePlacePickerHandle>(null);
+  // Nearby tapped but nothing picked yet — the reader's position is still
+  // being found, or couldn't be, or found nothing — so the pill shows as
+  // chosen and its settings open while the selection stays as it was.
   const [placeChosen, setPlaceChosen] = useState(false);
   // Any other change to the selection (a venue toggled by hand, a preset)
   // means the reader has moved on from the place. Adjusted during render
@@ -163,10 +165,6 @@ export default function VenueFilterSection({
     placeChosen,
   ]);
 
-  const focusPlaceInput = () => {
-    requestAnimationFrame(() => placeInputRef.current?.focus());
-  };
-
   const venueOptions = VENUE_OPTIONS.filter(
     ({ value }) => value !== "favourites" || favouriteVenueIds.length > 0,
   );
@@ -224,8 +222,10 @@ export default function VenueFilterSection({
               const option = v as VenueOption;
               setPlaceChosen(option === "place");
               if (option === "place") {
-                // The selection stays until a place is picked; the picker
-                // opens below and takes focus (see onClick).
+                // One tap is near you on Auto, as Venues Near Me was: the
+                // picker opens below and locates the reader once mounted.
+                // Without a position it focuses the station search instead.
+                requestAnimationFrame(() => pickerRef.current?.locate("auto"));
               } else if (option === "all") {
                 clearVenues();
               } else if (option === "cinemas") {
@@ -248,9 +248,7 @@ export default function VenueFilterSection({
                   // already active — so the quick-add input is focused whether
                   // or not the selection just changed.
                   focusQuickAdd
-                : value === "place"
-                  ? focusPlaceInput
-                  : undefined
+                : undefined
             }
           />
         ))}
@@ -266,7 +264,7 @@ export default function VenueFilterSection({
             onPickNearPlace(origin);
           }}
           onRequestLocation={onRequestLocation}
-          inputRef={placeInputRef}
+          ref={pickerRef}
         />
       )}
       {currentVenueOption !== "place" && geoError && (

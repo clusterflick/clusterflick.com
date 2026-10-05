@@ -1,6 +1,13 @@
 "use client";
 
-import { Ref, useEffect, useMemo, useState } from "react";
+import {
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Position, Venue } from "@/types";
 import {
   DEFAULT_RADIUS,
@@ -37,8 +44,17 @@ interface VenuePlacePickerProps {
   onPick: (origin: VenueOrigin) => void;
   /** Find the reader's position, or null if it can't be had. */
   onRequestLocation: () => Promise<Position | null>;
-  /** Handle for the place search, so the "Near a Place" pill can focus it. */
-  inputRef?: Ref<EntityQuickAddHandle>;
+  /** Lets the Nearby pill locate the reader as it opens the picker. */
+  ref?: Ref<VenuePlacePickerHandle>;
+}
+
+export interface VenuePlacePickerHandle {
+  /**
+   * Pick the venues around the reader at `radius`, asking for their position
+   * if need be. Without one, the station search takes focus instead, so a
+   * refused prompt still leaves a way on.
+   */
+  locate: (radius?: PlaceRadius) => void;
 }
 
 /** The widest radius offered, past which there's nothing wider to suggest. */
@@ -77,8 +93,9 @@ export default function VenuePlacePicker({
   geoError,
   onPick,
   onRequestLocation,
-  inputRef,
+  ref,
 }: VenuePlacePickerProps) {
+  const searchRef = useRef<EntityQuickAddHandle>(null);
   // Loaded when the picker first shows rather than with the page: only
   // readers picking near somewhere need the station list.
   const [stations, setStations] = useState<Station[] | null>(null);
@@ -148,40 +165,47 @@ export default function VenuePlacePicker({
     onPick({ ...place, radius, venues: ids });
   };
 
-  const pickPlace = (ref: PlaceRef, position: Position | null = null) => {
-    const resolved = resolvePlace(ref, {
+  const pickPlace = (
+    place: PlaceRef,
+    position: Position | null = null,
+    radius: PlaceRadius = shownRadius,
+  ) => {
+    const resolved = resolvePlace(place, {
       venues: venueLookup,
       stations,
       position,
     });
     if (!resolved) return;
-    pick({ place: formatPlaceRef(ref), ...resolved }, shownRadius);
+    pick({ place: formatPlaceRef(place), ...resolved }, radius);
   };
 
-  const useMyLocation = async () => {
+  const locate = async (radius: PlaceRadius = shownRadius) => {
     setAskedForLocation(true);
     const position = await onRequestLocation();
-    if (position) pickPlace({ kind: "here" }, position);
+    if (position) pickPlace({ kind: "here" }, position, radius);
+    else searchRef.current?.focus();
   };
+
+  useImperativeHandle(ref, () => ({ locate: (radius) => void locate(radius) }));
+
+  const isHere = current?.place === "here";
 
   return (
     <div className={styles.placePicker}>
-      {origin && (
+      {origin ? (
         <p className={styles.nearSummary} role="status">
           <strong>{describeVenueOrigin(origin)}</strong> ·{" "}
           {origin.venues.length === 1
             ? "1 venue"
             : `${origin.venues.length} venues`}
         </p>
+      ) : (
+        geoLoading && (
+          <p className={styles.nearSummary} role="status">
+            Finding your location…
+          </p>
+        )
       )}
-      <Button
-        variant="secondary"
-        className={styles.placeLocationButton}
-        onClick={useMyLocation}
-        disabled={geoLoading}
-      >
-        {geoLoading ? "Locating…" : "Use my location"}
-      </Button>
       <div
         className={styles.chipGroup}
         role="radiogroup"
@@ -202,8 +226,11 @@ export default function VenuePlacePicker({
           />
         ))}
       </div>
+      <p className={styles.placeSearchLabel}>
+        {current ? "Somewhere else?" : "Near a station or venue"}
+      </p>
       <EntityQuickAdd
-        ref={inputRef}
+        ref={searchRef}
         className={styles.standaloneQuickAdd}
         items={items}
         isSelected={(id) => current?.place === id}
@@ -216,6 +243,18 @@ export default function VenuePlacePicker({
         ariaLabel="Search a station or venue"
         pickVerb="choose"
       />
+      {/* Back to the reader, once they've picked somewhere else (or before
+          their position is known). Not offered while it's already them. */}
+      {!isHere && (
+        <Button
+          variant="secondary"
+          className={styles.placeLocationButton}
+          onClick={() => void locate()}
+          disabled={geoLoading}
+        >
+          {geoLoading ? "Locating…" : "Use my location"}
+        </Button>
+      )}
       {notice && (
         <p className={styles.geoNotice} role="status">
           {notice}

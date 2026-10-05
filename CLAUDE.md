@@ -364,8 +364,19 @@ bubble.
 
 The Venues section's **Nearby** pill picks the venues around a place, which
 need not be where the reader is: a visitor plans from where they'll be. It
-replaced "Venues Near Me", which knew only the device's position; the reader's
-position is now one place among others ("Use my location").
+replaced "Venues Near Me", which knew only the device's position.
+
+**One tap is near you, as Venues Near Me was.** Tapping Nearby locates the
+reader and selects the venues around them on Auto, so the pill does something
+like every other pill rather than being a button that reveals more filters.
+Its settings open under the pills while it is selected — "Near you · 10
+venues", the radius chips, and "Somewhere else?" over a station-or-venue
+search — as a selected option's settings, not as a secret. Use my location
+comes back once somewhere else is picked. Without a position the tap still
+checks the pill and opens the settings, says why, and focuses the station
+search, so a refused prompt leaves a way on. The picker owns this
+(`VenuePlacePicker`'s `locate` handle), so the pill and Use my location can't
+handle "nothing near you" differently.
 
 **Places** (`@/lib/places`) are `here`, a `station:<slug>` or a `venue:<id>`.
 Stations are the Underground, Overground, Elizabeth line and DLR, generated
