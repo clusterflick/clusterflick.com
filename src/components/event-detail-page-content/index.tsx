@@ -66,7 +66,7 @@ export interface EventDetailPageContentProps {
   movieUrlParams?: string;
   /**
    * Links opening the catalogue and planner filtered to this programme, drawn
-   * as a pair of buttons under the hero title. A filter rather than a list of
+   * as a pair of buttons under the hero title and again under the films grid. A filter rather than a list of
    * today's films, so the pages they open follow the programme as it changes.
    */
   browseLinks?: { catalogueHref: string; plannerHref: string };
@@ -97,6 +97,27 @@ export interface EventDetailPageContentProps {
    * Only meaningful with `venuesLayout="grid"`.
    */
   secondaryContentPlacement?: "before-films" | "after-films";
+}
+
+function BrowseLinks({
+  catalogueHref,
+  plannerHref,
+  className,
+}: {
+  catalogueHref: string;
+  plannerHref: string;
+  className: string;
+}) {
+  return (
+    <div className={className}>
+      <ButtonLink href={catalogueHref} size="sm">
+        Explore in the catalogue
+      </ButtonLink>
+      <ButtonLink href={plannerHref} variant="secondary" size="sm">
+        Plan in the planner
+      </ButtonLink>
+    </div>
+  );
 }
 
 /**
@@ -244,18 +265,7 @@ export default function EventDetailPageContent({
           >
             {heroChildren}
             {browseLinks && (
-              <div className={styles.browseLinks}>
-                <ButtonLink href={browseLinks.catalogueHref} size="sm">
-                  Explore in the catalogue
-                </ButtonLink>
-                <ButtonLink
-                  href={browseLinks.plannerHref}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Plan in the planner
-                </ButtonLink>
-              </div>
+              <BrowseLinks {...browseLinks} className={styles.browseLinks} />
             )}
           </DetailPageHero>
         }
@@ -276,6 +286,15 @@ export default function EventDetailPageContent({
                   movieUrlParams={movieUrlParams}
                   showAll={!movieUrlParams}
                 />
+                {/* Repeated under the grid, so a reader who has scrolled
+                    through the films has somewhere to go without heading
+                    back up to the hero. */}
+                {browseLinks && (
+                  <BrowseLinks
+                    {...browseLinks}
+                    className={styles.browseLinksAfterFilms}
+                  />
+                )}
               </ContentSection>
               {afterFilmsChildren}
               {!showMiddleContentFirst && middleContent && (
