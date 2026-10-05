@@ -71,6 +71,55 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-05",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The venue filters on the <Link href="/catalogue">catalogue</Link>{" "}
+            and <Link href="/planner">planner</Link> can now find what&rsquo;s
+            on near any Tube, Overground, Elizabeth line or DLR station, or near
+            a venue, as well as near you, so you can plan around where
+            you&rsquo;ll be rather than where you are. Pick &ldquo;Near a
+            Station…&rdquo;, search for one, and choose how far you&rsquo;ll go:
+            half a mile up to three, or Auto, which widens until it finds ten
+            venues. &ldquo;Near Me&rdquo; (formerly &ldquo;Venues near
+            me&rdquo;) is still one tap, and both remember the place, so the
+            filters read &ldquo;Near King&rsquo;s Cross St. Pancras&rdquo; and
+            you can change the distance without starting again. Station
+            locations come from{" "}
+            <Ext href="https://tfl.gov.uk/info-for/open-data-users/">
+              TfL Open Data
+            </Ext>
+            .
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            &ldquo;Playing at&rdquo; on a film&rsquo;s page now follows your
+            filters, listing only the venues whose showings appear below it, and
+            says how many of the film&rsquo;s venues that is, with a Show all to
+            see the rest.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Moved the event types to the top of the right-hand column in the
+            filters, so on a wide screen the two columns end at about the same
+            place instead of one running far past the other.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-04",
     changes: [
       {
