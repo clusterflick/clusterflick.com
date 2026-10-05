@@ -107,16 +107,6 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
-      {
-        tag: "Improvement",
-        body: () => (
-          <>
-            Moved the event types to the top of the right-hand column in the
-            filters, so on a wide screen the two columns end at about the same
-            place instead of one running far past the other.
-          </>
-        ),
-      },
     ],
   },
   {
