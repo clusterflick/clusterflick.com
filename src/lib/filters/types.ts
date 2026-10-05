@@ -10,6 +10,7 @@ export enum FilterId {
   PerformanceNotesSearch = "performanceNotesSearch",
   Categories = "categories",
   Venues = "venues",
+  Near = "near",
   DateRange = "dateRange",
   TimeRange = "timeRange",
   Genres = "genres",
@@ -31,6 +32,25 @@ export enum FilterId {
 }
 
 /**
+ * A search near a place (see `@/lib/places`). The URL carries only `place` and
+ * `radiusMiles`; `label` and `venues` are filled in on the reader's device by
+ * `NearFilterSync`, because the pipeline is a pure function of the dataset and
+ * the state and has no venue coordinates or position of its own.
+ */
+export type NearFilterValue = {
+  /** The place in its URL form: `here`, `station:<slug>`, `venue:<id>`, `pin:<lat>,<lon>`. */
+  place: string;
+  radiusMiles: number;
+  /** What to call the place after "near"; null until resolved. */
+  label: string | null;
+  /**
+   * The venues within the radius; null until resolved, which matches nothing
+   * rather than everything, since everything would claim to be nearby.
+   */
+  venues: string[] | null;
+};
+
+/**
  * The serializable filter state.
  * - `null` means "no filter applied" (all items included)
  * - Empty array `[]` means "none selected" (no items match)
@@ -42,6 +62,8 @@ export type FilterState = {
   [FilterId.PerformanceNotesSearch]: string;
   [FilterId.Categories]: Category[] | null;
   [FilterId.Venues]: string[] | null;
+  /** Venues within a radius of a place; `null` means no filter. */
+  [FilterId.Near]: NearFilterValue | null;
   [FilterId.DateRange]: { start: number | null; end: number | null };
   [FilterId.TimeRange]: { start: number; end: number };
   [FilterId.Genres]: string[] | null;
@@ -127,6 +149,7 @@ export type AnyFilterModule =
   | FilterModule<FilterId.PerformanceNotesSearch>
   | FilterModule<FilterId.Categories>
   | FilterModule<FilterId.Venues>
+  | FilterModule<FilterId.Near>
   | FilterModule<FilterId.DateRange>
   | FilterModule<FilterId.TimeRange>
   | FilterModule<FilterId.Genres>

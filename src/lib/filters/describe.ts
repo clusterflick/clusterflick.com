@@ -25,6 +25,11 @@ import {
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { FilterId, FilterState } from "./types";
+import {
+  formatRadiusLabel,
+  getPlaceFallbackLabel,
+  parsePlaceRef,
+} from "@/lib/places";
 import { filtersAtDefault, getRestrictiveFilterIds } from "./manager";
 
 /**
@@ -184,6 +189,21 @@ function matchVenueGroup(
   }
 
   return null;
+}
+
+/**
+ * "within 1 mile of King's Cross St. Pancras", or null with no place set. The
+ * label is filled in once the place resolves; until then it is read off the
+ * place itself.
+ */
+export function describeNear(state: FilterState): string | null {
+  const near = state.near;
+  if (!near) return null;
+  const ref = parsePlaceRef(near.place);
+  const label =
+    near.label ??
+    (ref ? getPlaceFallbackLabel(ref) : "a place no longer listed");
+  return `within ${formatRadiusLabel(near.radiusMiles)} of ${label}`;
 }
 
 /**
@@ -676,13 +696,20 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     }
   }
 
-  // Build venues description
-  const venuesDesc = describeVenues(
+  // Build venues description. A place narrows whatever the venues are set to,
+  // so "At Cinemas within 1 mile of Bank"; on its own it stands in for them.
+  const nearDesc = describeNear(state);
+  const venuesBase = describeVenues(
     state,
     venues,
     cinemaVenueIds,
     nearbyVenueIds,
   );
+  const venuesDesc = !nearDesc
+    ? venuesBase
+    : state.venues === null
+      ? capitalise(nearDesc)
+      : `${venuesBase} ${nearDesc}`;
 
   // Build dates description
   let datesDesc = describeDateRange(state);
@@ -788,6 +815,7 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
       ),
     ),
   );
+  add("near", [FilterId.Near], capitalise(describeNear(state) ?? ""));
   const categoryDesc = describeCategories(state, categories);
   add(
     "categories",

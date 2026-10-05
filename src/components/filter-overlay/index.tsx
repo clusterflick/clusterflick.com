@@ -43,6 +43,7 @@ import QuickFiltersSection from "./quick-filters-section";
 import ActiveFiltersSection from "./active-filters-section";
 import CategoryFilterSection from "./category-filter-section";
 import VenueFilterSection from "./venue-filter-section";
+import NearFilterSection from "./near-filter-section";
 import PeopleFilterSection from "./people-filter-section";
 import MovieFilterSection from "./movie-filter-section";
 import ProgrammeFilterSection from "./programme-filter-section";
@@ -112,6 +113,7 @@ export default function FilterOverlay({
     toggleVenue,
     selectVenues,
     clearVenues,
+    setNear,
     toggleHideFinished,
     toggleHideSoldOut,
     setHideSeen,
@@ -172,6 +174,21 @@ export default function FilterOverlay({
           }
         : undefined,
     [seenIds, filterState.hideSeen, setHideSeen],
+  );
+
+  // Places to search near: every venue with something showing, by name.
+  const nearVenues = useMemo(
+    () =>
+      venueGroups
+        .flatMap((group) =>
+          group.venues.map((venue) => ({ id: venue.id, name: venue.name })),
+        )
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [venueGroups],
+  );
+  const handleNearLocation = useCallback(
+    async () => (await requestLocation()) !== null,
+    [requestLocation],
   );
 
   // Compute filtered movie and performance counts
@@ -937,6 +954,14 @@ export default function FilterOverlay({
             toggleVenue={toggleVenue}
             selectVenues={selectVenues}
             clearVenues={clearVenues}
+          />
+          <NearFilterSection
+            near={filterState.near}
+            venues={nearVenues}
+            geoLoading={geoLoading}
+            geoError={geoError}
+            onChange={setNear}
+            onRequestLocation={handleNearLocation}
           />
           <CategoryFilterSection
             movies={movies}

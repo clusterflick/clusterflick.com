@@ -17,6 +17,7 @@ Pages at clusterflick.com.
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
+- `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Near a Place); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
@@ -359,14 +360,57 @@ two-mile ring left the nearest cinemas bunched in the middle of an empty circle.
 Locals are drawn larger and outside the cluster group, so they never fold into a
 bubble.
 
+## Near a Place
+
+`FilterId.Near` (`src/lib/filters/modules/near.ts`) restricts the grid to
+venues within a radius of a place, which need not be where the reader is: a
+visitor plans from where they'll be. "Near me" (above) only ever knew the
+device's position.
+
+**Places** (`@/lib/places`) are `here`, a `station:<slug>`, a `venue:<id>` or a
+`pin:<lat>,<lon>`. Stations are the Underground, Overground, Elizabeth line and
+DLR, generated from TfL's open data by `npm run fetch-london-stations` into
+`src/data/london-stations.json` and committed, since a build shouldn't depend on
+TfL's API. TfL's terms want their credit on the About page. The list is
+imported dynamically, only by a reader using the filter. Boroughs are not
+places: a borough is an area whose venues are decided by boundary, not a point,
+and its page links to its venues already.
+
+**The URL carries the place, not its venues** (`?near=station:bank&within=0.5mi`),
+so a link follows the dataset, as a club filter follows its programme. `within`
+accepts `km` too ("within 2km" is how plenty of readers think of a walk) and is
+stored in miles, which is what the site speaks; out-of-range values are clamped.
+A pin is rounded to three decimal places (~100m) when read and written, since a
+link gets shared. `here` is resolved on each reader's device, so a shared "near
+me" link means near whoever opens it and never carries the sender's location.
+
+**Its venues ride in the state**, as the Seen ids do for hide-seen: the pipeline
+has no coordinates or position of its own. `NearFilterSync` (in the root layout,
+inside the cinema data, filter and geolocation providers) fills in `label` and
+`venues` once the venues have loaded, and again whenever the place, radius,
+venues or position change. Until then the filter matches nothing, since
+everything would claim to be nearby. It waits for the venue data, so a page that
+never loads the listings never asks for the reader's location; a `here` link
+asks once. A station or venue the data doesn't hold resolves to no venues, and
+the empty grid's suggestions offer "Search all of London".
+
+**The radius is the reader's and never grows**, unlike the Venues Near Me pill,
+which widens until it finds ten venues. **It combines with the venue filter as
+"and"**: Cinemas plus a place is "cinemas near King's Cross", and the
+description reads that way ("At Cinemas within 1 mile of …").
+
+In the overlay it is a core section, "Near a place", under Venues: radius chips,
+a station-or-venue search (stations first, being how most people say where
+they'll be), and Use my location.
+
 ## Filter Overlay
 
 `FilterOverlay` (`src/components/filter-overlay/`) is being reorganised in stages
 around progressive disclosure: the most used filters in front, every filter
 findable, and a filter that is set never hidden.
 
-**Core filters and Refine.** Dates, Venues and Events are always in view, in
-a left column; everything else is a Refine row on the right, one line each
+**Core filters and Refine.** Dates, Venues, Near a place and Events are always
+in view, in a left column; everything else is a Refine row on the right, one line each
 naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
 Accessibility, Showings (hide past / sold out, moved out of the Dates
 header), Format, Genre, Ratings, Directors & cast, Films, and Clubs &

@@ -311,6 +311,21 @@ export default function AboutPage() {
               </a>
               .
             </p>
+            {/* TfL's open data terms ask for "Powered by TfL Open Data" and the
+                OS copyright line wherever the station data is used. */}
+            <p className={styles.disclaimer}>
+              Station locations are powered by{" "}
+              <a
+                href="https://tfl.gov.uk/info-for/open-data-users/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nowrap"
+              >
+                TfL Open Data
+              </a>
+              . Contains OS data © Crown copyright and database rights 2016 and
+              Geomni UK Map data © and database rights 2019.
+            </p>
             <p className={styles.disclaimer}>
               All trademarks are the property of their respective owners.
               Clusterflick is not endorsed by, certified by or affiliated with

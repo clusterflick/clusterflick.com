@@ -47,6 +47,11 @@ interface EntityQuickAddProps {
   className?: string;
   /** Optional handle exposing `focus()` for the underlying search input. */
   ref?: Ref<EntityQuickAddHandle>;
+  /**
+   * What picking an item does, for screen readers: "add" for a set (the
+   * default), "choose" for a single choice that replaces the last one.
+   */
+  pickVerb?: "add" | "choose";
 }
 
 /**
@@ -111,6 +116,7 @@ export default function EntityQuickAdd({
   maxResults = 8,
   className,
   ref,
+  pickVerb = "add",
 }: EntityQuickAddProps) {
   const [inputValue, setInputValue] = useState("");
   const localInputRef = useRef<HTMLInputElement>(null);
@@ -261,7 +267,7 @@ export default function EntityQuickAdd({
                   <span className={styles.visuallyHidden}>
                     {selected
                       ? " (selected, activate to remove)"
-                      : " (activate to add)"}
+                      : ` (activate to ${pickVerb})`}
                   </span>
                 </li>
               );

@@ -6,6 +6,7 @@ import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
 import { UserProvider } from "@/state/user-context";
 import { SeenFilterSync } from "@/state/seen-filter-sync";
+import { NearFilterSync } from "@/state/near-filter-sync";
 import DataLoadNoticeClient from "@/components/data-load-notice/data-load-notice-client";
 import "./globals.css";
 
@@ -114,6 +115,7 @@ export default function RootLayout({
         <CinemaDataProvider>
           <FilterConfigProvider>
             <GeolocationProvider>
+              <NearFilterSync />
               <UserProvider>
                 <SeenFilterSync />
                 {children}

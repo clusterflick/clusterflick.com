@@ -1142,3 +1142,14 @@
   font-size: 12px;
   color: var(--color-muted-gray);
 }
+
+/* What "Near a place" is set to, above its radius chips. */
+.nearSummary {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.nearSummary strong {
+  color: var(--color-white);
+}

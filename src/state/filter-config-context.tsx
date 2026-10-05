@@ -19,6 +19,7 @@ import {
   FilterState,
   FilterId,
   FormatFilterId,
+  NearFilterValue,
   PeopleFilterId,
   ProgrammeFilterId,
   RatingFilterId,
@@ -244,6 +245,9 @@ type FilterConfigContextType = {
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
   selectVenues: (venueIds: string[]) => void;
   clearVenues: () => void;
+  // Near a place: a fresh value from createNearValue, or null to clear it.
+  // NearFilterSync fills in its label and venues.
+  setNear: (value: NearFilterValue | null) => void;
   // Hide finished showings
   toggleHideFinished: () => void;
   // Hide sold out showings
@@ -710,6 +714,11 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Near a place
+  const setNear = useCallback((value: NearFilterValue | null) => {
+    setFilterState((prev) => filterManager.set(prev, FilterId.Near, value));
+  }, []);
+
   // Hide seen films
   const setHideSeen = useCallback((seenIds: string[] | null) => {
     setFilterState((prev) =>
@@ -810,6 +819,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      setNear,
       toggleHideFinished,
       toggleHideSoldOut,
       setHideSeen,
@@ -853,6 +863,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleVenue,
       selectVenues,
       clearVenues,
+      setNear,
       toggleHideFinished,
       toggleHideSoldOut,
       setHideSeen,

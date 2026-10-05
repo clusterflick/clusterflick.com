@@ -273,3 +273,75 @@ describe("describeFilterChips", () => {
     ).toEqual(["dateRange", "categories"]);
   });
 });
+
+describe("describeFilters describes a place", () => {
+  const near = {
+    place: "station:kings-cross-st-pancras",
+    radiusMiles: 1,
+    label: "King's Cross St. Pancras",
+    venues: ["v1"],
+  };
+  const describeState = (state = getDefaultState()) =>
+    describeFilters({
+      state,
+      categories: CATEGORIES,
+      venues: null,
+      genres: GENRES,
+      cinemaVenueIds: ["v1", "v2"],
+    });
+
+  it("stands in for the venues on its own", () => {
+    const state = set(getDefaultState(), FilterId.Near, near);
+    expect(describeState(state).venues).toBe(
+      "Within 1 mile of King's Cross St. Pancras",
+    );
+  });
+
+  // The venue pills and a place narrow together: "cinemas near King's Cross".
+  it("narrows a venue selection", () => {
+    let state = set(getDefaultState(), FilterId.Near, near);
+    state = set(state, FilterId.Venues, ["v1", "v2"]);
+    expect(describeState(state).venues).toBe(
+      "At Cinemas within 1 mile of King's Cross St. Pancras",
+    );
+  });
+
+  // The label arrives once the place resolves; until then it's read off the
+  // place, so the trigger never says "near null".
+  it("names an unresolved place from the place itself", () => {
+    const state = set(getDefaultState(), FilterId.Near, {
+      ...near,
+      radiusMiles: 0.5,
+      label: null,
+      venues: null,
+    });
+    expect(describeState(state).venues).toBe(
+      "Within half a mile of Kings Cross St Pancras",
+    );
+    const here = set(getDefaultState(), FilterId.Near, {
+      place: "here",
+      radiusMiles: 2,
+      label: null,
+      venues: null,
+    });
+    expect(describeState(here).venues).toBe("Within 2 miles of you");
+  });
+
+  it("is a chip of its own that widens to anywhere", () => {
+    const state = set(getDefaultState(), FilterId.Near, near);
+    const chips = describeFilterChips({
+      state,
+      categories: CATEGORIES,
+      venues: null,
+      genres: GENRES,
+      cinemaVenueIds: [],
+    });
+    const chip = chips.find((c) => c.key === "near");
+    expect(chip).toMatchObject({
+      filterIds: [FilterId.Near],
+      label: "Within 1 mile of King's Cross St. Pancras",
+      isDefault: false,
+    });
+    expect(widenFilters(state, chip!.filterIds).near).toBeNull();
+  });
+});
