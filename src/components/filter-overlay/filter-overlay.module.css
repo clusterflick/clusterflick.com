@@ -49,7 +49,7 @@
   padding: 0 48px;
 }
 
-.coreColumn {
+.column {
   display: flex;
   flex-direction: column;
   gap: 56px;

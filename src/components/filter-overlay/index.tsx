@@ -867,12 +867,13 @@ export default function FilterOverlay({
         />
       </div>
 
-      {/* Core filters on the left, always in view; the Refine list on the
-          right, one line per specialist filter. Side by side so the Refine
-          list is on screen from the start, and opening a row can't push the
-          core filters down. One column below 1200px. */}
+      {/* Dates and Venues on the left; Events then the Refine list on the
+          right, one line per specialist filter. Events sits above Refine
+          rather than under Venues to balance the columns, and above rather
+          than below so opening a row can't push a core filter down. One
+          column below 1200px, in the same order. */}
       <div className={styles.content}>
-        <div className={styles.coreColumn}>
+        <div className={styles.column}>
           {/* First in the column rather than under the event types, where it
               sat below everything and read as an afterthought. It is a
               standing preference rather than part of a search, so it leads
@@ -914,6 +915,9 @@ export default function FilterOverlay({
             selectVenues={selectVenues}
             clearVenues={clearVenues}
           />
+        </div>
+
+        <div className={styles.column}>
           <CategoryFilterSection
             movies={movies}
             categories={filterState.categories}
@@ -921,33 +925,32 @@ export default function FilterOverlay({
             selectAllCategories={selectAllCategories}
             clearAllCategories={clearAllCategories}
           />
+          <section className={styles.section} aria-labelledby="refine-heading">
+            <div className={styles.sectionHeader}>
+              <h3 id="refine-heading" className={styles.sectionTitle}>
+                Refine
+              </h3>
+            </div>
+            <p className={styles.sectionDescription}>
+              More ways to narrow down what&apos;s showing
+            </p>
+            <div className={styles.refineList}>
+              {REFINE_ROWS.map(({ id, title }) => (
+                <RefineRow
+                  key={id}
+                  id={id}
+                  title={title}
+                  summary={rowStatuses[id].summary}
+                  isSet={rowStatuses[id].isSet}
+                  open={openRows.has(id)}
+                  onToggle={() => toggleRow(id)}
+                >
+                  {refineRowContent[id]}
+                </RefineRow>
+              ))}
+            </div>
+          </section>
         </div>
-
-        <section className={styles.section} aria-labelledby="refine-heading">
-          <div className={styles.sectionHeader}>
-            <h3 id="refine-heading" className={styles.sectionTitle}>
-              Refine
-            </h3>
-          </div>
-          <p className={styles.sectionDescription}>
-            More ways to narrow down what&apos;s showing
-          </p>
-          <div className={styles.refineList}>
-            {REFINE_ROWS.map(({ id, title }) => (
-              <RefineRow
-                key={id}
-                id={id}
-                title={title}
-                summary={rowStatuses[id].summary}
-                isSet={rowStatuses[id].isSet}
-                open={openRows.has(id)}
-                onToggle={() => toggleRow(id)}
-              >
-                {refineRowContent[id]}
-              </RefineRow>
-            ))}
-          </div>
-        </section>
       </div>
 
       {/* Phones only: the header's Close is a small link at the top of a long

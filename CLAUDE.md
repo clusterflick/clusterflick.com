@@ -407,15 +407,20 @@ The point is stored with the origin, so a new radius needs no lookup and
 around progressive disclosure: the most used filters in front, every filter
 findable, and a filter that is set never hidden.
 
-**Core filters and Refine.** Dates, Venues and Events are always in view, in
-a left column; everything else is a Refine row on the right, one line each
+**Core filters and Refine.** Dates, Venues and Events are always in view:
+Dates and Venues in the left column, Events at the top of the right one;
+everything else is a Refine row below Events, one line each
 naming the filter and what it is set to (`RefineRow`, `filter-targets.ts`):
 Accessibility, Showings (hide past / sold out, moved out of the Dates
 header), Format, Genre, Ratings, Directors & cast, Films, and Clubs &
 festivals. Rows with an index page (formats, genres, clubs, festivals) link to
 it at the top of the row.
-Side by side so the Refine list is on screen from the start and opening a row
-can't push the core down; one column below 1200px. Every name is readable
+Side by side so the Refine list starts on screen and opening a row can't push
+the core down; one column below 1200px, in the same order. Events moved across
+to balance the columns: with all three core filters on the left it ran ~500px
+past Refine, and now the two end within ~130px. It sits above Refine rather
+than below, since rows open downwards and some are taller than the screen —
+below them, opening one would push a core filter out of view. Every name is readable
 without opening anything, which is what makes a filter findable, and opening
 one reveals one filter rather than the dozen "More Event Options" held.
 Accessibility comes first: it is a requirement for those who use it.
