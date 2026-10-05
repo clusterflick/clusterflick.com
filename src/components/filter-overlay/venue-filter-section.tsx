@@ -101,10 +101,14 @@ export default function VenueFilterSection({
     [venueGroups],
   );
 
-  // What a place can pick from: every venue with something showing, as the
-  // other pills count.
+  // What a place can pick from: every venue with something showing. The
+  // groups hold every venue in the dataset, empty ones too (count 0), and an
+  // empty venue counted towards Auto's ten would stop the radius short.
   const placeVenues = useMemo(
-    () => venueGroups.flatMap((group) => group.venues),
+    () =>
+      venueGroups.flatMap((group) =>
+        group.venues.filter((venue) => venue.count > 0),
+      ),
     [venueGroups],
   );
 

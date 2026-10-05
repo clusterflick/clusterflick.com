@@ -138,17 +138,24 @@ export function getVenueIdsWithin(
 }
 
 /**
- * The venues a radius picks around a point. `venues` should be those with
- * something showing: `auto` counts them to decide how far to go.
+ * The venues a radius picks around a point, sorted by id. `venues` must be
+ * only those with something showing: `auto` counts them to decide how far to
+ * go, so an empty venue would stop it short.
+ *
+ * Sorted because the result becomes a venue selection, which is a set: the
+ * same venues should always make the same URL, however they were found.
  */
 export function getVenueIdsNear(
   point: Position,
   radius: PlaceRadius,
   venues: Record<string, Pick<Venue, "id" | "geo">>,
 ): string[] {
-  if (radius !== "auto") return getVenueIdsWithin(point, radius, venues);
   const all = Object.values(venues);
-  return getNearbyVenueIds(point, all, new Set(all.map((venue) => venue.id)));
+  const ids =
+    radius === "auto"
+      ? getNearbyVenueIds(point, all, new Set(all.map((venue) => venue.id)))
+      : getVenueIdsWithin(point, radius, venues);
+  return ids.sort();
 }
 
 /**

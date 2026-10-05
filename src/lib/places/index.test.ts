@@ -127,7 +127,16 @@ describe("getVenueIdsNear", () => {
   // Auto is Venues Near Me's rule: widen from half a mile, looking for ten
   // venues, but never past two miles.
   it("widens on auto, up to two miles", () => {
-    expect(getVenueIdsNear(KINGS_CROSS, "auto", VENUES).sort()).toEqual([
+    expect(getVenueIdsNear(KINGS_CROSS, "auto", VENUES)).toEqual([
+      "bfi.org.uk-southbank",
+      "everyman.co.uk-kings-cross",
+    ]);
+  });
+
+  // A selection is a set, so the same venues always make the same URL —
+  // here nearest first would put the Everyman ahead.
+  it("returns ids sorted, not nearest first", () => {
+    expect(getVenueIdsNear(KINGS_CROSS, 2, VENUES)).toEqual([
       "bfi.org.uk-southbank",
       "everyman.co.uk-kings-cross",
     ]);

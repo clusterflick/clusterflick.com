@@ -274,7 +274,9 @@ export default function FilterOverlay({
       return;
     }
 
-    applyQuickFilter({ ...nearMeTodayPreset, venues: nearby });
+    // Sorted, as the Near Me pill's are, so the same venues make the same URL.
+    const venues = [...nearby].sort();
+    applyQuickFilter({ ...nearMeTodayPreset, venues });
     // Remembered beside the selection, so it reads "Near you" and the Near Me
     // pill can change its radius; Venues Near Me's rule is the Auto radius.
     rememberVenueOrigin({
@@ -282,7 +284,7 @@ export default function FilterOverlay({
       label: "you",
       point,
       radius: "auto",
-      venues: nearby,
+      venues,
     });
     trackEvent("filter-preset", { preset: "near-me-today" });
     onClose();
