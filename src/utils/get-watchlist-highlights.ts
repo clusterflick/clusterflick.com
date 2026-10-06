@@ -15,7 +15,11 @@ export interface WatchlistHighlight {
    * page and not the other.
    */
   finalShowing: MoviePerformance | null;
-  /** The film's best bookable occasion — a Q&A, a live score, a premiere. */
+  /**
+   * The film's best bookable occasion — a Q&A, a live score, a premiere.
+   * Null for a film whose run is ending: a film sits in one group, and missing
+   * it entirely is the more pressing news.
+   */
   occasion: Occasion | null;
 }
 
@@ -47,6 +51,9 @@ function getOccasions(movies: MoviesRecord, now: number) {
  * row treats as house style (the Garden's nightly intros) stays unflagged
  * here. Sold-out occasions are skipped, as the row skips them: a night you
  * can't have is no use to a reader.
+ *
+ * The two are exclusive: a film whose run is ending is flagged as that alone,
+ * even with a Q&A on its last night, so it appears in one group, not both.
  */
 export function getWatchlistHighlights(
   movies: MoviesRecord,
@@ -69,7 +76,7 @@ export function getWatchlistHighlights(
   // Rarest first, so the first bookable one met for a film is its best.
   for (const occasion of getOccasions(movies, now)) {
     const highlight = highlights.get(occasion.movie.id);
-    if (!highlight || highlight.occasion) continue;
+    if (!highlight || highlight.finalShowing || highlight.occasion) continue;
     if (occasion.performance.status?.soldOut) continue;
     highlight.occasion = occasion;
   }
