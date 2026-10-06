@@ -1199,7 +1199,8 @@ two groups above Showing now, each soonest first:
   what the home row wouldn't call rare isn't flagged here either. Sold-out
   occasions are skipped.
 
-A film can be in both, and each group then says its own thing about it; either
+A film is in one at most: an ending run is Last chance even with a Q&A on its
+last night, since missing the film entirely is the more pressing news. Either
 takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
 above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
 plain day and time ("Tomorrow, 20:30") with the venue on a line of its own,

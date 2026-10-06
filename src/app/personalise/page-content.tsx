@@ -941,9 +941,9 @@ function UserListSection({
     );
   }
 
-  // Each soonest first: the order to book them in. A film can be in both —
-  // ending this week with a Q&A on its last night — and each group then says
-  // its own thing about it. Either takes it out of Showing now.
+  // Each soonest first: the order to book them in. A film is in one at most —
+  // an ending run is Last chance even with a Q&A on its last night — and
+  // either takes it out of Showing now.
   const finalShowing = (id: string) => highlights.get(id)?.finalShowing;
   const occasion = (id: string) => highlights.get(id)?.occasion;
   const ending = entries

@@ -72,6 +72,15 @@ describe("getWatchlistHighlights", () => {
     expect(occasion?.performance.time).toBe(NOW + 60 * DAY);
   });
 
+  it("flags an ending run as that alone, even with an occasion", () => {
+    const movies = index([
+      makeMovie("film", [1, 3], { notes: { 1: "Q&A with the director" } }),
+    ]);
+    const highlight = getWatchlistHighlights(movies, ["film"], NOW).get("film");
+    expect(highlight?.finalShowing?.time).toBe(NOW + 3 * DAY);
+    expect(highlight?.occasion).toBeNull();
+  });
+
   it("skips a sold-out occasion", () => {
     const movies = index([
       makeMovie("film", [2, 30], {
