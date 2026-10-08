@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-08",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Turn Up Film Festival"
+              url="https://turnupfilmfestival.com/"
+            />
+            , London&rsquo;s student film festival, screening work by students
+            and recent graduates at Regent Street Cinema from 12 to 16 January.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-05",
     changes: [
       {
