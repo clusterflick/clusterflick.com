@@ -81,18 +81,29 @@ describe("Phoenix Rising International Film Festival title matchers", () => {
 describe("Turn Up Film Festival title matchers", () => {
   const festival = FESTIVALS.find(({ id }) => id === "turn-up-film-festival")!;
 
-  const claims = (title: string): boolean =>
+  // Each matcher's title query, checked only where its venue scope allows
+  const claims = (title: string, venueId: string): boolean =>
     festival.matchers.some((matcher) => {
       const query = matcher[FilterId.ShowingTitleSearch];
       if (typeof query !== "string") return false;
+      const venues = matcher[FilterId.Venues];
+      if (venues && !venues.includes(venueId)) return false;
       return matchesSearchQuery(title, normalizeForSearch(query));
     });
 
-  it("claims the festival by its full name", () => {
-    expect(claims("Turn Up Film Festival: Best Drama Shortlist")).toBe(true);
+  it.each([
+    "Turn Up Film Festival - Short Film Competition Part 1 + Q&A",
+    "Turn Up Film Festival -Short Film Competition Part 4 + Q&A",
+    "Line producing with Ioanna Karavela - Masterclass - TUFF 2027 (Room UG05)",
+  ])("claims %s at Regent Street Cinema", (title) => {
+    expect(claims(title, "regentstreetcinema.com")).toBe(true);
   });
 
-  it("does not claim a film whose title contains its abbreviation", () => {
-    expect(claims("The Right Stuff")).toBe(false);
+  it.each([
+    "Carl Sagan: We Are Made of Star Stuff",
+    "Funky Stuff",
+    "The Right Stuff",
+  ])("does not claim %s", (title) => {
+    expect(claims(title, "regentstreetcinema.com")).toBe(false);
   });
 });

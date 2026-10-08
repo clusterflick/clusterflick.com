@@ -783,15 +783,23 @@ export const FESTIVALS: Festival[] = [
     url: "https://turnupfilmfestival.com/",
     aliases: ["tuff"],
     matchers: [
-      // The full name only. The festival brands itself TUFF, but search
-      // normalisation strips spacing, so the abbreviation would also catch
-      // "The Right Stuff" or "Hot Stuff" — repertory titles at Regent Street
-      // Cinema, the festival's home, as much as anywhere else.
       {
+        // Matches the screenings, "Turn Up Film Festival - Short Film
+        // Competition Part 1 + Q&A"
         [FilterId.ShowingTitleSearch]: "Turn Up Film Festival",
       },
       {
         [FilterId.PerformanceNotesSearch]: "Turn Up Film Festival",
+      },
+      {
+        // Matches the industry programme, "Line producing with Ioanna
+        // Karavela - Masterclass - TUFF 2027 (Room UG05)". Search
+        // normalisation strips spacing, so "TUFF" alone would also claim
+        // "We Are Made of Star Stuff" or "Funky Stuff"; the edition's year
+        // anchors it without tying it to one edition, and the venue scope
+        // keeps any "… Stuff 20…" title elsewhere out.
+        [FilterId.ShowingTitleSearch]: "TUFF 20",
+        [FilterId.Venues]: ["regentstreetcinema.com"],
       },
     ],
   },
