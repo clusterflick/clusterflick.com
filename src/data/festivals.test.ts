@@ -77,3 +77,22 @@ describe("Phoenix Rising International Film Festival title matchers", () => {
     expect(claims("Phoenix Rising")).toBe(false);
   });
 });
+
+describe("Turn Up Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "turn-up-film-festival")!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it("claims the festival by its full name", () => {
+    expect(claims("Turn Up Film Festival: Best Drama Shortlist")).toBe(true);
+  });
+
+  it("does not claim a film whose title contains its abbreviation", () => {
+    expect(claims("The Right Stuff")).toBe(false);
+  });
+});
