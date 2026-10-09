@@ -74,6 +74,19 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-09",
     changes: [
       {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added <Link href="/film-clubs/kinoema">Kinoema</Link>, which runs
+            relaxed, accessible screenings with discussions and Q&amp;As. Next
+            up is Flesh and Fear, an anthology of horror shorts by disabled
+            women filmmakers, with Sick Girl Films and Girls in Film at{" "}
+            <Venue name="Kiln Theatre" url="https://kilntheatre.com" /> on 31
+            October.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
