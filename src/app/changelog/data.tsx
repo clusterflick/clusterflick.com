@@ -107,12 +107,17 @@ export const CHANGELOG: ChangelogDay[] = [
                   name: "Cafe OTO",
                   url: "https://www.cafeoto.co.uk",
                 },
+                {
+                  name: "Hartfield Hub",
+                  url: "https://hartfieldhub.com",
+                },
               ]}
             />
             : a hire venue in Georgian townhouses on Pentonville Road, a
             charity-run art space in the railway arches under Peckham Rye
-            station, and Dalston&rsquo;s home for experimental and improvised
-            music, which slips the odd film in among its gigs.
+            station, Dalston&rsquo;s home for experimental and improvised music,
+            which slips the odd film in among its gigs, and a pair of photo and
+            event studios in Wimbledon.
           </>
         ),
       },
