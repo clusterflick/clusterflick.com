@@ -419,6 +419,31 @@ remembers its origin too (`here`, Auto), so it reads "Near you".
 The point is stored with the origin, so a new radius needs no lookup and
 `here` stays where the reader was when they picked it.
 
+**Auto counts venues with anything on, not anything on for this search**, so
+a place can pick ten venues and still empty the grid — a watchlist for today
+finds nothing in a dense centre's half mile. It stays that way: a radius that
+re-picked whenever the dates or categories changed would stop meaning one set
+of venues, and Near Me relies on it meaning one. Instead the next radius out
+is offered where the emptiness shows:
+
+- **In the picker**, when the place's venues have nothing for the other
+  filters, a notice says so and names the nearest radius that has
+  ("Within 1 mile, 4 events do"), with a button to pick it
+  (`findWiderVenueOrigin`).
+- **In the empty state**, a wider-radius move sits just ahead of All venues,
+  on the grid and on a film page (`buildRadiusMove` in `suggest.ts`, given the
+  `venueOrigin` and `placeVenues`). Before it, All venues was the only venue
+  move, and all of London is far too big a step. The radius is settled when
+  the move is applied, so a pair with the dates can stop nearer than the move
+  alone would need. The offer carries its `venueOrigin`, which the caller
+  remembers beside the state, so the selection still reads "Within 1 mile of
+  you" and the picker can change it again.
+
+Both read the radii in `RADIUS_OPTIONS` that keep every venue picked and add
+one (`getWiderVenueOrigins`), over every venue with something showing in the
+whole dataset (`getPlaceVenues`) — not the movies the engine probes, which on
+a film page are that one film.
+
 ## Filter Overlay
 
 `FilterOverlay` (`src/components/filter-overlay/`) is being reorganised in stages

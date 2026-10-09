@@ -22,6 +22,7 @@ import {
   type FilterSuggestion,
 } from "./suggest";
 import { buildPeopleIndex } from "./modules/people";
+import type { VenueOrigin } from "@/lib/places";
 
 /**
  * The date filter's default is computed from the real clock (today→+7d), so
@@ -1541,6 +1542,123 @@ describe("suggestShowingRelaxations", () => {
     ]);
 
     expect(suggestShowingRelaxations({ movie, state, limit: 10 })).toEqual([]);
+  });
+});
+
+describe("venues picked around a place", () => {
+  const KINGS_CROSS = { lat: 51.53066, lon: -0.12319 };
+  // venue-a ~0.3 miles from King's Cross, venue-b (BFI Southbank) ~1.6.
+  const PLACE_VENUES = {
+    "venue-a": {
+      id: "venue-a",
+      name: "Prince Charles Cinema",
+      geo: { lat: 51.5352, lon: -0.1249 },
+    },
+    "venue-b": {
+      id: "venue-b",
+      name: "BFI Southbank",
+      geo: { lat: 51.5069, lon: -0.1153 },
+    },
+  } as unknown as Record<string, Venue>;
+  const nearYou: VenueOrigin = {
+    place: "here",
+    label: "you",
+    point: KINGS_CROSS,
+    radius: "auto",
+    venues: ["venue-a"],
+  };
+  const state = set(getDefaultState(), FilterId.Venues, ["venue-a"]);
+  const options = {
+    venues: PLACE_VENUES,
+    venueOrigin: nearYou,
+    placeVenues: PLACE_VENUES,
+  };
+
+  // All venues was the only venue move, and all of London is far too big a
+  // step when the next radius out would do.
+  it("widens the radius before widening to all venues", () => {
+    const movies = makeMovies({
+      "1": { title: "A", venueId: "venue-b" },
+    });
+
+    const suggestions = suggestFilterRelaxations({
+      movies,
+      state,
+      ...options,
+    });
+    expect(suggestions.map(lines)).toEqual([
+      ["Show “A”", "Within 2 miles of you: at BFI Southbank"],
+      ["Show “A”", "All venues: at BFI Southbank"],
+    ]);
+  });
+
+  it("carries the origin its venues were picked from", () => {
+    const movies = makeMovies({
+      "1": { title: "A", venueId: "venue-b" },
+    });
+
+    const [suggestion] = suggestFilterRelaxations({
+      movies,
+      state,
+      ...options,
+    });
+    expect(suggestion.venueOrigin).toEqual({
+      ...nearYou,
+      radius: 2,
+      venues: ["venue-a", "venue-b"],
+    });
+    expect(suggestion.state.venues).toEqual(["venue-a", "venue-b"]);
+    expect(Object.keys(apply(movies, suggestion.state))).toEqual(["1"]);
+  });
+
+  it("is not offered once the selection has moved on from the place", () => {
+    const movies = makeMovies({
+      "1": { title: "A", venueId: "venue-b" },
+    });
+
+    const suggestions = suggestFilterRelaxations({
+      movies,
+      state,
+      ...options,
+      venueOrigin: { ...nearYou, venues: ["venue-a", "venue-c"] },
+    });
+    expect(suggestions.every((s) => !s.venueOrigin)).toBe(true);
+    expect(suggestions.map(lines)).toEqual([
+      ["Show “A”", "All venues: at BFI Southbank"],
+    ]);
+  });
+
+  it("settles the radius against the rest of a pair", () => {
+    const movies = makeMovies({
+      "1": { title: "A", venueId: "venue-b", time: BEYOND_WINDOW },
+    });
+
+    const [suggestion] = suggestFilterRelaxations({
+      movies,
+      state,
+      ...options,
+    });
+    expect(lines(suggestion)).toEqual([
+      "Show “A”",
+      `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+      "Within 2 miles of you: at BFI Southbank",
+    ]);
+    expect(suggestion.venueOrigin?.radius).toBe(2);
+  });
+
+  it("is offered on a film page too", () => {
+    const movie = makeMovie("1", { title: "A", venueId: "venue-b" });
+
+    const [suggestion] = suggestShowingRelaxations({
+      movie,
+      state,
+      ...options,
+    });
+    expect(lines(suggestion)).toEqual([
+      "Search further away",
+      "Within 2 miles of you: at BFI Southbank",
+    ]);
+    expect(suggestion.venueOrigin?.radius).toBe(2);
   });
 });
 

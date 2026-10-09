@@ -1,10 +1,12 @@
 import { describe, it, expect } from "vitest";
 import {
   describeVenueOrigin,
+  findWiderVenueOrigin,
   formatPlaceRef,
   formatRadiusLabel,
   getVenueIdsNear,
   getVenueIdsWithin,
+  getWiderVenueOrigins,
   isVenueOriginCurrent,
   loadStations,
   parsePlaceRef,
@@ -140,6 +142,60 @@ describe("getVenueIdsNear", () => {
       "bfi.org.uk-southbank",
       "everyman.co.uk-kings-cross",
     ]);
+  });
+});
+
+describe("wider radii", () => {
+  const nearYou: VenueOrigin = {
+    place: "here",
+    label: "you",
+    point: KINGS_CROSS,
+    radius: 0.5,
+    venues: ["everyman.co.uk-kings-cross"],
+  };
+
+  // 1 mile picks the same Everyman as half a mile, so it answers nothing new;
+  // 3 miles adds nothing past 2 here either.
+  it("skips radii that add no venue", () => {
+    expect(getWiderVenueOrigins(nearYou, VENUES)).toEqual([
+      {
+        ...nearYou,
+        radius: 2,
+        venues: ["bfi.org.uk-southbank", "everyman.co.uk-kings-cross"],
+      },
+    ]);
+  });
+
+  // Auto can stop anywhere up to two miles, so the numbers it is compared
+  // with are those that keep its venues and add to them.
+  it("widens an automatic pick to the numbers that add to it", () => {
+    expect(
+      getWiderVenueOrigins({ ...nearYou, radius: "auto" }, VENUES).map(
+        (origin) => origin.radius,
+      ),
+    ).toEqual([2]);
+  });
+
+  it("has nothing wider past the widest radius", () => {
+    expect(
+      getWiderVenueOrigins(
+        {
+          ...nearYou,
+          radius: 3,
+          venues: ["bfi.org.uk-southbank", "everyman.co.uk-kings-cross"],
+        },
+        VENUES,
+      ),
+    ).toEqual([]);
+  });
+
+  it("finds the nearest wider radius that matches, or none", () => {
+    expect(
+      findWiderVenueOrigin(nearYou, VENUES, (ids) =>
+        ids.includes("bfi.org.uk-southbank"),
+      )?.radius,
+    ).toBe(2);
+    expect(findWiderVenueOrigin(nearYou, VENUES, () => false)).toBeNull();
   });
 });
 

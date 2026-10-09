@@ -32,6 +32,12 @@ import {
 } from "./word-distance";
 import { formatList } from "./describe";
 import {
+  describeVenueOrigin,
+  getWiderVenueOrigins,
+  isVenueOriginCurrent,
+  type VenueOrigin,
+} from "@/lib/places";
+import {
   ACCESSIBILITY_ALIASES,
   CATEGORY_ALIASES,
   GENRE_ALIASES,
@@ -87,6 +93,12 @@ export interface FilterSuggestion {
   count: number;
   /** The filter state to apply if the offer is taken. */
   state: FilterState;
+  /**
+   * Where the offered venues were picked from, to remember beside `state` when
+   * the offer is taken, so the selection still reads "Within 1 mile of you"
+   * and the picker can change its radius. Only a wider-radius offer sets it.
+   */
+  venueOrigin?: VenueOrigin;
 }
 
 /**
@@ -258,13 +270,24 @@ interface Move {
    * that — an offer headed "Show Quizzes" that selected all events.
    */
   writes: FilterId[];
-  transform: (state: FilterState) => FilterState;
+  /**
+   * `probed` is the record the result will be measured on, for a move that
+   * has to look before it settles (a wider radius). Defaults to the dataset
+   * the move was built from; a correction's reach passes its one film.
+   */
+  transform: (state: FilterState, probed?: MoviesRecord) => FilterState;
   /**
    * Turns the probe result into the specific fact worth reporting. Only ever
    * called on a result that already has something in it, so it can read the
    * first entry without guarding for emptiness beyond the obvious.
    */
   describeResult?: (result: MoviesRecord) => string | undefined;
+  /**
+   * For a move that picks venues around a place: the origin the candidate's
+   * venues stand for. It names the change line in place of `label`, since
+   * how far the move went is only known once it has been probed.
+   */
+  originFor?: (candidate: FilterState) => VenueOrigin | undefined;
 }
 
 /** Lookups needed to name things the reader would recognise. */
@@ -275,6 +298,19 @@ interface SuggestContext {
   genres?: Record<string, Genre> | null;
   /** From `buildPeopleIndex`; absent means no query is read as naming anyone. */
   people?: PeopleIndex | null;
+  /**
+   * The place the venue selection was picked from, while it still is. With
+   * `placeVenues`, the venues widen a radius at a time before they widen to
+   * everywhere.
+   */
+  venueOrigin?: VenueOrigin | null;
+  /**
+   * What a radius picks from: every venue with something showing in the whole
+   * dataset, as the place picker's are, so an offer selects exactly what its
+   * radius chip would. Not derived from the movies probed, which on a film
+   * page are that one film.
+   */
+  placeVenues?: Record<string, Pick<Venue, "id" | "geo">> | null;
 }
 
 /**
@@ -800,7 +836,9 @@ function correctionReach(
   const corrected = set(state, FilterId.Search, movie.title);
   if (Object.keys(apply(single, corrected)).length > 0) return 0;
   for (const widen of widens) {
-    if (Object.keys(apply(single, widen.transform(corrected))).length > 0) {
+    if (
+      Object.keys(apply(single, widen.transform(corrected, single))).length > 0
+    ) {
       return 1;
     }
   }
@@ -838,25 +876,93 @@ function buildCorrectionMoves(
   }));
 }
 
-/** Moves that reset one restrictive filter to its fully permissive value. */
-function buildWidenMoves(state: FilterState, context: SuggestContext): Move[] {
+/**
+ * Moves that reset one restrictive filter to its fully permissive value, with
+ * a wider radius just ahead of all venues when the venues were picked around a
+ * place ({@link buildRadiusMove}).
+ */
+function buildWidenMoves(
+  movies: MoviesRecord,
+  state: FilterState,
+  context: SuggestContext,
+): Move[] {
   const permissive = getPermissiveState();
   const restrictive = new Set(getRestrictiveFilterIds(state));
+  const radius = buildRadiusMove(movies, state, context);
 
-  return WIDENABLE.filter(({ id }) => restrictive.has(id)).map(
-    ({ id, label, action }) => ({
-      id: `widen:${id}`,
-      kind: "widen" as const,
-      action,
-      label,
-      soloOnly: id === FilterId.Accessibility,
-      altersQuery: false,
-      writes: [id],
-      transform: (current: FilterState) =>
-        set(current, id, get(permissive, id)),
-      describeResult: widenDetail(id, state, context),
-    }),
+  return WIDENABLE.filter(({ id }) => restrictive.has(id)).flatMap(
+    ({ id, label, action }) => {
+      const move: Move = {
+        id: `widen:${id}`,
+        kind: "widen" as const,
+        action,
+        label,
+        soloOnly: id === FilterId.Accessibility,
+        altersQuery: false,
+        writes: [id],
+        transform: (current: FilterState) =>
+          set(current, id, get(permissive, id)),
+        describeResult: widenDetail(id, state, context),
+      };
+      return id === FilterId.Venues && radius ? [radius, move] : [move];
+    },
   );
+}
+
+/**
+ * Widens venues picked around a place to the nearest radius that finds
+ * something, rather than to all of London. A reader near their own
+ * neighbourhood with nothing on in it would go a mile further far sooner than
+ * across town, and "all venues" was the only venue move there was.
+ *
+ * The radius is settled when the move is applied, against whatever else the
+ * combination has changed, so a pair with the dates can stop at a nearer
+ * radius than the move would need alone. Its change line names the radius it
+ * landed on ("Within 1 mile of you"), via `originFor`.
+ *
+ * Writes the venues, so it never pairs with all venues; it is offered before
+ * them, as the cheaper of the two.
+ */
+function buildRadiusMove(
+  movies: MoviesRecord,
+  state: FilterState,
+  context: SuggestContext,
+): Move | null {
+  const { venueOrigin, placeVenues } = context;
+  if (
+    !placeVenues ||
+    !isVenueOriginCurrent(venueOrigin, get(state, FilterId.Venues))
+  ) {
+    return null;
+  }
+  const wider = getWiderVenueOrigins(venueOrigin, placeVenues);
+  if (wider.length === 0) return null;
+
+  return {
+    id: "widen:radius",
+    kind: "widen",
+    action: "Search further away",
+    label: "A wider radius",
+    soloOnly: false,
+    altersQuery: false,
+    writes: [FilterId.Venues],
+    transform: (current: FilterState, probed: MoviesRecord = movies) => {
+      const found =
+        wider.find(
+          (origin) =>
+            Object.keys(
+              apply(probed, set(current, FilterId.Venues, origin.venues)),
+            ).length > 0,
+        ) ?? wider[wider.length - 1];
+      return set(current, FilterId.Venues, found.venues);
+    },
+    originFor: (candidate: FilterState) =>
+      wider.find((origin) =>
+        isVenueOriginCurrent(origin, get(candidate, FilterId.Venues)),
+      ),
+    describeResult: (result) =>
+      describeNewVenues(state, result, context.venues),
+  };
 }
 
 /**
@@ -887,16 +993,31 @@ function buildChanges(
   moves: Move[],
   headline: string,
   result: MoviesRecord,
+  candidate: FilterState,
 ): SuggestionChange[] {
   const changes: SuggestionChange[] = [];
 
   for (const move of moves) {
     const detail = move.describeResult?.(result);
     if (move.action === headline && detail === undefined) continue;
-    changes.push({ label: move.label, ...(detail ? { detail } : {}) });
+    const origin = move.originFor?.(candidate);
+    const label = origin ? describeVenueOrigin(origin) : move.label;
+    changes.push({ label, ...(detail ? { detail } : {}) });
   }
 
   return changes;
+}
+
+/** The origin a combination's venues were picked from, if one picked them. */
+function findVenueOrigin(
+  moves: Move[],
+  candidate: FilterState,
+): { venueOrigin?: VenueOrigin } {
+  for (const move of moves) {
+    const venueOrigin = move.originFor?.(candidate);
+    if (venueOrigin) return { venueOrigin };
+  }
+  return {};
 }
 
 export interface SuggestOptions extends SuggestContext {
@@ -943,8 +1064,17 @@ export function suggestFilterRelaxations({
   venues,
   genres,
   people,
+  venueOrigin,
+  placeVenues,
 }: SuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues, genres, people };
+  const context: SuggestContext = {
+    categories,
+    venues,
+    genres,
+    people,
+    venueOrigin,
+    placeVenues,
+  };
 
   // Nothing to rescue. Checked here rather than trusted to the caller because
   // the caller's idea of "empty" is easy to take from a different state than
@@ -960,7 +1090,7 @@ export function suggestFilterRelaxations({
   // nothing but only move the query; corrections rewrite it; clearing a stale
   // second query gives up words the reader typed, but ones they have likely
   // forgotten about, so it still beats giving up a filter; widenings come last.
-  const widens = buildWidenMoves(state, context);
+  const widens = buildWidenMoves(movies, state, context);
   const moves = [
     ...buildValueMoves(state, context),
     ...buildPeopleMoves(state, context),
@@ -983,9 +1113,10 @@ export function suggestFilterRelaxations({
       id: combination.map((move) => move.id).join("+"),
       kind: combination[0].kind,
       headline,
-      changes: buildChanges(combination, headline, filtered),
+      changes: buildChanges(combination, headline, filtered, candidate),
       count,
       state: candidate,
+      ...findVenueOrigin(combination, candidate),
     };
   });
 }
@@ -1112,8 +1243,16 @@ export function suggestShowingRelaxations({
   categories,
   venues,
   genres,
+  venueOrigin,
+  placeVenues,
 }: ShowingSuggestOptions): FilterSuggestion[] {
-  const context: SuggestContext = { categories, venues, genres };
+  const context: SuggestContext = {
+    categories,
+    venues,
+    genres,
+    venueOrigin,
+    placeVenues,
+  };
   const movies: MoviesRecord = { [movie.id]: movie };
 
   const countShowings = (result: MoviesRecord) =>
@@ -1121,7 +1260,7 @@ export function suggestShowingRelaxations({
 
   if (countShowings(apply(movies, state)) > 0) return [];
 
-  const widens = buildWidenMoves(state, context);
+  const widens = buildWidenMoves(movies, state, context);
   // Dropping a query is cheaper than giving up an accessibility requirement,
   // which stays last on its own terms.
   const accessibility = widens.filter((move) => move.soloOnly);
@@ -1151,9 +1290,10 @@ export function suggestShowingRelaxations({
       id: combination.map((move) => move.id).join("+"),
       kind: "widen",
       headline,
-      changes: buildChanges(combination, headline, filtered),
+      changes: buildChanges(combination, headline, filtered, candidate),
       count,
       state: candidate,
+      ...findVenueOrigin(combination, candidate),
     };
   });
 }
@@ -1254,7 +1394,7 @@ export function getFilterValueOffers({
       id: move.id,
       kind: move.kind,
       headline,
-      changes: buildChanges([move], headline, result),
+      changes: buildChanges([move], headline, result, candidate),
       count,
       state: candidate,
     });

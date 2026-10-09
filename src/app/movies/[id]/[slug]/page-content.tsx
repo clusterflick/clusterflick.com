@@ -33,6 +33,7 @@ import {
   type FilterSuggestion,
 } from "@/lib/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
+import { getPlaceVenues } from "@/lib/places";
 import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { formatDuration, formatDateLong } from "@/utils/format-date";
 import { formatLanguage } from "@/utils/format-language";
@@ -99,6 +100,7 @@ export default function PageContent({
     applyUrlParams,
     applyFilterState,
     venueOrigin,
+    rememberVenueOrigin,
   } = useFilterConfig();
   // Hiding seen films is for browsing. A reader who opens a film they've seen
   // came for it, and hiding every showing would answer them with nothing.
@@ -247,6 +249,10 @@ export default function PageContent({
       categories: EVENT_CATEGORIES,
       venues: metaData?.venues ?? null,
       genres: metaData?.genres ?? null,
+      venueOrigin,
+      // The whole dataset's venues, not this film's: a wider radius becomes the
+      // reader's venue selection everywhere, not just here.
+      placeVenues: getPlaceVenues(metaData?.venues, movies),
     });
   }, [
     showAll,
@@ -255,6 +261,8 @@ export default function PageContent({
     filteredMovie,
     filterState,
     metaData,
+    movies,
+    venueOrigin,
   ]);
 
   // Writes the global filter state, as the films grid does: an offer is a
@@ -262,12 +270,15 @@ export default function PageContent({
   // the grid disagree with what the reader just chose. "Show all" remains the
   // way to look past the filters without changing them.
   const applySuggestion = useCallback(
-    (suggestion: FilterSuggestion) =>
+    (suggestion: FilterSuggestion) => {
       applyFilterState({
         ...suggestion.state,
         [FilterId.HideSeen]: globalFilterState[FilterId.HideSeen],
-      }),
-    [applyFilterState, globalFilterState],
+      });
+      // A wider radius is still a pick around the same place.
+      if (suggestion.venueOrigin) rememberVenueOrigin(suggestion.venueOrigin);
+    },
+    [applyFilterState, globalFilterState, rememberVenueOrigin],
   );
 
   const handleShowAllToggle = useCallback(() => {

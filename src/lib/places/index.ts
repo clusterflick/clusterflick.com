@@ -1,5 +1,6 @@
-import type { Position, Venue } from "@/types";
+import type { CinemaData, Position, Venue } from "@/types";
 import { getDistanceInMiles, getNearbyVenueIds } from "@/utils/geo-distance";
+import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
 
 /**
  * A place to pick venues near, which need not be where the reader's device is:
@@ -186,6 +187,71 @@ export function isVenueOriginCurrent(
   }
   const picked = new Set(origin.venues);
   return selected.every((id) => picked.has(id));
+}
+
+/**
+ * The venues a place can pick from: those with anything showing in `movies`,
+ * which must be the whole dataset. A venue with nothing on would stop Auto
+ * short, and is useless in a selection anyway.
+ */
+export function getPlaceVenues(
+  venues: Record<string, Venue> | null | undefined,
+  movies: CinemaData["movies"],
+): Record<string, Venue> {
+  if (!venues) return {};
+  const showing = getVenueIdsWithShowings(movies);
+  return Object.fromEntries(
+    Object.entries(venues).filter(([id]) => showing.has(id)),
+  );
+}
+
+/** An origin widened to one of the numbered radii. */
+export type WiderVenueOrigin = VenueOrigin & { radius: number };
+
+/**
+ * The numbered radii wider than the one `origin` was picked at, nearest first,
+ * each as the origin it would make. `venues` must be the same set a pick reads
+ * (those with something showing), so a wider radius is exactly what the
+ * picker's own chip would select.
+ *
+ * Only radii that keep every venue already picked and add at least one: a
+ * radius picking the same venues answers nothing new, and Auto can reach past
+ * half a mile, so ½ mile can hold fewer venues than Auto did.
+ */
+export function getWiderVenueOrigins(
+  origin: VenueOrigin,
+  venues: Record<string, Pick<Venue, "id" | "geo">>,
+): WiderVenueOrigin[] {
+  const wider: WiderVenueOrigin[] = [];
+  let previous = origin.venues;
+  for (const radius of RADIUS_OPTIONS) {
+    if (radius === "auto") continue;
+    if (origin.radius !== "auto" && radius <= origin.radius) continue;
+    const ids = getVenueIdsNear(origin.point, radius, venues);
+    if (ids.length <= previous.length) continue;
+    const picked = new Set(ids);
+    if (!origin.venues.every((id) => picked.has(id))) continue;
+    wider.push({ ...origin, radius, venues: ids });
+    previous = ids;
+  }
+  return wider;
+}
+
+/**
+ * The nearest wider radius around `origin` whose venues satisfy `matches`, or
+ * null when none up to the widest does. How a place that finds nothing for the
+ * reader's other filters says how far they would have to go.
+ */
+export function findWiderVenueOrigin(
+  origin: VenueOrigin,
+  venues: Record<string, Pick<Venue, "id" | "geo">>,
+  matches: (venueIds: string[]) => boolean,
+): WiderVenueOrigin | null {
+  return (
+    getWiderVenueOrigins(origin, venues).find((wider) =>
+      matches(wider.venues),
+    ) ?? null
+  );
 }
 
 /** "Near you", "Within 2 miles of King's Cross St. Pancras". */
