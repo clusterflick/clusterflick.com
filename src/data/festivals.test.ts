@@ -25,6 +25,10 @@ const GARDEN_NOTES: [note: string, festivalId: string][] = [
     "Part of London Palestine Film Festival 2026",
     "london-palestine-film-festival",
   ],
+  [
+    "Part of London International Animation Festival 2026\nThe screening will be introduced.",
+    "london-international-animation-festival",
+  ],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
@@ -105,5 +109,29 @@ describe("Turn Up Film Festival title matchers", () => {
     "The Right Stuff",
   ])("does not claim %s", (title) => {
     expect(claims(title, "regentstreetcinema.com")).toBe(false);
+  });
+});
+
+describe("London International Animation Festival title matchers", () => {
+  const festival = FESTIVALS.find(
+    ({ id }) => id === "london-international-animation-festival",
+  )!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "LIAF 2026: International Competition Programme 1- Abstract Showcase",
+    "LIAF 2026: Jinsei- Animated Feature Film UK Premiere",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+
+  it("does not claim a title running the letters together", () => {
+    expect(claims("Bali Africa")).toBe(false);
   });
 });
