@@ -189,6 +189,19 @@ export default function FilterOverlay({
     return { movieCount, performanceCount };
   }, [movies, filterState]);
 
+  // How many events the current filters find at these venues, so the place
+  // picker can say when a pick has nothing for them, and how far would.
+  const countEventsAt = useCallback(
+    (venueIds: string[]) =>
+      Object.keys(
+        filterManager.apply(
+          movies,
+          filterManager.set(filterState, FilterId.Venues, venueIds),
+        ),
+      ).length,
+    [movies, filterState],
+  );
+
   // Calculate dynamic padding based on filter text height
   const countsPaddingTop = useMemo(() => {
     // Base padding is 80px for single line text (~42px tall)
@@ -911,6 +924,7 @@ export default function FilterOverlay({
             nearbyNotice={nearbyNotice}
             venueOrigin={venueOrigin}
             onPickNearPlace={selectVenuesNear}
+            countEventsAt={countEventsAt}
             onRequestLocation={requestLocation}
             onVenueOptionChange={setVenueOption}
             toggleVenue={toggleVenue}

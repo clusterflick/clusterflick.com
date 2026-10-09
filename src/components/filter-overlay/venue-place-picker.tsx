@@ -8,11 +8,13 @@ import {
   useRef,
   useState,
 } from "react";
+import clsx from "clsx";
 import type { Position, Venue } from "@/types";
 import {
   DEFAULT_RADIUS,
   RADIUS_OPTIONS,
   describeVenueOrigin,
+  findWiderVenueOrigin,
   formatPlaceRef,
   formatRadiusLabel,
   getVenueIdsNear,
@@ -44,6 +46,11 @@ interface VenuePlacePickerProps {
   onPick: (origin: VenueOrigin) => void;
   /** Find the reader's position, or null if it can't be had. */
   onRequestLocation: () => Promise<Position | null>;
+  /**
+   * How many events the reader's other filters find at these venues. With it,
+   * a place whose venues have nothing for them says so and how far would.
+   */
+  countEventsAt?: (venueIds: string[]) => number;
   /** Lets the Near Me and Near a Station… pills drive the picker as it opens. */
   ref?: Ref<VenuePlacePickerHandle>;
 }
@@ -95,6 +102,7 @@ export default function VenuePlacePicker({
   geoError,
   onPick,
   onRequestLocation,
+  countEventsAt,
   ref,
 }: VenuePlacePickerProps) {
   const searchRef = useRef<EntityQuickAddHandle>(null);
@@ -188,6 +196,21 @@ export default function VenuePlacePicker({
     else searchRef.current?.focus();
   };
 
+  // Auto picks the venues with anything on, not anything on for this search,
+  // so a place can find venues and still empty the grid. Rather than leave the
+  // reader to try each radius, say so and name the nearest one that works.
+  const shortfall = useMemo(() => {
+    if (!origin || !countEventsAt || countEventsAt(origin.venues) > 0) {
+      return null;
+    }
+    const wider = findWiderVenueOrigin(
+      origin,
+      venueLookup,
+      (ids) => countEventsAt(ids) > 0,
+    );
+    return { origin, wider, count: wider ? countEventsAt(wider.venues) : 0 };
+  }, [origin, venueLookup, countEventsAt]);
+
   useImperativeHandle(ref, () => ({
     locate: (radius) => void locate(radius),
     focusSearch: () => searchRef.current?.focus(),
@@ -210,6 +233,37 @@ export default function VenuePlacePicker({
             Finding your location…
           </p>
         )
+      )}
+      {shortfall && (
+        <div
+          className={clsx(styles.geoNotice, styles.radiusShortfall)}
+          role="status"
+        >
+          <p>
+            Nothing at{" "}
+            {shortfall.origin.venues.length === 1
+              ? "this venue"
+              : "these venues"}{" "}
+            matches your other filters.
+            {shortfall.wider
+              ? ` Within ${formatRadiusLabel(shortfall.wider.radius)}, ${shortfall.count.toLocaleString("en-GB")} ${shortfall.count === 1 ? "event does" : "events do"}.`
+              : shortfall.origin.radius === WIDEST_RADIUS_MILES
+                ? ""
+                : ` Nor does anything within ${formatRadiusLabel(WIDEST_RADIUS_MILES)}.`}
+          </p>
+          {shortfall.wider && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const { wider } = shortfall;
+                if (wider) pick(wider, wider.radius);
+              }}
+            >
+              Search within {formatRadiusLabel(shortfall.wider.radius)}
+            </Button>
+          )}
+        </div>
       )}
       <div
         className={styles.chipGroup}

@@ -37,6 +37,8 @@ interface VenueFilterSectionProps {
   /** The place the selection was picked from, while it still is. */
   venueOrigin: VenueOrigin | null;
   onPickNearPlace: (origin: VenueOrigin) => void;
+  /** How many events the other filters find at these venues. */
+  countEventsAt?: (venueIds: string[]) => number;
   onRequestLocation: () => Promise<Position | null>;
   onVenueOptionChange: (option: VenueOption, venueIds: string[]) => void;
   toggleVenue: (venueId: string, allVenueIds: string[]) => void;
@@ -56,6 +58,7 @@ export default function VenueFilterSection({
   nearbyNotice,
   venueOrigin,
   onPickNearPlace,
+  countEventsAt,
   onRequestLocation,
   onVenueOptionChange,
   toggleVenue,
@@ -282,6 +285,7 @@ export default function VenueFilterSection({
             onPickNearPlace(origin);
           }}
           onRequestLocation={onRequestLocation}
+          countEventsAt={countEventsAt}
           ref={pickerRef}
         />
       )}

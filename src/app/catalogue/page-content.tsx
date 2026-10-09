@@ -16,6 +16,7 @@ import {
   buildPeopleIndex,
   type FilterSuggestion,
 } from "@/lib/filters";
+import { getPlaceVenues } from "@/lib/places";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import StickyBar from "@/components/sticky-bar";
@@ -50,6 +51,8 @@ export default function PageContent() {
     hasActiveFilters,
     applyFilterState,
     applyUrlParams,
+    venueOrigin,
+    rememberVenueOrigin,
   } = useFilterConfig();
 
   const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
@@ -105,6 +108,12 @@ export default function PageContent() {
     [movies, metaData],
   );
 
+  // What a wider radius picks from, when the venues were picked around a place.
+  const placeVenues = useMemo(
+    () => getPlaceVenues(metaData?.venues, movies),
+    [metaData, movies],
+  );
+
   const suggestions = useMemo(() => {
     if (!showEmptyState || isEmpty) return [];
     return suggestFilterRelaxations({
@@ -118,6 +127,10 @@ export default function PageContent() {
       // Lets a query naming a person be read as one — the only route to the
       // people filters for a reader who doesn't know the overlay has them.
       people: peopleIndex,
+      // Lets venues picked around a place widen a radius at a time, rather
+      // than straight to every venue in London.
+      venueOrigin,
+      placeVenues,
     });
   }, [
     showEmptyState,
@@ -126,6 +139,8 @@ export default function PageContent() {
     metaData,
     deferredFilterState,
     peopleIndex,
+    venueOrigin,
+    placeVenues,
   ]);
 
   // One extra filter pass, and only while the grid is short enough for the
@@ -161,6 +176,8 @@ export default function PageContent() {
   // survives the transition and say what happened.
   const applySuggestion = (suggestion: FilterSuggestion) => {
     applyFilterState(suggestion.state);
+    // A wider radius is still a pick around the same place.
+    if (suggestion.venueOrigin) rememberVenueOrigin(suggestion.venueOrigin);
     setAnnouncement(
       `${suggestion.headline}. Showing ${suggestion.count.toLocaleString("en-GB")} result${
         suggestion.count === 1 ? "" : "s"

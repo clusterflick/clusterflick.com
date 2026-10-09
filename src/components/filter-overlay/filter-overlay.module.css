@@ -1163,6 +1163,20 @@
   margin-top: 12px;
 }
 
+/* A picked place with nothing on for the other filters, between its summary
+   and the radius chips, with the radius that would find something. */
+.radiusShortfall {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.radiusShortfall p {
+  margin: 0;
+}
+
 /* "Somewhere else?" over the station-or-venue search. */
 .placeSearchLabel {
   margin: 16px 0 0;
