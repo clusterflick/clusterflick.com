@@ -72,10 +72,6 @@
   white-space: nowrap;
 }
 
-.label:hover .name {
-  color: var(--color-neon-pink);
-}
-
 .dates {
   flex-shrink: 0;
   font-size: 12px;
