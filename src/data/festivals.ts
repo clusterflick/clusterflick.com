@@ -803,4 +803,29 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-international-animation-festival",
+    name: "London International Animation Festival",
+    url: "https://liaf.org.uk/",
+    aliases: ["liaf"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]:
+          "London International Animation Festival",
+      },
+      {
+        // The Garden Cinema notes each screening "Part of London
+        // International Animation Festival 2026"
+        [FilterId.PerformanceNotesSearch]:
+          "London International Animation Festival",
+      },
+      {
+        // Matches "LIAF 2026: International Competition Programme 1- Abstract
+        // Showcase". Search normalisation strips spacing, so "LIAF" alone
+        // would claim any title running "…li af…" together; the edition's
+        // year anchors it without tying it to one edition.
+        [FilterId.ShowingTitleSearch]: "LIAF 20",
+      },
+    ],
+  },
 ];

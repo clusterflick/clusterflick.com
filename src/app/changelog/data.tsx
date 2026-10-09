@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-09",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London International Animation Festival"
+              url="https://liaf.org.uk/"
+            />
+            , the UK&rsquo;s largest animation festival, screening independent
+            animation from around the world at venues across London from late
+            November.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-08",
     changes: [
       {
