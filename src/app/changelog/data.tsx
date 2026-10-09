@@ -103,11 +103,16 @@ export const CHANGELOG: ChangelogDay[] = [
                   name: "Peckham Oasis Gallery",
                   url: "https://www.instagram.com/peckhamoasisgallery/",
                 },
+                {
+                  name: "Cafe OTO",
+                  url: "https://www.cafeoto.co.uk",
+                },
               ]}
             />
-            : a hire venue in Georgian townhouses on Pentonville Road, and a
+            : a hire venue in Georgian townhouses on Pentonville Road, a
             charity-run art space in the railway arches under Peckham Rye
-            station.
+            station, and Dalston&rsquo;s home for experimental and improvised
+            music, which slips the odd film in among its gigs.
           </>
         ),
       },
