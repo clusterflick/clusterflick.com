@@ -88,6 +88,28 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Anomalous Space",
+                  url: "https://anomalous.co.uk/space",
+                },
+                {
+                  name: "Peckham Oasis Gallery",
+                  url: "https://www.instagram.com/peckhamoasisgallery/",
+                },
+              ]}
+            />
+            : a hire venue in Georgian townhouses on Pentonville Road, and a
+            gallery on a Peckham trading estate that has started showing film.
+          </>
+        ),
+      },
     ],
   },
   {
