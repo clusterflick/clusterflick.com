@@ -4,22 +4,28 @@ function VenueBlurb() {
   return (
     <section>
       <p>
-        Peckham Oasis Gallery is a gallery space in a pair of units on the
-        Dovedale Trading Estate in Peckham,{" "}
-        <Link href="/london-cinemas/southwark/">Southwark</Link>. It has no
-        website of its own and announces what&apos;s on through its Instagram,
-        with events listed for booking on Luma.
+        Peckham Oasis Gallery is a multi-disciplinary art and event space in the
+        railway arches beneath Peckham Rye station, in{" "}
+        <Link href="/london-cinemas/southwark/">Southwark</Link>. It is run by
+        Hifer Studios, a charity that turns vacant urban infrastructure into
+        accessible cultural spaces, and sets out to be a platform for emerging,
+        grassroots and experimental artists.
       </p>
       <p>
-        Its programme centres on exhibitions, often with workshops and talks
-        running alongside them, and film has joined that mix: screenings here
-        are one-off events in the gallery rather than a regular cinema schedule.
+        Its rotating exhibitions run from fine art to multimedia work, often
+        with independent curators, alongside live jazz, street food and a Sunday
+        art market where local makers sell prints, ceramics and handmade goods.
+        The raw, open-plan space is also hired out to artists and guest curators
+        for pop-ups, and community cinema screenings are part of that mix,
+        announced through the gallery&apos;s Instagram.
       </p>
     </section>
   );
 }
 
-export const seoDescription = "Gallery space on a Peckham trading estate";
-export const seoHighlights = "exhibitions, talks and occasional film nights";
+export const seoDescription =
+  "Charity-run art and event space under Peckham Rye station";
+export const seoHighlights =
+  "exhibitions, live jazz and community cinema screenings";
 
 export default VenueBlurb;

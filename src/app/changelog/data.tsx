@@ -106,7 +106,8 @@ export const CHANGELOG: ChangelogDay[] = [
               ]}
             />
             : a hire venue in Georgian townhouses on Pentonville Road, and a
-            gallery on a Peckham trading estate that has started showing film.
+            charity-run art space in the railway arches under Peckham Rye
+            station.
           </>
         ),
       },
