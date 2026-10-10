@@ -178,6 +178,19 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "women-and-the-world-film-festival",
+    name: "Women and the World International Film Festival",
+    url: "https://www.iffww.com/",
+    aliases: ["wwiff", "iffww"],
+    matchers: [
+      // Eventbrite listings at the Rio are titled "WWIFF: …"
+      { [FilterId.ShowingTitleSearch]: "WWIFF" },
+      // DocHouse titles its strand "DocHouse: Women and the World Festival: …"
+      // at Curzon Bloomsbury
+      { [FilterId.ShowingTitleSearch]: "Women and the World" },
+    ],
+  },
+  {
     id: "london-indian-film-festival",
     name: "London Indian Film Festival",
     url: "https://londonindianfilmfestival.co.uk/",
