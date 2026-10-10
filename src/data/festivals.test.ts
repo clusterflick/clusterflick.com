@@ -135,3 +135,23 @@ describe("London International Animation Festival title matchers", () => {
     expect(claims("Bali Africa")).toBe(false);
   });
 });
+
+describe("Women and the World International Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(
+    ({ id }) => id === "women-and-the-world-film-festival",
+  )!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    'WWIFF: Special screening "DOVZHENKO. THE FIRST LOOK"',
+    "DocHouse: Women and the World Festival: Traces",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+});
