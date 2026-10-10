@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function FestivalBlurb() {
   return (
     <section>
@@ -8,10 +10,13 @@ function FestivalBlurb() {
         Ukrainian producers through Talented U, a London non-profit.
       </p>
       <p>
-        The 2026 edition runs from 5 to 12 November, opening with a gala at Ham
-        Yard Hotel. Its theme is the role of women in shaping peace, security
-        and defence, and screenings across London include a DocHouse strand at
-        Curzon Bloomsbury and a special screening at the Rio Cinema.
+        The festival takes place over a week each November. The 2026 edition
+        runs from 5 to 12 November, opening with a gala at Ham Yard Hotel, and
+        its theme is the role of women in shaping peace, security and defence.
+        Screenings include a DocHouse strand at{" "}
+        <Link href="/venues/curzon-bloomsbury">Curzon Bloomsbury</Link> and a
+        special screening at the{" "}
+        <Link href="/venues/rio-cinema">Rio Cinema</Link> in Dalston.
       </p>
     </section>
   );
