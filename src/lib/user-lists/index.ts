@@ -154,6 +154,29 @@ export async function addManyToUserList(
   );
 }
 
+/**
+ * Puts entries back as they were, across lists, in one write — an undo. A
+ * `null` takes the film off that list, for one that wasn't on it before.
+ */
+export async function restoreUserListEntries(
+  db: Firestore,
+  uid: string,
+  movieId: Movie["id"],
+  entries: Partial<Record<UserListId, UserListEntry | null>>,
+): Promise<void> {
+  const { setDoc, deleteField } = await import("firebase/firestore/lite");
+  await setDoc(
+    await getUserDocRef(db, uid),
+    Object.fromEntries(
+      Object.entries(entries).map(([listId, entry]) => [
+        listId,
+        { [movieId]: entry ?? deleteField() },
+      ]),
+    ),
+    { merge: true },
+  );
+}
+
 export async function removeFromUserList(
   db: Firestore,
   uid: string,

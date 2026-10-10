@@ -1273,8 +1273,14 @@ everything in them is occasional (`list-management.tsx`).
 Editing takes a row of its own first, import and export pair up below it, and
 "Add a film" (below) comes last, as the one part whose results grow:
 
-- **Show Remove buttons** — off by default, and per visit rather than stored:
-  a Remove under every poster reads as the page's main business.
+- **Show editing buttons** — off by default, and per visit rather than stored:
+  buttons under every poster read as the page's main business. Remove under
+  every film, and **Seen it** on the watchlist, since ticking off a film just
+  watched is the edit most often wanted there. It moves the film to Seen as
+  the film page's button does, and its undo puts both lists back in one write
+  (`restoreToList`'s `others`), including an older Seen entry for a rewatch.
+  The Seen list gets no "Want to see": the film would stay put, so the press
+  would show nothing happening, and a rewatch is rare enough for its page.
 - **Import from Letterboxd.** Reads Letterboxd's export files (`watchlist.csv`,
   `watched.csv`, `diary.csv` — `Name`, `Year`, a date) and its import format
   (`Title`, `Year`, `tmdbID`), parsed in `@/lib/user-lists/letterboxd-csv`. The

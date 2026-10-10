@@ -176,7 +176,7 @@ export const SignedInLongLists: Story = {
   },
 };
 
-/** The list tools opened from the account bar, with Remove buttons shown. */
+/** The list tools opened from the account bar, with editing buttons shown. */
 export const SignedInManagingLists: Story = {
   args: SignedInWithLists.args,
   play: async ({ canvasElement }) => {
@@ -184,7 +184,7 @@ export const SignedInManagingLists: Story = {
     await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.click(
       canvas.getByRole("checkbox", {
-        name: "Show Remove buttons on your lists",
+        name: "Show editing buttons on your lists",
       }),
     );
   },

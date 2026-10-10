@@ -326,10 +326,23 @@
   border-radius: 10px;
 }
 
+/* Side by side while both fit, stacked on a tile too narrow for that. */
+.editButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.editButtons > * {
+  flex: 1 1 0;
+  min-width: max-content;
+}
+
 /* The pill the film page's "Want to see" and "Seen it" use, as this is the
    same control's other half. Pink on hover rather than white: this one takes
    something away. */
-.remove {
+.remove,
+.markSeen {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -354,12 +367,22 @@
   border-color: rgba(var(--color-neon-pink-rgb), 0.6);
 }
 
-.remove:focus-visible {
+/* Seen it adds rather than takes away, so it brightens to white as it does
+   on the film page. */
+.markSeen:hover {
+  color: var(--color-white);
+  background: rgba(var(--color-white-rgb), 0.1);
+  border-color: rgba(var(--color-white-rgb), 0.3);
+}
+
+.remove:focus-visible,
+.markSeen:focus-visible {
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
 }
 
-.remove svg {
+.remove svg,
+.markSeen svg {
   flex-shrink: 0;
 }
 
