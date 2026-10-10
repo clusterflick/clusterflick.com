@@ -71,7 +71,7 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
-    date: "2026-10-09",
+    date: "2026-10-10",
     changes: [
       {
         tag: "New film club",
@@ -86,6 +86,11 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+    ],
+  },
+  {
+    date: "2026-10-09",
+    changes: [
       {
         tag: "New festival",
         body: ({ Festival }) => (
