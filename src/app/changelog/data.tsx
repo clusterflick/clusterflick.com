@@ -74,6 +74,20 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-10",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Firmdale Ham Yard Hotel"
+              url="https://www.firmdalehotels.com/hotels/ham-yard-hotel"
+            />
+            , a Soho hotel whose 190-seat theatre hosts festival galas and
+            one-off screenings.
+          </>
+        ),
+      },
+      {
         tag: "New film club",
         body: ({ Venue }) => (
           <>
