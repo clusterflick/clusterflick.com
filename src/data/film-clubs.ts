@@ -655,4 +655,16 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Window Seat Cinema" },
     ],
   },
+  {
+    id: "kinoema",
+    name: "Kinoema",
+    kind: "community",
+    url: "https://www.instagram.com/accessiblescreenings/",
+    aliases: ["kinoema-accessible-screenings"],
+    matchers: [
+      // Venues list the screenings as "Kinoema presents: …".
+      { [FilterId.ShowingTitleSearch]: "Kinoema" },
+      { [FilterId.PerformanceNotesSearch]: "Kinoema" },
+    ],
+  },
 ];
