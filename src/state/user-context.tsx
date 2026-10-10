@@ -25,6 +25,7 @@ import {
   fetchUserData,
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
+  restoreUserListEntries,
   SIGNED_IN_FLAG_KEY,
   toUserListEntry,
   UserListId,
@@ -89,12 +90,15 @@ export type UserContextType = {
   ) => Promise<Movie["id"][]>;
   /**
    * Puts a removed entry back exactly as it was — its original `addedAt`, and
-   * none of `addToList`'s side effects on other lists. For undo.
+   * none of `addToList`'s side effects on other lists. For undo. `others` puts
+   * the film's entries on other lists back in the same write (`null` for a
+   * list it wasn't on), undoing an add that moved it between lists.
    */
   restoreToList: (
     listId: UserListId,
     movieId: Movie["id"],
     entry: UserListEntry,
+    others?: Partial<Record<UserListId, UserListEntry | null>>,
   ) => Promise<void>;
   addFavouriteVenue: (venue: Pick<Venue, "id" | "name">) => Promise<void>;
   removeFavouriteVenue: (venueId: Venue["id"]) => Promise<void>;
@@ -365,17 +369,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
 
   const restoreToList = useCallback<UserContextType["restoreToList"]>(
-    async (listId, movieId, entry) => {
+    async (listId, movieId, entry, others = {}) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      const entries = { ...others, [listId]: entry };
       const previous = lists;
-      setLists((current) =>
-        current
-          ? { ...current, [listId]: { ...current[listId], [movieId]: entry } }
-          : current,
-      );
+      setLists((current) => {
+        if (!current) return current;
+        const next = { ...current };
+        for (const [id, restored] of Object.entries(entries)) {
+          const otherId = id as UserListId;
+          next[otherId] = { ...current[otherId] };
+          if (restored) next[otherId][movieId] = restored;
+          else delete next[otherId][movieId];
+        }
+        return next;
+      });
       try {
-        await addToUserList(db, user.uid, listId, movieId, entry);
+        await restoreUserListEntries(db, user.uid, movieId, entries);
       } catch (error) {
         setLists(previous);
         throw error;

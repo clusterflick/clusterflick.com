@@ -117,27 +117,28 @@ function downloadCsv(fileName: string, csv: string) {
 }
 
 /**
- * Whether the lists show their Remove buttons, importing from and exporting to
+ * Whether the lists show their editing buttons (Remove, and Seen it on the
+ * watchlist), importing from and exporting to
  * Letterboxd, and adding a film that isn't showing. Tucked under the account
  * bar: all of it is occasional. The search comes last as the one part that
  * grows, so its results push nothing else down.
  */
 export default function ListManagement({
-  showRemove,
-  onShowRemoveChange,
+  showEditing,
+  onShowEditingChange,
 }: {
-  showRemove: boolean;
-  onShowRemoveChange: (show: boolean) => void;
+  showEditing: boolean;
+  onShowEditingChange: (show: boolean) => void;
 }) {
   return (
     <div className={styles.management}>
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Editing</h3>
         <Switch
-          id="personalise-show-remove"
-          label="Show Remove buttons on your lists"
-          checked={showRemove}
-          onChange={onShowRemoveChange}
+          id="personalise-show-editing"
+          label="Show editing buttons on your lists"
+          checked={showEditing}
+          onChange={onShowEditingChange}
           className={styles.managementSwitch}
         />
       </section>

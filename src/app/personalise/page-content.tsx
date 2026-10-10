@@ -528,9 +528,9 @@ function SignedIn({
   venueImagePaths: Record<string, string>;
 }) {
   const { lists, favouriteVenues } = useUserContext();
-  // Off by default, and for each visit: removing is occasional, and a Remove
-  // under every poster reads as the page's main business.
-  const [showRemove, setShowRemove] = useState(false);
+  // Off by default, and for each visit: editing is occasional, and buttons
+  // under every poster read as the page's main business.
+  const [showEditing, setShowEditing] = useState(false);
   // One panel at a time: both open below the toolbar, and two stacked would
   // push the lists a screen down.
   const [panel, setPanel] = useState<AccountPanel | null>(null);
@@ -561,28 +561,28 @@ function SignedIn({
         ref={accountBarRef}
         panel={panel}
         onPanelChange={setPanel}
-        showRemove={showRemove}
-        onShowRemoveChange={setShowRemove}
+        showEditing={showEditing}
+        onShowEditingChange={setShowEditing}
       />
       {lists ? (
         <>
           <UserListSection
             listId={UserListId.Watchlist}
             lists={lists}
-            showRemove={showRemove}
+            showEditing={showEditing}
             onOpenFilmSearch={openFilmSearch}
           />
           {favouriteVenues && (
             <FavouriteVenuesSection
               favouriteVenues={favouriteVenues}
-              showRemove={showRemove}
+              showEditing={showEditing}
               venueImagePaths={venueImagePaths}
             />
           )}
           <UserListSection
             listId={UserListId.Seen}
             lists={lists}
-            showRemove={showRemove}
+            showEditing={showEditing}
           />
         </>
       ) : (
@@ -598,14 +598,14 @@ function AccountBar({
   ref,
   panel,
   onPanelChange,
-  showRemove,
-  onShowRemoveChange,
+  showEditing,
+  onShowEditingChange,
 }: {
   ref: RefObject<HTMLDivElement | null>;
   panel: AccountPanel | null;
   onPanelChange: (panel: AccountPanel | null) => void;
-  showRemove: boolean;
-  onShowRemoveChange: (show: boolean) => void;
+  showEditing: boolean;
+  onShowEditingChange: (show: boolean) => void;
 }) {
   const { email, signOut } = useUserContext();
 
@@ -647,8 +647,8 @@ function AccountBar({
       <div id="personalise-lists" hidden={panel !== "lists"}>
         {panel === "lists" && (
           <ListManagement
-            showRemove={showRemove}
-            onShowRemoveChange={onShowRemoveChange}
+            showEditing={showEditing}
+            onShowEditingChange={onShowEditingChange}
           />
         )}
       </div>
@@ -722,37 +722,49 @@ function AccountManagement() {
   );
 }
 
+/**
+ * A film taken off a list while its undo is on offer. `seen` is set when it
+ * was marked seen rather than removed: its Seen entry from before, or `null`
+ * if it wasn't on Seen, for the undo to put back.
+ */
+type Removal = { entry: UserListEntry; seen?: UserListEntry | null };
+
 function UserListSection({
   listId,
   lists,
-  showRemove,
+  showEditing,
   onOpenFilmSearch,
 }: {
   listId: UserListId;
   lists: UserLists;
-  /** Remove buttons are hidden until asked for, from the account bar. */
-  showRemove: boolean;
+  /** Editing buttons are hidden until asked for, from the account bar. */
+  showEditing: boolean;
   /** Opens the list tools at the film search, from the empty watchlist. */
   onOpenFilmSearch?: () => void;
 }) {
-  const { removeFromList, restoreToList } = useUserContext();
+  const { addToList, removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
     useCinemaData();
   const [highlightGroupsRef, highlightGroupsWidth] =
     useElementWidth<HTMLDivElement>();
   // Held while their undo is on offer, so each keeps its place in the grid
   // rather than the films after it closing up under the pointer.
-  const [removed, setRemoved] = useState<Record<string, UserListEntry>>({});
+  const [removed, setRemoved] = useState<Record<string, Removal>>({});
   // Fixed for the visit: the page isn't left open long enough for "ending
   // soon" to drift, and a moving value would defeat the occasion cache.
   const [now] = useState(() => Date.now());
   const title = LIST_TITLES[listId];
   const listed = lists[listId];
-  const entries = Object.entries({ ...removed, ...listed })
+  const entries = Object.entries({
+    ...Object.fromEntries(
+      Object.entries(removed).map(([id, { entry }]) => [id, entry]),
+    ),
+    ...listed,
+  })
     .map(([id, entry]) => ({
       id,
       entry,
-      isRemoved: !(id in listed),
+      removal: id in listed ? undefined : removed[id],
       sortTitle: movies[id]?.normalizedTitle ?? getSortTitle(entry.title),
     }))
     .sort((a, b) => a.sortTitle.localeCompare(b.sortTitle));
@@ -775,16 +787,32 @@ function UserListSection({
     });
 
   const onRemove = (id: string, entry: UserListEntry) => {
-    setRemoved((current) => ({ ...current, [id]: entry }));
+    setRemoved((current) => ({ ...current, [id]: { entry } }));
     // A failed write puts the film back in the list, so the placeholder goes.
     removeFromList(listId, id).catch(() => forget(id));
   };
 
-  const onUndo = (id: string, entry: UserListEntry) => {
-    forget(id);
-    restoreToList(listId, id, entry).catch((error) =>
-      console.error("Failed to restore list entry", error),
+  // Marking seen takes the film off the watchlist, as on its own page, so it
+  // leaves the same placeholder a removal does.
+  const onMarkSeen = (id: string, entry: UserListEntry) => {
+    // A film seen before (on the watchlist again for a rewatch) gets a new
+    // entry, so the old one is kept for the undo to put back.
+    const seen = lists[UserListId.Seen][id] ?? null;
+    setRemoved((current) => ({ ...current, [id]: { entry, seen } }));
+    // As its page would add it, while it's still in the dataset.
+    addToList(UserListId.Seen, movies[id] ?? { id, ...entry }).catch(() =>
+      forget(id),
     );
+  };
+
+  const onUndo = (id: string, { entry, seen }: Removal) => {
+    forget(id);
+    restoreToList(
+      listId,
+      id,
+      entry,
+      seen === undefined ? undefined : { [UserListId.Seen]: seen },
+    ).catch((error) => console.error("Failed to restore list entry", error));
   };
 
   if (entries.length === 0) {
@@ -833,17 +861,21 @@ function UserListSection({
   };
 
   const toTile = (
-    { id, entry, isRemoved }: (typeof entries)[number],
+    { id, entry, removal }: (typeof entries)[number],
     showing: boolean,
     note?: PosterTileNote,
   ) => {
-    if (isRemoved) {
+    if (removal) {
       return (
         <RemovedPosterTile
           key={id}
           title={entry.title}
-          message={`Removed from ${title}`}
-          onUndo={() => onUndo(id, entry)}
+          message={
+            removal.seen === undefined
+              ? `Removed from ${title}`
+              : `Moved to ${LIST_TITLES[UserListId.Seen]}`
+          }
+          onUndo={() => onUndo(id, removal)}
           onExpire={() => forget(id)}
         />
       );
@@ -864,16 +896,29 @@ function UserListSection({
         details={entry.year ? [entry.year] : undefined}
         note={note}
         action={
-          showRemove && (
-            <button
-              type="button"
-              className={styles.remove}
-              onClick={() => onRemove(id, entry)}
-              aria-label={`Remove ${entry.title} from ${title}`}
-            >
-              <CloseIcon size={14} />
-              Remove
-            </button>
+          showEditing && (
+            <div className={styles.editButtons}>
+              {listId === UserListId.Watchlist && (
+                <button
+                  type="button"
+                  className={styles.markSeen}
+                  onClick={() => onMarkSeen(id, entry)}
+                  aria-label={`Mark ${entry.title} as seen`}
+                >
+                  <EyeIcon size={14} />
+                  Seen it
+                </button>
+              )}
+              <button
+                type="button"
+                className={styles.remove}
+                onClick={() => onRemove(id, entry)}
+                aria-label={`Remove ${entry.title} from ${title}`}
+              >
+                <CloseIcon size={14} />
+                Remove
+              </button>
+            </div>
           )
         }
       />
@@ -1053,11 +1098,11 @@ function UserListSection({
  */
 function FavouriteVenuesSection({
   favouriteVenues,
-  showRemove,
+  showEditing,
   venueImagePaths,
 }: {
   favouriteVenues: FavouriteVenues;
-  showRemove: boolean;
+  showEditing: boolean;
   venueImagePaths: Record<string, string>;
 }) {
   const { addFavouriteVenue, removeFavouriteVenue } = useUserContext();
@@ -1216,7 +1261,7 @@ function FavouriteVenuesSection({
                         Undo
                       </button>
                     ) : (
-                      showRemove && (
+                      showEditing && (
                         <button
                           type="button"
                           className={styles.remove}
