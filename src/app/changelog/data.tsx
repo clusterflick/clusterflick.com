@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-11",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="EbonyLife Place London"
+              url="https://ebonylifeplacelondon.com"
+            />
+            , a Wandsworth Road home for Black and African culture whose Amani
+            Auditorium screens Nollywood, African and diaspora cinema.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-10",
     changes: [
       {
