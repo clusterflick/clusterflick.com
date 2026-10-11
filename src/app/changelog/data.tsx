@@ -87,6 +87,20 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Kingston Museum"
+              url="https://www.kingstonheritage.org.uk"
+            />
+            , the borough&apos;s 1904 museum and home of its Eadweard Muybridge
+            collection.
+          </>
+        ),
+      },
     ],
   },
   {
