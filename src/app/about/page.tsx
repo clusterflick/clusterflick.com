@@ -37,7 +37,7 @@ const faqs = [
   {
     question: "What is Clusterflick?",
     answer:
-      "Clusterflick is a free site that brings together film screenings from across London's 400+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
+      "Clusterflick is a free site that brings together film screenings from across London's 450+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
   },
   {
     question: "Where does Clusterflick's film data come from?",
