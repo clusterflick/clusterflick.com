@@ -2,7 +2,7 @@
 
 **[clusterflick.com](https://clusterflick.com)** · **[Storybook (Chromatic)](https://main--6984c607d80835bfe88c8309.chromatic.com)**
 
-> Every film, every cinema, one place.
+> Every film showing in London.
 
 Clusterflick is an open-source web app that aggregates film screenings from
 across London cinemas into a single, searchable interface. Compare screenings,
@@ -11,7 +11,7 @@ cult classics.
 
 ## Features
 
-- **Unified Cinema Listings** — Browse film screenings from 450+ London cinemas
+- **Unified Cinema Listings** — Browse film screenings from 450+ London venues
   in one place
 - **Rich Movie Data** — View ratings and reviews from IMDb, Letterboxd,
   Metacritic, and Rotten Tomatoes

@@ -196,7 +196,7 @@ export default function FestivalsPageContent({
     <StandardPageLayout title="Festivals" subtitle={subtitle}>
       {count > 0 && (
         <p className={styles.intro}>
-          Clusterflick tracks film festivals happening right now across London.
+          Film festivals happening right now across London.
           {venues.length > 0 && (
             <>
               {" "}

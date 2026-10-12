@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
   description:
-    "Discover what's worth seeing across London's 450+ cinemas — the films showing most widely, new additions and last chance screenings. Every London cinema listing in one place.",
+    "Discover what's worth seeing across 450+ London venues — the films showing most widely, new additions and last chance screenings.",
   alternates: {
     canonical: "/",
   },
@@ -89,7 +89,7 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "Clusterflick",
-            description: "Every London cinema listing in one place",
+            description: "Every film showing in London",
             url: "https://clusterflick.com",
           }),
         }}
@@ -101,8 +101,7 @@ export default async function Home() {
             What&apos;s On at London Cinemas
           </OutlineHeading>
           <p className={styles.introLead}>
-            Clusterflick brings every film screening across 450+ London venues
-            into one place.
+            Every film showing in London — 450+ venues, one search.
             <br />
             From blockbusters at{" "}
             <Link href="/cinema-groups/picturehouse">

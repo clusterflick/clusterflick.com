@@ -80,7 +80,7 @@ export const Extended: Story = {
       <>
         <OutlineHeading>Clusterflick</OutlineHeading>
         <p style={{ fontSize: 18, opacity: 0.8 }}>
-          Every film, every cinema, one place.
+          Every film showing in London.
         </p>
       </>
     ),

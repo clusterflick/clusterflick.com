@@ -37,7 +37,7 @@ const faqs = [
   {
     question: "What is Clusterflick?",
     answer:
-      "Clusterflick is a free site that brings together film screenings from across London's 450+ cinemas into one place, so you can compare screenings and find your perfect movie night.",
+      "Clusterflick is a free site listing every film showing in London — 450+ venues, one search.",
   },
   {
     question: "Where does Clusterflick's film data come from?",
@@ -120,10 +120,9 @@ export default function AboutPage() {
         </div>
         <OutlineHeading className={styles.title}>Clusterflick</OutlineHeading>
         <p className={styles.tagline}>
-          <strong>Every film, every cinema, one place.</strong>
+          <strong>Every film showing in London.</strong>
           <br />
-          Compare screenings across London and find your perfect
-          movie&nbsp;night.
+          450+ venues, one search.
           <br />
           Whether you&apos;re chasing new releases or cult classics, we make it
           easy to see what&apos;s on, where, and&nbsp;when.

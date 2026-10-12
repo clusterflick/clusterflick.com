@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Clusterflick",
   },
   description:
-    "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+    "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.",
   keywords: [
     "cinema",
     "movies",
@@ -44,9 +44,9 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://clusterflick.com",
     siteName: "Clusterflick",
-    title: "Clusterflick – Every film, every cinema, one place",
+    title: "Clusterflick – Every film showing in London",
     description:
-      "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.",
+      "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.",
     images: [
       {
         url: "/images/og-image.png",
@@ -58,9 +58,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Clusterflick – Every film, every cinema, one place",
-    description:
-      "Compare screenings across London cinemas and find your perfect movie night.",
+    title: "Clusterflick – Every film showing in London",
+    description: "Every film showing in London — 450+ venues, one search.",
     creator: "@clusterflick",
     images: ["/images/og-image.png"],
   },

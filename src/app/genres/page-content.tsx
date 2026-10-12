@@ -31,8 +31,8 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
       subtitle={`${genres.length} genres · ${showingCount} showing now`}
     >
       <p className={styles.intro}>
-        Clusterflick sorts every film showing across London into {genres.length}{" "}
-        genres — from {genreLink("horror")} and {genreLink("comedy")} to{" "}
+        Every film showing across London, sorted into {genres.length} genres —
+        from {genreLink("horror")} and {genreLink("comedy")} to{" "}
         {genreLink("documentary")} and {genreLink("science fiction")}.
         {hasShowings && (
           <>

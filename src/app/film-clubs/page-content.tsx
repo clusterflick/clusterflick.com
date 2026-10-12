@@ -38,9 +38,9 @@ export default function FilmClubsPageContent({
   return (
     <StandardPageLayout title="Film Clubs" subtitle={subtitle}>
       <p className={styles.intro}>
-        Clusterflick tracks screenings from London&apos;s specialist film clubs.
-        These clubs run regular events covering everything from cult cinema to
-        world film, genre nights to community screenings.
+        London&apos;s specialist film clubs run regular events covering
+        everything from cult cinema to world film, genre nights to community
+        screenings.
       </p>
 
       <PosterRow

@@ -9,7 +9,7 @@ import FormatsPageContent from "./page-content";
 export const metadata: Metadata = {
   title: "Browse Films by Format in London",
   description:
-    "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across London's 450+ cinemas.",
+    "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across 450+ London venues.",
   alternates: {
     canonical: "/formats",
   },

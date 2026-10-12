@@ -16,7 +16,7 @@ import styles from "./page.module.css";
 const PAGE_TITLE =
   "Every Film Showing in London — Search London Cinema Listings";
 const PAGE_DESCRIPTION =
-  "Compare screenings across London cinemas and find your perfect movie night. Whether you're chasing new releases or cult classics, see what's on, where, and when.";
+  "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.";
 
 // How many films to bake into the static HTML.
 const STATIC_MOVIE_LIMIT = 72;

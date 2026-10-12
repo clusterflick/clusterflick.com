@@ -24,8 +24,7 @@ export default function VenuesPageContent({
       subtitle={`${totalVenues.toLocaleString("en-GB")} venues across London`}
     >
       <p className={styles.intro}>
-        Clusterflick tracks film screenings from{" "}
-        {totalVenues.toLocaleString("en-GB")} venues across{" "}
+        Film screenings from {totalVenues.toLocaleString("en-GB")} venues across{" "}
         <Link href="/london-cinemas">all 33 boroughs of London</Link>, from{" "}
         <Link href="/cinema-groups">major cinema chains</Link> like{" "}
         <Link href="/cinema-groups/curzon">Curzon</Link>,{" "}
