@@ -79,7 +79,8 @@ export const CHANGELOG: ChangelogDay[] = [
           <>
             Added{" "}
             <Venue name="Plaza Camden" url="https://www.plazacamden.com" />, a
-            new venue on Parkway in Camden.
+            1937 super cinema on Parkway reopened as an arts space, with film
+            alongside theatre, music and art.
           </>
         ),
       },
