@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CinemaData, Genre } from "@/types";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
+import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
 import styles from "./filter-overlay.module.css";
 
 interface GenreFilterSectionProps {
@@ -42,7 +43,7 @@ export default function GenreFilterSection({
     const counts = new Map<string, number>();
     availableGenres.forEach((genre) => counts.set(genre.id, 0));
     Object.values(movies).forEach((movie) => {
-      movie.genres?.forEach((genreId) => {
+      getMovieAndIncluded(movie, "genres").forEach((genreId) => {
         counts.set(genreId, (counts.get(genreId) || 0) + 1);
       });
     });

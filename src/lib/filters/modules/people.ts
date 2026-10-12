@@ -6,6 +6,7 @@ import {
   editBudgetFor,
   MIN_FUZZY_LENGTH,
 } from "../word-distance";
+import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
 
 /** The two people filter IDs. Each reads one credit list on the movie. */
 export type PeopleFilterId = FilterId.Directors | FilterId.Cast;
@@ -119,7 +120,7 @@ function buildPeopleFilter(
       const result: MoviesRecord = {};
 
       for (const [id, movie] of Object.entries(movies)) {
-        const credits = movie[group.key] ?? [];
+        const credits = getMovieAndIncluded(movie, group.key);
         if (credits.some((personId) => selectedSet.has(personId))) {
           result[id] = movie;
         }
@@ -163,8 +164,9 @@ export function getPeopleVocabulary(
   for (const movie of Object.values(movies)) {
     for (const group of PEOPLE_GROUPS) {
       const tally = counts[group.filterId];
-      // A person credited twice on one film still only screens once.
-      for (const personId of new Set(movie[group.key] ?? [])) {
+      // A person credited twice on one film still only screens once. Credits
+      // on the films an event screens count too, as the filter matches them.
+      for (const personId of new Set(getMovieAndIncluded(movie, group.key))) {
         tally.set(personId, (tally.get(personId) ?? 0) + 1);
       }
     }
