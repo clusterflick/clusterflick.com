@@ -71,6 +71,21 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-12",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue name="Plaza Camden" url="https://www.plazacamden.com" />, a
+            new venue on Parkway in Camden.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-11",
     changes: [
       {
