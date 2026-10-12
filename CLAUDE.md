@@ -640,6 +640,18 @@ started emitting it carries none, and TheMovieDB has no score for some people.
 Absent is not zero — unranked, not unpopular — and the ordering falls through to
 director-first.
 
+## Multi-film Events
+
+A double bill, marathon or shorts programme usually matches no single film, so
+its own `genres`, `directors` and `actors` are empty (genres hold only the
+"Uncategorised" placeholder) while each film in `includedMovies` carries its
+own. The genre and people filters, the genre pages and the overlay's counts
+read an event through `getMovieAndIncluded` (`@/utils/get-movie-and-included`):
+the event plus the films it screens, any one matching, as every multi-select
+filter reads "or". An unmatched event whose films supply genres stops being
+Uncategorised. A shorts programme whose venue listed no films still has
+nothing to read, and stays Uncategorised.
+
 ## Films Filter
 
 `FilterId.Movies` (`src/lib/filters/modules/movies.ts`) restricts the grid to a

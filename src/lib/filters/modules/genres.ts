@@ -1,11 +1,13 @@
 import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
+import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
 
 /**
  * Genres filter module.
  * Filters movies by genre IDs.
  * - `null` = all genres selected (no filter applied)
  * - `[]` = no genres selected (no movies match)
- * - `[...ids]` = only movies with at least one of these genres
+ * - `[...ids]` = only movies with at least one of these genres, counting
+ *   those of the films a multi-film event screens
  */
 export const genresFilter: FilterModule<FilterId.Genres> = {
   id: FilterId.Genres,
@@ -65,8 +67,8 @@ export const genresFilter: FilterModule<FilterId.Genres> = {
     const result: MoviesRecord = {};
 
     for (const [id, movie] of Object.entries(movies)) {
-      // Check if movie has any of the selected genres
-      const movieGenres = movie.genres ?? [];
+      // Check if movie, or any film it screens, has a selected genre
+      const movieGenres = getMovieAndIncluded(movie, "genres");
       const hasMatchingGenre = movieGenres.some((genreId) =>
         genreSet.has(genreId),
       );
