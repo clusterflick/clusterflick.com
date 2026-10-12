@@ -84,6 +84,18 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://www.skiddle.com">Skiddle</Ext>, the ticketing
+            site, including any film nights{" "}
+            <Venue name="Plaza Camden" url="https://www.plazacamden.com" />{" "}
+            sells there.
+          </>
+        ),
+      },
     ],
   },
   {
