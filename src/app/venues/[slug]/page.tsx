@@ -134,7 +134,7 @@ export async function generateMetadata({
   const fallbackOgImage = {
     url: "/images/og-image.png",
     width: 1200,
-    height: 675,
+    height: 630,
     alt: "Clusterflick",
   };
 
