@@ -18,6 +18,7 @@
 # next.js
 /.next/
 /out/
+/static-history/
 
 # production
 /build
