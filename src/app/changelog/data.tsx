@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-14",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="QUEERHUB Film Festival"
+              url="https://queerhub.uk/festival"
+            />
+            , a festival of new queer short films with filmmaker Q&amp;As,
+            screening over two evenings at the London Film School on 23 and 24
+            October.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-12",
     changes: [
       {
