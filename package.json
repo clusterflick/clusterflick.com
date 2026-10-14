@@ -11,6 +11,7 @@
     "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
     "fetch-calendar-data": "node ./scripts/fetch-calendar-data.js",
     "fetch-london-stations": "node ./scripts/fetch-london-stations.js",
+    "carry-forward-static": "node ./scripts/carry-forward-static.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",
     "test": "vitest run --project unit",
     "storybook": "storybook dev -p 6006",
