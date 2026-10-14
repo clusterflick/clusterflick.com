@@ -155,3 +155,21 @@ describe("Women and the World International Film Festival title matchers", () =>
     expect(claims(title)).toBe(true);
   });
 });
+
+describe("QUEERHUB Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "queerhub")!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "QUEERHUB Film Festival: Friday",
+    "QUEERHUB Film Festival: Saturday",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+});
