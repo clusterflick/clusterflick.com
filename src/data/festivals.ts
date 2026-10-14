@@ -440,6 +440,17 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "queerhub",
+    name: "QUEERHUB Film Festival",
+    url: "https://queerhub.uk/festival",
+    aliases: ["queerhub-film-festival"],
+    matchers: [
+      // Ticket Tailor listings at the London Film School, one per evening:
+      // "QUEERHUB Film Festival: Friday", "… Saturday", October 23–24 2026
+      { [FilterId.ShowingTitleSearch]: "QUEERHUB" },
+    ],
+  },
+  {
     id: "fighting-spirit-film-festival",
     name: "The Fighting Spirit Film Festival",
     url: "https://www.fightingspiritfilmfestival.com",
