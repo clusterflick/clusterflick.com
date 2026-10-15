@@ -67,7 +67,7 @@ export default function PosterRow({
         )}
       </div>
       {intro && <p className={styles.intro}>{intro}</p>}
-      <PosterScroller>
+      <PosterScroller scrollKey={title}>
         {movies.map(({ movie, subtitle }) => {
           const includedMovies = movie.includedMovies;
           const includedWithPosters =

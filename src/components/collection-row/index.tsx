@@ -53,7 +53,7 @@ export default function CollectionRow({
         )}
       </div>
       {intro && <p className={styles.intro}>{intro}</p>}
-      <PosterScroller>
+      <PosterScroller scrollKey={title}>
         {collections.map(({ collection, showingCount }) => (
           <Link
             key={collection.id}
