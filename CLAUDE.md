@@ -609,8 +609,12 @@ Refine row does: these arrive from outside the overlay (a name on a film
 page), and behind a closed row they would read as no filter at all.
 
 **The control is `EntityQuickAdd`**, the Downshift combobox the venue filter
-already used, generalised. Matching is case-insensitive substring, and results
-stop at `maxResults` **in list order** — so the vocabulary must arrive
+already used, generalised. Matching is a substring of both sides run through
+`normalizeForSearch`, so case, accents, punctuation and spacing never stop a
+match: compared as typed, "Kings Cr" missed "King's Cross St. Pancras" and only
+reached it at the lengths the fuzzy pass below happened to cover. The
+normalized names are cached in a `WeakMap` on the list. Results stop at
+`maxResults` **in list order** — so the vocabulary must arrive
 best-represented first, or a two-letter query walks all 11,000 cast names.
 
 **A menu falls back to fuzzy; it has nothing to disambiguate.** When the
