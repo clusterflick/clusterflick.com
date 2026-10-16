@@ -299,6 +299,42 @@ type FilterConfigContextType = {
   applyUrlParams: () => void;
 };
 
+/**
+ * Discard stale dates — if a start or end date is in the past, fall back to
+ * the default so the reader doesn't see zero results. A date comes from
+ * session storage or a URL, and an old history entry or bookmark carries the
+ * day it was made on.
+ */
+function discardStaleDates(state: FilterState): FilterState {
+  const todayMidnight = getLondonMidnightTimestamp();
+  const dateRange = state[FilterId.DateRange];
+  if (
+    (dateRange.start !== null && dateRange.start < todayMidnight) ||
+    (dateRange.end !== null && dateRange.end < todayMidnight)
+  ) {
+    return {
+      ...state,
+      [FilterId.DateRange]: filterManager.getDefaultState()[FilterId.DateRange],
+    };
+  }
+  return state;
+}
+
+/**
+ * The filter state a URL's query asks for, resolved over `current`, or null
+ * when it carries no filter params. The `base` param picks the starting point
+ * (default / all / patch); params then override individual dimensions on top
+ * of it, so a deep link is self-contained rather than inheriting whatever was
+ * left in session storage.
+ */
+export function resolveUrlFilterState(
+  search: string,
+  current: FilterState,
+): FilterState | null {
+  const resolved = filterManager.resolveFilterStateFromUrl(search, current);
+  return resolved ? discardStaleDates(resolved) : null;
+}
+
 const Context = createContext<FilterConfigContextType | undefined>(undefined);
 
 export function FilterConfigProvider({ children }: { children: ReactNode }) {
@@ -324,44 +360,22 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       // Silently ignore — will use defaults
     }
 
-    // Resolve URL params on top (highest priority). The `base` param picks the
-    // starting point (default / all / patch); params then override individual
-    // dimensions on top of it, so a deep link is self-contained rather than
-    // inheriting whatever was left in session storage.
+    // Resolve URL params on top (highest priority).
     try {
-      const resolved = filterManager.resolveFilterStateFromUrl(
-        window.location.search,
-        state,
-      );
-      if (resolved) {
-        state = resolved;
-      }
+      state = resolveUrlFilterState(window.location.search, state) ?? state;
     } catch {
       // Malformed URL params — ignore
     }
 
-    // Discard stale dates — if a restored start or end date is in the
-    // past, fall back to the default so the user doesn't see zero results
-    const todayMidnight = getLondonMidnightTimestamp();
-    const dateRange = state[FilterId.DateRange];
-    const defaultDateRange =
-      filterManager.getDefaultState()[FilterId.DateRange];
-    if (
-      (dateRange.start !== null && dateRange.start < todayMidnight) ||
-      (dateRange.end !== null && dateRange.end < todayMidnight)
-    ) {
-      state = { ...state, [FilterId.DateRange]: defaultDateRange };
-    }
+    // A restored date can be as stale as a URL's.
+    state = discardStaleDates(state);
 
     return state;
   });
 
-  // Strip URL params on mount so a refresh uses session storage.
-  useEffect(() => {
-    if (filterManager.hasUrlFilterParams(window.location.search)) {
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-  }, []);
+  // The URL is left alone here. The catalogue and planner keep their filters
+  // in it (useFilterUrlSync), and the film page strips what it was handed
+  // (applyUrlParams), so each page decides what its own address carries.
 
   // Sync filter state to session storage on every change.
   useEffect(() => {
@@ -839,13 +853,13 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     setStoredVenueOrigin(null);
   }, []);
 
+  // For a page that takes filters from a link but keeps them out of its own
+  // address (the film page): adopt them, then strip them.
   const applyUrlParams = useCallback(() => {
-    if (!filterManager.hasUrlFilterParams(window.location.search)) return;
-    setFilterState(
-      (prev) =>
-        filterManager.resolveFilterStateFromUrl(window.location.search, prev) ??
-        prev,
-    );
+    // Read now: the updater runs later, after the address has been stripped.
+    const search = window.location.search;
+    if (!filterManager.hasUrlFilterParams(search)) return;
+    setFilterState((prev) => resolveUrlFilterState(search, prev) ?? prev);
     window.history.replaceState({}, "", window.location.pathname);
   }, []);
 

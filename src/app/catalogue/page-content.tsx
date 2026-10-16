@@ -27,6 +27,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import EmptyState from "@/components/empty-state";
 import FilterSuggestions from "@/components/filter-suggestions";
 import { useOpenFiltersHash } from "@/hooks/use-open-filters-hash";
+import { useFilterUrlSync } from "@/hooks/use-filter-url-sync";
 import styles from "./page.module.css";
 
 const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
@@ -50,22 +51,18 @@ export default function PageContent() {
     resetFilters,
     hasActiveFilters,
     applyFilterState,
-    applyUrlParams,
     venueOrigin,
     rememberVenueOrigin,
   } = useFilterConfig();
 
   const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
-  // Ahead of `applyUrlParams`, which would clear the hash.
+  // Ahead of `useFilterUrlSync`, which keeps the hash it finds.
   useOpenFiltersHash(() => setIsFilterOverlayOpen(true));
 
-  // Apply any URL params on mount — FilterConfigProvider stays mounted across
-  // client-side navigations, so its useState initialiser never re-reads URL
-  // params. Without this, navigating to /catalogue?venues=… via a client-side link
-  // would leave the filter unapplied until a full refresh.
-  useEffect(() => {
-    applyUrlParams();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // The filters live in the address — FilterConfigProvider stays mounted
+  // across client-side navigations, so its useState initialiser never re-reads
+  // it, and Back has to land on the filters each entry was showing.
+  useFilterUrlSync();
 
   // Fetch data once on mount. Empty deps are intentional: all movie data is loaded
   // into global context once, and getData returns early if data already exists.

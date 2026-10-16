@@ -557,6 +557,37 @@ taller than the screen and put its heading under the bar) and focusing it.
 with the ids of the filters that visit changed (`getChangedFilterIds`), sent
 once per visit rather than per tap. Filter ids only, never values.
 
+## Filters in the Address
+
+The filters are one tab-wide state (`FilterConfigProvider`, mirrored to session
+storage), and **the films grids — `/catalogue` and `/planner` — also keep it in
+their address** (`useFilterUrlSync`). Each history entry then holds the filters
+it was showing, so Back lands on them: grid → film → a cast name → Back → Back
+returns to the grid as it was, not to the cast filter the link set.
+
+- **Changes are written with `replaceState`**, never `pushState`: tapping
+  through chips doesn't fill the history, and Back still leaves the page. A
+  preset is a change like any other, so it replaces the entry it was applied on.
+- **Only filter params are rewritten** (`replaceFilterParams`); a page's own
+  params (the planner's `day` and `view`) are kept, and the planner's writer
+  keeps the filters' in turn. A param is the filters' if `base` or any module's
+  `fromUrlParams` reads it.
+- **A bare address means where you left off, unless reached by Back or
+  Forward.** Followed from a link (the nav's Films, "Back to film list"), it
+  carries on with the session's filters, so no link has to carry them to keep
+  them. Reached by traversal it means the defaults, since every entry the grid
+  shows is written with its filters and only the defaults write nothing.
+  Traversal is told from a popstate seen before the page mounted, or for a
+  reloaded document its navigation entry's `back_forward` type.
+- **The film page reads the filters but keeps them out of its address**
+  (`applyUrlParams` adopts what a link hands it, then strips it), so a film
+  link someone copies doesn't carry their filters.
+- **Written filters must read back as the same state.** The round trip is
+  tested in `manager.test.ts`; a new filter module has to survive it.
+- A date in the address is a day, not "today", so an old entry or bookmark
+  falls back to the default window once its day has passed
+  (`discardStaleDates`), as session storage always did.
+
 ## Cast & Crew Filters
 
 Directors and cast are **filters on the films grid, not pages of their own**
