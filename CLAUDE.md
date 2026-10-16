@@ -423,7 +423,8 @@ The point is stored with the origin, so a new radius needs no lookup and
 `reresolveAutoVenueOrigin`). Auto counts the venues with something showing, and
 the listings arrive in chunks, so a pick made mid-load counted only the venues
 in the chunks already in. "Near me today" tapped as the catalogue opened picked
-one venue with nothing on today, while 1 mile found fifteen events. While the
+10 venues around Soho rather than 28, and showed one event where 1 mile found
+fifteen. While the
 selection is still the one Auto made, it is re-picked over the whole dataset
 when loading finishes (not per chunk, and not while any chunk has failed). The
 "Near me today" pill also reads "Loading…" and waits until then, so the

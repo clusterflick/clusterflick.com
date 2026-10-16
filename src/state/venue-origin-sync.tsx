@@ -9,7 +9,7 @@ import { useFilterConfig } from "@/state/filter-config-context";
  * Picks an Auto venue selection again once the listings are complete, so a
  * pick made while they were still arriving doesn't stay on the venues that
  * happened to have loaded. "Near me today", tapped as the catalogue opened,
- * picked one venue with nothing on today rather than the cinemas a mile away.
+ * picked 10 venues around Soho rather than 28.
  *
  * Only while the selection is still the one Auto made (`venueOrigin` is null
  * once the reader changes it), and only over a complete dataset: while chunks
