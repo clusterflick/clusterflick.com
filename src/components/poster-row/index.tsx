@@ -25,9 +25,10 @@ interface PosterRowProps {
   seeAllHref?: string;
   seeAllLabel?: string;
   /**
-   * Append `#show-all` to each poster link so the movie page opens with past
-   * showings already expanded. Used by rows (e.g. New Additions) where the point
-   * is the full schedule, not just what's upcoming.
+   * Append `#show-all` to each poster link so the movie page lists every
+   * showing, ignoring the reader's filters. Used by rows (e.g. New Additions)
+   * where the point is the full schedule, not just what the filters allow.
+   * Never with `movieUrlParams`: it would ignore the filters the link sets too.
    */
   showAll?: boolean;
   /**

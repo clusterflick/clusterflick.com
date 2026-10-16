@@ -230,7 +230,6 @@ export default function VenueDetailPageContent({
             intro="Screenings added here in the past week."
             movies={justAdded}
             movieUrlParams={allVenueMovieParams}
-            showAll
           />
         </div>
       )}
