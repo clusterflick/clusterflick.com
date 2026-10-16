@@ -761,6 +761,7 @@ export default function FilterOverlay({
             onNearMeToday={handleNearMeToday}
             onThisWeek={handleThisWeek}
             geoLoading={geoLoading}
+            listingsLoading={!hasAttemptedLoad || isLoading}
             nearMeTodayActive={nearMeTodayActive}
             thisWeekActive={thisWeekActive}
           />

@@ -190,6 +190,31 @@ export function isVenueOriginCurrent(
 }
 
 /**
+ * An Auto origin picked again over `venues`, or null when it stands as it is:
+ * a numbered radius, or Auto finding the same venues or none.
+ *
+ * Auto is a rule, not a list. A pick made while the listings were still
+ * arriving counted only the venues in the chunks loaded so far, so in a dense
+ * centre it could stop at a handful of small venues and miss the cinemas next
+ * door. Once the listings are complete, the pick is made again over the whole
+ * dataset. Finding nothing leaves the selection alone, as a pick does.
+ *
+ * `venues` must be those with something showing (`getPlaceVenues`).
+ */
+export function reresolveAutoVenueOrigin(
+  origin: VenueOrigin,
+  venues: Record<string, Pick<Venue, "id" | "geo">>,
+): VenueOrigin | null {
+  if (origin.radius !== "auto") return null;
+  const ids = getVenueIdsNear(origin.point, "auto", venues);
+  if (ids.length === 0) return null;
+  const picked = new Set(origin.venues);
+  const unchanged =
+    ids.length === picked.size && ids.every((id) => picked.has(id));
+  return unchanged ? null : { ...origin, venues: ids };
+}
+
+/**
  * The venues a place can pick from: those with anything showing in `movies`,
  * which must be the whole dataset. A venue with nothing on would stop Auto
  * short, and is useless in a selection anyway.

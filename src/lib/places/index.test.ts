@@ -10,6 +10,7 @@ import {
   isVenueOriginCurrent,
   loadStations,
   parsePlaceRef,
+  reresolveAutoVenueOrigin,
   resolvePlace,
   type PlaceContext,
   type VenueOrigin,
@@ -230,6 +231,53 @@ describe("the remembered origin", () => {
     expect(formatRadiusLabel(0.5)).toBe("half a mile");
     expect(formatRadiusLabel(1)).toBe("1 mile");
     expect(formatRadiusLabel(3)).toBe("3 miles");
+  });
+});
+
+describe("re-resolving an Auto pick", () => {
+  // Picked while only the Everyman's chunk had loaded.
+  const early: VenueOrigin = {
+    place: "here",
+    label: "you",
+    point: KINGS_CROSS,
+    radius: "auto",
+    venues: ["everyman.co.uk-kings-cross"],
+  };
+
+  // The whole dataset is in: Auto widens to the BFI as it would have.
+  it("picks again over the complete listings", () => {
+    expect(reresolveAutoVenueOrigin(early, VENUES)).toEqual({
+      ...early,
+      venues: ["bfi.org.uk-southbank", "everyman.co.uk-kings-cross"],
+    });
+  });
+
+  it("leaves a pick that finds the same venues", () => {
+    expect(
+      reresolveAutoVenueOrigin(
+        {
+          ...early,
+          venues: ["everyman.co.uk-kings-cross", "bfi.org.uk-southbank"],
+        },
+        VENUES,
+      ),
+    ).toBeNull();
+  });
+
+  // "Within half a mile" means within half a mile, whatever has loaded.
+  it("leaves a numbered radius", () => {
+    expect(
+      reresolveAutoVenueOrigin({ ...early, radius: 0.5 }, VENUES),
+    ).toBeNull();
+  });
+
+  // As a pick that finds nothing, it doesn't empty the selection.
+  it("leaves the selection when nothing is near", () => {
+    expect(
+      reresolveAutoVenueOrigin(early, {
+        "kingston.example": VENUES["kingston.example"],
+      }),
+    ).toBeNull();
   });
 });
 
