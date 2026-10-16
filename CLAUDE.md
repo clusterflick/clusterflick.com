@@ -565,9 +565,12 @@ their address** (`useFilterUrlSync`). Each history entry then holds the filters
 it was showing, so Back lands on them: grid → film → a cast name → Back → Back
 returns to the grid as it was, not to the cast filter the link set.
 
-- **Changes are written with `replaceState`**, never `pushState`: tapping
-  through chips doesn't fill the history, and Back still leaves the page. A
-  preset is a change like any other, so it replaces the entry it was applied on.
+- **Changes are written with `replaceState`**: tapping through chips doesn't
+  fill the history, and Back still leaves the page. **Presets are pushed** as
+  an entry of their own: "Near me today" is somewhere to go rather than a
+  tweak, so Back returns to the filters it replaced (Highly Rated, say). The
+  context marks the preset's state (`takeHistoryEntry`, matched by identity),
+  and a preset that changes nothing in the address adds no entry.
 - **Only filter params are rewritten** (`replaceFilterParams`); a page's own
   params (the planner's `day` and `view`) are kept, and the planner's writer
   keeps the filters' in turn. A param is the filters' if `base` or any module's

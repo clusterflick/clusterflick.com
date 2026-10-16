@@ -8,6 +8,7 @@ import {
   useEffect,
   ReactNode,
   useMemo,
+  useRef,
 } from "react";
 import {
   AccessibilityFeature,
@@ -289,6 +290,9 @@ type FilterConfigContextType = {
   // Quick filters (one-tap presets)
   applyQuickFilter: (quickFilter: QuickFilter) => void;
   isQuickFilterActive: (quickFilter: QuickFilter) => boolean;
+  // Whether this state, written to a films grid's address, is a new history
+  // entry rather than a change to the current one. Answers once.
+  takeHistoryEntry: (state: FilterState) => boolean;
   // Whole-state replacement (zero-result suggestions)
   applyFilterState: (state: FilterState) => void;
   // Take filters back to fully permissive (the overlay's active-filters strip)
@@ -809,13 +813,27 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
   // Quick filters — apply a preset atomically on top of a clean default state
   // so results never depend on whatever filters were previously set. Personal
   // settings (hide seen films) are the reader's, not the search's, so they stay.
-  const applyQuickFilter = useCallback((quickFilter: QuickFilter) => {
-    setFilterState((prev) =>
-      filterManager.keepPersonalFilters(
+  // A preset is somewhere to go rather than a tweak, so on a films grid it is
+  // its own history entry and Back returns to the filters it replaced. The
+  // state is built here rather than in an updater so the grid can tell it by
+  // identity when it writes the address (`takeHistoryEntry`).
+  const historyEntryState = useRef<FilterState | null>(null);
+  const applyQuickFilter = useCallback(
+    (quickFilter: QuickFilter) => {
+      const next = filterManager.keepPersonalFilters(
         buildQuickFilterState(quickFilter),
-        prev,
-      ),
-    );
+        filterState,
+      );
+      historyEntryState.current = next;
+      setFilterState(next);
+    },
+    [filterState],
+  );
+
+  const takeHistoryEntry = useCallback((state: FilterState) => {
+    const isEntry = state === historyEntryState.current;
+    if (isEntry) historyEntryState.current = null;
+    return isEntry;
   }, []);
 
   // True when the current filter state exactly matches what applying this quick
@@ -908,6 +926,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       setHideSeen,
       applyQuickFilter,
       isQuickFilterActive,
+      takeHistoryEntry,
       applyFilterState,
       widenFilters,
       resetFilters,
@@ -954,6 +973,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       setHideSeen,
       applyQuickFilter,
       isQuickFilterActive,
+      takeHistoryEntry,
       applyFilterState,
       widenFilters,
       resetFilters,

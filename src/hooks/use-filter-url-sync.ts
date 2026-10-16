@@ -41,13 +41,21 @@ function takeArrivedByTraversal(): boolean {
   return entry?.type === "back_forward";
 }
 
-/** Rewrite the address's filter params to `state`, adding no history entry. */
-function writeFilterParams(state: FilterState) {
+/**
+ * Rewrite the address's filter params to `state`: in place, or as a new
+ * history entry for `asEntry`. An address that wouldn't change is left alone,
+ * so re-applying the preset already on screen adds nothing to Back.
+ */
+function writeFilterParams(state: FilterState, asEntry: boolean) {
   const { pathname, search, hash } = window.location;
   const query = filterManager.replaceFilterParams(search, state);
   const next = `${pathname}${query ? `?${query}` : ""}${hash}`;
   if (next === `${pathname}${search}${hash}`) return;
-  window.history.replaceState(window.history.state, "", next);
+  if (asEntry) {
+    window.history.pushState(null, "", next);
+  } else {
+    window.history.replaceState(window.history.state, "", next);
+  }
 }
 
 /**
@@ -65,14 +73,17 @@ function writeFilterParams(state: FilterState) {
  *   is written with its filters, and only the defaults write nothing.
  *
  * Every change is written back with `replaceState`, so tapping through chips
- * doesn't fill the history and Back still leaves the page. Session storage is
+ * doesn't fill the history and Back still leaves the page. A preset is the
+ * exception: somewhere to go rather than a tweak, it is pushed as an entry of
+ * its own (`takeHistoryEntry`), so Back returns to the filters it replaced.
+ * Session storage is
  * kept in step by the provider as before, which is what lets the film page and
  * a bare link pick up the last filters used.
  *
  * Call it after `useOpenFiltersHash`, which reads the hash this keeps.
  */
 export function useFilterUrlSync() {
-  const { filterState, applyFilterState } = useFilterConfig();
+  const { filterState, applyFilterState, takeHistoryEntry } = useFilterConfig();
   const latestState = useRef(filterState);
   const adopted = useRef(false);
 
@@ -91,15 +102,19 @@ export function useFilterUrlSync() {
   useEffect(() => {
     latestState.current = filterState;
     let state = filterState;
+    // A preset is matched by identity, so one applied away from a grid can't
+    // mark any later change here.
+    let asEntry = takeHistoryEntry(filterState);
     if (!adopted.current) {
       adopted.current = true;
+      asEntry = false;
       const fromAddress = readAddress(filterState, takeArrivedByTraversal());
       if (!filterManager.statesEqual(fromAddress, filterState)) {
         applyFilterState(fromAddress);
         state = fromAddress;
       }
     }
-    writeFilterParams(state);
+    writeFilterParams(state, asEntry);
   }, [filterState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Back and Forward between two entries of this same page don't remount it.
