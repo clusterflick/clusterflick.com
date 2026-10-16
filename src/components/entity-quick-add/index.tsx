@@ -4,12 +4,7 @@ import { Ref, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useCombobox } from "downshift";
 import clsx from "clsx";
 import SearchInput from "@/components/search-input";
-import { normalizeForSearch, normalizeToWords } from "@/lib/filters/normalize";
-import {
-  bestWordRunDistance,
-  editBudgetFor,
-  MIN_FUZZY_LENGTH,
-} from "@/lib/filters/word-distance";
+import { matchItems } from "./match-items";
 import styles from "./entity-quick-add.module.css";
 
 export interface EntityQuickAddItem {
@@ -55,45 +50,6 @@ interface EntityQuickAddProps {
 }
 
 /**
- * Names pre-split into words, built the first time a list needs a fuzzy pass
- * and kept for as long as that list lives.
- *
- * Lazy and cached rather than memoised alongside the list: splitting 11,000
- * names costs about as much as the scan itself, and most sessions never mistype
- * anything, so it should not be paid on mount.
- */
-const wordCache = new WeakMap<EntityQuickAddItem[], string[][]>();
-
-function fuzzyMatches(
-  items: EntityQuickAddItem[],
-  needle: string,
-  limit: number,
-): EntityQuickAddItem[] {
-  if (needle.length < MIN_FUZZY_LENGTH) return [];
-
-  let words = wordCache.get(items);
-  if (!words) {
-    words = items.map((item) => normalizeToWords(item.name));
-    wordCache.set(items, words);
-  }
-
-  const budget = editBudgetFor(needle);
-  const scored: { item: EntityQuickAddItem; distance: number }[] = [];
-  for (let index = 0; index < items.length; index += 1) {
-    const distance = bestWordRunDistance(needle, words[index], budget);
-    if (distance <= budget) scored.push({ item: items[index], distance });
-  }
-
-  return scored
-    .sort(
-      (a, b) =>
-        a.distance - b.distance || (b.item.count ?? 0) - (a.item.count ?? 0),
-    )
-    .slice(0, limit)
-    .map(({ item }) => item);
-}
-
-/**
  * A search-and-toggle combobox for adding or removing one named thing from a
  * filter. Type to search, then pick a suggestion to flip its inclusion;
  * suggestions show whether it is already selected. Selecting closes the menu
@@ -103,8 +59,9 @@ function fuzzyMatches(
  * no selection state of its own, delegating to `isSelected`/`onToggle` so it
  * stays in lockstep with whatever renders the current selection.
  *
- * Matching is a plain case-insensitive substring, never fuzzy: the reader is
- * typing a name they already have in mind.
+ * Matching is a substring that ignores case, accents, punctuation and spacing,
+ * so "Kings Cr" finds "King's Cross"; only when that finds nothing is the
+ * query read as a misspelling (`matchItems`).
  */
 export default function EntityQuickAdd({
   items: allItems,
@@ -127,26 +84,10 @@ export default function EntityQuickAdd({
     [],
   );
 
-  const items = useMemo(() => {
-    const query = inputValue.toLowerCase().trim();
-    if (!query) return [];
-
-    // `allItems` arrives best-represented first, so stopping early keeps the
-    // most-screened matches and avoids walking 11,000 cast names.
-    const matches: EntityQuickAddItem[] = [];
-    for (const item of allItems) {
-      if (!item.name.toLowerCase().includes(query)) continue;
-      matches.push(item);
-      if (matches.length >= maxResults) break;
-    }
-    if (matches.length > 0) return matches;
-
-    // Nothing matched as typed, so read it as a misspelling — "Mark Hammill"
-    // is one letter from a real name and currently answers with an empty menu.
-    // A menu is a list of candidates, so unlike the suggestion engine there is
-    // nothing here to disambiguate: show the closest, closest first.
-    return fuzzyMatches(allItems, normalizeForSearch(query), maxResults);
-  }, [allItems, inputValue, maxResults]);
+  const items = useMemo(
+    () => matchItems(allItems, inputValue, maxResults),
+    [allItems, inputValue, maxResults],
+  );
 
   const {
     isOpen,
