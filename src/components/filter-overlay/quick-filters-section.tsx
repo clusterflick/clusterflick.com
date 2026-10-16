@@ -10,6 +10,11 @@ interface QuickFiltersSectionProps {
   onThisWeek: () => void;
   /** True while the browser is resolving the user's location for "near me". */
   geoLoading: boolean;
+  /**
+   * True until the listings have finished loading. "Near me" counts the venues
+   * with something showing, which a part-loaded dataset gets wrong.
+   */
+  listingsLoading: boolean;
   /** True when the current filters match the "near me today" preset. */
   nearMeTodayActive?: boolean;
   /** True when the current filters match the "this week" preset. */
@@ -28,6 +33,7 @@ export default function QuickFiltersSection({
   onNearMeToday,
   onThisWeek,
   geoLoading,
+  listingsLoading,
   nearMeTodayActive = false,
   thisWeekActive = false,
 }: QuickFiltersSectionProps) {
@@ -40,11 +46,15 @@ export default function QuickFiltersSection({
           nearMeTodayActive && styles.quickPillActive,
         )}
         onClick={onNearMeToday}
-        disabled={geoLoading}
+        disabled={geoLoading || listingsLoading}
         aria-pressed={nearMeTodayActive}
         title="Films, shorts & multi-film events showing nearby today"
       >
-        {geoLoading ? "Locating…" : "Near me today"}
+        {geoLoading
+          ? "Locating…"
+          : listingsLoading
+            ? "Loading…"
+            : "Near me today"}
       </button>
       <button
         type="button"

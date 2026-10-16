@@ -419,6 +419,16 @@ remembers its origin too (`here`, Auto), so it reads "Near you".
 The point is stored with the origin, so a new radius needs no lookup and
 `here` stays where the reader was when they picked it.
 
+**Auto is picked again once the listings are complete** (`VenueOriginSync`,
+`reresolveAutoVenueOrigin`). Auto counts the venues with something showing, and
+the listings arrive in chunks, so a pick made mid-load counted only the venues
+in the chunks already in. "Near me today" tapped as the catalogue opened picked
+one venue with nothing on today, while 1 mile found fifteen events. While the
+selection is still the one Auto made, it is re-picked over the whole dataset
+when loading finishes (not per chunk, and not while any chunk has failed). The
+"Near me today" pill also reads "Loading…" and waits until then, so the
+re-pick is a fallback rather than something the reader watches happen.
+
 **Auto counts venues with anything on, not anything on for this search**, so
 a place can pick ten venues and still empty the grid — a watchlist for today
 finds nothing in a dense centre's half mile. It stays that way: a radius that
