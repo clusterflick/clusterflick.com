@@ -364,8 +364,7 @@ function getBaseState(
 
 /**
  * Whether the URL carries anything that should drive filter state — a valid
- * `base` or any recognised filter param. Used to decide whether to strip the
- * query string on mount.
+ * `base` or any recognised filter param.
  */
 export function hasUrlFilterParams(search: string): boolean {
   const params = new URLSearchParams(search);
@@ -414,6 +413,48 @@ export function resolveFilterStateFromUrl(
 }
 
 /**
+ * The query params that encode a filter state: only what differs from the
+ * defaults, and no `base`, since resolving them over the default base gives the
+ * same state back. Personal filters are never written.
+ */
+export function buildFilterParams(state: FilterState): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const filterModule of modules) {
+    if (filterModule.hasActiveFilter(state)) {
+      filterModule.toUrlParams(state, params);
+    }
+  }
+  return params;
+}
+
+/**
+ * Whether a query param is one the filters read — `base`, or a param some
+ * module recognises on its own. Lets the filter params be rewritten without
+ * touching params a page keeps for itself (the planner's `day` and `view`).
+ */
+function isFilterUrlParam(key: string, value: string): boolean {
+  if (key === "base") return true;
+  const single = new URLSearchParams([[key, value]]);
+  return modules.some((m) => m.fromUrlParams(single) !== undefined);
+}
+
+/**
+ * `search` with its filter params replaced by those encoding `state`, every
+ * other param kept as it was. Returns the query without a leading "?", empty
+ * when nothing is left.
+ */
+export function replaceFilterParams(
+  search: string,
+  state: FilterState,
+): string {
+  const params = buildFilterParams(state);
+  for (const [key, value] of new URLSearchParams(search)) {
+    if (!isFilterUrlParam(key, value)) params.append(key, value);
+  }
+  return params.toString();
+}
+
+/**
  * Build a shareable URL with the current filter state encoded as query params.
  * Only includes params that differ from the defaults.
  *
@@ -422,15 +463,7 @@ export function resolveFilterStateFromUrl(
  * homepage with a query string nothing there acts on.
  */
 export function buildFilterUrl(state: FilterState): string {
-  const params = new URLSearchParams();
-
-  for (const filterModule of modules) {
-    if (filterModule.hasActiveFilter(state)) {
-      filterModule.toUrlParams(state, params);
-    }
-  }
-
-  const query = params.toString();
+  const query = buildFilterParams(state).toString();
   const base =
     typeof window !== "undefined"
       ? `${window.location.origin}${window.location.pathname}`
@@ -456,5 +489,7 @@ export const filterManager = {
   apply,
   resolveFilterStateFromUrl,
   hasUrlFilterParams,
+  buildFilterParams,
+  replaceFilterParams,
   buildFilterUrl,
 };

@@ -54,6 +54,7 @@ import {
   type PlannerRowData,
 } from "@/utils/get-planner-day";
 import { useOpenFiltersHash } from "@/hooks/use-open-filters-hash";
+import { useFilterUrlSync } from "@/hooks/use-filter-url-sync";
 import styles from "./page.module.css";
 
 const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
@@ -62,8 +63,8 @@ const FilterOverlay = dynamic(() => import("@/components/filter-overlay"), {
 
 /**
  * The day being viewed rides in the URL so the back button from a listing page
- * returns to it. It is view state, not filter state: the filters' own URL
- * params are stripped once read, and this must survive that.
+ * returns to it. It is view state, not filter state, so it sits beside the
+ * filters' own params (`useFilterUrlSync`), and each writer keeps the other's.
  */
 const DAY_PARAM = "day";
 
@@ -86,14 +87,19 @@ function readViewFromUrl(): PlannerView {
   return view === "time" ? "time" : "film";
 }
 
-/** Only what departs from the defaults, so a first visit keeps a clean URL. */
+/**
+ * Only what departs from the defaults, so a first visit keeps a clean URL.
+ * Every other param is the filters', and stays as it is.
+ */
 function writeUrl(day: DateString | null, view: PlannerView) {
-  const params = new URLSearchParams();
+  const params = new URLSearchParams(window.location.search);
+  params.delete(DAY_PARAM);
+  params.delete(VIEW_PARAM);
   if (day) params.set(DAY_PARAM, day);
   if (view !== "film") params.set(VIEW_PARAM, view);
   const query = params.toString();
   window.history.replaceState(
-    null,
+    window.history.state,
     "",
     `${window.location.pathname}${query ? `?${query}` : ""}`,
   );
@@ -146,17 +152,15 @@ export default function PageContent() {
     retry,
     hydrateUrl,
   } = useCinemaData();
-  const { filterState, resetFilters, hasActiveFilters, applyUrlParams } =
-    useFilterConfig();
+  const { filterState, resetFilters, hasActiveFilters } = useFilterConfig();
 
   // The day the reader chose, or null to follow the start of the range. Kept
   // unclamped so a filter change that narrows the range and then widens it
   // again brings the reader back to where they were.
   //
-  // Read during the first render, ahead of every effect: `applyUrlParams` below
-  // and the provider's strip-on-mount both clear the whole query string. Safe
-  // to differ from the server's null because nothing that shows the day renders
-  // until the data has loaded, which is after hydration.
+  // Read during the first render, ahead of every effect. Safe to differ from
+  // the server's null because nothing that shows the day renders until the
+  // data has loaded, which is after hydration.
   const [chosenDay, setChosenDay] = useState<DateString | null>(readDayFromUrl);
   const [view, setView] = useState<PlannerView>(readViewFromUrl);
   // The chips follow `view` at once; the list follows this deferred copy,
@@ -167,14 +171,13 @@ export default function PageContent() {
   const isSwitchingView = listView !== view;
 
   const [isFilterOverlayOpen, setIsFilterOverlayOpen] = useState(false);
-  // Ahead of `applyUrlParams`, which would clear the hash.
+  // Ahead of `useFilterUrlSync`, which keeps the hash it finds.
   useOpenFiltersHash(() => setIsFilterOverlayOpen(true));
 
-  // With the filter params gone the provider's own strip-on-mount (which runs
-  // after this, parent effects following child ones) has nothing to do, so a
-  // day written back to the URL survives it.
+  // The filters live in the address, beside the day and view.
+  useFilterUrlSync();
+
   useEffect(() => {
-    applyUrlParams();
     getData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
