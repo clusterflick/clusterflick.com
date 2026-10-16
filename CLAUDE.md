@@ -424,11 +424,11 @@ The point is stored with the origin, so a new radius needs no lookup and
 the listings arrive in chunks, so a pick made mid-load counted only the venues
 in the chunks already in. "Near me today" tapped as the catalogue opened picked
 10 venues around Soho rather than 28, and showed one event where 1 mile found
-fifteen. While the
-selection is still the one Auto made, it is re-picked over the whole dataset
-when loading finishes (not per chunk, and not while any chunk has failed). The
-"Near me today" pill also reads "Loading…" and waits until then, so the
-re-pick is a fallback rather than something the reader watches happen.
+fifteen. While the selection is still the one Auto made, it is re-picked over
+the whole dataset when loading finishes (not per chunk, and not while any chunk
+has failed). The "Near me today" pill also reads "Loading…" and waits until
+then, so the re-pick is a fallback rather than something the reader watches
+happen.
 
 **Auto counts venues with anything on, not anything on for this search**, so
 a place can pick ten venues and still empty the grid — a watchlist for today
