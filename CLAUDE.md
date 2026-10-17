@@ -400,6 +400,23 @@ dense centre and a sparse suburb alike. ½, 1, 2 and 3 miles are the reader's
 and never grow. A pick that finds nothing leaves the selection alone and says
 so, keeping the place for a wider radius.
 
+**Auto's radius belongs to the area, not the exact point**
+(`getNearbyRadius`). The ten-venue rule is worked out at the centres of the
+four cells of a fixed ~500m grid nearest the place and blended by distance,
+then every venue within that radius of the place itself is picked. Worked out
+at the exact point, the rule jumps a whole 0.1-mile step when the tenth venue
+crosses its line, bringing in or dropping a band of venues at once, and GPS
+drift was enough to do it: two windows 30m apart in Shoreditch stopped at 0.5
+and 0.6 miles, one with Curzon Hoxton and one without, 2 films today against 9.
+Blended, the radius moves by hundredths of a mile as the place does, so a venue
+changes only when it is itself on the edge. Over 1,500 points in zones 1–2,
+moving 30m changed today's films by three or more at 8.4% of them, and at 4.1%
+blended, finding as many films; a fixed 1-mile radius is ~3%. The cost is that
+ten venues is no longer promised at the exact point: the radius is the one the
+area needs. Counting programme instead of venues (screenings or films within
+reach) was measured too, and mostly moved the jumps rather than removing them,
+fixing about four spots for every three it broke.
+
 **What it produces is an ordinary venue selection**, so a URL carries venue ids
 and nothing else. A separate filter holding the place was built first and
 taken out: it put a second "near" control beside Venues, ANDed with it, for
