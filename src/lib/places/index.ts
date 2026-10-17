@@ -31,7 +31,8 @@ export type Station = {
 /**
  * How far from a place to pick venues: a number of miles, or `auto` — the
  * Venues Near Me rule (`getNearbyVenueIds`), which starts at half a mile and
- * widens until it has ten venues, up to two. Auto suits a dense centre and a
+ * widens until it has ten venues, up to two, worked out for the area around
+ * the place rather than its exact point. Auto suits a dense centre and a
  * sparse suburb alike, so it is the default; a number is for a reader who
  * knows how far they'll go.
  */
