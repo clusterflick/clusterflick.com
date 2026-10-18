@@ -1,7 +1,8 @@
 /* eslint-disable */
 /**
- * Copies the previous deploys' `_next/static` files into this build's output,
- * so HTML from an earlier build can still load its JavaScript.
+ * Copies the previous deploys' `_next/static` files and listings data into this
+ * build's output, so HTML from an earlier build can still load its JavaScript
+ * and the data that JavaScript asks for.
  *
  * GitHub Pages replaces the whole site on deploy, so an older build's chunks
  * 404 the moment a new one goes live. Old HTML outlives them: GitHub's proxy
@@ -12,12 +13,24 @@
  * cache is per data centre, so an edge that never served a chunk has nothing
  * to fall back on.
  *
- * Everything under `_next/static` is named by content hash or build id, so
- * files from different builds never collide and carrying old ones forward
- * costs only bytes. This build's own files always win.
+ * The JavaScript is only half of it. Each build bakes the name of its own
+ * meta blob in (`NEXT_PUBLIC_DATA_FILENAME`), so a previous build's page loads
+ * its chunks, asks for `data/data.meta.<old hash>.json`, gets a 404 and shows
+ * "Something went wrong" until the stale HTML expires. The smoke tests hit
+ * exactly that on /catalogue two minutes after a deploy. So the hashed data
+ * files - the meta blob and the movie chunks it names - are carried too. A
+ * build's data is ~11MB, and a chunk that didn't change keeps its name and
+ * costs nothing. Unhashed files in `data/` (`collections.json`) are never
+ * carried: a name shared across builds can't say which build it belongs to.
  *
- * The history lives in ./static-history/<run id>/, one copy of `_next/static`
- * per deploy, restored from the Actions cache. The deploy job saves it again
+ * Everything carried is named by content hash or build id, so files from
+ * different builds never collide and carrying old ones forward costs only
+ * bytes. This build's own files always win.
+ *
+ * The history lives in ./static-history/<run id>/, laid out as `out/` is
+ * (`_next/static/...` and `data/...`), one copy per deploy, restored from the
+ * Actions cache. A run saved before the data was carried holds `_next/static`'s
+ * contents at its top level, and is read as such. The deploy job saves it again
  * only once the deploy has succeeded, so a build that never went live is never
  * carried. A missing history (the first run, or an evicted cache) carries
  * nothing: that is today's behaviour, not a reason to block a deploy.
@@ -25,7 +38,14 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const STATIC_DIR = path.join(process.cwd(), "out", "_next", "static");
+const OUT_DIR = path.join(process.cwd(), "out");
+const STATIC_PATH = path.join("_next", "static");
+const DATA_PATH = "data";
+const STATIC_DIR = path.join(OUT_DIR, STATIC_PATH);
+const DATA_DIR = path.join(OUT_DIR, DATA_PATH);
+// What process-combined-data.js names by content hash: the meta blob and the
+// movie chunks it lists.
+const HASHED_DATA_FILE = /^data\.(meta|\d+)\.[0-9a-f]{10}\.json$/;
 const HISTORY_DIR = path.join(process.cwd(), "static-history");
 // This build plus the two before it. Deploys are hours apart, and stale HTML
 // has been seen for minutes, so two previous builds is plenty of margin.
@@ -42,8 +62,10 @@ function listFiles(dir, base = dir) {
 function main() {
   const runId = process.env.GITHUB_RUN_ID;
   if (!runId) throw new Error("GITHUB_RUN_ID is not set");
-  if (!fs.existsSync(STATIC_DIR)) {
-    throw new Error(`${STATIC_DIR} does not exist; run the build first`);
+  for (const dir of [STATIC_DIR, DATA_DIR]) {
+    if (!fs.existsSync(dir)) {
+      throw new Error(`${dir} does not exist; run the build first`);
+    }
   }
 
   fs.mkdirSync(HISTORY_DIR, { recursive: true });
@@ -57,16 +79,26 @@ function main() {
   // the history holds each build exactly once.
   const current = path.join(HISTORY_DIR, runId);
   fs.rmSync(current, { recursive: true, force: true });
-  fs.cpSync(STATIC_DIR, current, { recursive: true });
+  fs.cpSync(STATIC_DIR, path.join(current, STATIC_PATH), { recursive: true });
+  fs.mkdirSync(path.join(current, DATA_PATH), { recursive: true });
+  for (const file of fs.readdirSync(DATA_DIR)) {
+    if (!HASHED_DATA_FILE.test(file)) continue;
+    fs.copyFileSync(
+      path.join(DATA_DIR, file),
+      path.join(current, DATA_PATH, file),
+    );
+  }
 
   if (previous.length === 0) {
     console.log("No previous builds in the history; nothing carried forward");
   }
   for (const build of previous) {
     const buildDir = path.join(HISTORY_DIR, build);
+    // Saved before the data was carried: `_next/static`'s contents, unwrapped.
+    const legacy = !fs.existsSync(path.join(buildDir, "_next"));
     let carried = 0;
     for (const file of listFiles(buildDir)) {
-      const target = path.join(STATIC_DIR, file);
+      const target = path.join(legacy ? STATIC_DIR : OUT_DIR, file);
       if (fs.existsSync(target)) continue;
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(buildDir, file), target);

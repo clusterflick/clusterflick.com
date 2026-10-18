@@ -72,8 +72,9 @@ jobs:
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      # Keep the previous deploys' chunks alive, so HTML from an earlier build
-      # (stale in GitHub's proxy, or an open tab) can still load its JavaScript.
+      # Keep the previous deploys' chunks and data alive, so HTML from an earlier
+      # build (stale in GitHub's proxy, or an open tab) can still load its
+      # JavaScript and the listings that JavaScript asks for.
       # See scripts/carry-forward-static.js.
       - name: Restore previous deploys' static files
         uses: actions/cache/restore@v6
