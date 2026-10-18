@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-18",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="SIFFA: Independent International Film Festival & Awards"
+              url="https://siffafestival.co.uk/"
+            />
+            , bringing independent features, documentaries and shorts from
+            around the world to Vue Piccadilly from 19 to 22 November, with
+            filmmaker Q&amp;As and the IRIDA awards.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-14",
     changes: [
       {

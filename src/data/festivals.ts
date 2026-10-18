@@ -451,6 +451,22 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "siffa",
+    name: "SIFFA: Independent International Film Festival & Awards",
+    url: "https://siffafestival.co.uk/",
+    aliases: ["siffa-festival"],
+    matchers: [
+      {
+        // Matches the Vue Piccadilly listings, "SIFFA 2026 Opening Gala:
+        // Nicholas and Alexandra" and "SIFFA 2026: Gipsy Kings + Q&A | In
+        // Competition". Search normalisation strips spacing, so "SIFFA" alone
+        // would claim any title running "…s iffa…" together; the edition's
+        // year anchors it without tying it to one edition.
+        [FilterId.ShowingTitleSearch]: "SIFFA 20",
+      },
+    ],
+  },
+  {
     id: "fighting-spirit-film-festival",
     name: "The Fighting Spirit Film Festival",
     url: "https://www.fightingspiritfilmfestival.com",

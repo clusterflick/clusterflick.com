@@ -173,3 +173,21 @@ describe("QUEERHUB Film Festival title matchers", () => {
     expect(claims(title)).toBe(true);
   });
 });
+
+describe("SIFFA title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "siffa")!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "SIFFA 2026 Opening Gala: Nicholas and Alexandra",
+    "SIFFA 2026: Gipsy Kings + Q&A | In Competition",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+});
