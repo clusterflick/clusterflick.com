@@ -331,15 +331,17 @@ describe("buildUpdates", () => {
     expect(result).toEqual([]);
   });
 
-  it("leaves out an added showing whose performances had all started before the run", () => {
-    // A venue dropped its own listing once the screening started, and the
-    // festival's copy of it took over under a new showing id
+  it("leaves out an added showing with no performances still to come", () => {
+    // As the diff publishes it: performances are only those after the run's
+    // asOf, so a showing found once its screening had started arrives empty.
+    // Here a venue dropped its own listing as the screening started, and the
+    // festival's copy of it took over under a new showing id.
     const result = buildUpdates(
       [
         blob("2026-07-25T04:41:53Z", {
           "a.com": venue({
             showings: {
-              added: [added("a.com-1", "Paper Tiger", [JUL_25 - 3_600_000])],
+              added: [added("a.com-1", "Paper Tiger", [])],
               removed: [],
               modified: [],
             },
@@ -350,61 +352,6 @@ describe("buildUpdates", () => {
     );
 
     expect(result).toEqual([]);
-  });
-
-  it("counts only the performances still to come when a run adds a mix", () => {
-    const result = buildUpdates(
-      [
-        blob("2026-07-25T04:41:53Z", {
-          "a.com": venue({
-            showings: {
-              added: [
-                added("a.com-1", "Fight Club", [
-                  JUL_25 - 3_600_000,
-                  JUL_25 + DAY,
-                ]),
-              ],
-              removed: [],
-              modified: [modified("a.com-2", "Heat", [JUL_25 - 60_000])],
-            },
-          }),
-        }),
-      ],
-      data([
-        movie("550", "Fight Club", ["a.com-1"]),
-        movie("949", "Heat", ["a.com-2"]),
-      ]),
-    );
-
-    expect(result).toHaveLength(1);
-    expect(result[0].newFilms).toHaveLength(1);
-    expect(result[0].newFilms[0]).toMatchObject({
-      key: "550",
-      performanceCount: 1,
-      nextPerformance: JUL_25 + DAY,
-    });
-    // Heat gained only a date already past, so it isn't reported at all
-    expect(result[0].moreShowings).toEqual([]);
-  });
-
-  it("measures against the run, so an old run keeps what it reported", () => {
-    const result = buildUpdates(
-      [
-        blob("2026-07-25T04:41:53Z", {
-          "a.com": venue({
-            showings: {
-              added: [added("a.com-1", "Fight Club", [JUL_25 + 3_600_000])],
-              removed: [],
-              modified: [],
-            },
-          }),
-        }),
-      ],
-      // Built days after that screening took place
-      data([movie("550", "Fight Club", ["a.com-1"])]),
-    );
-
-    expect(result[0].newFilms.map(({ key }) => key)).toEqual(["550"]);
   });
 
   it("renders an unmatched event without a link or poster", () => {

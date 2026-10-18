@@ -318,12 +318,6 @@ export function buildUpdates(
         ? new Date(ordered[index - 1].metadata.asOf).getTime()
         : parseReleaseTag(blob.metadata.previousRelease);
 
-    // Performances that had started by the time the run was published were
-    // never bookable from it. Measured against the run rather than the build,
-    // so an old run keeps what it reported once its screenings have passed.
-    // An unreadable timestamp keeps everything.
-    const runTime = new Date(blob.metadata.asOf).getTime() || -Infinity;
-
     const films = new Map<string, Accumulator>();
     const venues = new Map<string, UpdateVenueAddition>();
 
@@ -341,19 +335,17 @@ export function buildUpdates(
       }
 
       for (const showing of diffVenue.showings.added) {
-        const performances = showing.performances ?? [];
-        const upcoming = performances.filter((time) => time >= runTime);
-        // A showing whose every performance had started before the run was
-        // published was found too late to book. That happens when a venue
-        // drops a screening once it starts and a festival's copy of it, kept
-        // out until then as a duplicate, takes its place under a new id: it
-        // reads as an addition, but there is nothing to go to.
-        if (performances.length > 0 && upcoming.length === 0) continue;
+        // The diff lists only performances after the run's `asOf`, so a
+        // showing with none was found too late to book. That happens when a
+        // venue drops a screening once it starts and a festival's copy of it,
+        // kept out until then as a duplicate, takes its place under a new id:
+        // it reads as an addition, but there is nothing to go to.
+        if (showing.futurePerformanceCount === 0) continue;
         accumulate(
           films,
           showing,
           venue,
-          upcoming,
+          showing.performances ?? [],
           true,
           showingIndex,
           firstSeenIndex,
@@ -363,16 +355,14 @@ export function buildUpdates(
 
       for (const showing of diffVenue.showings.modified) {
         // Only added dates are of interest; reschedules and removals are not
-        // things a reader can act on, and nor is a date already past
-        const upcoming = showing.performances.added.filter(
-          (time) => time >= runTime,
-        );
-        if (upcoming.length === 0) continue;
+        // things a reader can act on. Past dates never arrive here: the diff
+        // compares only performances after the run's `asOf`.
+        if (showing.performances.added.length === 0) continue;
         accumulate(
           films,
           showing,
           venue,
-          upcoming,
+          showing.performances.added,
           false,
           showingIndex,
           firstSeenIndex,
