@@ -25,13 +25,10 @@ function FestivalBlurb() {
         <Link href="/venues/odeon-luxe-and-dine-islington">
           ODEON Luxe &amp; Dine Islington
         </Link>{" "}
-        and, for the first time,{" "}
-        <Link href="/venues/art-house-crouch-end">ArtHouse Crouch End</Link> for
-        further shorts programmes, before settling at the Hen &amp; Chickens for
-        independent horror features from the UK and abroad, industry talks, a
-        Halloween night of <em>The Silence of the Lambs</em> and{" "}
-        <em>The Rocky Horror Picture Show</em>, and a screening of{" "}
-        <em>Saint Maud</em> with BIFA.
+        and <Link href="/venues/art-house-crouch-end">ArtHouse Crouch End</Link>{" "}
+        for further shorts programmes, before settling at the Hen &amp; Chickens
+        for independent horror features from the UK and abroad, industry talks
+        and Halloween screenings of horror classics.
       </p>
     </section>
   );
@@ -40,6 +37,6 @@ function FestivalBlurb() {
 export const seoDescription =
   "an independent horror film festival run by filmmakers, based at Islington's Hen & Chickens Theatre every Halloween week since 2016";
 export const seoHighlights =
-  "independent horror features and short film programmes from the UK and abroad, industry talks and Halloween-night classics, across Islington and Crouch End";
+  "independent horror features and short film programmes from the UK and abroad, industry talks and Halloween screenings of horror classics, across Islington and Crouch End";
 
 export default FestivalBlurb;
