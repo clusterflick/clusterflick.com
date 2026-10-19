@@ -71,6 +71,29 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-19",
+    changes: [
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/feminist-fightback-film-club">
+              Feminist Fightback Film Club
+            </Link>
+            , the monthly screenings of the London feminist collective. Next up
+            is Rose Glass&apos;s Saint Maud at{" "}
+            <Venue
+              name="The People's Letters Bookshop"
+              url="https://peoplesletters.org"
+            />{" "}
+            on 23 October, with donations on the door.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-18",
     changes: [
       {
