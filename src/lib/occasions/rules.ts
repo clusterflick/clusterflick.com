@@ -100,9 +100,21 @@ const RULES: OccasionRule[] = [
     label: (name) => `Live score by ${name}`,
   },
   {
+    // "Film screening with new score performed live by the Royal Philharmonic
+    // Orchestra" — concert halls put "live" after the score, not before it.
+    // A leading "the" is skipped, since a capture must start with a capital.
+    kind: OccasionKind.LiveScore,
+    pattern: new RegExp(
+      String.raw`\b(?:score|music|soundtrack)\s+(?:performed|played)\s+live\s+(?:by|from)\s+(?:the\s+)?` +
+        NAME,
+      "i",
+    ),
+    label: (name) => `Live score by ${name}`,
+  },
+  {
     kind: OccasionKind.LiveScore,
     pattern:
-      /\blive (?:score|scored|music|accompaniment|band|orchestra|soundtrack)\b/i,
+      /\blive (?:score|scored|music|accompaniment|band|orchestra|soundtrack)\b|\b(?:score|music|soundtrack)\s+(?:performed|played)\s+live\b/i,
     label: "Live score",
   },
 
