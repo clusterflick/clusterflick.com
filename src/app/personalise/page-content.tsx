@@ -295,7 +295,7 @@ function isSignInLink(url: URL) {
 }
 
 const STORE_NOTE =
-  "Your email address, so we can send you sign-in links, and the films and venues you add to your lists. Nothing else, and we never share it. You can delete your account, and everything in it, from this page at any time.";
+  "Your email address, so we can send you sign-in links, and the films and venues you add to your lists. Nothing else, and we never share it. While you're signed in, this browser keeps a copy of your lists so pages show them straight away; signing out removes it. You can delete your account, and everything in it, from this page at any time.";
 
 function getErrorCode(error: unknown): string | undefined {
   return typeof error === "object" && error && "code" in error
@@ -527,7 +527,7 @@ function SignedIn({
 }: {
   venueImagePaths: Record<string, string>;
 }) {
-  const { lists, favouriteVenues } = useUserContext();
+  const { lists, favouriteVenues, listsSynced } = useUserContext();
   // Off by default, and for each visit: editing is occasional, and buttons
   // under every poster read as the page's main business.
   const [showEditing, setShowEditing] = useState(false);
@@ -564,7 +564,8 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
       />
-      {lists ? (
+      {/* The server's copy only: every tile here can be edited. */}
+      {lists && listsSynced ? (
         <>
           <UserListSection
             listId={UserListId.Watchlist}

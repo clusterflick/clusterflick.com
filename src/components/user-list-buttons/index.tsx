@@ -53,14 +53,17 @@ export default function UserListButtons({
   movie,
   layout = "inline",
 }: UserListButtonsProps) {
-  const { status, lists, addToList, removeFromList } = useUserContext();
+  const { status, lists, listsSynced, addToList, removeFromList } =
+    useUserContext();
   const [error, setError] = useState(false);
 
   if (status === "unavailable") return null;
 
   const listIds = Object.values(UserListId);
 
-  if (status !== "signed-in") {
+  // Lists cached from the last visit mean a reader still being signed in, so
+  // they get the buttons (disabled until synced) rather than a flash of links.
+  if (status !== "signed-in" && !lists) {
     return (
       <div className={styles.wrapper}>
         <div
@@ -107,8 +110,9 @@ export default function UserListButtons({
               type="button"
               aria-pressed={isOn}
               // Lists still loading: the state isn't known, so neither is
-              // what a press would do.
-              disabled={!lists}
+              // what a press would do. A cached copy is known but may be
+              // about to be replaced, so a press waits for the server's.
+              disabled={!lists || !listsSynced}
               onClick={() => toggle(listId, isOn)}
               className={clsx(styles.button, isOn && styles.on)}
             >

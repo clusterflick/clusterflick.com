@@ -30,6 +30,7 @@ import {
   toUserListEntry,
   UserListId,
   type FavouriteVenues,
+  type UserData,
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
@@ -48,10 +49,20 @@ export type UserStatus =
 export type UserContextType = {
   status: UserStatus;
   email: string | null;
-  /** Null until fetched after sign-in, and whenever signed out. */
+  /**
+   * Null until known, and whenever signed out. For a returning reader it is
+   * this browser's copy from their last visit until the server's arrives, so
+   * it can be shown before Firebase has even loaded — see `listsSynced`.
+   */
   lists: UserLists | null;
   /** "My Venues". Null exactly when `lists` is. */
   favouriteVenues: FavouriteVenues | null;
+  /**
+   * Whether `lists` is the server's copy. Until it is, they are fine to show
+   * but not to edit: an edit made on the cached copy could be overwritten by
+   * the read still in flight, so every change below refuses until then.
+   */
+  listsSynced: boolean;
   /** Emails a sign-in link. Signing up and signing in are the same action. */
   sendSignInLink: (email: string) => Promise<void>;
   /**
@@ -112,6 +123,45 @@ export type UserContextType = {
  */
 const PENDING_EMAIL_KEY = "clusterflick-sign-in-email";
 const PENDING_EMAIL_MAX_AGE_MS = 60 * 60 * 1000;
+
+/**
+ * This browser's copy of the signed-in reader's lists, so a return visit can
+ * show them (markers, "From Your Watchlist", the Seen filter) before the SDK
+ * has loaded, signed in and read the document — about a second on a fast
+ * connection. Replaced by the server's copy as soon as it arrives, rewritten
+ * on every change after that, and removed on sign-out and account deletion.
+ * Keyed to the uid, so it is dropped if someone else turns out to be signed
+ * in. Only ever read while the signed-in flag is set.
+ */
+const USER_DATA_CACHE_KEY = "clusterflick-user-data";
+
+type CachedUserData = UserData & { uid: string };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function readCachedUserData(): CachedUserData | null {
+  const raw = storageGet(USER_DATA_CACHE_KEY);
+  if (!raw) return null;
+  try {
+    const cached = JSON.parse(raw);
+    if (
+      typeof cached?.uid === "string" &&
+      isRecord(cached.lists?.[UserListId.Watchlist]) &&
+      isRecord(cached.lists?.[UserListId.Seen]) &&
+      isRecord(cached.favouriteVenues)
+    ) {
+      return cached;
+    }
+  } catch {}
+  storageRemove(USER_DATA_CACHE_KEY);
+  return null;
+}
+
+function writeCachedUserData(data: CachedUserData) {
+  storageSet(USER_DATA_CACHE_KEY, JSON.stringify(data));
+}
 
 /**
  * The lists a film leaves on being added to `listId`. Seeing a film fulfils
@@ -176,6 +226,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [lists, setLists] = useState<UserLists | null>(null);
   const [favouriteVenues, setFavouriteVenues] =
     useState<FavouriteVenues | null>(null);
+  // Whose lists the server last sent: the lists are synced while that is
+  // still who's signed in.
+  const [syncedUid, setSyncedUid] = useState<string | null>(null);
+  const listsSynced = user !== null && syncedUid === user.uid;
+  // Whose lists the cached copy on screen is, until the server's replaces it.
+  const cachedUidRef = useRef<string | null>(null);
   const servicesRef = useRef<FirebaseServices | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -191,11 +247,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setStatus(nextUser ? "signed-in" : "signed-out");
         if (nextUser) {
           storageSet(SIGNED_IN_FLAG_KEY, "1");
+          // Someone else's lists: take them off screen until the reader's own
+          // arrive.
+          if (cachedUidRef.current && cachedUidRef.current !== nextUser.uid) {
+            setLists(null);
+            setFavouriteVenues(null);
+            storageRemove(USER_DATA_CACHE_KEY);
+          }
         } else {
           storageRemove(SIGNED_IN_FLAG_KEY);
+          storageRemove(USER_DATA_CACHE_KEY);
+          setSyncedUid(null);
           setLists(null);
           setFavouriteVenues(null);
         }
+        cachedUidRef.current = null;
       });
     }
     return servicesRef.current;
@@ -204,7 +270,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     if (storageGet(SIGNED_IN_FLAG_KEY)) {
-      getServices().catch(() => setStatus("signed-out"));
+      const cached = readCachedUserData();
+      if (cached) {
+        cachedUidRef.current = cached.uid;
+        setLists(cached.lists);
+        setFavouriteVenues(cached.favouriteVenues);
+      }
+      getServices().catch(() => {
+        setStatus("signed-out");
+        setLists(null);
+        setFavouriteVenues(null);
+      });
     } else {
       setStatus("signed-out");
     }
@@ -219,6 +295,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setLists(fetched.lists);
         setFavouriteVenues(fetched.favouriteVenues);
+        setSyncedUid(user.uid);
       },
       (error) => console.error("Failed to load lists", error),
     );
@@ -226,6 +303,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [user]);
+
+  // Keep this browser's copy in step: once the server's copy has arrived, and
+  // after every change to it (optimistic updates and their rollbacks alike).
+  useEffect(() => {
+    if (!user || !listsSynced || !lists || !favouriteVenues) return;
+    writeCachedUserData({ uid: user.uid, lists, favouriteVenues });
+  }, [user, listsSynced, lists, favouriteVenues]);
 
   const sendSignInLink = useCallback(
     async (email: string) => {
@@ -278,6 +362,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // delete its document. If the account deletion then needs a fresh sign-in,
     // the lists are already gone and the caller asks for one.
     await deleteUserLists(db, current.uid);
+    storageRemove(USER_DATA_CACHE_KEY);
+    setSyncedUid(null);
     setLists(null);
     setFavouriteVenues(null);
     await current.delete();
@@ -287,6 +373,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     async (listId, movie) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       const entry = toUserListEntry(movie);
       const removeFrom = getListsLeftOnAdd(listId);
       const previous = lists;
@@ -309,13 +396,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [getServices, user, lists],
+    [getServices, user, lists, listsSynced],
   );
 
   const removeFromList = useCallback<UserContextType["removeFromList"]>(
     async (listId, movieId) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       const previous = lists;
       setLists((current) => {
         if (!current) return current;
@@ -330,13 +418,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [getServices, user, lists],
+    [getServices, user, lists, listsSynced],
   );
 
   const importToList = useCallback<UserContextType["importToList"]>(
     async (listId, entries) => {
       const { db } = await getServices();
       if (!user || !lists) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       // Already listed keeps its entry, and with it when it was added.
       const added = Object.fromEntries(
         Object.entries(entries).filter(([id]) => !(id in lists[listId])),
@@ -365,13 +454,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
       return ids;
     },
-    [getServices, user, lists],
+    [getServices, user, lists, listsSynced],
   );
 
   const restoreToList = useCallback<UserContextType["restoreToList"]>(
     async (listId, movieId, entry, others = {}) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       const entries = { ...others, [listId]: entry };
       const previous = lists;
       setLists((current) => {
@@ -392,13 +482,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [getServices, user, lists],
+    [getServices, user, lists, listsSynced],
   );
 
   const addFavouriteVenue = useCallback<UserContextType["addFavouriteVenue"]>(
     async (venue) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       const entry = { name: venue.name, addedAt: Date.now() };
       const previous = favouriteVenues;
       setFavouriteVenues((current) =>
@@ -411,7 +502,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [getServices, user, favouriteVenues],
+    [getServices, user, favouriteVenues, listsSynced],
   );
 
   const removeFavouriteVenue = useCallback<
@@ -420,6 +511,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     async (venueId) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
+      if (!listsSynced) throw new Error("Lists not loaded yet");
       const previous = favouriteVenues;
       setFavouriteVenues((current) => {
         if (!current) return current;
@@ -434,7 +526,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [getServices, user, favouriteVenues],
+    [getServices, user, favouriteVenues, listsSynced],
   );
 
   const contextValue = useMemo<UserContextType>(
@@ -443,6 +535,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       email: user?.email ?? null,
       lists,
       favouriteVenues,
+      listsSynced,
       sendSignInLink,
       completeSignIn,
       getPendingEmail: readPendingEmail,
@@ -461,6 +554,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       user,
       lists,
       favouriteVenues,
+      listsSynced,
       sendSignInLink,
       completeSignIn,
       signOut,
@@ -495,6 +589,7 @@ export function MockUserProvider({
     email: null,
     lists: null,
     favouriteVenues: null,
+    listsSynced: true,
     sendSignInLink: noop,
     completeSignIn: async () => "done",
     getPendingEmail: () => null,

@@ -16,7 +16,9 @@ import { useUserContext } from "@/state/user-context";
  *
  * While the lists are still loading the stored ids are left alone: they came
  * from this session, and clearing them would flash the seen films back in on
- * every page load.
+ * every page load. This browser's copy of the lists from the last visit counts
+ * as loaded: the ids follow it straight away, then the server's copy when it
+ * arrives.
  */
 export function SeenFilterSync() {
   const { status, lists } = useUserContext();
@@ -29,7 +31,7 @@ export function SeenFilterSync() {
       setHideSeen(null);
       return;
     }
-    if (status !== "signed-in" || !lists) return;
+    if (!lists) return;
 
     const seenIds = Object.keys(lists[UserListId.Seen]);
     const current = new Set(hidden);

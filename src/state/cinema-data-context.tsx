@@ -43,6 +43,13 @@ type ContextType = {
    * check this first.
    */
   failedFiles: string[];
+  /**
+   * Movie chunks merged into `movies` so far. With `metaData.mapping` this
+   * says whether particular films have arrived, for what needs only a few
+   * films and shouldn't wait on every chunk — see `haveMoviesLoaded`
+   * (`@/utils/have-movies-loaded`).
+   */
+  loadedFiles: ReadonlySet<string>;
   /** Whether `retryFailedFiles` is refetching them. */
   isRetryingFailedFiles: boolean;
   getData: () => Promise<void>;
@@ -206,20 +213,20 @@ const Context = createContext<ContextType | undefined>(undefined);
  */
 function createChunkProcessor(
   metaData: MetaData,
-  updateMovies: (movies: CinemaData["movies"]) => void,
+  updateMovies: (movies: CinemaData["movies"], filename: string) => void,
 ) {
   // Idempotent: finds the genre by name once it exists
   const uncategorisedId = ensureUncategorisedGenre(metaData.genres);
   const validGenreIds = new Set(Object.keys(metaData.genres));
 
-  return (newMovies: CinemaData["movies"]) => {
+  return (newMovies: CinemaData["movies"], filename: string) => {
     const withoutPast = stripPastPerformances(newMovies);
     const processed = assignUncategorisedGenre(
       withoutPast,
       uncategorisedId,
       validGenreIds,
     );
-    updateMovies(processed);
+    updateMovies(processed, filename);
   };
 }
 
@@ -230,10 +237,12 @@ function createChunkProcessor(
  */
 async function loadChunks(
   filenames: string[],
-  processChunk: (movies: CinemaData["movies"]) => void,
+  processChunk: (movies: CinemaData["movies"], filename: string) => void,
 ): Promise<string[]> {
   const results = await Promise.allSettled(
-    filenames.map((filename) => getMovieData(filename).then(processChunk)),
+    filenames.map((filename) =>
+      getMovieData(filename).then((movies) => processChunk(movies, filename)),
+    ),
   );
 
   const failed: string[] = [];
@@ -258,6 +267,9 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
   const [hasAttemptedLoad, setHasAttemptedLoad] = useState<boolean>(false);
   const [error, setError] = useState<DataFetchError | null>(null);
   const [failedFiles, setFailedFiles] = useState<string[]>([]);
+  const [loadedFiles, setLoadedFiles] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
   const [isRetryingFailedFiles, setIsRetryingFailedFiles] = useState(false);
 
   // Ref for synchronous loading check to prevent race conditions
@@ -273,9 +285,13 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
     [metaData],
   );
 
-  const updateMovies = useCallback((newMovies: CinemaData["movies"]) => {
-    setMovies((state) => ({ ...state, ...newMovies }));
-  }, []);
+  const updateMovies = useCallback(
+    (newMovies: CinemaData["movies"], filename: string) => {
+      setMovies((state) => ({ ...state, ...newMovies }));
+      setLoadedFiles((state) => new Set(state).add(filename));
+    },
+    [],
+  );
 
   /**
    * Core loading function that fetches metadata and movie data.
@@ -308,7 +324,10 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
         let prioritisedFilename: string | undefined;
         if (filenameKey !== undefined) {
           prioritisedFilename = metaData.filenames[filenameKey];
-          await getMovieData(prioritisedFilename).then(processChunk);
+          const prioritised = prioritisedFilename;
+          await getMovieData(prioritised).then((movies) =>
+            processChunk(movies, prioritised),
+          );
         }
 
         // Get the remaining data files, carrying on past any that fail
@@ -368,6 +387,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
     // Reset state and try again
     setError(null);
     setMovies({});
+    setLoadedFiles(new Set());
     setMetaData(null);
     await loadData();
   }, [loadData]);
@@ -399,6 +419,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       hasAttemptedLoad,
       error,
       failedFiles,
+      loadedFiles,
       isRetryingFailedFiles,
       getData,
       getDataWithPriority,
@@ -414,6 +435,7 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       hasAttemptedLoad,
       error,
       failedFiles,
+      loadedFiles,
       isRetryingFailedFiles,
       getData,
       getDataWithPriority,
