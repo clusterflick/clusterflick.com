@@ -33,15 +33,18 @@ potentially thousands of films, this is an enormous object.
 ## Phase 1: Data Reduction
 
 The processing script (`scripts/process-combined-data.js`) runs a sequence of
-five reduction passes, composed functionally:
+reduction passes, composed functionally. `addReviewData` isn't a reduction: it
+attaches each movie's review data from the matched-data files, and runs ahead
+of the passes that trim it:
 
 ```javascript
 function removeOptionalData(data) {
   return [
     removeShowingOverviews,
+    addReviewData,
     trimRottenTomatoData,
-    extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
+    rankPeoplePopularity,
     removeIdProperty,
   ].reduce((reducedData, reduction) => reduction(reducedData), data);
 }
@@ -60,35 +63,18 @@ duplicated data that was repeated across every showing of the same film.
 Strips fields from Rotten Tomatoes reviews that aren't used on the frontend
 (`verified`, `dislikes`, `likes`, `top`).
 
-### Pass 3 — Extract Common URL Prefixes
+URLs are left whole. A table of common URL prefixes used to replace them with
+`{n}` placeholders, but it was rebuilt from scratch every release and shifted
+in most of them, which renamed every content-hashed chunk; after gzip it saved
+under 4%, most of which gzip and brotli already catch within a chunk.
 
-This is the most interesting reduction. Every showing has a URL and every
-performance has a booking URL — thousands of URLs, most sharing common prefixes
-like `https://www.picturehouses.com/cinema/` or
-`https://www.barbican.org.uk/whats-on/`. The algorithm:
-
-1. Collects **every URL** across showings, performances, and review data.
-2. Scans each URL for natural boundary characters (`/`, `?`, `=`, `&`) and
-   extracts candidate prefixes at those positions (minimum 20 characters).
-3. For each prefix used 2+ times, calculates **net byte savings**:
-   `(prefix_length - placeholder_length) × usage_count - storage_cost`.
-4. Greedily selects the highest-savings prefixes, skipping any that are subsumed
-   by an already-selected prefix.
-5. Replaces occurrences with `{index}` placeholders — e.g.,
-   `https://www.picturehouses.com/cinema/hackney-picturehouse/film/nosferatu`
-   becomes `{3}hackney-picturehouse/film/nosferatu`.
-6. Stores the prefix lookup table in `urlPrefixes`.
-
-This also doubles as the merge point where review data from the four
-matched-data files gets attached to each movie.
-
-### Pass 4 — Remove False Accessibility Flags
+### Pass 3 — Remove False Accessibility Flags
 
 Accessibility flags on performances are stored as booleans
 (`audioDescribed: true`, `subtitled: false`). This pass deletes any `false`
 flags — their absence implies false, saving bytes.
 
-### Pass 5 — Remove Redundant ID Properties
+### Pass 4 — Remove Redundant ID Properties
 
 Since every entity is stored as a key-value pair
 (`"abc123": { "id": "abc123", ... }`), the `id` field inside the object is
@@ -168,7 +154,6 @@ The **meta file** contains everything except the movies:
   "genres": {},
   "people": {},
   "venues": {},
-  "urlPrefixes": ["https://www.picturehouses.com/cinema/", "..."],
   "mapping": { "0": ["movie-a", "movie-b"], "1": ["movie-c"] },
   "filenames": ["data.0.a1b2c3d4e5.json", "data.1.f6g7h8i9j0.json"]
 }
@@ -233,9 +218,6 @@ As chunks arrive, each batch of movies goes through post-processing:
 3. **`expandData`** — Re-adds the `id` property that was stripped during Phase
    1, restoring `"abc123": { id: "abc123", ... }` so components can pass IDs
    around naturally.
-4. **URL hydration** happens on-demand via `hydrateUrl` — when a component needs
-   to display or link to a URL, `{3}hackney-picturehouse/film/nosferatu` is
-   expanded back to its full form using the `urlPrefixes` lookup from metadata.
 
 ## Summary
 
@@ -244,7 +226,6 @@ As chunks arrive, each batch of movies goes through post-processing:
 | Large monolithic input | Split into ~27 chunks + 1 meta file                        |
 | Chunk sizing           | By performance count (max 1,000), not file size            |
 | Redundant data         | Strip showing overviews, IDs, false flags                  |
-| URL bloat              | Extract shared prefixes, replace with `{n}` placeholders   |
 | Payload compression    | `compress-json` for structural deduplication               |
 | Cache busting          | Content-addressed filenames (SHA-256 hash)                 |
 | Initial load speed     | Meta loads first (small); movie chunks load in parallel    |

@@ -40,8 +40,6 @@ interface PlannerRowProps {
   venues: Record<string, Venue>;
   /** Genre names, already resolved from ids. */
   genres?: string[];
-  /** Resolves the compressed URLs in the dataset (`useCinemaData`). */
-  hydrateUrl: (url: string) => string;
   /** Defaults to `PLANNER_ROW_LIMIT`. */
   limit?: number;
   /** The film's week, drawn as a strip of days between summary and lane. */
@@ -62,7 +60,6 @@ export default function PlannerRow({
   performances,
   venues,
   genres,
-  hydrateUrl,
   limit = PLANNER_ROW_LIMIT,
   week,
   lastChance,
@@ -102,7 +99,6 @@ export default function PlannerRow({
             movie={movie}
             performance={performance}
             venues={venues}
-            hydrateUrl={hydrateUrl}
           />
         ))}
         {hiddenCount > 0 && (

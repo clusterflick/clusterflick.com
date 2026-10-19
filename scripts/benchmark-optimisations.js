@@ -84,8 +84,8 @@ function pct(value, baseline) {
 
 /**
  * Merge review data from matched-data files onto each movie.
- * In the production script this happens inside extractCommonUrlPrefix,
- * but it's data assembly, not an optimisation, so we always run it.
+ * In the production script this is the addReviewData step. It's data
+ * assembly, not an optimisation, so we always run it.
  */
 function mergeReviews(data) {
   Object.values(data.movies).forEach((movie) => {
@@ -142,107 +142,6 @@ function trimRottenTomatoData(data) {
   return data;
 }
 
-function generateUrlPrefixes(data, minPrefixLength = 20) {
-  const urls = [];
-
-  Object.values(data.movies).forEach((movie) => {
-    Object.values(movie.showings).forEach((showing) => {
-      if (showing.url) urls.push(showing.url);
-    });
-    movie.performances.forEach((performance) => {
-      if (performance.bookingUrl) urls.push(performance.bookingUrl);
-    });
-  });
-
-  // Also include review URLs (already merged onto movies)
-  Object.values(data.movies).forEach((movie) => {
-    if (movie.imdb?.url) urls.push(movie.imdb.url);
-    if (movie.letterboxd?.url) urls.push(movie.letterboxd.url);
-    if (movie.metacritic?.url) urls.push(movie.metacritic.url);
-    if (movie.rottenTomatoes?.url) urls.push(movie.rottenTomatoes.url);
-  });
-
-  const prefixCounts = new Map();
-  urls.forEach((url) => {
-    for (let i = 0; i < url.length; i++) {
-      if (
-        url[i] === "/" ||
-        url[i] === "?" ||
-        url[i] === "=" ||
-        url[i] === "&"
-      ) {
-        const prefix = url.substring(0, i + 1);
-        if (prefix.length >= minPrefixLength) {
-          prefixCounts.set(prefix, (prefixCounts.get(prefix) || 0) + 1);
-        }
-      }
-    }
-  });
-
-  const prefixesWithSavings = [];
-  prefixCounts.forEach((count, prefix) => {
-    if (count < 2) return;
-    const placeholderLength = 4;
-    const savingsPerUse = prefix.length - placeholderLength;
-    const storageCost = prefix.length;
-    const netSavings = savingsPerUse * count - storageCost;
-    if (netSavings > 0) {
-      prefixesWithSavings.push({ prefix, count, savings: netSavings });
-    }
-  });
-
-  prefixesWithSavings.sort((a, b) => b.savings - a.savings);
-
-  const selectedPrefixes = [];
-  prefixesWithSavings.forEach(({ prefix }) => {
-    const subsumedByExisting = selectedPrefixes.some(
-      (selected) => prefix.startsWith(selected) && prefix !== selected,
-    );
-    if (subsumedByExisting) return;
-
-    const wouldSubsumeExisting = selectedPrefixes.some(
-      (selected) => selected.startsWith(prefix) && selected !== prefix,
-    );
-    if (wouldSubsumeExisting) return;
-
-    selectedPrefixes.push(prefix);
-  });
-
-  return selectedPrefixes.sort();
-}
-
-function extractUrlPrefixes(data) {
-  const urlPrefixes = generateUrlPrefixes(data);
-  data.urlPrefixes = urlPrefixes;
-
-  Object.values(data.movies).forEach((movie) => {
-    if (movie.rottenTomatoes?.url) {
-      urlPrefixes.forEach((prefix, index) => {
-        movie.rottenTomatoes.url = movie.rottenTomatoes.url.replace(
-          prefix,
-          `{${index}}`,
-        );
-      });
-    }
-
-    Object.values(movie.showings).forEach((showing) => {
-      urlPrefixes.forEach((prefix, index) => {
-        showing.url = showing.url.replace(prefix, `{${index}}`);
-      });
-    });
-
-    movie.performances.forEach((performance) => {
-      urlPrefixes.forEach((prefix, index) => {
-        performance.bookingUrl = performance.bookingUrl.replace(
-          prefix,
-          `{${index}}`,
-        );
-      });
-    });
-  });
-  return data;
-}
-
 function removeOffAccessibilityIndicators(data) {
   Object.values(data.movies).forEach((movie) => {
     movie.performances.forEach((performance) => {
@@ -285,7 +184,6 @@ function removeIdProperty(data) {
 
 function chunkMovies(data) {
   const { generatedAt, genres, people, venues, movies } = data;
-  const urlPrefixes = data.urlPrefixes || [];
 
   const files = {};
   const mapping = {};
@@ -320,7 +218,6 @@ function chunkMovies(data) {
     genres,
     people,
     venues,
-    urlPrefixes,
     mapping,
     filenames,
   };
@@ -341,8 +238,6 @@ function measureVariant(options) {
   // Apply optimisations based on flags
   if (!options.skipOverviews) removeShowingOverviews(data);
   if (!options.skipTrimRT) trimRottenTomatoData(data);
-  if (!options.skipUrlPrefixes) extractUrlPrefixes(data);
-  else data.urlPrefixes = [];
   if (!options.skipAccessibility) removeOffAccessibilityIndicators(data);
   if (!options.skipRemoveIds) removeIdProperty(data);
 
@@ -400,7 +295,6 @@ const allOn = {
   skipCompressJson: false,
   skipRemoveIds: false,
   skipAccessibility: false,
-  skipUrlPrefixes: false,
   skipTrimRT: false,
   skipOverviews: false,
 };
@@ -414,7 +308,6 @@ const variants = [
     ...allOn,
     skipAccessibility: true,
   },
-  { name: "Without URL prefix extraction", ...allOn, skipUrlPrefixes: true },
   { name: "Without trimming RT data", ...allOn, skipTrimRT: true },
   {
     name: "Without removing showing overviews",
@@ -426,7 +319,6 @@ const variants = [
     skipCompressJson: true,
     skipRemoveIds: true,
     skipAccessibility: true,
-    skipUrlPrefixes: true,
     skipTrimRT: true,
     skipOverviews: true,
   },

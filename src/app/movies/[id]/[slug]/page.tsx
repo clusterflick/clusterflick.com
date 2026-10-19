@@ -12,7 +12,6 @@ import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { getMovieCollections } from "@/utils/get-movie-collections";
-import { hydrateUrl } from "@/utils/hydrate-url";
 import type { Genre, Person, Venue, Movie } from "@/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import {
@@ -287,9 +286,7 @@ export default async function MovieDetailPage({
     movie.metacritic?.url,
     movie.moviedb?.url,
     movie.rottenTomatoes?.url,
-  ]
-    .filter((url): url is string => Boolean(url))
-    .map((url) => hydrateUrl(url, data.urlPrefixes));
+  ].filter((url): url is string => Boolean(url));
 
   const movieJsonLd = buildMovieJsonLd({
     movie,

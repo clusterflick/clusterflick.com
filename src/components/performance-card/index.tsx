@@ -217,7 +217,6 @@ interface PerformanceCardActionsProps {
  * The interactive layer of a `PerformanceCard`: a whole-card link to the
  * venue's listing, a "Finished" or "Sold Out" badge, and a Book button that
  * appears on hover (always on touch widths). Pass it as the card's children.
- * URLs must already be hydrated (`useCinemaData().hydrateUrl`).
  */
 export function PerformanceCardActions({
   showingUrl,

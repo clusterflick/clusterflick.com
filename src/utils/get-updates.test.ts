@@ -55,7 +55,6 @@ const data = (movies: Movie[], venueIds: string[] = ["a.com"]): CinemaData =>
     people: {},
     genres: {},
     filenames: [],
-    urlPrefixes: [],
   }) as unknown as CinemaData;
 
 const added = (

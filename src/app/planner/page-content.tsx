@@ -150,7 +150,6 @@ export default function PageContent() {
     error,
     getData,
     retry,
-    hydrateUrl,
   } = useCinemaData();
   const { filterState, resetFilters, hasActiveFilters } = useFilterConfig();
 
@@ -396,7 +395,6 @@ export default function PageContent() {
             performances={performances}
             venues={metaData?.venues ?? {}}
             genres={genreNames(movie.genres)}
-            hydrateUrl={hydrateUrl}
             // A one-day range has nothing to compare the day against.
             week={
               week.length > 1
@@ -452,7 +450,6 @@ export default function PageContent() {
             },
           }))}
           venues={metaData?.venues ?? {}}
-          hydrateUrl={hydrateUrl}
         />
       );
     };

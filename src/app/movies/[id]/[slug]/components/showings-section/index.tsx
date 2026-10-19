@@ -94,7 +94,6 @@ function renderPerformanceCard(
   showings: Record<string, Showing>,
   venues: Record<string, Venue>,
   movieTitle: string,
-  hydrateUrl: (url: string) => string,
 ) {
   const showing = showings[performance.showingId];
   const venue = venues[showing?.venueId];
@@ -122,8 +121,8 @@ function renderPerformanceCard(
       status={status}
     >
       <PerformanceCardActions
-        showingUrl={showing ? hydrateUrl(showing.url) : undefined}
-        bookingUrl={hydrateUrl(performance.bookingUrl)}
+        showingUrl={showing?.url}
+        bookingUrl={performance.bookingUrl}
         venueName={venue?.name}
         status={status}
       />
@@ -172,7 +171,7 @@ export default function ShowingsSection({
   onApplySuggestion,
   staticContent,
 }: ShowingsSectionProps) {
-  const { hydrateUrl, error, retry } = useCinemaData();
+  const { error, retry } = useCinemaData();
   const hasPerformances = Object.keys(performancesByDate).length > 0;
   const [showFinished, setShowFinished] = useState(false);
 
@@ -451,7 +450,6 @@ export default function ShowingsSection({
                           showings,
                           venues,
                           movieTitle,
-                          hydrateUrl,
                         ),
                       )}
                     </div>
