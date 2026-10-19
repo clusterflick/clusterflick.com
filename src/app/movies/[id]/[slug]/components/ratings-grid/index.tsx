@@ -6,7 +6,6 @@ import LinkCard, {
 } from "@/components/link-card";
 import CardGrid from "@/components/card-grid";
 import { TickIcon, CrossIcon } from "@/components/icons";
-import { useCinemaData } from "@/state/cinema-data-context";
 import styles from "./ratings-grid.module.css";
 
 interface RatingsGridProps {
@@ -26,7 +25,6 @@ export default function RatingsGrid({
   rottenTomatoes,
   metacritic,
 }: RatingsGridProps) {
-  const { hydrateUrl } = useCinemaData();
   // Treat a 0 score as "no score" — Metacritic returns 0 for the user score
   // when there are too few audience reviews to be meaningful.
   const hasMetacriticCritics = Boolean(metacritic?.critics?.rating);
@@ -49,7 +47,7 @@ export default function RatingsGrid({
       <div className={styles.ratingsWrapper}>
         <CardGrid size="md" className={styles.ratingsGrid}>
           {imdb && imdb.rating !== null && (
-            <LinkCard href={hydrateUrl(imdb.url)} variant="rating">
+            <LinkCard href={imdb.url} variant="rating">
               <CardLabel>IMDb</CardLabel>
               <CardValue>
                 {imdb.rating.toFixed(1)}
@@ -62,7 +60,7 @@ export default function RatingsGrid({
           )}
 
           {letterboxd && letterboxd.rating && (
-            <LinkCard href={hydrateUrl(letterboxd.url)} variant="rating">
+            <LinkCard href={letterboxd.url} variant="rating">
               <CardLabel>Letterboxd</CardLabel>
               <CardValue>
                 {letterboxd.rating.toFixed(1)}
@@ -75,7 +73,7 @@ export default function RatingsGrid({
           )}
 
           {moviedb && moviedb.reviews > 0 && (
-            <LinkCard href={hydrateUrl(moviedb.url)} variant="rating">
+            <LinkCard href={moviedb.url} variant="rating">
               <CardLabel>TMDB</CardLabel>
               <CardValue>
                 {Math.round(moviedb.rating * 10)}
@@ -88,7 +86,7 @@ export default function RatingsGrid({
           )}
 
           {rottenTomatoes && rottenTomatoes.critics.all?.score && (
-            <LinkCard href={hydrateUrl(rottenTomatoes.url)} variant="rating">
+            <LinkCard href={rottenTomatoes.url} variant="rating">
               <CardLabel>Rotten Tomatoes</CardLabel>
               <CardValue>
                 <div className={styles.ratingsSpacing}>
@@ -110,7 +108,7 @@ export default function RatingsGrid({
           )}
 
           {metacritic && (hasMetacriticCritics || hasMetacriticAudience) && (
-            <LinkCard href={hydrateUrl(metacritic.url)} variant="rating">
+            <LinkCard href={metacritic.url} variant="rating">
               <CardLabel>Metacritic</CardLabel>
               <CardValue>
                 <div className={styles.ratingsSpacing}>
@@ -147,7 +145,7 @@ export default function RatingsGrid({
               rendered to stand in for "not rated". */}
           {bechdel && (
             <LinkCard
-              href={hydrateUrl(bechdel.url)}
+              href={bechdel.url}
               variant="rating"
               // The verdict is carried by a tick or cross, so it has to be
               // spelled out here - "1 of 3 criteria" only implies it. The rest

@@ -344,7 +344,6 @@ export type CinemaData = {
   genres: Record<string, Genre>;
   collections: Record<string, CollectionSummary>;
   movies: Record<string, Movie>;
-  urlPrefixes: string[];
 };
 
 export type MetaData = Omit<CinemaData, "movies"> & {

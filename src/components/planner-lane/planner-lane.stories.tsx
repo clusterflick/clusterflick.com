@@ -57,7 +57,6 @@ const cards = (count: number) =>
         bookingUrl: "https://example.com/book",
       }}
       venues={VENUES}
-      hydrateUrl={(url) => url}
     />
   ));
 

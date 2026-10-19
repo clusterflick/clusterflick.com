@@ -70,7 +70,6 @@ export const Default: Story = {
   args: {
     label: "19:00",
     venues: VENUES,
-    hydrateUrl: (url) => url,
     items: [
       item(
         "28",
@@ -95,7 +94,6 @@ export const RepeatedFilm: Story = {
   args: {
     label: "18:00",
     venues: VENUES,
-    hydrateUrl: (url) => url,
     items: [
       item("5", "Resident Evil", "2026", "pcc", 0),
       item("5", "Resident Evil", "2026", "rio", 0),
@@ -114,7 +112,6 @@ export const OverLimit: Story = {
   args: {
     label: "20:00",
     venues: VENUES,
-    hydrateUrl: (url) => url,
     limit: 3,
     items: Array.from({ length: 8 }, (_, i) =>
       item(`f${i}`, `Film ${i + 1}`, "2026", i % 2 ? "rio" : "pcc", i * 5),
@@ -127,7 +124,6 @@ export const SingleShowing: Story = {
   args: {
     label: "11:00",
     venues: VENUES,
-    hydrateUrl: (url) => url,
     items: [item("3", "Paris, Texas", "1984", "rio", 0)],
   },
 };

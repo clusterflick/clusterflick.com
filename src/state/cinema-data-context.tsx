@@ -11,7 +11,6 @@ import {
 } from "react";
 import { CinemaData, MetaData } from "@/types";
 import { getLondonMidnightTimestamp } from "@/utils/format-date";
-import { hydrateUrl as hydrateUrlWithPrefixes } from "@/utils/hydrate-url";
 import { pruneByPerformances } from "@/utils/prune-movies";
 import { fetchWithRetry, FetchRetryError } from "@/utils/fetch-with-retry";
 
@@ -47,7 +46,6 @@ type ContextType = {
   isRetryingFailedFiles: boolean;
   getData: () => Promise<void>;
   getDataWithPriority: (movieId: string) => Promise<void>;
-  hydrateUrl: (truncatedUrl: string) => string;
   retry: () => Promise<void>;
   /**
    * Refetch only the chunks in `failedFiles`, merging them into what is
@@ -265,14 +263,6 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
   // before the first one sets isLoading to true
   const isLoadingRef = useRef(false);
 
-  const hydrateUrl = useCallback(
-    (truncatedUrl: string) => {
-      if (!metaData) return truncatedUrl;
-      return hydrateUrlWithPrefixes(truncatedUrl, metaData.urlPrefixes);
-    },
-    [metaData],
-  );
-
   const updateMovies = useCallback((newMovies: CinemaData["movies"]) => {
     setMovies((state) => ({ ...state, ...newMovies }));
   }, []);
@@ -402,7 +392,6 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       isRetryingFailedFiles,
       getData,
       getDataWithPriority,
-      hydrateUrl,
       retry,
       retryFailedFiles,
     }),
@@ -417,7 +406,6 @@ export function CinemaDataProvider({ children }: { children: ReactNode }) {
       isRetryingFailedFiles,
       getData,
       getDataWithPriority,
-      hydrateUrl,
       retry,
       retryFailedFiles,
     ],

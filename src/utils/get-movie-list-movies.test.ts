@@ -78,34 +78,7 @@ describe("curated list matching", () => {
     expect(films[0].rank).toBe(1);
   });
 
-  it("matches the Rotten Tomatoes slug in a compressed url", () => {
-    const movies = record([
-      movie({
-        id: "2",
-        title: "Renamed Locally",
-        year: "1972",
-        rottenTomatoes: {
-          url: "{102}the_godfather",
-        } as Movie["rottenTomatoes"],
-      }),
-    ]);
-
-    const films = filmsFor(
-      curatedList([
-        {
-          rank: 1,
-          title: "The Godfather",
-          year: 1972,
-          rtSlug: "the_godfather",
-        },
-      ]),
-      movies,
-    );
-
-    expect(films[0]?.movie.id).toBe("2");
-  });
-
-  it("matches the Rotten Tomatoes slug in a hydrated url", () => {
+  it("matches the Rotten Tomatoes slug in its url", () => {
     const movies = record([
       movie({
         id: "3",

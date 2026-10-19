@@ -24,17 +24,12 @@ const DEFAULT_YEAR_TOLERANCE = 1;
 
 /**
  * The `rottentomatoes.com/m/<slug>` slug for a movie, or null.
- *
- * Handles both the compressed form the dataset ships (`{102}the_godfather`,
- * where `{102}` indexes `urlPrefixes`) and a fully hydrated URL, so callers
- * don't need to hydrate first.
  */
 function getRtSlug(movie: Movie): string | null {
   const url = movie.rottenTomatoes?.url;
   if (!url) return null;
 
-  const withoutPrefix = url.replace(/^\{\d+\}/, "");
-  const segments = withoutPrefix.split("/").filter(Boolean);
+  const segments = url.split("/").filter(Boolean);
   return segments[segments.length - 1] ?? null;
 }
 

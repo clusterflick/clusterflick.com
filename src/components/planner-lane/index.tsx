@@ -39,8 +39,6 @@ interface PlannerLaneCardProps {
   movie: PlannerLaneMovie;
   performance: MoviePerformance;
   venues: Record<string, Venue>;
-  /** Resolves the compressed URLs in the dataset (`useCinemaData`). */
-  hydrateUrl: (url: string) => string;
   /** Name the film on the card, for lanes that mix films. */
   film?: PerformanceCardFilm;
 }
@@ -58,7 +56,6 @@ export function PlannerLaneCard({
   movie,
   performance,
   venues,
-  hydrateUrl,
   film,
 }: PlannerLaneCardProps) {
   const showing = movie.showings[performance.showingId];
@@ -84,8 +81,8 @@ export function PlannerLaneCard({
       status={status}
     >
       <PerformanceCardActions
-        showingUrl={showing ? hydrateUrl(showing.url) : undefined}
-        bookingUrl={hydrateUrl(performance.bookingUrl)}
+        showingUrl={showing?.url}
+        bookingUrl={performance.bookingUrl}
         venueName={venue?.name}
         status={status}
       />

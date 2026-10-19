@@ -11,7 +11,6 @@ const emptyMetaData = {
   generatedAt: new Date().toISOString(),
   filenames: [],
   mapping: {},
-  urlPrefixes: [],
   genres: {},
   people: {},
   venues: {},

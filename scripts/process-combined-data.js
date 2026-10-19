@@ -103,144 +103,6 @@ function trimRottenTomatoData(data) {
   return data;
 }
 
-/**
- * Generate URL prefixes automatically based on the data.
- * Finds common prefixes that provide net byte savings when replaced with {index} placeholders.
- */
-function generateUrlPrefixes(data, minPrefixLength = 20) {
-  const urls = [];
-
-  Object.values(data.movies).forEach((movie) => {
-    Object.values(movie.showings).forEach((showing) => {
-      if (showing.url) urls.push(showing.url);
-    });
-
-    movie.performances.forEach((performance) => {
-      if (performance.bookingUrl) urls.push(performance.bookingUrl);
-    });
-  });
-
-  Object.values(bechdelResults).forEach((result) => {
-    if (result?.url) urls.push(result.url);
-  });
-  Object.values(imdbReviews).forEach((review) => {
-    if (review?.url) urls.push(review.url);
-  });
-  Object.values(letterboxdReviews).forEach((review) => {
-    if (review?.url) urls.push(review.url);
-  });
-  Object.values(metacriticReviews).forEach((review) => {
-    if (review?.url) urls.push(review.url);
-  });
-  Object.values(moviedbReviews).forEach((review) => {
-    if (review?.url) urls.push(review.url);
-  });
-  Object.values(rottentomatoesReviews).forEach((review) => {
-    if (review?.url) urls.push(review.url);
-  });
-
-  // Find candidate prefixes at natural URL boundaries
-  const prefixCounts = new Map();
-  urls.forEach((url) => {
-    for (let i = 0; i < url.length; i++) {
-      if (
-        url[i] === "/" ||
-        url[i] === "?" ||
-        url[i] === "=" ||
-        url[i] === "&"
-      ) {
-        const prefix = url.substring(0, i + 1);
-        if (prefix.length >= minPrefixLength) {
-          prefixCounts.set(prefix, (prefixCounts.get(prefix) || 0) + 1);
-        }
-      }
-    }
-  });
-
-  // Calculate net savings for each prefix
-  // Savings = (prefix_length - placeholder_length) × usage_count - prefix_length_in_meta
-  const prefixesWithSavings = [];
-
-  prefixCounts.forEach((count, prefix) => {
-    if (count < 2) return; // Must be used at least twice to be worthwhile
-
-    // Placeholder length varies: {0}-{9} = 3 chars, {10}-{99} = 4 chars, etc.
-    // Use conservative estimate of 4 chars
-    const placeholderLength = 4;
-    const savingsPerUse = prefix.length - placeholderLength;
-    const storageCost = prefix.length;
-    const netSavings = savingsPerUse * count - storageCost;
-
-    if (netSavings > 0) {
-      prefixesWithSavings.push({ prefix, count, savings: netSavings });
-    }
-  });
-
-  // Sort by savings (descending)
-  prefixesWithSavings.sort((a, b) => b.savings - a.savings);
-
-  // Greedily select prefixes, preferring longer ones when they subsume shorter ones
-  const selectedPrefixes = [];
-
-  prefixesWithSavings.forEach(({ prefix }) => {
-    // Check if this prefix would be redundant
-    // A shorter prefix that's already selected would match all URLs this one matches
-    const subsumedByExisting = selectedPrefixes.some(
-      (selected) => prefix.startsWith(selected) && prefix !== selected,
-    );
-
-    if (subsumedByExisting) return;
-
-    // Check if this prefix would subsume an existing one with less savings
-    // If so, the existing shorter one is already covering those URLs
-    const wouldSubsumeExisting = selectedPrefixes.some(
-      (selected) => selected.startsWith(prefix) && selected !== prefix,
-    );
-
-    if (wouldSubsumeExisting) return;
-
-    selectedPrefixes.push(prefix);
-  });
-
-  // Sort alphabetically for consistent output
-  return selectedPrefixes.sort();
-}
-
-function extractCommonUrlPrefix(data) {
-  // Generate prefixes dynamically based on actual data
-  const urlPrefixes = generateUrlPrefixes(data);
-  data.urlPrefixes = urlPrefixes;
-
-  Object.values(data.movies).forEach((movie) => {
-    if (movie.rottenTomatoes) {
-      urlPrefixes.forEach((prefix, index) => {
-        movie.rottenTomatoes.url = movie.rottenTomatoes.url.replace(
-          prefix,
-          `{${index}}`,
-        );
-      });
-    }
-
-    const showings = Object.values(movie.showings);
-    showings.forEach((showing) => {
-      urlPrefixes.forEach((prefix, index) => {
-        showing.url = showing.url.replace(prefix, `{${index}}`);
-      });
-    });
-
-    const performances = Object.values(movie.performances);
-    performances.forEach((performance) => {
-      urlPrefixes.forEach((prefix, index) => {
-        performance.bookingUrl = performance.bookingUrl.replace(
-          prefix,
-          `{${index}}`,
-        );
-      });
-    });
-  });
-  return data;
-}
-
 function removeOffAccessiblityIndicators(data) {
   Object.values(data.movies).forEach((movie) => {
     const performances = Object.values(movie.performances);
@@ -326,7 +188,6 @@ function removeOptionalData(data) {
     removeShowingOverviews,
     addReviewData,
     trimRottenTomatoData,
-    extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
     rankPeoplePopularity,
     removeIdProperty,
@@ -335,15 +196,8 @@ function removeOptionalData(data) {
 
 try {
   const reducedData = removeOptionalData(addVenueLastPerformance(data));
-  const {
-    generatedAt,
-    genres,
-    people,
-    venues,
-    collections,
-    urlPrefixes,
-    movies,
-  } = reducedData;
+  const { generatedAt, genres, people, venues, collections, movies } =
+    reducedData;
 
   const files = {};
   const mapping = {};
@@ -407,7 +261,6 @@ try {
     people,
     venues,
     collections: collectionRegistry,
-    urlPrefixes,
     mapping,
     filenames,
   };

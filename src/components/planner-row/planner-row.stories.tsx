@@ -84,7 +84,6 @@ const baseArgs = {
   href: "/movies/28/apocalypse-now",
   venues: VENUES,
   genres: ["Drama", "War"],
-  hydrateUrl: (url: string) => url,
 };
 
 /** The expected state: a handful of performances across a few venues. */

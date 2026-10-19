@@ -37,8 +37,6 @@ interface PlannerHourRowProps {
   /** The hour's performances, in time order. */
   items: PlannerHourRowItem[];
   venues: Record<string, Venue>;
-  /** Resolves the compressed URLs in the dataset (`useCinemaData`). */
-  hydrateUrl: (url: string) => string;
   /** Defaults to `PLANNER_HOUR_LIMIT`. */
   limit?: number;
   className?: string;
@@ -60,7 +58,6 @@ export default function PlannerHourRow({
   label,
   items,
   venues,
-  hydrateUrl,
   limit = PLANNER_HOUR_LIMIT,
   className,
 }: PlannerHourRowProps) {
@@ -83,7 +80,6 @@ export default function PlannerHourRow({
       movie={movie}
       performance={performance}
       venues={venues}
-      hydrateUrl={hydrateUrl}
       film={film}
     />
   );
