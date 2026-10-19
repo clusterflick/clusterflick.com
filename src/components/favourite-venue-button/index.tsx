@@ -26,13 +26,19 @@ interface FavouriteVenueButtonProps {
 export default function FavouriteVenueButton({
   venue,
 }: FavouriteVenueButtonProps) {
-  const { status, favouriteVenues, addFavouriteVenue, removeFavouriteVenue } =
-    useUserContext();
+  const {
+    status,
+    favouriteVenues,
+    listsSynced,
+    addFavouriteVenue,
+    removeFavouriteVenue,
+  } = useUserContext();
   const [error, setError] = useState(false);
 
   if (status === "unavailable") return null;
 
-  if (status !== "signed-in") {
+  // Cached from the last visit: a reader still being signed in.
+  if (status !== "signed-in" && !favouriteVenues) {
     return (
       <div className={styles.wrapper}>
         <Link href="/personalise" className={styles.button} title={HINT}>
@@ -65,8 +71,9 @@ export default function FavouriteVenueButton({
         type="button"
         aria-pressed={isOn}
         // Still loading: the state isn't known, so neither is what a press
-        // would do.
-        disabled={!favouriteVenues}
+        // would do. A cached copy may be about to be replaced, so a press
+        // waits for the server's.
+        disabled={!favouriteVenues || !listsSynced}
         onClick={toggle}
         className={clsx(styles.button, isOn && styles.on)}
         title={isOn ? undefined : HINT}

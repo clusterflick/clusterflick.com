@@ -1228,6 +1228,27 @@ one static import puts the SDK in every page's bundle. Firestore is
 caching. Auth is `initializeAuth` rather than `getAuth`, which would bundle the
 popup/redirect resolvers email links never use.
 
+**A returning reader's lists come from this browser first.** Loading the SDK,
+restoring the session and reading the document are three steps in a row, about
+a second on a fast connection, and on a phone they compete with the listings
+for the main thread. So the `UserProvider` keeps a copy of the document in
+`localStorage` (`clusterflick-user-data`, with the uid), shows it as soon as it
+mounts, and replaces it with the server's copy when that arrives. The copy is
+rewritten on every change after that, dropped if a different uid signs in, and
+removed on sign-out and account deletion. Together with the row waiting only
+for its own films (below), it took "From Your Watchlist" from 1.4s to 0.6s on
+a fast desktop, measured on a production build with Firebase answering at its
+measured round trips.
+
+The cached copy is for **showing, not editing**. `listsSynced` says whether
+`lists` is the server's copy, and every change refuses until it is: an edit
+made to the cached copy could be overwritten by the read still in flight. The
+list and My Venues buttons render from the cache, disabled, and `/personalise`
+waits for the server's copy, since every tile there is editable. Markers, the
+watchlist row, the Seen filter and the My Venues pill read `lists` whatever its
+source, so they key on `lists !== null`, not on `status === "signed-in"` — an
+unconfirmed reader with a cached copy is `checking`.
+
 **Storage is one document per user at `users/{uid}`**, every list a map of
 movie id → `UserListEntry`. One read per session. The entry snapshots title,
 year and poster because a listed film outlives its run — once it leaves the
@@ -1264,7 +1285,17 @@ then the rest, with the Last Chance row's "Last showing" when the run is ending
 and "Next showing" otherwise. Every category counts, since the reader chose the
 films. Hidden when empty and while signed out, so the static HTML is unchanged.
 
-It arrives seconds after paint, above every other row, so its slot **reserves
+**It waits for its own films, not the whole dataset.** The row needs each
+film's showings, which only the listings hold, but only the chunks those films
+are in: `loadedFiles` on the cinema data context and `metaData.mapping` say
+when they have arrived (`haveMoviesLoaded`), or loading ending does when one
+failed. Waiting for every chunk instead put it in the same render as the other
+rows' `computeDiscoveryRows`, about 0.8s on a mid-range phone; with both
+changes the row lands at 3.7s there rather than 4.9s. Each later
+chunk still changes `movies`, so a recomputed row that reads the same (films
+and subtitles) is discarded rather than re-rendered and re-measured.
+
+It arrives after paint, above every other row, so its slot **reserves
 the height the row last had**: an inline script sets it before paint, only for
 a reader carrying the signed-in flag (which is why `SIGNED_IN_FLAG_KEY` lives
 in `@/lib/user-lists`, readable from a server component, not in the user
@@ -1454,7 +1485,9 @@ will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 
 **Personalisation is account-only**, lists and venues alike, so that it syncs
-across devices. Don't add a signed-out, browser-held copy of any of it.
+across devices. Don't add a signed-out, browser-held copy of any of it. The
+cached copy above is not one: it belongs to the signed-in account, is only
+read while the signed-in flag is set, and goes on sign-out.
 
 **Deleting an account deletes the lists first**: once the account is gone, the
 rules let nobody delete its document. Firebase may refuse the account deletion

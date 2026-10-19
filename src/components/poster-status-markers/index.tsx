@@ -45,8 +45,9 @@ interface PosterStatusMarkersProps {
  * seen — drawn in a poster's top-right corner. Several overlap like a pile of
  * chips and fan out when the enclosing link is hovered or focused.
  *
- * Renders nothing unless signed in with lists loaded, so the static HTML (always
- * signed out) is unaffected and signed-out visitors never see an empty slot.
+ * Renders nothing until the lists are known (signed in, or this browser's copy
+ * of them from the last visit), so the static HTML (always signed out) is
+ * unaffected and signed-out visitors never see an empty slot.
  * The lists are already held by `UserProvider` on every page for a signed-in
  * reader, so this costs no extra load. Indicators only: changing a list stays
  * on the film's own page.
@@ -59,7 +60,7 @@ export default function PosterStatusMarkers({
   movieId,
 }: PosterStatusMarkersProps) {
   const context = useUserContext();
-  if (context.status !== "signed-in" || !context.lists) return null;
+  if (!context.lists) return null;
 
   const active = MARKERS.filter((marker) => marker.isOn(context, movieId));
   if (active.length === 0) return null;

@@ -1,9 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { ScoredMovie } from "@/utils/get-discovery-movies";
 import LoadingIndicator from "@/components/loading-indicator";
 import PosterRow from "@/components/poster-row";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { haveMoviesLoaded } from "@/utils/have-movies-loaded";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
@@ -25,6 +27,11 @@ function storeHeight(height: number) {
   } catch {}
 }
 
+/** What the row shows, so a recomputation that changes nothing is ignored. */
+function getRowKey(row: ScoredMovie[]) {
+  return row.map(({ movie, subtitle }) => `${movie.id}|${subtitle}`).join();
+}
+
 /**
  * "From Your Watchlist" — the signed-in reader's watchlist films showing in
  * the next fortnight, favourite venues first (see `getWatchlistRow`).
@@ -32,23 +39,40 @@ function storeHeight(height: number) {
  * Client-only: the static HTML carries just the empty slot, so signed-out
  * readers and crawlers see the page unchanged. The slot holds the row's last
  * height until the row settles — see `watchlist-row-reservation`.
+ *
+ * It needs only its own films, so it lands as soon as the chunks holding them
+ * have, rather than waiting on every chunk and on the other rows being worked
+ * out from them. The lists can be this browser's copy from the last visit
+ * (see `UserProvider`), so for a returning reader Firebase isn't waited on
+ * either.
  */
 export default function WatchlistRow() {
   const { status, lists, favouriteVenues } = useUserContext();
-  const { movies, metaData, isLoading, hasAttemptedLoad } = useCinemaData();
+  const { movies, metaData, isLoading, hasAttemptedLoad, loadedFiles } =
+    useCinemaData();
   const slotRef = useRef<HTMLDivElement>(null);
+  const [kept, setKept] = useState<{ key: string; row: ScoredMovie[] } | null>(
+    null,
+  );
 
-  // The cinema data is fetched by DiscoverySections, beside this.
-  const dataReady =
-    hasAttemptedLoad && !isLoading && Object.keys(movies).length > 0;
-  const signedIn = status === "signed-in";
+  // Lists, from the server or cached, mean a signed-in reader (or one about to
+  // be confirmed as such); signing out clears them.
+  const signedIn = lists !== null;
 
   const watchlistIds = useMemo(
     () => (lists ? Object.keys(lists[UserListId.Watchlist]) : []),
     [lists],
   );
 
-  const row = useMemo(
+  // The cinema data is fetched by DiscoverySections, beside this. Ready once
+  // the watchlist's own chunks are in — or loading has ended, which covers a
+  // chunk that failed.
+  const dataReady =
+    hasAttemptedLoad &&
+    metaData !== null &&
+    (!isLoading || haveMoviesLoaded(metaData, loadedFiles, watchlistIds));
+
+  const computedRow = useMemo(
     () =>
       signedIn && lists && dataReady
         ? getWatchlistRow(
@@ -68,6 +92,19 @@ export default function WatchlistRow() {
       metaData,
     ],
   );
+
+  // Every chunk after the row's own changes `movies`, and with it the row's
+  // identity but not its content. Keep the last row while it reads the same,
+  // so the posters don't re-render and the height isn't re-measured (a forced
+  // layout of the whole page) once per chunk.
+  const key = useMemo(
+    () => (computedRow ? getRowKey(computedRow) : null),
+    [computedRow],
+  );
+  if (computedRow && key !== null && key !== kept?.key) {
+    setKept({ key, row: computedRow });
+  }
+  const row = computedRow && key === kept?.key ? kept.row : computedRow;
 
   // Settled once there is an answer: a row to show, or known to have none.
   // Signed out (or a stale flag) is an answer; still loading is not.
