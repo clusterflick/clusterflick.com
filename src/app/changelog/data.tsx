@@ -74,6 +74,20 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-19",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="London Action Resource Centre"
+              url="https://larc.noblogs.org"
+            />
+            , a collectively run Whitechapel building whose main hall hosts
+            screenings by grassroots groups.
+          </>
+        ),
+      },
+      {
         tag: "New film club",
         body: ({ Venue }) => (
           <>
