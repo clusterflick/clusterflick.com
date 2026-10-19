@@ -549,6 +549,30 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "unrestricted-view-horror-film-festival",
+    name: "Unrestricted View Horror Film Festival",
+    url: "https://uvff.co.uk/uvhff-2026",
+    aliases: ["uvhff"],
+    matchers: [
+      {
+        // Matches the Everyman Screen on the Green opening night, "Unrestricted
+        // View Horror Film Festival 2026: Opening Night", and the programme's
+        // own billing for the Hen & Chickens screenings ("UNRESTRICTED VIEW
+        // HORROR FILM FESTIVAL 2026 X BIFA: SAINT MAUD"). Keeping "Horror" in
+        // the name leaves out the spring Unrestricted View Film Festival, a
+        // separate festival from the same team.
+        [FilterId.ShowingTitleSearch]: "Unrestricted View Horror",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Unrestricted View Horror",
+      },
+      {
+        // The festival's own abbreviation, as in "UVHFF x About Bloody Time"
+        [FilterId.ShowingTitleSearch]: "UVHFF",
+      },
+    ],
+  },
+  {
     id: "bfi-london-film-festival",
     name: "BFI London Film Festival",
     url: "https://www.bfi.org.uk/london-film-festival",
