@@ -12,8 +12,8 @@ function FestivalBlurb() {
         <Link href="/venues/the-hen-and-chickens-theatre-bar">
           Hen &amp; Chickens Theatre
         </Link>{" "}
-        in Islington since 1999 &mdash; the festival&rsquo;s &ldquo;spiritual
-        home&rdquo; and its hub.
+        in <Link href="/london-cinemas/islington">Islington</Link> since 1999
+        &mdash; the festival&rsquo;s &ldquo;spiritual home&rdquo; and its hub.
       </p>
       <p>
         The 11th edition runs from 26 October to 1 November 2026. It opens with
