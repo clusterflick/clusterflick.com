@@ -283,9 +283,9 @@ type Metacritic = {
   critics: MetacriticScore;
 };
 
+// Likes, dislikes, verified audience and top critics are trimmed by
+// scripts/process-combined-data.js before the data ships
 type RottenTomatoesScore = {
-  dislikes?: number;
-  likes?: number;
   reviews: number;
   rating?: number | null;
   score?: number | null;
@@ -296,11 +296,9 @@ type RottenTomatoes = {
   url: string;
   audience: {
     all: RottenTomatoesScore | undefined;
-    verified: RottenTomatoesScore | undefined;
   };
   critics: {
     all: RottenTomatoesScore | undefined;
-    top: RottenTomatoesScore | undefined;
   };
 };
 

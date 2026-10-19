@@ -101,10 +101,9 @@ function makeMovie(
       ? {
           id: "rt",
           url: "",
-          audience: { all: undefined, verified: undefined },
+          audience: { all: undefined },
           critics: {
             all: { reviews: opts.rt.reviews, score: opts.rt.score },
-            top: undefined,
           },
         }
       : undefined,

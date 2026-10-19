@@ -76,15 +76,28 @@ function removeShowingOverviews(data) {
   return data;
 }
 
+function addReviewData(data) {
+  Object.values(data.movies).forEach((movie) => {
+    movie.bechdel = bechdelResults[movie.id];
+    movie.imdb = imdbReviews[movie.id];
+    movie.letterboxd = letterboxdReviews[movie.id];
+    movie.metacritic = metacriticReviews[movie.id];
+    movie.moviedb = moviedbReviews[movie.id];
+    movie.rottenTomatoes = rottentomatoesReviews[movie.id];
+  });
+  return data;
+}
+
+// Must run after addReviewData, or there is nothing to trim
 function trimRottenTomatoData(data) {
   Object.values(data.movies).forEach((movie) => {
     if (movie.rottenTomatoes) {
-      delete movie.rottenTomatoes.audience.verified;
-      delete movie.rottenTomatoes.audience.all?.dislikes;
-      delete movie.rottenTomatoes.audience.all?.likes;
-      delete movie.rottenTomatoes.critics.top;
-      delete movie.rottenTomatoes.critics.all?.dislikes;
-      delete movie.rottenTomatoes.critics.all?.likes;
+      delete movie.rottenTomatoes.audience?.verified;
+      delete movie.rottenTomatoes.audience?.all?.dislikes;
+      delete movie.rottenTomatoes.audience?.all?.likes;
+      delete movie.rottenTomatoes.critics?.top;
+      delete movie.rottenTomatoes.critics?.all?.dislikes;
+      delete movie.rottenTomatoes.critics?.all?.likes;
     }
   });
   return data;
@@ -199,14 +212,6 @@ function extractCommonUrlPrefix(data) {
   data.urlPrefixes = urlPrefixes;
 
   Object.values(data.movies).forEach((movie) => {
-    // Add reviews to movie data
-    movie.bechdel = bechdelResults[movie.id];
-    movie.imdb = imdbReviews[movie.id];
-    movie.letterboxd = letterboxdReviews[movie.id];
-    movie.metacritic = metacriticReviews[movie.id];
-    movie.moviedb = moviedbReviews[movie.id];
-    movie.rottenTomatoes = rottentomatoesReviews[movie.id];
-
     if (movie.rottenTomatoes) {
       urlPrefixes.forEach((prefix, index) => {
         movie.rottenTomatoes.url = movie.rottenTomatoes.url.replace(
@@ -319,6 +324,7 @@ function addVenueLastPerformance(data) {
 function removeOptionalData(data) {
   return [
     removeShowingOverviews,
+    addReviewData,
     trimRottenTomatoData,
     extractCommonUrlPrefix,
     removeOffAccessiblityIndicators,
