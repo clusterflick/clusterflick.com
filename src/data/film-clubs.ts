@@ -667,4 +667,17 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Kinoema" },
     ],
   },
+  {
+    id: "feminist-fightback-film-club",
+    name: "Feminist Fightback Film Club",
+    kind: "queer",
+    url: "https://www.feministfightback.org.uk/events/category/feminist-fightback-film-club/",
+    aliases: ["feminist-fightback"],
+    matchers: [
+      // Billed as "Feminist Fightback Film Club presents: …", and as often
+      // "Filmclub" in one word, so the collective's name alone is matched.
+      { [FilterId.ShowingTitleSearch]: "Feminist Fightback" },
+      { [FilterId.PerformanceNotesSearch]: "Feminist Fightback" },
+    ],
+  },
 ];
