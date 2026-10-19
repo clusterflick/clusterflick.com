@@ -74,6 +74,21 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-19",
     changes: [
       {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Unrestricted View Horror Film Festival"
+              url="https://uvff.co.uk/uvhff-2026"
+            />
+            , a week of independent horror features and shorts from 26 October
+            to 1 November, opening at Everyman Screen on the Green and running
+            through Islington and Crouch End to the Hen &amp; Chickens Theatre.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ Venue }) => (
           <>

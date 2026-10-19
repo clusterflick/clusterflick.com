@@ -191,3 +191,30 @@ describe("SIFFA title matchers", () => {
     expect(claims(title)).toBe(true);
   });
 });
+
+describe("Unrestricted View Horror Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(
+    ({ id }) => id === "unrestricted-view-horror-film-festival",
+  )!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "Unrestricted View Horror Film Festival 2026: Opening Night",
+    "UNRESTRICTED VIEW HORROR FILM FESTIVAL 2026 X BIFA: SAINT MAUD",
+    "UVHFF x About Bloody Time",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+
+  it("does not claim the spring Unrestricted View Film Festival", () => {
+    expect(claims("Unrestricted View Film Festival 2027: Opening Night")).toBe(
+      false,
+    );
+  });
+});
