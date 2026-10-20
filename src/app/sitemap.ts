@@ -1,6 +1,8 @@
 import { type MetadataRoute } from "next";
-import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
+import { getMovieUrl } from "@/utils/get-movie-url";
+import { getVenueUrl } from "@/utils/get-venue-url";
+import { getBoroughUrl } from "@/utils/get-borough-url";
 import { Movie, Venue } from "@/types";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
@@ -19,7 +21,6 @@ import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getCollectionsData } from "@/utils/get-collections-data";
 import { getCollectionUrl } from "@/utils/get-collection-url";
-import { getDepartedData } from "@/utils/get-departed-data";
 import {
   buildUpdates,
   getUpdateDayPath,
@@ -29,31 +30,31 @@ import {
 
 export const dynamic = "force-static";
 
+const SITE = "https://clusterflick.com";
+
+// The export is built with `trailingSlash: true`, so every page is served at
+// its path plus "/" — the address its canonical tag names — and the bare path
+// 301s there. Listing the bare path told Google every page was a redirect.
+function pageUrl(path: string): string {
+  return `${SITE}${path.endsWith("/") ? path : `${path}/`}`;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await getStaticData();
 
   const moviePages = Object.values(data.movies).map((movie: Movie) => ({
-    url: `https://clusterflick.com/movies/${movie.id}/${slugify(movie.title)}`,
+    url: pageUrl(getMovieUrl(movie)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   }));
 
-  // Films that have finished their run. Listed so a page that was indexed while
-  // the film was on stays indexed rather than looking removed, but ranked below
-  // and marked as static: nothing on them will change until the film returns,
-  // at which point it moves back into the set above.
-  const departedMoviePages = Object.values(getDepartedData().movies).map(
-    (movie) => ({
-      url: `https://clusterflick.com/movies/${movie.id}/${slugify(movie.title)}`,
-      lastModified: data.generatedAt,
-      changeFrequency: "yearly" as const,
-      priority: 0.2,
-    }),
-  );
+  // Films that have finished their run keep their pages (`getDepartedData`),
+  // so links to them still land, but aren't listed: each says little more than
+  // that the film has stopped showing, and they were two fifths of the sitemap.
 
   const venuePages = Object.values(data.venues).map((venue: Venue) => ({
-    url: `https://clusterflick.com/venues/${slugify(venue.name)}`,
+    url: pageUrl(getVenueUrl(venue)),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
@@ -64,91 +65,91 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const boroughPages = LONDON_BOROUGHS.filter((b) =>
     venuesByBorough.has(b.slug),
   ).map((b) => ({
-    url: `https://clusterflick.com/london-cinemas/${b.slug}`,
+    url: pageUrl(getBoroughUrl(b)),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.5,
   }));
 
   const festivalListPage = {
-    url: "https://clusterflick.com/festivals",
+    url: pageUrl("/festivals"),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const festivalPages = FESTIVALS.map((festival) => ({
-    url: `https://clusterflick.com${getFestivalUrl(festival)}`,
+    url: pageUrl(getFestivalUrl(festival)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   }));
 
   const filmClubListPage = {
-    url: "https://clusterflick.com/film-clubs",
+    url: pageUrl("/film-clubs"),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   };
 
   const filmClubPages = FILM_CLUBS.map((club) => ({
-    url: `https://clusterflick.com${getFilmClubUrl(club)}`,
+    url: pageUrl(getFilmClubUrl(club)),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
   const cinemaGroupListPage = {
-    url: "https://clusterflick.com/cinema-groups",
+    url: pageUrl("/cinema-groups"),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   };
 
   const genreListPage = {
-    url: "https://clusterflick.com/genres",
+    url: pageUrl("/genres"),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const genrePages = GENRES.map((genre) => ({
-    url: `https://clusterflick.com${getGenreUrl(genre)}`,
+    url: pageUrl(getGenreUrl(genre)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const formatListPage = {
-    url: "https://clusterflick.com/formats",
+    url: pageUrl("/formats"),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const formatPages = FORMATS.map((format) => ({
-    url: `https://clusterflick.com${getFormatUrl(format)}`,
+    url: pageUrl(getFormatUrl(format)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const movieListListPage = {
-    url: "https://clusterflick.com/lists",
+    url: pageUrl("/lists"),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const movieListPages = MOVIE_LISTS.map((list) => ({
-    url: `https://clusterflick.com${getMovieListUrl(list)}`,
+    url: pageUrl(getMovieListUrl(list)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const collectionListPage = {
-    url: "https://clusterflick.com/collections",
+    url: pageUrl("/collections"),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
@@ -156,7 +157,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const collectionPages = Object.values(getCollectionsData()).map(
     (collection) => ({
-      url: `https://clusterflick.com${getCollectionUrl(collection)}`,
+      url: pageUrl(getCollectionUrl(collection)),
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 0.6,
@@ -168,7 +169,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const cinemaGroupPages = VENUE_GROUPS.filter((group) =>
     venuesByGroup.has(group.slug),
   ).map((group) => ({
-    url: `https://clusterflick.com${getVenueGroupUrl(group)}`,
+    url: pageUrl(getVenueGroupUrl(group)),
     lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
@@ -176,55 +177,55 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages = [
     {
-      url: "https://clusterflick.com",
+      url: pageUrl("/"),
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 1,
     },
     {
-      url: "https://clusterflick.com/catalogue",
+      url: pageUrl("/catalogue"),
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 1,
     },
     {
-      url: "https://clusterflick.com/updates",
+      url: pageUrl("/updates"),
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 0.8,
     },
     {
-      url: "https://clusterflick.com/about",
+      url: pageUrl("/about"),
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
-      url: "https://clusterflick.com/accessibility",
+      url: pageUrl("/accessibility"),
       lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 0.8,
     },
     {
-      url: "https://clusterflick.com/changelog",
+      url: pageUrl("/changelog"),
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.5,
     },
     {
-      url: "https://clusterflick.com/data-licence",
+      url: pageUrl("/data-licence"),
       lastModified: data.generatedAt,
       changeFrequency: "yearly" as const,
       priority: 0.4,
     },
     {
-      url: "https://clusterflick.com/venues",
+      url: pageUrl("/venues"),
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     },
     {
-      url: "https://clusterflick.com/london-cinemas",
+      url: pageUrl("/london-cinemas"),
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.6,
@@ -238,7 +239,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const updateDayPages = groupUpdatesByDay(
     buildUpdates(readDiffBlobs(), data),
   ).map((day) => ({
-    url: `https://clusterflick.com${getUpdateDayPath(day.date)}`,
+    url: pageUrl(getUpdateDayPath(day.date)),
     lastModified: day.releases[0].asOf,
     changeFrequency: "daily" as const,
     priority: 0.5,
@@ -259,7 +260,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     collectionListPage,
     ...collectionPages,
     ...moviePages,
-    ...departedMoviePages,
     ...venuePages,
     ...boroughPages,
     ...festivalPages,

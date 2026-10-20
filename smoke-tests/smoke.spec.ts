@@ -200,7 +200,9 @@ test.describe("Venue Pages", () => {
   });
 
   test("venues list page renders heading and venue count", async ({ page }) => {
-    await expect(page.locator("h1").first()).toContainText("Venues");
+    await expect(page.locator("h1").first()).toContainText(
+      "Every Cinema in London",
+    );
     await expect(page.getByText(/\d+ venues across London/)).toBeVisible();
 
     await venuesPage.screenshot("venues-list");

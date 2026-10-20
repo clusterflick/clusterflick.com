@@ -9,14 +9,14 @@ import type { Venue } from "@/types";
 import VenuesPageContent from "./page-content";
 
 export const metadata: Metadata = {
-  title: "Venues",
+  title: "Every Cinema in London — All Screening Venues",
   description:
     "Browse all cinema venues across London tracked by Clusterflick. From major chains like Curzon, Everyman and Picturehouse to independent cinemas, arts centres and pop-up screenings.",
   alternates: {
     canonical: "/venues",
   },
   openGraph: {
-    title: "London Cinema Venues | Clusterflick",
+    title: "Every Cinema in London | Clusterflick",
     description:
       "Browse all cinema venues across London tracked by Clusterflick. From major chains like Curzon, Everyman and Picturehouse to independent cinemas, arts centres and pop-up screenings.",
     url: "https://clusterflick.com/venues",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "London Cinema Venues | Clusterflick",
+    title: "Every Cinema in London | Clusterflick",
     description:
       "Browse all cinema venues across London tracked by Clusterflick. From major chains to independent cinemas and pop-up screenings.",
     creator: "@clusterflick",

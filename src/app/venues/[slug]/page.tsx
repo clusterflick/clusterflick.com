@@ -139,7 +139,7 @@ export async function generateMetadata({
   };
 
   return {
-    title: venue.name,
+    title: `${venue.name} — What's On & Showtimes`,
     description,
     alternates: {
       canonical: getVenueUrl(venue),

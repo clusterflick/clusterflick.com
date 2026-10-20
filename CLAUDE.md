@@ -1461,6 +1461,22 @@ rules let nobody delete its document. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
 finish.
 
+## Search Engines
+
+**The sitemap lists canonical addresses only.** The export uses
+`trailingSlash: true`, so a page lives at its path plus `/` and the bare path
+301s there. `sitemap.ts` builds every entry through `pageUrl`, from the same
+`get*Url` helpers the pages use for their canonicals; `sitemap.test.ts` holds
+it to that. Departed films are left out: their pages stay up so links land,
+but each says little more than that the film has stopped showing, and they
+were two fifths of the sitemap.
+
+**A page's `<title>` names what it is found by**, not just what it is called.
+Film pages read "Heat (1995) — Showtimes in London" (a departed film keeps
+the bare name, having none), venue pages "Prince Charles Cinema — What's On
+& Showtimes", and `/venues` is "Every Cinema in London". Social titles keep
+the short name.
+
 ## Testing
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with
