@@ -1461,6 +1461,29 @@ rules let nobody delete its document. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
 finish.
 
+## Reports
+
+`/reports/<id>` are dated snapshots of what the listings show, written to be
+cited: a journalist writes the story and links the report as its source, which
+is the point of them. They also link on to the listing pages they're about (a
+borough report is linked from that borough's page, via `boroughSlugs` in
+`src/data/reports/index.ts`).
+
+**The numbers are fixed, not computed at build.** The build holds only what is
+showing now, and a report says what was true when it was written. Each
+report's data sits beside the registry (`src/data/reports/<id>.ts`) with a
+comment saying how it was derived. Year-long figures come from rebuilding
+every screening out of the daily `data-combined` releases, each release
+supplying the screenings up to the next one (the everycinema.london history
+method), so nothing is counted twice. Two traps when doing that: venue ids
+changed scheme on 28 January 2026, so count venues by name and place rather
+than id; and a new name at the same address can be a new operator (ODEON
+Camden closed, Plaza Camden opened), so a rename must be named explicitly.
+Format data (`format.source`) only exists from July 2026.
+
+Exploring the data belongs on everycinema.london; a report is the finished,
+citable claim.
+
 ## Search Engines
 
 **The sitemap lists canonical addresses only.** The export uses

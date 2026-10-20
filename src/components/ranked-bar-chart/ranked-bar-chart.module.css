@@ -1,0 +1,110 @@
+.figure {
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.caption {
+  text-align: left;
+  color: var(--color-light-gray);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.row {
+  color: var(--color-muted-gray);
+}
+
+.row:hover {
+  color: var(--color-light-gray);
+}
+
+.label {
+  font-weight: 400;
+  text-align: left;
+  padding: 3px 12px 3px 0;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.label a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.label a:hover,
+.label a:focus-visible {
+  text-decoration: underline;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.track {
+  flex: 1;
+  min-width: 0;
+}
+
+.bar {
+  display: block;
+  height: 12px;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--color-muted-gray);
+  opacity: 0.6;
+}
+
+.row:hover .bar {
+  opacity: 1;
+}
+
+.value {
+  flex: 0 0 auto;
+  min-width: 6ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Colour plus weight: the accent and the grey sit close for deuteranopia, so
+   the highlighted row is also bold. */
+.highlight {
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.highlight .label {
+  font-weight: 700;
+}
+
+.highlight .bar {
+  background: var(--color-neon-pink);
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .table {
+    font-size: 13px;
+  }
+
+  .label {
+    white-space: normal;
+    width: 40%;
+  }
+}

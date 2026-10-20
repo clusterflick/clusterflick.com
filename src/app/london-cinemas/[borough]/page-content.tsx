@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { AccessibilityFeature } from "@/types";
+import { REPORTS, getReportUrl } from "@/data/reports";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
@@ -78,6 +79,9 @@ export default function BoroughPageContent({
   accessibilityStats,
 }: BoroughPageContentProps) {
   const hasEvents = totalMovies > 0;
+  const reports = REPORTS.filter((report) =>
+    report.boroughSlugs?.includes(boroughSlug),
+  );
   const mapImagePath = `/images/boroughs/${boroughSlug}.png`;
 
   // Link to the film list pre-filtered to this borough's venues.
@@ -192,6 +196,12 @@ export default function BoroughPageContent({
                 </>
               )}
             </p>
+            {reports.map((report) => (
+              <p key={report.id} className={styles.intro}>
+                Read our report:{" "}
+                <Link href={getReportUrl(report)}>{report.title}</Link>.
+              </p>
+            ))}
           </>
         }
         sidebar={
