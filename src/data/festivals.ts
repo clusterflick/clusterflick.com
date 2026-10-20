@@ -680,6 +680,27 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "film-africa",
+    name: "Film Africa",
+    url: "https://www.filmafrica.org/",
+    aliases: ["film-africa-festival"],
+    matchers: [
+      {
+        // Partner venues title their screenings with the festival's name -
+        // "Film Africa: Tutu" (Rio), "Congo Boy (Film Africa)" (Riverside),
+        // "Film Africa: O Profeta" (Bernie Grant). Left unscoped, as the
+        // festival takes a different set of partner venues each year. "African
+        // Odysseys" is not matched: it is BFI Southbank's year-round strand.
+        [FilterId.ShowingTitleSearch]: "Film Africa",
+      },
+      {
+        // BFI Southbank notes each screening "Part of Film Africa 2026", and
+        // Ciné Lumière "Part of Film Africa 2026" from its season tag.
+        [FilterId.PerformanceNotesSearch]: "Film Africa",
+      },
+    ],
+  },
+  {
     id: "erotic-film-festival-london",
     name: "Erotic Film Festival London",
     url: "https://eroticfilmfestivallondon.com",
@@ -786,6 +807,117 @@ export const FESTIVALS: Festival[] = [
       },
       {
         [FilterId.PerformanceNotesSearch]: "UKJFF",
+      },
+    ],
+  },
+  {
+    id: "london-korean-film-festival",
+    name: "London Korean Film Festival",
+    url: "https://www.koreanfilm.co.uk/",
+    aliases: ["lkff", "korean-film-festival"],
+    matchers: [
+      {
+        // BFI Southbank and the ICA note each screening "Part of London Korean
+        // Film Festival 2026", and Ciné Lumière "Part of London Korean Film
+        // Festival" from its season tag. The titles themselves carry no
+        // marker, and the films go on general release - Possible Love played
+        // the ICA and a dozen other cinemas the fortnight before the festival
+        // - so the notes are what tells a festival screening from a regular
+        // one.
+        [FilterId.PerformanceNotesSearch]: "London Korean Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "London Korean Film Festival",
+      },
+      {
+        // The festival brands itself LKFF ("LKFF 2026 Opening Gala"). Left
+        // unscoped, as UKJFF and LPFF are: the abbreviation is distinctive and
+        // the festival's venues change from year to year.
+        [FilterId.ShowingTitleSearch]: "LKFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LKFF",
+      },
+    ],
+  },
+  {
+    id: "mubi-fest-london",
+    name: "MUBI FEST London",
+    url: "https://mubifest.com/en/london",
+    aliases: ["mubi-fest", "mubifest"],
+    matchers: [
+      {
+        // Hackney Picturehouse titles every screening "MUBI FEST: …". Bare
+        // "MUBI" is not matched: MUBI distributes films that play all over
+        // London, and the festival's own screenings are noted "Presented by
+        // MUBI" or "In partnership with …", neither of which names it.
+        [FilterId.ShowingTitleSearch]: "MUBI Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "MUBI Fest",
+      },
+    ],
+  },
+  {
+    id: "french-film-festival-london",
+    name: "French Film Festival London",
+    url: "https://www.institut-francais.org.uk/festivals-and-series/french-film-festival-london/",
+    // "french-film-festival" is not claimed here: it is ambiguous between this
+    // and French Film Festival UK, a separate touring festival.
+    aliases: ["fffl"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of French Film Festival
+        // London" from its season tag. The full name rather than "French Film
+        // Fest", which would also claim the touring French Film Festival UK -
+        // a separate festival, which titles its London screenings "French Film
+        // Fest UK: …".
+        [FilterId.PerformanceNotesSearch]: "French Film Festival London",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival London",
+      },
+    ],
+  },
+  {
+    id: "french-film-festival-uk",
+    name: "French Film Festival UK",
+    url: "https://frenchfilmfestival.org.uk/",
+    aliases: ["ffuk", "french-film-festival-uk-and-ireland"],
+    matchers: [
+      {
+        // The Gate titles its screening "French Film Fest UK: The Money Maker
+        // + Q&A". Both that and the full name are matched: search
+        // normalisation runs the words together, so "French Film Fest UK" is
+        // not a substring of "French Film Festival UK". Neither claims the
+        // French Film Festival London, which ends "London", not "UK".
+        [FilterId.ShowingTitleSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Festival UK",
+      },
+    ],
+  },
+  {
+    id: "fashion-in-film-festival",
+    name: "Fashion in Film Festival",
+    url: "https://www.fashioninfilm.com/",
+    aliases: ["fiff", "fashion-in-film"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of Fashion in Film Festival"
+        // from its season tag. Its own "Fashion & Cinema" series is a
+        // different programme and does not match.
+        [FilterId.PerformanceNotesSearch]: "Fashion in Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Fashion in Film Festival",
       },
     ],
   },
