@@ -31,6 +31,19 @@ const GARDEN_NOTES: [note: string, festivalId: string][] = [
   ],
 ];
 
+// Notes from venues other than the Garden, worded as each venue words them
+const OTHER_NOTES: [note: string, festivalId: string][] = [
+  // BFI Southbank and the ICA
+  ["Part of London Korean Film Festival 2026", "london-korean-film-festival"],
+  ["Part of Film Africa 2026", "film-africa"],
+  // Ciné Lumière's season tags
+  [
+    "UK premiere\nPart of London Korean Film Festival",
+    "london-korean-film-festival",
+  ],
+  ["+ Q&A\nPart of Film Africa 2026", "film-africa"],
+];
+
 const matchesNote = (festivalId: string, note: string): boolean => {
   const festival = FESTIVALS.find(({ id }) => id === festivalId);
   if (!festival) throw new Error(`No festival registered as "${festivalId}"`);
@@ -43,12 +56,15 @@ const matchesNote = (festivalId: string, note: string): boolean => {
 };
 
 describe("festival performance-note matchers", () => {
-  it.each(GARDEN_NOTES)("%s is claimed by %s", (note, festivalId) => {
-    expect(matchesNote(festivalId, note)).toBe(true);
-  });
+  it.each([...GARDEN_NOTES, ...OTHER_NOTES])(
+    "%s is claimed by %s",
+    (note, festivalId) => {
+      expect(matchesNote(festivalId, note)).toBe(true);
+    },
+  );
 
   it("does not let one festival claim another's note", () => {
-    for (const [note, festivalId] of GARDEN_NOTES) {
+    for (const [note, festivalId] of [...GARDEN_NOTES, ...OTHER_NOTES]) {
       const claimants = FESTIVALS.filter(({ id }) => matchesNote(id, note)).map(
         ({ id }) => id,
       );

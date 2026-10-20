@@ -680,6 +680,27 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "film-africa",
+    name: "Film Africa",
+    url: "https://www.filmafrica.org/",
+    aliases: ["film-africa-festival"],
+    matchers: [
+      {
+        // Partner venues title their screenings with the festival's name -
+        // "Film Africa: Tutu" (Rio), "Congo Boy (Film Africa)" (Riverside),
+        // "Film Africa: O Profeta" (Bernie Grant). Left unscoped, as the
+        // festival takes a different set of partner venues each year. "African
+        // Odysseys" is not matched: it is BFI Southbank's year-round strand.
+        [FilterId.ShowingTitleSearch]: "Film Africa",
+      },
+      {
+        // BFI Southbank notes each screening "Part of Film Africa 2026", and
+        // Ciné Lumière "Part of Film Africa 2026" from its season tag.
+        [FilterId.PerformanceNotesSearch]: "Film Africa",
+      },
+    ],
+  },
+  {
     id: "erotic-film-festival-london",
     name: "Erotic Film Festival London",
     url: "https://eroticfilmfestivallondon.com",
@@ -786,6 +807,54 @@ export const FESTIVALS: Festival[] = [
       },
       {
         [FilterId.PerformanceNotesSearch]: "UKJFF",
+      },
+    ],
+  },
+  {
+    id: "london-korean-film-festival",
+    name: "London Korean Film Festival",
+    url: "https://www.koreanfilm.co.uk/",
+    aliases: ["lkff", "korean-film-festival"],
+    matchers: [
+      {
+        // BFI Southbank and the ICA note each screening "Part of London Korean
+        // Film Festival 2026", and Ciné Lumière "Part of London Korean Film
+        // Festival" from its season tag. The titles themselves carry no
+        // marker, and the films go on general release - Possible Love played
+        // the ICA and a dozen other cinemas the fortnight before the festival
+        // - so the notes are what tells a festival screening from a regular
+        // one.
+        [FilterId.PerformanceNotesSearch]: "London Korean Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "London Korean Film Festival",
+      },
+      {
+        // The festival brands itself LKFF ("LKFF 2026 Opening Gala"). Left
+        // unscoped, as UKJFF and LPFF are: the abbreviation is distinctive and
+        // the festival's venues change from year to year.
+        [FilterId.ShowingTitleSearch]: "LKFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LKFF",
+      },
+    ],
+  },
+  {
+    id: "mubi-fest-london",
+    name: "MUBI FEST London",
+    url: "https://mubifest.com/en/london",
+    aliases: ["mubi-fest", "mubifest"],
+    matchers: [
+      {
+        // Hackney Picturehouse titles every screening "MUBI FEST: …". Bare
+        // "MUBI" is not matched: MUBI distributes films that play all over
+        // London, and the festival's own screenings are noted "Presented by
+        // MUBI" or "In partnership with …", neither of which names it.
+        [FilterId.ShowingTitleSearch]: "MUBI Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "MUBI Fest",
       },
     ],
   },
