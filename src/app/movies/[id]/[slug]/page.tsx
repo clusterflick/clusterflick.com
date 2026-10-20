@@ -92,7 +92,11 @@ export async function generateMetadata({
     };
   }
 
-  const title = movie.year ? `${movie.title} (${movie.year})` : movie.title;
+  const name = movie.year ? `${movie.title} (${movie.year})` : movie.title;
+  // A film's page is found by searching for where it's on, so the title says
+  // so. A departed film has no showtimes to offer, and claiming them would
+  // promise a search something the page can't give.
+  const title = departedMovie ? name : `${name} — Showtimes in London`;
   const leadSentence = departedMovie
     ? `${movie.title} is not currently screening at cinemas in London.`
     : `Find screenings for ${movie.title} at cinemas across London.`;
@@ -117,7 +121,7 @@ export async function generateMetadata({
       canonical: getMovieUrl(movie),
     },
     openGraph: {
-      title: `${title} | Clusterflick`,
+      title: `${name} | Clusterflick`,
       description,
       images: movie.posterPath
         ? [`https://image.tmdb.org/t/p/w500${movie.posterPath}`]

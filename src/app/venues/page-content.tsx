@@ -20,7 +20,7 @@ export default function VenuesPageContent({
 }: VenuesPageContentProps) {
   return (
     <StandardPageLayout
-      title="Venues"
+      title="Every Cinema in London"
       subtitle={`${totalVenues.toLocaleString("en-GB")} venues across London`}
     >
       <p className={styles.intro}>
