@@ -120,6 +120,11 @@ export async function generateMetadata({
     alternates: {
       canonical: getMovieUrl(movie),
     },
+    // A departed page stays up so links to the film still land, but it is
+    // little more than "no longer showing", which Google files as a soft 404.
+    // Kept out of the index, crawling goes on the films that are showing; its
+    // links are still followed. Returning films lose it on the next build.
+    ...(departedMovie && { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${name} | Clusterflick`,
       description,
@@ -150,8 +155,8 @@ export default async function MovieDetailPage({
       // The same structured data the live page publishes, minus what a film
       // with no screenings cannot have: no ScreeningEvents, and no sameAs or
       // ratings, since the match stage only ever sees the combined data. A
-      // page that exists to keep an indexed link working has to stay readable
-      // to whatever indexed it.
+      // page that exists to keep a link working has to stay readable to
+      // whatever followed it.
       const departedUrl = `https://clusterflick.com${getMovieUrl(departedMovie)}`;
       return (
         <>

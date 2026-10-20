@@ -50,8 +50,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Films that have finished their run keep their pages (`getDepartedData`),
-  // so links to them still land, but aren't listed: each says little more than
-  // that the film has stopped showing, and they were two fifths of the sitemap.
+  // so links to them still land, but aren't listed — and are `noindex`: each
+  // says little more than that the film has stopped showing, and they were two
+  // fifths of the sitemap.
 
   const venuePages = Object.values(data.venues).map((venue: Venue) => ({
     url: pageUrl(getVenueUrl(venue)),
