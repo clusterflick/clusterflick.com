@@ -29,6 +29,7 @@ const runnerUp = DATA.boroughs.at(-2)!;
 const runnerUpName = LONDON_BOROUGHS.find(
   (b) => b.slug === runnerUp.slug,
 )!.name;
+const runnerUpTimes = Math.round(runnerUp.screenings / lewisham);
 const screeningShare = (lewisham / DATA.londonScreenings) * 100;
 const populationShare =
   (DATA.population.lewisham / DATA.population.london) * 100;
@@ -168,13 +169,16 @@ export default function Lewisham2026Report() {
             <dd>{lewisham}</dd>
           </div>
           <div className={styles.stat}>
-            <dt>By then on a typical day, Westminster has screened as many</dt>
+            <dt>
+              Westminster has had this many screenings by this time on a typical
+              day
+            </dt>
             <dd>{westminsterPassesAt}</dd>
           </div>
           <div className={styles.stat}>
             <dt>
-              Lewisham&apos;s share of London&apos;s film screenings. It is home
-              to {populationShare.toFixed(1)}% of Londoners.
+              Lewisham is home to {populationShare.toFixed(1)}% of Londoners,
+              but has only a tiny share of all London&apos;s film screenings.
             </dt>
             <dd>{screeningShare.toFixed(2)}%</dd>
           </div>
@@ -182,7 +186,7 @@ export default function Lewisham2026Report() {
 
         <ContentSection
           title="Every borough"
-          intro={`Lewisham's bar is there: it is ${lewisham} screenings long. The next lowest, the ${runnerUpName}, had ${fmt(runnerUp.screenings)}.`}
+          intro={`Lewisham's bar is there: it is ${lewisham} screenings long. The next lowest, the ${runnerUpName}, had ${runnerUpTimes} times as many.`}
         >
           <RankedBarChart
             caption={`Film screenings by borough, ${period}`}
