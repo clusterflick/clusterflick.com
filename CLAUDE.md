@@ -1472,7 +1472,9 @@ borough report is linked from that borough's page, via `boroughSlugs` in
 **The numbers are fixed, not computed at build.** The build holds only what is
 showing now, and a report says what was true when it was written. Each
 report's data sits beside the registry (`src/data/reports/<id>.ts`) with a
-comment saying how it was derived. Year-long figures come from rebuilding
+comment saying how it was derived, and the scripts that produced it are
+linked from the report (a gist: they're one-off, not a reusable pipeline,
+so they don't belong in `data-analysed`). Year-long figures come from rebuilding
 every screening out of the daily `data-combined` releases, each release
 supplying the screenings up to the next one (the everycinema.london history
 method), so nothing is counted twice. Two traps when doing that: venue ids

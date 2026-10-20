@@ -19,6 +19,8 @@ const TIME_OUT_CLOSURE =
   "https://www.timeout.com/london/news/lewishams-only-cinema-has-just-been-shuttered-and-the-community-is-reeling-110424";
 const LADYWELL_LIVE_DELAY =
   "https://ladywell-live.org/2026/09/26/independent-group-castle-cinema-to-take-over-former-catford-mews-site-and-open-cinema-in-the-summer/";
+const SCRIPTS_GIST =
+  "https://gist.github.com/alistairjcbrown/4a304f1d9e5e62ef8d61afe0ebfeac39";
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
 const screeningsIn = (slug: string) =>
@@ -267,6 +269,14 @@ export default function Lewisham2026Report() {
               <strong>Population.</strong> ONS mid-2024 estimates: Lewisham{" "}
               {fmt(DATA.population.lewisham)}, London{" "}
               {fmt(DATA.population.london)}.
+            </li>
+            <li>
+              <strong>The working.</strong> The scripts that produced these
+              numbers, and how to run them, are{" "}
+              <a href={SCRIPTS_GIST} target="_blank" rel="noopener noreferrer">
+                on GitHub
+              </a>
+              .
             </li>
             <li>
               <strong>Using these numbers.</strong> They&apos;re free to use
