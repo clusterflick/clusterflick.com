@@ -15,7 +15,7 @@ function FestivalBlurb() {
         The festival opens in London, spread across cinemas throughout the city
         — regularly including the{" "}
         <Link href="/venues/phoenix-cinema">Phoenix Cinema</Link> and{" "}
-        <Link href="/venues/jw3">JW3</Link> — before touring Manchester and the
+        <Link href="/venues/jw-3">JW3</Link> — before touring Manchester and the
         rest of the UK and running online. Its programme mixes galas, UK
         premieres and filmmaker Q&amp;As with premieres from its own short film
         funds.

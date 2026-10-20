@@ -71,6 +71,163 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-20",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue, VenueList }) => (
+          <>
+            Added{" "}
+            <Festival name="Film Africa" url="https://www.filmafrica.org/" />,
+            the Royal African Society&rsquo;s festival of African cinema, from
+            23 October to 1 November. It opens and closes at{" "}
+            <Venue
+              name="BFI Southbank"
+              url="https://www.bfi.org.uk/bfi-southbank"
+            />{" "}
+            and spreads out to partner venues including{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Ciné Lumière",
+                  url: "https://www.institut-francais.org.uk/cinema/",
+                },
+                {
+                  name: "Riverside Studios",
+                  url: "https://riversidestudios.co.uk",
+                },
+                { name: "Rio Cinema", url: "https://riocinema.org.uk" },
+              ]}
+            />
+            .
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue, VenueList }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Korean Film Festival"
+              url="https://www.koreanfilm.co.uk/"
+            />
+            , a fortnight of new Korean cinema from 2 to 16 November, with its
+            galas at{" "}
+            <Venue
+              name="BFI Southbank"
+              url="https://www.bfi.org.uk/bfi-southbank"
+            />{" "}
+            and screenings at{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Institute of Contemporary Arts",
+                  url: "https://www.ica.art",
+                },
+                {
+                  name: "Ciné Lumière",
+                  url: "https://www.institut-francais.org.uk/cinema/",
+                },
+              ]}
+            />
+            .
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="MUBI FEST London"
+              url="https://mubifest.com/en/london"
+            />
+            , MUBI&rsquo;s first London festival: three days of previews,
+            Q&amp;As and anniversary screenings at{" "}
+            <Venue
+              name="Hackney Picturehouse"
+              url="https://www.picturehouses.com/cinema/hackney-picturehouse"
+            />{" "}
+            from 13 to 15 November.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="French Film Festival London"
+              url="https://www.institut-francais.org.uk/festivals-and-series/french-film-festival-london/"
+            />
+            , more than 40 films and almost 100 screenings at{" "}
+            <Venue
+              name="Ciné Lumière"
+              url="https://www.institut-francais.org.uk/cinema/"
+            />{" "}
+            from 18 to 29 November, many of them UK premieres.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="French Film Festival UK"
+              url="https://frenchfilmfestival.org.uk/"
+            />
+            , the touring festival of French and francophone cinema, whose 34th
+            edition runs from 4 November to 9 December and comes to{" "}
+            <Venue
+              name="The Gate Picturehouse"
+              url="https://www.picturehouses.com/cinema/the-gate"
+            />{" "}
+            in London.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival, Venue }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="Fashion in Film Festival"
+              url="https://www.fashioninfilm.com/"
+            />
+            , which marks its 20th anniversary at{" "}
+            <Venue
+              name="Ciné Lumière"
+              url="https://www.institut-francais.org.uk/cinema/"
+            />{" "}
+            from 28 November to 6 December, from early cinema to William
+            Klein&rsquo;s Who Are You, Polly Maggoo?
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: ({ Venue }) => (
+          <>
+            Screenings at{" "}
+            <Venue
+              name="Ciné Lumière"
+              url="https://www.institut-francais.org.uk/cinema/"
+            />{" "}
+            now say which festival or season they&rsquo;re part of, so its
+            London Korean Film Festival, Film Africa and London Palestine Film
+            Festival screenings appear on those festivals&rsquo; pages.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-19",
     changes: [
       {

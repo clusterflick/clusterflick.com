@@ -15,7 +15,7 @@ function FestivalBlurb() {
         The opening and closing galas are held at{" "}
         <Link href="/venues/bfi-southbank">BFI Southbank</Link>, with the rest
         of the programme spread across venues including the{" "}
-        <Link href="/venues/ica">ICA</Link> and{" "}
+        <Link href="/venues/institute-of-contemporary-arts">ICA</Link> and{" "}
         <Link href="/venues/cine-lumiere">Ciné Lumière</Link>. Alongside special
         screenings, it is organised into strands such as Cinema Now and
         Women&rsquo;s Voices, &ldquo;a strand dedicated to up-and-coming
