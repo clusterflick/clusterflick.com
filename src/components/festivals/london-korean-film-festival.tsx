@@ -4,27 +4,30 @@ function FestivalBlurb() {
   return (
     <section>
       <p>
-        The London Korean Film Festival is run each November by the Korean
-        Cultural Centre UK, in collaboration with the Korean Film Archive. Over
-        two weeks it brings new Korean features, documentaries and shorts to
-        London, from galas and special screenings to Cinema Now and the
-        Women&apos;s Voices strand, dedicated to up-and-coming independent women
-        filmmakers.
+        The London Korean Film Festival (LKFF) is run by the Korean Cultural
+        Centre UK, in collaboration with the Korean Film Archive and with
+        support from the Korean Film Council. The centre staged its first
+        festival in 2006 with a dozen films, and it has grown into an annual
+        fortnight of Korean cinema each November, holding its 20th edition in
+        2025.
       </p>
       <p>
-        Its opening and closing galas are held at{" "}
+        The opening and closing galas are held at{" "}
         <Link href="/venues/bfi-southbank">BFI Southbank</Link>, with the rest
         of the programme spread across venues including the{" "}
         <Link href="/venues/ica">ICA</Link> and{" "}
-        <Link href="/venues/cine-lumiere">Ciné Lumière</Link>.
+        <Link href="/venues/cine-lumiere">Ciné Lumière</Link>. Alongside special
+        screenings, it is organised into strands such as Cinema Now and
+        Women&rsquo;s Voices, &ldquo;a strand dedicated to up-and-coming
+        independent women filmmakers&rdquo;.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "New Korean features, documentaries and shorts at BFI Southbank, the ICA and venues across London each November";
+  "an annual fortnight of Korean cinema each November, run by the Korean Cultural Centre UK at BFI Southbank, the ICA and venues across London";
 export const seoHighlights =
-  "Opening and closing galas, Cinema Now and the Women's Voices strand";
+  "opening and closing galas, the Cinema Now strand and Women's Voices, a strand for independent women filmmakers";
 
 export default FestivalBlurb;
