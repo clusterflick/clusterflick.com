@@ -8,7 +8,7 @@ function FestivalBlurb() {
         the Polish Cultural Institute. Running across venues including{" "}
         <Link href="/venues/bfi-southbank">BFI Southbank</Link>,{" "}
         <Link href="/venues/cine-lumiere">Ciné Lumière</Link>,{" "}
-        <Link href="/venues/ica">ICA</Link>, and{" "}
+        <Link href="/venues/institute-of-contemporary-arts">ICA</Link>, and{" "}
         <Link href="/venues/the-barbican">the Barbican</Link>, the festival
         brings the finest Polish cinema — classic and contemporary — to London
         audiences each spring. Since its founding, it has become the UK&apos;s
