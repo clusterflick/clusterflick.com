@@ -859,6 +859,42 @@ export const FESTIVALS: Festival[] = [
     ],
   },
   {
+    id: "french-film-festival-london",
+    name: "French Film Festival London",
+    url: "https://www.institut-francais.org.uk/festivals-and-series/french-film-festival-london/",
+    aliases: ["fffl", "french-film-festival"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of French Film Festival
+        // London" from its season tag. The full name rather than "French Film
+        // Fest", which would also claim the touring French Film Festival UK -
+        // a separate festival, which titles its London screenings "French Film
+        // Fest UK: …".
+        [FilterId.PerformanceNotesSearch]: "French Film Festival London",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival London",
+      },
+    ],
+  },
+  {
+    id: "fashion-in-film-festival",
+    name: "Fashion in Film Festival",
+    url: "https://www.fashioninfilm.com/",
+    aliases: ["fiff", "fashion-in-film"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of Fashion in Film Festival"
+        // from its season tag. Its own "Fashion & Cinema" series is a
+        // different programme and does not match.
+        [FilterId.PerformanceNotesSearch]: "Fashion in Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Fashion in Film Festival",
+      },
+    ],
+  },
+  {
     id: "london-palestine-film-festival",
     name: "London Palestine Film Festival",
     url: "https://www.palestinefilm.org.uk/",
