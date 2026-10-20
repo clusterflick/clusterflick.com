@@ -1471,6 +1471,14 @@ it to that. Departed films are left out: their pages stay up so links land,
 but each says little more than that the film has stopped showing, and they
 were two fifths of the sitemap.
 
+**Departed film pages are `noindex`** (`follow` still on). Google was
+already filing them as soft 404s or declining to index them, and re-checking
+them spent crawling the films that are showing needed. Film pages churn
+weekly, and indexed pages fell steadily from ~2,100 to ~880 as new films were
+indexed more slowly than old ones left; the durable pages (venues, boroughs,
+groups, clubs, festivals, genres, formats) are the ones search can build on.
+A film that returns drops the tag on the next build.
+
 **A page's `<title>` names what it is found by**, not just what it is called.
 Film pages read "Heat (1995) — Showtimes in London" (a departed film keeps
 the bare name, having none), venue pages "Prince Charles Cinema — What's On
