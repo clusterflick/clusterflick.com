@@ -114,6 +114,15 @@ describe("matchOccasions", () => {
     ).toEqual(["Live score by Hugo Max"]);
   });
 
+  it("reads a score performed live as a live score", () => {
+    expect(
+      labels(
+        "Frankenstein (1931) \n Film screening with new score performed live by the Royal Philharmonic Orchestra",
+      ),
+    ).toEqual(["Live score by Royal Philharmonic Orchestra"]);
+    expect(labels("Nosferatu \n Music performed live")).toEqual(["Live score"]);
+  });
+
   it("ignores chain preview pricing", () => {
     expect(
       labels("Members' Only Morning Previews - Tickets are £5 for members"),
