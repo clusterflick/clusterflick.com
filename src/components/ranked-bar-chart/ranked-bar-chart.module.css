@@ -67,8 +67,11 @@
   height: 12px;
   min-width: 2px;
   border-radius: 0 4px 4px 0;
-  background: var(--color-muted-gray);
-  opacity: 0.6;
+  /* Electric blue, dulled so the highlighted row stands out. At this opacity
+     it passes the colour-blind separation check against the accent and keeps
+     3:1 contrast with the page. */
+  background: var(--color-electric-blue);
+  opacity: 0.7;
 }
 
 .row:hover .bar {

@@ -18,7 +18,7 @@ export const REPORTS: Report[] = [
     id: "lewisham-2026",
     title: "Lewisham's year without a cinema",
     description:
-      "In 2026 so far, Lewisham has had 88 film screenings. Westminster has averaged 255 a day.",
+      "In 2026 so far, Lewisham has had 88 film screenings: as many as Westminster has by 2:30pm on a typical day.",
     asOf: "2026-10-19",
     boroughSlugs: ["lewisham"],
   },
