@@ -862,7 +862,9 @@ export const FESTIVALS: Festival[] = [
     id: "french-film-festival-london",
     name: "French Film Festival London",
     url: "https://www.institut-francais.org.uk/festivals-and-series/french-film-festival-london/",
-    aliases: ["fffl", "french-film-festival"],
+    // "french-film-festival" is not claimed here: it is ambiguous between this
+    // and French Film Festival UK, a separate touring festival.
+    aliases: ["fffl"],
     matchers: [
       {
         // Ciné Lumière notes each screening "Part of French Film Festival
@@ -874,6 +876,31 @@ export const FESTIVALS: Festival[] = [
       },
       {
         [FilterId.ShowingTitleSearch]: "French Film Festival London",
+      },
+    ],
+  },
+  {
+    id: "french-film-festival-uk",
+    name: "French Film Festival UK",
+    url: "https://frenchfilmfestival.org.uk/",
+    aliases: ["ffuk", "french-film-festival-uk-and-ireland"],
+    matchers: [
+      {
+        // The Gate titles its screening "French Film Fest UK: The Money Maker
+        // + Q&A". Both that and the full name are matched: search
+        // normalisation runs the words together, so "French Film Fest UK" is
+        // not a substring of "French Film Festival UK". Neither claims the
+        // French Film Festival London, which ends "London", not "UK".
+        [FilterId.ShowingTitleSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Festival UK",
       },
     ],
   },
