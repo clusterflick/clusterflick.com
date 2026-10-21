@@ -11,7 +11,8 @@
  * share rankings also need 200+ screenings. The format and language rankings
  * cover their own windows instead, with 100+ screenings for languages. Format
  * data starts 2026-07-01 and language data 2026-08-21. A film's
- * year is its release year, so a re-release counts as the original.
+ * year is its release year, so a re-release counts as the original. Languages
+ * are TheMovieDB's codes.
  */
 export const LONDON_CINEMAS_2026 = {
   from: "2026-01-01",
@@ -283,6 +284,116 @@ export const LONDON_CINEMAS_2026 = {
       value: 48.0,
     },
   ],
+  languageMix: {
+    "institut-francais.org.uk": [
+      {
+        language: "fr",
+        screenings: 240,
+      },
+      {
+        language: "es",
+        screenings: 40,
+      },
+      {
+        language: "ka",
+        screenings: 11,
+      },
+      {
+        language: "ar",
+        screenings: 7,
+      },
+    ],
+    "closeupfilmcentre.com": [
+      {
+        language: "fr",
+        screenings: 19,
+      },
+      {
+        language: "ja",
+        screenings: 16,
+      },
+      {
+        language: "es",
+        screenings: 8,
+      },
+      {
+        language: "it",
+        screenings: 6,
+      },
+    ],
+    "cineworld.co.uk-ilford": [
+      {
+        language: "ta",
+        screenings: 482,
+      },
+      {
+        language: "hi",
+        screenings: 392,
+      },
+      {
+        language: "ml",
+        screenings: 329,
+      },
+      {
+        language: "te",
+        screenings: 301,
+      },
+    ],
+    "metrocinema.co.uk": [
+      {
+        language: "hi",
+        screenings: 223,
+      },
+      {
+        language: "ml",
+        screenings: 45,
+      },
+      {
+        language: "ta",
+        screenings: 23,
+      },
+      {
+        language: "ar",
+        screenings: 16,
+      },
+    ],
+    "cineworld.co.uk-hounslow": [
+      {
+        language: "hi",
+        screenings: 397,
+      },
+      {
+        language: "ta",
+        screenings: 313,
+      },
+      {
+        language: "te",
+        screenings: 247,
+      },
+      {
+        language: "pa",
+        screenings: 154,
+      },
+    ],
+    "cineworld.co.uk-south-ruislip": [
+      {
+        language: "hi",
+        screenings: 462,
+      },
+      {
+        language: "ta",
+        screenings: 385,
+      },
+      {
+        language: "ml",
+        screenings: 130,
+      },
+      {
+        language: "pa",
+        screenings: 100,
+      },
+    ],
+  },
   mostLanguages: [
     {
       id: "bfi.org.uk-southbank",

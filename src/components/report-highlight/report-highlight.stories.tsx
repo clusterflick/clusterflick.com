@@ -6,7 +6,7 @@ import ReportHighlight from "@/components/report-highlight";
  * for, the number it stands out with, and the venue as a card.
  *
  * **When to use:**
- * - A report section's leader ("winner"), or a venue worth calling out that
+ * - A report section's leader ("top"), or a venue worth calling out that
  *   isn't the leader ("mention"), such as a multiplex near the top of a
  *   ranking independents usually own.
  *
@@ -28,7 +28,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Winner: Story = {
+export const Top: Story = {
   args: {
     title: "Most adventurous programme",
     stat: "86%",

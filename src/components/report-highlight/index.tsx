@@ -3,15 +3,15 @@ import VenueCard from "@/components/venue-card";
 import { StarIcon } from "@/components/icons";
 import styles from "./report-highlight.module.css";
 
-type Variant = "winner" | "mention";
+type Variant = "top" | "mention";
 
 const variantStyles: Record<Variant, string> = {
-  winner: styles.winner,
+  top: styles.top,
   mention: styles.mention,
 };
 
 const variantLabels: Record<Variant, string> = {
-  winner: "Winner",
+  top: "Top",
   mention: "Special mention",
 };
 
@@ -19,7 +19,7 @@ interface ReportHighlightProps {
   variant?: Variant;
   /** What the venue stands out for, e.g. "Most adventurous programme". */
   title: string;
-  /** The number it won with, e.g. "86%". */
+  /** The number or name it stands out with, e.g. "86%". */
   stat: string;
   /** What the number means, e.g. "of screenings were of films 25+ years old". */
   statLabel: string;
@@ -36,7 +36,7 @@ interface ReportHighlightProps {
  * and the venue as a card.
  */
 export default function ReportHighlight({
-  variant = "winner",
+  variant = "top",
   title,
   stat,
   statLabel,

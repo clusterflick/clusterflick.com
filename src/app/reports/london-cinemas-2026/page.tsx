@@ -32,6 +32,22 @@ const FORMAT_LABELS: Record<string, string> = {
   vhs: "VHS",
 };
 
+// TheMovieDB uses "cn" for Cantonese, which isn't a standard language code.
+const LANGUAGE_NAMES: Record<string, string> = { cn: "Cantonese" };
+const languageNames = new Intl.DisplayNames(["en"], { type: "language" });
+const languageName = (code: string) =>
+  LANGUAGE_NAMES[code] ?? languageNames.of(code) ?? code;
+
+/** "French, Spanish and Georgian": a venue's main non-English languages. */
+const formatLanguages = (venueId: keyof typeof DATA.languageMix, count = 3) => {
+  const names = DATA.languageMix[venueId]
+    .slice(0, count)
+    .map((l) => languageName(l.language));
+  return names.length > 1
+    ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`
+    : names.join("");
+};
+
 /** Ranked venues as chart rows: the leader emphasised, each linked if open. */
 const venueRows = (venues: readonly RankedVenue[]) =>
   venues.map((venue, index) => ({
@@ -269,8 +285,8 @@ export default function LondonCinemas2026Report() {
           <div className={styles.highlights}>
             <ReportHighlight
               title="Oldest film screened"
-              stat={String(oldest.year)}
-              statLabel={`${oldest.title}, aboard a floating arts centre built inside a 1913 cargo ship at South Quay`}
+              stat={`${oldest.title} (${oldest.year})`}
+              statLabel="screened aboard a floating arts centre, built inside a 1913 cargo ship at South Quay"
               venue={cardVenue(oldest)}
             />
           </div>
@@ -294,21 +310,21 @@ export default function LondonCinemas2026Report() {
           <p className={styles.body}>
             {DATA.nonEnglishShare.toFixed(0)}% of London&apos;s screenings were
             of films not in English, in {DATA.languages} original languages.{" "}
-            {venueLink(mostLanguages)} showed the most languages,{" "}
-            {mostLanguages.value}.
+            {venueLink(mostLanguages)} showed films in {mostLanguages.value}{" "}
+            original languages, more than any other venue.
           </p>
           <div className={styles.highlights}>
             <ReportHighlight
               title="Most international programme"
               stat={percent(mostInternational.value)}
-              statLabel="of screenings were of films not in English"
+              statLabel={`of screenings were of films not in English, mostly in ${formatLanguages(mostInternational.id)}`}
               venue={cardVenue(mostInternational)}
             />
             <ReportHighlight
               variant="mention"
               title="Most international multiplex"
               stat={fmt(ilfordCount.value)}
-              statLabel={`screenings of films not in English, more than any other venue in London: ${percent(ilford.value)} of its programme, mostly South Asian films`}
+              statLabel={`screenings of films not in English, more than any other venue in London: ${percent(ilford.value)} of its programme, mostly in ${formatLanguages(ilford.id, 4)}`}
               venue={cardVenue(ilford)}
             />
           </div>

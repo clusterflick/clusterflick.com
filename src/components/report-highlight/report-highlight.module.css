@@ -8,14 +8,19 @@
   background: rgba(var(--color-white-rgb), 0.03);
 }
 
-.winner {
+/* The eyebrow is yellow, as the planner's tags are; the number keeps the
+   site's pink. */
+.top {
   border-color: rgba(var(--color-neon-pink-rgb), 0.6);
   --highlight-accent: var(--color-neon-pink);
+  --highlight-eyebrow: var(--color-buttery-yellow);
 }
 
+/* Quieter than a top spot: blue throughout. */
 .mention {
-  border-color: rgba(var(--color-buttery-yellow-rgb), 0.6);
-  --highlight-accent: var(--color-buttery-yellow);
+  border-color: rgba(var(--color-electric-blue-rgb), 0.6);
+  --highlight-accent: var(--color-electric-blue);
+  --highlight-eyebrow: var(--color-electric-blue);
 }
 
 .eyebrow {
@@ -27,7 +32,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--highlight-accent);
+  color: var(--highlight-eyebrow);
 }
 
 /* A section heading's size would compete with the section's own. */
