@@ -84,6 +84,10 @@ function WindowNote({ what, from }: { what: string; from: string }) {
 
 const [topFilm] = DATA.mostScreenedFilms;
 const vhs = DATA.formats.find((f) => f.format === "vhs")!;
+// The aside only holds while The Odyssey has no 16mm or VHS screenings.
+const odysseyFreeFormats = DATA.formats
+  .filter((f) => f.format === "16mm" || f.format === "vhs")
+  .every((f) => f.odyssey === 0);
 const notCinemas = DATA.venuesWithScreenings - DATA.venueTypes.Cinema;
 const [nickel] = DATA.repertory;
 const [mostFilms] = DATA.mostDifferentFilms;
@@ -257,6 +261,8 @@ export default function LondonCinemas2026Report() {
             {vhs.total} from VHS). {fmt(DATA.odysseyPrintScreenings)} of the
             prints were The Odyssey, on 35mm, 70mm and IMAX 70mm. Without it,
             70mm almost disappears, and what&apos;s left on film is mostly 35mm.
+            {odysseyFreeFormats &&
+              " (16mm and VHS remain an Odyssey-free zone.)"}
           </p>
           <RankedBarChart
             caption="Screenings from film and tape, by format"
