@@ -53,12 +53,14 @@ export default function ReportHighlight({
         <span className={styles.stat}>{stat}</span>{" "}
         <span className={styles.statLabel}>{statLabel}</span>
       </p>
-      <VenueCard
-        href={venue.href}
-        name={venue.name}
-        type={venue.type}
-        imagePath={venue.imagePath}
-      />
+      <div className={styles.venue}>
+        <VenueCard
+          href={venue.href}
+          name={venue.name}
+          type={venue.type}
+          imagePath={venue.imagePath}
+        />
+      </div>
     </section>
   );
 }
