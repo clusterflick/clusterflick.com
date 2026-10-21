@@ -1481,7 +1481,10 @@ method), so nothing is counted twice. Two traps when doing that: venue ids
 changed scheme on 28 January 2026, so count venues by name and place rather
 than id; and a new name at the same address can be a new operator (ODEON
 Camden closed, Plaza Camden opened), so a rename must be named explicitly.
-Format data (`format.source`) only exists from July 2026.
+Format data (`format.source`) only exists from 1 July 2026, and a film's
+`originalLanguage` only from 21 August 2026 (before then every film reads as
+English, since the field is omitted for English): bound those measures to their
+windows. Release year, film matching and accessibility tags cover the whole year.
 
 Exploring the data belongs on everycinema.london; a report is the finished,
 citable claim.

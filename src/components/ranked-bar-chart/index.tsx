@@ -19,6 +19,8 @@ interface RankedBarChartProps {
   labelHeading: string;
   /** Header for the value column, e.g. "Screenings". */
   valueHeading: string;
+  /** How a value is written, e.g. as a percentage. Defaults to "1,234". */
+  formatValue?: (value: number) => string;
 }
 
 /**
@@ -32,6 +34,7 @@ export default function RankedBarChart({
   caption,
   labelHeading,
   valueHeading,
+  formatValue = (value) => value.toLocaleString("en-GB"),
 }: RankedBarChartProps) {
   const sorted = [...items].sort((a, b) => b.value - a.value);
   const max = Math.max(...sorted.map((item) => item.value), 1);
@@ -66,9 +69,7 @@ export default function RankedBarChart({
                     style={{ width: `${(item.value / max) * 100}%` }}
                   />
                 </span>
-                <span className={styles.value}>
-                  {item.value.toLocaleString("en-GB")}
-                </span>
+                <span className={styles.value}>{formatValue(item.value)}</span>
               </td>
             </tr>
           ))}

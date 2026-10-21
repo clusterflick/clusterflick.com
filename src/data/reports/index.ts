@@ -15,6 +15,13 @@ export type Report = {
 
 export const REPORTS: Report[] = [
   {
+    id: "london-cinemas-2026",
+    title: "London's cinemas in 2026: who shows what",
+    description:
+      "The most adventurous programmes, films on film, the oldest films on screen, films from around the world and accessible screenings.",
+    asOf: "2026-10-19",
+  },
+  {
     id: "lewisham-2026",
     title: "Lewisham's year without a cinema",
     description:

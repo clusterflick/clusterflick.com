@@ -1,0 +1,87 @@
+.lead p {
+  font-size: 18px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 32px 0 60px;
+}
+
+@media (min-width: 700px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+.stat dd {
+  margin: 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-neon-pink);
+}
+
+.stat dt {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 24px 0;
+}
+
+.method {
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.method li {
+  margin-bottom: 12px;
+}
+
+.action {
+  margin-top: 24px;
+}
+
+.films {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.films li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+.filmTitle {
+  font-weight: 600;
+}
+
+.filmVenue {
+  color: var(--color-light-gray);
+}

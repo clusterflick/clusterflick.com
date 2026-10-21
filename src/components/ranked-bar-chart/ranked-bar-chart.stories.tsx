@@ -50,6 +50,21 @@ export const Highlighted: Story = {
   },
 };
 
+/** Values written as percentages, with the leader emphasised. */
+export const Percentages: Story = {
+  args: {
+    caption: "Share of screenings of films 25+ years old",
+    labelHeading: "Venue",
+    valueHeading: "Share",
+    formatValue: (value: number) => `${Math.round(value)}%`,
+    items: [
+      { key: "nickel", label: "The Nickel", value: 85.8, highlight: true },
+      { key: "pcc", label: "Prince Charles Cinema", value: 69.4 },
+      { key: "close-up", label: "Close-Up Film Centre", value: 68.6 },
+    ],
+  },
+};
+
 /** No emphasis and no links: a plain ranked list. */
 export const Plain: Story = {
   args: {
