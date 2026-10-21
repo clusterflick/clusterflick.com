@@ -215,13 +215,18 @@ export default function LondonCinemas2026Report() {
             <dd>{fmt(DATA.londonScreenings)}</dd>
           </div>
           <div className={styles.stat}>
-            <dt>Of them were {topFilm.title}</dt>
+            <dt>
+              Of them were {topFilm.title}, one in every{" "}
+              {Math.round(DATA.londonScreenings / topFilm.screenings)}{" "}
+              screenings in London
+            </dt>
             <dd>{fmt(topFilm.screenings)}</dd>
           </div>
           <div className={styles.stat}>
             <dt>
               Of the {DATA.venuesWithScreenings} places that screened films
-              aren&apos;t cinemas
+              aren&apos;t cinemas,{" "}
+              {percent((notCinemas / DATA.venuesWithScreenings) * 100)} of them
             </dt>
             <dd>{notCinemas}</dd>
           </div>
