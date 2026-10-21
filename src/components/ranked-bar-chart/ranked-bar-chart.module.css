@@ -9,6 +9,7 @@
 }
 
 .caption {
+  font-size: 14px;
   text-align: left;
   color: var(--color-light-gray);
   font-weight: 600;
@@ -62,16 +63,26 @@
   min-width: 0;
 }
 
+.stack {
+  display: flex;
+  gap: 2px;
+  min-width: 2px;
+}
+
 .bar {
   display: block;
+  flex: 1 1 0;
   height: 12px;
   min-width: 2px;
-  border-radius: 0 4px 4px 0;
   /* Electric blue, dulled so the highlighted row stands out. At this opacity
      it passes the colour-blind separation check against the accent and keeps
      3:1 contrast with the page. */
   background: var(--color-electric-blue);
   opacity: 0.7;
+}
+
+.bar:last-child {
+  border-radius: 0 4px 4px 0;
 }
 
 .row:hover .bar {
@@ -110,4 +121,40 @@
     white-space: normal;
     width: 40%;
   }
+}
+
+/* A split bar's second segment, in the accent like a highlighted row. */
+.barSplit {
+  background: var(--color-neon-pink);
+  opacity: 1;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--color-electric-blue);
+  opacity: 0.7;
+}
+
+.swatchSplit {
+  background: var(--color-neon-pink);
+  opacity: 1;
 }

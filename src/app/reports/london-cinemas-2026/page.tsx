@@ -3,22 +3,34 @@ import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import RankedBarChart from "@/components/ranked-bar-chart";
+import ReportHighlight from "@/components/report-highlight";
 import { ButtonLink } from "@/components/button";
+import { CalendarIcon } from "@/components/icons";
 import { LONDON_CINEMAS_2026 as DATA } from "@/data/reports/london-cinemas-2026";
 import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueImagePath } from "@/utils/get-venue-image";
 import { formatReportDate } from "../format-report-date";
 import styles from "./page.module.css";
 
-type RankedVenue = {
+type ReportVenue = {
   id: string;
   name: string;
+  type: string;
   current: boolean;
-  value: number;
 };
+type RankedVenue = ReportVenue & { value: number };
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
 const percent = (n: number) => `${Math.round(n)}%`;
 const period = `${formatReportDate(DATA.from)} to ${formatReportDate(DATA.to)}`;
+
+const FORMAT_LABELS: Record<string, string> = {
+  "35mm": "35mm",
+  "70mm": "70mm",
+  "imax-70mm": "IMAX 70mm",
+  "16mm": "16mm",
+  vhs: "VHS",
+};
 
 /** Ranked venues as chart rows: the leader emphasised, each linked if open. */
 const venueRows = (venues: readonly RankedVenue[]) =>
@@ -34,22 +46,45 @@ const venueLink = (venue: { name: string }) => (
   <Link href={getVenueUrl(venue)}>{venue.name}</Link>
 );
 
+const cardVenue = (venue: ReportVenue) => ({
+  name: venue.name,
+  type: venue.type,
+  href: venue.current ? getVenueUrl(venue) : undefined,
+  imagePath: getVenueImagePath(venue.id),
+});
+
+/** Says that a section covers less than the whole year, and why. */
+function WindowNote({ what, from }: { what: string; from: string }) {
+  return (
+    <p className={styles.window}>
+      <CalendarIcon size={16} />
+      <span>
+        We started recording {what} on {formatReportDate(from)}, so this section
+        covers screenings from then to {formatReportDate(DATA.to)}.
+      </span>
+    </p>
+  );
+}
+
 const [topFilm] = DATA.mostScreenedFilms;
+const vhs = DATA.formats.find((f) => f.format === "vhs")!;
 const notCinemas = DATA.venuesWithScreenings - DATA.venueTypes.Cinema;
-const [nickel, , closeUp] = DATA.repertory;
-const [mostFilms, secondMostFilms] = DATA.mostDifferentFilms;
+const [nickel] = DATA.repertory;
+const [mostFilms] = DATA.mostDifferentFilms;
 const [printLeader, printRunnerUp] = DATA.printVenues;
-const nonOdysseyPrints = DATA.printScreenings - DATA.odysseyPrintScreenings;
+const [oldest] = DATA.oldestFilms;
+const [mostInternational] = DATA.nonEnglish;
 const [relaxedLeader, relaxedRunnerUp] = DATA.relaxed.leaders;
 const [hohLeader, hohRunnerUp] = DATA.hardOfHearing.leaders;
+const [mostLanguages] = DATA.mostLanguages;
 const ilford = DATA.nonEnglish.find((v) => v.name === "Cineworld Ilford")!;
+const ilfordCount = DATA.mostNonEnglishScreenings;
 // The copy names Ilford as having the most non-English screenings too.
-if (DATA.mostNonEnglishScreenings.id !== ilford.id) {
+if (ilfordCount.id !== ilford.id) {
   throw new Error(
     "Cineworld Ilford no longer has the most non-English screenings",
   );
 }
-const [mostLanguages] = DATA.mostLanguages;
 
 const title = "London's Cinemas in 2026";
 const description = `Who shows what in London: the most adventurous programmes, films on film, the oldest films on screen, films from around the world and accessible screenings, from ${fmt(DATA.londonScreenings)} film screenings at ${DATA.venuesWithScreenings} venues.`;
@@ -161,16 +196,22 @@ export default function LondonCinemas2026Report() {
 
         <ContentSection
           title="The most adventurous programmes"
-          intro={
-            <>
-              {venueLink(nickel)} in Clerkenwell gives {percent(nickel.value)}{" "}
-              of its screenings to films at least 25 years old. Of the{" "}
-              {DATA.nickel.films} films it showed this year,{" "}
-              {DATA.nickel.onceShare}% were shown just once, and the typical
-              film on its screen was released in {DATA.nickel.medianYear}.
-            </>
-          }
+          intro="Most screens show this year's releases. A few give most of their time to older films, and show each one only once or twice."
         >
+          <div className={styles.highlights}>
+            <ReportHighlight
+              title="Most adventurous programme"
+              stat={percent(nickel.value)}
+              statLabel={`of screenings were of films at least 25 years old. ${DATA.nickel.onceShare}% of its ${DATA.nickel.films} films were shown just once.`}
+              venue={cardVenue(nickel)}
+            />
+            <ReportHighlight
+              title="Widest range"
+              stat={fmt(mostFilms.value)}
+              statLabel={`different films, from ${DATA.mostDecades.value} decades of cinema`}
+              venue={cardVenue(mostFilms)}
+            />
+          </div>
           <RankedBarChart
             caption="Share of screenings of films at least 25 years old"
             labelHeading="Venue"
@@ -178,33 +219,38 @@ export default function LondonCinemas2026Report() {
             formatValue={percent}
             items={venueRows(DATA.repertory)}
           />
-          <p className={styles.body}>
-            {venueLink(closeUp)} in Shoreditch is close behind the Prince
-            Charles. For sheer range, {venueLink(mostFilms)} showed the most
-            different films, {fmt(mostFilms.value)}, from{" "}
-            {DATA.mostDecades.value} decades of cinema; the{" "}
-            {venueLink(secondMostFilms)} showed {fmt(secondMostFilms.value)}.
-          </p>
         </ContentSection>
 
-        <ContentSection
-          title="Film on film"
-          intro={
-            <>
-              Since {formatReportDate(DATA.formatFrom)}, London has had{" "}
-              {fmt(DATA.printScreenings)} screenings from a physical print:{" "}
-              {fmt(DATA.formats["35mm"])} on 35mm, {fmt(DATA.formats["70mm"])}{" "}
-              on 70mm, {fmt(DATA.formats["imax-70mm"])} on IMAX 70mm and{" "}
-              {DATA.formats["16mm"]} on 16mm, plus {DATA.formats.vhs} from VHS.{" "}
-              {fmt(DATA.odysseyPrintScreenings)} of the prints were The Odyssey.
-              Of the other {fmt(nonOdysseyPrints)}, {venueLink(printLeader)}{" "}
-              showed {printLeader.value}, almost four times as many as{" "}
-              {venueLink(printRunnerUp)}.
-            </>
-          }
-        >
+        <ContentSection title="Film on film">
+          <WindowNote what="screening formats" from={DATA.formatFrom} />
+          <p className={styles.body}>
+            {fmt(DATA.printScreenings)} screenings were from a film print (and{" "}
+            {vhs.total} from VHS). {fmt(DATA.odysseyPrintScreenings)} of the
+            prints were The Odyssey, on 35mm, 70mm and IMAX 70mm. Without it,
+            70mm almost disappears, and what&apos;s left on film is mostly 35mm.
+          </p>
           <RankedBarChart
-            caption={`Screenings from a physical print since ${formatReportDate(DATA.formatFrom)}, not counting The Odyssey`}
+            caption="Screenings from film and tape, by format"
+            labelHeading="Format"
+            valueHeading="Screenings"
+            split={{ split: "Everything else", rest: "The Odyssey" }}
+            items={DATA.formats.map((f) => ({
+              key: f.format,
+              label: FORMAT_LABELS[f.format] ?? f.format,
+              value: f.total,
+              splitValue: f.total - f.odyssey,
+            }))}
+          />
+          <div className={styles.highlights}>
+            <ReportHighlight
+              title="Most film on film"
+              stat={fmt(printLeader.value)}
+              statLabel={`print screenings, not counting The Odyssey. Almost four times as many as ${printRunnerUp.name}.`}
+              venue={cardVenue(printLeader)}
+            />
+          </div>
+          <RankedBarChart
+            caption="Screenings from a physical print, not counting The Odyssey"
             labelHeading="Venue"
             valueHeading="Print screenings"
             items={venueRows(DATA.printVenues)}
@@ -218,15 +264,16 @@ export default function LondonCinemas2026Report() {
 
         <ContentSection
           title="The oldest films on screen"
-          intro={
-            <>
-              The oldest film screened in London this year was older than the
-              ship it was shown in. {venueLink(DATA.oldestFilms[0])}, a floating
-              arts centre built inside a 1913 cargo ship at South Quay, screened{" "}
-              {DATA.oldestFilms[0].title} from {DATA.oldestFilms[0].year}.
-            </>
-          }
+          intro="The oldest film screened in London this year was older than the ship it was shown in."
         >
+          <div className={styles.highlights}>
+            <ReportHighlight
+              title="Oldest film screened"
+              stat={String(oldest.year)}
+              statLabel={`${oldest.title}, aboard a floating arts centre built inside a 1913 cargo ship at South Quay`}
+              venue={cardVenue(oldest)}
+            />
+          </div>
           <ol className={styles.films}>
             {DATA.oldestFilms.map((film) => (
               <li key={`${film.title}-${film.id}`}>
@@ -239,47 +286,53 @@ export default function LondonCinemas2026Report() {
           </ol>
         </ContentSection>
 
-        <ContentSection
-          title="Around the world"
-          intro={
-            <>
-              Since {formatReportDate(DATA.languageFrom)},{" "}
-              {DATA.nonEnglishShare.toFixed(0)}% of London&apos;s screenings
-              were of films not in English, in {DATA.languages} original
-              languages. Some of the most international screens are in
-              multiplexes. At {venueLink(ilford)}, {percent(ilford.value)} of
-              screenings weren&apos;t in English:{" "}
-              {fmt(DATA.mostNonEnglishScreenings.value)} in two months, mostly
-              of South Asian films, and more than at any other venue in London.
-            </>
-          }
-        >
+        <ContentSection title="Around the world">
+          <WindowNote
+            what="films' original languages"
+            from={DATA.languageFrom}
+          />
+          <p className={styles.body}>
+            {DATA.nonEnglishShare.toFixed(0)}% of London&apos;s screenings were
+            of films not in English, in {DATA.languages} original languages.{" "}
+            {venueLink(mostLanguages)} showed the most languages,{" "}
+            {mostLanguages.value}.
+          </p>
+          <div className={styles.highlights}>
+            <ReportHighlight
+              title="Most international programme"
+              stat={percent(mostInternational.value)}
+              statLabel="of screenings were of films not in English"
+              venue={cardVenue(mostInternational)}
+            />
+            <ReportHighlight
+              variant="mention"
+              title="Most international multiplex"
+              stat={fmt(ilfordCount.value)}
+              statLabel={`screenings of films not in English, more than any other venue in London: ${percent(ilford.value)} of its programme, mostly South Asian films`}
+              venue={cardVenue(ilford)}
+            />
+          </div>
           <RankedBarChart
-            caption={`Share of screenings of films not in English, since ${formatReportDate(DATA.languageFrom)}`}
+            caption="Share of screenings of films not in English"
             labelHeading="Venue"
             valueHeading="Share of screenings"
             formatValue={percent}
             items={venueRows(DATA.nonEnglish)}
           />
-          <p className={styles.body}>
-            {venueLink(mostLanguages)} showed films in the most languages,{" "}
-            {mostLanguages.value}.
-          </p>
         </ContentSection>
 
         <ContentSection
           title="Accessible screenings"
-          intro={
-            <>
-              Relaxed screenings, with the lights up, the sound down and freedom
-              to move around, are rare: {fmt(DATA.relaxed.screenings)} all year,
-              at {DATA.relaxed.venues} venues, about one in every{" "}
-              {fmt(Math.round(DATA.londonScreenings / DATA.relaxed.screenings))}{" "}
-              screenings. {venueLink(relaxedLeader)} ran {relaxedLeader.value},
-              three times as many as {venueLink(relaxedRunnerUp)}.
-            </>
-          }
+          intro={`Relaxed screenings, with the lights up, the sound down and freedom to move around, are rare: ${fmt(DATA.relaxed.screenings)} all year, at ${DATA.relaxed.venues} venues, about one in every ${fmt(Math.round(DATA.londonScreenings / DATA.relaxed.screenings))} screenings.`}
         >
+          <div className={styles.highlights}>
+            <ReportHighlight
+              title="Most relaxed screenings"
+              stat={fmt(relaxedLeader.value)}
+              statLabel={`relaxed screenings, three times as many as ${relaxedRunnerUp.name}`}
+              venue={cardVenue(relaxedLeader)}
+            />
+          </div>
           <RankedBarChart
             caption="Relaxed screenings"
             labelHeading="Venue"
@@ -342,9 +395,9 @@ export default function LondonCinemas2026Report() {
               new venue.
             </li>
             <li>
-              <strong>Shorter windows.</strong> Our data has recorded the format
-              of a screening since {formatReportDate(DATA.formatFrom)} and a
-              film&apos;s original language since{" "}
+              <strong>Shorter windows.</strong> We started recording a
+              screening&apos;s format on {formatReportDate(DATA.formatFrom)} and
+              a film&apos;s original language on{" "}
               {formatReportDate(DATA.languageFrom)}, so those sections cover
               only that time. For languages, a venue needs at least 100
               screenings in it.

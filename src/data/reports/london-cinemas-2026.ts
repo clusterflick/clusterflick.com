@@ -9,8 +9,8 @@
  *
  * Year-long venue rankings use venues followed since January or February;
  * share rankings also need 200+ screenings. The format and language rankings
- * cover their own windows instead, with 100+ screenings for languages. Format data starts 2026-07-01 and language data
- * 2026-08-21, so those sections cover only those windows. A film's
+ * cover their own windows instead, with 100+ screenings for languages. Format
+ * data starts 2026-07-01 and language data 2026-08-21. A film's
  * year is its release year, so a re-release counts as the original.
  */
 export const LONDON_CINEMAS_2026 = {
@@ -35,6 +35,7 @@ export const LONDON_CINEMAS_2026 = {
   mostScreeningsOfOneFilm: {
     id: "myvue.com-westfield",
     name: "Vue Westfield London",
+    type: "Cinema",
     current: true,
     title: "Spider-Man: Brand New Day",
     screenings: 1337,
@@ -43,36 +44,42 @@ export const LONDON_CINEMAS_2026 = {
     {
       id: "thenickel.co.uk",
       name: "The Nickel",
+      type: "Cinema",
       current: true,
       value: 85.8,
     },
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
+      type: "Cinema",
       current: true,
       value: 69.4,
     },
     {
       id: "closeupfilmcentre.com",
       name: "Close-Up Film Centre",
+      type: "Cinema",
       current: true,
       value: 68.6,
     },
     {
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
+      type: "Cinema",
       current: true,
       value: 42.7,
     },
     {
       id: "thegardencinema.co.uk",
       name: "The Garden Cinema",
+      type: "Cinema",
       current: true,
       value: 21.8,
     },
     {
       id: "ica.art",
       name: "Institute of Contemporary Arts",
+      type: "Cinema",
       current: true,
       value: 17.6,
     },
@@ -86,18 +93,21 @@ export const LONDON_CINEMAS_2026 = {
     {
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
+      type: "Cinema",
       current: true,
       value: 807,
     },
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
+      type: "Cinema",
       current: true,
       value: 758,
     },
     {
       id: "cineworld.co.uk-the-o2-greenwich",
       name: "Cineworld The O2 Greenwich",
+      type: "Cinema",
       current: true,
       value: 547,
     },
@@ -105,53 +115,80 @@ export const LONDON_CINEMAS_2026 = {
   mostDecades: {
     id: "bfi.org.uk-southbank",
     name: "BFI Southbank",
+    type: "Cinema",
     current: true,
     value: 12,
   },
   formatFrom: "2026-07-01",
-  formats: {
-    "35mm": 641,
-    "70mm": 347,
-    "imax-70mm": 322,
-    "16mm": 24,
-    vhs: 8,
-  },
+  formats: [
+    {
+      format: "35mm",
+      total: 641,
+      odyssey: 246,
+    },
+    {
+      format: "70mm",
+      total: 347,
+      odyssey: 317,
+    },
+    {
+      format: "imax-70mm",
+      total: 322,
+      odyssey: 322,
+    },
+    {
+      format: "16mm",
+      total: 24,
+      odyssey: 0,
+    },
+    {
+      format: "vhs",
+      total: 8,
+      odyssey: 0,
+    },
+  ],
   printScreenings: 1334,
   odysseyPrintScreenings: 885,
   printVenues: [
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
+      type: "Cinema",
       current: true,
       value: 223,
     },
     {
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
+      type: "Cinema",
       current: true,
       value: 59,
     },
     {
       id: "odeon.co.uk-leicester-square",
       name: "ODEON Luxe Leicester Square",
+      type: "Cinema",
       current: true,
       value: 55,
     },
     {
       id: "picturehouses.com-central",
       name: "Picturehouse Central",
+      type: "Cinema",
       current: true,
       value: 32,
     },
     {
       id: "curzon.com-soho",
       name: "Curzon Soho",
+      type: "Cinema",
       current: true,
       value: 22,
     },
     {
       id: "everymancinema.com-screen-on-the-green",
       name: "Everyman Screen on the Green",
+      type: "Cinema",
       current: true,
       value: 18,
     },
@@ -162,6 +199,7 @@ export const LONDON_CINEMAS_2026 = {
       year: 1911,
       id: "theatreship.co.uk",
       name: "Theatreship",
+      type: "Community Cinema",
       current: true,
     },
     {
@@ -169,6 +207,7 @@ export const LONDON_CINEMAS_2026 = {
       year: 1913,
       id: "cinemamuseum.org.uk",
       name: "The Cinema Museum",
+      type: "Cinema",
       current: true,
     },
     {
@@ -176,6 +215,7 @@ export const LONDON_CINEMAS_2026 = {
       year: 1915,
       id: "finchcafe.co.uk",
       name: "Finch Community Cinema",
+      type: "Community Cinema",
       current: true,
     },
     {
@@ -183,6 +223,7 @@ export const LONDON_CINEMAS_2026 = {
       year: 1917,
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
+      type: "Cinema",
       current: true,
     },
     {
@@ -190,6 +231,7 @@ export const LONDON_CINEMAS_2026 = {
       year: 1920,
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
+      type: "Cinema",
       current: true,
     },
   ],
@@ -201,36 +243,42 @@ export const LONDON_CINEMAS_2026 = {
     {
       id: "institut-francais.org.uk",
       name: "Ciné Lumière",
+      type: "Cultural Centre",
       current: true,
       value: 88.3,
     },
     {
       id: "closeupfilmcentre.com",
       name: "Close-Up Film Centre",
+      type: "Cinema",
       current: true,
       value: 75.3,
     },
     {
       id: "cineworld.co.uk-ilford",
       name: "Cineworld Ilford",
+      type: "Cinema",
       current: true,
       value: 72.3,
     },
     {
       id: "metrocinema.co.uk",
       name: "Metro Cinema",
+      type: "Cinema",
       current: true,
       value: 68.9,
     },
     {
       id: "cineworld.co.uk-hounslow",
       name: "Cineworld Hounslow",
+      type: "Cinema",
       current: true,
       value: 57.5,
     },
     {
       id: "cineworld.co.uk-south-ruislip",
       name: "Cineworld South Ruislip",
+      type: "Cinema",
       current: true,
       value: 48.0,
     },
@@ -239,12 +287,14 @@ export const LONDON_CINEMAS_2026 = {
     {
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
+      type: "Cinema",
       current: true,
       value: 35,
     },
     {
       id: "curzon.com-soho",
       name: "Curzon Soho",
+      type: "Cinema",
       current: true,
       value: 25,
     },
@@ -252,6 +302,7 @@ export const LONDON_CINEMAS_2026 = {
   mostNonEnglishScreenings: {
     id: "cineworld.co.uk-ilford",
     name: "Cineworld Ilford",
+    type: "Cinema",
     current: true,
     value: 1722,
   },
@@ -262,36 +313,42 @@ export const LONDON_CINEMAS_2026 = {
       {
         id: "lumiereromford.com",
         name: "Lumiere Cinema Romford",
+        type: "Cinema",
         current: true,
         value: 137,
       },
       {
         id: "bfi.org.uk-southbank",
         name: "BFI Southbank",
+        type: "Cinema",
         current: true,
         value: 44,
       },
       {
         id: "curzon.com-camden",
         name: "Curzon Camden",
+        type: "Cinema",
         current: true,
         value: 41,
       },
       {
         id: "curzon.com-kingston",
         name: "Curzon Kingston",
+        type: "Cinema",
         current: true,
         value: 41,
       },
       {
         id: "curzon.com-aldgate",
         name: "Curzon Aldgate",
+        type: "Cinema",
         current: true,
         value: 40,
       },
       {
         id: "omniplex.co.uk-sutton",
         name: "Omniplex Sutton",
+        type: "Cinema",
         current: true,
         value: 40,
       },
@@ -304,18 +361,21 @@ export const LONDON_CINEMAS_2026 = {
       {
         id: "bfi.org.uk-southbank",
         name: "BFI Southbank",
+        type: "Cinema",
         current: true,
         value: 855,
       },
       {
         id: "picturehouses.com-greenwich",
         name: "Greenwich Picturehouse",
+        type: "Cinema",
         current: true,
         value: 825,
       },
       {
         id: "picturehouses.com-finsbury-park",
         name: "Finsbury Park Picturehouse",
+        type: "Cinema",
         current: true,
         value: 505,
       },

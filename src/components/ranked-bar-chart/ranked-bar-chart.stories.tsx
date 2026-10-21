@@ -65,6 +65,23 @@ export const Percentages: Story = {
   },
 };
 
+/** Each bar split in two, with a legend naming the parts. */
+export const Split: Story = {
+  args: {
+    caption: "Screenings from a physical print, by format",
+    labelHeading: "Format",
+    valueHeading: "Screenings",
+    split: { split: "Everything else", rest: "The Odyssey" },
+    items: [
+      { key: "35mm", label: "35mm", value: 641, splitValue: 395 },
+      { key: "70mm", label: "70mm", value: 347, splitValue: 30 },
+      { key: "imax", label: "IMAX 70mm", value: 322, splitValue: 0 },
+      { key: "16mm", label: "16mm", value: 24, splitValue: 24 },
+      { key: "vhs", label: "VHS", value: 8, splitValue: 8 },
+    ],
+  },
+};
+
 /** No emphasis and no links: a plain ranked list. */
 export const Plain: Story = {
   args: {

@@ -85,3 +85,31 @@
 .filmVenue {
   color: var(--color-light-gray);
 }
+
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 24px 0 32px;
+}
+
+/* Says a section covers less than the whole year. */
+.window {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-electric-blue);
+  background: rgba(var(--color-electric-blue-rgb), 0.08);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
+.window svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-electric-blue);
+}

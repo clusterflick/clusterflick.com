@@ -1,0 +1,58 @@
+.highlight {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid;
+  background: rgba(var(--color-white-rgb), 0.03);
+}
+
+.winner {
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
+  --highlight-accent: var(--color-neon-pink);
+}
+
+.mention {
+  border-color: rgba(var(--color-buttery-yellow-rgb), 0.6);
+  --highlight-accent: var(--color-buttery-yellow);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--highlight-accent);
+}
+
+/* A section heading's size would compete with the section's own. */
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-white);
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.statLine {
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.stat {
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--highlight-accent);
+}
+
+.statLabel {
+  font-size: 15px;
+  color: var(--color-light-gray);
+}
