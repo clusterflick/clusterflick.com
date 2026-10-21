@@ -300,7 +300,7 @@ export default function LondonCinemas2026Report() {
           <p className={styles.body}>
             And VHS isn&apos;t dead: all {vhs.total} VHS screenings were at two
             Hackney bars, {venueLink(vhsBars[0])} and {venueLink(vhsBars[1])},
-            and at {vhsOthers.map((v) => venueLink(v))}.
+            and at {venueLink(vhsOthers[0])}.
           </p>
           <div className={styles.action}>
             <ButtonLink href="/formats" variant="secondary">
