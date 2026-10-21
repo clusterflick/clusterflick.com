@@ -8,12 +8,15 @@
  * shorts, double bills and TV. A venue that changed id is counted once.
  *
  * Year-long venue rankings use venues followed since January or February;
- * share rankings also need 200+ screenings. The format and language rankings
- * cover their own windows instead, with 100+ screenings for languages. Format
- * data starts 2026-07-01 and language data 2026-08-21. A film's
- * year is its release year, so a re-release counts as the original. Languages
- * are TheMovieDB's codes. Format counts drop a screening listed twice by two
- * sources on the same format (4 of them).
+ * share rankings also need 200+ screenings. Format data starts
+ * 2026-07-01, so the format rankings cover that window, and drop a
+ * screening listed twice by two sources on the same format
+ * (4 of them). The pipeline recorded original
+ * language from 2026-08-21; earlier screenings take it from TheMovieDB
+ * details cached in data-cache releases while the film was showing
+ * (tmdb_languages.py), covering 99.97% of matched screenings.
+ * "xx", TheMovieDB's no language, counts as neither. A film's year is its
+ * release year, so a re-release counts as the original.
  */
 export const LONDON_CINEMAS_2026 = {
   from: "2026-01-01",
@@ -302,160 +305,161 @@ export const LONDON_CINEMAS_2026 = {
     },
   ],
   languageFrom: "2026-08-21",
-  languageScreenings: 167962,
-  nonEnglishShare: 11.6,
-  languages: 79,
+  languageScreenings: 819379,
+  languageCoverage: 99.97,
+  nonEnglishShare: 11.9,
+  languages: 92,
   nonEnglish: [
     {
       id: "institut-francais.org.uk",
       name: "Ciné Lumière",
       type: "Cultural Centre",
       current: true,
-      value: 88.3,
+      value: 82.7,
     },
     {
       id: "closeupfilmcentre.com",
       name: "Close-Up Film Centre",
       type: "Cinema",
       current: true,
-      value: 75.3,
-    },
-    {
-      id: "cineworld.co.uk-ilford",
-      name: "Cineworld Ilford",
-      type: "Cinema",
-      current: true,
-      value: 72.3,
+      value: 79.6,
     },
     {
       id: "metrocinema.co.uk",
       name: "Metro Cinema",
       type: "Cinema",
       current: true,
-      value: 68.9,
+      value: 75.6,
+    },
+    {
+      id: "cineworld.co.uk-ilford",
+      name: "Cineworld Ilford",
+      type: "Cinema",
+      current: true,
+      value: 63.2,
+    },
+    {
+      id: "ica.art",
+      name: "Institute of Contemporary Arts",
+      type: "Cinema",
+      current: true,
+      value: 58.3,
     },
     {
       id: "cineworld.co.uk-hounslow",
       name: "Cineworld Hounslow",
       type: "Cinema",
       current: true,
-      value: 57.5,
-    },
-    {
-      id: "cineworld.co.uk-south-ruislip",
-      name: "Cineworld South Ruislip",
-      type: "Cinema",
-      current: true,
-      value: 48.0,
+      value: 51.3,
     },
   ],
   languageMix: {
     "institut-francais.org.uk": [
       {
         language: "fr",
-        screenings: 240,
+        screenings: 742,
+      },
+      {
+        language: "it",
+        screenings: 93,
       },
       {
         language: "es",
-        screenings: 40,
-      },
-      {
-        language: "ka",
-        screenings: 11,
+        screenings: 87,
       },
       {
         language: "ar",
-        screenings: 7,
+        screenings: 80,
       },
     ],
     "closeupfilmcentre.com": [
       {
+        language: "fa",
+        screenings: 63,
+      },
+      {
         language: "fr",
-        screenings: 19,
+        screenings: 59,
       },
       {
         language: "ja",
-        screenings: 16,
-      },
-      {
-        language: "es",
-        screenings: 8,
+        screenings: 29,
       },
       {
         language: "it",
-        screenings: 6,
-      },
-    ],
-    "cineworld.co.uk-ilford": [
-      {
-        language: "ta",
-        screenings: 482,
-      },
-      {
-        language: "hi",
-        screenings: 392,
-      },
-      {
-        language: "ml",
-        screenings: 329,
-      },
-      {
-        language: "te",
-        screenings: 301,
+        screenings: 27,
       },
     ],
     "metrocinema.co.uk": [
       {
         language: "hi",
-        screenings: 223,
+        screenings: 945,
       },
       {
         language: "ml",
-        screenings: 45,
+        screenings: 217,
+      },
+      {
+        language: "gu",
+        screenings: 141,
+      },
+      {
+        language: "te",
+        screenings: 73,
+      },
+    ],
+    "cineworld.co.uk-ilford": [
+      {
+        language: "hi",
+        screenings: 1897,
+      },
+      {
+        language: "ml",
+        screenings: 1567,
       },
       {
         language: "ta",
-        screenings: 23,
+        screenings: 1492,
       },
       {
-        language: "ar",
-        screenings: 16,
+        language: "te",
+        screenings: 1487,
+      },
+    ],
+    "ica.art": [
+      {
+        language: "fr",
+        screenings: 201,
+      },
+      {
+        language: "es",
+        screenings: 125,
+      },
+      {
+        language: "ja",
+        screenings: 120,
+      },
+      {
+        language: "pt",
+        screenings: 90,
       },
     ],
     "cineworld.co.uk-hounslow": [
       {
         language: "hi",
-        screenings: 397,
-      },
-      {
-        language: "ta",
-        screenings: 313,
+        screenings: 1978,
       },
       {
         language: "te",
-        screenings: 247,
+        screenings: 1274,
       },
       {
         language: "pa",
-        screenings: 154,
-      },
-    ],
-    "cineworld.co.uk-south-ruislip": [
-      {
-        language: "hi",
-        screenings: 462,
+        screenings: 1058,
       },
       {
         language: "ta",
-        screenings: 385,
-      },
-      {
-        language: "ml",
-        screenings: 130,
-      },
-      {
-        language: "pa",
-        screenings: 100,
+        screenings: 925,
       },
     ],
   },
@@ -465,14 +469,14 @@ export const LONDON_CINEMAS_2026 = {
       name: "BFI Southbank",
       type: "Cinema",
       current: true,
-      value: 35,
+      value: 47,
     },
     {
-      id: "curzon.com-soho",
-      name: "Curzon Soho",
+      id: "barbican.org.uk",
+      name: "The Barbican",
       type: "Cinema",
       current: true,
-      value: 25,
+      value: 41,
     },
   ],
   mostNonEnglishScreenings: {
@@ -480,7 +484,7 @@ export const LONDON_CINEMAS_2026 = {
     name: "Cineworld Ilford",
     type: "Cinema",
     current: true,
-    value: 1722,
+    value: 7582,
   },
   relaxed: {
     screenings: 1108,

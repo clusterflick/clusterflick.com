@@ -1481,10 +1481,15 @@ method), so nothing is counted twice. Two traps when doing that: venue ids
 changed scheme on 28 January 2026, so count venues by name and place rather
 than id; and a new name at the same address can be a new operator (ODEON
 Camden closed, Plaza Camden opened), so a rename must be named explicitly.
-Format data (`format.source`) only exists from 1 July 2026, and a film's
-`originalLanguage` only from 21 August 2026 (before then every film reads as
-English, since the field is omitted for English): bound those measures to their
-windows. Release year, film matching and accessibility tags cover the whole year.
+Format data (`format.source`) only exists from 1 July 2026: bound format
+measures to that window. A film's `originalLanguage` was only recorded from 21
+August 2026 (before then every film reads as English, since the field is
+omitted for English), but it is a property of the film, so it can be
+backfilled: each daily `clusterflick/data-cache` release holds TheMovieDB's
+details (`moviedb-data.json`, with `original_language`) for the films showing
+that day, keyed by the same TMDB id. Sampling a release every ten days covered
+99.97% of 2026's matched screenings. Release year, film matching and
+accessibility tags cover the whole year.
 
 Exploring the data belongs on everycinema.london; a report is the finished,
 citable claim.

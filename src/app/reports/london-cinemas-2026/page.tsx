@@ -339,10 +339,6 @@ export default function LondonCinemas2026Report() {
         </ContentSection>
 
         <ContentSection title="Around the world">
-          <WindowNote
-            what="films' original languages"
-            from={DATA.languageFrom}
-          />
           <p className={styles.body}>
             {DATA.nonEnglishShare.toFixed(0)}% of London&apos;s screenings were
             of films not in English, in {DATA.languages} original languages.{" "}
@@ -447,12 +443,19 @@ export default function LondonCinemas2026Report() {
               new venue.
             </li>
             <li>
-              <strong>Shorter windows.</strong> We started recording a
-              screening&apos;s format on {formatReportDate(DATA.formatFrom)} and
-              a film&apos;s original language on{" "}
-              {formatReportDate(DATA.languageFrom)}, so those sections cover
-              only that time. For languages, a venue needs at least 100
-              screenings in it.
+              <strong>Formats.</strong> We started recording a screening&apos;s
+              format on {formatReportDate(DATA.formatFrom)}, so that section
+              covers only that time. A screening two sources listed on the same
+              format is counted once.
+            </li>
+            <li>
+              <strong>Languages.</strong> A film&apos;s original language is
+              TheMovieDB&apos;s. We started recording it on{" "}
+              {formatReportDate(DATA.languageFrom)}, and for earlier screenings
+              took it from TheMovieDB details we saved while the film was
+              showing, which covers all but{" "}
+              {(100 - DATA.languageCoverage).toFixed(2)}% of screenings. Silent
+              films count as no language.
             </li>
             <li>
               <strong>A film&apos;s age</strong> is from its original release
