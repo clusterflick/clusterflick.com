@@ -12,7 +12,8 @@
  * cover their own windows instead, with 100+ screenings for languages. Format
  * data starts 2026-07-01 and language data 2026-08-21. A film's
  * year is its release year, so a re-release counts as the original. Languages
- * are TheMovieDB's codes.
+ * are TheMovieDB's codes. Format counts drop a screening listed twice by two
+ * sources on the same format (4 of them).
  */
 export const LONDON_CINEMAS_2026 = {
   from: "2026-01-01",
@@ -120,6 +121,7 @@ export const LONDON_CINEMAS_2026 = {
     current: true,
     value: 12,
   },
+  formatDuplicatesDropped: 4,
   formatFrom: "2026-07-01",
   formats: [
     {
@@ -139,7 +141,7 @@ export const LONDON_CINEMAS_2026 = {
     },
     {
       format: "16mm",
-      total: 24,
+      total: 20,
       odyssey: 0,
     },
     {
@@ -148,7 +150,7 @@ export const LONDON_CINEMAS_2026 = {
       odyssey: 0,
     },
   ],
-  printScreenings: 1334,
+  printScreenings: 1330,
   odysseyPrintScreenings: 885,
   printVenues: [
     {
@@ -192,6 +194,69 @@ export const LONDON_CINEMAS_2026 = {
       type: "Cinema",
       current: true,
       value: 18,
+    },
+  ],
+  sixteenMillimetre: [
+    {
+      id: "thecastlecinema.com",
+      name: "The Castle Cinema",
+      type: "Cinema",
+      current: true,
+      value: 9,
+    },
+    {
+      id: "cinemamuseum.org.uk",
+      name: "The Cinema Museum",
+      type: "Cinema",
+      current: true,
+      value: 4,
+    },
+    {
+      id: "ica.art",
+      name: "Institute of Contemporary Arts",
+      type: "Cinema",
+      current: true,
+      value: 4,
+    },
+    {
+      id: "thenickel.co.uk",
+      name: "The Nickel",
+      type: "Cinema",
+      current: true,
+      value: 2,
+    },
+    {
+      id: "mildmay.club",
+      name: "The Mildmay Club",
+      type: "Music Venue",
+      current: true,
+      value: 1,
+    },
+  ],
+  vhs: [
+    {
+      id: "dalstonsuperstore.com",
+      name: "Dalston Superstore",
+      type: "Pub & Bar",
+      current: true,
+      value: 3,
+      borough: "Hackney",
+    },
+    {
+      id: "thenickel.co.uk",
+      name: "The Nickel",
+      type: "Cinema",
+      current: true,
+      value: 3,
+      borough: "Camden",
+    },
+    {
+      id: "facebook.com-thehaggerston",
+      name: "The Haggerston",
+      type: "Pub & Bar",
+      current: true,
+      value: 2,
+      borough: "Hackney",
     },
   ],
   oldestFilms: [

@@ -89,6 +89,19 @@ const [nickel] = DATA.repertory;
 const [mostFilms] = DATA.mostDifferentFilms;
 const [printLeader, printRunnerUp] = DATA.printVenues;
 const [oldest] = DATA.oldestFilms;
+const [sixteen] = DATA.sixteenMillimetre;
+// Named here rather than exported: the films are the copy, not a measure.
+const sixteenSample = "Buster Keaton's The General to The Big Sleep";
+const vhsBars = DATA.vhs.filter((v) => v.type === "Pub & Bar");
+const vhsOthers = DATA.vhs.filter((v) => v.type !== "Pub & Bar");
+// The VHS line names two Hackney bars and one other venue.
+if (
+  vhsBars.length !== 2 ||
+  vhsOthers.length !== 1 ||
+  vhsBars.some((v) => v.borough !== "Hackney")
+) {
+  throw new Error("The VHS venues no longer match the report's copy");
+}
 const [mostInternational] = DATA.nonEnglish;
 const [relaxedLeader, relaxedRunnerUp] = DATA.relaxed.leaders;
 const [hohLeader, hohRunnerUp] = DATA.hardOfHearing.leaders;
@@ -264,6 +277,13 @@ export default function LondonCinemas2026Report() {
               statLabel={`print screenings, not counting The Odyssey. Almost four times as many as ${printRunnerUp.name}.`}
               venue={cardVenue(printLeader)}
             />
+            <ReportHighlight
+              variant="mention"
+              title="Most 16mm"
+              stat={fmt(sixteen.value)}
+              statLabel={`screenings on 16mm, more than anywhere else in London: classics from ${sixteenSample}`}
+              venue={cardVenue(sixteen)}
+            />
           </div>
           <RankedBarChart
             caption="Screenings from a physical print, not counting The Odyssey"
@@ -271,6 +291,11 @@ export default function LondonCinemas2026Report() {
             valueHeading="Print screenings"
             items={venueRows(DATA.printVenues)}
           />
+          <p className={styles.body}>
+            And VHS isn&apos;t dead: all {vhs.total} VHS screenings were at two
+            Hackney bars, {venueLink(vhsBars[0])} and {venueLink(vhsBars[1])},
+            and at {vhsOthers.map((v) => venueLink(v))}.
+          </p>
           <div className={styles.action}>
             <ButtonLink href="/formats" variant="secondary">
               Browse films by format
