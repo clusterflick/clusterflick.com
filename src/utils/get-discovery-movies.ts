@@ -6,6 +6,7 @@ import {
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
 } from "@/lib/filters/modules/categories";
 import {
+  addLondonDays,
   formatDayAndDate,
   getLondonMidnightTimestamp,
   MS_PER_DAY,
@@ -124,7 +125,7 @@ export function getDiscoveryWindow(
   days = 7,
   start: number = getLondonMidnightTimestamp(),
 ): DiscoveryWindow {
-  return { rangeStart: start, rangeEnd: start + (days + 1) * MS_PER_DAY };
+  return { rangeStart: start, rangeEnd: addLondonDays(start, days + 1) };
 }
 
 function upcomingPerformances(movie: Movie, window: DiscoveryWindow) {

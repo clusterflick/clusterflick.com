@@ -1,6 +1,6 @@
 import type { Movie, MoviePerformance } from "@/types";
 import type { MoviesRecord } from "@/lib/filters/types";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import { addLondonDays, getLondonMidnightTimestamp } from "@/utils/format-date";
 
 /**
  * A single performance in the venue schedule board, kept alongside its movie so
@@ -29,7 +29,7 @@ export interface VenueScheduleDay {
  * "nothing scheduled" line while still distinguishing today from tomorrow.
  *
  * `todayMidnight` defaults to today's London midnight; it is injectable so tests
- * can pin "now". Day boundaries use {@link MS_PER_DAY} to match the discovery
+ * can pin "now". Day boundaries use {@link addLondonDays} to match the discovery
  * window's convention (see `getDiscoveryWindow`).
  */
 export function getVenueSchedule(
@@ -37,8 +37,8 @@ export function getVenueSchedule(
   venueId: string,
   todayMidnight: number = getLondonMidnightTimestamp(),
 ): VenueScheduleDay[] {
-  const tomorrowMidnight = todayMidnight + MS_PER_DAY;
-  const rangeEnd = todayMidnight + 2 * MS_PER_DAY;
+  const tomorrowMidnight = addLondonDays(todayMidnight, 1);
+  const rangeEnd = addLondonDays(todayMidnight, 2);
 
   const today: VenueScheduleEntry[] = [];
   const tomorrow: VenueScheduleEntry[] = [];

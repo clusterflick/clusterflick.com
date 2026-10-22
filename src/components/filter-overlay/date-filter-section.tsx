@@ -16,7 +16,7 @@ import {
   dateStringToLondonTimestamp,
   minutesToTimeString,
   timeStringToMinutes,
-  MS_PER_DAY,
+  addLondonDays,
 } from "@/utils/format-date";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
@@ -119,18 +119,18 @@ export default function DateFilterSection({
     if (start === todayMidnight && end === todayMidnight) return "today";
 
     // Tomorrow
-    const tomorrowMidnight = todayMidnight + MS_PER_DAY;
+    const tomorrowMidnight = addLondonDays(todayMidnight, 1);
     if (start === tomorrowMidnight && end === tomorrowMidnight)
       return "tomorrow";
 
     // This week: today to Sunday
     const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-    const endOfWeekMidnight = todayMidnight + daysUntilSunday * MS_PER_DAY;
+    const endOfWeekMidnight = addLondonDays(todayMidnight, daysUntilSunday);
     if (start === todayMidnight && end === endOfWeekMidnight)
       return "this-week";
 
     // Next 7 days
-    const next7Midnight = todayMidnight + 7 * MS_PER_DAY;
+    const next7Midnight = addLondonDays(todayMidnight, 7);
     if (start === todayMidnight && end === next7Midnight) return "next-7-days";
 
     // This weekend
@@ -146,8 +146,8 @@ export default function DateFilterSection({
       saturdayOffset = 6 - dayOfWeek;
       sundayOffset = 7 - dayOfWeek;
     }
-    const saturdayMidnight = todayMidnight + saturdayOffset * MS_PER_DAY;
-    const sundayMidnight = todayMidnight + sundayOffset * MS_PER_DAY;
+    const saturdayMidnight = addLondonDays(todayMidnight, saturdayOffset);
+    const sundayMidnight = addLondonDays(todayMidnight, sundayOffset);
     if (start === saturdayMidnight && end === sundayMidnight)
       return "this-weekend";
 
