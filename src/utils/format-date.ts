@@ -69,37 +69,78 @@ export function timestampToLondonDateString(timestamp: number): string {
 }
 
 /**
+ * London's offset from UTC, in milliseconds, at a given instant.
+ */
+function getLondonOffsetMs(timestamp: number): number {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: LONDON_TIMEZONE,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hourCycle: "h23",
+  }).formatToParts(new Date(timestamp));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((p) => p.type === type)?.value);
+  const londonAsUtc = Date.UTC(
+    part("year"),
+    part("month") - 1,
+    part("day"),
+    part("hour"),
+    part("minute"),
+  );
+  return londonAsUtc - (timestamp - (timestamp % 60000));
+}
+
+/**
  * Convert a YYYY-MM-DD date string to a timestamp representing the start of that day
  * in London timezone. This is used for efficient date range filtering - converting
  * boundary dates to timestamps once, then doing fast numeric comparisons.
  *
  * Note: This returns the timestamp for midnight London time on that date.
- * For end-of-range comparisons, add 24 hours (86400000ms) and use < instead of <=.
+ * For end-of-range comparisons, take the next day's midnight with
+ * {@link addLondonDays} and use < instead of <=. Adding 24 hours instead is an
+ * hour out across a change of the clocks.
  */
 export function dateStringToLondonTimestamp(dateString: string): number {
-  // Parse the date parts
   const [year, month, day] = dateString.split("-").map(Number);
 
-  // Create a date at noon UTC on this date (noon avoids DST edge cases during construction)
-  const noonUtc = Date.UTC(year, month - 1, day, 12, 0, 0, 0);
+  // The offset at 00:00 UTC is the offset at London midnight: the clocks only
+  // ever change at 01:00 UTC, after both. Taking it at noon instead gave the
+  // wrong midnight on the two days a year the clocks change.
+  const midnightUtc = Date.UTC(year, month - 1, day);
+  return midnightUtc - getLondonOffsetMs(midnightUtc);
+}
 
-  // Get the UTC offset for London at this time
-  // We format a date at this time and extract the offset from it
-  const testDate = new Date(noonUtc);
-  const londonTimeStr = testDate.toLocaleString("en-GB", {
-    timeZone: LONDON_TIMEZONE,
-    hour: "2-digit",
-    hour12: false,
-  });
-  const londonHour = parseInt(londonTimeStr, 10);
+/**
+ * Midnight London time `days` calendar days after the London date of
+ * `timestamp` (negative goes back).
+ *
+ * Use this rather than adding `days * MS_PER_DAY` to a midnight: the week the
+ * clocks change has a day of 23 or 25 hours, so fixed arithmetic lands an hour
+ * either side of midnight and moves the boundary of every range built on it.
+ */
+export function addLondonDays(timestamp: number, days: number): number {
+  const [year, month, day] = timestampToLondonDateString(timestamp)
+    .split("-")
+    .map(Number);
+  const target = new Date(Date.UTC(year, month - 1, day + days));
+  return dateStringToLondonTimestamp(target.toISOString().slice(0, 10));
+}
 
-  // The difference between UTC hour (12) and London hour tells us the offset
-  // If London shows 13:00 when UTC is 12:00, London is UTC+1
-  const offsetHours = londonHour - 12;
-
-  // Return midnight London time as a UTC timestamp
-  // If London is UTC+1, midnight London = 23:00 previous day UTC
-  return Date.UTC(year, month - 1, day, 0 - offsetHours, 0, 0, 0);
+/**
+ * Calendar days from the London date of `from` to the London date of `to`,
+ * whatever the hours in between (negative when `to` is earlier).
+ */
+export function getLondonDaysBetween(from: number, to: number): number {
+  const toUtcDate = (timestamp: number) => {
+    const [year, month, day] = timestampToLondonDateString(timestamp)
+      .split("-")
+      .map(Number);
+    return Date.UTC(year, month - 1, day);
+  };
+  return Math.round((toUtcDate(to) - toUtcDate(from)) / MS_PER_DAY);
 }
 
 /**
@@ -330,11 +371,7 @@ export function getDaysFromNow(
   timestamp: number,
   maxDays: number = 10,
 ): number | null {
-  const todayMidnight = getLondonMidnightTimestamp();
-
-  // Calculate days difference using timestamps
-  const diffMs = timestamp - todayMidnight;
-  const diffDays = Math.floor(diffMs / MS_PER_DAY);
+  const diffDays = getLondonDaysBetween(Date.now(), timestamp);
 
   if (diffDays >= 0 && diffDays <= maxDays) {
     return diffDays;

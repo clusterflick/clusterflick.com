@@ -1,6 +1,10 @@
 import Link from "next/link";
 import clsx from "clsx";
-import { formatDateShort, MS_PER_DAY } from "@/utils/format-date";
+import {
+  addLondonDays,
+  formatDateShort,
+  getLondonDaysBetween,
+} from "@/utils/format-date";
 import styles from "./festival-timeline.module.css";
 
 export interface FestivalTimelineItem {
@@ -28,7 +32,7 @@ const MIN_WEEKS = 4;
 const MAX_WEEKS = 10;
 
 function dayIndex(time: number, start: number): number {
-  return Math.floor((time - start) / MS_PER_DAY);
+  return getLondonDaysBetween(start, time);
 }
 
 /**
@@ -79,7 +83,7 @@ export default function FestivalTimeline({
             >
               {week === 0
                 ? "Today"
-                : formatDateShort(new Date(start + week * 7 * MS_PER_DAY))}
+                : formatDateShort(new Date(addLondonDays(start, week * 7)))}
             </span>
           ))}
         </div>

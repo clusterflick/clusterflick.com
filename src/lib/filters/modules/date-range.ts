@@ -3,7 +3,7 @@ import {
   getLondonMidnightTimestamp,
   dateStringToLondonTimestamp,
   timestampToLondonDateString,
-  MS_PER_DAY,
+  addLondonDays,
 } from "@/utils/format-date";
 import { pruneByPerformances } from "@/utils/prune-movies";
 
@@ -15,7 +15,7 @@ function getDefaultDateRange(): { start: number; end: number } {
   const todayMidnight = getLondonMidnightTimestamp();
   return {
     start: todayMidnight,
-    end: todayMidnight + 7 * MS_PER_DAY,
+    end: addLondonDays(todayMidnight, 7),
   };
 }
 
@@ -105,9 +105,9 @@ export const dateRangeFilter: FilterModule<FilterId.DateRange> = {
       return movies;
     }
 
-    // End timestamp represents midnight of the end date, so we add a day
-    // to include performances on that date (using < comparison)
-    const endTimestamp = end !== null ? end + MS_PER_DAY : null;
+    // End timestamp represents midnight of the end date, so we take the next
+    // midnight to include performances on that date (using < comparison)
+    const endTimestamp = end !== null ? addLondonDays(end, 1) : null;
 
     return pruneByPerformances(movies, (perf) => {
       if (start !== null && perf.time < start) {

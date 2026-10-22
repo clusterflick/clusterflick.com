@@ -22,7 +22,7 @@ import {
   getLondonDayOfWeek,
   timestampToLondonDateString,
   minutesToShortTime,
-  MS_PER_DAY,
+  addLondonDays,
 } from "@/utils/format-date";
 import { FilterId, FilterState } from "./types";
 import {
@@ -296,20 +296,20 @@ function matchDatePreset(range: {
   }
 
   // Tomorrow
-  const tomorrowMidnight = todayMidnight + MS_PER_DAY;
+  const tomorrowMidnight = addLondonDays(todayMidnight, 1);
   if (start === tomorrowMidnight && end === tomorrowMidnight) {
     return "Tomorrow";
   }
 
   // This Week (today to Sunday)
   const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-  const endOfWeekMidnight = todayMidnight + daysUntilSunday * MS_PER_DAY;
+  const endOfWeekMidnight = addLondonDays(todayMidnight, daysUntilSunday);
   if (start === todayMidnight && end === endOfWeekMidnight) {
     return "This Week";
   }
 
   // Next 7 Days
-  const next7Midnight = todayMidnight + 7 * MS_PER_DAY;
+  const next7Midnight = addLondonDays(todayMidnight, 7);
   if (start === todayMidnight && end === next7Midnight) {
     return "Next 7 Days";
   }
@@ -327,14 +327,14 @@ function matchDatePreset(range: {
     saturdayOffset = 6 - dayOfWeek;
     sundayOffset = 7 - dayOfWeek;
   }
-  const saturdayMidnight = todayMidnight + saturdayOffset * MS_PER_DAY;
-  const sundayMidnight = todayMidnight + sundayOffset * MS_PER_DAY;
+  const saturdayMidnight = addLondonDays(todayMidnight, saturdayOffset);
+  const sundayMidnight = addLondonDays(todayMidnight, sundayOffset);
   if (start === saturdayMidnight && end === sundayMidnight) {
     return "This Weekend";
   }
 
   // Any Time (~5 years)
-  const allTimeEnd = todayMidnight + 5 * 365 * MS_PER_DAY;
+  const allTimeEnd = addLondonDays(todayMidnight, 5 * 365);
   if (start === todayMidnight && end === allTimeEnd) {
     return "Any Time";
   }
