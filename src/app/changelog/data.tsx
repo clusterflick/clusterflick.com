@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-22",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="K.C. Continental Stores"
+              url="https://www.kccontinentalstores.co.uk"
+            />
+            , a community-owned cafe and bar on Caledonian Road where Friday
+            Knights runs its movie club nights.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-20",
     changes: [
       {
