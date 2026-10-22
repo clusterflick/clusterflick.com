@@ -87,6 +87,24 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/haringey-community-cinema">
+              Haringey Community Cinema
+            </Link>
+            , free screenings in Tottenham with guest speakers and discussion.
+            Next up is Raoul Peck&apos;s Lumumba for Congo Week at{" "}
+            <Venue
+              name="The Antwerp Arms"
+              url="https://www.antwerparms.co.uk"
+            />{" "}
+            on 24 October.
+          </>
+        ),
+      },
     ],
   },
   {

@@ -680,4 +680,21 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Feminist Fightback" },
     ],
   },
+  {
+    id: "haringey-community-cinema",
+    name: "Haringey Community Cinema",
+    kind: "community",
+    url: "https://haringeycommunitycinema.uk",
+    aliases: ["hcc"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Haringey Community Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Haringey Community Cinema" },
+      // Eventbrite listings are often headed "HCC …". Too short to match
+      // across London, so only at the two Tottenham venues they screen at.
+      {
+        [FilterId.ShowingTitleSearch]: "HCC",
+        [FilterId.Venues]: ["antwerparms.co.uk", "lordshiphub.org"],
+      },
+    ],
+  },
 ];
