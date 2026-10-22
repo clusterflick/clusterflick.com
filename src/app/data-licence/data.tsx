@@ -5,16 +5,27 @@
  * them for a different audience.
  */
 
+/**
+ * Everything published lives under one address on our own domain, served from
+ * the latest releases by `scripts/fetch-published-data.js`. The index is the
+ * way in: it names every venue's files and the releases they came from.
+ */
+export const DATA_INDEX_URL = "https://clusterflick.com/data/index.json";
+
 export const LICENSED_DATASETS = [
   {
     name: "Data file per venue",
-    url: "https://github.com/clusterflick/data-transformed/releases/latest",
+    url: DATA_INDEX_URL,
+    pattern: "https://clusterflick.com/data/venues/<venue-id>.json",
+    archive: "https://github.com/clusterflick/data-transformed/releases",
     description:
       "Individual JSON files for the showings at each venue, all following the same schema. The fullest form of the data, and the one to build on.",
   },
   {
     name: "Calendar file per venue",
-    url: "https://github.com/clusterflick/data-calendar/releases/latest",
+    url: DATA_INDEX_URL,
+    pattern: "https://clusterflick.com/data/calendars/<venue-id>.ics",
+    archive: "https://github.com/clusterflick/data-calendar/releases",
     description:
       "Individual ICS files for the showings at each venue. Subscribe to one, or hand them to anything that speaks iCalendar.",
   },

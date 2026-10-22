@@ -35,7 +35,9 @@ do
 done
 
 npm run fetch-diffed-data
-npm run fetch-calendar-data
 
+# Cleared before anything writes to it: the published datasets live in here
+# too, beside the listing chunks.
 rm -rf ./public/data
+npm run fetch-published-data
 npm run process-combined-data

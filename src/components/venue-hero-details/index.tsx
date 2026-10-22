@@ -11,7 +11,7 @@ import {
 import styles from "./venue-hero-details.module.css";
 
 interface VenueHeroDetailsProps {
-  /** Venue id — the filename of its feed in the data-calendar release. */
+  /** Venue id — the filename of its published feed, `/data/calendars/<id>.ics`. */
   venueId: string;
   venueName: string;
   /** The venue's `type` from the dataset, rendered as-is. */
@@ -44,8 +44,10 @@ export default function VenueHeroDetails({
   lastPerformance,
   children,
 }: VenueHeroDetailsProps) {
-  const calendarUrl = `https://github.com/clusterflick/data-calendar/releases/latest/download/${venueId}`;
-  const webcalUrl = `webcal://github.com/clusterflick/data-calendar/releases/latest/download/${venueId}`;
+  // The hosted copy fetch-published-data writes, not the GitHub release: an
+  // address on our own domain stays put whatever hosts the pipeline.
+  const calendarUrl = `https://clusterflick.com/data/calendars/${venueId}.ics`;
+  const webcalUrl = `webcal://clusterflick.com/data/calendars/${venueId}.ics`;
 
   return (
     <>

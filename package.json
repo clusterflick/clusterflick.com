@@ -9,7 +9,7 @@
     "format": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore .",
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
-    "fetch-calendar-data": "node ./scripts/fetch-calendar-data.js",
+    "fetch-published-data": "node ./scripts/fetch-published-data.js",
     "fetch-london-stations": "node ./scripts/fetch-london-stations.js",
     "carry-forward-static": "node ./scripts/carry-forward-static.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",

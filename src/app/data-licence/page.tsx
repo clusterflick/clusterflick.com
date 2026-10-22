@@ -9,6 +9,7 @@ import ContentSection from "@/components/content-section";
 import CardGrid from "@/components/card-grid";
 import LinkCard, { CardDescription, CardTitle } from "@/components/link-card";
 import {
+  DATA_INDEX_URL,
   LICENSED_DATASETS,
   ATTRIBUTION_SNIPPETS,
   INTERNAL_REPOS,
@@ -58,7 +59,7 @@ export default function DataLicencePage() {
       <div className={styles.content}>
         <ContentSection
           title="What you can use"
-          intro="Two datasets are published for reuse. Both are rebuilt daily and released on GitHub."
+          intro="Two datasets are published for reuse. Both are rebuilt daily and served from clusterflick.com."
         >
           <CardGrid className={styles.datasets}>
             {LICENSED_DATASETS.map((dataset) => (
@@ -83,6 +84,61 @@ export default function DataLicencePage() {
           <p className={styles.body}>
             You can redistribute it, build on it, and sell what you build. There
             is no non-commercial restriction and no share-alike requirement.
+          </p>
+        </ContentSection>
+
+        <ContentSection
+          title="Where to get it"
+          intro="Every file has a fixed address, so you can link to it, subscribe to it, or fetch it on a schedule."
+        >
+          <dl className={styles.snippets}>
+            <div className={styles.snippet}>
+              <dt className={styles.snippetLabel}>Index</dt>
+              <dd className={styles.snippetValue}>
+                <pre>
+                  <code>{DATA_INDEX_URL}</code>
+                </pre>
+              </dd>
+            </div>
+            {LICENSED_DATASETS.map((dataset) => (
+              <div key={dataset.name} className={styles.snippet}>
+                <dt className={styles.snippetLabel}>{dataset.name}</dt>
+                <dd className={styles.snippetValue}>
+                  <pre>
+                    <code>{dataset.pattern}</code>
+                  </pre>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className={styles.body}>
+            Start from the{" "}
+            <a href={DATA_INDEX_URL} target="_blank" rel="noopener noreferrer">
+              index
+            </a>
+            . It lists every venue id with the files published for it, and names
+            the release each dataset was built from, so you can tell whether
+            anything has changed since you last looked.
+          </p>
+          <p className={styles.body}>
+            Only the latest data is hosted here. Every earlier release is kept
+            on GitHub, for{" "}
+            <a
+              href={LICENSED_DATASETS[0].archive}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              the data files
+            </a>{" "}
+            and{" "}
+            <a
+              href={LICENSED_DATASETS[1].archive}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              the calendars
+            </a>
+            , if you need to look back.
           </p>
         </ContentSection>
 
@@ -215,17 +271,9 @@ export default function DataLicencePage() {
             best we can to keep it backwards compatible.
           </p>
           <p className={styles.body}>
-            Releases are hosted by GitHub rather than by us, so whatever you
-            build against them lives within{" "}
-            <a
-              href="https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub&apos;s rate limits
-            </a>
-            . Authenticated requests get a far higher allowance than anonymous
-            ones, which is the usual fix if you start seeing 403s.
+            The files are refreshed when the pipeline runs, so there is nothing
+            to gain from fetching them more than once an hour. The index&apos;s
+            release tags say when there is something new.
           </p>
         </ContentSection>
 

@@ -55,8 +55,8 @@ const timeoutSignal = () =>
  * A body that fails to parse is retried for the same reason — a truncated
  * response is the likely cause, not a malformed file.
  *
- * Mirrors `fetchWithRetry` in `scripts/fetch-calendar-data.js`, which does the
- * same job for the calendar feeds at build time.
+ * Mirrors `fetchWithRetry` in `scripts/fetch-published-data.js`, which does the
+ * same job for the published datasets at build time.
  */
 export async function fetchWithRetry<T>(
   url: string,

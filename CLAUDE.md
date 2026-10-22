@@ -16,7 +16,7 @@ Pages at clusterflick.com.
 - `npm run format` — Prettier format all files
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
-- `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
+- `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/data/` (see Published Data)
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -254,12 +254,11 @@ page. Only a load where _nothing_ arrived sets `error`, the full-page state.
 
 **The feed is consumed as published, not re-derived.** `clusterflick/data-calendar` releases one
 ICS per venue, named after the venue id with no extension, one asset per venue in the dataset.
-`scripts/fetch-calendar-data.js` downloads the latest release into `public/calendars/` as
-`<venue-id>.<hash>.ics` plus a `manifest.json` of venue id → filename, which
-`@/utils/get-venue-calendar` reads at build time so the hashed URL is baked into the static HTML.
-Serving from our own origin removes CORS from the picture; the content hash means an unchanged
-venue keeps its URL, and so its cache entry, between builds. A missing release is not fatal —
-the manifest comes back empty and pages render their empty state.
+`scripts/fetch-published-data.js` hosts it at `/data/calendars/<venue-id>.ics` (see Published
+Data), and `@/utils/get-venue-calendar` reads `data/index.json` at build time to know which
+venues have one. The page loads that same URL: the address a subscriber's calendar app polls,
+not a copy made for the page. Serving from our own origin removes CORS from the picture. A
+missing release is not fatal — the index comes back empty and pages render their empty state.
 
 **Network failure is expected; missing data is not.** Fetching hundreds of assets from GitHub's
 CDN means the occasional dropped connection, and one of those used to fail the whole build. Every
@@ -268,7 +267,7 @@ _inside_ the retried attempt — a connection dropped mid-stream is the case wor
 happens after the headers have arrived. A 4xx is not retried, being a permanent answer.
 
 A download that still fails after all that **fails the build**. The tempting alternative — drop
-that venue and carry on — is wrong here, because a venue absent from the manifest renders an empty
+that venue and carry on — is wrong here, because a venue absent from the index renders an empty
 calendar, which tells a reader it has no screenings rather than that we failed to fetch them:
 wrong information, not absent information. Deploys are triggered per data release, so a red build
 costs one update and leaves the previous complete site standing, which is much cheaper than a
@@ -278,7 +277,7 @@ above, where every venue is equally empty and the site plainly has no calendar d
 Failures are still **collected rather than thrown at the first one**, even though any of them
 fails the build. `Promise.all` rejects on the first rejection without cancelling its siblings, so
 throwing from a worker exited the process mid-flight knowing nothing about the other 400 assets —
-and skipped `writeManifest`, leaving a wiped directory and no manifest behind. Draining the queue
+and skipped writing the index, leaving a wiped directory and no index behind. Draining the queue
 first means one log line distinguishes a single flaky venue from an outage.
 
 The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
@@ -326,6 +325,35 @@ Styling lives in `calendar.module.css` as `--fc-*` custom properties plus `:glob
 overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` elements and pick
 up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
 would render at 48px in pink.
+
+## Published Data
+
+The two datasets licensed for reuse (`/data-licence`) are hosted on this site rather than pointed
+at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-transformed` and
+`data-calendar` releases into `public/data/`:
+
+- `data/venues/<venue-id>.json` — the venue's transformed listings
+- `data/calendars/<venue-id>.ics` — its calendar feed
+- `data/index.json` — every venue's files, the release each dataset came from, and the licence
+
+**The names are fixed, not content-hashed**, because they are addresses other people link to,
+fetch on a schedule and subscribe to — the licence page, the venue pages' calendar subscription
+links and the calendar page all use them. The site's own listing chunks are hashed so a browser
+can keep them forever; these can't be, so freshness is a Cloudflare cache rule on these paths
+(about an hour at the edge, minutes in the browser) instead of the default one-year cache
+Cloudflare gives `.json`. The smoke tests check those headers, since a rule that stops matching
+would quietly serve week-old data.
+
+**They share `data/` with the listing chunks without being carried forward.**
+`carry-forward-static` only carries the top-level `data.*.<hash>.json` files, so a venue that
+leaves a release stops being served with it. Each deploy is exactly one release, and the GitHub
+releases remain the archive of earlier ones. `fetch-published-data` removes only what it writes;
+`process-combined-data` writes the chunks beside them.
+
+The download rules are the calendar's (above): retried, collected, and any file that still fails
+fails the build, because a missing file 404s for whoever relied on it. The index is written last,
+so it only ever describes a complete set. A release that can't be listed fails the build too;
+only one that doesn't exist (a 404) is let through, as an empty index.
 
 ## Near Me
 

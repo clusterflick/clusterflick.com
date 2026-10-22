@@ -1,48 +1,37 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
-interface CalendarManifest {
-  tag: string | null;
-  files: Record<string, string>;
+interface PublishedDataIndex {
+  venues: Record<string, { data?: string; calendar?: string }>;
 }
 
-let manifest: CalendarManifest | null = null;
+let index: PublishedDataIndex | null = null;
 
 /**
- * Reads the manifest written by scripts/fetch-calendar-data.js. A missing
- * manifest is not an error — the fetch step is skipped in some environments
- * (Storybook, a checkout that has not run the data scripts), and every calendar
- * page degrades to its empty state rather than failing the build.
+ * Reads the index written by scripts/fetch-published-data.js. A missing index
+ * is not an error — the fetch step is skipped in some environments (Storybook,
+ * a checkout that has not run the data scripts), and every calendar page
+ * degrades to its empty state rather than failing the build.
  */
-function getManifest(): CalendarManifest {
-  if (manifest) return manifest;
+function getIndex(): PublishedDataIndex {
+  if (index) return index;
 
-  const manifestPath = join(
-    process.cwd(),
-    "public",
-    "calendars",
-    "manifest.json",
-  );
+  const indexPath = join(process.cwd(), "public", "data", "index.json");
 
   try {
-    manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+    index = JSON.parse(readFileSync(indexPath, "utf-8"));
   } catch {
-    manifest = { tag: null, files: {} };
+    index = { venues: {} };
   }
 
-  return manifest!;
+  return index!;
 }
 
 /**
- * Site-relative URL of a venue's ICS feed, content-hashed so it can be cached
- * indefinitely. Returns null when the venue has no published calendar.
+ * Site-relative URL of a venue's published ICS feed — the same file a
+ * subscriber reads (see `VenueHeroDetails`). Returns null when the venue has no
+ * published calendar.
  */
 export function getVenueCalendarPath(venueId: string): string | null {
-  const filename = getManifest().files[venueId];
-  return filename ? `/calendars/${filename}` : null;
-}
-
-/** Release tag the calendars were built from, for "last updated" copy. */
-export function getCalendarReleaseTag(): string | null {
-  return getManifest().tag;
+  return getIndex().venues[venueId]?.calendar ?? null;
 }
