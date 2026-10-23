@@ -95,8 +95,9 @@ export const CHANGELOG: ChangelogDay[] = [
             <Link href="/film-clubs/haringey-community-cinema">
               Haringey Community Cinema
             </Link>
-            , free screenings in Tottenham with guest speakers and discussion.
-            Next up is Raoul Peck&apos;s Lumumba for Congo Week at{" "}
+            , free or pay-what-you-can screenings in Tottenham with guest
+            speakers and discussion. Next up is Raoul Peck&apos;s Lumumba for
+            Congo Week at{" "}
             <Venue
               name="The Antwerp Arms"
               url="https://www.antwerparms.co.uk"
