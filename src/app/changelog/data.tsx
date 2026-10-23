@@ -88,6 +88,29 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "The All Good Bookshop",
+                  url: "https://allgoodbookshop.co.uk",
+                },
+                {
+                  name: "Chestnuts Community Centre",
+                  url: "https://www.bridgerenewaltrust.org.uk/chestnuts-community-centre",
+                },
+              ]}
+            />
+            , a co-operative bookshop on Turnpike Lane and a community centre in
+            Chestnuts Park, Tottenham, both venues where Haringey Community
+            Cinema puts on screenings.
+          </>
+        ),
+      },
+      {
         tag: "New film club",
         body: ({ Venue }) => (
           <>

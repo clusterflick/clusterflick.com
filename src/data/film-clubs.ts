@@ -690,10 +690,15 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.ShowingTitleSearch]: "Haringey Community Cinema" },
       { [FilterId.PerformanceNotesSearch]: "Haringey Community Cinema" },
       // Eventbrite listings are often headed "HCC …". Too short to match
-      // across London, so only at the two Tottenham venues they screen at.
+      // across London, so only at the Haringey venues they screen at.
       {
         [FilterId.ShowingTitleSearch]: "HCC",
-        [FilterId.Venues]: ["antwerparms.co.uk", "lordshiphub.org"],
+        [FilterId.Venues]: [
+          "antwerparms.co.uk",
+          "lordshiphub.org",
+          "allgoodbookshop.co.uk",
+          "bridgerenewaltrust.org.uk-chestnuts-community-centre",
+        ],
       },
     ],
   },
