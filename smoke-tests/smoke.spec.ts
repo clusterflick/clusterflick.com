@@ -372,9 +372,9 @@ test.describe("Published Data", () => {
     }
   });
 
-  // Cloudflare's own rule caches `.json` for a year and doesn't cache `.ics`
-  // at all. These fixed names need the cache rule for their paths instead:
-  // cached at the edge, and never held by a browser for more than an hour.
+  // The zone's JSON rule caches `.json` for a year, and nothing caches `.ics`
+  // at all. These fixed names need the `/datasets/` rule instead: cached at
+  // the edge, and never held by a browser for more than an hour.
   // Only the live site sits behind Cloudflare, so a local run skips this.
   test("published files are cached briefly at the edge", async ({
     request,

@@ -339,9 +339,13 @@ at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-trans
 **The names are fixed, not content-hashed**, because they are addresses other people link to,
 fetch on a schedule and subscribe to — the licence page, the venue pages' calendar subscription
 links and the calendar page all use them. Freshness is a Cloudflare cache rule on `/datasets/`
-(an hour at the edge, ten minutes in the browser), placed after the rule that gives `.json` a
-one-year cache. The smoke tests check those headers, since a rule that stops matching would
-quietly serve year-old data.
+that makes them cacheable (`.ics` otherwise isn't) and respects the origin's TTL at the edge and
+in the browser, which is GitHub Pages' own `max-age=600`. It sits after the "Cache JSON blobs"
+rule, which gives every `.json` a year, because a later Cache Rule overrides an earlier one.
+Respecting the origin rather than setting a TTL is deliberate: on our plan an override can't go
+below two hours, and ten minutes keeps a reader, and the site's own calendar page, within one
+cache period of a deploy. The smoke tests check those headers, since a rule that stops matching
+would quietly serve year-old data.
 
 **Not under `data/`.** That directory is the site's own: content-hashed listing chunks, cached
 forever and carried forward between deploys by `carry-forward-static`, with no promise about
