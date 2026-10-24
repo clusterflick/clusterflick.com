@@ -51,6 +51,7 @@ next-env.d.ts
 /matched-data/
 /diffed-data/
 /public/data/
+/public/datasets/
 
 # Storybook
 *storybook.log

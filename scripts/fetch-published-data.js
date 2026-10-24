@@ -1,23 +1,23 @@
 /* eslint-disable */
 /**
- * Downloads the two datasets published for reuse into ./public/data/, so they
- * are served from clusterflick.com rather than from a GitHub release:
+ * Downloads the two datasets published for reuse into ./public/datasets/, so
+ * they are served from clusterflick.com rather than from a GitHub release:
  *
- *   data/venues/<venue-id>.json     from clusterflick/data-transformed
- *   data/calendars/<venue-id>.ics   from clusterflick/data-calendar
- *   data/index.json                 every venue's files, and the releases
+ *   datasets/venues/<venue-id>.json     from clusterflick/data-transformed
+ *   datasets/calendars/<venue-id>.ics   from clusterflick/data-calendar
+ *   datasets/index.json                 every venue's files, and the releases
  *
  * Both releases name each asset after the venue id with no extension
  * (`actonecinema.co.uk`). The names here are stable rather than content-hashed,
  * because they are addresses other people link to and subscribe to: the data
  * licence page and the venue pages' calendar subscriptions point at them, and
  * the site's own calendar page loads the same URL a subscriber does. Freshness
- * is Cloudflare's cache rule for these paths, not the filename.
+ * is Cloudflare's cache rule for this path, not the filename.
  *
- * They sit beside the site's own listing chunks in `data/` without being
- * mistaken for them: `carry-forward-static` only carries the top-level
- * `data.*.<hash>.json` files, so these never outlive the release they came
- * from.
+ * Deliberately not under `data/`, which holds the site's own content-hashed
+ * listing chunks: those are internal, cached forever and carried forward
+ * between deploys, and these are none of that. A directory of their own gives
+ * them one cache rule, and lets this script own everything in it.
  *
  * A download that fails every attempt fails the build, and so does a release
  * that can't be listed. A venue missing here is a published file that 404s for
@@ -31,8 +31,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const DATA_DIR = path.join(process.cwd(), "public", "data");
-const INDEX_PATH = path.join(DATA_DIR, "index.json");
+const OUT_DIR = path.join(process.cwd(), "public", "datasets");
+const INDEX_PATH = path.join(OUT_DIR, "index.json");
 
 const DATASETS = [
   {
@@ -168,7 +168,7 @@ async function downloadAsset(dataset, asset) {
     },
   );
 
-  const publishedPath = `/data/${dataset.dir}/${asset.name}.${dataset.extension}`;
+  const publishedPath = `/datasets/${dataset.dir}/${asset.name}.${dataset.extension}`;
   fs.writeFileSync(path.join(process.cwd(), "public", publishedPath), body);
   return { venueId: asset.name, key: dataset.key, publishedPath };
 }
@@ -199,13 +199,9 @@ async function downloadAll(jobs) {
 }
 
 async function main() {
-  // Only what this script owns: `data/` also holds the site's listing chunks,
-  // written by process-combined-data.
-  fs.rmSync(INDEX_PATH, { force: true });
+  fs.rmSync(OUT_DIR, { recursive: true, force: true });
   for (const { dir } of DATASETS) {
-    const outDir = path.join(DATA_DIR, dir);
-    fs.rmSync(outDir, { recursive: true, force: true });
-    fs.mkdirSync(outDir, { recursive: true });
+    fs.mkdirSync(path.join(OUT_DIR, dir), { recursive: true });
   }
 
   const releases = {};
@@ -275,7 +271,7 @@ async function main() {
   for (const dataset of DATASETS) {
     const count = entries.filter(({ key }) => key === dataset.key).length;
     console.log(
-      `Downloaded ${count} file(s) from ${dataset.repo} ${releases[dataset.key]?.tag ?? "(no release)"} to public/data/${dataset.dir}`,
+      `Downloaded ${count} file(s) from ${dataset.repo} ${releases[dataset.key]?.tag ?? "(no release)"} to public/datasets/${dataset.dir}`,
     );
   }
 }

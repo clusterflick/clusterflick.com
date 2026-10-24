@@ -16,7 +16,7 @@ Pages at clusterflick.com.
 - `npm run format` — Prettier format all files
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
-- `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/data/` (see Published Data)
+- `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -254,8 +254,8 @@ page. Only a load where _nothing_ arrived sets `error`, the full-page state.
 
 **The feed is consumed as published, not re-derived.** `clusterflick/data-calendar` releases one
 ICS per venue, named after the venue id with no extension, one asset per venue in the dataset.
-`scripts/fetch-published-data.js` hosts it at `/data/calendars/<venue-id>.ics` (see Published
-Data), and `@/utils/get-venue-calendar` reads `data/index.json` at build time to know which
+`scripts/fetch-published-data.js` hosts it at `/datasets/calendars/<venue-id>.ics` (see
+Published Data), and `@/utils/get-venue-calendar` reads `datasets/index.json` at build time to know which
 venues have one. The page loads that same URL: the address a subscriber's calendar app polls,
 not a copy made for the page. Serving from our own origin removes CORS from the picture. A
 missing release is not fatal — the index comes back empty and pages render their empty state.
@@ -330,25 +330,24 @@ would render at 48px in pink.
 
 The two datasets licensed for reuse (`/data-licence`) are hosted on this site rather than pointed
 at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-transformed` and
-`data-calendar` releases into `public/data/`:
+`data-calendar` releases into `public/datasets/`:
 
-- `data/venues/<venue-id>.json` — the venue's transformed listings
-- `data/calendars/<venue-id>.ics` — its calendar feed
-- `data/index.json` — every venue's files, the release each dataset came from, and the licence
+- `datasets/venues/<venue-id>.json` — the venue's transformed listings
+- `datasets/calendars/<venue-id>.ics` — its calendar feed
+- `datasets/index.json` — every venue's files, the release each dataset came from, and the licence
 
 **The names are fixed, not content-hashed**, because they are addresses other people link to,
 fetch on a schedule and subscribe to — the licence page, the venue pages' calendar subscription
-links and the calendar page all use them. The site's own listing chunks are hashed so a browser
-can keep them forever; these can't be, so freshness is a Cloudflare cache rule on these paths
-(about an hour at the edge, minutes in the browser) instead of the default one-year cache
-Cloudflare gives `.json`. The smoke tests check those headers, since a rule that stops matching
-would quietly serve week-old data.
+links and the calendar page all use them. Freshness is a Cloudflare cache rule on `/datasets/`
+(an hour at the edge, ten minutes in the browser), placed after the rule that gives `.json` a
+one-year cache. The smoke tests check those headers, since a rule that stops matching would
+quietly serve year-old data.
 
-**They share `data/` with the listing chunks without being carried forward.**
-`carry-forward-static` only carries the top-level `data.*.<hash>.json` files, so a venue that
-leaves a release stops being served with it. Each deploy is exactly one release, and the GitHub
-releases remain the archive of earlier ones. `fetch-published-data` removes only what it writes;
-`process-combined-data` writes the chunks beside them.
+**Not under `data/`.** That directory is the site's own: content-hashed listing chunks, cached
+forever and carried forward between deploys by `carry-forward-static`, with no promise about
+their shape. These are the opposite on every count, so they get a directory of their own — one
+cache rule covers it, nothing carries it forward (each deploy is exactly one release, and the
+GitHub releases remain the archive of earlier ones), and `fetch-published-data` owns all of it.
 
 The download rules are the calendar's (above): retried, collected, and any file that still fails
 fails the build, because a missing file 404s for whoever relied on it. The index is written last,

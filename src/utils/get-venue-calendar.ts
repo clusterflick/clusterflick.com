@@ -16,7 +16,7 @@ let index: PublishedDataIndex | null = null;
 function getIndex(): PublishedDataIndex {
   if (index) return index;
 
-  const indexPath = join(process.cwd(), "public", "data", "index.json");
+  const indexPath = join(process.cwd(), "public", "datasets", "index.json");
 
   try {
     index = JSON.parse(readFileSync(indexPath, "utf-8"));

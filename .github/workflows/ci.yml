@@ -50,7 +50,7 @@ jobs:
         env:
           PAT: ${{ secrets.PAT || github.token }}
       # The two datasets published for reuse - a JSON and an ICS per venue -
-      # hosted under /data/ at fixed addresses (see /data-licence)
+      # hosted under /datasets/ at fixed addresses (see /data-licence)
       - run: npm run fetch-published-data
         env:
           PAT: ${{ secrets.PAT || github.token }}

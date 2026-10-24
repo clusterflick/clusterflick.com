@@ -264,7 +264,7 @@ test.describe("Venue Calendar Page", () => {
   // app subscribes to (see CLAUDE.md, Published Data) — not a copy of it.
   test("calendar loads the published feed", async ({ page }) => {
     const feed = page.waitForResponse((response) =>
-      response.url().endsWith(`/data/calendars/${CALENDAR_VENUE_ID}.ics`),
+      response.url().endsWith(`/datasets/calendars/${CALENDAR_VENUE_ID}.ics`),
     );
     await calendarPage.goto(CALENDAR_VENUE_SLUG);
     expect((await feed).status()).toBe(200);
@@ -330,33 +330,35 @@ test.describe("Venue Calendar Page", () => {
 // site rather than ours.
 test.describe("Published Data", () => {
   const PUBLISHED_PATHS = [
-    "/data/index.json",
-    `/data/venues/${CALENDAR_VENUE_ID}.json`,
-    `/data/calendars/${CALENDAR_VENUE_ID}.ics`,
+    "/datasets/index.json",
+    `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
   ];
 
   test("the index names every venue's files and the releases", async ({
     request,
   }) => {
-    const response = await request.get("/data/index.json");
+    const response = await request.get("/datasets/index.json");
     expect(response.status()).toBe(200);
     const index = await response.json();
 
     expect(index.releases.data.tag).toBeTruthy();
     expect(index.releases.calendar.tag).toBeTruthy();
     expect(index.venues[CALENDAR_VENUE_ID]).toEqual({
-      data: `/data/venues/${CALENDAR_VENUE_ID}.json`,
-      calendar: `/data/calendars/${CALENDAR_VENUE_ID}.ics`,
+      data: `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+      calendar: `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
     });
   });
 
   test("a venue's data and calendar files are served", async ({ request }) => {
-    const data = await request.get(`/data/venues/${CALENDAR_VENUE_ID}.json`);
+    const data = await request.get(
+      `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    );
     expect(data.status()).toBe(200);
     expect(Array.isArray(await data.json())).toBe(true);
 
     const calendar = await request.get(
-      `/data/calendars/${CALENDAR_VENUE_ID}.ics`,
+      `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
     );
     expect(calendar.status()).toBe(200);
     expect(await calendar.text()).toMatch(/^BEGIN:VCALENDAR/);

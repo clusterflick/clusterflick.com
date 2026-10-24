@@ -35,9 +35,7 @@ do
 done
 
 npm run fetch-diffed-data
-
-# Cleared before anything writes to it: the published datasets live in here
-# too, beside the listing chunks.
-rm -rf ./public/data
 npm run fetch-published-data
+
+rm -rf ./public/data
 npm run process-combined-data
