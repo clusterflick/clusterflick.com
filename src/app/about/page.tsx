@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HeroSection from "@/components/hero-section";
-import LinkCard, {
-  CardArrow,
-  CardContent,
-  CardDescription,
-  CardIcon,
-  CardTitle,
-} from "@/components/link-card";
+import LinkCard, { CardContent, CardIcon } from "@/components/link-card";
 import { EmailIcon } from "@/components/icons";
 import { ButtonLink } from "@/components/button";
 import Divider from "@/components/divider";
@@ -19,7 +13,7 @@ import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
 import StatusSection from "./components/status-section";
-import { socialLinks, partnerSites, dataFormats } from "./data";
+import { socialLinks, partnerSites } from "./data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -396,8 +390,9 @@ export default function AboutPage() {
             align="center"
             intro={
               <>
-                The showing data is refreshed daily, available in two formats,
-                and free to use — including commercially — under{" "}
+                The showing data is refreshed daily, published as a JSON file
+                and a calendar feed for every venue, and free to use — including
+                commercially — under{" "}
                 <a
                   href="https://creativecommons.org/licenses/by/4.0/"
                   target="_blank"
@@ -410,19 +405,6 @@ export default function AboutPage() {
               </>
             }
           >
-            <CardGrid>
-              {dataFormats.map((format) => (
-                <LinkCard key={format.name} href={format.url} variant="feature">
-                  <CardTitle>{format.name}</CardTitle>
-                  <CardDescription>
-                    {format.description}
-                    <br />
-                    <br />
-                  </CardDescription>
-                  <CardArrow />
-                </LinkCard>
-              ))}
-            </CardGrid>
             <p className={styles.licenceLink}>
               <ButtonLink href="/data-licence" variant="secondary">
                 Read the data licence

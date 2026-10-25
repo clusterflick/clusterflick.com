@@ -6,8 +6,7 @@ import PageHeader from "@/components/page-header";
 import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
-import CardGrid from "@/components/card-grid";
-import LinkCard, { CardDescription, CardTitle } from "@/components/link-card";
+import { ButtonAnchor } from "@/components/button";
 import {
   DATA_INDEX_URL,
   LICENSED_DATASETS,
@@ -61,17 +60,23 @@ export default function DataLicencePage() {
           title="What you can use"
           intro="Two datasets are published for reuse. Both are rebuilt daily and served from clusterflick.com."
         >
-          <CardGrid className={styles.datasets}>
-            {LICENSED_DATASETS.map((dataset) => (
-              // No CardArrow: it is absolutely positioned over the bottom of
-              // the card and these descriptions run to the full height, so on
-              // hover it lands on top of the last line.
-              <LinkCard key={dataset.name} href={dataset.url} variant="feature">
-                <CardTitle>{dataset.name}</CardTitle>
-                <CardDescription>{dataset.description}</CardDescription>
-              </LinkCard>
-            ))}
-          </CardGrid>
+          <p className={styles.body}>
+            One is a JSON file for each venue, listing its showings in a shared
+            schema: the fullest form of the data, and the one to build on. The
+            other is an iCalendar file for each venue, to subscribe to or hand
+            to anything that reads ICS. The index lists every venue&apos;s
+            files.
+          </p>
+          <p className={styles.indexLink}>
+            <ButtonAnchor
+              href={DATA_INDEX_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+            >
+              Open the index
+            </ButtonAnchor>
+          </p>
 
           <p className={styles.body}>
             The licence covers our own contribution. Which film is showing, at

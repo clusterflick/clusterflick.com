@@ -30,10 +30,10 @@
   margin: 0 0 20px;
 }
 
-/* CardGrid has no trailing margin of its own, and the prose below explains the
-   cards, so it needs a gap wider than the one between two paragraphs. */
-.datasets {
-  margin-bottom: 32px;
+/* The button closes the description of the datasets, so it takes the wider
+   gap a section break would, before the prose about what the licence covers. */
+.indexLink {
+  margin: 0 0 32px;
 }
 
 /* ─── Attribution snippets ─── */
