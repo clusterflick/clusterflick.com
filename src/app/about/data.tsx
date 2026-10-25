@@ -70,7 +70,15 @@ export const socialLinks = [
   },
 ];
 
-export const partnerSites = [
+interface PartnerSite {
+  name: string;
+  description: string;
+  url: string;
+  // Only a site's own mark; without one the card shows its initial instead
+  logo?: string;
+}
+
+export const partnerSites: PartnerSite[] = [
   {
     name: "CultureCity.London",
     description:
@@ -98,5 +106,24 @@ export const partnerSites = [
       "Q&As, filmmaker talks, premieres and special screenings at London cinemas.",
     url: "https://culturvultur.com",
     logo: "/images/partners/culturvultur.svg",
+  },
+  {
+    name: "Cartelita",
+    description:
+      "Jazz, theatre and film listings for several cities, including London's independent and repertory cinemas.",
+    url: "https://cartelita.july.dev/london/en/film",
+  },
+  {
+    name: "PicHouse",
+    description:
+      "Picturehouse Screen 1 showtimes and every bookable BFI IMAX screening, with trailers.",
+    url: "https://pichouse-ssr.pages.dev",
+  },
+  {
+    name: "WhatsPlaying",
+    description:
+      "London screenings you can get to, watch, and still be home in time.",
+    url: "https://aduncan2.github.io/whats-playing/",
+    logo: "/images/partners/whatsplaying.png",
   },
 ];

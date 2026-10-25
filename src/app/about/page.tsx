@@ -366,12 +366,18 @@ export default function AboutPage() {
                   aria-label={`Visit ${site.name}`}
                 >
                   <span className={styles.partnerLogo}>
-                    <Image
-                      src={site.logo}
-                      alt={`${site.name} logo`}
-                      width={48}
-                      height={48}
-                    />
+                    {site.logo ? (
+                      <Image
+                        src={site.logo}
+                        alt={`${site.name} logo`}
+                        width={48}
+                        height={48}
+                      />
+                    ) : (
+                      <span className={styles.partnerInitial} aria-hidden>
+                        {site.name.charAt(0)}
+                      </span>
+                    )}
                   </span>
                   <CardContent>
                     <strong>{site.name}</strong>
