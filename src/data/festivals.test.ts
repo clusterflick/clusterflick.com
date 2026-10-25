@@ -263,3 +263,36 @@ describe("French film festival title matchers", () => {
     ]);
   });
 });
+
+describe("Romanian Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "romanian-film-festival")!;
+
+  // Each matcher's title query, checked only where its venue scope allows
+  const claims = (title: string, venueId: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      const venues = matcher[FilterId.Venues];
+      if (venues && !venues.includes(venueId)) return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    ["RFF 2026: 3 Days in September", "curzon.com-mayfair"],
+    ["RFF 2026: 12:08 East of Bucharest", "curzon.com-soho"],
+    ["Romanian Film Festival: Opening Night", "riocinema.org.uk"],
+    ["Romanian Film Fest UK: Shorts", "riocinema.org.uk"],
+  ])("claims %s at %s", (title, venueId) => {
+    expect(claims(title, venueId)).toBe(true);
+  });
+
+  it("does not claim another RFF elsewhere", () => {
+    expect(claims("RFF 2026: Girlfriends", "riocinema.org.uk")).toBe(false);
+  });
+
+  it("does not claim an RFF title without an edition year", () => {
+    expect(claims("RFF: GIRLFRIENDS + CLAUDIA WEILL", "curzon.com-soho")).toBe(
+      false,
+    );
+  });
+});
