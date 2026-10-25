@@ -7,6 +7,7 @@ import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
 import { ButtonAnchor } from "@/components/button";
+import { CalendarIcon, FileCodeIcon } from "@/components/icons";
 import {
   DATA_INDEX_URL,
   LICENSED_DATASETS,
@@ -60,13 +61,27 @@ export default function DataLicencePage() {
           title="What you can use"
           intro="Two datasets are published for reuse. Both are rebuilt daily and served from clusterflick.com."
         >
-          <p className={styles.body}>
-            One is a JSON file for each venue, listing its showings in a shared
-            schema: the fullest form of the data, and the one to build on. The
-            other is an iCalendar file for each venue, to subscribe to or hand
-            to anything that reads ICS. The index lists every venue&apos;s
-            files.
-          </p>
+          <ul className={styles.datasetList}>
+            <li className={styles.datasetItem}>
+              <span className={styles.datasetIcon}>
+                <FileCodeIcon size={22} />
+              </span>
+              <p className={styles.datasetText}>
+                <strong>A JSON file for each venue</strong>, listing its
+                showings in a shared schema. The fullest form of the data, and
+                the one to build on.
+              </p>
+            </li>
+            <li className={styles.datasetItem}>
+              <span className={styles.datasetIcon}>
+                <CalendarIcon size={22} />
+              </span>
+              <p className={styles.datasetText}>
+                <strong>An iCalendar file for each venue</strong>, to subscribe
+                to or hand to anything that reads ICS.
+              </p>
+            </li>
+          </ul>
           <p className={styles.indexLink}>
             <ButtonAnchor
               href={DATA_INDEX_URL}
@@ -74,7 +89,7 @@ export default function DataLicencePage() {
               rel="noopener noreferrer"
               variant="secondary"
             >
-              Open the index
+              Open index.json
             </ButtonAnchor>
           </p>
 
