@@ -347,6 +347,17 @@ below two hours, and ten minutes keeps a reader, and the site's own calendar pag
 cache period of a deploy. The smoke tests check those headers, since a rule that stops matching
 would quietly serve year-old data.
 
+**The calendars are served uncompressed**, and that is accepted rather than an oversight. GitHub
+Pages gzips the `.json` files but not `text/calendar`, and Cloudflare only compresses the content
+types on its default list, which `text/calendar` isn't on. A Compression Rule doesn't change that:
+one was tried matching the path, then the media type, with the Zstandard preset and with a custom
+algorithm list, and every response still came back uncompressed while `robots.txt` on the same
+zone came back as Brotli. Rewriting the `Content-Type` to something compressible would risk
+calendar apps no longer recognising the feed, and a Worker to compress them is a lot of
+machinery for this. A typical feed is ~190KB and the largest ~700KB; it is fetched by calendar
+apps a few times a day and served from Cloudflare's cache, so the cost is the download, not the
+origin. If feed size ever matters, the lasting fix is a smaller feed from `data-calendar`.
+
 **Not under `data/`.** That directory is the site's own: content-hashed listing chunks, cached
 forever and carried forward between deploys by `carry-forward-static`, with no promise about
 their shape. These are the opposite on every count, so they get a directory of their own — one
