@@ -1024,4 +1024,27 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "romanian-film-festival",
+    name: "Romanian Film Festival",
+    url: "https://rofilmfest.com/",
+    aliases: ["rff", "rofilmfest", "romanian-film-festival-in-london"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Romanian Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Romanian Film Festival",
+      },
+      {
+        // Matches "RFF 2026: 3 Days in September" at Curzon Mayfair and Soho.
+        // "RFF" is a common acronym - an unrelated "RFF: GIRLFRIENDS + CLAUDIA
+        // WEILL" has turned up elsewhere - so the edition's year anchors it
+        // and it is scoped to the Curzon screens the festival has run at
+        // since 2003.
+        [FilterId.ShowingTitleSearch]: "RFF 20",
+        [FilterId.Venues]: ["curzon.com-soho", "curzon.com-mayfair"],
+      },
+    ],
+  },
 ];
