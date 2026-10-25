@@ -71,6 +71,52 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-25",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Shoreditch Arts Club"
+              url="https://shoreditchartsclub.com"
+            />
+            , a members&apos; club on Redchurch Street with its own cinema room,
+            whose programme mixes screenings with talks, performance and
+            installations.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Sevente" url="https://sevente.co.uk" />, a
+            neighbourhood bar and cultural space on Hackney Road that runs its
+            own film club nights.
+          </>
+        ),
+      },
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://cinebur.com">Cinebur</Ext>, the app hosts use to
+            put on movie nights, including the film nights at{" "}
+            <Venue name="Sevente" url="https://sevente.co.uk" /> and{" "}
+            <Venue
+              name="Shoreditch Arts Club"
+              url="https://shoreditchartsclub.com"
+            />
+            .
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-22",
     changes: [
       {
