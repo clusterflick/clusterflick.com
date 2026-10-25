@@ -355,6 +355,35 @@ export function CalendarIcon({ size = 24, ...props }: IconProps) {
   );
 }
 
+/** A file of code or data: a page with a folded corner and `<>` on it. */
+export function FileCodeIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      {...props}
+    >
+      <path
+        d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 3v5h5M10 12.5 8 15l2 2.5M14 12.5l2 2.5-2 2.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /** `filled` marks a film as saved; outlined, it offers to save it. */
 export function BookmarkIcon({
   size = 24,

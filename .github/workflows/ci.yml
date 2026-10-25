@@ -49,9 +49,9 @@ jobs:
       - run: npm run fetch-diffed-data
         env:
           PAT: ${{ secrets.PAT || github.token }}
-      # One ICS per venue, served from our own origin so the calendar pages can
-      # read them without CORS and cache them on a content hash
-      - run: npm run fetch-calendar-data
+      # The two datasets published for reuse - a JSON and an ICS per venue -
+      # hosted under /datasets/ at fixed addresses (see /data-licence)
+      - run: npm run fetch-published-data
         env:
           PAT: ${{ secrets.PAT || github.token }}
       - run: npm run process-combined-data

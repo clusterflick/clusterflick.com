@@ -100,24 +100,3 @@ export const partnerSites = [
     logo: "/images/partners/culturvultur.svg",
   },
 ];
-
-/**
- * The datasets published for reuse. Deliberately only the two that are
- * licensed — the combined file the site itself loads is an internal build
- * artifact with no schema guarantees, so pointing people at it was an offer we
- * could not keep. See /data-licence.
- */
-export const dataFormats = [
-  {
-    name: "Data file per venue",
-    url: "https://github.com/clusterflick/data-transformed/releases/latest",
-    description:
-      "Individual JSON files for the showings at each venue. These all follow the same schema.",
-  },
-  {
-    name: "Calendar file per venue",
-    url: "https://github.com/clusterflick/data-calendar/releases/latest",
-    description:
-      "Individual ICS files for the showings at each venue. Import cinema schedules into your calendar app.",
-  },
-];

@@ -1,22 +1,26 @@
 /**
  * The two datasets published for reuse, and the internal artifacts that are
  * not. Kept beside the page rather than in `src/data` because nothing else
- * needs them — the About page links to the same two datasets, but describes
- * them for a different audience.
+ * needs them — the About page only mentions the datasets and links here.
  */
+
+/**
+ * Everything published lives under one address on our own domain, served from
+ * the latest releases by `scripts/fetch-published-data.js`. The index is the
+ * way in: it names every venue's files and the releases they came from.
+ */
+export const DATA_INDEX_URL = "https://clusterflick.com/datasets/index.json";
 
 export const LICENSED_DATASETS = [
   {
     name: "Data file per venue",
-    url: "https://github.com/clusterflick/data-transformed/releases/latest",
-    description:
-      "Individual JSON files for the showings at each venue, all following the same schema. The fullest form of the data, and the one to build on.",
+    pattern: "https://clusterflick.com/datasets/venues/<venue-id>.json",
+    archive: "https://github.com/clusterflick/data-transformed/releases",
   },
   {
     name: "Calendar file per venue",
-    url: "https://github.com/clusterflick/data-calendar/releases/latest",
-    description:
-      "Individual ICS files for the showings at each venue. Subscribe to one, or hand them to anything that speaks iCalendar.",
+    pattern: "https://clusterflick.com/datasets/calendars/<venue-id>.ics",
+    archive: "https://github.com/clusterflick/data-calendar/releases",
   },
 ];
 

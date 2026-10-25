@@ -249,6 +249,7 @@ test.describe("Venue Pages", () => {
 // A venue busy enough that any week of the year has something programmed, so
 // the test can assert on real events rather than an empty grid.
 const CALENDAR_VENUE_SLUG = "prince-charles-cinema";
+const CALENDAR_VENUE_ID = "princecharlescinema.com";
 
 test.describe("Venue Calendar Page", () => {
   let calendarPage: VenueCalendarPage;
@@ -257,6 +258,16 @@ test.describe("Venue Calendar Page", () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     calendarPage = new VenueCalendarPage(page);
     await calendarPage.goto(CALENDAR_VENUE_SLUG);
+  });
+
+  // The page reads the published feed itself — the same address a calendar
+  // app subscribes to (see CLAUDE.md, Published Data) — not a copy of it.
+  test("calendar loads the published feed", async ({ page }) => {
+    const feed = page.waitForResponse((response) =>
+      response.url().endsWith(`/datasets/calendars/${CALENDAR_VENUE_ID}.ics`),
+    );
+    await calendarPage.goto(CALENDAR_VENUE_SLUG);
+    expect((await feed).status()).toBe(200);
   });
 
   test("calendar renders showings from the ICS feed", async () => {
@@ -310,6 +321,80 @@ test.describe("Venue Calendar Page", () => {
       "",
     );
     expect(canonicalPath).toBe(`/venues/${CALENDAR_VENUE_SLUG}`);
+  });
+});
+
+// The datasets licensed for reuse, hosted at fixed addresses (see CLAUDE.md,
+// Published Data). People link to these and fetch them on a schedule, so a
+// missing file or a cache rule that stopped matching breaks someone else's
+// site rather than ours.
+test.describe("Published Data", () => {
+  const PUBLISHED_PATHS = [
+    "/datasets/index.json",
+    `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+  ];
+
+  test("the index names every venue's files and the releases", async ({
+    request,
+  }) => {
+    const response = await request.get("/datasets/index.json");
+    expect(response.status()).toBe(200);
+    const index = await response.json();
+
+    expect(index.releases.data.tag).toBeTruthy();
+    expect(index.releases.calendar.tag).toBeTruthy();
+    expect(index.venues[CALENDAR_VENUE_ID]).toEqual({
+      data: `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+      calendar: `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+    });
+  });
+
+  test("a venue's data and calendar files are served", async ({ request }) => {
+    const data = await request.get(
+      `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    );
+    expect(data.status()).toBe(200);
+    expect(Array.isArray(await data.json())).toBe(true);
+
+    const calendar = await request.get(
+      `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+    );
+    expect(calendar.status()).toBe(200);
+    expect(await calendar.text()).toMatch(/^BEGIN:VCALENDAR/);
+  });
+
+  // A browser app should be able to read them directly.
+  test("published files allow cross-origin reads", async ({ request }) => {
+    for (const path of PUBLISHED_PATHS) {
+      const response = await request.get(path);
+      expect(response.headers()["access-control-allow-origin"], path).toBe("*");
+    }
+  });
+
+  // The zone's JSON rule caches `.json` for a year, and nothing caches `.ics`
+  // at all. These fixed names need the `/datasets/` rule instead: cached at
+  // the edge, and never held by a browser for more than an hour.
+  // Only the live site sits behind Cloudflare, so a local run skips this.
+  test("published files are cached briefly at the edge", async ({
+    request,
+  }) => {
+    test.skip(
+      new URL(SITE_URL).hostname !== "clusterflick.com",
+      "Cache headers are set by Cloudflare in front of the live site",
+    );
+
+    for (const path of PUBLISHED_PATHS) {
+      const response = await request.get(path);
+      const headers = response.headers();
+      const maxAge = Number(
+        /max-age=(\d+)/.exec(headers["cache-control"] ?? "")?.[1],
+      );
+      expect(maxAge, `${path} cache-control`).toBeLessThanOrEqual(3600);
+      expect(["DYNAMIC", "BYPASS"], `${path} cf-cache-status`).not.toContain(
+        headers["cf-cache-status"],
+      );
+    }
   });
 });
 

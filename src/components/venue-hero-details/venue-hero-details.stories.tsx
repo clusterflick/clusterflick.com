@@ -23,7 +23,7 @@ import { MockUserProvider } from "@/state/user-context";
  *   assumes the centred hero layout.
  *
  * The subscription URLs are derived from `venueId`, which is the filename each
- * venue's ICS feed is published under in the `data-calendar` release.
+ * venue's ICS feed is published under at `/datasets/calendars/<id>.ics`.
  */
 const meta = {
   title: "Components/VenueHeroDetails",

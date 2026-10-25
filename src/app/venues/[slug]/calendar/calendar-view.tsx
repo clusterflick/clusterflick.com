@@ -9,7 +9,7 @@ import type { EventClickArg, EventMountArg } from "@fullcalendar/core";
 import styles from "./calendar.module.css";
 
 interface CalendarViewProps {
-  /** Content-hashed, same-origin URL of the venue's ICS feed. */
+  /** Same-origin URL of the venue's published ICS feed. */
   calendarPath: string;
   venueName: string;
 }

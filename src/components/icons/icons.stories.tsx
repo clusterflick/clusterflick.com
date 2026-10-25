@@ -18,6 +18,7 @@ import {
   GoogleCalendarIcon,
   OutlookCalendarIcon,
   CalendarIcon,
+  FileCodeIcon,
   MenuIcon,
 } from "@/components/icons";
 
@@ -32,7 +33,7 @@ import {
  *
  * **UI icons** (navigation, controls):
  * `ArrowLeftIcon`, `ChevronDownIcon`, `CloseIcon`, `PlayIcon`, `MenuIcon`,
- * `CalendarIcon`, `TickIcon`, `CrossIcon`, `BookmarkIcon`, `EyeIcon`
+ * `CalendarIcon`, `FileCodeIcon`, `TickIcon`, `CrossIcon`, `BookmarkIcon`, `EyeIcon`
  *
  * **Social icons** (venue/festival profile links):
  * `LetterboxdIcon`, `InstagramIcon`, `XIcon`, `BlueskyIcon`, `ThreadsIcon`,
@@ -88,6 +89,7 @@ export const UIIcons: Story = {
         { label: "Play", icon: <PlayIcon size={24} /> },
         { label: "Menu", icon: <MenuIcon size={24} /> },
         { label: "Calendar", icon: <CalendarIcon size={24} /> },
+        { label: "FileCode", icon: <FileCodeIcon size={24} /> },
         { label: "Tick", icon: <TickIcon size={24} /> },
         { label: "Bookmark", icon: <BookmarkIcon size={24} /> },
         { label: "Bookmark (filled)", icon: <BookmarkIcon size={24} filled /> },
