@@ -281,6 +281,7 @@ describe("Romanian Film Festival title matchers", () => {
     ["RFF 2026: 3 Days in September", "curzon.com-mayfair"],
     ["RFF 2026: 12:08 East of Bucharest", "curzon.com-soho"],
     ["Romanian Film Festival: Opening Night", "riocinema.org.uk"],
+    ["Romanian Film Fest UK: Shorts", "riocinema.org.uk"],
   ])("claims %s at %s", (title, venueId) => {
     expect(claims(title, venueId)).toBe(true);
   });

@@ -4,26 +4,27 @@ function FestivalBlurb() {
   return (
     <section>
       <p>
-        The Romanian Film Festival in London has brought new Romanian cinema to
-        UK audiences since 2003. A non-profit festival run in partnership with
-        Curzon, it pairs recent features and documentaries, many of them UK
-        premieres, with restorations from the country&rsquo;s back catalogue,
-        and brings directors and cast over from Romania for Q&amp;As.
+        The Romanian Film Festival UK sets out to &ldquo;celebrate Romanian
+        cinema and connect filmmakers with UK wide audiences&rdquo;. Billed as
+        &ldquo;London and beyond&rdquo;, it brings recent Romanian features,
+        documentaries and restorations to the UK, with filmmakers and cast over
+        for Q&amp;As, and is financed by the Department for Romanians Abroad.
       </p>
       <p>
-        The festival has long been at home at{" "}
-        <Link href="/venues/curzon-soho">Curzon Soho</Link>. The 2026 edition
-        runs in early December at{" "}
+        The 2025 edition was held at{" "}
+        <Link href="/venues/curzon-soho">Curzon Soho</Link>, with a pop-up in
+        Colchester. The 2026 edition runs in Colchester from 28 to 29 November
+        and in London from 2 to 7 December, at{" "}
         <Link href="/venues/curzon-mayfair">Curzon Mayfair</Link> and Curzon
-        Soho, with a Q&amp;A after every screening.
+        Soho.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "London's annual festival of new Romanian cinema, held at Curzon since 2003";
+  "a festival of new Romanian cinema in London and beyond, at Curzon Mayfair and Curzon Soho";
 export const seoHighlights =
-  "new Romanian features and documentaries, UK premieres and restorations, with filmmaker Q&As";
+  "recent Romanian features, documentaries and restorations, with filmmaker Q&As";
 
 export default FestivalBlurb;

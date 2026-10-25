@@ -1026,22 +1026,24 @@ export const FESTIVALS: Festival[] = [
   },
   {
     id: "romanian-film-festival",
-    name: "Romanian Film Festival",
-    url: "https://rofilmfest.com/",
-    aliases: ["rff", "rofilmfest", "romanian-film-festival-in-london"],
+    name: "Romanian Film Festival UK",
+    url: "https://www.rofilmfest.co.uk/",
+    aliases: ["rff", "rofilmfest", "romanian-film-festival-uk"],
     matchers: [
       {
-        [FilterId.ShowingTitleSearch]: "Romanian Film Festival",
+        // Search normalisation runs the words together, so "Romanian Film
+        // Fest" also covers the full "Romanian Film Festival" and the
+        // festival's own "Romanian Film Fest UK"
+        [FilterId.ShowingTitleSearch]: "Romanian Film Fest",
       },
       {
-        [FilterId.PerformanceNotesSearch]: "Romanian Film Festival",
+        [FilterId.PerformanceNotesSearch]: "Romanian Film Fest",
       },
       {
         // Matches "RFF 2026: 3 Days in September" at Curzon Mayfair and Soho.
         // "RFF" is a common acronym - an unrelated "RFF: GIRLFRIENDS + CLAUDIA
         // WEILL" has turned up elsewhere - so the edition's year anchors it
-        // and it is scoped to the Curzon screens the festival has run at
-        // since 2003.
+        // and it is scoped to the Curzon screens the festival uses in London.
         [FilterId.ShowingTitleSearch]: "RFF 20",
         [FilterId.Venues]: ["curzon.com-soho", "curzon.com-mayfair"],
       },
