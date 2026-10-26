@@ -106,7 +106,7 @@ export default function StatusView({ status, latestUrl }: StatusViewProps) {
               <dd>{days(dataset.streaks.longest)}</dd>
             </div>
             <div className={styles.stat}>
-              <dt>Per day, last {RECENT_DAYS} days</dt>
+              <dt>Per day</dt>
               <dd>
                 {dataset.range.fewest === dataset.range.median
                   ? number(dataset.range.median)
@@ -117,7 +117,8 @@ export default function StatusView({ status, latestUrl }: StatusViewProps) {
           <p className={styles.note}>
             A streak counts consecutive days with at least one release, and
             carries on through today until its first release lands. Per day is
-            the fewest releases in a day, then the median.
+            the fewest releases in a day over the last {RECENT_DAYS} days, then
+            the median.
           </p>
           <ReleaseDayBars days={dataset.recent} label={dataset.label} />
         </ContentSection>

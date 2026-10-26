@@ -1,13 +1,18 @@
+/* The same measure as /datasets and /data-licence, its sibling pages */
 .content {
+  max-width: 800px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+/* The page's one summary line, so it gets room to stand apart from the
+   freshness notice above and the first section below. */
 .lede {
   font-size: 18px;
   line-height: 1.6;
-  margin: 16px 0 8px;
+  margin: 32px 0 28px;
   text-align: center;
 }
 
