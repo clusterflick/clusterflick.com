@@ -74,6 +74,83 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-10-26",
     changes: [
       {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Duke Street Church",
+                  url: "https://www.dukestreetchurch.com",
+                },
+                {
+                  name: "St Mary's Barnes",
+                  url: "https://www.stmarybarnes.org",
+                },
+                {
+                  name: "St Paul's West Hackney",
+                  url: "https://www.stpaulswesthackney.org",
+                },
+              ]}
+            />
+            , churches in Richmond, Barnes and West Hackney whose halls and
+            auditoriums host community film screenings.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "Coven", url: "https://worldwidecoven.net/" },
+                {
+                  name: "Biddle Bros",
+                  url: "https://www.instagram.com/biddlebros/",
+                },
+              ]}
+            />
+            , a queer nightclub and performance space on Old Compton Street and
+            a bar on Lower Clapton Road, both hosting promoter-run film nights.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Hart Shoreditch Hotel",
+                  url: "https://hartshoreditch.com/whats-on/",
+                },
+                {
+                  name: "UCL Cruciform Building",
+                  url: "https://www.ucl.ac.uk/library/using-library/libraries-and-study-spaces/cruciform-hub",
+                },
+                {
+                  name: "A House for Artists",
+                  url: "https://www.instagram.com/ahouseforartists/",
+                },
+                {
+                  name: "Rhizomatic!",
+                  url: "https://www.instagram.com/rhizomatic.ldn/",
+                },
+              ]}
+            />
+            : a Shoreditch hotel with its own events programme, UCL&apos;s
+            former University College Hospital building on Gower Street,
+            artists&apos; housing in Barking with a community cinema in its
+            ground-floor Living Room, and a creative space in Fish Island.
+          </>
+        ),
+      },
+      {
         tag: "New feature",
         body: () => (
           <>

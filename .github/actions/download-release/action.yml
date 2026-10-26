@@ -1,0 +1,52 @@
+name: Download release
+description:
+  Download every asset of a repository's latest release, with a second pass
+  after a pause if the first one fails
+
+# release-downloader retries each asset itself, but three tries 30s apart are
+# over in a minute, and GitHub's release CDN can answer 5xx for longer than
+# that (a 504 on moviedb.json for every attempt failed a deploy). A second pass
+# a few minutes on outlasts that, and costs nothing when the first succeeds.
+
+inputs:
+  repository:
+    description: The source repository, as {owner}/{repo}
+    required: true
+  out-file-path:
+    description: Directory under $GITHUB_WORKSPACE to place the assets in
+    required: true
+  token:
+    description: Token for the GitHub API
+    required: true
+  retry-delay:
+    description: Seconds to wait before the second pass
+    default: "180"
+
+runs:
+  using: composite
+  steps:
+    - id: first
+      continue-on-error: true
+      uses: clusterflick/release-downloader@v4
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        latest: true
+        fileName: "*"
+        out-file-path: ${{ inputs.out-file-path }}
+    - if: steps.first.outcome == 'failure'
+      shell: bash
+      env:
+        REPOSITORY: ${{ inputs.repository }}
+        RETRY_DELAY: ${{ inputs.retry-delay }}
+      run: |
+        echo "::warning::Downloading $REPOSITORY failed, trying again in ${RETRY_DELAY}s"
+        sleep "$RETRY_DELAY"
+    - if: steps.first.outcome == 'failure'
+      uses: clusterflick/release-downloader@v4
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        latest: true
+        fileName: "*"
+        out-file-path: ${{ inputs.out-file-path }}
