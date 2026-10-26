@@ -26,3 +26,18 @@ export function useNow(fallback: string): Date {
   );
   return new Date(now);
 }
+
+const noSubscription = () => () => {};
+
+/**
+ * False for server rendering and hydration, true once the page is on the
+ * reader's clock. For wording that `useNow`'s build-time fallback would make
+ * wrong, such as "2 hours ago": render something true at any time until then.
+ */
+export function useIsOnReaderClock(): boolean {
+  return useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  );
+}

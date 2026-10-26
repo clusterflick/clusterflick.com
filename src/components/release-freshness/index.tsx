@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { useNow } from "@/hooks/use-now";
+import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
 import { formatShowingTime, formatDateLong } from "@/utils/format-date";
 import {
   getHoursSince,
@@ -33,8 +33,10 @@ interface LatestJson {
  * since stopped would otherwise go on saying "2 hours ago" forever. Past
  * `STALE_AFTER_HOURS` it turns into a warning.
  *
- * It renders against the build time first, so the static HTML matches the
- * first client render, then moves to the reader's clock and asks latest.json
+ * The static HTML names the release and its date but no age, since an age
+ * counted from the build time is wrong by the time anyone reads it, and
+ * swapping it for the real one on load read as a flicker. The age is added
+ * once the page is on the reader's clock, which then also asks latest.json
  * whether anything newer has been released since the page was built.
  */
 export default function ReleaseFreshness({
@@ -43,6 +45,7 @@ export default function ReleaseFreshness({
   latestUrl = "/datasets/latest.json",
 }: ReleaseFreshnessProps) {
   const now = useNow(builtAt);
+  const isOnReaderClock = useIsOnReaderClock();
   const [published, setPublished] = useState<ReleaseRef | null>(null);
 
   useEffect(() => {
@@ -83,13 +86,25 @@ export default function ReleaseFreshness({
       <span className={styles.indicator} aria-hidden="true" />
       {isStale ? (
         <span>
-          <strong>No new data for {formatHours(hours)}.</strong> The last
-          release was on {when}. Releases have come several times a day, so the
-          pipeline has most likely stopped.
+          <strong>
+            {isOnReaderClock
+              ? `No new data for ${formatHours(hours)}.`
+              : `No new data since ${when}.`}
+          </strong>{" "}
+          {isOnReaderClock && <>The last release was on {when}. </>}
+          Releases have come several times a day, so the pipeline has most
+          likely stopped.
         </span>
       ) : (
         <span>
-          Last new data <strong>{formatHours(hours, true)}</strong>, release{" "}
+          Last new data{" "}
+          {isOnReaderClock ? (
+            <>
+              <strong>{formatHours(hours, true)}</strong>, release
+            </>
+          ) : (
+            "from release"
+          )}{" "}
           <code>{latest.tag}</code> on {when}.
         </span>
       )}
