@@ -8,6 +8,8 @@
  *   datasets/schema.json                the JSON files' schema, from
  *                                       clusterflick/scripts
  *   datasets/index.json                 every venue, its files, and the releases
+ *   datasets/latest.json                just `generatedAt` and the releases, for
+ *                                       polling whether anything is new
  *
  * The index describes each venue as well as naming its files - name, type,
  * address, coordinates and its page here - because a file named after a domain
@@ -16,8 +18,8 @@
  *
  * Both releases name each asset after the venue id with no extension
  * (`actonecinema.co.uk`). The names here are stable rather than content-hashed,
- * because they are addresses other people link to and subscribe to: the data
- * licence page and the venue pages' calendar subscriptions point at them, and
+ * because they are addresses other people link to and subscribe to: the
+ * datasets page and the venue pages' calendar subscriptions point at them, and
  * the site's own calendar page loads the same URL a subscriber does. Freshness
  * is Cloudflare's cache rule for this path, not the filename.
  *
@@ -40,6 +42,7 @@ const path = require("node:path");
 
 const OUT_DIR = path.join(process.cwd(), "public", "datasets");
 const INDEX_PATH = path.join(OUT_DIR, "index.json");
+const LATEST_PATH = path.join(OUT_DIR, "latest.json");
 const SCHEMA_PATH = path.join(OUT_DIR, "schema.json");
 const COMBINED_DATA_PATH = path.join(
   process.cwd(),
@@ -346,23 +349,25 @@ async function main() {
     venues[id] = { ...venueDetails[id], ...venues[id] };
   }
 
+  // latest.json answers only "is there new data?", so a consumer can poll it
+  // rather than fetching the whole index. It is the index's own `generatedAt`
+  // and `releases`, from the one object, so the two can never disagree.
+  // `generatedAt` moves on every deploy, and the site deploys several times
+  // per release, so it is the tags that say whether the data changed.
+  const latest = { generatedAt: new Date().toISOString(), releases };
+
   // Written last, so an index only ever describes a complete download.
-  fs.writeFileSync(
-    INDEX_PATH,
-    `${JSON.stringify(
-      {
-        licence: "CC BY 4.0",
-        licenceUrl: "https://creativecommons.org/licenses/by/4.0/",
-        terms: "https://clusterflick.com/data-licence/",
-        generatedAt: new Date().toISOString(),
-        releases,
-        schema: "/datasets/schema.json",
-        venues,
-      },
-      null,
-      2,
-    )}\n`,
-  );
+  const write = (file, value) =>
+    fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+  write(INDEX_PATH, {
+    licence: "CC BY 4.0",
+    licenceUrl: "https://creativecommons.org/licenses/by/4.0/",
+    terms: "https://clusterflick.com/data-licence/",
+    ...latest,
+    schema: "/datasets/schema.json",
+    venues,
+  });
+  write(LATEST_PATH, latest);
 
   for (const dataset of DATASETS) {
     const count = entries.filter(({ key }) => key === dataset.key).length;

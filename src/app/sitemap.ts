@@ -214,6 +214,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
+      url: pageUrl("/datasets"),
+      lastModified: data.generatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    },
+    {
       url: pageUrl("/data-licence"),
       lastModified: data.generatedAt,
       changeFrequency: "yearly" as const,

@@ -46,8 +46,13 @@ jobs:
         env:
           PAT: ${{ secrets.PAT || github.token }}
       # The two datasets published for reuse - a JSON and an ICS per venue -
-      # hosted under /datasets/ at fixed addresses (see /data-licence)
+      # hosted under /datasets/ at fixed addresses (see /datasets)
       - run: npm run fetch-published-data
+        env:
+          PAT: ${{ secrets.PAT || github.token }}
+      # Every release of those two datasets, for the release history on
+      # /datasets/status (from clusterflick/data-analysed's release log)
+      - run: npm run fetch-release-log
         env:
           PAT: ${{ secrets.PAT || github.token }}
       - run: npm run process-combined-data

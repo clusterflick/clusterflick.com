@@ -6,15 +6,8 @@ import PageHeader from "@/components/page-header";
 import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
-import { ButtonAnchor } from "@/components/button";
-import { CalendarIcon, FileCodeIcon } from "@/components/icons";
-import {
-  DATA_INDEX_URL,
-  DATA_SCHEMA_URL,
-  LICENSED_DATASETS,
-  ATTRIBUTION_SNIPPETS,
-  INTERNAL_REPOS,
-} from "./data";
+import DataPageLinks from "@/app/datasets/data-page-links";
+import { ATTRIBUTION_SNIPPETS, INTERNAL_REPOS } from "./data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -60,47 +53,15 @@ export default function DataLicencePage() {
       <div className={styles.content}>
         <ContentSection
           title="What you can use"
-          intro="Two datasets are published for reuse. Both are rebuilt daily and served from clusterflick.com."
+          intro={
+            <>
+              Two datasets are published for reuse: a JSON file and an iCalendar
+              feed for every venue, served from clusterflick.com. The{" "}
+              <Link href="/datasets">datasets page</Link> covers what&apos;s in
+              them, where to get them and how to tell when they&apos;ve changed.
+            </>
+          }
         >
-          <ul className={styles.datasetList}>
-            <li className={styles.datasetItem}>
-              <span className={styles.datasetIcon}>
-                <FileCodeIcon size={22} />
-              </span>
-              <p className={styles.datasetText}>
-                <strong>A JSON file for each venue</strong>, listing its
-                showings in{" "}
-                <a
-                  href={DATA_SCHEMA_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  a shared schema
-                </a>
-                . The fullest form of the data, and the one to build on.
-              </p>
-            </li>
-            <li className={styles.datasetItem}>
-              <span className={styles.datasetIcon}>
-                <CalendarIcon size={22} />
-              </span>
-              <p className={styles.datasetText}>
-                <strong>An iCalendar file for each venue</strong>, to subscribe
-                to or hand to anything that reads ICS.
-              </p>
-            </li>
-          </ul>
-          <p className={styles.indexLink}>
-            <ButtonAnchor
-              href={DATA_INDEX_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="secondary"
-            >
-              Open index.json
-            </ButtonAnchor>
-          </p>
-
           <p className={styles.body}>
             The licence covers our own contribution. Which film is showing, at
             which venue, on which screen, at what time. The booking link, the
@@ -113,70 +74,9 @@ export default function DataLicencePage() {
             You can redistribute it, build on it, and sell what you build. There
             is no non-commercial restriction and no share-alike requirement.
           </p>
-        </ContentSection>
-
-        <ContentSection
-          title="Where to get it"
-          intro="Every file has a fixed address, so you can link to it, subscribe to it, or fetch it on a schedule."
-        >
-          <dl className={styles.snippets}>
-            <div className={styles.snippet}>
-              <dt className={styles.snippetLabel}>Index</dt>
-              <dd className={styles.snippetValue}>
-                <pre>
-                  <code>{DATA_INDEX_URL}</code>
-                </pre>
-              </dd>
-            </div>
-            {LICENSED_DATASETS.map((dataset) => (
-              <div key={dataset.name} className={styles.snippet}>
-                <dt className={styles.snippetLabel}>{dataset.name}</dt>
-                <dd className={styles.snippetValue}>
-                  <pre>
-                    <code>{dataset.pattern}</code>
-                  </pre>
-                </dd>
-              </div>
-            ))}
-            <div className={styles.snippet}>
-              <dt className={styles.snippetLabel}>JSON schema</dt>
-              <dd className={styles.snippetValue}>
-                <pre>
-                  <code>{DATA_SCHEMA_URL}</code>
-                </pre>
-              </dd>
-            </div>
-          </dl>
-          <p className={styles.body}>
-            Start from the{" "}
-            <a href={DATA_INDEX_URL} target="_blank" rel="noopener noreferrer">
-              index
-            </a>
-            . It lists every venue by id with its name, type, address,
-            coordinates and page on Clusterflick, and the files published for
-            it. It also names the release each dataset was built from, so you
-            can tell whether anything has changed since you last looked.
-          </p>
-          <p className={styles.body}>
-            Only the latest data is hosted here. Every earlier release is kept
-            on GitHub, for{" "}
-            <a
-              href={LICENSED_DATASETS[0].archive}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              the data files
-            </a>{" "}
-            and{" "}
-            <a
-              href={LICENSED_DATASETS[1].archive}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              the calendars
-            </a>
-            , if you need to look back.
-          </p>
+          <div className={styles.dataPageLinks}>
+            <DataPageLinks current="licence" />
+          </div>
         </ContentSection>
 
         <ContentSection
@@ -306,11 +206,6 @@ export default function DataLicencePage() {
             up. The schema of the licensed datasets is stable in practice, but
             it is not frozen, and we will change it when we need to, aiming as
             best we can to keep it backwards compatible.
-          </p>
-          <p className={styles.body}>
-            The files are refreshed when the pipeline runs, so there is nothing
-            to gain from fetching them more than once an hour. The index&apos;s
-            release tags say when there is something new.
           </p>
         </ContentSection>
 

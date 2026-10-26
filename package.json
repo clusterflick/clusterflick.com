@@ -10,6 +10,7 @@
     "process-combined-data": "node ./scripts/process-combined-data.js",
     "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
     "fetch-published-data": "node ./scripts/fetch-published-data.js",
+    "fetch-release-log": "node ./scripts/fetch-release-log.js",
     "fetch-london-stations": "node ./scripts/fetch-london-stations.js",
     "carry-forward-static": "node ./scripts/carry-forward-static.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",

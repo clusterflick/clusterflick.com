@@ -150,6 +150,30 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The published data has a page of its own,{" "}
+            <Link href="/datasets">Datasets</Link>, covering what&rsquo;s in it,
+            where to get it and how to tell when it has changed, leaving the{" "}
+            <Link href="/data-licence">data licence</Link> to the terms. A new{" "}
+            <code>latest.json</code> names just the current releases, to poll
+            for new data without fetching the whole index.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added a <Link href="/datasets/status">data status</Link> page, with
+            the release history of both datasets since February 2025: every day
+            with a release over the last 90 days, the streaks, and the time of
+            day new data lands.
+          </>
+        ),
+      },
     ],
   },
   {

@@ -71,6 +71,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: "/updates", label: "New Listings", group: "site" },
   { href: "/about", label: "About", group: "site" },
   { href: "/changelog", label: "Changelog", group: "site" },
+  { href: "/datasets", label: "Datasets", group: "site" },
   { href: "/data-licence", label: "Data Licence", group: "site" },
 ];
 

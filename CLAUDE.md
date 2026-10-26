@@ -17,6 +17,7 @@ Pages at clusterflick.com.
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
+- `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -328,8 +329,9 @@ would render at 48px in pink.
 
 ## Published Data
 
-The two datasets licensed for reuse (`/data-licence`) are hosted on this site rather than pointed
-at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-transformed` and
+The two datasets licensed for reuse are hosted on this site rather than pointed at on GitHub.
+`/datasets` documents them (what's in them, the addresses, the schema, how often they change, how to
+detect new data) and `/data-licence` licenses them; the URL constants live in `@/app/datasets/data`. `scripts/fetch-published-data.js` downloads the latest `data-transformed` and
 `data-calendar` releases into `public/datasets/`:
 
 - `datasets/venues/<venue-id>.json` — the venue's transformed listings
@@ -338,6 +340,10 @@ at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-trans
   `transform` validates each venue's output against before release
 - `datasets/index.json` — every venue, its files, the release each dataset came from, and the
   licence
+- `datasets/latest.json` — only the index's `generatedAt` and `releases`, written from the same
+  object, so a consumer can poll it for new data. Consumers compare the release **tags**, never
+  `generatedAt`: the site deploys more than once per release (dispatched by both `data-calendar`
+  and `data-matched`), and `generatedAt` moves with every deploy whether the data changed or not
 
 **The index describes each venue**: name, type, group, address, coordinates, the venue's own
 listings URL and its page here, taken from the combined data the workflow downloads first. A file
@@ -348,7 +354,7 @@ come from one run and a mismatch is something to look into. The details sit besi
 `data` and `calendar` keys, so a reader of those is unaffected.
 
 **The names are fixed, not content-hashed**, because they are addresses other people link to,
-fetch on a schedule and subscribe to — the licence page, the venue pages' calendar subscription
+fetch on a schedule and subscribe to — the datasets page, the venue pages' calendar subscription
 links and the calendar page all use them. Freshness is a Cloudflare cache rule on `/datasets/`
 that makes them cacheable (`.ics` otherwise isn't) and respects the origin's TTL at the edge and
 in the browser, which is GitHub Pages' own `max-age=600`. It sits after the "Cache JSON blobs"
@@ -379,6 +385,35 @@ The download rules are the calendar's (above): retried, collected, and any file 
 fails the build, because a missing file 404s for whoever relied on it. The index is written last,
 so it only ever describes a complete set. A release that can't be listed fails the build too;
 only one that doesn't exist (a 404) is let through, as an empty index.
+
+## Data Status
+
+`/datasets/status` is the release history of the two published datasets: when they started, how
+many releases, the current and longest streak of days with one, a 90-day bar per dataset and the
+time of day releases land. It is a record of what has happened, with no commitment about what
+happens next — keep any SLA, notice period or guarantee off it.
+
+**The history is `clusterflick/data-analysed`'s release log**, not the releases API.
+`data-transformed` and `data-calendar` each dispatch its `Release Log` workflow as they publish,
+which appends `{ dataset, repository, tag, publishedAt }` to `release-log.jsonl` on a
+`release-log-YYYYMM` release. `npm run fetch-release-log` downloads every month by name into
+`/release-log/` (gitignored, read at build time, never published), and a missing past month or a
+failed download fails the build: a hole in the history would read as days without a release. The
+log is dispatched at the same moment as the site build, so it can be a release behind;
+`getReleaseStatus` adds index.json's releases to it.
+
+**Times are release times** (`publishedAt`), not deploy times. The files under `/datasets/` change
+when the site next deploys after a release, and the page says so rather than measuring it.
+
+**Today is the reader's, not the build's.** A pipeline that stops also stops the builds, so a page
+that only knew its build date would show a full row of green and an unbroken streak indefinitely.
+`useNow` renders the static HTML against the build time and then moves to the browser's clock, and
+the date-dependent parts (`getStreaks`, `getRecentDays`, `getDailyRange`) are redone against it.
+`ReleaseFreshness` does the same for "Last new data X hours ago", checks `/datasets/latest.json`
+for anything newer than the build, and turns into a warning past `STALE_AFTER_HOURS` (36). The
+time-of-day distribution (`getTimeOfDay`) is built once, from the `data` releases of the last 90
+days, with the calendar's lag behind them given as a figure rather than a second near-identical
+series.
 
 ## Near Me
 
