@@ -36,6 +36,7 @@ done
 
 npm run fetch-diffed-data
 npm run fetch-published-data
+npm run fetch-release-log
 
 rm -rf ./public/data
 npm run process-combined-data
