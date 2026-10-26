@@ -12,6 +12,8 @@
   --color-neon-pink: #f12869;
   --color-purple-accent: #643296;
   --color-white: #ffffff;
+  /* Status only, never decoration: a day with a release on /datasets/status */
+  --color-release-green: #2fbf71;
 
   /* RGB components for alpha variants */
   --color-black-rgb: 0, 0, 0;

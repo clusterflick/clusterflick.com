@@ -412,8 +412,8 @@ export default function AboutPage() {
             }
           >
             <p className={styles.licenceLink}>
-              <ButtonLink href="/data-licence" variant="secondary">
-                Read the data licence
+              <ButtonLink href="/datasets" variant="secondary">
+                About the datasets
               </ButtonLink>
             </p>
           </ContentSection>

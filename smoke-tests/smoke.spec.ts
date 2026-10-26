@@ -331,6 +331,7 @@ test.describe("Venue Calendar Page", () => {
 test.describe("Published Data", () => {
   const PUBLISHED_PATHS = [
     "/datasets/index.json",
+    "/datasets/latest.json",
     "/datasets/schema.json",
     `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
     `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
@@ -354,6 +355,49 @@ test.describe("Published Data", () => {
       data: `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
       calendar: `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
     });
+  });
+
+  // Pollers read latest.json instead of the index, so the two must agree, and
+  // it must stay small: anything more belongs in the index.
+  test("latest.json carries the index's releases and nothing else", async ({
+    request,
+  }) => {
+    const [latest, index] = await Promise.all(
+      ["/datasets/latest.json", "/datasets/index.json"].map(async (path) => {
+        const response = await request.get(path);
+        expect(response.status(), path).toBe(200);
+        return response.json();
+      }),
+    );
+
+    expect(Object.keys(latest).sort()).toEqual(["generatedAt", "releases"]);
+    expect(latest).toEqual({
+      generatedAt: index.generatedAt,
+      releases: index.releases,
+    });
+  });
+
+  test("the datasets page and its release history are served", async ({
+    page,
+  }) => {
+    await page.goto(`${SITE_URL}/datasets/`);
+    await expect(
+      page.getByRole("heading", { name: "Datasets", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("Last new data")).toBeVisible();
+
+    await page.goto(`${SITE_URL}/datasets/status/`);
+    await expect(
+      page.getByRole("heading", { name: "When releases land" }),
+    ).toBeVisible();
+  });
+
+  // The licence page used to document the datasets too, and people link to it
+  test("the data licence still links to the datasets", async ({ page }) => {
+    await page.goto(`${SITE_URL}/data-licence/`);
+    await expect(
+      page.getByRole("link", { name: "About the datasets" }),
+    ).toHaveAttribute("href", /\/datasets\/?$/);
   });
 
   test("the schema for the data files is served", async ({ request }) => {

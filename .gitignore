@@ -50,6 +50,7 @@ next-env.d.ts
 /combined-data/
 /matched-data/
 /diffed-data/
+/release-log/
 /public/data/
 /public/datasets/
 

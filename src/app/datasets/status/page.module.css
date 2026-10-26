@@ -1,0 +1,79 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lede {
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 16px 0 8px;
+  text-align: center;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+/* ─── Per-dataset figures ─── */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+@media (max-width: 640px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  background: rgba(var(--color-dark-navy-rgb), 0.6);
+}
+
+.stat dt {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-gray);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-white);
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.note {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-muted-gray);
+}
+
+/* ─── Time of day ─── */
+
+.facts {
+  margin: 20px 0 0;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.facts li + li {
+  margin-top: 8px;
+}

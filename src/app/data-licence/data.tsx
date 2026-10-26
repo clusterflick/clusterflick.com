@@ -1,32 +1,9 @@
 /**
- * The two datasets published for reuse, and the internal artifacts that are
- * not. Kept beside the page rather than in `src/data` because nothing else
- * needs them — the About page only mentions the datasets and links here.
+ * The credit to copy, and the internal artifacts that are not licensed for
+ * reuse. Kept beside the page rather than in `src/data` because nothing else
+ * needs them. Where the datasets live is in `@/app/datasets/data`, beside the
+ * page that documents them.
  */
-
-/**
- * Everything published lives under one address on our own domain, served from
- * the latest releases by `scripts/fetch-published-data.js`. The index is the
- * way in: it describes every venue, names its files and the releases they came
- * from.
- */
-export const DATA_INDEX_URL = "https://clusterflick.com/datasets/index.json";
-
-/** Describes the per-venue JSON files: the schema they are validated against. */
-export const DATA_SCHEMA_URL = "https://clusterflick.com/datasets/schema.json";
-
-export const LICENSED_DATASETS = [
-  {
-    name: "Data file per venue",
-    pattern: "https://clusterflick.com/datasets/venues/<venue-id>.json",
-    archive: "https://github.com/clusterflick/data-transformed/releases",
-  },
-  {
-    name: "Calendar file per venue",
-    pattern: "https://clusterflick.com/datasets/calendars/<venue-id>.ics",
-    archive: "https://github.com/clusterflick/data-calendar/releases",
-  },
-];
 
 /**
  * The same credit in the three forms people actually need to paste. Kept

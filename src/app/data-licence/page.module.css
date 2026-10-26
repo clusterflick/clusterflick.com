@@ -30,50 +30,10 @@
   margin: 0 0 20px;
 }
 
-/* ─── The two datasets ─── */
-
-.datasetList {
-  list-style: none;
-  margin: 0 0 28px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.datasetItem {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-/* Blue, as the snippet labels are: the colour this page gives to what you can
-   take away and use. */
-.datasetIcon {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  color: var(--color-electric-blue);
-  background: rgba(var(--color-electric-blue-rgb), 0.12);
-  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.35);
-}
-
-/* Nudged down so the first line sits level with the middle of the icon. */
-.datasetText {
-  font-size: 16px;
-  line-height: 1.7;
-  margin: 0;
-  padding-top: 8px;
-}
-
-/* The button closes the description of the datasets, so it takes the wider
-   gap a section break would, before the prose about what the licence covers. */
-.indexLink {
-  margin: 0 0 32px;
+/* Closes the description of what's covered, so it takes the wider gap a
+   section break would. */
+.datasetsLink {
+  margin: 8px 0 12px;
   text-align: center;
 }
 
