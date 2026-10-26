@@ -5,7 +5,14 @@
  *
  *   datasets/venues/<venue-id>.json     from clusterflick/data-transformed
  *   datasets/calendars/<venue-id>.ics   from clusterflick/data-calendar
- *   datasets/index.json                 every venue's files, and the releases
+ *   datasets/schema.json                the JSON files' schema, from
+ *                                       clusterflick/scripts
+ *   datasets/index.json                 every venue, its files, and the releases
+ *
+ * The index describes each venue as well as naming its files - name, type,
+ * address, coordinates and its page here - because a file named after a domain
+ * says nothing about where the cinema is. Those come from the combined data,
+ * which the workflow downloads before this runs.
  *
  * Both releases name each asset after the venue id with no extension
  * (`actonecinema.co.uk`). The names here are stable rather than content-hashed,
@@ -33,6 +40,22 @@ const path = require("node:path");
 
 const OUT_DIR = path.join(process.cwd(), "public", "datasets");
 const INDEX_PATH = path.join(OUT_DIR, "index.json");
+const SCHEMA_PATH = path.join(OUT_DIR, "schema.json");
+const COMBINED_DATA_PATH = path.join(
+  process.cwd(),
+  "combined-data",
+  "combined-data.json",
+);
+const SITE = "https://clusterflick.com";
+
+// The schema `transform` validates every venue's output against before it is
+// released, so it describes the files as published. Read from main because
+// that is what the pipeline runs.
+const SCHEMA = {
+  repository: "clusterflick/scripts",
+  path: "schema.json",
+  url: "https://raw.githubusercontent.com/clusterflick/scripts/main/schema.json",
+};
 
 const DATASETS = [
   {
@@ -102,13 +125,13 @@ const isRetryableStatus = (status) => status === 429 || status >= 500;
  * connection dropped part-way through a response is exactly the failure worth
  * retrying, and it happens while streaming, after the headers have arrived.
  */
-async function fetchWithRetry(url, label, read) {
+async function fetchWithRetry(url, label, read, requestHeaders = headers()) {
   let lastError;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
     try {
       const response = await fetch(url, {
-        headers: headers(),
+        headers: requestHeaders,
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
 
@@ -198,7 +221,59 @@ async function downloadAll(jobs) {
   return { entries, failures };
 }
 
+async function downloadSchema() {
+  const body = await fetchWithRetry(
+    SCHEMA.url,
+    `Failed downloading ${SCHEMA.repository} ${SCHEMA.path}`,
+    async (response) => {
+      const text = await response.text();
+      if (JSON.parse(text).type !== "array") {
+        throw new Error(`${SCHEMA.path} does not describe a JSON array`);
+      }
+      return text;
+    },
+    // A public file needs no token, and one GitHub doesn't accept for this
+    // repository turns the answer into a 404
+    { "User-Agent": "clusterflick.com-build" },
+  );
+  fs.writeFileSync(SCHEMA_PATH, body);
+}
+
+/**
+ * What the index says about each venue. Only the venue's public facts: the
+ * pipeline's own bookkeeping (structure, programming) and the social handles
+ * are left out, being either internal or someone else's to publish.
+ */
+async function getVenueDetails() {
+  if (!fs.existsSync(COMBINED_DATA_PATH)) {
+    throw new Error(
+      `${COMBINED_DATA_PATH} not found - download the latest clusterflick/data-combined release first.`,
+    );
+  }
+  const { venues } = JSON.parse(fs.readFileSync(COMBINED_DATA_PATH, "utf-8"));
+  // ESM-only; the same slug `getVenueUrl` builds a venue page's address from
+  const { default: slugify } = await import("@sindresorhus/slugify");
+
+  const details = {};
+  for (const [id, venue] of Object.entries(venues)) {
+    details[id] = {
+      name: venue.name,
+      type: venue.type,
+      ...(venue.groupName ? { groupName: venue.groupName } : {}),
+      address: venue.address,
+      geo: venue.geo,
+      url: venue.url,
+      page: `${SITE}/venues/${slugify(venue.name)}/`,
+    };
+  }
+  return details;
+}
+
 async function main() {
+  // Read before anything is deleted, so a missing download leaves the last
+  // set in place locally
+  const venueDetails = await getVenueDetails();
+
   fs.rmSync(OUT_DIR, { recursive: true, force: true });
   for (const { dir } of DATASETS) {
     fs.mkdirSync(path.join(OUT_DIR, dir), { recursive: true });
@@ -221,6 +296,11 @@ async function main() {
   }
 
   const { entries, failures } = await downloadAll(jobs);
+  try {
+    await downloadSchema();
+  } catch (error) {
+    failures.push(error.message);
+  }
 
   if (failures.length > 0) {
     // Every failure is reported, not just the one that happened to land first,
@@ -228,7 +308,7 @@ async function main() {
     // Capped, because an outage fails every asset at once and hundreds of
     // identical lines bury the summary that explains the exit code.
     console.error(
-      `\n${failures.length} of ${jobs.length} file(s) could not be downloaded after ${MAX_ATTEMPTS} attempts:`,
+      `\n${failures.length} of ${jobs.length + 1} file(s) could not be downloaded after ${MAX_ATTEMPTS} attempts:`,
     );
     for (const message of failures.slice(0, MAX_LOGGED_FAILURES)) {
       console.error(`   - ${message}`);
@@ -238,7 +318,9 @@ async function main() {
         `   - ...and ${failures.length - MAX_LOGGED_FAILURES} more`,
       );
     }
-    throw new Error(`${failures.length} of ${jobs.length} downloads failed.`);
+    throw new Error(
+      `${failures.length} of ${jobs.length + 1} downloads failed.`,
+    );
   }
 
   const venues = {};
@@ -251,6 +333,19 @@ async function main() {
     venues[venueId][key] = publishedPath;
   }
 
+  // A venue with files but no details would be the gap this index exists to
+  // fill. The releases come from the same pipeline run, so this is a mismatch
+  // to look into rather than to publish around.
+  const undescribed = Object.keys(venues).filter((id) => !venueDetails[id]);
+  if (undescribed.length > 0) {
+    throw new Error(
+      `${undescribed.length} venue(s) have published files but no details in the combined data: ${undescribed.join(", ")}`,
+    );
+  }
+  for (const id of Object.keys(venues)) {
+    venues[id] = { ...venueDetails[id], ...venues[id] };
+  }
+
   // Written last, so an index only ever describes a complete download.
   fs.writeFileSync(
     INDEX_PATH,
@@ -261,6 +356,7 @@ async function main() {
         terms: "https://clusterflick.com/data-licence/",
         generatedAt: new Date().toISOString(),
         releases,
+        schema: "/datasets/schema.json",
         venues,
       },
       null,

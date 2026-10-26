@@ -331,11 +331,12 @@ test.describe("Venue Calendar Page", () => {
 test.describe("Published Data", () => {
   const PUBLISHED_PATHS = [
     "/datasets/index.json",
+    "/datasets/schema.json",
     `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
     `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
   ];
 
-  test("the index names every venue's files and the releases", async ({
+  test("the index describes every venue, its files and the releases", async ({
     request,
   }) => {
     const response = await request.get("/datasets/index.json");
@@ -344,10 +345,21 @@ test.describe("Published Data", () => {
 
     expect(index.releases.data.tag).toBeTruthy();
     expect(index.releases.calendar.tag).toBeTruthy();
-    expect(index.venues[CALENDAR_VENUE_ID]).toEqual({
+    expect(index.schema).toBe("/datasets/schema.json");
+    expect(index.venues[CALENDAR_VENUE_ID]).toMatchObject({
+      name: expect.any(String),
+      address: expect.any(String),
+      geo: { lat: expect.any(Number), lon: expect.any(Number) },
+      page: `https://clusterflick.com/venues/${CALENDAR_VENUE_SLUG}/`,
       data: `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
       calendar: `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
     });
+  });
+
+  test("the schema for the data files is served", async ({ request }) => {
+    const response = await request.get("/datasets/schema.json");
+    expect(response.status()).toBe(200);
+    expect((await response.json()).type).toBe("array");
   });
 
   test("a venue's data and calendar files are served", async ({ request }) => {

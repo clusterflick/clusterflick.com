@@ -10,6 +10,7 @@ import { ButtonAnchor } from "@/components/button";
 import { CalendarIcon, FileCodeIcon } from "@/components/icons";
 import {
   DATA_INDEX_URL,
+  DATA_SCHEMA_URL,
   LICENSED_DATASETS,
   ATTRIBUTION_SNIPPETS,
   INTERNAL_REPOS,
@@ -68,8 +69,15 @@ export default function DataLicencePage() {
               </span>
               <p className={styles.datasetText}>
                 <strong>A JSON file for each venue</strong>, listing its
-                showings in a shared schema. The fullest form of the data, and
-                the one to build on.
+                showings in{" "}
+                <a
+                  href={DATA_SCHEMA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  a shared schema
+                </a>
+                . The fullest form of the data, and the one to build on.
               </p>
             </li>
             <li className={styles.datasetItem}>
@@ -130,15 +138,24 @@ export default function DataLicencePage() {
                 </dd>
               </div>
             ))}
+            <div className={styles.snippet}>
+              <dt className={styles.snippetLabel}>JSON schema</dt>
+              <dd className={styles.snippetValue}>
+                <pre>
+                  <code>{DATA_SCHEMA_URL}</code>
+                </pre>
+              </dd>
+            </div>
           </dl>
           <p className={styles.body}>
             Start from the{" "}
             <a href={DATA_INDEX_URL} target="_blank" rel="noopener noreferrer">
               index
             </a>
-            . It lists every venue id with the files published for it, and names
-            the release each dataset was built from, so you can tell whether
-            anything has changed since you last looked.
+            . It lists every venue by id with its name, type, address,
+            coordinates and page on Clusterflick, and the files published for
+            it. It also names the release each dataset was built from, so you
+            can tell whether anything has changed since you last looked.
           </p>
           <p className={styles.body}>
             Only the latest data is hosted here. Every earlier release is kept

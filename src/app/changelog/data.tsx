@@ -114,6 +114,18 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The published data&rsquo;s index now describes every venue, with its
+            name, type, address, coordinates and page here, rather than just
+            naming its files, and the schema the JSON files follow is published
+            beside them. Both are linked from the{" "}
+            <Link href="/data-licence">data licence</Link> page.
+          </>
+        ),
+      },
     ],
   },
   {

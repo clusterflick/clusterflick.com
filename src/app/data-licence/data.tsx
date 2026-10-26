@@ -7,9 +7,13 @@
 /**
  * Everything published lives under one address on our own domain, served from
  * the latest releases by `scripts/fetch-published-data.js`. The index is the
- * way in: it names every venue's files and the releases they came from.
+ * way in: it describes every venue, names its files and the releases they came
+ * from.
  */
 export const DATA_INDEX_URL = "https://clusterflick.com/datasets/index.json";
+
+/** Describes the per-venue JSON files: the schema they are validated against. */
+export const DATA_SCHEMA_URL = "https://clusterflick.com/datasets/schema.json";
 
 export const LICENSED_DATASETS = [
   {
