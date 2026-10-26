@@ -334,7 +334,18 @@ at on GitHub. `scripts/fetch-published-data.js` downloads the latest `data-trans
 
 - `datasets/venues/<venue-id>.json` — the venue's transformed listings
 - `datasets/calendars/<venue-id>.ics` — its calendar feed
-- `datasets/index.json` — every venue's files, the release each dataset came from, and the licence
+- `datasets/schema.json` — the JSON files' schema, from `clusterflick/scripts` (main), the one
+  `transform` validates each venue's output against before release
+- `datasets/index.json` — every venue, its files, the release each dataset came from, and the
+  licence
+
+**The index describes each venue**: name, type, group, address, coordinates, the venue's own
+listings URL and its page here, taken from the combined data the workflow downloads first. A file
+named after a domain says nothing about where the cinema is, and the licence page already counted
+the venue records as ours to give. Social handles and the pipeline's bookkeeping (`structure`,
+`programming`) are left out. A venue with files but no details fails the build, since the releases
+come from one run and a mismatch is something to look into. The details sit beside the existing
+`data` and `calendar` keys, so a reader of those is unaffected.
 
 **The names are fixed, not content-hashed**, because they are addresses other people link to,
 fetch on a schedule and subscribe to — the licence page, the venue pages' calendar subscription
