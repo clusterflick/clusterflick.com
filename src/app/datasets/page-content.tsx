@@ -70,7 +70,15 @@ export default function DatasetsPageContent({
 
         <ContentSection
           title="What's published"
-          intro="Two datasets, both covering every venue Clusterflick lists, both served from clusterflick.com."
+          intro={
+            <>
+              Two datasets, both covering every venue Clusterflick lists. Both
+              are free to use, including commercially, under CC BY 4.0 as long
+              as you credit Clusterflick; the film metadata from The Movie
+              Database inside them isn&apos;t ours to license. The{" "}
+              <Link href="/data-licence">data licence</Link> has the terms.
+            </>
+          }
         >
           <ul className={styles.datasetList}>
             <li className={styles.datasetItem}>
@@ -109,13 +117,6 @@ export default function DatasetsPageContent({
             >
               Open index.json
             </ButtonAnchor>
-          </p>
-          <p className={styles.body}>
-            Both are free to use, including commercially, as long as you credit
-            Clusterflick. The film metadata from The Movie Database inside them
-            is not ours to license. The{" "}
-            <Link href="/data-licence">data licence</Link> has the terms, the
-            credit to copy, and which fields that covers.
           </p>
         </ContentSection>
 

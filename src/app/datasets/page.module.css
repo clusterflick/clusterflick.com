@@ -62,10 +62,10 @@
   padding-top: 8px;
 }
 
-/* The button closes the description of the datasets, so it takes the wider
-   gap a section break would, before the prose about what the licence covers. */
+/* The button closes the section, so it keeps the bottom margin the prose in
+   every other section ends on. */
 .indexLink {
-  margin: 0 0 32px;
+  margin: 0 0 20px;
   text-align: center;
 }
 
