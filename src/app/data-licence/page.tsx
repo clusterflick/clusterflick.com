@@ -6,7 +6,7 @@ import PageHeader from "@/components/page-header";
 import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
-import { ButtonLink } from "@/components/button";
+import DataPageLinks from "@/app/datasets/data-page-links";
 import { ATTRIBUTION_SNIPPETS, INTERNAL_REPOS } from "./data";
 import styles from "./page.module.css";
 
@@ -74,11 +74,9 @@ export default function DataLicencePage() {
             You can redistribute it, build on it, and sell what you build. There
             is no non-commercial restriction and no share-alike requirement.
           </p>
-          <p className={styles.datasetsLink}>
-            <ButtonLink href="/datasets" variant="secondary">
-              About the datasets
-            </ButtonLink>
-          </p>
+          <div className={styles.dataPageLinks}>
+            <DataPageLinks current="licence" />
+          </div>
         </ContentSection>
 
         <ContentSection

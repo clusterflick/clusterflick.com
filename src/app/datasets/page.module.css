@@ -12,14 +12,12 @@
 
 /* ─── How fresh the data is ─── */
 
+/* The freshness line, then the way to the other two data pages */
 .freshness {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   margin: 8px 0 32px;
-}
-
-.statusLink {
-  margin: 10px 0 0;
-  text-align: right;
-  font-size: 15px;
 }
 
 /* ─── The two datasets ─── */
@@ -60,13 +58,6 @@
   line-height: 1.7;
   margin: 0;
   padding-top: 8px;
-}
-
-/* The button closes the section, so it keeps the bottom margin the prose in
-   every other section ends on. */
-.indexLink {
-  margin: 0 0 20px;
-  text-align: center;
 }
 
 /* ─── Attribution snippets ─── */

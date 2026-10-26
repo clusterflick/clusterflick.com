@@ -32,9 +32,8 @@
 
 /* Closes the description of what's covered, so it takes the wider gap a
    section break would. */
-.datasetsLink {
+.dataPageLinks {
   margin: 8px 0 12px;
-  text-align: center;
 }
 
 /* ─── Attribution snippets ─── */

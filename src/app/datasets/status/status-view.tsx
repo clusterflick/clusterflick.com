@@ -15,6 +15,7 @@ import {
   RECENT_DAYS,
   type ReleaseStatus,
 } from "@/utils/release-status";
+import DataPageLinks from "../data-page-links";
 import styles from "./page.module.css";
 
 interface StatusViewProps {
@@ -73,6 +74,14 @@ export default function StatusView({ status, latestUrl }: StatusViewProps) {
         </strong>{" "}
         releases across both datasets.
       </p>
+      <div className={styles.intro}>
+        <p>
+          This is the release history of the two datasets Clusterflick publishes
+          for reuse. What&apos;s in them, how to use them and the terms
+          they&apos;re published under each have a page of their own.
+        </p>
+        <DataPageLinks current="status" />
+      </div>
 
       {datasets.map((dataset) => (
         <ContentSection

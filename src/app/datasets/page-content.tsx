@@ -2,7 +2,7 @@ import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import ReleaseFreshness from "@/components/release-freshness";
-import { ButtonAnchor, ButtonLink } from "@/components/button";
+import { ButtonLink } from "@/components/button";
 import { CalendarIcon, FileCodeIcon } from "@/components/icons";
 import type { ReleaseStatus } from "@/utils/release-status";
 import {
@@ -11,6 +11,7 @@ import {
   DATA_SCHEMA_URL,
   LICENSED_DATASETS,
 } from "./data";
+import DataPageLinks from "./data-page-links";
 import styles from "./page.module.css";
 
 const LATEST_EXAMPLE = `{
@@ -63,9 +64,7 @@ export default function DatasetsPageContent({
             builtAt={status.builtAt}
             latestUrl={latestUrl}
           />
-          <p className={styles.statusLink}>
-            <Link href="/datasets/status">See the release history</Link>
-          </p>
+          <DataPageLinks current="datasets" />
         </div>
 
         <ContentSection
@@ -108,16 +107,6 @@ export default function DatasetsPageContent({
               </p>
             </li>
           </ul>
-          <p className={styles.indexLink}>
-            <ButtonAnchor
-              href={DATA_INDEX_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="secondary"
-            >
-              Open index.json
-            </ButtonAnchor>
-          </p>
         </ContentSection>
 
         <ContentSection
