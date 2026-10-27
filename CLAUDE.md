@@ -1331,6 +1331,34 @@ the same one the film's URL is built from, so it is stable across releases; the
 slug is derived from the title, as `getMovieUrl` does. The rules restrict the
 document to the list fields, so a new list needs a rules change too.
 
+**Film details live in a second document, `users/{uid}/meta/films`**
+(`@/lib/user-lists/film-details`): each listed film's genres, directors,
+top-billed cast, runtime and language, with names stored once in a `people`
+map. They are for stats on the Seen list and filtering the watchlist, both
+by things a list entry doesn't carry and a departed film no longer has in
+the dataset. A separate document because the lists load on every page for the
+markers, and credits would triple them for data only `/personalise` reads.
+Ids are TheMovieDB's, which the dataset's genre and person ids already are.
+
+- **Captured on add** from the dataset (`recordFilmDetails` in the user
+  context), after the list write and best effort: details can be fetched
+  again, and a failure must never lose an add. Films not in the loaded
+  dataset — a departed page, a TMDB search result, an import TMDB found — get
+  none yet; a backfill through the search Worker is the planned fill.
+- **Cast stops at five** (`FILM_DETAILS_CAST_LIMIT`): favourite actors are
+  leading roles, and the document has a 1 MiB limit.
+- **Unmatched films get no details.** Their genres are only the venue's
+  categories or the Uncategorised placeholder; stats should count them as
+  "without details", not guess.
+- **Removing a film leaves its details**, so readers join the document on the
+  lists rather than reading it alone.
+- **Its fields are exempt from indexing** (`firestore.indexes.json`), since
+  every map key and array element counts toward the 40,000 index entries a
+  document may have. Deploy rules and indexes with the Firebase CLI before the
+  site: without the rule, deleting an account fails on this document.
+- **Not your ratings.** Letterboxd's diary carries them, but nothing here
+  could change them afterwards, so they would go stale.
+
 **Controls live under the poster on the film's page** (`UserListButtons`),
 and under film search results, never on browsing-grid posters. Signed out, the
 buttons link to `/personalise`, which makes them the way in to
@@ -1551,8 +1579,9 @@ will show, so its server component passes every logo path in
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.
 
-**Deleting an account deletes the lists first**: once the account is gone, the
-rules let nobody delete its document. Firebase may refuse the account deletion
+**Deleting an account deletes the lists first**, film details included (a
+subcollection isn't deleted with its parent): once the account is gone, the
+rules let nobody delete its documents. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
 finish.
 
