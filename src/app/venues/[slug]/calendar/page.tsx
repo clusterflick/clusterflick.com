@@ -136,7 +136,11 @@ export default async function VenueCalendarPage({
       afterContent={
         calendarPath ? (
           <div className={styles.calendarWrapper}>
-            <VenueCalendar calendarPath={calendarPath} venueName={venue.name} />
+            <VenueCalendar
+              calendarPath={calendarPath}
+              venueId={venue.id}
+              venueName={venue.name}
+            />
           </div>
         ) : undefined
       }

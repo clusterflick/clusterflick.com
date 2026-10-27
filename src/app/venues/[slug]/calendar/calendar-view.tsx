@@ -6,11 +6,13 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import type { EventClickArg, EventMountArg } from "@fullcalendar/core";
+import { getScreeningFilterUrl } from "@/utils/get-screening-filter-url";
 import styles from "./calendar.module.css";
 
 interface CalendarViewProps {
   /** Same-origin URL of the venue's published ICS feed. */
   calendarPath: string;
+  venueId: string;
   venueName: string;
 }
 
@@ -20,6 +22,7 @@ const NARROW_VIEWPORT = "(max-width: 720px)";
 
 export default function CalendarView({
   calendarPath,
+  venueId,
   venueName,
 }: CalendarViewProps) {
   // This component only ever renders in the browser (it is loaded with
@@ -54,14 +57,21 @@ export default function CalendarView({
     return () => query.removeEventListener("change", onChange);
   }, []);
 
-  // Events carry the venue's own website as their URL. Rather than navigating
-  // the calendar away, open it in a new tab so the page you were reading stays
-  // where it was.
+  // Events carry the film's page on this site as their URL. The page narrows it
+  // to this venue and the screening's day, so the film opens on the showing
+  // that was clicked; the feed itself keeps the bare address, since filters are
+  // this site's business, not the published data's. A new tab keeps the
+  // calendar where it was, and with `noopener` starts with its own session
+  // storage, so these filters never replace the ones the reader had here.
   const onEventClick = (info: EventClickArg) => {
     info.jsEvent.preventDefault();
-    if (info.event.url) {
-      window.open(info.event.url, "_blank", "noopener,noreferrer");
-    }
+    const { url, start } = info.event;
+    if (!url) return;
+    window.open(
+      start ? getScreeningFilterUrl(url, venueId, start.getTime()) : url,
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
 
   // Titles are truncated to one line in the month grid, so the full one goes on
