@@ -14,12 +14,13 @@ const PAGES: Array<{ page: DataPage; href: string; label: string }> = [
 ];
 
 /**
- * The other two of the three published-data pages - what the datasets are,
- * the terms they're under and their release history - as a centred row of
- * buttons. One list, in one order, so each page points at the others the same
- * way and under the same names.
+ * The three published-data pages - what the datasets are, the terms they're
+ * under and their release history - as a centred row of buttons, less the one
+ * being read. One list, in one order, so each page points at the others the
+ * same way and under the same names. Without `current` (the About page) it
+ * links all three.
  */
-export default function DataPageLinks({ current }: { current: DataPage }) {
+export default function DataPageLinks({ current }: { current?: DataPage }) {
   return (
     <p className={styles.links}>
       {PAGES.filter(({ page }) => page !== current).map(({ href, label }) => (

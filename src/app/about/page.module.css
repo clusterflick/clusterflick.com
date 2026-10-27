@@ -102,8 +102,7 @@
   margin: 32px 0 16px;
 }
 
-/* The licence sits alongside the format cards rather than under them — it is
-   the terms those downloads come with, not an afterthought. */
-.licenceLink {
+/* The published-data pages, under the Showing Data intro. */
+.dataLinks {
   margin-top: 28px;
 }

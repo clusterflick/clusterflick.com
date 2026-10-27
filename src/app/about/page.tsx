@@ -4,7 +4,7 @@ import Link from "next/link";
 import HeroSection from "@/components/hero-section";
 import LinkCard, { CardContent, CardIcon } from "@/components/link-card";
 import { EmailIcon } from "@/components/icons";
-import { ButtonLink } from "@/components/button";
+import DataPageLinks from "@/app/datasets/data-page-links";
 import Divider from "@/components/divider";
 import OutlineHeading from "@/components/outline-heading";
 import PageHeader from "@/components/page-header";
@@ -411,11 +411,9 @@ export default function AboutPage() {
               </>
             }
           >
-            <p className={styles.licenceLink}>
-              <ButtonLink href="/datasets" variant="secondary">
-                About the datasets
-              </ButtonLink>
-            </p>
+            <div className={styles.dataLinks}>
+              <DataPageLinks />
+            </div>
           </ContentSection>
         </div>
       </div>
