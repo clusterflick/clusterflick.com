@@ -9,6 +9,10 @@ across London cinemas into a single, searchable interface. Compare screenings,
 find showtimes, and discover what's on — whether you're chasing new releases or
 cult classics.
 
+This repository is the website. The data pipeline that feeds it, and the rest of
+the tooling, live across the
+[Clusterflick organisation](https://github.com/clusterflick).
+
 ## Features
 
 - **Unified Cinema Listings** — Browse film screenings from 450+ London venues
