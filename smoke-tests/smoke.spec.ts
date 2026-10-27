@@ -377,6 +377,18 @@ test.describe("Published Data", () => {
     });
   });
 
+  // The way in for an agent that looks for one (https://llmstxt.org), which
+  // should land on the datasets rather than scrape the pages.
+  test("llms.txt is served and points at the datasets", async ({ request }) => {
+    const response = await request.get("/llms.txt");
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("text/plain");
+
+    const text = await response.text();
+    expect(text).toMatch(/^# Clusterflick\n/);
+    expect(text).toContain("https://clusterflick.com/datasets/index.json");
+  });
+
   test("the datasets page and its release history are served", async ({
     page,
   }) => {
