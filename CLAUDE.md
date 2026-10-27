@@ -833,6 +833,13 @@ finished, so a selection isn't described as not showing while its films are
 still arriving. Past six chips the selection collapses to a count, since a
 watchlist would otherwise push every other filter off the screen.
 
+**The overlay can select the watchlist too.** A "My Watchlist" chip sits above
+the Films row's search for a signed-in reader with anything on the list, and
+selects the same snapshot "Explore watchlist" does (`selectMovies`). Before it,
+watchlist films at My Venues meant leaving for `/personalise` and coming back
+through its link. The chip reads as checked while the selection is exactly the
+watchlist; its count is the films on it that are showing.
+
 It widens as "All films", beside the people: a selection left over from
 another page is exactly the invisible blocker the empty state exists to name.
 

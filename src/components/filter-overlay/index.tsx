@@ -94,6 +94,7 @@ export default function FilterOverlay({
     togglePerson,
     clearPeople,
     toggleMovie,
+    selectMovies,
     clearMovies,
     toggleProgramme,
     clearProgrammes,
@@ -157,6 +158,13 @@ export default function FilterOverlay({
         (id) => metaData?.venues[id] !== undefined,
       ),
     [favouriteVenues, metaData],
+  );
+
+  // Every id on the watchlist, not just the films showing: the same snapshot
+  // "Explore watchlist" links to, so the two select the same thing.
+  const watchlistIds = useMemo(
+    () => (lists ? Object.keys(lists[UserListId.Watchlist]) : []),
+    [lists],
   );
 
   // "Hide films I've seen", offered once the Seen list has loaded. Switching it
@@ -689,7 +697,9 @@ export default function FilterOverlay({
       <MovieFilterSection
         vocabulary={movieVocabulary}
         selected={filterState.movies}
+        watchlistIds={watchlistIds}
         toggleMovie={toggleMovie}
+        selectMovies={selectMovies}
         clearMovies={clearMovies}
       />
     ),

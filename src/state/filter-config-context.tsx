@@ -243,6 +243,7 @@ type FilterConfigContextType = {
   clearPeople: (filterId: PeopleFilterId) => void;
   // Films — a chosen set of film ids (e.g. a watchlist)
   toggleMovie: (movieId: string) => void;
+  selectMovies: (movieIds: string[]) => void;
   clearMovies: () => void;
   // Minimum score on one rating source; null clears it
   setRating: (filterId: RatingFilterId, min: number | null) => void;
@@ -526,6 +527,16 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
         updated.length > 0 ? updated : null,
       );
     });
+  }, []);
+
+  const selectMovies = useCallback((movieIds: string[]) => {
+    setFilterState((prev) =>
+      filterManager.set(
+        prev,
+        FilterId.Movies,
+        movieIds.length > 0 ? [...movieIds] : null,
+      ),
+    );
   }, []);
 
   const clearMovies = useCallback(() => {
@@ -900,6 +911,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       togglePerson,
       clearPeople,
       toggleMovie,
+      selectMovies,
       clearMovies,
       toggleProgramme,
       clearProgrammes,
@@ -947,6 +959,7 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       togglePerson,
       clearPeople,
       toggleMovie,
+      selectMovies,
       clearMovies,
       toggleProgramme,
       clearProgrammes,
