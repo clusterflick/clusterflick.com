@@ -19,12 +19,20 @@ const CalendarView = dynamic(() => import("./calendar-view"), {
 
 interface VenueCalendarProps {
   calendarPath: string;
+  venueId: string;
   venueName: string;
 }
 
 export default function VenueCalendar({
   calendarPath,
+  venueId,
   venueName,
 }: VenueCalendarProps) {
-  return <CalendarView calendarPath={calendarPath} venueName={venueName} />;
+  return (
+    <CalendarView
+      calendarPath={calendarPath}
+      venueId={venueId}
+      venueName={venueName}
+    />
+  );
 }

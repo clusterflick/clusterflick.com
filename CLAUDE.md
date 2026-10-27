@@ -284,7 +284,13 @@ first means one log line distinguishes a single flaky venue from an outage.
 The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
 This is deliberate dogfooding: the page reads exactly what subscribers read, so anything wrong in
 the feed shows up here. Events carry the film's page on this site as their `URL`, not a booking
-link, so a click opens `/movies/<id>/<slug>` in a new tab. The feed builds that address itself,
+link, so a click opens `/movies/<id>/<slug>` in a new tab. The page adds the filters for that
+screening (`getScreeningFilterUrl`: `base=all`, the venue, the screening's London day), so the
+film opens on the showing that was clicked rather than every showing across London; `base=all`
+because the default event types would hide a quiz or talk. The feed keeps the bare address —
+filters are this site's behaviour, not the published data's — and the new tab's `noopener`
+gives it its own session storage, so the reader's filters in the calendar's tab are left alone.
+The feed builds that address itself,
 from the same combined release the site builds from — it has to agree with `getMovieUrl` exactly,
 since a static export has no dynamic route to catch a near-miss.
 
