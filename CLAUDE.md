@@ -1580,6 +1580,13 @@ indexed more slowly than old ones left; the durable pages (venues, boroughs,
 groups, clubs, festivals, genres, formats) are the ones search can build on.
 A film that returns drops the tag on the next build.
 
+**`/llms.txt` leads agents to the datasets** (`src/app/llms.txt/`). Little is
+known to read it, which is why it is small: the published datasets first, by
+the constants in `@/app/datasets/data`, then the site's URL shapes and index
+pages. It never lists pages one by one, since the sitemap does that and they
+change weekly, and there is no `llms-full.txt`. `content.test.ts` checks
+that every page it links is one the site builds, at its canonical address.
+
 **A page's `<title>` names what it is found by**, not just what it is called.
 Film pages read "Heat (1995) — Showtimes in London" (a departed film keeps
 the bare name, having none), venue pages "Prince Charles Cinema — What's On
