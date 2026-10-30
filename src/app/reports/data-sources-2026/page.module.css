@@ -1,0 +1,126 @@
+.lead p {
+  font-size: 18px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 32px 0 60px;
+}
+
+@media (min-width: 700px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+.stat dd {
+  margin: 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-neon-pink);
+}
+
+.stat dt {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 24px 0;
+}
+
+.method {
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.method li {
+  margin-bottom: 12px;
+}
+
+.points {
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 24px 0 0;
+}
+
+.points li {
+  margin-bottom: 12px;
+}
+
+.badge {
+  font-size: 0.6em;
+  color: var(--color-muted-gray);
+  margin-left: 8px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.clashes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.clashes thead th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-gray);
+  font-weight: 600;
+  padding: 0 12px 8px 0;
+}
+
+.clashes tbody th,
+.clashes td {
+  text-align: left;
+  vertical-align: middle;
+  padding: 10px 12px 10px 0;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+.clashes tbody th {
+  font-weight: 700;
+}
+
+.clashes td:nth-child(2) {
+  color: var(--color-light-gray);
+}
+
+/* On a phone the "what it gives us" column is the one to lose. */
+@media (max-width: 599px) {
+  .clashes thead th:nth-child(2),
+  .clashes td:nth-child(2) {
+    display: none;
+  }
+}
