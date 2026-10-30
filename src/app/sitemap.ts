@@ -21,6 +21,7 @@ import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getCollectionsData } from "@/utils/get-collections-data";
 import { getCollectionUrl } from "@/utils/get-collection-url";
+import { REPORTS, getReportUrl } from "@/data/reports";
 import {
   buildUpdates,
   getUpdateDayPath,
@@ -176,6 +177,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // A report is a fixed snapshot: it changes only if it's corrected.
+  const reportPages = [
+    { path: "/reports", lastModified: REPORTS[0]?.asOf },
+    ...REPORTS.map((report) => ({
+      path: getReportUrl(report),
+      lastModified: report.asOf,
+    })),
+  ].map(({ path, lastModified }) => ({
+    url: pageUrl(path),
+    lastModified: lastModified ?? data.generatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
   const staticPages = [
     {
       url: pageUrl("/"),
@@ -255,6 +270,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...updateDayPages,
+    ...reportPages,
     festivalListPage,
     filmClubListPage,
     cinemaGroupListPage,

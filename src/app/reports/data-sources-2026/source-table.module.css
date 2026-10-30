@@ -1,0 +1,137 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.row {
+  display: block;
+  padding: 16px 0;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.1);
+  /* Clear the sticky header when a row is jumped to by its anchor. */
+  scroll-margin-top: 100px;
+}
+
+.row:target {
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+}
+
+.row th,
+.row td {
+  display: block;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.row td::before {
+  content: attr(data-label);
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-gray);
+  margin-bottom: 4px;
+}
+
+.source {
+  font-weight: 400;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.covers,
+.method,
+.note,
+.meta {
+  display: block;
+}
+
+.covers {
+  color: var(--color-muted-gray);
+  font-size: 13px;
+}
+
+.method {
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+.note {
+  color: var(--color-light-gray);
+  margin-top: 6px;
+}
+
+.meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+@media (min-width: 900px) {
+  .table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+
+  .table thead th {
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted-gray);
+    font-weight: 600;
+    padding: 0 16px 8px 0;
+  }
+
+  .row {
+    display: table-row;
+  }
+
+  .row th,
+  .row td {
+    display: table-cell;
+    vertical-align: top;
+    padding: 16px 16px 16px 0;
+    border-top: 1px solid rgba(var(--color-white-rgb), 0.1);
+  }
+
+  .row td::before {
+    content: none;
+  }
+
+  .source {
+    width: 18%;
+  }
+
+  .row td:nth-child(2) {
+    width: 26%;
+  }
+
+  .row td:nth-child(3) {
+    width: 22%;
+  }
+}
