@@ -65,6 +65,13 @@ export class FilmsPage {
     return (await firstTitle.textContent())?.trim() ?? null;
   }
 
+  async getFirstPosterHref(): Promise<string | null> {
+    return await this.page
+      .locator(POSTER_SELECTOR)
+      .first()
+      .getAttribute("href");
+  }
+
   async clickFirstPoster() {
     await this.page.locator(POSTER_SELECTOR).first().click();
   }
