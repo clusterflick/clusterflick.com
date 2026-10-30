@@ -2,6 +2,12 @@
   margin-bottom: 60px;
 }
 
+/* A section linked to as #id lands below the fixed 63px site header, with
+   room to spare, rather than with its heading underneath it. */
+.section[id] {
+  scroll-margin-top: 83px;
+}
+
 .title {
   font-size: 32px;
   font-weight: 700;

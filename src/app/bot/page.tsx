@@ -59,8 +59,11 @@ export default function BotPage() {
             Every listing on Clusterflick links directly to the venue&apos;s own
             booking page. Clusterflick doesn&apos;t sell tickets. The listing
             data that powers Clusterflick is also published openly under a{" "}
-            <Link href="/data-licence">CC BY 4.0 licence</Link>, and other
-            London film sites use it.
+            <Link href="/data-licence">CC BY 4.0 licence</Link>, and{" "}
+            <Link href="/about#built-with-clusterflick">
+              other London film sites
+            </Link>{" "}
+            use it.
           </p>
           <div className={styles.dataPageLinks}>
             <DataPageLinks />
