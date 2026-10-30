@@ -1049,4 +1049,24 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "native-spirit-festival",
+    name: "Native Spirit Festival",
+    url: "https://nativespiritfoundation.org/",
+    aliases: ["native-spirit", "native-spirit-film-festival", "nsff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Native Spirit Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Native Spirit Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Native Spirit Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Native Spirit Film Festival",
+      },
+    ],
+  },
 ];
