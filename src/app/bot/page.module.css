@@ -1,0 +1,30 @@
+/* Hero */
+.hero {
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 56px;
+  margin-bottom: 24px;
+}
+
+.tagline {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+/* Prose only, so the data licence page's narrow measure. */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
