@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
@@ -29,6 +30,16 @@ export default function BotPage() {
         align="center"
         className={styles.hero}
       >
+        {/* Decorative: the heading below already says what it is. */}
+        <div className={styles.robot}>
+          <Image
+            src="/images/icons/neon-robot.png"
+            alt=""
+            width={180}
+            height={149}
+            priority
+          />
+        </div>
         <OutlineHeading className={styles.title}>
           The Clusterflick bot
         </OutlineHeading>

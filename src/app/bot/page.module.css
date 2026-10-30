@@ -3,6 +3,11 @@
   padding-bottom: 60px;
 }
 
+.robot {
+  margin: 10px auto 24px;
+  opacity: 0.75;
+}
+
 .title {
   font-size: 56px;
   margin-bottom: 24px;
