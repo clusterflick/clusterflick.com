@@ -83,6 +83,8 @@ export default function BotPage() {
             If the bot is causing problems for your site, or a listing is wrong,
             email{" "}
             <a href="mailto:hello@clusterflick.com">hello@clusterflick.com</a>.
+          </p>
+          <p className={styles.body}>
             If you&apos;d rather your venue wasn&apos;t listed, get in touch and
             tell me why.
           </p>
