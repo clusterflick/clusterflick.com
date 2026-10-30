@@ -353,7 +353,7 @@ export const DATA_SOURCES: DataSource[] = [
     termsDate: "2025-06",
     readInBrowser: true,
     termsNote:
-      "Access is licensed for “personal and non-commercial use”, excluding “any use of data mining, robots, or similar data gathering and extraction tools”. Holding an account means agreeing to this.",
+      "Access is licensed for “personal and non-commercial use”, excluding “any use of data mining, robots, or similar data gathering and extraction tools”. These are the terms linked from cinebur.com, and they say they cover the app. The app’s sign-up form says that signing up means agreeing to Cinebur’s terms, with nothing to tick, and links them to cinebur.com/legal, which returned 404.",
   },
   {
     id: "clyx",

@@ -352,9 +352,12 @@ export default function DataSources2026Report() {
             <li>
               <strong>We hold an account at one source.</strong>{" "}
               {linkTo("cinebur")}&apos;s listings can only be read signed in, so
-              we read them through a Clusterflick account, and holding one means
-              agreeing to terms that exclude &ldquo;data mining, robots, or
-              similar data gathering and extraction tools&rdquo;.
+              we read them through a Clusterflick account. Its sign-up form says
+              that signing up means agreeing to Cinebur&apos;s terms, with
+              nothing to tick, but links to a page that returns 404. The terms
+              linked from its website say they cover the app, and exclude
+              &ldquo;data mining, robots, or similar data gathering and
+              extraction tools&rdquo;.
             </li>
             <li>
               <strong>&ldquo;Non-commercial&rdquo; is never defined.</strong>{" "}
