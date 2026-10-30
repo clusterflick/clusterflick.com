@@ -227,7 +227,8 @@ export default function Lewisham2026Report() {
             Two are volunteer-run community cinemas,{" "}
             {communityCinemas.map((v) => v.name).join(" and ")}, with{" "}
             {communityCinemas.reduce((sum, v) => sum + v.screenings, 0)}{" "}
-            screenings between them. The borough&apos;s best-known volunteer cinema,{" "}
+            screenings between them. The borough&apos;s best-known volunteer
+            cinema,{" "}
             <Link href="/film-clubs/deptford-cinema">Deptford Cinema</Link>,
             lost its home on Deptford Broadway in 2020 and has screened as
             pop-ups ever since.
