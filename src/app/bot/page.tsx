@@ -42,12 +42,14 @@ export default function BotPage() {
       <Divider />
 
       <div className={styles.content}>
-        <ContentSection title="What it collects">
+        <ContentSection title="What it uses">
           <p className={styles.body}>
             Factual scheduling information: which film is showing, where and
             when, the format, accessibility details such as subtitled or
-            audio-described screenings, and the link to book. It doesn&apos;t
-            collect synopses, marketing copy, images or prices.
+            audio-described screenings, and the link to book. The bot saves
+            pages as it finds them, but only those facts are used. Your
+            synopses, marketing copy, images and prices don&apos;t appear on
+            Clusterflick or in its published data.
           </p>
         </ContentSection>
 
