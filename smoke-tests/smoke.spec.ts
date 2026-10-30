@@ -94,15 +94,24 @@ test.describe("Films Grid (browse & filter)", () => {
     await filmsPage.screenshot("after-scroll-middle");
   });
 
-  test("search for first movie title shows exactly 1 match", async () => {
+  test("search for first movie title narrows the grid to that movie", async () => {
     const firstMovieTitle = await filmsPage.getFirstMovieTitle();
+    const firstMovieHref = await filmsPage.getFirstPosterHref();
+    const posterCountBefore = await filmsPage.countVisiblePosters();
     expect(firstMovieTitle).toBeTruthy();
+    expect(firstMovieHref).toBeTruthy();
 
     await filmsPage.searchForMovie(firstMovieTitle!);
 
+    // Not "exactly 1": search ignores punctuation and matches substrings, so a
+    // one-word title also finds every title containing that word ("#Cult"
+    // finds "Rio Forever Cult Lates"). The grid is in title order and this was
+    // its first film, so it stays first in any subset of it.
     await expect(async () => {
       const searchResultCount = await filmsPage.countVisiblePosters();
-      expect(searchResultCount).toBe(1);
+      expect(searchResultCount).toBeGreaterThanOrEqual(1);
+      expect(searchResultCount).toBeLessThan(posterCountBefore);
+      expect(await filmsPage.getFirstPosterHref()).toBe(firstMovieHref);
     }).toPass({ timeout: 5000 });
 
     await filmsPage.screenshot("after-search");
