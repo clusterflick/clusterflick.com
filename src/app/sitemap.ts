@@ -178,15 +178,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // A report is a fixed snapshot: it changes only if it's corrected.
-  const reportPages = [
-    { path: "/reports", lastModified: REPORTS[0]?.asOf },
-    ...REPORTS.map((report) => ({
-      path: getReportUrl(report),
-      lastModified: report.asOf,
-    })),
-  ].map(({ path, lastModified }) => ({
-    url: pageUrl(path),
-    lastModified: lastModified ?? data.generatedAt,
+  const reportPages = REPORTS.map((report) => ({
+    url: pageUrl(getReportUrl(report)),
+    lastModified: report.asOf,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));

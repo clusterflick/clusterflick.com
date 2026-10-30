@@ -138,12 +138,6 @@ export default function DataSources2026Report() {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Reports",
-          item: "https://clusterflick.com/reports",
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
           name: title,
           item: `https://clusterflick.com${URL_PATH}`,
         },
@@ -160,8 +154,6 @@ export default function DataSources2026Report() {
       <StandardPageLayout
         title={title}
         subtitle={`A Clusterflick report · Checked on ${checkedOn}`}
-        backUrl="/reports"
-        backText="All reports"
       >
         <div className={styles.lead}>
           <p>
