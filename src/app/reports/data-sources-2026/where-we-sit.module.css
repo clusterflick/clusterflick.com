@@ -10,7 +10,8 @@
 
 .table {
   width: 100%;
-  min-width: 760px;
+  /* Below this the cells are too narrow for a name like DesignMyNight. */
+  min-width: 920px;
   border-collapse: separate;
   border-spacing: 4px;
   table-layout: fixed;
@@ -93,6 +94,7 @@
 }
 
 .names {
+  overflow-wrap: anywhere;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -130,7 +132,7 @@
   color: var(--color-muted-gray);
 }
 
-@media (min-width: 800px) {
+@media (min-width: 1000px) {
   .scrollHint {
     display: none;
   }

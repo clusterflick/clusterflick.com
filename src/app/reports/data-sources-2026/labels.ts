@@ -36,9 +36,10 @@ export const TERMS_LABELS: Record<TermsVerdict, string> = {
   bans: "Bans automated access",
 };
 
-// Colour says how strongly a site objects: pink forbids, yellow is
-// borderline, blue limits what can be done with the content, gray says
-// nothing about it. The label always says it in words too.
+// Colour says how far we are from a site's rules: pink is a clash, yellow
+// is arguable (access limited without naming scraping, or reuse of the
+// content limited), gray says nothing either way. The label always says
+// which in words too.
 export const ROBOTS_COLORS: Record<RobotsVerdict, TagColor> = {
   "not-applicable": "gray",
   none: "gray",
@@ -51,7 +52,7 @@ export const TERMS_COLORS: Record<TermsVerdict, TagColor> = {
   licence: "gray",
   "none-found": "gray",
   silent: "gray",
-  restricts: "blue",
+  restricts: "yellow",
   borderline: "yellow",
   bans: "pink",
 };

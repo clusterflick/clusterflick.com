@@ -1,5 +1,6 @@
 .table {
   width: 100%;
+  overflow-wrap: break-word;
   border-collapse: collapse;
   font-size: 14px;
   line-height: 1.5;

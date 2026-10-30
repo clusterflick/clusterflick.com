@@ -39,6 +39,9 @@ const inBoth = clashes.filter(
 const borderline = DATA_SOURCES.filter(
   (source) => source.terms === "borderline",
 );
+const limitsReuse = DATA_SOURCES.filter(
+  (source) => source.terms === "restricts",
+);
 const robotsAllowsButTermsBan = DATA_SOURCES.filter(
   (source) => source.robots === "allows" && source.terms === "bans",
 );
@@ -308,6 +311,12 @@ export default function DataSources2026Report() {
             . Their terms limit how the site may be accessed without naming
             scraping, or ban it on a site whose reach over the pages we read
             isn&apos;t clear.
+          </p>
+          <p className={styles.body}>
+            Another {limitsReuse.length} say nothing about automated access but
+            limit copying, republishing or commercial use of their content. We
+            show their listings, so that&apos;s arguable too, and they&apos;re
+            marked in yellow rather than counted as clashes.
           </p>
         </ContentSection>
 
