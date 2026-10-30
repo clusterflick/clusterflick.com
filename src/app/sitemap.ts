@@ -235,6 +235,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     {
+      url: pageUrl("/bot"),
+      lastModified: data.generatedAt,
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    },
+    {
       url: pageUrl("/venues"),
       lastModified: data.generatedAt,
       changeFrequency: "weekly" as const,

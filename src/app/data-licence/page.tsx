@@ -218,8 +218,10 @@ export default function DataLicencePage() {
               <a href="mailto:hello@clusterflick.com">hello@clusterflick.com</a>{" "}
               and ask. We would rather answer than have you guess. If you build
               something, tell us — there is a list of{" "}
-              <Link href="/about">sites built on this data</Link> and we&apos;d
-              like to add you to it.
+              <Link href="/about#built-with-clusterflick">
+                sites built on this data
+              </Link>{" "}
+              and we&apos;d like to add you to it.
             </>
           }
         />

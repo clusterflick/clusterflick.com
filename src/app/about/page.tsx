@@ -352,6 +352,7 @@ export default function AboutPage() {
           />
 
           <ContentSection
+            id="built-with-clusterflick"
             title="Built with Clusterflick"
             as="h3"
             align="center"

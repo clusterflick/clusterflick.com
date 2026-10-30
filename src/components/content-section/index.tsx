@@ -31,6 +31,8 @@ interface ContentSectionProps {
   children?: ReactNode;
   /** Optional className for the section container */
   className?: string;
+  /** Optional id, so the section can be linked to as `#id` */
+  id?: string;
 }
 
 /**
@@ -47,6 +49,7 @@ export default function ContentSection({
   action,
   children,
   className = "",
+  id,
 }: ContentSectionProps) {
   const alignmentClass = align === "center" ? styles.centered : "";
 
@@ -67,7 +70,10 @@ export default function ContentSection({
   );
 
   return (
-    <section className={clsx(styles.section, alignmentClass, className)}>
+    <section
+      id={id}
+      className={clsx(styles.section, alignmentClass, className)}
+    >
       {action ? (
         <div className={styles.titleRow}>
           {heading}
