@@ -48,6 +48,7 @@ const OTHER_NOTES: [note: string, festivalId: string][] = [
     "Part of 200 Years of Photography\nPart of Fashion in Film Festival",
     "fashion-in-film-festival",
   ],
+  ["Part of Native Spirit Festival", "native-spirit-festival"],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
@@ -294,5 +295,27 @@ describe("Romanian Film Festival title matchers", () => {
     expect(claims("RFF: GIRLFRIENDS + CLAUDIA WEILL", "curzon.com-soho")).toBe(
       false,
     );
+  });
+});
+
+describe("Native Spirit Festival title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "native-spirit-festival")!;
+
+  const claims = (title: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "Native Spirit Festival 20th Edition: World Indigenous-led Cinema",
+    "Native Spirit Film Festival: Opening Night",
+  ])("claims %s", (title) => {
+    expect(claims(title)).toBe(true);
+  });
+
+  it("does not claim a film merely titled Native Spirit", () => {
+    expect(claims("Native Spirit")).toBe(false);
   });
 });
