@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 function FestivalBlurb() {
   return (
     <section>
@@ -11,12 +9,8 @@ function FestivalBlurb() {
         Native Filmmakers, talks and performances&rdquo;.
       </p>
       <p>
-        The 20th edition brings an international programme of
-        Indigenous-produced films to the{" "}
-        <Link href="/venues/institute-of-advanced-legal-studies">
-          Institute of Advanced Legal Studies
-        </Link>{" "}
-        in Russell Square on 11 and 14 November 2026.
+        Its London programme is an international selection of
+        Indigenous-produced films.
       </p>
     </section>
   );

@@ -48,6 +48,7 @@ const OTHER_NOTES: [note: string, festivalId: string][] = [
     "Part of 200 Years of Photography\nPart of Fashion in Film Festival",
     "fashion-in-film-festival",
   ],
+  ["Part of Native Spirit Festival", "native-spirit-festival"],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
