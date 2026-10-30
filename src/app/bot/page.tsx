@@ -35,7 +35,7 @@ export default function BotPage() {
           Clusterflick is a free listings site covering every screening at over
           450 London cinemas. I run it as a personal project. To keep it up to
           date, a bot collects listings from cinema websites and ticketing
-          platforms twice a day, at around 6am and 6pm UK time.
+          platforms twice a day, at around 4am and 4pm UK time.
         </p>
       </HeroSection>
 
@@ -47,16 +47,15 @@ export default function BotPage() {
             Factual scheduling information: which film is showing, where and
             when, the format, accessibility details such as subtitled or
             audio-described screenings, and the link to book. It doesn&apos;t
-            collect synopses, marketing copy, images or prices, and it never
-            logs in or accesses anything behind an account or paywall.
+            collect synopses, marketing copy, images or prices.
           </p>
         </ContentSection>
 
         <ContentSection title="What happens to it">
           <p className={styles.body}>
             Every listing on Clusterflick links directly to the venue&apos;s own
-            booking page. I don&apos;t sell tickets. The processed listings are
-            also published openly under a{" "}
+            booking page. Clusterflick doesn&apos;t sell tickets. The processed
+            listings are also published openly under a{" "}
             <Link href="/data-licence">CC BY 4.0 licence</Link>, and other
             London film sites use them.
           </p>
