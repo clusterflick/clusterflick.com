@@ -6,6 +6,7 @@ import PageHeader from "@/components/page-header";
 import SiteFooter from "@/components/site-footer";
 import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
+import DataPageLinks from "@/app/datasets/data-page-links";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -61,6 +62,9 @@ export default function BotPage() {
             <Link href="/data-licence">CC BY 4.0 licence</Link>, and other
             London film sites use it.
           </p>
+          <div className={styles.dataPageLinks}>
+            <DataPageLinks />
+          </div>
         </ContentSection>
 
         <ContentSection title="How it behaves">

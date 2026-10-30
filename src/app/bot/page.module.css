@@ -28,3 +28,9 @@
   line-height: 1.7;
   margin: 0 0 20px;
 }
+
+/* Closes the section on the published data, so it takes the wider gap a
+   section break would. */
+.dataPageLinks {
+  margin: 8px 0 12px;
+}
