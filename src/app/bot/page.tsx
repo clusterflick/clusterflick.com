@@ -33,9 +33,9 @@ export default function BotPage() {
         </OutlineHeading>
         <p className={styles.tagline}>
           Clusterflick is a free listings site covering every screening at over
-          450 London cinemas. I run it as a personal project. To keep it up to
-          date, a bot collects listings from cinema websites and ticketing
-          platforms twice a day, at around 4am and 4pm UK time.
+          450 London cinemas. To keep it up to date, a bot collects listings
+          from cinema websites and ticketing platforms twice a day, at around
+          4am and 4pm UK time.
         </p>
       </HeroSection>
 
@@ -78,7 +78,7 @@ export default function BotPage() {
             email{" "}
             <a href="mailto:hello@clusterflick.com">hello@clusterflick.com</a>.
             If you&apos;d rather your venue wasn&apos;t listed, get in touch and
-            tell me why. I read everything and will reply.
+            tell me why.
           </p>
         </ContentSection>
       </div>
