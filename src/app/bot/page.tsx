@@ -53,13 +53,13 @@ export default function BotPage() {
           </p>
         </ContentSection>
 
-        <ContentSection title="What happens to it">
+        <ContentSection title="What happens to the data">
           <p className={styles.body}>
             Every listing on Clusterflick links directly to the venue&apos;s own
-            booking page. Clusterflick doesn&apos;t sell tickets. The processed
-            listings are also published openly under a{" "}
+            booking page. Clusterflick doesn&apos;t sell tickets. The listing
+            data that powers Clusterflick is also published openly under a{" "}
             <Link href="/data-licence">CC BY 4.0 licence</Link>, and other
-            London film sites use them.
+            London film sites use it.
           </p>
         </ContentSection>
 
