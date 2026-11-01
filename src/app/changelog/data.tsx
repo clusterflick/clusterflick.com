@@ -71,6 +71,66 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-10-30",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Native Spirit Festival"
+              url="https://nativespiritfoundation.org/"
+            />
+            , the annual UK festival of Indigenous film, media and arts, running
+            since 2007, whose London programme is an international selection of
+            Indigenous-produced films.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Published a report on{" "}
+            <Link href="/reports/data-sources-2026">
+              where Clusterflick&rsquo;s data comes from
+            </Link>
+            : every place listings and film data are fetched from, how
+            they&rsquo;re fetched, and what each site&rsquo;s robots.txt and
+            terms ask of automated visitors.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added a page about <Link href="/bot">the Clusterflick bot</Link>,
+            for anyone who spots it in their logs: what it collects from cinema
+            and ticketing websites, how it behaves and how to get in touch.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-27",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Signed in, a My Watchlist chip in the filters&rsquo; Films row now
+            selects the films on your watchlist, so you can combine them with
+            any other filter (your watchlist at My Venues, say) without going
+            via <Link href="/personalise">Personalise</Link>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-26",
     changes: [
       {
@@ -179,6 +239,21 @@ export const CHANGELOG: ChangelogDay[] = [
   {
     date: "2026-10-25",
     changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Romanian Film Festival UK"
+              url="https://www.rofilmfest.co.uk/"
+            />
+            , bringing recent Romanian features, documentaries and restorations
+            to the UK with filmmaker and cast Q&amp;As, in London from 2 to 7
+            December.
+          </>
+        ),
+      },
       {
         tag: "New venue",
         body: ({ Venue }) => (
@@ -525,6 +600,22 @@ export const CHANGELOG: ChangelogDay[] = [
     ],
   },
   {
+    date: "2026-10-17",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/catalogue">catalogue</Link> and{" "}
+            <Link href="/planner">planner</Link> now keep your filters in the
+            address, so going from the grid to a film, on to a name in its cast
+            and then back returns you to the grid as you left it.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-14",
     changes: [
       {
@@ -570,6 +661,16 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Double bills, marathons and shorts programmes now count as the films
+            they screen, so they turn up when you filter by genre, director or
+            cast, and on the <Link href="/genres">genre pages</Link>.
+          </>
+        ),
+      },
     ],
   },
   {
@@ -608,6 +709,22 @@ export const CHANGELOG: ChangelogDay[] = [
   {
     date: "2026-10-10",
     changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Women and the World International Film Festival"
+              url="https://www.iffww.com/"
+            />
+            , bringing fiction features, documentaries and shorts to London from
+            5 to 12 November, alongside panels and masterclasses, with a focus
+            this year on the role of women in shaping peace, security and
+            defence.
+          </>
+        ),
+      },
       {
         tag: "New venue",
         body: ({ Venue }) => (
