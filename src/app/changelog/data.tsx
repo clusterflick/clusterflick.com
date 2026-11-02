@@ -80,6 +80,38 @@ export const CHANGELOG: ChangelogDay[] = [
             Added{" "}
             <VenueList
               items={[
+                { name: "Mosaic Rooms", url: "https://mosaicrooms.org" },
+                {
+                  name: "Museum of Youth Culture",
+                  url: "https://www.museumofyouthculture.com",
+                },
+                {
+                  name: "Pretty Decent Blackhorse Road",
+                  url: "https://prettydecentbeer.co",
+                },
+                {
+                  name: "Pretty Decent Forest Gate",
+                  url: "https://prettydecentbeer.co",
+                },
+                {
+                  name: "Pretty Decent Victoria Park",
+                  url: "https://prettydecentbeer.co",
+                },
+              ]}
+            />
+            : a Cromwell Road gallery, a Camden museum of youth culture, and the
+            three taprooms of an east London brewery that each show their own
+            film for its Sunday Movie Club.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
                 {
                   name: "Bonny Downs Community Association",
                   url: "https://bonnydowns.org",
