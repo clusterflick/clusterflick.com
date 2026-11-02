@@ -71,6 +71,60 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-02",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Bonny Downs Community Association",
+                  url: "https://bonnydowns.org",
+                },
+                { name: "Chats Palace", url: "https://www.chatspalace.com" },
+                {
+                  name: "Four Corners",
+                  url: "https://www.fourcornersfilm.co.uk",
+                },
+                {
+                  name: "Red Door Studios",
+                  url: "https://www.throughthereddoor.org",
+                },
+                {
+                  name: "Second Home Spitalfields",
+                  url: "https://secondhome.io",
+                },
+                {
+                  name: "St Francis at The Engine Room",
+                  url: "https://engineroom.org.uk",
+                },
+                {
+                  name: "The Art House by Acrylicize",
+                  url: "https://thearthouse.live",
+                },
+                { name: "The Bear Church", url: "https://www.thebear.tv" },
+                { name: "The Portico", url: "https://www.theportico.uk" },
+                {
+                  name: "Walworth Living Room",
+                  url: "https://www.walworthlivingroom.org",
+                },
+                {
+                  name: "Wapping Powerhouse",
+                  url: "https://www.wappingpowerhouse.org",
+                },
+              ]}
+            />
+            , from arts centres and churches to community spaces, a workspace
+            and a former hydraulic power station.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-30",
     changes: [
       {
