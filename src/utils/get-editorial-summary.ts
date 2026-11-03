@@ -61,6 +61,15 @@ export function getEditorialSummary(): EditorialSummary | null {
     const content = readFileSync(summaryPath, "utf-8");
     const summary = JSON.parse(content) as EditorialSummary;
     if (!summary.text) return null;
+    // Still renders, as prose with nothing featured, but a file this old is
+    // usually a local one left over from before highlights: `npm run dev`
+    // doesn't regenerate it, so say so rather than quietly showing the fallback.
+    const filmLinks = (summary.links ?? []).filter((link) => link.movieId);
+    if (filmLinks.length > 0 && filmLinks.every((link) => !link.highlight)) {
+      console.warn(
+        "editorial-summary.json has no highlights, so the home page will feature nothing. It predates them: run `npm run generate-summary` to rebuild it.",
+      );
+    }
     return summary;
   } catch {
     return null;
