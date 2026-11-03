@@ -99,6 +99,16 @@ describe("getFeaturedScreenings", () => {
     expect(featured.map((f) => f.movieId)).toEqual(["wide"]);
   });
 
+  it("doesn't feature a short title where the text names a longer one", () => {
+    const linksHerSmell = { ...herLink, phrase: "Her Smell", movieId: "ran" };
+    const featured = getFeaturedScreenings(
+      summary("Her Smell is on.", [herLink, linksHerSmell]),
+      data,
+      NOW,
+    );
+    expect(featured.map((f) => f.movieId)).toEqual(["ran"]);
+  });
+
   it("carries the reason, the showing and what the card shows", () => {
     const [ran] = getFeaturedScreenings(summary("Ran.", [ranLink]), data, NOW);
     expect(ran).toEqual({

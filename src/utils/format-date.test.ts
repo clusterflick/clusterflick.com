@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  formatRelativeDay,
   addLondonDays,
   dateStringToLondonTimestamp,
   getDaysFromNow,
@@ -91,5 +92,32 @@ describe("getDaysFromNow", () => {
     vi.useFakeTimers();
     vi.setSystemTime(Date.parse("2026-03-26T12:00:00Z"));
     expect(getDaysFromNow(Date.parse("2026-03-29T23:30:00Z"))).toBe(4);
+  });
+});
+
+describe("formatRelativeDay", () => {
+  // Tuesday 3 November 2026, 12:00 in London.
+  const now = Date.UTC(2026, 10, 3, 12);
+  const on = (days: number, hour = 19) =>
+    Date.UTC(2026, 10, 3 + days, hour, 30);
+
+  it("names today and tomorrow", () => {
+    expect(formatRelativeDay(on(0), now)).toBe("Today");
+    expect(formatRelativeDay(on(1), now)).toBe("Tomorrow");
+  });
+
+  it("uses the weekday for the rest of the week, long or short", () => {
+    expect(formatRelativeDay(on(5), now)).toBe("Sunday");
+    expect(formatRelativeDay(on(5), now, { weekday: "short" })).toBe("Sun");
+  });
+
+  it("uses the date from a week out, where a weekday would mean this one", () => {
+    expect(formatRelativeDay(on(7), now)).toBe("Tue 10 Nov");
+  });
+
+  it("counts London days, not 24-hour spans", () => {
+    // 23:30 tonight and 00:30 tomorrow are an hour apart but a day apart.
+    expect(formatRelativeDay(on(0, 23), now)).toBe("Today");
+    expect(formatRelativeDay(on(1, 0), now)).toBe("Tomorrow");
   });
 });

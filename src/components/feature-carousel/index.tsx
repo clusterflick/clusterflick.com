@@ -41,8 +41,10 @@ interface FeatureCarouselProps {
   label?: string;
 }
 
-const posterUrl = (path: string, size: "w342" | "w500") =>
-  `https://image.tmdb.org/t/p/${size}${path}`;
+// One size for both the fan and the wash, so each poster is fetched once: the
+// wash's blur hides the extra detail, and a second size would be a second
+// download of every poster above the fold.
+const posterUrl = (path: string) => `https://image.tmdb.org/t/p/w500${path}`;
 
 /**
  * A full-width feature that rotates through a few films, each with its poster
@@ -60,7 +62,10 @@ export default function FeatureCarousel({
 }: FeatureCarouselProps) {
   const [requested, setRequested] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [held, setHeld] = useState(false);
+  // Separate, because either ending must not release the other: a reader who
+  // clicked a tab and moved the mouse away still has focus in the carousel.
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   // False through hydration, when the media query still reads false: timing a
   // bar then would end it at once for a reduced-motion reader, whose bars the
@@ -73,7 +78,7 @@ export default function FeatureCarousel({
   // The list can shrink on the client, as showings lapse.
   const active = Math.min(requested, count - 1);
   const rotates = hydrated && count > 1 && !reducedMotion;
-  const running = rotates && !paused && !held;
+  const running = rotates && !paused && !hovered && !focused;
   const item = items[active];
 
   const select = (index: number) => setRequested((index + count) % count);
@@ -93,11 +98,13 @@ export default function FeatureCarousel({
       className={styles.feature}
       aria-roledescription="carousel"
       aria-label={label}
-      onMouseEnter={() => setHeld(true)}
-      onMouseLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setHeld(false);
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setFocused(false);
+        }
       }}
     >
       <div className={styles.wash} aria-hidden="true">
@@ -106,7 +113,7 @@ export default function FeatureCarousel({
             key={slide.id}
             className={clsx(styles.washLayer, index === active && styles.on)}
             style={{
-              backgroundImage: `url(${posterUrl(slide.posterPath, "w342")})`,
+              backgroundImage: `url(${posterUrl(slide.posterPath)})`,
             }}
           />
         ))}
@@ -169,7 +176,7 @@ export default function FeatureCarousel({
           {items.map((slide, index) => (
             <Image
               key={slide.id}
-              src={posterUrl(slide.posterPath, "w500")}
+              src={posterUrl(slide.posterPath)}
               alt=""
               width={500}
               height={750}

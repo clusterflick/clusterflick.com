@@ -28,17 +28,18 @@ const COUNT_UP_MS = 1400;
 const format = (value: number) => value.toLocaleString("en-GB");
 
 /**
- * A row of large linked figures, for the scale of something at a glance. Each
- * figure counts up from zero once, the first time the band scrolls into view.
+ * A row of large linked figures, for the scale of something at a glance. When
+ * the band starts below the fold, each figure counts up from zero as it
+ * scrolls into view; a band already on screen at load keeps its numbers.
  *
  * The static HTML carries the real numbers, and so does any reader who prefers
- * reduced motion: the count-up only ever rewrites text that is already right.
+ * reduced motion.
  */
 export default function StatsBand({
   items,
   label = "At a glance",
 }: StatsBandProps) {
-  const bandRef = useRef<HTMLDivElement>(null);
+  const bandRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const band = bandRef.current;
@@ -46,10 +47,30 @@ export default function StatsBand({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const numbers = [...band.querySelectorAll<HTMLElement>("[data-value]")];
+    const showReal = () => {
+      for (const number of numbers) {
+        number.textContent = format(Number(number.dataset.value));
+      }
+    };
     let frame = 0;
+    // Only ever counts figures nobody has read yet. A band already in view
+    // when the page loads keeps the numbers its static HTML painted, since
+    // zeroing them then would be a flicker over text being read. Off screen,
+    // they are zeroed unseen and count up as the band scrolls in.
+    let armed = false;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
+        const entry = entries[entries.length - 1];
+        if (!armed) {
+          if (entry.isIntersecting) {
+            observer.disconnect();
+            return;
+          }
+          armed = true;
+          for (const number of numbers) number.textContent = format(0);
+          return;
+        }
+        if (entry.intersectionRatio < 0.4) return;
         observer.disconnect();
         const start = performance.now();
         const step = (now: number) => {
@@ -64,44 +85,42 @@ export default function StatsBand({
         };
         frame = requestAnimationFrame(step);
       },
-      { threshold: 0.4 },
+      { threshold: [0, 0.4] },
     );
     observer.observe(band);
     return () => {
       observer.disconnect();
       cancelAnimationFrame(frame);
       // Leave the real figures behind if unmounted mid-count.
-      for (const number of numbers) {
-        number.textContent = format(Number(number.dataset.value));
-      }
+      showReal();
     };
   }, [items]);
 
   return (
-    <div ref={bandRef} className={styles.band} role="list" aria-label={label}>
+    <ul ref={bandRef} className={styles.band} aria-label={label}>
       {items.map((item) => (
-        <Link
-          key={item.id}
-          href={item.href}
-          role="listitem"
-          className={clsx(styles.stat, item.highlight && styles.highlight)}
-          aria-label={[format(item.value), item.label, item.detail]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          <span className={styles.value} data-value={item.value} aria-hidden>
-            {format(item.value)}
-          </span>
-          <span className={styles.label} aria-hidden>
-            {item.label}
-          </span>
-          {item.detail && (
-            <span className={styles.detail} aria-hidden>
-              {item.detail}
+        <li key={item.id} className={styles.item}>
+          <Link
+            href={item.href}
+            className={clsx(styles.stat, item.highlight && styles.highlight)}
+            aria-label={[format(item.value), item.label, item.detail]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <span className={styles.value} data-value={item.value} aria-hidden>
+              {format(item.value)}
             </span>
-          )}
-        </Link>
+            <span className={styles.label} aria-hidden>
+              {item.label}
+            </span>
+            {item.detail && (
+              <span className={styles.detail} aria-hidden>
+                {item.detail}
+              </span>
+            )}
+          </Link>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

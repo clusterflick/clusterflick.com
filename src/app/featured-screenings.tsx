@@ -73,7 +73,15 @@ export function FeaturedPicks({
   summary: ReactNode;
 }) {
   const { now, upcoming } = useUpcoming(featured, builtAt);
-  if (upcoming.length === 0) return null;
+  // Every pick has started since the build: the summary still stands, as it
+  // does for a summary with nothing to feature, rather than going with them.
+  if (upcoming.length === 0) {
+    return summary ? (
+      <div className={styles.summaryFallback}>
+        <div className={styles.summary}>{summary}</div>
+      </div>
+    ) : null;
+  }
   return (
     <section className={styles.picks} aria-labelledby="picks-title">
       <h2 id="picks-title" className={styles.groupTitle}>

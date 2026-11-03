@@ -362,6 +362,39 @@ export function formatDayAndDate(time: number): string {
   });
 }
 
+const longWeekdayFormatter = new Intl.DateTimeFormat("en-GB", {
+  weekday: "long",
+  timeZone: LONDON_TIMEZONE,
+});
+
+const shortWeekdayFormatter = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short",
+  timeZone: LONDON_TIMEZONE,
+});
+
+/**
+ * A showing's day as a reader would say it, relative to `now`: "Today",
+ * "Tomorrow", the weekday for the rest of the week ("Sunday", or "Sun" with
+ * `weekday: "short"`), and the date from a week out ("Tue 10 Nov"), where a
+ * bare weekday would read as this one. The one wording for a showing's day,
+ * shared by the home page's picks, the watchlist's notes and Local Venues.
+ */
+export function formatRelativeDay(
+  time: number,
+  now: number,
+  { weekday = "long" }: { weekday?: "long" | "short" } = {},
+): string {
+  const days = getLondonDaysBetween(now, time);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  if (days > 1 && days < 7) {
+    return (
+      weekday === "long" ? longWeekdayFormatter : shortWeekdayFormatter
+    ).format(time);
+  }
+  return formatDayAndDate(time);
+}
+
 /**
  * Get the number of days from now (in London time) to a given timestamp.
  * Uses London timezone to ensure consistency with showings display.

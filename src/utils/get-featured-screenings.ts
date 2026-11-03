@@ -7,11 +7,11 @@ import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getRating } from "@/utils/movie-ratings.mjs";
 import {
-  formatDayAndDate,
+  formatRelativeDay,
   formatShowingTime,
-  getLondonDaysBetween,
   MS_PER_DAY,
 } from "@/utils/format-date";
+import { findSummaryMentions } from "@/utils/summary-mentions";
 
 /** The home page's picks: at most this many, in the order the summary names them. */
 export const FEATURED_LIMIT = 6;
@@ -57,22 +57,6 @@ export interface FeaturedScreening {
   weekShowings: number;
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/**
- * Where the summary first names `phrase`, matched as `linkifySummary` matches
- * it (case-insensitive, not inside a longer word), or -1.
- */
-function findMention(text: string, phrase: string): number {
-  const pattern = new RegExp(
-    `(?<![A-Za-z0-9])${escapeRegExp(phrase)}(?![A-Za-z0-9])`,
-    "i",
-  );
-  return text.search(pattern);
-}
-
 function getCredit(movie: Movie, data: CinemaData): string | null {
   const directors = (movie.directors ?? [])
     .map((id) => data.people[id]?.name)
@@ -103,16 +87,26 @@ export function getFeaturedScreenings(
 ): FeaturedScreening[] {
   if (!summary) return [];
 
-  const mentioned = (summary.links ?? [])
-    .map((link) => ({ link, index: findMention(summary.text, link.phrase) }))
-    .filter(({ link, index }) => link.movieId && link.highlight && index >= 0)
-    .sort((a, b) => a.index - b.index);
+  // Matched over every link, venues included, exactly as the prose's links
+  // are: a film title inside a venue's name is the venue's, not the film's.
+  const links = summary.links ?? [];
+  const mentioned = findSummaryMentions(
+    summary.text,
+    links.map((link) => link.phrase),
+  ).flatMap(({ phrase }) =>
+    links.filter(
+      (link) =>
+        link.phrase.toLowerCase() === phrase.toLowerCase() &&
+        link.movieId &&
+        link.highlight,
+    ),
+  );
 
   const weekEnd = now + 7 * MS_PER_DAY;
   const seen = new Set<string>();
   const featured: FeaturedScreening[] = [];
 
-  for (const { link } of mentioned) {
+  for (const link of mentioned) {
     const movieId = link.movieId!;
     const highlight = link.highlight!;
     const movie = data.movies[movieId];
@@ -157,23 +151,9 @@ export function getFeaturedScreenings(
   return featured;
 }
 
-const longWeekday = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  timeZone: "Europe/London",
-});
-
-/**
- * "Tomorrow, 19:30", "Sunday, 19:30", or "Tue 10 Nov, 18:00" a week or more
- * out, where a bare weekday would read as this one.
- */
+/** "Tomorrow, 19:30", "Sunday, 19:30", or "Tue 10 Nov, 18:00" a week or more out. */
 export function formatFeaturedWhen(time: number, now: number): string {
-  const days = getLondonDaysBetween(now, time);
-  let day: string;
-  if (days === 0) day = "Today";
-  else if (days === 1) day = "Tomorrow";
-  else if (days > 1 && days < 7) day = longWeekday.format(time);
-  else day = formatDayAndDate(time);
-  return `${day}, ${formatShowingTime(time)}`;
+  return `${formatRelativeDay(time, now)}, ${formatShowingTime(time)}`;
 }
 
 /**

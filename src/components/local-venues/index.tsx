@@ -5,9 +5,8 @@ import type { LocalVenue } from "@/utils/get-local-venues";
 import { formatShortDistance } from "@/utils/geo-distance";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import {
+  formatRelativeDay,
   formatShowingTime,
-  getDaysFromNow,
-  LONDON_TIMEZONE,
   timestampToLondonDateString,
 } from "@/utils/format-date";
 import styles from "./local-venues.module.css";
@@ -20,13 +19,7 @@ interface LocalVenuesProps {
 
 /** "Today", "Tomorrow", or the weekday — a local's next few are all this week. */
 function formatDay(time: number): string {
-  const days = getDaysFromNow(time, 1);
-  if (days === 0) return "Today";
-  if (days === 1) return "Tomorrow";
-  return new Date(time).toLocaleDateString("en-GB", {
-    weekday: "short",
-    timeZone: LONDON_TIMEZONE,
-  });
+  return formatRelativeDay(time, Date.now(), { weekday: "short" });
 }
 
 /**
