@@ -1,0 +1,79 @@
+/* Card chrome matches the editorial summary note it grew out of. */
+.card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 12px;
+  color: inherit;
+  font-weight: 400;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.card:hover {
+  color: inherit;
+  background: rgba(var(--color-neon-pink-rgb), 0.05);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.55);
+  transform: translateY(-2px);
+}
+
+.poster {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px -10px rgba(var(--color-black-rgb), 0.9);
+  transition: transform 0.3s ease;
+}
+
+.card:hover .poster {
+  transform: scale(1.04) rotate(-1deg);
+}
+
+.body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  align-content: start;
+}
+
+.label {
+  justify-self: start;
+}
+
+.title {
+  margin: 4px 0 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-white);
+  text-wrap: balance;
+  transition: color 0.25s ease;
+}
+
+.card:hover .title {
+  color: var(--color-neon-pink);
+}
+
+.credit {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.footer {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
+.footer strong {
+  color: var(--color-white);
+}

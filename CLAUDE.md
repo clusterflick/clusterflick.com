@@ -73,6 +73,10 @@ covers the need. The canonical components are:
 - **Posters:** `FilmPosterGrid` (browsing grid, title on hover),
   `PosterTile` + `PosterTileList` (compact tile with title and detail below,
   plus an optional control)
+- **Home page:** `FeatureCarousel` (a few films rotating full-width),
+  `PickCard` (a film picked for a reason, with when and where), `StatsBand`
+  (large linked figures that count up), `OccasionRow` (wide cards leading
+  with what makes a screening an occasion)
 - **Programmes:** `ProgrammeCard` (a festival, club or list with films
   showing: logo, a fan of posters, the next screening), `EventCard` (the same
   with nothing showing), `FestivalTimeline` (festivals as bars across the
@@ -154,6 +158,71 @@ the one a reader browsing for the club would look under first; a club that fits 
 programme mostly sits (Queer Horror Nights is queer, Sick Girl Films is horror). The kind applies
 whether or not the club has anything on: a dormant club is listed by name only, and moves into its
 group as soon as a screening matches.
+
+## Home Page Top
+
+The home page opens with three things built from data the build already has:
+a `FeatureCarousel` of up to four films, the `h1` over a `StatsBand` of the
+week's scale, and "This Week's Picks" as `PickCard`s, with the summary's prose
+folded beneath them. The discovery rows follow, except that "Sagas & Series"
+is left out with fewer than `COLLECTION_ROW_MIN` (2) collections, applied in
+`computeDiscoveryRows` so the build-time rows and the client's agree: a row of
+one collection reads as broken.
+
+The lead and the summary are dense with names, so their text is muted grey and
+their links bold light grey with a faint underline rather than the global blue,
+which made them read as a page of references. They still turn pink on hover.
+
+**Two rows have a layout of their own**, the two whose point a poster can't
+show. The rest stay poster rows, which scan easily once the top of the page
+carries the variety.
+
+- **More Than a Screening** is an `OccasionRow`: wide cards that lead with the
+  occasion ("Live score by …") in large type, the film beneath, the poster
+  blurred behind as a wash. They lead with the occasion rather than a label so
+  they don't read as more picks. `getOccasionMovies` carries the `occasion`
+  (label, time, venue id), and `getOccasionRowItems` turns it into cards for
+  both this row and `/near-me`'s, which differ only in where a card leads: the
+  home page opens the film on its full schedule, `/near-me` on its nearby
+  showings.
+- **Last Chance** keeps its posters with a yellow "Ends Thu 5 Nov" `badge` on
+  each (`PosterRow`'s top-left corner; top-right is the list markers), since the
+  subtitle only shows on hover on desktop and the date is the point of the row.
+  It comes from `getLastChanceMovies`, so `/near-me`'s Last Chance has it too.
+
+**The picks are the films the editorial summary names**, in the order it names
+them (`getFeaturedScreenings`). The summary's `links` cover every candidate the
+model was shown, most of which the prose leaves out, so a link is only used
+once the text mentions it. `generate-summary.mjs` gives each film link a
+`highlight`: the list that claimed it (`kind`), a card label, and the showing
+the highlight is about. Each film is claimed by exactly one list, so the label
+always agrees with why the prose names it. A film picked for its reach
+(`popular`) has no showing and shows its week's count instead. The label's
+colour follows the kind (`TONE_BY_KIND`): blue for a format, pink for a night
+that won't come round again, yellow for a final showing, grey otherwise.
+
+A summary written before highlights existed features nothing, and its prose is
+shown as before. A highlight is skipped rather than guessed when its film or
+venue has left the dataset or its showing has started.
+
+**The hero uses posters, not backdrops.** Backdrop stills were tried and the
+poster read better: it keeps the site's colours, each slide looks alike, and
+plenty of films have no good still. The pipeline doesn't publish film
+backdrops anyway. The poster is blurred behind the section as a wash, which is
+masked out at the bottom rather than faded to a colour, since the page's
+background is a gradient and any flat colour draws a hard edge.
+
+**Both are build-time snapshots read on the reader's clock** (`useNow`), so a
+showing that has started drops out and "Tomorrow" stays true. The carousel
+doesn't start rotating until then either, for a reduced-motion reader's sake:
+the global stylesheet shortens their animations to nothing, and the progress
+bar's end is what advances a slide. It never rotates for them at all, holds
+while the pointer or focus is inside, and can be paused.
+
+**The figures count the coming week over the catalogue's default categories**
+(`getListingsStats`), so "Films" is roughly what its link opens on. The 35mm
+figure is left out in a week with none. The static HTML carries the real
+numbers and the count-up only rewrites text that is already right.
 
 ## Festival & Film Club Indexes
 

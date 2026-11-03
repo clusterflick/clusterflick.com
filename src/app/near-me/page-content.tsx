@@ -24,6 +24,9 @@ import ColumnsLayout from "@/components/columns-layout";
 import VenueMap from "@/components/venue-map";
 import LocalVenues from "@/components/local-venues";
 import PosterRow from "@/components/poster-row";
+import OccasionRow from "@/components/occasion-row";
+import { getMovieUrl } from "@/utils/get-movie-url";
+import { getOccasionRowItems } from "@/utils/get-occasion-row-items";
 import LinkedList from "@/components/linked-list";
 import Button, { ButtonLink } from "@/components/button";
 import type {
@@ -124,6 +127,12 @@ export default function NearMePageContent({
     () =>
       `base=all&venues=${[...nearbyVenueIds].map(encodeURIComponent).join(",")}`,
     [nearbyVenueIds],
+  );
+
+  // Venue names for the occasion cards, which name where each one is.
+  const venueNames = useMemo(
+    () => Object.fromEntries(venues.map(({ id, name }) => [id, { name }])),
+    [venues],
   );
 
   const localIds = useMemo(
@@ -343,11 +352,14 @@ export default function NearMePageContent({
                 movies={rows.highlyRated}
                 movieUrlParams={movieUrlParams}
               />
-              <PosterRow
+              <OccasionRow
                 title="More Than a Screening Near Me"
                 intro="Q&As, live scores and premieres nearby — nights you can't catch on another date."
-                movies={rows.occasions}
-                movieUrlParams={movieUrlParams}
+                items={getOccasionRowItems(
+                  rows.occasions,
+                  venueNames,
+                  (movie) => `${getMovieUrl(movie)}?${movieUrlParams}`,
+                )}
               />
               <PosterRow
                 title="Just Added Near Me"

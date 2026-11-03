@@ -48,6 +48,17 @@ h3.title {
   border-bottom: none;
 }
 
+/* Over the poster art, so it carries its own dark ground to stay legible.
+   Two classes deep to outrank the Tag's own translucent background. */
+.posterLink .badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  background-color: rgba(var(--color-midnight-navy-rgb), 0.85);
+  pointer-events: none;
+}
+
 .posterLink:hover {
   border-bottom: none;
   color: inherit;
