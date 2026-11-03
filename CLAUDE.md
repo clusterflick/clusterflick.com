@@ -181,8 +181,10 @@ carries the variety.
   occasion ("Live score by …") in large type, the film beneath, the poster
   blurred behind as a wash. They lead with the occasion rather than a label so
   they don't read as more picks. `getOccasionMovies` carries the `occasion`
-  (label, time, venue id) beside the subtitle, which `/near-me`'s poster row
-  still uses.
+  (label, time, venue id), and `getOccasionRowItems` turns it into cards for
+  both this row and `/near-me`'s, which differ only in where a card leads: the
+  home page opens the film on its full schedule, `/near-me` on its nearby
+  showings.
 - **Last Chance** keeps its posters with a yellow "Ends Thu 5 Nov" `badge` on
   each (`PosterRow`'s top-left corner; top-right is the list markers), since the
   subtitle only shows on hover on desktop and the date is the point of the row.
