@@ -211,7 +211,9 @@ export default async function Home() {
           <WatchlistRow />
 
           <DiscoverySections
-            fallback={<DiscoveryRowsView rows={serverRows} />}
+            fallback={
+              <DiscoveryRowsView rows={serverRows} venues={data.venues} />
+            }
           />
 
           <div className={styles.browseCta}>

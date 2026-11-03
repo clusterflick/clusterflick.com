@@ -87,6 +87,10 @@ export interface ScoredMovie {
   movie: Movie;
   performanceCount: number;
   subtitle?: string;
+  /** A label drawn on the poster, for what a glance has to catch. */
+  badge?: { label: string; color: "yellow" };
+  /** The occasion itself, for a row that leads with it rather than the film. */
+  occasion?: { label: string; time: number; venueId: string };
 }
 
 export interface NewAdditions {
@@ -416,6 +420,12 @@ export function getLastChanceMovies(
       movie,
       performanceCount,
       subtitle: formatLastShowing(finalTime),
+      // On the poster itself: the subtitle only shows on hover on desktop,
+      // and the date is the point of the row.
+      badge: {
+        label: `Ends ${formatDayAndDate(finalTime)}`,
+        color: "yellow" as const,
+      },
     }));
 }
 
@@ -616,10 +626,11 @@ export function getOccasionMovies(
     { venueIds },
   )
     .slice(0, limit)
-    .map(({ movie, performance, label, filmPerformanceCount }) => ({
+    .map(({ movie, performance, venueId, label, filmPerformanceCount }) => ({
       movie,
       performanceCount: filmPerformanceCount,
       subtitle: formatOccasion({ label, performance }),
+      occasion: { label, time: performance.time, venueId },
     }));
 }
 

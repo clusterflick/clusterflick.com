@@ -5,6 +5,7 @@ import { getMovieUrl } from "@/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import PosterStatusMarkers from "@/components/poster-status-markers";
+import Tag from "@/components/tag";
 import PosterScroller from "./scroller";
 import styles from "./poster-row.module.css";
 
@@ -12,6 +13,12 @@ export interface PosterRowItem {
   movie: Movie;
   /** Optional context line shown on the poster overlay (falls back to year). */
   subtitle?: string;
+  /**
+   * A label drawn on the poster's top-left corner, always visible — for the
+   * one fact a row is about ("Ends Thu 5 Nov"), which the subtitle only shows
+   * on hover. Top-right is the reader's list markers.
+   */
+  badge?: { label: string; color: "pink" | "blue" | "yellow" | "gray" };
 }
 
 interface PosterRowProps {
@@ -69,7 +76,7 @@ export default function PosterRow({
       </div>
       {intro && <p className={styles.intro}>{intro}</p>}
       <PosterScroller scrollKey={title}>
-        {movies.map(({ movie, subtitle }) => {
+        {movies.map(({ movie, subtitle, badge }) => {
           const includedMovies = movie.includedMovies;
           const includedWithPosters =
             includedMovies?.filter((m) => m.posterPath) || [];
@@ -86,6 +93,11 @@ export default function PosterRow({
               className={styles.posterLink}
             >
               <PosterStatusMarkers movieId={movie.id} />
+              {badge && (
+                <Tag color={badge.color} size="sm" className={styles.badge}>
+                  {badge.label}
+                </Tag>
+              )}
               {useStackedPoster ? (
                 <StackedPoster
                   mainPosterPath={movie.posterPath}

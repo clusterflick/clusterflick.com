@@ -81,7 +81,7 @@
   margin: 12px 0 0;
   font-size: 15px;
   line-height: 1.75;
-  color: var(--color-light-gray);
+  color: var(--color-muted-gray);
   text-wrap: pretty;
 }
 
@@ -131,7 +131,7 @@
   padding: 16px 20px;
   font-size: 15px;
   line-height: 1.7;
-  color: var(--color-light-gray);
+  color: var(--color-muted-gray);
   text-align: left;
   background: rgba(var(--color-white-rgb), 0.03);
   border: 1px solid rgba(var(--color-white-rgb), 0.08);

@@ -75,7 +75,8 @@ covers the need. The canonical components are:
   plus an optional control)
 - **Home page:** `FeatureCarousel` (a few films rotating full-width),
   `PickCard` (a film picked for a reason, with when and where), `StatsBand`
-  (large linked figures that count up)
+  (large linked figures that count up), `OccasionRow` (wide cards leading
+  with what makes a screening an occasion)
 - **Programmes:** `ProgrammeCard` (a festival, club or list with films
   showing: logo, a fan of posters, the next screening), `EventCard` (the same
   with nothing showing), `FestivalTimeline` (festivals as bars across the
@@ -168,9 +169,24 @@ is left out with fewer than `COLLECTION_ROW_MIN` (2) collections, applied in
 `computeDiscoveryRows` so the build-time rows and the client's agree: a row of
 one collection reads as broken.
 
-The lead and the summary are dense with names, so their links are bold light
-grey with a faint underline rather than the global blue, which made them read
-as a page of references. They still turn pink on hover.
+The lead and the summary are dense with names, so their text is muted grey and
+their links bold light grey with a faint underline rather than the global blue,
+which made them read as a page of references. They still turn pink on hover.
+
+**Two rows have a layout of their own**, the two whose point a poster can't
+show. The rest stay poster rows, which scan easily once the top of the page
+carries the variety.
+
+- **More Than a Screening** is an `OccasionRow`: wide cards that lead with the
+  occasion ("Live score by …") in large type, the film beneath, the poster
+  blurred behind as a wash. They lead with the occasion rather than a label so
+  they don't read as more picks. `getOccasionMovies` carries the `occasion`
+  (label, time, venue id) beside the subtitle, which `/near-me`'s poster row
+  still uses.
+- **Last Chance** keeps its posters with a yellow "Ends Thu 5 Nov" `badge` on
+  each (`PosterRow`'s top-left corner; top-right is the list markers), since the
+  subtitle only shows on hover on desktop and the date is the point of the row.
+  It comes from `getLastChanceMovies`, so `/near-me`'s Last Chance has it too.
 
 **The picks are the films the editorial summary names**, in the order it names
 them (`getFeaturedScreenings`). The summary's `links` cover every candidate the
