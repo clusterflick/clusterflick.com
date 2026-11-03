@@ -78,7 +78,6 @@
 }
 
 .summaryNote p {
-  max-width: 75ch;
   margin: 12px 0 0;
   font-size: 15px;
   line-height: 1.75;
@@ -94,8 +93,36 @@
 .introLead {
   font-size: 16px;
   line-height: 1.7;
-  color: var(--color-light-gray);
+  color: var(--color-muted-gray);
   margin: 0 auto 28px auto;
+}
+
+/*
+ * Prose dense with names reads as a page of references when every name is a
+ * blue link. Here they are bold in the text's own light grey, with a faint
+ * underline so they still read as links, and turn pink on hover as every
+ * link does.
+ */
+.introLead a,
+.summary a,
+.summaryNote a {
+  color: var(--color-light-gray);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.18);
+}
+
+.introLead a:hover,
+.summary a:hover,
+.summaryNote a:hover {
+  color: var(--color-neon-pink);
+  border-bottom-color: var(--color-neon-pink);
+}
+
+/* A summary with nothing to feature sits in the page's content column. */
+.summaryFallback {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
 }
 
 /* Card chrome matches the "What we store" note on /personalise. */

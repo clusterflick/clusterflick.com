@@ -163,7 +163,14 @@ group as soon as a screening matches.
 The home page opens with three things built from data the build already has:
 a `FeatureCarousel` of up to four films, the `h1` over a `StatsBand` of the
 week's scale, and "This Week's Picks" as `PickCard`s, with the summary's prose
-folded beneath them. The discovery rows follow, unchanged.
+folded beneath them. The discovery rows follow, except that "Sagas & Series"
+is left out with fewer than `COLLECTION_ROW_MIN` (2) collections, applied in
+`computeDiscoveryRows` so the build-time rows and the client's agree: a row of
+one collection reads as broken.
+
+The lead and the summary are dense with names, so their links are bold light
+grey with a faint underline rather than the global blue, which made them read
+as a page of references. They still turn pink on hover.
 
 **The picks are the films the editorial summary names**, in the order it names
 them (`getFeaturedScreenings`). The summary's `links` cover every candidate the

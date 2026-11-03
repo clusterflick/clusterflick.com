@@ -13,6 +13,7 @@ import {
   getMarathonMovies,
   getHighlyRated,
   getCollectionRow,
+  computeDiscoveryRows,
   getOccasionMovies,
   getRating,
   computeNearMeRows,
@@ -514,6 +515,28 @@ describe("getCollectionRow", () => {
     );
 
     expect(result).toHaveLength(0);
+  });
+
+  it("leaves Sagas & Series out of the home rows with only one collection", () => {
+    const one = asRecord([
+      inCollection("a1", "1", ["v1"]),
+      inCollection("a2", "1", ["v2"]),
+    ]);
+    const two = asRecord([
+      inCollection("a1", "1", ["v1"]),
+      inCollection("a2", "1", ["v2"]),
+      inCollection("b1", "2", ["v1"]),
+      inCollection("b2", "2", ["v2"]),
+    ]);
+    const rows = (movies: MoviesRecord) =>
+      computeDiscoveryRows(movies, { now: NOW, anchorToNow: true, collections })
+        .collections;
+
+    expect(rows(one)).toEqual([]);
+    expect(rows(two).map((r) => r.collection.name)).toEqual([
+      "Alien",
+      "Back to the Future",
+    ]);
   });
 
   it("ignores films with no performances in the window", () => {

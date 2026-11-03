@@ -164,17 +164,13 @@ export default async function Home() {
 
         <header className={styles.intro}>
           <OutlineHeading as="h1" className={styles.introTitle}>
-            What&apos;s On at London Cinemas
+            Every Film Showing in London
           </OutlineHeading>
           <p className={styles.introLead}>
-            Every film showing in London — 450+ venues, one search.
-            <br />
             From blockbusters at{" "}
-            <Link href="/cinema-groups/picturehouse">
-              Picturehouses
-            </Link> and <Link href="/cinema-groups/everyman">Everyman</Link> to
-            independent gems at the{" "}
-            <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
+            <Link href="/cinema-groups/picturehouse">Picturehouses</Link> and{" "}
+            <Link href="/cinema-groups/everyman">Everyman</Link> to independent
+            gems at the <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
             <Link href="/venues/genesis-cinema">Genesis</Link> and the{" "}
             <Link href="/venues/prince-charles-cinema">Prince Charles</Link>{" "}
             cinemas.
@@ -199,8 +195,10 @@ export default async function Home() {
           // A summary with nothing to feature (one written before highlights
           // existed) is shown as prose, as it always was.
           summaryProse && (
-            <div className={styles.summary} data-source={summary?.source}>
-              {summaryProse}
+            <div className={styles.summaryFallback}>
+              <div className={styles.summary} data-source={summary?.source}>
+                {summaryProse}
+              </div>
             </div>
           )
         )}

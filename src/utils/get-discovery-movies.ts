@@ -534,6 +534,11 @@ export function getHighlyRated(
 // pointing at.
 const COLLECTION_MIN_SHOWING = 2;
 const COLLECTION_LIMIT = 12;
+/**
+ * The home page's "Sagas & Series" needs at least this many collections to be
+ * shown at all: a row holding one collection reads as broken, not as a row.
+ */
+export const COLLECTION_ROW_MIN = 2;
 
 /**
  * Collections with several of their films showing in the window — franchises
@@ -668,8 +673,16 @@ export function computeDiscoveryRows(
       movies,
       getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),
     ),
-    collections: getCollectionRow(movies, options.collections ?? {}, window),
+    collections: atLeast(
+      getCollectionRow(movies, options.collections ?? {}, window),
+      COLLECTION_ROW_MIN,
+    ),
   };
+}
+
+/** The list, or nothing when it is too short to stand as a row. */
+function atLeast<T>(items: T[], min: number): T[] {
+  return items.length >= min ? items : [];
 }
 
 /** The discovery rows scoped to the venues near a reader (the near-me page). */
