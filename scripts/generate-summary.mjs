@@ -74,28 +74,77 @@ const YEAR_MS = 365.25 * DAY;
 
 // Special formats / events, mined from movie + showing titles and performance
 // notes. Higher weight = more special (a 70mm print trumps a generic IMAX show).
+// `hook` is the prose phrase handed to the model; `label` is the same thing as a
+// card label on the home page, and `format` says whether it is a way of
+// projecting the film (a print, a restoration) rather than an occasion.
 const EVENT_KINDS = [
-  { re: /\b70\s?mm\b/i, w: 100, hook: "a 70mm print" },
-  { re: /\b35\s?mm\b/i, w: 96, hook: "a 35mm print" },
-  { re: /\b16\s?mm\b/i, w: 95, hook: "a 16mm print" },
-  { re: /\bpremiere\b/i, w: 92, hook: "a premiere" },
+  {
+    re: /\b70\s?mm\b/i,
+    w: 100,
+    hook: "a 70mm print",
+    label: "70mm print",
+    format: true,
+  },
+  {
+    re: /\b35\s?mm\b/i,
+    w: 96,
+    hook: "a 35mm print",
+    label: "35mm print",
+    format: true,
+  },
+  {
+    re: /\b16\s?mm\b/i,
+    w: 95,
+    hook: "a 16mm print",
+    label: "16mm print",
+    format: true,
+  },
+  { re: /\bpremiere\b/i, w: 92, hook: "a premiere", label: "Premiere" },
   {
     re: /in attendance|in person|in conversation|live appearance/i,
     w: 90,
     hook: "with a guest in attendance",
+    label: "Guest in attendance",
   },
-  { re: /q\s*&\s*a|\bq and a\b|\bq&a\b/i, w: 82, hook: "with a Q&A" },
-  { re: /preview|sneak peek|first look/i, w: 76, hook: "a preview" },
-  { re: /all.?night|all.?dayer|\bmarathon\b/i, w: 72, hook: "an all-nighter" },
-  { re: /\b4k\b|restoration|restored/i, w: 66, hook: "a new restoration" },
+  {
+    re: /q\s*&\s*a|\bq and a\b|\bq&a\b/i,
+    w: 82,
+    hook: "with a Q&A",
+    label: "Q&A",
+  },
+  {
+    re: /preview|sneak peek|first look/i,
+    w: 76,
+    hook: "a preview",
+    label: "Preview",
+  },
+  {
+    re: /all.?night|all.?dayer|\bmarathon\b/i,
+    w: 72,
+    hook: "an all-nighter",
+    label: "All-nighter",
+  },
+  {
+    re: /\b4k\b|restoration|restored/i,
+    w: 66,
+    hook: "a new restoration",
+    label: "Restoration",
+    format: true,
+  },
   {
     re: /introduc|presented by|hosted by/i,
     w: 62,
     hook: "with an introduction",
+    label: "With an introduction",
   },
-  { re: /anniversar/i, w: 56, hook: "an anniversary screening" },
-  { re: /sing.?along/i, w: 52, hook: "a sing-along" },
-  { re: /\bimax\b/i, w: 42, hook: "in IMAX" },
+  {
+    re: /anniversar/i,
+    w: 56,
+    hook: "an anniversary screening",
+    label: "Anniversary screening",
+  },
+  { re: /sing.?along/i, w: 52, hook: "a sing-along", label: "Sing-along" },
+  { re: /\bimax\b/i, w: 42, hook: "in IMAX", label: "IMAX", format: true },
 ];
 const CELLULOID_RE = /\b(70|35|16)\s?mm\b/i;
 
@@ -220,11 +269,30 @@ function detectEvent(movie, upcoming) {
     const text = `${movie.title}\n${showing?.title ?? ""}\n${perf.notes ?? ""}`;
     for (const kind of EVENT_KINDS) {
       if (kind.re.test(text) && (!best || kind.w > best.weight)) {
-        best = { weight: kind.w, hook: kind.hook, perf, showing };
+        best = {
+          weight: kind.w,
+          hook: kind.hook,
+          label: kind.label,
+          format: kind.format === true,
+          perf,
+          showing,
+        };
       }
     }
   }
   return best;
+}
+
+/**
+ * Why a film is in the candidate set, for the home page's featured screenings:
+ * the list that claimed it, a card label, and the showing the highlight is about
+ * (absent for a film picked for its reach rather than one showing). Each film is
+ * claimed by exactly one list, so it carries exactly one highlight.
+ */
+function highlightFor(kind, label, time, venueId) {
+  const highlight = { kind, label };
+  if (time !== undefined && venueId) highlight.performance = { time, venueId };
+  return highlight;
 }
 
 function computeSignals(meta, movies, now) {
@@ -303,6 +371,12 @@ function computeSignals(meta, movies, now) {
         venueId: event.showing?.venueId ?? null,
         when: formatWhen(event.perf.time, now),
         rating: rating?.text ?? null,
+        highlight: highlightFor(
+          event.format ? "format" : "occasion",
+          event.label,
+          event.perf.time,
+          event.showing?.venueId,
+        ),
       });
     }
 
@@ -324,6 +398,12 @@ function computeSignals(meta, movies, now) {
           when: formatWhen(unusual.perf.time, now),
           rating: rating.text,
           norm: rating.norm,
+          highlight: highlightFor(
+            "unusual-venue",
+            "Off the beaten track",
+            unusual.perf.time,
+            unusual.showing?.venueId,
+          ),
         });
       }
     }
@@ -340,6 +420,12 @@ function computeSignals(meta, movies, now) {
         when: formatWhen(allFuture[0].time, now),
         rating: rating?.text ?? null,
         norm: rating?.norm ?? 0,
+        highlight: highlightFor(
+          "one-off",
+          "One night only",
+          allFuture[0].time,
+          only?.showing?.venueId,
+        ),
       });
     }
 
@@ -365,6 +451,12 @@ function computeSignals(meta, movies, now) {
             venue: venueName(meta, finalShowing?.venueId),
             venueId: finalShowing?.venueId ?? null,
             rating: rating?.text ?? null,
+            highlight: highlightFor(
+              "final-showing",
+              "Final showing",
+              finalTime,
+              finalShowing?.venueId,
+            ),
           });
         }
       }
@@ -388,6 +480,12 @@ function computeSignals(meta, movies, now) {
         venue: repVenue,
         venueId: repVenueId,
         when: repWhen,
+        highlight: highlightFor(
+          "hidden-gem",
+          "Hidden gem",
+          rep?.perf.time,
+          repVenueId,
+        ),
       });
     }
 
@@ -400,8 +498,14 @@ function computeSignals(meta, movies, now) {
     if (matched && releaseTime !== null && earliestSeen >= newCutoff) {
       const ageMs = now - releaseTime;
       let kind = "back on the big screen";
-      if (ageMs > CLASSIC_MIN_AGE_YEARS * YEAR_MS) kind = "a classic";
-      else if (ageMs <= NEW_RELEASE_MAX_AGE_DAYS * DAY) kind = "a new release";
+      let label = "Back on the big screen";
+      if (ageMs > CLASSIC_MIN_AGE_YEARS * YEAR_MS) {
+        kind = "a classic";
+        label = "Classic, just added";
+      } else if (ageMs <= NEW_RELEASE_MAX_AGE_DAYS * DAY) {
+        kind = "a new release";
+        label = "New release";
+      }
       newlyAddedCandidates.push({
         id,
         title: movie.title,
@@ -410,6 +514,7 @@ function computeSignals(meta, movies, now) {
         year: new Date(releaseTime).getUTCFullYear(),
         rating: rating?.text ?? null,
         earliestSeen,
+        highlight: highlightFor("new", label, rep?.perf.time, repVenueId),
       });
     }
 
@@ -422,6 +527,8 @@ function computeSignals(meta, movies, now) {
         venueCount,
         rating: rating?.text ?? null,
         score: venueCount * 3 + upcoming.length,
+        // About the film's reach rather than any one showing.
+        highlight: highlightFor("popular", `Showing at ${venueCount} venues`),
       });
     }
   }
@@ -500,7 +607,7 @@ function computeSignals(meta, movies, now) {
     ...newlyAdded,
     ...popular,
   ]) {
-    addLink(c.title, { movieId: c.id });
+    addLink(c.title, { movieId: c.id, highlight: c.highlight });
   }
   for (const c of [
     ...events,

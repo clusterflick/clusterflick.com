@@ -1,11 +1,42 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
+/**
+ * Which of `generate-summary`'s highlight lists put a film in front of the
+ * model. Each film is claimed by exactly one.
+ */
+export type EditorialHighlightKind =
+  | "format"
+  | "occasion"
+  | "one-off"
+  | "final-showing"
+  | "unusual-venue"
+  | "hidden-gem"
+  | "new"
+  | "popular";
+
+/** Why a film is in the summary's candidate set. */
+export interface EditorialHighlight {
+  kind: EditorialHighlightKind;
+  /** A card label: "35mm print", "Final showing", "Showing at 96 venues". */
+  label: string;
+  /**
+   * The showing the highlight is about. Absent for a film picked for its reach
+   * ("popular") rather than for one showing.
+   */
+  performance?: { time: number; venueId: string };
+}
+
 /** A known entity mentioned in the summary, keyed by the exact phrase used. */
 export interface EditorialSummaryLink {
   phrase: string;
   movieId?: string;
   venueId?: string;
+  /**
+   * Film links only. Absent from summaries written before it was added, so a
+   * reader has to cope without it.
+   */
+  highlight?: EditorialHighlight;
 }
 
 export interface EditorialSummary {
