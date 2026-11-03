@@ -1,6 +1,9 @@
 /* The row's heading mirrors PosterRow's, so the discovery rows read as one system. */
 .row {
   margin-bottom: 36px;
+  /* Room above the cards for their hover lift, which the scroller would
+     otherwise clip: a horizontal scroller clips vertically too. */
+  --poster-scroller-padding-top: 4px;
 }
 
 .title {
@@ -9,10 +12,11 @@
   margin: 0 0 4px;
 }
 
+/* 4px less than PosterRow's, given back as the scroller's padding above. */
 .intro {
   font-size: 14px;
   color: var(--color-muted-gray);
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 }
 
 /* Wide rather than tall: the occasion is the headline, not the poster. */
