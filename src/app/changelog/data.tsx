@@ -75,14 +75,23 @@ export const CHANGELOG: ChangelogDay[] = [
     changes: [
       {
         tag: "New venue",
-        body: ({ Venue }) => (
+        body: ({ VenueList }) => (
           <>
             Added{" "}
-            <Venue
-              name="Autumn Three"
-              url="https://www.instagram.com/autumnthree_"
+            <VenueList
+              items={[
+                {
+                  name: "Autumn Three",
+                  url: "https://www.instagram.com/autumnthree_",
+                },
+                {
+                  name: "The Liberation Centre",
+                  url: "https://theliberationcentre.com",
+                },
+              ]}
             />
-            , a studio and listening space in Hackney Wick.
+            : a studio and listening space in Hackney Wick, and a youth and
+            community centre in Brixton.
           </>
         ),
       },
