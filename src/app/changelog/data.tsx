@@ -74,6 +74,18 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-04",
     changes: [
       {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://tzkrti.com/en">Tzkrti</Ext>, a ticketing platform
+            for Arab and Palestinian culture, which sells tickets for screenings
+            at places like{" "}
+            <Venue name="Mosaic Rooms" url="https://mosaicrooms.org" />.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
