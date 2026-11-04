@@ -71,6 +71,52 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-03",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The <Link href="/">home page</Link> opens with a few of the
+            week&rsquo;s screenings worth knowing about &mdash; a one-off, a
+            35mm print, a final showing &mdash; each with when and where it is,
+            and its trailer where there is one. Below them are the week at a
+            glance (how many films, screenings and venues are on, and how many
+            showings are on 35mm) and This Week&rsquo;s Picks: the screenings
+            the week&rsquo;s summary mentions, with the summary itself folded
+            away underneath.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            More Than a Screening, on the <Link href="/">home page</Link> and{" "}
+            <Link href="/near-me">Near Me</Link>, now leads with the occasion
+            itself &mdash; the guest in the room, the live score &mdash; on a
+            wide card, rather than in small print under a poster. Last Chance
+            posters show the day each run ends, and Sagas &amp; Series is left
+            out in a week with only one franchise on.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            The step that works out which films a double bill, marathon or
+            franchise event is showing now uses OpenAI&rsquo;s GPT-6.1 Terra
+            rather than Google&rsquo;s Gemini. On hand-checked listings it
+            matched the best of the nine setups tried, at a third of the cost of
+            the best Gemini one. The models the pipeline falls back on have also
+            moved off ones that are being retired.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-02",
     changes: [
       {
