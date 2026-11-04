@@ -71,6 +71,24 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-04",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Autumn Three"
+              url="https://www.instagram.com/autumnthree_"
+            />
+            , a studio and listening space in Hackney Wick.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-03",
     changes: [
       {
