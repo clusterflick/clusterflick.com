@@ -107,6 +107,20 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Norrøna Flagship Store London"
+              url="https://www.norrona.com/gb/en/store/norrona-flagship-store-london"
+            />
+            , the outdoor clothing brand&apos;s new Regent Street shop, which
+            hosts ski film nights.
+          </>
+        ),
+      },
     ],
   },
   {
