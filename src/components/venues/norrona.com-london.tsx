@@ -4,15 +4,15 @@ function VenueBlurb() {
   return (
     <section>
       <p>
-        Norrøna is a Norwegian outdoor clothing brand, and its London flagship
-        store is at 15 Regent Street in{" "}
-        <Link href="/london-cinemas/westminster/">Westminster</Link>, selling
+        Norrøna Flagship Store London is the Norwegian outdoor clothing
+        brand&apos;s shop on Regent Street in{" "}
+        <Link href="/london-cinemas/westminster/">Westminster</Link>, stocking
         its range for skiing, hiking, mountain biking and more.
       </p>
       <p>
-        The store hosts evening events that are open to all, among them ski and
-        snowboard film nights: the Norrøna Freeride Film Tour, and a screening
-        of TGR&apos;s annual ski film.
+        Its evening events are open to all, from talks with mountain guides and
+        the brand&apos;s athletes to adventure nights and ski and snowboard film
+        screenings such as the Norrøna Freeride Film Tour.
       </p>
     </section>
   );
