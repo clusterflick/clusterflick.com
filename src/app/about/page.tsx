@@ -19,6 +19,9 @@ import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
 import StatusSection from "./components/status-section";
+import { getStatusStats } from "./components/status-section/get-status-stats";
+import { getStaticData } from "@/utils/get-static-data";
+import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { socialLinks, partnerSites, features, ratingSources } from "./data";
 import styles from "./page.module.css";
 
@@ -94,7 +97,10 @@ const aboutJsonLd = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const data = await getStaticData();
+  const stats = getStatusStats(data, getLondonMidnightTimestamp());
+
   return (
     <main id="main-content">
       <script
@@ -125,7 +131,7 @@ export default function AboutPage() {
           easy to see what&apos;s on, where, and&nbsp;when.
         </p>
         <div className={styles.stats}>
-          <StatusSection />
+          <StatusSection stats={stats} />
         </div>
       </HeroSection>
 
