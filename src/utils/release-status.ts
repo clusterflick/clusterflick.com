@@ -154,6 +154,16 @@ export function getHoursSince(publishedAt: string, now: Date): number {
   );
 }
 
+/** "3 hours" or "2 days", or with `asAgo`, "3 hours ago". */
+export function formatHours(hours: number, asAgo = false): string {
+  if (hours < 1) return asAgo ? "less than an hour ago" : "less than an hour";
+  const span =
+    hours < 48
+      ? `${hours} ${hours === 1 ? "hour" : "hours"}`
+      : `${Math.floor(hours / 24)} days`;
+  return asAgo ? `${span} ago` : span;
+}
+
 function median(sorted: number[]): number {
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2

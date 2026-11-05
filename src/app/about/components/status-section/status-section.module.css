@@ -3,9 +3,61 @@
 }
 
 .lastUpdated {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
   font-size: 16px;
   color: var(--color-light-gray);
   margin-bottom: 24px;
+}
+
+/* A live dot, as on /datasets/status: filled green and gently pulsing while
+   fresh, a hollow yellow ring once stale, so the two read apart without
+   colour as well. The global stylesheet stills the pulse for readers who
+   prefer reduced motion. */
+.indicator {
+  flex: none;
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-release-green);
+  transform: translateY(-1px);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--color-release-green);
+    animation: pulse 2.4s ease-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.stale {
+  color: var(--color-buttery-yellow);
+
+  .indicator {
+    background: none;
+    border: 2px solid var(--color-buttery-yellow);
+
+    &::after {
+      display: none;
+    }
+  }
 }
 
 .statsGrid {

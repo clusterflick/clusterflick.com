@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
+import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
 import { formatDatePart, formatTimePart } from "@/utils/format-date";
+import {
+  formatHours,
+  getHoursSince,
+  STALE_AFTER_HOURS,
+} from "@/utils/release-status";
 import SourcesPopup from "./sources-popup";
 import type { StatusStats } from "./get-status-stats";
 import styles from "./status-section.module.css";
@@ -21,6 +28,19 @@ interface StatusSectionProps {
  */
 export default function StatusSection({ stats }: StatusSectionProps) {
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
+  // The age is worked out on the reader's clock: counted from the build, it
+  // would say "2 hours ago" for as long as the page went unrebuilt. Until
+  // then the static HTML gives only the date, which is true at any time.
+  const now = useNow(stats.generatedAt);
+  const isOnReaderClock = useIsOnReaderClock();
+  const hours = getHoursSince(stats.generatedAt, now);
+  const isStale = isOnReaderClock && hours >= STALE_AFTER_HOURS;
+  const when = (
+    <>
+      <strong className="nowrap">{formatDatePart(stats.generatedAt)}</strong>{" "}
+      <strong className="nowrap">at {formatTimePart(stats.generatedAt)}</strong>
+    </>
+  );
 
   const items: Array<{
     label: string;
@@ -51,17 +71,36 @@ export default function StatusSection({ stats }: StatusSectionProps) {
     {
       label: "Showings",
       value: stats.showings,
+      // Every showing, laid out by day: what this figure counts.
+      href: "/planner?base=all",
     },
   ];
 
   return (
     <div className={styles.container}>
-      <p className={styles.lastUpdated}>
-        Data last refreshed on{" "}
-        <strong className="nowrap">{formatDatePart(stats.generatedAt)}</strong>{" "}
-        <strong className="nowrap">
-          at {formatTimePart(stats.generatedAt)}
-        </strong>
+      <p
+        className={clsx(styles.lastUpdated, isStale && styles.stale)}
+        role={isStale ? "alert" : undefined}
+      >
+        <span className={styles.indicator} aria-hidden="true" />
+        <span>
+          {isStale ? (
+            <>
+              No new data for <strong>{formatHours(hours)}</strong>, since{" "}
+              {when}.
+            </>
+          ) : isOnReaderClock ? (
+            <>
+              Data last refreshed <strong>{formatHours(hours, true)}</strong>,
+              on {when}.
+            </>
+          ) : (
+            <>Data last refreshed on {when}.</>
+          )}{" "}
+          <Link href="/datasets/status" className="nowrap">
+            Release history
+          </Link>
+        </span>
       </p>
       <div className={styles.statsGrid}>
         {items.map((stat) => {
