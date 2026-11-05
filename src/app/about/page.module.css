@@ -62,12 +62,11 @@
   margin: 32px auto 0;
 }
 
-/* The feature variant's arrow sits bottom-right, so leave it room. */
 .featureCard {
   align-items: flex-start;
   justify-content: flex-start;
   text-align: left;
-  padding: 14px 18px 30px;
+  padding: 14px 18px 16px;
 
   h3 {
     font-size: 18px;

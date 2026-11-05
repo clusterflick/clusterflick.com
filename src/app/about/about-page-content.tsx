@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import HeroSection from "@/components/hero-section";
 import LinkCard, {
-  CardArrow,
   CardContent,
   CardDescription,
   CardIcon,
@@ -85,7 +84,6 @@ export default function AboutPageContent({ stats }: AboutPageContentProps) {
                 >
                   <CardTitle>{feature.title}</CardTitle>
                   <CardDescription>{feature.description}</CardDescription>
-                  <CardArrow />
                 </LinkCard>
               ))}
             </CardGrid>
@@ -202,7 +200,7 @@ export default function AboutPageContent({ stats }: AboutPageContentProps) {
             intro={
               <>
                 The code for this site and the processing pipeline behind it is
-                open source under the MIT licence, and{" "}
+                open source under the <strong>MIT licence</strong>, and{" "}
                 <a
                   href="https://github.com/clusterflick/"
                   target="_blank"
