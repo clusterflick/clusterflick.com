@@ -141,8 +141,9 @@ export const features: Feature[] = [
     title: "Browse Every Film",
     description:
       "Search and filter by date, venue, format, genre, rating or accessibility.",
-    // Every date: the catalogue's default week would hide most of it.
-    href: "/catalogue?dateRange=all",
+    // The defaults on every date: the default week would hide most of it,
+    // and `base` clears whatever filters the reader left the catalogue on.
+    href: "/catalogue?base=default&dateRange=all",
   },
   {
     title: "Plan Your Week",

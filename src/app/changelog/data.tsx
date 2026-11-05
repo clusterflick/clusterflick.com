@@ -101,6 +101,21 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/about">about page</Link> has been refreshed. It now
+            opens with the current figures: how many venues are listing
+            something, how many events and showings there are, and how long ago
+            the data was last refreshed, with a link to the release history. The
+            event sources behind those figures are listed by name. Below that, a
+            new section points to what you can do here, from browsing every film
+            to keeping a watchlist, and ways to get in touch now come before the
+            credits. Oh, and the popcorn pops.
+          </>
+        ),
+      },
     ],
   },
   {
