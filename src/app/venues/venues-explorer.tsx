@@ -11,6 +11,7 @@ import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
 import SearchInput from "@/components/search-input";
+import StickyBar from "@/components/sticky-bar";
 import Switch from "@/components/switch";
 import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
 import styles from "./page.module.css";
@@ -71,74 +72,85 @@ export default function VenuesExplorer({
 
   return (
     <>
-      <div className={styles.mapSection}>
-        <VenueMap venues={filteredMapVenues} boundary={boundary} />
-      </div>
+      {/* Above the map it filters, and stuck under the header the whole way
+          down the list, so changing the search never means scrolling back up
+          past the map. */}
+      <StickyBar className={styles.searchBar}>
+        <div className={styles.searchControls}>
+          <SearchInput
+            id="venues-search"
+            className={styles.search}
+            placeholder="Filter venues..."
+            ariaLabel="Filter venues"
+            value={query}
+            onChange={setQuery}
+          />
 
-      <div className={styles.searchControls}>
-        <SearchInput
-          id="venues-search"
-          placeholder="Filter venues..."
-          ariaLabel="Filter venues"
-          value={query}
-          onChange={setQuery}
-        />
+          <div className={styles.searchMeta}>
+            {/* Always rendered, so the bar keeps its height as the count
+                comes and goes. */}
+            <p className={styles.searchResultCount} aria-live="polite">
+              {isFiltering &&
+                `Showing ${matchCount.toLocaleString("en-GB")} ${
+                  matchCount === 1 ? "venue" : "venues"
+                }`}
+            </p>
 
-        <Switch
-          id="venues-hide-empty"
-          className={styles.hideEmptySwitch}
-          label="Hide venues with no showings"
-          checked={hideEmpty}
-          onChange={setHideEmpty}
-        />
-
-        {isFiltering && (
-          <p className={styles.searchResultCount}>
-            Showing {matchCount.toLocaleString("en-GB")}{" "}
-            {matchCount === 1 ? "venue" : "venues"}
-          </p>
-        )}
-      </div>
-
-      {filteredGroups.map((group) => {
-        const groupSlug = GROUP_SLUG_BY_LABEL.get(group.label);
-        return (
-          <section key={group.id} className={styles.group}>
-            <h2 className={styles.groupTitle}>
-              {group.label}
-              <span className={styles.groupCount}>{group.venues.length}</span>
-              {groupSlug && (
-                <Link
-                  href={getVenueGroupUrl({ slug: groupSlug })}
-                  className={styles.groupLink}
-                >
-                  Group page →
-                </Link>
-              )}
-            </h2>
-            <LinkGrid
-              items={group.venues.map((venue) => ({
-                key: venue.href,
-                href: venue.href,
-                label: venue.displayName,
-                count:
-                  venue.eventCount > 0
-                    ? venue.eventCount.toLocaleString("en-GB")
-                    : undefined,
-              }))}
+            <Switch
+              id="venues-hide-empty"
+              label="Hide venues with no showings"
+              checked={hideEmpty}
+              onChange={setHideEmpty}
             />
-          </section>
-        );
-      })}
+          </div>
+        </div>
+      </StickyBar>
 
-      {filteredGroups.length === 0 &&
-        (query.trim() ? (
-          <p className={styles.noResults}>
-            No venues match &ldquo;{query}&rdquo;
-          </p>
-        ) : (
-          <p className={styles.noResults}>No venues have showings listed</p>
-        ))}
+      <div className={styles.mapSection}>
+        <VenueMap venues={filteredMapVenues} boundary={boundary} bleed />
+      </div>
+
+      <div className={styles.column}>
+        {filteredGroups.map((group) => {
+          const groupSlug = GROUP_SLUG_BY_LABEL.get(group.label);
+          return (
+            <section key={group.id} className={styles.group}>
+              <h2 className={styles.groupTitle}>
+                {group.label}
+                <span className={styles.groupCount}>{group.venues.length}</span>
+                {groupSlug && (
+                  <Link
+                    href={getVenueGroupUrl({ slug: groupSlug })}
+                    className={styles.groupLink}
+                  >
+                    Group page →
+                  </Link>
+                )}
+              </h2>
+              <LinkGrid
+                items={group.venues.map((venue) => ({
+                  key: venue.href,
+                  href: venue.href,
+                  label: venue.displayName,
+                  count:
+                    venue.eventCount > 0
+                      ? venue.eventCount.toLocaleString("en-GB")
+                      : undefined,
+                }))}
+              />
+            </section>
+          );
+        })}
+
+        {filteredGroups.length === 0 &&
+          (query.trim() ? (
+            <p className={styles.noResults}>
+              No venues match &ldquo;{query}&rdquo;
+            </p>
+          ) : (
+            <p className={styles.noResults}>No venues have showings listed</p>
+          ))}
+      </div>
     </>
   );
 }

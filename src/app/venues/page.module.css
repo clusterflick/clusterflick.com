@@ -1,33 +1,85 @@
+/* The page lives in StandardPageLayout's full-width slot (see page-content),
+   so it supplies what the layout's content column would: its stacking above
+   the hero, the column, and the space before the footer. */
+.page {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 80px;
+}
+
+.column {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 .intro {
   font-size: 16px;
   line-height: 1.7;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-.mapSection {
-  margin-bottom: 32px;
+/* Search bar */
+
+.searchBar {
+  margin-bottom: 8px;
 }
 
-/* Search input */
-
-/* Input, toggle and result count read as one control block, so they are spaced
-   together and carry a single gap down to the first venue group. */
+/* Lines up with the column below: the bar supplies 16px of gutter (24px from
+   768px), the column 20px. */
 .searchControls {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
+  gap: 8px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 4px;
 }
 
-/* The switch spans the full-width input above it, so its default
-   space-between would leave the label a whole column away from the track. */
-.hideEmptySwitch {
-  justify-content: flex-end;
+.search {
+  min-width: 0;
+}
+
+/* Count on the left, toggle on the right: the line under the search on a
+   phone, the end of the row beside it on wider screens. */
+.searchMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  min-height: 22px;
 }
 
 .searchResultCount {
   font-size: 14px;
   color: var(--color-muted-gray);
+}
+
+@media (min-width: 768px) {
+  .searchControls {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding: 0;
+  }
+
+  .search {
+    flex: 1 1 auto;
+  }
+
+  .searchMeta {
+    flex: none;
+    flex-wrap: nowrap;
+  }
+
+  .searchResultCount:empty {
+    display: none;
+  }
+}
+
+.mapSection {
+  margin-bottom: 24px;
 }
 
 /* Venue groups */
