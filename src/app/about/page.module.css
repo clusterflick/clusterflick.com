@@ -7,7 +7,7 @@
   margin: 0 auto 20px;
   width: 200px;
 
-  img {
+  .logoImage {
     width: 100%;
     height: auto;
   }

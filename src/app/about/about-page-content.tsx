@@ -17,6 +17,7 @@ import SiteFooter from "@/components/site-footer";
 import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
+import PopcornLogo from "@/components/popcorn-logo";
 import StatusSection from "./components/status-section";
 import type { StatusStats } from "./components/status-section/get-status-stats";
 import { socialLinks, partnerSites, features, ratingSources } from "./data";
@@ -44,12 +45,7 @@ export default function AboutPageContent({ stats }: AboutPageContentProps) {
         className={styles.hero}
       >
         <div className={styles.logoLarge}>
-          <Image
-            src="/images/logo.svg"
-            alt="Clusterflick logo"
-            width={200}
-            height={200}
-          />
+          <PopcornLogo className={styles.logoImage} />
         </div>
         <OutlineHeading className={styles.title}>Clusterflick</OutlineHeading>
         <p className={styles.headline}>Every film showing in London.</p>
