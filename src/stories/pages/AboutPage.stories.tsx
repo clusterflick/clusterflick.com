@@ -41,9 +41,13 @@ export const Default: Story = {
       generatedAt: "2026-11-05T08:21:00.000Z",
       venues: { active: 294, total: 511 },
       sources: [
-        { source: "bfi.org.uk", count: 412 },
-        { source: "dice.fm", count: 88 },
-        { source: "eventbrite.co.uk", count: 156 },
+        {
+          source: "bfi.org.uk-bfi-festivals",
+          name: "BFI Festivals",
+          count: 412,
+        },
+        { source: "dice.fm", name: "DICE", count: 88 },
+        { source: "eventbrite.co.uk", name: "Eventbrite", count: 156 },
       ],
       events: 1872,
       showings: 46778,
