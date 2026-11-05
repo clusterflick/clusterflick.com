@@ -67,7 +67,8 @@ async function buildHelpers(): Promise<ChangeHelpers> {
   const VenueList = ({ items }: { items: Ref[] }) => (
     <>
       {items.map((item, i) => (
-        <span key={item.url}>
+        // By name: venues can share a website (a brewery's three taprooms).
+        <span key={item.name}>
           <Venue {...item} />
           {i < items.length - 2 ? ", " : null}
           {i === items.length - 2 ? " and " : null}
