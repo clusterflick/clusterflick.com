@@ -59,7 +59,7 @@
 
 .stats {
   max-width: 900px;
-  margin: 36px auto 0;
+  margin: 32px auto 0;
 }
 
 /* The feature variant's arrow sits bottom-right, so leave it room. */
@@ -67,7 +67,20 @@
   align-items: flex-start;
   justify-content: flex-start;
   text-align: left;
-  padding: 22px 24px 40px;
+  padding: 14px 18px 30px;
+
+  h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+}
+
+/* The social and partner cards are a scannable list, so they sit tighter
+   than LinkCard's standalone default. */
+.compactCard {
+  min-height: 0;
+  padding: 12px 16px;
+  gap: 12px;
 }
 
 .content {
@@ -80,8 +93,8 @@
 
 .partnerLogo {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -106,7 +119,7 @@
 
 .partnerDescription {
   display: block;
-  margin-top: 6px;
+  margin-top: 2px;
   font-size: 14px;
   opacity: 0.7;
   line-height: 1.5;

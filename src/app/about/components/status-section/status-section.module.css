@@ -28,7 +28,7 @@
   );
   border: 1px solid rgba(var(--color-white-rgb), 0.1);
   border-radius: 12px;
-  padding: 24px 16px;
+  padding: 18px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;

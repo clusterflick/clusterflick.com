@@ -64,7 +64,8 @@ export const socialLinks = [
     url: "https://bsky.app/profile/clusterflick.bsky.social",
     handle: (
       <>
-        bsky.app/profile/<strong>clusterflick</strong>.bsky.social
+        bsky.app/profile/<strong>clusterflick</strong>.<wbr />
+        bsky.social
       </>
     ),
   },

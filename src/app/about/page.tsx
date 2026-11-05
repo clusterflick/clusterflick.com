@@ -18,12 +18,6 @@ import SiteFooter from "@/components/site-footer";
 import ContentSection from "@/components/content-section";
 import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
-import StatsBand, { type StatsBandItem } from "@/components/stats-band";
-import { getStaticData } from "@/utils/get-static-data";
-import { getListingsStats } from "@/utils/get-listings-stats";
-import { getFormatUrl } from "@/utils/get-format-url";
-import { FORMATS } from "@/data/formats";
-import { FormatSource } from "@/types";
 import StatusSection from "./components/status-section";
 import { socialLinks, partnerSites, features, ratingSources } from "./data";
 import styles from "./page.module.css";
@@ -100,49 +94,7 @@ const aboutJsonLd = [
   },
 ];
 
-export default async function AboutPage() {
-  // The same week's figures the home page opens with, counted at build time.
-  const data = await getStaticData();
-  const now = Date.parse(new Date().toISOString());
-  const stats = getListingsStats(data, now);
-  const statItems: StatsBandItem[] = [
-    {
-      id: "films",
-      value: stats.films,
-      label: "Films",
-      detail: "showing this week",
-      href: "/catalogue",
-    },
-    {
-      id: "screenings",
-      value: stats.screenings,
-      label: "Screenings",
-      detail: "in the next 7 days",
-      href: "/planner",
-    },
-    {
-      id: "venues",
-      value: stats.venues,
-      label: "Venues",
-      detail: `screening, of ${stats.venuesTracked} we track`,
-      href: "/venues",
-    },
-  ];
-  // As on the home page: the curiosity, when there is one to report.
-  const thirtyFiveMm = FORMATS.find(
-    (format) => format.id === FormatSource.ThirtyFiveMm,
-  );
-  if (thirtyFiveMm && stats.thirtyFiveMm.screenings > 0) {
-    statItems.push({
-      id: "35mm",
-      value: stats.thirtyFiveMm.screenings,
-      label: "On 35mm",
-      detail: `${stats.thirtyFiveMm.films} ${stats.thirtyFiveMm.films === 1 ? "film" : "films"} on celluloid`,
-      href: getFormatUrl(thirtyFiveMm),
-      highlight: true,
-    });
-  }
-
+export default function AboutPage() {
   return (
     <main id="main-content">
       <script
@@ -173,7 +125,7 @@ export default async function AboutPage() {
           easy to see what&apos;s on, where, and&nbsp;when.
         </p>
         <div className={styles.stats}>
-          <StatsBand items={statItems} label="This week in London" />
+          <StatusSection />
         </div>
       </HeroSection>
 
@@ -223,6 +175,7 @@ export default async function AboutPage() {
                   key={site.name}
                   href={site.url}
                   variant="social"
+                  className={styles.compactCard}
                   aria-label={`Visit ${site.name}`}
                 >
                   <span className={styles.partnerLogo}>
@@ -255,6 +208,56 @@ export default async function AboutPage() {
       <Divider />
 
       <div className={styles.content}>
+        <div className={styles.connectGroup}>
+          <GroupHeader
+            icon="/images/icons/neon-clapper.svg"
+            iconWidth={66}
+            iconHeight={66}
+            title="Connect"
+          />
+
+          <ContentSection
+            title="Find Us Around the Internet"
+            intro="Say hi! 👋"
+            as="h3"
+            align="center"
+          >
+            <CardGrid>
+              {socialLinks.map((link) => (
+                <LinkCard
+                  key={link.name}
+                  href={link.url}
+                  variant="social"
+                  className={styles.compactCard}
+                  aria-label={`Clusterflick on ${link.name}`}
+                >
+                  <CardIcon>
+                    <link.Icon aria-hidden="true" />
+                  </CardIcon>
+                  <CardContent>{link.handle}</CardContent>
+                </LinkCard>
+              ))}
+            </CardGrid>
+          </ContentSection>
+
+          <ContentSection title="Or Get in Touch" as="h3" align="center">
+            <LinkCard
+              href="mailto:hello@clusterflick.com"
+              variant="contact"
+              aria-label="Email Clusterflick at hello@clusterflick.com"
+            >
+              <CardIcon>
+                <EmailIcon aria-hidden="true" />
+              </CardIcon>
+              <CardContent>hello@clusterflick.com</CardContent>
+            </LinkCard>
+          </ContentSection>
+        </div>
+      </div>
+
+      <Divider />
+
+      <div className={styles.content}>
         <div id="behind-the-scenes" className={styles.technicalGroup}>
           <GroupHeader
             icon="/images/icons/neon-projector.svg"
@@ -262,10 +265,6 @@ export default async function AboutPage() {
             iconHeight={66}
             title="Behind the Scenes"
           />
-
-          <ContentSection title="Status" as="h3" align="center">
-            <StatusSection />
-          </ContentSection>
 
           <ContentSection
             title="Open Source"
@@ -439,54 +438,6 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      <Divider />
-
-      <div className={styles.content}>
-        <div className={styles.connectGroup}>
-          <GroupHeader
-            icon="/images/icons/neon-clapper.svg"
-            iconWidth={66}
-            iconHeight={66}
-            title="Connect"
-          />
-
-          <ContentSection
-            title="Find Us Around the Internet"
-            intro="Say hi! 👋"
-            as="h3"
-            align="center"
-          >
-            <CardGrid>
-              {socialLinks.map((link) => (
-                <LinkCard
-                  key={link.name}
-                  href={link.url}
-                  variant="social"
-                  aria-label={`Clusterflick on ${link.name}`}
-                >
-                  <CardIcon>
-                    <link.Icon aria-hidden="true" />
-                  </CardIcon>
-                  <CardContent>{link.handle}</CardContent>
-                </LinkCard>
-              ))}
-            </CardGrid>
-          </ContentSection>
-
-          <ContentSection title="Or Get in Touch" as="h3" align="center">
-            <LinkCard
-              href="mailto:hello@clusterflick.com"
-              variant="contact"
-              aria-label="Email Clusterflick at hello@clusterflick.com"
-            >
-              <CardIcon>
-                <EmailIcon aria-hidden="true" />
-              </CardIcon>
-              <CardContent>hello@clusterflick.com</CardContent>
-            </LinkCard>
-          </ContentSection>
-        </div>
-      </div>
       <SiteFooter />
     </main>
   );
