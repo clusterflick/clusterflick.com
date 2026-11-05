@@ -230,9 +230,9 @@ export default function AboutPageContent({ stats }: AboutPageContentProps) {
             align="center"
             intro={
               <>
-                The showing data is refreshed daily, published as a JSON file
-                and a calendar feed for every venue, and free to use — including
-                commercially — under{" "}
+                The showing data is refreshed several times a day, published as
+                a JSON file and a calendar feed for every venue, and free to use
+                — including commercially — under{" "}
                 <a
                   href="https://creativecommons.org/licenses/by/4.0/"
                   target="_blank"

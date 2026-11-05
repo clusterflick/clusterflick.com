@@ -498,7 +498,7 @@ export default async function AccessibilityPage() {
                 ) : (
                   <p className={styles.noScreenings}>
                     No {label.toLowerCase()} screenings are currently listed.
-                    Check back soon — data is refreshed daily.
+                    Check back soon — data is refreshed several times a day.
                   </p>
                 )}
               </section>

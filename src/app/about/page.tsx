@@ -29,7 +29,7 @@ const faqs = [
   {
     question: "How often is the showing data updated?",
     answer:
-      "The showing data is refreshed from each venue and event source daily.",
+      "The showing data is refreshed from each venue and event source several times a day.",
   },
   {
     question: "Is Clusterflick open source?",
@@ -39,7 +39,7 @@ const faqs = [
   {
     question: "Can I use Clusterflick's screening data in my own project?",
     answer:
-      "Yes. The showing data is refreshed daily, available in two formats, and free to use — including commercially — under CC BY 4.0, as long as you credit us. Film metadata supplied by TMDB is excluded and stays subject to TMDB's own terms; the data licence page has the full terms.",
+      "Yes. The showing data is refreshed several times a day, available in two formats, and free to use — including commercially — under CC BY 4.0, as long as you credit us. Film metadata supplied by TMDB is excluded and stays subject to TMDB's own terms; the data licence page has the full terms.",
   },
 ];
 
