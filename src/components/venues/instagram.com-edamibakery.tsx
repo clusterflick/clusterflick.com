@@ -6,22 +6,20 @@ function VenueBlurb() {
       <p>
         Edami is a Lebanese bakery on Shacklewell Lane in{" "}
         <Link href="/london-cinemas/hackney/">Hackney</Link>, practically next
-        door to the Shacklewell Arms. Its counter is built around manakish,
-        baked fresh to order and topped with za&apos;atar and cheese or
-        something sweet, alongside spinach fatayer, ka&apos;ak and
-        &quot;syrup-soaked pastries&quot;, with Lebanese coffee, fresh juices
-        and ayran to drink.
+        door to the Shacklewell Arms. Manakish are baked to order at the
+        counter, alongside pastries, Lebanese coffee and ayran.
       </p>
       <p>
-        The room is a counter and a handful of round tables under Crittall
-        windows. Once the bakery has closed for the day, outside organisers take
-        it over for evening events, screenings and talks among them.
+        It is a small, bright room: a counter and a handful of round tables
+        under Crittall windows. The bakery keeps daytime hours, so its evenings
+        are free for others: outside organisers borrow the room after closing
+        for screenings and talks.
       </p>
     </section>
   );
 }
 
 export const seoDescription = "Lebanese bakery on Shacklewell Lane in Hackney";
-export const seoHighlights = "evening screenings and talks";
+export const seoHighlights = "after-hours screenings and talks";
 
 export default VenueBlurb;
