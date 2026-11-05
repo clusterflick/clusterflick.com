@@ -95,7 +95,9 @@ export default function StatusSection() {
     onClick?: () => void;
   }> = [
     {
-      label: "Venues",
+      // "294 of 511 venues" alone read as most of the site being broken; the
+      // label says what the first figure counts.
+      label: "Venues Listing",
       value: venueCounts.active,
       total: venueCounts.total,
       href: "/venues",

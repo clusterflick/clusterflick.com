@@ -127,3 +127,57 @@ export const partnerSites: PartnerSite[] = [
     logo: "/images/partners/whatsplaying.png",
   },
 ];
+
+interface Feature {
+  title: string;
+  description: string;
+  href: string;
+}
+
+// What a first-time reader can do here, each pointing at the page that does it.
+export const features: Feature[] = [
+  {
+    title: "Browse Every Film",
+    description:
+      "Search and filter by date, venue, format, genre, rating or accessibility.",
+    href: "/catalogue",
+  },
+  {
+    title: "Plan Your Week",
+    description:
+      "Lay screenings out by day and fit a few films around each other.",
+    href: "/planner",
+  },
+  {
+    title: "What's On Near Me",
+    description:
+      "The cinemas closest to you, and what they're showing today and this week.",
+    href: "/near-me",
+  },
+  {
+    title: "Festivals & Film Clubs",
+    description:
+      "Follow a festival or a club's programme as it changes, all in one place.",
+    href: "/festivals",
+  },
+  {
+    title: "Film Lists",
+    description:
+      "Which Oscar winners, Palme d'Or films and all-time greats are on a big screen now.",
+    href: "/lists",
+  },
+  {
+    title: "Your Watchlist",
+    description:
+      "Keep a watchlist and a seen list, import from Letterboxd and star your venues.",
+    href: "/personalise",
+  },
+];
+
+export const ratingSources = [
+  { name: "IMDb", url: "https://www.imdb.com/" },
+  { name: "Letterboxd", url: "https://letterboxd.com/" },
+  { name: "Rotten Tomatoes", url: "https://www.rottentomatoes.com/" },
+  { name: "Metacritic", url: "https://www.metacritic.com/" },
+  { name: "Bechdel Test", url: "https://bechdeltest.com/" },
+];
