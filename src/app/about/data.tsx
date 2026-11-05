@@ -168,7 +168,7 @@ export const features: Feature[] = [
   {
     title: "Film Lists",
     description:
-      "Which Oscar winners, Palme d'Or films and all-time greats are on a big screen now.",
+      "Oscar winners, Palme d'Or films and all-time greats on a big screen now.",
     href: "/lists",
   },
   {
