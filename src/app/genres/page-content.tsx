@@ -1,15 +1,27 @@
 import Link from "next/link";
 import EventCard from "@/components/event-card";
+import ProgrammeCard from "@/components/programme-card";
 import StandardPageLayout from "@/components/standard-page-layout";
 import type { GenreListItem } from "./page";
 import styles from "./page.module.css";
+
+/**
+ * The description's first sentence. The rest is written for search ("Find
+ * horror films showing across London…") and says nothing a card's posters
+ * and count don't, while crowding out the line that sets the genre's tone.
+ */
+function getLede(description: string): string {
+  return description.split(/(?<=[.!?])\s/)[0];
+}
 
 interface GenresPageContentProps {
   genres: GenreListItem[];
 }
 
 export default function GenresPageContent({ genres }: GenresPageContentProps) {
-  const showingCount = genres.filter((g) => g.movieCount > 0).length;
+  const showingGenres = genres.filter((g) => g.movieCount > 0);
+  const emptyGenres = genres.filter((g) => g.movieCount === 0);
+  const showingCount = showingGenres.length;
 
   // Rank by how many films are currently showing to surface the busiest genres
   // in the intro.
@@ -53,27 +65,51 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
         )}{" "}
         Pick a genre to see what&apos;s currently screening and where.
       </p>
-      <ul className={styles.genreGrid}>
-        {genres.map((genre) => (
-          <li key={genre.id}>
-            <EventCard
-              href={genre.href}
-              name={`${genre.name} Films`}
-              imagePath={genre.imagePath}
-              description={genre.seoDescription}
-              meta={
-                <span className={styles.filmCount}>
-                  {genre.movieCount > 0
-                    ? `${genre.movieCount.toLocaleString("en-GB")} ${
-                        genre.movieCount === 1 ? "film" : "films"
-                      } showing`
-                    : "Nothing showing right now"}
-                </span>
-              }
-            />
-          </li>
-        ))}
-      </ul>
+      {showingGenres.length > 0 && (
+        <ul className={styles.genreGrid}>
+          {showingGenres.map((genre) => (
+            <li key={genre.id}>
+              <ProgrammeCard
+                href={genre.href}
+                name={`${genre.name} Films`}
+                imagePath={genre.imagePath}
+                description={getLede(genre.seoDescription)}
+                posters={genre.posters}
+                meta={
+                  <span className={styles.filmCount}>
+                    {genre.movieCount.toLocaleString("en-GB")}{" "}
+                    {genre.movieCount === 1 ? "film" : "films"} showing
+                  </span>
+                }
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+      {emptyGenres.length > 0 && (
+        <section className={styles.section} aria-labelledby="empty-genres">
+          <h2 id="empty-genres" className={styles.sectionHeading}>
+            Nothing showing right now
+          </h2>
+          <ul className={styles.genreGrid}>
+            {emptyGenres.map((genre) => (
+              <li key={genre.id}>
+                <EventCard
+                  href={genre.href}
+                  name={`${genre.name} Films`}
+                  imagePath={genre.imagePath}
+                  description={getLede(genre.seoDescription)}
+                  meta={
+                    <span className={styles.noFilms}>
+                      No films currently showing
+                    </span>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </StandardPageLayout>
   );
 }

@@ -33,3 +33,23 @@
   padding: 2px 10px;
   border-radius: 20px;
 }
+
+.noFilms {
+  font-size: 13px;
+  color: rgba(var(--color-white-rgb), 0.35);
+}
+
+/* Genres with nothing on, below the ones with films. */
+
+.section {
+  margin-top: 48px;
+}
+
+.sectionHeading {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--color-white-rgb), 0.45);
+  margin: 0 0 20px;
+}
