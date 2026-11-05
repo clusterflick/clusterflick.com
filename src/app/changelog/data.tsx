@@ -71,6 +71,39 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-05",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "Farr's Dalston", url: "https://www.farrs.pub" },
+                {
+                  name: "The White Hart",
+                  url: "https://www.whitehartsouthwark.co.uk",
+                },
+                {
+                  name: "Edami",
+                  url: "https://www.instagram.com/edamibakery",
+                },
+                {
+                  name: "Eat the Sunshine . Down the Sun",
+                  url: "https://www.instagram.com/etsdts_",
+                },
+              ]}
+            />
+            : a Dalston bar in a former picture palace, a Southwark pub with a
+            screening room upstairs, a Lebanese bakery in Hackney, and a
+            Kennington café with a basement sonic art space.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-04",
     changes: [
       {
