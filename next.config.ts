@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import getMetaDataFilename from "./src/utils/get-meta-data-filename";
+import getVenueCountFloor from "./src/utils/get-venue-count-floor";
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
@@ -10,6 +11,7 @@ const nextConfig: NextConfig = {
   },
   env: {
     NEXT_PUBLIC_DATA_FILENAME: getMetaDataFilename(),
+    NEXT_PUBLIC_VENUE_COUNT_FLOOR: String(getVenueCountFloor()),
   },
   // In production the TMDB search Worker (clusterflick/api-tmdb-search) sits
   // on this path in front of the static site. `next dev` sends it to the

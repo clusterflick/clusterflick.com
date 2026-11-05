@@ -9,6 +9,7 @@ import ContentSection from "@/components/content-section";
 import DataPageLinks from "@/app/datasets/data-page-links";
 import { ATTRIBUTION_SNIPPETS, INTERNAL_REPOS } from "./data";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Data Licence",
@@ -67,8 +68,8 @@ export default function DataLicencePage() {
             which venue, on which screen, at what time. The booking link, the
             performance notes, the accessibility and format flags. The venue
             records, with their addresses and coordinates. And the normalisation
-            and film matching that turns 450+ venues&apos; wildly different
-            listings into one consistent shape.
+            and film matching that turns {VENUE_COUNT} venues&apos; wildly
+            different listings into one consistent shape.
           </p>
           <p className={styles.body}>
             You can redistribute it, build on it, and sell what you build. There

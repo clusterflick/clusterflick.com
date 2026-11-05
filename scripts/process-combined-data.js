@@ -1,5 +1,10 @@
 /* eslint-disable */
-const { existsSync, mkdirSync, writeFileSync } = require("node:fs");
+const {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  writeFileSync,
+} = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const data = require("../combined-data/combined-data.json");
@@ -253,6 +258,27 @@ try {
   writeFileSync(
     path.join(outputPath, "collections.json"),
     JSON.stringify(collections),
+  );
+
+  // The ticketing platforms and other sources the pipeline reads, by id, so
+  // the about page can name them. Read at build time only, like the
+  // collections above, from the source modules in clusterflick/scripts.
+  const sourcesDirectory = path.dirname(require.resolve("scripts/sources"));
+  const sourceNames = {};
+  readdirSync(sourcesDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .forEach((entry) => {
+      const { id, name } = require(
+        path.join(sourcesDirectory, entry.name, "attributes.js"),
+      );
+      if (!id || !name) {
+        throw new Error(`Source ${entry.name} has no id or name`);
+      }
+      sourceNames[id] = name;
+    });
+  writeFileSync(
+    path.join(outputPath, "sources.json"),
+    JSON.stringify(sourceNames),
   );
 
   const meta = {

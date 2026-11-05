@@ -9,6 +9,7 @@ import Divider from "@/components/divider";
 import ContentSection from "@/components/content-section";
 import DataPageLinks from "@/app/datasets/data-page-links";
 import styles from "./page.module.css";
+import { VENUE_COUNT_FLOOR } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "The Clusterflick bot",
@@ -45,9 +46,9 @@ export default function BotPage() {
         </OutlineHeading>
         <p className={styles.tagline}>
           Clusterflick is a free listings site covering every screening at over
-          450 London cinemas. To keep it up to date, a bot collects listings
-          from cinema websites and ticketing platforms twice a day, at around
-          4am and 4pm UK time.
+          {VENUE_COUNT_FLOOR} London cinemas. To keep it up to date, a bot
+          collects listings from cinema websites and ticketing platforms twice a
+          day, at around 4am and 4pm UK time.
         </p>
       </HeroSection>
 

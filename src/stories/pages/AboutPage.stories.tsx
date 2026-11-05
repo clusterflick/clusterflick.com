@@ -1,26 +1,24 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import AboutPage from "@/app/about/page";
+import AboutPageContent from "@/app/about/about-page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
-import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
-
-// Wrapper that provides all required contexts (using real providers)
-function AboutPageWrapper() {
-  return (
-    <CinemaDataProvider>
-      <FilterConfigProvider>
-        <GeolocationProvider>
-          <AboutPage />
-        </GeolocationProvider>
-      </FilterConfigProvider>
-    </CinemaDataProvider>
-  );
-}
 
 const meta = {
   title: "Pages/About",
-  component: AboutPageWrapper,
+  component: AboutPageContent,
+  // The page header reads the cinema data context, as on every page.
+  decorators: [
+    (Story) => (
+      <CinemaDataProvider>
+        <FilterConfigProvider>
+          <GeolocationProvider>
+            <Story />
+          </GeolocationProvider>
+        </FilterConfigProvider>
+      </CinemaDataProvider>
+    ),
+  ],
   parameters: {
     layout: "fullscreen",
     nextjs: {
@@ -28,32 +26,31 @@ const meta = {
     },
     chromatic: { disableSnapshot: true },
   },
-} satisfies Meta<typeof AboutPageWrapper>;
+} satisfies Meta<typeof AboutPageContent>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * About page with statistics still loading.
- * The hero and content sections are visible, but stat cards
- * show loading spinners.
+ * The about page with its Status figures, which are counted at build time and
+ * so arrive with the page rather than loading in.
  */
-export const Loading: Story = {
-  parameters: {
-    msw: {
-      handlers: loadingHandlers,
-    },
-  },
-};
-
-/**
- * About page fully loaded with all statistics displayed.
- * Shows venue count, event count, and showing totals from real data.
- */
-export const FullyLoaded: Story = {
-  parameters: {
-    msw: {
-      handlers, // Pass through to real data files
+export const Default: Story = {
+  args: {
+    stats: {
+      generatedAt: "2026-11-05T08:21:00.000Z",
+      venues: { active: 294, total: 511 },
+      sources: [
+        {
+          source: "bfi.org.uk-bfi-festivals",
+          name: "BFI Festivals",
+          count: 412,
+        },
+        { source: "dice.fm", name: "DICE", count: 88 },
+        { source: "eventbrite.co.uk", name: "Eventbrite", count: 156 },
+      ],
+      events: 1872,
+      showings: 46778,
     },
   },
 };

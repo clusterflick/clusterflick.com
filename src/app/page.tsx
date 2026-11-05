@@ -26,14 +26,14 @@ import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";
 import WatchlistRow from "./watchlist-row";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   // The root page shares a segment with the layout that defines the title
   // template, so the "| Clusterflick" suffix isn't applied automatically here.
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
-  description:
-    "Discover what's worth seeing across 450+ London venues — the films showing most widely, new additions and last chance screenings.",
+  description: `Discover what's worth seeing across ${VENUE_COUNT} London venues — the films showing most widely, new additions and last chance screenings.`,
   alternates: {
     canonical: "/",
   },
