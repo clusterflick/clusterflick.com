@@ -27,6 +27,9 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
+          // Set from the processed data at build time (get-venue-count-floor);
+          // unit tests run without it, so they get a fixed figure.
+          env: { NEXT_PUBLIC_VENUE_COUNT_FLOOR: "500" },
           include: ["src/**/*.test.ts"],
         },
       },

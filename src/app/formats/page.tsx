@@ -5,11 +5,11 @@ import { getFormatUrl } from "@/utils/get-format-url";
 import { getFormatImagePath } from "@/utils/get-format-image";
 import { getFormatMovies } from "@/utils/get-format-movies";
 import FormatsPageContent from "./page-content";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Browse Films by Format in London",
-  description:
-    "Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across 450+ London venues.",
+  description: `Browse London cinema listings by format: 70mm, 35mm, 16mm, IMAX, 3D and more. Find film prints and premium presentations showing across ${VENUE_COUNT} London venues.`,
   alternates: {
     canonical: "/formats",
   },

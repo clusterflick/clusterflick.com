@@ -4,6 +4,7 @@ import {
   DATA_SCHEMA_URL,
   LICENSED_DATASETS,
 } from "@/app/datasets/data";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 const SITE = "https://clusterflick.com";
 
@@ -28,7 +29,7 @@ export function buildLlmsTxt(): string {
 
   return `# Clusterflick
 
-> Every film showing in London, from 450+ cinemas and venues in one search: showtimes, venues, film clubs and festivals, updated several times a day.
+> Every film showing in London, from ${VENUE_COUNT} cinemas and venues in one search: showtimes, venues, film clubs and festivals, updated several times a day.
 
 Listings come from each venue's own website, matched to TheMovieDB and to IMDb, Letterboxd and Rotten Tomatoes ratings. For machine use, prefer the datasets below to the pages: they have fixed addresses and a schema, while the pages' markup can change at any time.
 

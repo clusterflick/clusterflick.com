@@ -6,11 +6,11 @@ import { getGenreImagePath } from "@/utils/get-genre-image";
 import { getGenreMovies } from "@/utils/get-genre-movies";
 import { validateGenreRegistry } from "@/utils/validate-genre-registry";
 import GenresPageContent from "./page-content";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Browse Films by Genre in London",
-  description:
-    "Browse London cinema listings by genre — horror, comedy, drama, science fiction, documentary and more. Find films by genre showing across 450+ London venues.",
+  description: `Browse London cinema listings by genre — horror, comedy, drama, science fiction, documentary and more. Find films by genre showing across ${VENUE_COUNT} London venues.`,
   alternates: {
     canonical: "/genres",
   },

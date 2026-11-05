@@ -3,6 +3,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getLondonMidnightTimestamp } from "@/utils/format-date";
 import { getStatusStats } from "./components/status-section/get-status-stats";
 import AboutPageContent from "./about-page-content";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "About",
@@ -18,8 +19,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     question: "What is Clusterflick?",
-    answer:
-      "Clusterflick is a free site listing every film showing in London — 450+ venues, one search.",
+    answer: `Clusterflick is a free site listing every film showing in London — ${VENUE_COUNT} venues, one search.`,
   },
   {
     question: "Where does Clusterflick's film data come from?",
