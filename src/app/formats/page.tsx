@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { FORMATS, FORMAT_SECTIONS, type FormatKind } from "@/data/formats";
-import { getFormatUrl } from "@/utils/get-format-url";
 import { getFormatImagePath } from "@/utils/get-format-image";
-import { getFormatMovies } from "@/utils/get-format-movies";
+import { getFormatsIndex } from "@/utils/get-formats-index";
 import FormatsPageContent from "./page-content";
 import { VENUE_COUNT } from "@/utils/venue-count";
 
@@ -29,51 +27,17 @@ export const metadata: Metadata = {
   },
 };
 
-export type FormatListItem = {
-  id: string;
-  kind: FormatKind;
-  name: string;
-  href: string;
-  imagePath: string | null;
-  seoDescription: string;
-  movieCount: number;
-};
-
-/** One rendered section of the index: a heading, its intro and its formats. */
-export type FormatSection = {
-  id: string;
-  title: string;
-  intro: string;
-  formats: FormatListItem[];
-};
-
 export default async function FormatsPage() {
   const data = await getStaticData();
 
-  const nowTs = new Date(data.generatedAt).getTime();
-
-  const formats: FormatListItem[] = FORMATS.map((format) => ({
-    id: format.id,
-    kind: format.kind,
-    name: format.name,
-    href: getFormatUrl(format),
-    imagePath: getFormatImagePath(format.slug),
-    seoDescription: format.seoDescription,
-    movieCount: getFormatMovies(format, data.movies, nowTs).length,
-  }));
-
-  // Group into sections so source and presentation read as separate ideas
-  // rather than one undifferentiated list. Formats keep their FORMATS order
-  // within a section, and empty sections are dropped so the page never renders
-  // a heading over nothing.
-  const sections: FormatSection[] = FORMAT_SECTIONS.map(
-    ({ id, title, intro, kinds }) => ({
-      id,
-      title,
-      intro,
-      formats: formats.filter((format) => kinds.includes(format.kind)),
-    }),
-  ).filter((section) => section.formats.length > 0);
+  const { formats, sections, emptyFormats } = getFormatsIndex(
+    data.movies,
+    data.venues,
+    {
+      now: new Date(data.generatedAt).getTime(),
+      getImagePath: getFormatImagePath,
+    },
+  );
 
   const jsonLd = [
     {
@@ -120,7 +84,11 @@ export default async function FormatsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <FormatsPageContent formats={formats} sections={sections} />
+      <FormatsPageContent
+        formats={formats}
+        sections={sections}
+        emptyFormats={emptyFormats}
+      />
     </>
   );
 }
