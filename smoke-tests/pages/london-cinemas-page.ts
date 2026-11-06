@@ -4,8 +4,11 @@ const SITE_URL = process.env.SITE_URL || "https://clusterflick.com";
 // The nav menu and site footer link to /london-cinemas/ from every page, so the
 // prefix match alone picks up chrome links — and the (hidden) menu one comes
 // first in the DOM. Excluding the section index itself leaves only boroughs.
+// The map and its ranked list link to boroughs too, ahead of the A-Z list and
+// in a different order, so the link is narrowed to the A-Z list's entries -
+// otherwise the name read and the link clicked are different boroughs.
 const BOROUGH_LINK_SELECTOR =
-  'a[href^="/london-cinemas/"]:not([href="/london-cinemas/"])';
+  'a[href^="/london-cinemas/"]:not([href="/london-cinemas/"]):has([data-testid="link-grid-label"])';
 const BOROUGH_NAME_SELECTOR = `${BOROUGH_LINK_SELECTOR} [data-testid="link-grid-label"]`;
 
 export class LondonCinemasPage {
