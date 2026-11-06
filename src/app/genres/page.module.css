@@ -6,6 +6,12 @@
   margin-bottom: 32px;
 }
 
+/* The busiest genres, as figures */
+
+.busiest {
+  margin-bottom: 40px;
+}
+
 /* Genre grid */
 
 .genreGrid {

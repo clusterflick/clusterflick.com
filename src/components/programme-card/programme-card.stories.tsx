@@ -104,3 +104,17 @@ export const Minimal: Story = {
     meta: filmCountMeta,
   },
 };
+
+/** A genre: its icon is a neon sign, which lights up when the card is hovered. */
+export const NeonLogo: Story = {
+  args: {
+    ...Default.args,
+    href: "/genres/horror",
+    name: "Horror Films",
+    imagePath: "/images/genres/horror.png",
+    description:
+      "Chills, thrills and cult classics — from slow-burn dread to all-out scares.",
+    next: null,
+    neonLogo: true,
+  },
+};

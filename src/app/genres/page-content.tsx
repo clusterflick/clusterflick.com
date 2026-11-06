@@ -2,6 +2,7 @@ import Link from "next/link";
 import EventCard from "@/components/event-card";
 import ProgrammeCard from "@/components/programme-card";
 import StandardPageLayout from "@/components/standard-page-layout";
+import StatsBand, { type StatsBandItem } from "@/components/stats-band";
 import type { GenreListItem } from "./page";
 import styles from "./page.module.css";
 
@@ -23,11 +24,18 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
   const emptyGenres = genres.filter((g) => g.movieCount === 0);
   const showingCount = showingGenres.length;
 
-  // Rank by how many films are currently showing to surface the busiest genres
-  // in the intro.
-  const byPopularity = [...genres].sort((a, b) => b.movieCount - a.movieCount);
-  const [first, second, third] = byPopularity;
-  const hasShowings = first && first.movieCount > 0;
+  // The busiest genres, as a band of figures under the intro. Four, so the
+  // band's two columns on a phone come out even.
+  const busiest: StatsBandItem[] = [...showingGenres]
+    .sort((a, b) => b.movieCount - a.movieCount || a.name.localeCompare(b.name))
+    .slice(0, 4)
+    .map((genre) => ({
+      id: genre.id,
+      value: genre.movieCount,
+      label: genre.name,
+      detail: genre.movieCount === 1 ? "film showing" : "films showing",
+      href: genre.href,
+    }));
 
   // Link genre names mentioned in the intro to their pages, resolving the href
   // by (case-insensitive) genre name.
@@ -45,46 +53,41 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
       <p className={styles.intro}>
         Every film showing across London, sorted into {genres.length} genres —
         from {genreLink("horror")} and {genreLink("comedy")} to{" "}
-        {genreLink("documentary")} and {genreLink("science fiction")}.
-        {hasShowings && (
-          <>
-            {" "}
-            Right now, <strong>{genreLink(first.name)}</strong> has the most on
-            with {first.movieCount.toLocaleString("en-GB")}{" "}
-            {first.movieCount === 1 ? "film" : "films"} screening
-            {second && second.movieCount > 0 && (
-              <>
-                , followed by {genreLink(second.name)}
-                {third && third.movieCount > 0 && (
-                  <> and {genreLink(third.name)}</>
-                )}
-              </>
-            )}
-            .
-          </>
-        )}{" "}
-        Pick a genre to see what&apos;s currently screening and where.
+        {genreLink("documentary")} and {genreLink("science fiction")}. Pick a
+        genre to see what&apos;s currently screening and where.
       </p>
+      {busiest.length > 0 && (
+        <div className={styles.busiest}>
+          <h2 className={styles.sectionHeading}>Most on right now</h2>
+          <StatsBand items={busiest} label="Most on right now" />
+        </div>
+      )}
       {showingGenres.length > 0 && (
-        <ul className={styles.genreGrid}>
-          {showingGenres.map((genre) => (
-            <li key={genre.id}>
-              <ProgrammeCard
-                href={genre.href}
-                name={`${genre.name} Films`}
-                imagePath={genre.imagePath}
-                description={getLede(genre.seoDescription)}
-                posters={genre.posters}
-                meta={
-                  <span className={styles.filmCount}>
-                    {genre.movieCount.toLocaleString("en-GB")}{" "}
-                    {genre.movieCount === 1 ? "film" : "films"} showing
-                  </span>
-                }
-              />
-            </li>
-          ))}
-        </ul>
+        <section aria-labelledby="showing-genres">
+          <h2 id="showing-genres" className={styles.sectionHeading}>
+            Showing now
+          </h2>
+          <ul className={styles.genreGrid}>
+            {showingGenres.map((genre) => (
+              <li key={genre.id}>
+                <ProgrammeCard
+                  href={genre.href}
+                  name={`${genre.name} Films`}
+                  imagePath={genre.imagePath}
+                  description={getLede(genre.seoDescription)}
+                  posters={genre.posters}
+                  neonLogo
+                  meta={
+                    <span className={styles.filmCount}>
+                      {genre.movieCount.toLocaleString("en-GB")}{" "}
+                      {genre.movieCount === 1 ? "film" : "films"} showing
+                    </span>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
       {emptyGenres.length > 0 && (
         <section className={styles.section} aria-labelledby="empty-genres">
@@ -99,6 +102,7 @@ export default function GenresPageContent({ genres }: GenresPageContentProps) {
                   name={`${genre.name} Films`}
                   imagePath={genre.imagePath}
                   description={getLede(genre.seoDescription)}
+                  neonLogo
                   meta={
                     <span className={styles.noFilms}>
                       No films currently showing
