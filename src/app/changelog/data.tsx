@@ -71,6 +71,27 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-06",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/venues">venues page</Link> now opens on a
+            full-screen map of every venue, with the search sitting just below
+            it. Once you scroll, the search sticks to the top of the page, so
+            you can change it from anywhere in the list without scrolling back
+            up past the map. Maps in the page, here and on{" "}
+            <Link href="/near-me">Near Me</Link>, no longer get in the way of
+            scrolling: one finger scrolls the page and two fingers move the map,
+            and on a computer you hold Ctrl (⌘ on a Mac) to zoom with the scroll
+            wheel.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-05",
     changes: [
       {
