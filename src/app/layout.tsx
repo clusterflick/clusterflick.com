@@ -7,6 +7,7 @@ import { GeolocationProvider } from "@/state/geolocation-context";
 import { UserProvider } from "@/state/user-context";
 import { SeenFilterSync } from "@/state/seen-filter-sync";
 import { VenueOriginSync } from "@/state/venue-origin-sync";
+import { NavigationScrollReset } from "@/state/navigation-scroll-reset";
 import DataLoadNoticeClient from "@/components/data-load-notice/data-load-notice-client";
 import "./globals.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
@@ -116,6 +117,7 @@ export default function RootLayout({
               <UserProvider>
                 <SeenFilterSync />
                 <VenueOriginSync />
+                <NavigationScrollReset />
                 {children}
               </UserProvider>
             </GeolocationProvider>
