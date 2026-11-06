@@ -36,6 +36,13 @@
   container: prose / inline-size;
 }
 
+/* The `lead` prop: centred on the page at the prose measure, outside the
+   heading rail. */
+.lead {
+  max-width: calc(var(--page-prose) - 40px);
+  margin: 0 auto;
+}
+
 /* The prose page width, less the 20px gutters `.content` supplies. */
 .proseBody {
   max-width: calc(var(--page-prose) - 40px);

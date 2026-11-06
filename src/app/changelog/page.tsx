@@ -20,15 +20,26 @@ export const metadata: Metadata = {
   },
 };
 
-/** Formats an ISO date (YYYY-MM-DD) as e.g. "Sunday, 12 July 2026". */
+/**
+ * Formats an ISO date (YYYY-MM-DD) as e.g. "Sunday,\n12 July 2026". The
+ * newline collapses to a space wherever the heading runs on one line, and is
+ * the break when it sits in the narrow rail beside its changes, so the date
+ * always wraps after the weekday rather than wherever the width runs out.
+ * OutlineHeading takes only a string, so a newline rather than markup.
+ */
 function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
+  const date = new Date(`${iso}T00:00:00Z`);
+  const weekday = date.toLocaleDateString("en-GB", {
     weekday: "long",
+    timeZone: "UTC",
+  });
+  const rest = date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
+  return `${weekday},\n${rest}`;
 }
 
 /** Outbound link used when no Clusterflick page exists for a reference. */

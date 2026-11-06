@@ -29,6 +29,45 @@ const days = (value: number) =>
   `${number(value)} ${value === 1 ? "day" : "days"}`;
 
 /**
+ * The page's opening: how fresh the data is, the history in one line, and the
+ * way to the other two data pages. Nothing here depends on today beyond what
+ * ReleaseFreshness works out for itself, so it stands apart from the sections
+ * below and the page can centre it above them.
+ */
+export function StatusSummary({ status, latestUrl }: StatusViewProps) {
+  const newest = status.datasets
+    .map(({ latest }) => latest)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
+  const firstEver = status.datasets
+    .map(({ first }) => first)
+    .sort((a, b) => a.publishedAt.localeCompare(b.publishedAt))[0];
+  const total = status.datasets.reduce((sum, { total }) => sum + total, 0);
+
+  return (
+    <div className={styles.summary}>
+      <ReleaseFreshness
+        latest={newest}
+        builtAt={status.builtAt}
+        latestUrl={latestUrl}
+      />
+
+      <p className={styles.lede}>
+        Releasing since <strong>{formatDateLong(firstEver.publishedAt)}</strong>
+        , with <strong>{number(total)}</strong> releases across both datasets.
+      </p>
+      <div className={styles.intro}>
+        <p>
+          This is the release history of the two datasets Clusterflick publishes
+          for reuse. What&apos;s in them, how to use them and the terms
+          they&apos;re published under each have a page of their own.
+        </p>
+        <DataPageLinks current="status" />
+      </div>
+    </div>
+  );
+}
+
+/**
  * Everything that depends on today is worked out here, in the browser, against
  * the reader's clock: the static HTML is drawn as of the build, then redrawn
  * as of now. If the pipeline stops, the build stops with it, and a page that
@@ -36,7 +75,9 @@ const days = (value: number) =>
  * green for as long as anyone looked at it. Redrawn, the missing days appear
  * as missing and the streak ends.
  */
-export default function StatusView({ status, latestUrl }: StatusViewProps) {
+export default function StatusView({
+  status,
+}: Pick<StatusViewProps, "status">) {
   const today = getLondonDay(useNow(status.builtAt));
 
   const datasets = useMemo(
@@ -50,39 +91,10 @@ export default function StatusView({ status, latestUrl }: StatusViewProps) {
     [status.datasets, today],
   );
 
-  const newest = status.datasets
-    .map(({ latest }) => latest)
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
-  const firstEver = status.datasets
-    .map(({ first }) => first)
-    .sort((a, b) => a.publishedAt.localeCompare(b.publishedAt))[0];
   const { timeOfDay } = status;
 
   return (
     <>
-      <ReleaseFreshness
-        latest={newest}
-        builtAt={status.builtAt}
-        latestUrl={latestUrl}
-      />
-
-      <p className={styles.lede}>
-        Releasing since <strong>{formatDateLong(firstEver.publishedAt)}</strong>
-        , with{" "}
-        <strong>
-          {number(datasets.reduce((sum, { total }) => sum + total, 0))}
-        </strong>{" "}
-        releases across both datasets.
-      </p>
-      <div className={styles.intro}>
-        <p>
-          This is the release history of the two datasets Clusterflick publishes
-          for reuse. What&apos;s in them, how to use them and the terms
-          they&apos;re published under each have a page of their own.
-        </p>
-        <DataPageLinks current="status" />
-      </div>
-
       {datasets.map((dataset) => (
         <ContentSection
           key={dataset.key}

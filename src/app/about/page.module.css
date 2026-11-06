@@ -57,8 +57,13 @@
   color: var(--color-light-gray);
 }
 
+/* A set width, not the hero's shrink-to-fit: the centred hero sizes a block
+   to its widest line, which here was the "Data last refreshed" sentence, so
+   the cards changed width when it gained "2 hours ago" on the reader's
+   clock. The prose text measure, about what that sentence used to give. */
 .stats {
-  max-width: 900px;
+  width: 100%;
+  max-width: calc(var(--page-prose) - 40px);
   margin: 32px auto 0;
 }
 

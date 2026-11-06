@@ -5,6 +5,14 @@
   gap: 8px;
 }
 
+/* Freshness, the summary line and the links, centred above the sections as
+   the page's lead. The same 8px rhythm as the sections below. */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* The page's one summary line, so it gets room to stand apart from the
    freshness notice above and the first section below. */
 .lede {

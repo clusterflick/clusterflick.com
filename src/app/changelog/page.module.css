@@ -60,10 +60,15 @@
     padding-top: 40px;
   }
 
+  /* The weekday on a line of its own, then the date (the newline is in the
+     text): `pre` breaks only there, so "30 September 2026" never wraps after
+     September. At 22px the widest date is about 235px, inside the rail. */
   .dayHeading {
     position: sticky;
     top: 83px;
-    font-size: 24px;
+    font-size: 22px;
+    line-height: 1.3;
+    white-space: pre;
     margin-bottom: 0;
   }
 }

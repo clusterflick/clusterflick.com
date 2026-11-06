@@ -57,16 +57,17 @@ export default function DatasetsPageContent({
       title="Datasets"
       subtitle="Clusterflick's screening data, published for reuse under CC BY 4.0."
       width="prose"
+      lead={
+        <div className={styles.freshness}>
+          <ReleaseFreshness
+            latest={newest}
+            builtAt={status.builtAt}
+            latestUrl={latestUrl}
+          />
+          <DataPageLinks current="datasets" />
+        </div>
+      }
     >
-      <div className={styles.freshness}>
-        <ReleaseFreshness
-          latest={newest}
-          builtAt={status.builtAt}
-          latestUrl={latestUrl}
-        />
-        <DataPageLinks current="datasets" />
-      </div>
-
       <ContentSection
         title="What's published"
         intro={

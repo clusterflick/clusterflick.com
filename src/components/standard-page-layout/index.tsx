@@ -57,6 +57,13 @@ interface StandardPageLayoutProps {
   backText?: string;
   /** Width of the content column (default: "default") */
   width?: StandardPageWidth;
+  /**
+   * Optional opening content above the body, centred on the page at the prose
+   * measure: a status line, the links to sibling pages. On a prose page it
+   * spans the whole column rather than the text column beside the heading
+   * rail, so something centred reads as centred on the page.
+   */
+  lead?: ReactNode;
   /** Page body rendered below the hero and divider */
   children: ReactNode;
   /**
@@ -103,6 +110,7 @@ export default function StandardPageLayout({
   backUrl,
   backText,
   width = "default",
+  lead,
   children,
   afterContent,
   hideFooter = false,
@@ -131,7 +139,7 @@ export default function StandardPageLayout({
 
       {!hideHero && <Divider />}
 
-      {children && (
+      {(lead || children) && (
         <div
           className={clsx(
             styles.content,
@@ -139,6 +147,7 @@ export default function StandardPageLayout({
             width === "wide" && styles.wide,
           )}
         >
+          {lead && <div className={styles.lead}>{lead}</div>}
           {width === "prose" ? (
             <div className={styles.proseBody}>{children}</div>
           ) : (
