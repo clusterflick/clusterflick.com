@@ -74,20 +74,6 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-06",
     changes: [
       {
-        tag: "Improvement",
-        body: () => (
-          <>
-            <Link href="/cinema-groups">Cinema Groups</Link> now shows
-            what&rsquo;s on at each chain this week, rather than just listing
-            them. Each card leads with posters of the films only that chain is
-            showing, so you can see what sets Curzon, Picturehouse or the BFI
-            apart, with its films, showings and venues beneath. Between them the
-            chains are a fifth of the venues we list but run nine in ten of
-            London&rsquo;s screenings.
-          </>
-        ),
-      },
-      {
         tag: "New feature",
         body: () => (
           <>
@@ -99,18 +85,6 @@ export const CHANGELOG: ChangelogDay[] = [
             screenings in Lewisham, against 77,699 in Westminster. Reports now
             have an <Link href="/reports">index of their own</Link>, linked from
             the footer, and a borough&rsquo;s page links to any report about it.
-          </>
-        ),
-      },
-      {
-        tag: "New feature",
-        body: () => (
-          <>
-            <Link href="/updates">New Listings</Link> now tells you what each
-            day did to your watchlist. If you&rsquo;re{" "}
-            <Link href="/personalise">signed in</Link>, it names the films on
-            your watchlist that got new showings, and marks them where they
-            appear.
           </>
         ),
       },
@@ -137,6 +111,18 @@ export const CHANGELOG: ChangelogDay[] = [
             day opens with its figures, a film&rsquo;s venues are counted by
             chain rather than named one by one, and less is shown before
             &ldquo;Show all&rdquo;.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            <Link href="/updates">New Listings</Link> now tells you what each
+            day did to your watchlist. If you&rsquo;re{" "}
+            <Link href="/personalise">signed in</Link>, it names the films on
+            your watchlist that got new showings, and marks them where they
+            appear.
           </>
         ),
       },
@@ -179,6 +165,20 @@ export const CHANGELOG: ChangelogDay[] = [
             what it has on before you open it, and the page leads with the four
             genres with the most films showing right now. The neon genre signs
             stay, and now flicker on when you hover over them.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            <Link href="/cinema-groups">Cinema Groups</Link> now shows
+            what&rsquo;s on at each chain this week, rather than just listing
+            them. Each card leads with posters of the films only that chain is
+            showing, so you can see what sets Curzon, Picturehouse or the BFI
+            apart, with its films, showings and venues beneath. Between them the
+            chains are a fifth of the venues we list but run nine in ten of
+            London&rsquo;s screenings.
           </>
         ),
       },
