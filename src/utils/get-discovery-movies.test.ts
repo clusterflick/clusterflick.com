@@ -13,6 +13,7 @@ import {
   getMarathonMovies,
   getHighlyRated,
   getCollectionRow,
+  computeDiscoveryRows,
   getOccasionMovies,
   getRating,
   computeNearMeRows,
@@ -278,6 +279,15 @@ describe("getLastChanceMovies", () => {
     expect(result[0].subtitle).toMatch(/^Last showing /);
   });
 
+  it("labels the poster with the day the run ends", () => {
+    const ending = makeMovie("ending", [
+      { venueId: "v1", times: [NOW + DAY, NOW + 6 * DAY] },
+    ]);
+    const [row] = getLastChanceMovies(asRecord([ending]), NOW);
+    // NOW + 6 days is Monday 20 November 2023.
+    expect(row.badge).toEqual({ label: "Ends Mon 20 Nov", color: "yellow" });
+  });
+
   it("excludes films still running beyond 7 days", () => {
     const running = makeMovie("running", [
       { venueId: "v1", times: [NOW + DAY, NOW + 9 * DAY] },
@@ -516,6 +526,28 @@ describe("getCollectionRow", () => {
     expect(result).toHaveLength(0);
   });
 
+  it("leaves Sagas & Series out of the home rows with only one collection", () => {
+    const one = asRecord([
+      inCollection("a1", "1", ["v1"]),
+      inCollection("a2", "1", ["v2"]),
+    ]);
+    const two = asRecord([
+      inCollection("a1", "1", ["v1"]),
+      inCollection("a2", "1", ["v2"]),
+      inCollection("b1", "2", ["v1"]),
+      inCollection("b2", "2", ["v2"]),
+    ]);
+    const rows = (movies: MoviesRecord) =>
+      computeDiscoveryRows(movies, { now: NOW, anchorToNow: true, collections })
+        .collections;
+
+    expect(rows(one)).toEqual([]);
+    expect(rows(two).map((r) => r.collection.name)).toEqual([
+      "Alien",
+      "Back to the Future",
+    ]);
+  });
+
   it("ignores films with no performances in the window", () => {
     const outside = {
       ...makeMovie("a1", [{ venueId: "v1", times: [NOW + 100 * DAY] }]),
@@ -547,6 +579,19 @@ describe("getOccasionMovies", () => {
     expect(row.subtitle).toBe(
       "Q&A with Mark Gatiss ·\u00A0Wed\u00A015\u00A0Nov",
     );
+  });
+
+  it("carries the occasion, its showing and its venue for a card to lead with", () => {
+    const movies = asRecord([
+      makeMovie("a", [{ venueId: "v1", title: "A + Q&A with Mark Gatiss" }]),
+    ]);
+
+    const [row] = getOccasionMovies(movies, window);
+    expect(row.occasion).toEqual({
+      label: "Q&A with Mark Gatiss",
+      time: row.movie.performances[0].time,
+      venueId: "v1",
+    });
   });
 
   it("keeps a film with no poster, which MoviePoster draws from the title", () => {

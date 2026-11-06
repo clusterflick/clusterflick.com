@@ -17,6 +17,13 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  * out of the clusters, as the near-me page does for the reader's locals, and
  * `detail` to replace the popup's "N films showing" line. `fill` drops the
  * fixed in-page height so the map fills its parent (see `VenueMapDialog`).
+ * `insetTop` keeps framing, popups and controls below something laid over the
+ * top of the map, such as the `/venues` page's heading.
+ *
+ * Embedded in a page (anything but `fill`), the map leaves one-finger drags
+ * and plain wheel scrolls to the page: on a touch screen it pans with two
+ * fingers, and a wheel zooms it only with Ctrl or ⌘ held. A hint says so when
+ * the page scrolls instead.
  *
  * **When to use:** for a spatial, browse-by-location overview of many venues.
  *
@@ -140,5 +147,14 @@ export const Default: Story = {
 export const SingleVenue: Story = {
   args: {
     venues: [sampleVenues[0]],
+  },
+};
+
+/** With 160px at the top covered, as by the `/venues` page's heading: the
+ * controls start below it and the venues are framed beneath it. */
+export const InsetTop: Story = {
+  args: {
+    venues: sampleVenues,
+    insetTop: 160,
   },
 };

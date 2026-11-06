@@ -64,13 +64,22 @@ export const socialLinks = [
     url: "https://bsky.app/profile/clusterflick.bsky.social",
     handle: (
       <>
-        bsky.app/profile/<strong>clusterflick</strong>.bsky.social
+        bsky.app/profile/<strong>clusterflick</strong>.<wbr />
+        bsky.social
       </>
     ),
   },
 ];
 
-export const partnerSites = [
+interface PartnerSite {
+  name: string;
+  description: string;
+  url: string;
+  // Only a site's own mark; without one the card shows its initial instead
+  logo?: string;
+}
+
+export const partnerSites: PartnerSite[] = [
   {
     name: "CultureCity.London",
     description:
@@ -99,25 +108,81 @@ export const partnerSites = [
     url: "https://culturvultur.com",
     logo: "/images/partners/culturvultur.svg",
   },
+  {
+    name: "Cartelita",
+    description:
+      "Jazz, theatre and film listings for several cities, including London's independent and repertory cinemas.",
+    url: "https://cartelita.july.dev/london/en/film",
+  },
+  {
+    name: "PicHouse",
+    description:
+      "Picturehouse Screen 1 showtimes and every bookable BFI IMAX screening, with trailers.",
+    url: "https://pichouse-ssr.pages.dev",
+  },
+  {
+    name: "WhatsPlaying",
+    description:
+      "London screenings you can get to, watch, and still be home in time.",
+    url: "https://aduncan2.github.io/whats-playing/",
+    logo: "/images/partners/whatsplaying.png",
+  },
 ];
 
-/**
- * The datasets published for reuse. Deliberately only the two that are
- * licensed — the combined file the site itself loads is an internal build
- * artifact with no schema guarantees, so pointing people at it was an offer we
- * could not keep. See /data-licence.
- */
-export const dataFormats = [
+interface Feature {
+  title: string;
+  description: string;
+  href: string;
+}
+
+// What a first-time reader can do here, each pointing at the page that does it.
+export const features: Feature[] = [
   {
-    name: "Data file per venue",
-    url: "https://github.com/clusterflick/data-transformed/releases/latest",
+    title: "Browse Every Film",
     description:
-      "Individual JSON files for the showings at each venue. These all follow the same schema.",
+      "Search and filter by date, venue, format, genre, rating or accessibility.",
+    // The defaults on every date: the default week would hide most of it,
+    // and `base` clears whatever filters the reader left the catalogue on.
+    href: "/catalogue?base=default&dateRange=all",
   },
   {
-    name: "Calendar file per venue",
-    url: "https://github.com/clusterflick/data-calendar/releases/latest",
+    title: "Plan Your Week",
     description:
-      "Individual ICS files for the showings at each venue. Import cinema schedules into your calendar app.",
+      "Lay screenings out by day and fit a few films around each other.",
+    // The defaults, which are the next 7 days, rather than whatever filters
+    // the reader left the planner on.
+    href: "/planner?base=default",
   },
+  {
+    title: "What's On Near Me",
+    description:
+      "The cinemas closest to you, and what they're showing today and this week.",
+    href: "/near-me",
+  },
+  {
+    title: "Festivals & Film Clubs",
+    description:
+      "Follow a festival or a club's programme as it changes, all in one place.",
+    href: "/festivals",
+  },
+  {
+    title: "Film Lists",
+    description:
+      "Oscar winners, Palme d'Or films and all-time greats on a big screen now.",
+    href: "/lists",
+  },
+  {
+    title: "Your Watchlist",
+    description:
+      "Keep a watchlist and a seen list, import from Letterboxd and star your venues.",
+    href: "/personalise",
+  },
+];
+
+export const ratingSources = [
+  { name: "IMDb", url: "https://www.imdb.com/" },
+  { name: "Letterboxd", url: "https://letterboxd.com/" },
+  { name: "Rotten Tomatoes", url: "https://www.rottentomatoes.com/" },
+  { name: "Metacritic", url: "https://www.metacritic.com/" },
+  { name: "Bechdel Test", url: "https://bechdeltest.com/" },
 ];

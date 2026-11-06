@@ -1,10 +1,14 @@
 import PosterRow from "@/components/poster-row";
 import CollectionRow from "@/components/collection-row";
+import OccasionRow from "@/components/occasion-row";
+import type { Venue } from "@/types";
+import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import {
   getMarathonsUrl,
   HIGHLY_RATED,
   type DiscoveryRows,
 } from "@/utils/get-discovery-movies";
+import { getOccasionRowItems } from "@/utils/get-occasion-row-items";
 import { getHighlyRatedUrl } from "@/lib/filters/modules/ratings";
 import styles from "./page.module.css";
 
@@ -13,7 +17,14 @@ import styles from "./page.module.css";
  * it's used both for the SSR fallback (build-time data) and the client refresh
  * (view-time data) — see DiscoverySections.
  */
-export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
+export default function DiscoveryRowsView({
+  rows,
+  venues,
+}: {
+  rows: DiscoveryRows;
+  /** Names the venue on each occasion card. */
+  venues?: Record<string, Pick<Venue, "name">>;
+}) {
   const {
     popular,
     highlyRated,
@@ -47,11 +58,14 @@ export default function DiscoveryRowsView({ rows }: { rows: DiscoveryRows }) {
         seeAllHref={getHighlyRatedUrl(HIGHLY_RATED.filterId)}
       />
 
-      <PosterRow
+      <OccasionRow
         title="More Than a Screening"
         intro="Q&As, live scores and premieres — nights you can't catch on another date."
-        movies={occasions}
-        showAll
+        items={getOccasionRowItems(
+          occasions,
+          venues,
+          (movie) => `${getMovieUrl(movie)}${SHOW_ALL_HASH}`,
+        )}
       />
 
       <CollectionRow

@@ -11,6 +11,7 @@ import {
 import {
   formatDateLong,
   getLondonMidnightTimestamp,
+  addLondonDays,
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { FilterId, type FilterState, type MoviesRecord } from "./types";
@@ -1203,7 +1204,7 @@ describe("suggestFilterRelaxations", () => {
 
     it("falls back to the date itself beyond a fortnight", () => {
       // Counting to "in 23 days" is harder than reading the date.
-      const far = TODAY + 23 * MS_PER_DAY;
+      const far = addLondonDays(TODAY, 23);
       const movies = makeMovies({
         "1": { title: "Eternal Sunshine", time: far },
       });
@@ -1216,7 +1217,7 @@ describe("suggestFilterRelaxations", () => {
     });
 
     it("reaches for a relative day inside a fortnight", () => {
-      const soon = TODAY + 8 * MS_PER_DAY;
+      const soon = addLondonDays(TODAY, 8);
       const movies = makeMovies({
         "1": { title: "Eternal Sunshine", time: soon },
       });

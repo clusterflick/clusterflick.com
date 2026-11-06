@@ -68,11 +68,11 @@
   margin-bottom: 28px;
 }
 
-/* Mirrors StandardPageLayout's `.content` wrapper. Secondary content placed
-   after the films sits inside the full-bleed films section rather than that
-   wrapper, so it has to re-impose the same column width itself. */
+/* The page's default column. Secondary content placed after the films sits
+   inside the full-bleed films section rather than StandardPageLayout's
+   wrapper, so it has to re-impose the column width itself. */
 .afterFilmsContent {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding-top: 24px;
 }

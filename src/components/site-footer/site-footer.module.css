@@ -10,7 +10,7 @@
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto;
 }
 

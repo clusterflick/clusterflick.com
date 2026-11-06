@@ -114,6 +114,25 @@
   }
 }
 
+.patternFrame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* A fixed-layout xsmall poster sits inset by the 10px padding, on the lighter
+   panel, while the placeholder used to fill the whole box — so in one grid the
+   films without artwork came out larger, and louder, than those with it. The
+   placeholder now takes the same frame. Fluid xsmall posters cover the whole
+   box (see .poster.fluid img), so their placeholders are left full-bleed. */
+.noPoster.xsmall:not(.fluid) {
+  background-color: rgba(var(--color-dark-navy-rgb), 0.6);
+
+  & .patternFrame {
+    inset: 10px;
+  }
+}
+
 /* Color variants */
 .colorPink {
   --pattern-color: var(--color-neon-pink);

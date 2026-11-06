@@ -16,7 +16,8 @@ Pages at clusterflick.com.
 - `npm run format` — Prettier format all files
 - `npm run storybook` — Start Storybook dev server on port 6006
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
-- `npm run fetch-calendar-data` — Download the latest `data-calendar` release into `/public/calendars/` (see Venue Calendars)
+- `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
+- `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -72,6 +73,10 @@ covers the need. The canonical components are:
 - **Posters:** `FilmPosterGrid` (browsing grid, title on hover),
   `PosterTile` + `PosterTileList` (compact tile with title and detail below,
   plus an optional control)
+- **Home page:** `FeatureCarousel` (a few films rotating full-width),
+  `PickCard` (a film picked for a reason, with when and where), `StatsBand`
+  (large linked figures that count up), `OccasionRow` (wide cards leading
+  with what makes a screening an occasion)
 - **Programmes:** `ProgrammeCard` (a festival, club or list with films
   showing: logo, a fan of posters, the next screening), `EventCard` (the same
   with nothing showing), `FestivalTimeline` (festivals as bars across the
@@ -109,6 +114,58 @@ Only create a new component when no existing one fits. When you do:
 - **Links:** Do not add custom CSS classes to plain `<a>` or `<Link>` elements
   just to replicate global link styles. The global stylesheet already styles
   links correctly — custom overrides are usually unnecessary and worse.
+
+## Page Widths
+
+A page's content sits in one of four columns, tokens on `:root` in
+`globals.css`, gutter included. **Pick by what the page mostly holds**, not by
+which page you copied:
+
+- **`--page-prose` (800px)** — reading pages: the data licence, the bot page,
+  the changelog, the datasets pages. Long lines are hard to read, so this is
+  one 800px column — until the screen has room for more (a 1040px container,
+  about a 1080px window). Then the column widens to `--page-wide` and each
+  section's heading moves into a rail beside its text, sticking under the
+  header as the text scrolls. An 800px strip in the middle of a big screen
+  left most of it empty and made the page longer than it needed to be; the
+  rail uses the width while keeping the text column a readable length.
+  `ContentSection` and the changelog's days take the rail (the `prose`
+  container query, with `--prose-rail` and `--prose-gap` set by
+  `StandardPageLayout`), and anything else lines up with the text column. A
+  new block on a prose page that has a heading of its own should take the
+  rail the same way.
+- **`--page-default` (1000px)** — cards and lists: venues, festivals, clubs,
+  boroughs, groups, a venue or programme page. The default.
+- **`--page-wide` (1200px)** — poster rows and discovery: the home page. The
+  footer sits at this width on every page.
+- **`--page-film` (1400px)** — the film page alone, whose 308px poster column
+  comes out of the width; at `--page-wide` the details beside it felt cramped.
+- **Full-bleed** — poster grids, maps and calendars, through
+  `StandardPageLayout`'s `afterContent`.
+
+`StandardPageLayout` takes the first three as `width` (`"prose"`,
+`"default"`, `"wide"`), so a page that wants a different column passes a prop
+rather than rebuilding the header, hero and divider around a `.content` of its
+own. A bespoke hero goes in `hero`.
+
+Opening content that should centre on the page — a status line, the links to
+sibling pages — goes in `lead`. It renders above the body at the prose text
+measure, centred on the whole column, so on a prose page it stays out of the
+heading rail instead of sitting off to the right in the text column, and it
+ends 60px above the body, the gap between sections. `/datasets` and
+`/datasets/status` use it.
+
+Narrower elements inside a page share two measures (content only, so add any
+gutter on top): **`--measure-blurb` (640px)** for hero taglines and blurbs,
+and **`--measure-notice` (700px)** for the notices and offers under the
+catalogue's search controls. A paragraph inside a card caps itself in `ch`
+instead, since its measure belongs to its font size.
+
+Anything lining up with a column reads its token (`calc(var(--page-default) -
+40px)` for a bar that supplies its own gutter) rather than repeating the
+number. Media queries can't read custom properties, so a breakpoint tied to a
+width says which one beside it. The filter overlay's 1440px is not a page
+width: it is sized for its two filter columns.
 
 ## Film Clubs
 
@@ -153,6 +210,71 @@ the one a reader browsing for the club would look under first; a club that fits 
 programme mostly sits (Queer Horror Nights is queer, Sick Girl Films is horror). The kind applies
 whether or not the club has anything on: a dormant club is listed by name only, and moves into its
 group as soon as a screening matches.
+
+## Home Page Top
+
+The home page opens with three things built from data the build already has:
+a `FeatureCarousel` of up to four films, the `h1` over a `StatsBand` of the
+week's scale, and "This Week's Picks" as `PickCard`s, with the summary's prose
+folded beneath them. The discovery rows follow, except that "Sagas & Series"
+is left out with fewer than `COLLECTION_ROW_MIN` (2) collections, applied in
+`computeDiscoveryRows` so the build-time rows and the client's agree: a row of
+one collection reads as broken.
+
+The lead and the summary are dense with names, so their text is muted grey and
+their links bold light grey with a faint underline rather than the global blue,
+which made them read as a page of references. They still turn pink on hover.
+
+**Two rows have a layout of their own**, the two whose point a poster can't
+show. The rest stay poster rows, which scan easily once the top of the page
+carries the variety.
+
+- **More Than a Screening** is an `OccasionRow`: wide cards that lead with the
+  occasion ("Live score by …") in large type, the film beneath, the poster
+  blurred behind as a wash. They lead with the occasion rather than a label so
+  they don't read as more picks. `getOccasionMovies` carries the `occasion`
+  (label, time, venue id), and `getOccasionRowItems` turns it into cards for
+  both this row and `/near-me`'s, which differ only in where a card leads: the
+  home page opens the film on its full schedule, `/near-me` on its nearby
+  showings.
+- **Last Chance** keeps its posters with a yellow "Ends Thu 5 Nov" `badge` on
+  each (`PosterRow`'s top-left corner; top-right is the list markers), since the
+  subtitle only shows on hover on desktop and the date is the point of the row.
+  It comes from `getLastChanceMovies`, so `/near-me`'s Last Chance has it too.
+
+**The picks are the films the editorial summary names**, in the order it names
+them (`getFeaturedScreenings`). The summary's `links` cover every candidate the
+model was shown, most of which the prose leaves out, so a link is only used
+once the text mentions it. `generate-summary.mjs` gives each film link a
+`highlight`: the list that claimed it (`kind`), a card label, and the showing
+the highlight is about. Each film is claimed by exactly one list, so the label
+always agrees with why the prose names it. A film picked for its reach
+(`popular`) has no showing and shows its week's count instead. The label's
+colour follows the kind (`TONE_BY_KIND`): blue for a format, pink for a night
+that won't come round again, yellow for a final showing, grey otherwise.
+
+A summary written before highlights existed features nothing, and its prose is
+shown as before. A highlight is skipped rather than guessed when its film or
+venue has left the dataset or its showing has started.
+
+**The hero uses posters, not backdrops.** Backdrop stills were tried and the
+poster read better: it keeps the site's colours, each slide looks alike, and
+plenty of films have no good still. The pipeline doesn't publish film
+backdrops anyway. The poster is blurred behind the section as a wash, which is
+masked out at the bottom rather than faded to a colour, since the page's
+background is a gradient and any flat colour draws a hard edge.
+
+**Both are build-time snapshots read on the reader's clock** (`useNow`), so a
+showing that has started drops out and "Tomorrow" stays true. The carousel
+doesn't start rotating until then either, for a reduced-motion reader's sake:
+the global stylesheet shortens their animations to nothing, and the progress
+bar's end is what advances a slide. It never rotates for them at all, holds
+while the pointer or focus is inside, and can be paused.
+
+**The figures count the coming week over the catalogue's default categories**
+(`getListingsStats`), so "Films" is roughly what its link opens on. The 35mm
+figure is left out in a week with none. The static HTML carries the real
+numbers and the count-up only rewrites text that is already right.
 
 ## Festival & Film Club Indexes
 
@@ -254,12 +376,11 @@ page. Only a load where _nothing_ arrived sets `error`, the full-page state.
 
 **The feed is consumed as published, not re-derived.** `clusterflick/data-calendar` releases one
 ICS per venue, named after the venue id with no extension, one asset per venue in the dataset.
-`scripts/fetch-calendar-data.js` downloads the latest release into `public/calendars/` as
-`<venue-id>.<hash>.ics` plus a `manifest.json` of venue id → filename, which
-`@/utils/get-venue-calendar` reads at build time so the hashed URL is baked into the static HTML.
-Serving from our own origin removes CORS from the picture; the content hash means an unchanged
-venue keeps its URL, and so its cache entry, between builds. A missing release is not fatal —
-the manifest comes back empty and pages render their empty state.
+`scripts/fetch-published-data.js` hosts it at `/datasets/calendars/<venue-id>.ics` (see
+Published Data), and `@/utils/get-venue-calendar` reads `datasets/index.json` at build time to know which
+venues have one. The page loads that same URL: the address a subscriber's calendar app polls,
+not a copy made for the page. Serving from our own origin removes CORS from the picture. A
+missing release is not fatal — the index comes back empty and pages render their empty state.
 
 **Network failure is expected; missing data is not.** Fetching hundreds of assets from GitHub's
 CDN means the occasional dropped connection, and one of those used to fail the whole build. Every
@@ -268,7 +389,7 @@ _inside_ the retried attempt — a connection dropped mid-stream is the case wor
 happens after the headers have arrived. A 4xx is not retried, being a permanent answer.
 
 A download that still fails after all that **fails the build**. The tempting alternative — drop
-that venue and carry on — is wrong here, because a venue absent from the manifest renders an empty
+that venue and carry on — is wrong here, because a venue absent from the index renders an empty
 calendar, which tells a reader it has no screenings rather than that we failed to fetch them:
 wrong information, not absent information. Deploys are triggered per data release, so a red build
 costs one update and leaves the previous complete site standing, which is much cheaper than a
@@ -278,13 +399,19 @@ above, where every venue is equally empty and the site plainly has no calendar d
 Failures are still **collected rather than thrown at the first one**, even though any of them
 fails the build. `Promise.all` rejects on the first rejection without cancelling its siblings, so
 throwing from a worker exited the process mid-flight knowing nothing about the other 400 assets —
-and skipped `writeManifest`, leaving a wiped directory and no manifest behind. Draining the queue
+and skipped writing the index, leaving a wiped directory and no index behind. Draining the queue
 first means one log line distinguishes a single flaky venue from an outage.
 
 The page then hands that URL to FullCalendar's `iCalendarPlugin` and never touches the bytes.
 This is deliberate dogfooding: the page reads exactly what subscribers read, so anything wrong in
 the feed shows up here. Events carry the film's page on this site as their `URL`, not a booking
-link, so a click opens `/movies/<id>/<slug>` in a new tab. The feed builds that address itself,
+link, so a click opens `/movies/<id>/<slug>` in a new tab. The page adds the filters for that
+screening (`getScreeningFilterUrl`: `base=all`, the venue, the screening's London day), so the
+film opens on the showing that was clicked rather than every showing across London; `base=all`
+because the default event types would hide a quiz or talk. The feed keeps the bare address —
+filters are this site's behaviour, not the published data's — and the new tab's `noopener`
+gives it its own session storage, so the reader's filters in the calendar's tab are left alone.
+The feed builds that address itself,
 from the same combined release the site builds from — it has to agree with `getMovieUrl` exactly,
 since a static export has no dynamic route to catch a near-miss.
 
@@ -326,6 +453,94 @@ Styling lives in `calendar.module.css` as `--fc-*` custom properties plus `:glob
 overrides. Two site-wide rules must be neutralised explicitly: events are `<a>` elements and pick
 up the global blue link colour and underline, and the toolbar title is an `<h2>`, which globals.css
 would render at 48px in pink.
+
+## Published Data
+
+The two datasets licensed for reuse are hosted on this site rather than pointed at on GitHub.
+`/datasets` documents them (what's in them, the addresses, the schema, how often they change, how to
+detect new data) and `/data-licence` licenses them; the URL constants live in `@/app/datasets/data`. `scripts/fetch-published-data.js` downloads the latest `data-transformed` and
+`data-calendar` releases into `public/datasets/`:
+
+- `datasets/venues/<venue-id>.json` — the venue's transformed listings
+- `datasets/calendars/<venue-id>.ics` — its calendar feed
+- `datasets/schema.json` — the JSON files' schema, from `clusterflick/scripts` (main), the one
+  `transform` validates each venue's output against before release
+- `datasets/index.json` — every venue, its files, the release each dataset came from, and the
+  licence
+- `datasets/latest.json` — only the index's `generatedAt` and `releases`, written from the same
+  object, so a consumer can poll it for new data. Consumers compare the release **tags**, never
+  `generatedAt`: the site deploys more than once per release (dispatched by both `data-calendar`
+  and `data-matched`), and `generatedAt` moves with every deploy whether the data changed or not
+
+**The index describes each venue**: name, type, group, address, coordinates, the venue's own
+listings URL and its page here, taken from the combined data the workflow downloads first. A file
+named after a domain says nothing about where the cinema is, and the licence page already counted
+the venue records as ours to give. Social handles and the pipeline's bookkeeping (`structure`,
+`programming`) are left out. A venue with files but no details fails the build, since the releases
+come from one run and a mismatch is something to look into. The details sit beside the existing
+`data` and `calendar` keys, so a reader of those is unaffected.
+
+**The names are fixed, not content-hashed**, because they are addresses other people link to,
+fetch on a schedule and subscribe to — the datasets page, the venue pages' calendar subscription
+links and the calendar page all use them. Freshness is a Cloudflare cache rule on `/datasets/`
+that makes them cacheable (`.ics` otherwise isn't) and respects the origin's TTL at the edge and
+in the browser, which is GitHub Pages' own `max-age=600`. It sits after the "Cache JSON blobs"
+rule, which gives every `.json` a year, because a later Cache Rule overrides an earlier one.
+Respecting the origin rather than setting a TTL is deliberate: on our plan an override can't go
+below two hours, and ten minutes keeps a reader, and the site's own calendar page, within one
+cache period of a deploy. The smoke tests check those headers, since a rule that stops matching
+would quietly serve year-old data.
+
+**The calendars are served uncompressed**, and that is accepted rather than an oversight. GitHub
+Pages gzips the `.json` files but not `text/calendar`, and Cloudflare only compresses the content
+types on its default list, which `text/calendar` isn't on. A Compression Rule doesn't change that:
+one was tried matching the path, then the media type, with the Zstandard preset and with a custom
+algorithm list, and every response still came back uncompressed while `robots.txt` on the same
+zone came back as Brotli. Rewriting the `Content-Type` to something compressible would risk
+calendar apps no longer recognising the feed, and a Worker to compress them is a lot of
+machinery for this. A typical feed is ~190KB and the largest ~700KB; it is fetched by calendar
+apps a few times a day and served from Cloudflare's cache, so the cost is the download, not the
+origin. If feed size ever matters, the lasting fix is a smaller feed from `data-calendar`.
+
+**Not under `data/`.** That directory is the site's own: content-hashed listing chunks, cached
+forever and carried forward between deploys by `carry-forward-static`, with no promise about
+their shape. These are the opposite on every count, so they get a directory of their own — one
+cache rule covers it, nothing carries it forward (each deploy is exactly one release, and the
+GitHub releases remain the archive of earlier ones), and `fetch-published-data` owns all of it.
+
+The download rules are the calendar's (above): retried, collected, and any file that still fails
+fails the build, because a missing file 404s for whoever relied on it. The index is written last,
+so it only ever describes a complete set. A release that can't be listed fails the build too;
+only one that doesn't exist (a 404) is let through, as an empty index.
+
+## Data Status
+
+`/datasets/status` is the release history of the two published datasets: when they started, how
+many releases, the current and longest streak of days with one, a 90-day bar per dataset and the
+time of day releases land. It is a record of what has happened, with no commitment about what
+happens next — keep any SLA, notice period or guarantee off it.
+
+**The history is `clusterflick/data-analysed`'s release log**, not the releases API.
+`data-transformed` and `data-calendar` each dispatch its `Release Log` workflow as they publish,
+which appends `{ dataset, repository, tag, publishedAt }` to `release-log.jsonl` on a
+`release-log-YYYYMM` release. `npm run fetch-release-log` downloads every month by name into
+`/release-log/` (gitignored, read at build time, never published), and a missing past month or a
+failed download fails the build: a hole in the history would read as days without a release. The
+log is dispatched at the same moment as the site build, so it can be a release behind;
+`getReleaseStatus` adds index.json's releases to it.
+
+**Times are release times** (`publishedAt`), not deploy times. The files under `/datasets/` change
+when the site next deploys after a release, and the page says so rather than measuring it.
+
+**Today is the reader's, not the build's.** A pipeline that stops also stops the builds, so a page
+that only knew its build date would show a full row of green and an unbroken streak indefinitely.
+`useNow` renders the static HTML against the build time and then moves to the browser's clock, and
+the date-dependent parts (`getStreaks`, `getRecentDays`, `getDailyRange`) are redone against it.
+`ReleaseFreshness` does the same for "Last new data X hours ago", checks `/datasets/latest.json`
+for anything newer than the build, and turns into a warning past `STALE_AFTER_HOURS` (36). The
+time-of-day distribution (`getTimeOfDay`) is built once, from the `data` releases of the last 90
+days, with the calendar's lag behind them given as a figure rather than a second near-identical
+series.
 
 ## Near Me
 
@@ -744,6 +959,13 @@ takes the loaded dataset as its `movies` lookup, withheld until loading has
 finished, so a selection isn't described as not showing while its films are
 still arriving. Past six chips the selection collapses to a count, since a
 watchlist would otherwise push every other filter off the screen.
+
+**The overlay can select the watchlist too.** A "My Watchlist" chip sits above
+the Films row's search for a signed-in reader with anything on the list, and
+selects the same snapshot "Explore watchlist" does (`selectMovies`). Before it,
+watchlist films at My Venues meant leaving for `/personalise` and coming back
+through its link. The chip reads as checked while the selection is exactly the
+watchlist; its count is the films on it that are showing.
 
 It widens as "All films", beside the people: a selection left over from
 another page is exactly the invisible blocker the empty state exists to name.
@@ -1503,6 +1725,13 @@ weekly, and indexed pages fell steadily from ~2,100 to ~880 as new films were
 indexed more slowly than old ones left; the durable pages (venues, boroughs,
 groups, clubs, festivals, genres, formats) are the ones search can build on.
 A film that returns drops the tag on the next build.
+
+**`/llms.txt` leads agents to the datasets** (`src/app/llms.txt/`). Little is
+known to read it, which is why it is small: the published datasets first, by
+the constants in `@/app/datasets/data`, then the site's URL shapes and index
+pages. It never lists pages one by one, since the sitemap does that and they
+change weekly, and there is no `llms-full.txt`. `content.test.ts` checks
+that every page it links is one the site builds, at its canonical address.
 
 **A page's `<title>` names what it is found by**, not just what it is called.
 Film pages read "Heat (1995) — Showtimes in London" (a departed film keeps

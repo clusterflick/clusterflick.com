@@ -71,6 +71,578 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-06",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/formats">formats page</Link> has had the same
+            treatment as genres. Each format fans out posters of what it has on,
+            and says how many showings there are and where: IMAX 70mm, for
+            instance, is only at one venue. Rare formats like 16mm and VHS show
+            their next screening. The page leads with how many showings are
+            coming up on film, and formats with nothing on are now listed by
+            name at the bottom rather than as empty cards.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/venues">venues page</Link> now opens on a
+            full-screen map of every venue, with the search sitting just below
+            it. Once you scroll, the search sticks to the top of the page, so
+            you can change it from anywhere in the list without scrolling back
+            up past the map. Maps in the page, here and on{" "}
+            <Link href="/near-me">Near Me</Link>, no longer get in the way of
+            scrolling: one finger scrolls the page and two fingers move the map,
+            and on a computer you hold Ctrl (⌘ on a Mac) to zoom with the scroll
+            wheel.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/genres">genres page</Link> has been livened up.
+            Each genre now fans out posters of its busiest films, so you can see
+            what it has on before you open it, and the page leads with the four
+            genres with the most films showing right now. The neon genre signs
+            stay, and now flicker on when you hover over them.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-11-05",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "Farr's Dalston", url: "https://www.farrs.pub" },
+                {
+                  name: "The White Hart",
+                  url: "https://www.whitehartsouthwark.co.uk",
+                },
+                {
+                  name: "Edami",
+                  url: "https://www.instagram.com/edamibakery",
+                },
+                {
+                  name: "Eat the Sunshine . Down the Sun",
+                  url: "https://www.instagram.com/etsdts_",
+                },
+              ]}
+            />
+            : a Dalston bar in a former picture palace, a Southwark pub with a
+            screening room upstairs, a Lebanese bakery in Hackney, and a
+            Kennington café with a basement sonic art space.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/about">about page</Link> has been refreshed. It now
+            opens with the current figures: how many venues are listing
+            something, how many events and showings there are, and how long ago
+            the data was last refreshed, with a link to the release history. The
+            event sources behind those figures are listed by name. Below that, a
+            new section points to what you can do here, from browsing every film
+            to keeping a watchlist, and ways to get in touch now come before the
+            credits. Oh, and the popcorn pops.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-11-04",
+    changes: [
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://tzkrti.com/en">Tzkrti</Ext>, a ticketing platform
+            for Arab and Palestinian culture, which sells tickets for screenings
+            at places like{" "}
+            <Venue name="Mosaic Rooms" url="https://mosaicrooms.org" />.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Autumn Three",
+                  url: "https://www.instagram.com/autumnthree_",
+                },
+                {
+                  name: "The Liberation Centre",
+                  url: "https://theliberationcentre.com",
+                },
+              ]}
+            />
+            : a studio and listening space in Hackney Wick, and a youth and
+            community centre in Brixton.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Norrøna Flagship Store London"
+              url="https://www.norrona.com/gb/en/store/norrona-flagship-store-london"
+            />
+            , the outdoor clothing brand&apos;s new Regent Street shop, which
+            hosts ski film nights.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-11-03",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/">home page</Link> has been redesigned. It opens
+            with a few of the week&rsquo;s screenings worth knowing about
+            &mdash; a one-off, a 35mm print, a final showing &mdash; each with
+            when and where it is, and its trailer where there is one. Below them
+            are the week at a glance (how many films, screenings and venues are
+            on, and how many showings are on 35mm) and This Week&rsquo;s Picks:
+            the screenings the week&rsquo;s summary mentions, with the summary
+            itself folded away underneath. Further down, More Than a Screening
+            now leads with the occasion itself &mdash; the guest in the room,
+            the live score &mdash; on a wide card, as it does on{" "}
+            <Link href="/near-me">Near Me</Link>; Last Chance posters show the
+            day each run ends; and Sagas &amp; Series is left out in a week with
+            only one franchise on.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            The step that works out which films a double bill, marathon or
+            franchise event is showing now uses OpenAI&rsquo;s GPT-6.1 Terra
+            rather than Google&rsquo;s Gemini. On hand-checked listings it
+            matched the best of the nine setups tried, at a third of the cost of
+            the best Gemini one. The models the pipeline falls back on have also
+            moved off ones that are being retired.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-11-02",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "Mosaic Rooms", url: "https://mosaicrooms.org" },
+                {
+                  name: "Museum of Youth Culture",
+                  url: "https://www.museumofyouthculture.com",
+                },
+                {
+                  name: "Pretty Decent Blackhorse Road",
+                  url: "https://prettydecentbeer.co",
+                },
+                {
+                  name: "Pretty Decent Forest Gate",
+                  url: "https://prettydecentbeer.co",
+                },
+                {
+                  name: "Pretty Decent Victoria Park",
+                  url: "https://prettydecentbeer.co",
+                },
+              ]}
+            />
+            : a Cromwell Road gallery, a Camden museum of youth culture, and the
+            three taprooms of an east London brewery that each show their own
+            film for its Sunday Movie Club.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Bonny Downs Community Association",
+                  url: "https://bonnydowns.org",
+                },
+                { name: "Chats Palace", url: "https://www.chatspalace.com" },
+                {
+                  name: "Four Corners",
+                  url: "https://www.fourcornersfilm.co.uk",
+                },
+                {
+                  name: "Red Door Studios",
+                  url: "https://www.throughthereddoor.org",
+                },
+                {
+                  name: "Second Home Spitalfields",
+                  url: "https://secondhome.io",
+                },
+                {
+                  name: "St Francis at The Engine Room",
+                  url: "https://engineroom.org.uk",
+                },
+                {
+                  name: "The Art House by Acrylicize",
+                  url: "https://thearthouse.live",
+                },
+                { name: "The Bear Church", url: "https://www.thebear.tv" },
+                { name: "The Portico", url: "https://www.theportico.uk" },
+                {
+                  name: "Walworth Living Room",
+                  url: "https://www.walworthlivingroom.org",
+                },
+                {
+                  name: "Wapping Powerhouse",
+                  url: "https://www.wappingpowerhouse.org",
+                },
+              ]}
+            />
+            , from arts centres and churches to community spaces, a workspace
+            and a former hydraulic power station.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-30",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Native Spirit Festival"
+              url="https://nativespiritfoundation.org/"
+            />
+            , the annual UK festival of Indigenous film, media and arts, running
+            since 2007, whose London programme is an international selection of
+            Indigenous-produced films.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Published a report on{" "}
+            <Link href="/reports/data-sources-2026">
+              where Clusterflick&rsquo;s data comes from
+            </Link>
+            : every place listings and film data are fetched from, how
+            they&rsquo;re fetched, and what each site&rsquo;s robots.txt and
+            terms ask of automated visitors.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added a page about <Link href="/bot">the Clusterflick bot</Link>,
+            for anyone who spots it in their logs: what it collects from cinema
+            and ticketing websites, how it behaves and how to get in touch.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-27",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Signed in, a My Watchlist chip in the filters&rsquo; Films row now
+            selects the films on your watchlist, so you can combine them with
+            any other filter (your watchlist at My Venues, say) without going
+            via <Link href="/personalise">Personalise</Link>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-26",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Duke Street Church",
+                  url: "https://www.dukestreetchurch.com",
+                },
+                {
+                  name: "St Mary's Barnes",
+                  url: "https://www.stmarybarnes.org",
+                },
+                {
+                  name: "St Paul's West Hackney",
+                  url: "https://www.stpaulswesthackney.org",
+                },
+              ]}
+            />
+            , churches in Richmond, Barnes and West Hackney whose halls and
+            auditoriums host community film screenings.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                { name: "Coven", url: "https://worldwidecoven.net/" },
+                {
+                  name: "Biddle Bros",
+                  url: "https://www.instagram.com/biddlebros/",
+                },
+              ]}
+            />
+            , a queer nightclub and performance space on Old Compton Street and
+            a bar on Lower Clapton Road, both hosting promoter-run film nights.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Hart Shoreditch Hotel",
+                  url: "https://hartshoreditch.com/whats-on/",
+                },
+                {
+                  name: "UCL Cruciform Building",
+                  url: "https://www.ucl.ac.uk/library/using-library/libraries-and-study-spaces/cruciform-hub",
+                },
+                {
+                  name: "A House for Artists",
+                  url: "https://www.instagram.com/ahouseforartists/",
+                },
+                {
+                  name: "Rhizomatic!",
+                  url: "https://www.instagram.com/rhizomatic.ldn/",
+                },
+              ]}
+            />
+            : a Shoreditch hotel with its own events programme, UCL&apos;s
+            former University College Hospital building on Gower Street,
+            artists&apos; housing in Barking with a community cinema in its
+            ground-floor Living Room, and a creative space in Fish Island.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The published data has a page of its own,{" "}
+            <Link href="/datasets">Datasets</Link>, covering what&rsquo;s in it,
+            where to get it and how to tell when it has changed, leaving the{" "}
+            <Link href="/data-licence">data licence</Link> to the terms. A new{" "}
+            <code>latest.json</code> names just the current releases, to poll
+            for new data without fetching the whole index.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Added a <Link href="/datasets/status">data status</Link> page, with
+            the release history of both datasets since February 2025: every day
+            with a release over the last 90 days, the streaks, and the time of
+            day new data lands.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-25",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Romanian Film Festival UK"
+              url="https://www.rofilmfest.co.uk/"
+            />
+            , bringing recent Romanian features, documentaries and restorations
+            to the UK with filmmaker and cast Q&amp;As, in London from 2 to 7
+            December.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Shoreditch Arts Club"
+              url="https://shoreditchartsclub.com"
+            />
+            , a members&apos; club on Redchurch Street with its own cinema room,
+            whose programme mixes screenings with talks, performance and
+            installations.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added <Venue name="Sevente" url="https://sevente.co.uk" />, a
+            neighbourhood bar and cultural space on Hackney Road that runs its
+            own film club nights.
+          </>
+        ),
+      },
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://cinebur.com">Cinebur</Ext>, the app hosts use to
+            put on movie nights, including the film nights at{" "}
+            <Venue name="Sevente" url="https://sevente.co.uk" /> and{" "}
+            <Venue
+              name="Shoreditch Arts Club"
+              url="https://shoreditchartsclub.com"
+            />
+            .
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The published data&rsquo;s index now describes every venue, with its
+            name, type, address, coordinates and page here, rather than just
+            naming its files, and the schema the JSON files follow is published
+            beside them. Both are linked from the{" "}
+            <Link href="/data-licence">data licence</Link> page.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    date: "2026-10-22",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="K.C. Continental Stores"
+              url="https://www.kccontinentalstores.co.uk"
+            />
+            , a community-owned cafe and bar on Caledonian Road where Friday
+            Knights runs its movie club nights.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "The All Good Bookshop",
+                  url: "https://allgoodbookshop.co.uk",
+                },
+                {
+                  name: "Chestnuts Community Centre",
+                  url: "https://www.bridgerenewaltrust.org.uk/chestnuts-community-centre",
+                },
+              ]}
+            />
+            , a co-operative bookshop on Turnpike Lane and a community centre in
+            Chestnuts Park, Tottenham, both venues where Haringey Community
+            Cinema puts on screenings.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/haringey-community-cinema">
+              Haringey Community Cinema
+            </Link>
+            , free or pay-what-you-can screenings in Tottenham with guest
+            speakers and discussion. Next up is Raoul Peck&apos;s Lumumba for
+            Congo Week at{" "}
+            <Venue
+              name="The Antwerp Arms"
+              url="https://www.antwerparms.co.uk"
+            />{" "}
+            on 24 October.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-20",
     changes: [
       {
@@ -300,6 +872,22 @@ export const CHANGELOG: ChangelogDay[] = [
     ],
   },
   {
+    date: "2026-10-17",
+    changes: [
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/catalogue">catalogue</Link> and{" "}
+            <Link href="/planner">planner</Link> now keep your filters in the
+            address, so going from the grid to a film, on to a name in its cast
+            and then back returns you to the grid as you left it.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-10-14",
     changes: [
       {
@@ -345,6 +933,16 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            Double bills, marathons and shorts programmes now count as the films
+            they screen, so they turn up when you filter by genre, director or
+            cast, and on the <Link href="/genres">genre pages</Link>.
+          </>
+        ),
+      },
     ],
   },
   {
@@ -383,6 +981,22 @@ export const CHANGELOG: ChangelogDay[] = [
   {
     date: "2026-10-10",
     changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Women and the World International Film Festival"
+              url="https://www.iffww.com/"
+            />
+            , bringing fiction features, documentaries and shorts to London from
+            5 to 12 November, alongside panels and masterclasses, with a focus
+            this year on the role of women in shaping peace, security and
+            defence.
+          </>
+        ),
+      },
       {
         tag: "New venue",
         body: ({ Venue }) => (

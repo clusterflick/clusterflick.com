@@ -1,6 +1,7 @@
 import type { StorybookConfig } from "@storybook/nextjs-vite";
 import { mergeConfig, type Rollup } from "vite";
 import getMetaDataFilename from "../src/utils/get-meta-data-filename";
+import getVenueCountFloor from "../src/utils/get-venue-count-floor";
 
 // The metadata filename is content-hashed, so it changes every time the data is
 // reprocessed — CI regenerates it from a fresh release on every run. Resolve it
@@ -13,6 +14,8 @@ if (!metaDataFilename) {
     "No data.meta.*.json found in public/data — run `npm run process-combined-data` before building Storybook",
   );
 }
+
+const venueCountFloor = String(getVenueCountFloor());
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -29,12 +32,15 @@ const config: StorybookConfig = {
   env: (config) => ({
     ...config,
     NEXT_PUBLIC_DATA_FILENAME: metaDataFilename,
+    NEXT_PUBLIC_VENUE_COUNT_FLOOR: venueCountFloor,
   }),
   async viteFinal(config) {
     return mergeConfig(config, {
       define: {
         "process.env.NEXT_PUBLIC_DATA_FILENAME":
           JSON.stringify(metaDataFilename),
+        "process.env.NEXT_PUBLIC_VENUE_COUNT_FLOOR":
+          JSON.stringify(venueCountFloor),
       },
       build: {
         // Suppress sourcemap warnings for Next.js app directory files

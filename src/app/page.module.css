@@ -3,11 +3,86 @@
   padding-top: 80px;
 }
 
+/* The feature sits directly under the 63px header, its wash reaching it. */
+.pageWithFeature {
+  padding-top: 63px;
+}
+
 .intro {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto 40px;
   padding: 8px 20px 0;
   text-align: center;
+}
+
+.pageWithFeature .intro {
+  padding-top: 32px;
+}
+
+.freshness {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+/* Green is the release-status colour: a fresh release, never decoration. */
+.freshnessDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-release-green);
+}
+
+.picks {
+  max-width: var(--page-wide);
+  margin: 0 auto 48px;
+  padding: 0 20px;
+}
+
+.picksGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .picksGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1000px) {
+  .picksGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.summaryNote {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+.summaryNote summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+}
+
+.summaryNote summary:hover {
+  color: var(--color-white);
+}
+
+.summaryNote p {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--color-muted-gray);
+  text-wrap: pretty;
 }
 
 .introTitle {
@@ -18,8 +93,36 @@
 .introLead {
   font-size: 16px;
   line-height: 1.7;
-  color: var(--color-light-gray);
+  color: var(--color-muted-gray);
   margin: 0 auto 28px auto;
+}
+
+/*
+ * Prose dense with names reads as a page of references when every name is a
+ * blue link. Here they are bold in the text's own light grey, with a faint
+ * underline so they still read as links, and turn pink on hover as every
+ * link does.
+ */
+.introLead a,
+.summary a,
+.summaryNote a {
+  color: var(--color-light-gray);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.18);
+}
+
+.introLead a:hover,
+.summary a:hover,
+.summaryNote a:hover {
+  color: var(--color-neon-pink);
+  border-bottom-color: var(--color-neon-pink);
+}
+
+/* A summary with nothing to feature sits in the page's content column. */
+.summaryFallback {
+  max-width: var(--page-wide);
+  margin: 0 auto 40px;
+  padding: 0 20px;
 }
 
 /* Card chrome matches the "What we store" note on /personalise. */
@@ -28,7 +131,7 @@
   padding: 16px 20px;
   font-size: 15px;
   line-height: 1.7;
-  color: var(--color-light-gray);
+  color: var(--color-muted-gray);
   text-align: left;
   background: rgba(var(--color-white-rgb), 0.03);
   border: 1px solid rgba(var(--color-white-rgb), 0.08);
@@ -45,7 +148,7 @@
 }
 
 .sections {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto;
   padding: 0 20px;
 }

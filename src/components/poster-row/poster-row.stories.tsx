@@ -91,6 +91,21 @@ export const WithSeeAll: Story = {
   },
 };
 
+/** Last Chance, with the day each run ends drawn on its poster. */
+export const WithBadges: Story = {
+  args: {
+    title: "Last Chance",
+    movies: POSTER_FILMS.map((movie, index) => {
+      const day = ["Thu 5", "Fri 6", "Sat 7", "Sun 8", "Mon 9"][index];
+      return {
+        movie,
+        subtitle: `Last showing ${day} Nov`,
+        badge: { label: `Ends ${day} Nov`, color: "yellow" as const },
+      };
+    }),
+  },
+};
+
 /** Marathon/double-bill row — stacked posters from included movies. */
 export const Marathons: Story = {
   args: {

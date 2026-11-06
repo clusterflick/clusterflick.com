@@ -50,8 +50,9 @@ next-env.d.ts
 /combined-data/
 /matched-data/
 /diffed-data/
+/release-log/
 /public/data/
-/public/calendars/
+/public/datasets/
 
 # Storybook
 *storybook.log

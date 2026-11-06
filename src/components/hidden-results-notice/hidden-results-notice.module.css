@@ -8,8 +8,8 @@
   /* The page wrapper has no side padding, so blocks sitting directly in it
      supply their own — the same 20px the search controls above use, which is
      also what lines this up with them. Width is the gutter plus the 700px of
-     content, so the card is unchanged on a wide screen. */
-  max-width: 740px;
+     content (--measure-notice), so the card is unchanged on a wide screen. */
+  max-width: calc(var(--measure-notice) + 40px);
   margin: 8px auto 32px;
   padding: 0 20px;
 }

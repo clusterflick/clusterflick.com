@@ -17,11 +17,11 @@ import {
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Accessible Cinema",
-  description:
-    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 450+ venues.",
+  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at ${VENUE_COUNT} venues.`,
   alternates: {
     canonical: "/accessibility",
   },
@@ -209,8 +209,7 @@ export default async function AccessibilityPage() {
   const faqs = [
     {
       question: "What accessibility features can I find screenings for?",
-      answer:
-        "Audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings, across 450+ London venues.",
+      answer: `Audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings, across ${VENUE_COUNT} London venues.`,
     },
     {
       question: "Where does the accessibility data come from?",
@@ -280,7 +279,7 @@ export default async function AccessibilityPage() {
           <strong>Cinema for everyone.</strong>
           <br />
           Find screenings with audio description, captions, relaxed
-          environments, and more across 450+ London venues.
+          environments, and more across {VENUE_COUNT} London venues.
         </p>
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and
@@ -499,7 +498,7 @@ export default async function AccessibilityPage() {
                 ) : (
                   <p className={styles.noScreenings}>
                     No {label.toLowerCase()} screenings are currently listed.
-                    Check back soon — data is refreshed daily.
+                    Check back soon — data is refreshed several times a day.
                   </p>
                 )}
               </section>

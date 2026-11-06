@@ -45,6 +45,8 @@
   align-items: start;
   gap: 64px;
   width: 100%;
+  /* Not a page width: an overlay sized for its two filter columns, which a
+     page column would squeeze. */
   max-width: 1440px;
   padding: 0 48px;
 }

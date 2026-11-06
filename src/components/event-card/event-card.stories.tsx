@@ -87,6 +87,18 @@ export const NoFilms: Story = {
   },
 };
 
+/** A genre with nothing on: its icon is a neon sign, lit when the card is hovered. */
+export const NeonLogo: Story = {
+  args: {
+    href: "/genres/western",
+    name: "Western Films",
+    imagePath: "/images/genres/western.png",
+    description: "Frontier tales, gunslingers and revisionist classics.",
+    meta: noFilmsMeta,
+    neonLogo: true,
+  },
+};
+
 /** Grid of cards showing consistent hover behaviour across multiple items. */
 export const Grid: Story = {
   args: {

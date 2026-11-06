@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 import clsx from "clsx";
 import styles from "./sticky-bar.module.css";
 
@@ -6,6 +6,8 @@ interface StickyBarProps {
   children: ReactNode;
   /** For the page's own spacing around the bar (margins only). */
   className?: string;
+  /** To the bar itself, e.g. to measure it. */
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
@@ -16,6 +18,14 @@ interface StickyBarProps {
  *
  * Place it outside any padded content column: it supplies its own gutters.
  */
-export default function StickyBar({ children, className }: StickyBarProps) {
-  return <div className={clsx(styles.bar, className)}>{children}</div>;
+export default function StickyBar({
+  children,
+  className,
+  ref,
+}: StickyBarProps) {
+  return (
+    <div ref={ref} className={clsx(styles.bar, className)}>
+      {children}
+    </div>
+  );
 }

@@ -8,15 +8,15 @@ import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES,
 } from "@/lib/filters/modules/categories";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import { addLondonDays, getLondonMidnightTimestamp } from "@/utils/format-date";
 import PageContent from "./page-content";
 import SSROnly from "../ssr-only";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 const PAGE_TITLE =
   "Every Film Showing in London — Search London Cinema Listings";
-const PAGE_DESCRIPTION =
-  "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.";
+const PAGE_DESCRIPTION = `Every film showing in London, from ${VENUE_COUNT} venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.`;
 
 // How many films to bake into the static HTML.
 const STATIC_MOVIE_LIMIT = 72;
@@ -40,7 +40,7 @@ export default async function FilmsPage() {
   const defaultCategories = new Set(DEFAULT_CATEGORIES);
   const todayMidnight = getLondonMidnightTimestamp();
   const rangeStart = todayMidnight;
-  const rangeEnd = todayMidnight + 8 * MS_PER_DAY; // 7-day range, end is exclusive (midnight + 1 day)
+  const rangeEnd = addLondonDays(todayMidnight, 8); // 7-day range, end is exclusive (midnight + 1 day)
 
   const matchingMovies = Object.values(data.movies)
     .filter((movie) => {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GROUPED_NAV_LINKS } from "@/utils/nav-links";
 import styles from "./site-footer.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 /**
  * The site-wide footer: every navigable page, grouped the same way the
@@ -35,7 +36,7 @@ export default function SiteFooter() {
           ))}
         </div>
         <p className={styles.colophon}>
-          Every film showing in London — 450+ venues, one search.
+          Every film showing in London — {VENUE_COUNT} venues, one search.
         </p>
       </div>
     </footer>
