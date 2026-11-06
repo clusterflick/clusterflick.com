@@ -144,6 +144,18 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
+            The <Link href="/genres">genres page</Link> has been livened up.
+            Each genre now fans out posters of its busiest films, so you can see
+            what it has on before you open it, and the page leads with the four
+            genres with the most films showing right now. The neon genre signs
+            stay, and now flicker on when you hover over them.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
             The <Link href="/venues">venues page</Link> now opens on a
             full-screen map of every venue, with the search sitting just below
             it. Once you scroll, the search sticks to the top of the page, so
@@ -153,18 +165,6 @@ export const CHANGELOG: ChangelogDay[] = [
             scrolling: one finger scrolls the page and two fingers move the map,
             and on a computer you hold Ctrl (⌘ on a Mac) to zoom with the scroll
             wheel.
-          </>
-        ),
-      },
-      {
-        tag: "Improvement",
-        body: () => (
-          <>
-            The <Link href="/genres">genres page</Link> has been livened up.
-            Each genre now fans out posters of its busiest films, so you can see
-            what it has on before you open it, and the page leads with the four
-            genres with the most films showing right now. The neon genre signs
-            stay, and now flicker on when you hover over them.
           </>
         ),
       },
