@@ -1,7 +1,13 @@
-/* The same measure as /datasets and /data-licence, its sibling pages */
+/* Its measure is the layout's prose width, as on its sibling pages */
 .content {
-  max-width: 800px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Freshness, the summary line and the links, centred above the sections as
+   the page's lead. The same 8px rhythm as the sections below. */
+.summary {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -20,7 +26,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin: 12px 0 28px;
+  margin: 12px 0 0;
   text-align: center;
 }
 

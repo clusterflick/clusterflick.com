@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
@@ -6,6 +7,16 @@ import Divider from "@/components/divider";
 import PreloadCinemaData from "@/components/preload-cinema-data";
 import SiteFooter from "@/components/site-footer";
 import styles from "./standard-page-layout.module.css";
+
+/**
+ * The content column's width, by what the page mostly holds:
+ * - `prose` — reading pages (the data licence, the changelog). One column,
+ *   with section headings moved into a rail beside the text on wide screens
+ * - `default` — cards and lists (venues, festivals, clubs, boroughs)
+ * - `wide` — poster rows and discovery content
+ * Full-bleed content goes in `afterContent` instead.
+ */
+export type StandardPageWidth = "prose" | "default" | "wide";
 
 interface StandardPageLayoutProps {
   /**
@@ -44,6 +55,15 @@ interface StandardPageLayoutProps {
    */
   backUrl?: string;
   backText?: string;
+  /** Width of the content column (default: "default") */
+  width?: StandardPageWidth;
+  /**
+   * Optional opening content above the body, centred on the page at the prose
+   * measure: a status line, the links to sibling pages. On a prose page it
+   * spans the whole column rather than the text column beside the heading
+   * rail, so something centred reads as centred on the page.
+   */
+  lead?: ReactNode;
   /** Page body rendered below the hero and divider */
   children: ReactNode;
   /**
@@ -89,6 +109,8 @@ export default function StandardPageLayout({
   hero,
   backUrl,
   backText,
+  width = "default",
+  lead,
   children,
   afterContent,
   hideFooter = false,
@@ -117,7 +139,22 @@ export default function StandardPageLayout({
 
       {!hideHero && <Divider />}
 
-      {children && <div className={styles.content}>{children}</div>}
+      {(lead || children) && (
+        <div
+          className={clsx(
+            styles.content,
+            width === "prose" && styles.prose,
+            width === "wide" && styles.wide,
+          )}
+        >
+          {lead && <div className={styles.lead}>{lead}</div>}
+          {width === "prose" ? (
+            <div className={styles.proseBody}>{children}</div>
+          ) : (
+            children
+          )}
+        </div>
+      )}
       {afterContent}
       {!hideFooter && <SiteFooter />}
     </main>

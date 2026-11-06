@@ -115,6 +115,58 @@ Only create a new component when no existing one fits. When you do:
   just to replicate global link styles. The global stylesheet already styles
   links correctly — custom overrides are usually unnecessary and worse.
 
+## Page Widths
+
+A page's content sits in one of four columns, tokens on `:root` in
+`globals.css`, gutter included. **Pick by what the page mostly holds**, not by
+which page you copied:
+
+- **`--page-prose` (800px)** — reading pages: the data licence, the bot page,
+  the changelog, the datasets pages. Long lines are hard to read, so this is
+  one 800px column — until the screen has room for more (a 1040px container,
+  about a 1080px window). Then the column widens to `--page-wide` and each
+  section's heading moves into a rail beside its text, sticking under the
+  header as the text scrolls. An 800px strip in the middle of a big screen
+  left most of it empty and made the page longer than it needed to be; the
+  rail uses the width while keeping the text column a readable length.
+  `ContentSection` and the changelog's days take the rail (the `prose`
+  container query, with `--prose-rail` and `--prose-gap` set by
+  `StandardPageLayout`), and anything else lines up with the text column. A
+  new block on a prose page that has a heading of its own should take the
+  rail the same way.
+- **`--page-default` (1000px)** — cards and lists: venues, festivals, clubs,
+  boroughs, groups, a venue or programme page. The default.
+- **`--page-wide` (1200px)** — poster rows and discovery: the home page. The
+  footer sits at this width on every page.
+- **`--page-film` (1400px)** — the film page alone, whose 308px poster column
+  comes out of the width; at `--page-wide` the details beside it felt cramped.
+- **Full-bleed** — poster grids, maps and calendars, through
+  `StandardPageLayout`'s `afterContent`.
+
+`StandardPageLayout` takes the first three as `width` (`"prose"`,
+`"default"`, `"wide"`), so a page that wants a different column passes a prop
+rather than rebuilding the header, hero and divider around a `.content` of its
+own. A bespoke hero goes in `hero`.
+
+Opening content that should centre on the page — a status line, the links to
+sibling pages — goes in `lead`. It renders above the body at the prose text
+measure, centred on the whole column, so on a prose page it stays out of the
+heading rail instead of sitting off to the right in the text column, and it
+ends 60px above the body, the gap between sections. `/datasets` and
+`/datasets/status` use it.
+
+Narrower elements inside a page share two measures (content only, so add any
+gutter on top): **`--measure-blurb` (640px)** for hero taglines and blurbs,
+and **`--measure-notice` (700px)** for the notices and offers under the
+catalogue's search controls. A paragraph inside a card caps itself in `ch`
+instead, since its measure belongs to its font size.
+
+Anything lining up with a column reads its token (`calc(var(--page-default) -
+40px)` for a bar that supplies its own gutter) rather than repeating the
+number. Media queries can't read custom properties, so a breakpoint tied to a
+width says which one beside it. The filter overlay's 1440px is not a page
+width: it is sized for its two filter columns.
+
 ## Film Clubs
 
 Film clubs are defined in `src/data/film-clubs.ts`. Each club has a `matchers` array of

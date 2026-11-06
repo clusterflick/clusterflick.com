@@ -126,7 +126,8 @@
   }
 }
 
-/* Below the content max-width (1200px) the page container is full-width with
+/* Below the content max-width (--page-wide, 1200px: a media query can't read
+   the token, so keep the two in step) the page container is full-width with
    just a gutter, so break the scroller out to the full viewport width. Posters
    are then clipped at the screen edge (where content is expected to run off)
    rather than at an internal content margin — that internal clip line is what

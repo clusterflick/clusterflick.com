@@ -1,9 +1,3 @@
-/* Mostly prose, so the measure stays narrower than the layout allows. */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 .body {
   font-size: 16px;
   line-height: 1.7;
@@ -17,7 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: 8px 0 32px;
+  margin: 8px 0 0;
 }
 
 /* ─── The two datasets ─── */

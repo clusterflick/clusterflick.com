@@ -11,16 +11,7 @@
 .tagline {
   font-size: 20px;
   line-height: 1.6;
-  max-width: 640px;
-}
-
-/* Content wrapper */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-  position: relative;
-  z-index: 1;
+  max-width: var(--measure-blurb);
 }
 
 /* ─── Timeline ─── */
@@ -50,6 +41,36 @@
   padding-bottom: 8px;
   display: block;
   border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+/* On a wide screen the date moves into the prose rail beside its changes (see
+   StandardPageLayout's `.prose`), sticking under the header while they scroll
+   past, as ContentSection's headings do on the other prose pages. */
+@container prose (min-width: 1040px) {
+  .day {
+    display: grid;
+    grid-template-columns: var(--prose-rail) minmax(0, 1fr);
+    column-gap: var(--prose-gap);
+    align-items: start;
+    margin-left: calc(-1 * (var(--prose-rail) + var(--prose-gap)));
+  }
+
+  .day + .day {
+    margin-top: 40px;
+    padding-top: 40px;
+  }
+
+  /* The weekday on a line of its own, then the date (the newline is in the
+     text): `pre` breaks only there, so "30 September 2026" never wraps after
+     September. At 22px the widest date is about 235px, inside the rail. */
+  .dayHeading {
+    position: sticky;
+    top: 83px;
+    font-size: 22px;
+    line-height: 1.3;
+    white-space: pre;
+    margin-bottom: 0;
+  }
 }
 
 .changes {

@@ -12,9 +12,56 @@
 
 /* Main content area below the hero + divider */
 .content {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding: 0 20px 80px;
   position: relative;
   z-index: 1;
+}
+
+/* The `width` prop. Default is the rule above; see "Page Widths" in
+   CLAUDE.md for which one a page takes. */
+
+/* Prose reads as one 800px column until the screen has room for more, then
+   sets each section's heading in a rail beside its text, so a wide screen
+   holds more of the page rather than framing a narrow strip of it. The
+   column is the wide page width, so the container can measure the room;
+   `.proseBody` keeps the single column at the prose width until then.
+   ContentSection and the changelog's days read the rail from the `prose`
+   container and the two custom properties below. */
+.prose {
+  --prose-rail: 240px;
+  --prose-gap: 56px;
+  max-width: var(--page-wide);
+  container: prose / inline-size;
+}
+
+/* The `lead` prop: centred on the page at the prose measure, outside the
+   heading rail. Set off from the body by ContentSection's 60px, the gap
+   between sections, so the first section reads as one of them rather than
+   as a caption to the lead; a lead's own blocks leave their bottom margin
+   to this. */
+.lead {
+  max-width: calc(var(--page-prose) - 40px);
+  margin: 0 auto 60px;
+}
+
+/* The prose page width, less the 20px gutters `.content` supplies. */
+.proseBody {
+  max-width: calc(var(--page-prose) - 40px);
+  margin: 0 auto;
+}
+
+/* Keep in step with the rail rules in ContentSection and the changelog. */
+@container prose (min-width: 1040px) {
+  /* The rail sits in this padding: anything that isn't a railed section
+     lines up with the text column, and railed sections pull back into it. */
+  .proseBody {
+    max-width: none;
+    padding-left: calc(var(--prose-rail) + var(--prose-gap));
+  }
+}
+
+.wide {
+  max-width: var(--page-wide);
 }

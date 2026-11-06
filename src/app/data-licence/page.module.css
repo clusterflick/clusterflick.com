@@ -11,17 +11,7 @@
 .tagline {
   font-size: 20px;
   line-height: 1.6;
-  max-width: 640px;
-}
-
-/* Content wrapper — narrower than the About page's card grids, because this is
-   mostly prose and long measures are hard to read. */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-  position: relative;
-  z-index: 1;
+  max-width: var(--measure-blurb);
 }
 
 .body {

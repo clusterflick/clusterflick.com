@@ -2,7 +2,7 @@ import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import type { ReleaseStatus } from "@/utils/release-status";
-import StatusView from "./status-view";
+import StatusView, { StatusSummary } from "./status-view";
 import styles from "./page.module.css";
 
 interface DataStatusPageContentProps {
@@ -19,9 +19,11 @@ export default function DataStatusPageContent({
     <StandardPageLayout
       title="Data Status"
       subtitle="When the published datasets have been released, and how often."
+      width="prose"
+      lead={<StatusSummary status={status} latestUrl={latestUrl} />}
     >
       <div className={styles.content}>
-        <StatusView status={status} latestUrl={latestUrl} />
+        <StatusView status={status} />
 
         <ContentSection title="About this page">
           <p className={styles.body}>

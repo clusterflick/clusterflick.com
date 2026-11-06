@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import slugify from "@sindresorhus/slugify";
 import Link from "next/link";
 import HeroSection from "@/components/hero-section";
+import StandardPageLayout from "@/components/standard-page-layout";
 import OutlineHeading from "@/components/outline-heading";
-import PageHeader from "@/components/page-header";
-import SiteFooter from "@/components/site-footer";
-import Divider from "@/components/divider";
 import Tag from "@/components/tag";
 import { getStaticData } from "@/utils/get-static-data";
 import { FESTIVALS } from "@/data/festivals";
@@ -22,15 +20,26 @@ export const metadata: Metadata = {
   },
 };
 
-/** Formats an ISO date (YYYY-MM-DD) as e.g. "Sunday, 12 July 2026". */
+/**
+ * Formats an ISO date (YYYY-MM-DD) as e.g. "Sunday,\n12 July 2026". The
+ * newline collapses to a space wherever the heading runs on one line, and is
+ * the break when it sits in the narrow rail beside its changes, so the date
+ * always wraps after the weekday rather than wherever the width runs out.
+ * OutlineHeading takes only a string, so a newline rather than markup.
+ */
 function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
+  const date = new Date(`${iso}T00:00:00Z`);
+  const weekday = date.toLocaleDateString("en-GB", {
     weekday: "long",
+    timeZone: "UTC",
+  });
+  const rest = date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
+  return `${weekday},\n${rest}`;
 }
 
 /** Outbound link used when no Clusterflick page exists for a reference. */
@@ -93,51 +102,43 @@ export default async function ChangelogPage() {
   const helpers = await buildHelpers();
 
   return (
-    <main id="main-content">
-      <PageHeader />
-
-      <HeroSection
-        backgroundImage="/images/light-circles.jpg"
-        backgroundImageAlt="Abstract blurred cinema lights"
-        align="center"
-        className={styles.hero}
-      >
-        <OutlineHeading className={styles.title}>Changelog</OutlineHeading>
-        <p className={styles.tagline}>
-          A running record of what&apos;s new on Clusterflick — the venues,
-          sources and festivals we&apos;ve added, plus features and improvements
-          across the site and its data.
-        </p>
-      </HeroSection>
-
-      <Divider />
-
-      <section className={styles.content}>
-        <ol className={styles.timeline}>
-          {CHANGELOG.map((day) => (
-            <li key={day.date} className={styles.day}>
-              <OutlineHeading
-                as="h2"
-                color="blue"
-                className={styles.dayHeading}
-              >
-                {formatDate(day.date)}
-              </OutlineHeading>
-              <ul className={styles.changes}>
-                {day.changes.map((change, i) => (
-                  <li key={i} className={styles.change}>
-                    <Tag color={tagColor(change.tag)} size="sm">
-                      {change.tag}
-                    </Tag>
-                    <p className={styles.changeBody}>{change.body(helpers)}</p>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <SiteFooter />
-    </main>
+    <StandardPageLayout
+      width="prose"
+      hero={
+        <HeroSection
+          backgroundImage="/images/light-circles.jpg"
+          backgroundImageAlt="Abstract blurred cinema lights"
+          align="center"
+          className={styles.hero}
+        >
+          <OutlineHeading className={styles.title}>Changelog</OutlineHeading>
+          <p className={styles.tagline}>
+            A running record of what&apos;s new on Clusterflick — the venues,
+            sources and festivals we&apos;ve added, plus features and
+            improvements across the site and its data.
+          </p>
+        </HeroSection>
+      }
+    >
+      <ol className={styles.timeline}>
+        {CHANGELOG.map((day) => (
+          <li key={day.date} className={styles.day}>
+            <OutlineHeading as="h2" color="blue" className={styles.dayHeading}>
+              {formatDate(day.date)}
+            </OutlineHeading>
+            <ul className={styles.changes}>
+              {day.changes.map((change, i) => (
+                <li key={i} className={styles.change}>
+                  <Tag color={tagColor(change.tag)} size="sm">
+                    {change.tag}
+                  </Tag>
+                  <p className={styles.changeBody}>{change.body(helpers)}</p>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </StandardPageLayout>
   );
 }
