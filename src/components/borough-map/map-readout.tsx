@@ -71,11 +71,11 @@ export default function MapReadout({
       onBlur={() => setActive(null)}
     >
       <div className={styles.mapColumn}>
-        <p className={styles.readout} aria-hidden="true">
+        <div className={styles.readout} aria-hidden="true">
           {active ? (
             <>
-              <strong className={styles.readoutLabel}>{active.label}</strong>{" "}
-              {active.readout}
+              <strong className={styles.readoutLabel}>{active.label}</strong>
+              <span className={styles.readoutDetail}>{active.readout}</span>
             </>
           ) : (
             <span className={styles.prompt}>
@@ -89,7 +89,7 @@ export default function MapReadout({
               {prompt}
             </span>
           )}
-        </p>
+        </div>
         <div className={styles.canvas}>
           {children}
           {shape && (

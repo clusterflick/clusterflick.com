@@ -323,6 +323,11 @@ coordinates are polygons rather than rings; reading them as rings once
 dropped Pimlico from Westminster and Erith from Bexley, leaving holes in the
 map. Both the generator and `getVenueBorough` now read each part as a polygon
 and fail on a malformed ring rather than dropping the zone.
+Each borough page's map image (`public/images/boroughs/<slug>.png`, from
+`scripts/fetch-borough-maps.js`) is drawn from the same dissolved outline, so
+a change to the outlines means regenerating those too. The script skips
+images that exist and needs a `GOOGLE_MAPS_API_KEY`, so delete the affected
+ones first.
 
 ## Festival & Film Club Indexes
 

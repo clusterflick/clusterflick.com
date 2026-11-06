@@ -54,23 +54,42 @@
   }
 }
 
-/* One line, always taken, so pointing at the map never moves it. */
+/* A fixed box of two lines, name over figures, each held to one line: the
+   readout changes as the pointer crosses the map, and a box that grew or
+   wrapped with its text made everything under it jump. The prompt is centred
+   in the same box. */
 .readout {
-  min-height: 1.6em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 52px;
   margin: 0 0 8px;
-  font-size: 16px;
-  line-height: 1.6;
   color: var(--color-light-gray);
 }
 
+.readoutLabel,
+.readoutDetail {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .readoutLabel {
+  font-size: 16px;
+  line-height: 24px;
   color: var(--color-white);
+}
+
+.readoutDetail {
+  font-size: 14px;
+  line-height: 20px;
 }
 
 /* The prompt is the only sign the map answers to a pointer, so it reads as a
    hint rather than a caption: a pill, with a pointer beside it. */
 .prompt {
   display: inline-flex;
+  align-self: flex-start;
   align-items: center;
   gap: 8px;
   padding: 2px 12px 2px 8px;
