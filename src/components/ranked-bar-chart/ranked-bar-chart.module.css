@@ -47,11 +47,6 @@
   text-decoration: none;
 }
 
-.label a:hover,
-.label a:focus-visible {
-  text-decoration: underline;
-}
-
 .cell {
   display: flex;
   align-items: center;
