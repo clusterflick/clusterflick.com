@@ -5,6 +5,7 @@ import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
 import { formatShowingTime } from "@/utils/format-date";
 import VenueList from "./venue-list";
 import CappedList from "./capped-list";
+import WatchlistTag from "./watchlist-tag";
 import styles from "./updates.module.css";
 
 /**
@@ -37,6 +38,7 @@ function FilmTile({ film }: { film: UpdateFilm }) {
       includedMovies={film.includedMovies}
       href={film.href ?? undefined}
       details={[venueLabel, pluralise(film.performanceCount, "showing")]}
+      movieId={film.movieId ?? undefined}
     />
   );
 }
@@ -119,6 +121,7 @@ export default function ReleaseSection({
                 ) : (
                   film.title
                 )}
+                {film.movieId && <WatchlistTag movieId={film.movieId} />}
                 {" — "}
                 {pluralise(film.performanceCount, "new showing")}
                 {" at "}

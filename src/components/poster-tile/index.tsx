@@ -4,6 +4,7 @@ import clsx from "clsx";
 import EventPoster, {
   type EventPosterIncludedMovie,
 } from "@/components/event-poster";
+import PosterStatusMarkers from "@/components/poster-status-markers";
 import styles from "./poster-tile.module.css";
 
 export {
@@ -62,6 +63,12 @@ export interface PosterTileProps {
    * with and without one keep their titles in line across the row.
    */
   note?: PosterTileNote;
+  /**
+   * Marks the poster with the reader's lists (watchlist, seen), as the browsing
+   * grids do. Opt-in: on `/personalise` every tile is on a list already, so a
+   * marker there would say nothing.
+   */
+  movieId?: string;
 }
 
 /**
@@ -76,9 +83,13 @@ export default function PosterTile({
   details = [],
   action,
   note,
+  movieId,
 }: PosterTileProps) {
   const body = (
     <>
+      {/* First, so it is the direct child of whatever the tile's target is:
+          hovering that is what fans a stack of markers out */}
+      {movieId && <PosterStatusMarkers movieId={movieId} />}
       <EventPoster
         title={title}
         posterPath={posterPath}

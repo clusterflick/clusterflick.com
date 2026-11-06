@@ -5,6 +5,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import { getStaticData } from "@/utils/get-static-data";
 import {
   buildUpdates,
+  getDayFilms,
   getUpdateDayPath,
   groupUpdatesByDay,
   readDiffBlobs,
@@ -16,6 +17,7 @@ import {
   formatDateLong,
 } from "@/utils/format-date";
 import ReleaseSection from "../release-section";
+import WatchlistHighlights from "../watchlist-highlights";
 import DayStats from "../day-stats";
 import styles from "../updates.module.css";
 
@@ -138,6 +140,7 @@ export default async function UpdateDayPage({
     >
       {/* The band says what the subtitle used to, at a glance */}
       <DayStats day={day} />
+      <WatchlistHighlights films={getDayFilms(day)} headingLevel={2} />
 
       <ol className={styles.timeline}>
         {day.releases.map((release) => (

@@ -1547,6 +1547,17 @@ context). The reservation comes off in a layout effect once the row settles,
 which also stores the new height — or clears it when the row is empty, so a
 reader with nothing showing reserves nothing next time.
 
+**`/updates` says what a day did to the watchlist** (`WatchlistHighlights`):
+a pink panel under the day's figures, "3 films on your watchlist got new
+showings", each film once however many of the day's runs touched it
+(`getDayFilms`), with a link to plan them. Every film the day changed ships to
+every reader, since only the browser knows the list, so each carries only what
+the panel shows. Below it the same films are marked where they appear: the
+poster markers on new films (`PosterTile`'s opt-in `movieId`; `/personalise`
+leaves it off, every tile there being on a list) and a yellow "On your
+watchlist" tag after the title in More showings. Signed-in only and hidden
+when nothing matched, so the static HTML is unchanged.
+
 **`/personalise` splits the watchlist into showing now and not showing**,
 using the client cinema data, since what's on is the question a watchlist is
 brought to. Films not showing are unlinked: whether a departed page still

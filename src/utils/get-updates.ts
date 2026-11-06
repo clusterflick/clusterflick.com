@@ -32,6 +32,11 @@ export type UpdateVenue = {
 export type UpdateFilm = {
   /** Stable within a run; the movie id when matched, else the title. */
   key: string;
+  /**
+   * The film's id in the current dataset, which is also what a reader's lists
+   * are keyed by. Null for an entry that resolved to no film.
+   */
+  movieId: string | null;
   title: string;
   /**
    * Link to the film's page, when it is still in the current dataset. Carries
@@ -256,6 +261,7 @@ function accumulate(
       firstSeen: movie ? firstSeenIndex.get(movie.id) : undefined,
       film: {
         key,
+        movieId: movie?.id ?? null,
         title: movie?.title ?? showing.title,
         href: movie ? `${getMovieUrl(movie)}${SHOW_ALL_HASH}` : null,
         posterPath: movie?.posterPath,
@@ -495,6 +501,85 @@ export function groupUpdatesByDay(releases: UpdateRelease[]): UpdateDay[] {
     date,
     releases: dayReleases,
   }));
+}
+
+/** One film's changes across a whole day, for the reader's watchlist panel. */
+export type DayFilm = Pick<
+  UpdateFilm,
+  "title" | "href" | "posterPath" | "includedMovies"
+> & {
+  movieId: string;
+  /** New to the listings in one of the day's runs, not only given more dates. */
+  isNew: boolean;
+  performanceCount: number;
+  venueCount: number;
+  /** The venue's name when there is only one, which says more than a count. */
+  soleVenue: string | null;
+};
+
+/**
+ * Every film the day changed, once each, most new showings first.
+ *
+ * A film can be in several of a day's runs — added in the morning, given more
+ * dates in the afternoon — and a reader asking "what happened to my films
+ * today" wants one answer per film, so its runs are folded together: their
+ * showings summed, their venues counted once, and new if any run brought it
+ * in. Entries that resolved to no film are left out, having no id a list could
+ * hold.
+ *
+ * Every film the day changed is sent to every reader, since whose watchlist
+ * holds what is only known in the browser, so each carries only what the
+ * panel shows: a count of venues rather than the list of them.
+ */
+export function getDayFilms(day: UpdateDay): DayFilm[] {
+  const byId = new Map<string, { film: DayFilm; venues: UpdateVenue[] }>();
+
+  for (const release of day.releases) {
+    const runFilms = [
+      ...release.newFilms.map((film) => ({ film, isNew: true })),
+      ...release.moreShowings.map((film) => ({ film, isNew: false })),
+    ];
+    for (const { film, isNew } of runFilms) {
+      if (!film.movieId) continue;
+      let entry = byId.get(film.movieId);
+      if (!entry) {
+        entry = {
+          venues: [],
+          film: {
+            movieId: film.movieId,
+            title: film.title,
+            href: film.href,
+            posterPath: film.posterPath,
+            includedMovies: film.includedMovies,
+            isNew: false,
+            performanceCount: 0,
+            venueCount: 0,
+            soleVenue: null,
+          },
+        };
+        byId.set(film.movieId, entry);
+      }
+      entry.film.isNew ||= isNew;
+      entry.film.performanceCount += film.performanceCount;
+      for (const venue of film.venues) {
+        if (!entry.venues.some(({ id }) => id === venue.id)) {
+          entry.venues.push(venue);
+        }
+      }
+    }
+  }
+
+  return [...byId.values()]
+    .map(({ film, venues }) => ({
+      ...film,
+      venueCount: venues.length,
+      soleVenue: venues.length === 1 ? venues[0].name : null,
+    }))
+    .sort(
+      (a, b) =>
+        b.performanceCount - a.performanceCount ||
+        a.title.localeCompare(b.title),
+    );
 }
 
 /** What a whole day brought, summed across its runs. */

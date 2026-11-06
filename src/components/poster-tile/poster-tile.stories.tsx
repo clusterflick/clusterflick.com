@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Button from "@/components/button";
+import { MockUserProvider } from "@/state/user-context";
+import { UserListId } from "@/lib/user-lists";
 import PosterTile, { PosterTileList } from ".";
 
 /**
@@ -110,4 +112,32 @@ export const WithLastChanceNote: Story = {
     },
     action: <Button variant="link">Remove</Button>,
   },
+};
+
+/**
+ * With `movieId`, the poster carries the reader's list markers, as browsing
+ * grids do — here a film on the watchlist. Signed out, nothing is drawn.
+ */
+export const WithListMarkers: Story = {
+  args: {
+    ...Linked.args,
+    movieId: "28",
+  },
+  decorators: [
+    (Story) => (
+      <MockUserProvider
+        value={{
+          status: "signed-in",
+          lists: {
+            [UserListId.Watchlist]: {
+              "28": { title: "Apocalypse Now", addedAt: 1_758_000_000_000 },
+            },
+            [UserListId.Seen]: {},
+          },
+        }}
+      >
+        <Story />
+      </MockUserProvider>
+    ),
+  ],
 };
