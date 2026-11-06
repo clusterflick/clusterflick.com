@@ -282,15 +282,29 @@ numbers and the count-up only rewrites text that is already right.
 ## London Cinemas by Borough
 
 `/london-cinemas` leads with a map of what's on in each borough in the coming
-week (`BoroughMap`), the same figures ranked beneath it (`RankedBarChart`,
-which is also the table view and the only readout a phone gets, since a tap
-follows the link), then every borough A–Z. Built in `getBoroughWeek`, shared
-with the page's story.
+week (`BoroughMap`) with the same figures ranked beside it as its `aside`
+(`RankedBarChart`), then every borough A–Z. They are one figure rather than two
+sections: the map shows where, the list the exact order, and the list is the
+table view and the only readout a phone gets, since a tap on the map follows
+the link. Rows carry `getBoroughMapLinkAttributes`, so pointing at a row
+outlines its borough and pointing at a borough marks its row. Built in
+`getBoroughWeek`, shared with the page's story.
+
+**A week, not everything listed.** How far ahead a venue publishes varies far
+more than what it has on: measured, half the venues list 46 days ahead or
+less, a tenth only 8, and some over 200. Counting everything would mostly
+measure publishing habits (Lambeth goes from 79 films to 353, mostly the BFI's
+months ahead). A week is the window nearly every venue fills.
+
+**Shaded by films, not screenings.** One multiplex running a handful of films
+all day outweighs a borough of small venues on screenings (Sutton: one venue,
+21 films, 243 screenings). Screenings are in the readout instead of a toggle,
+so both figures are to hand without two sets of bands.
 
 **The figures are the home page's**, `getListingsStats` narrowed to a
 borough's venues: films in the catalogue's default categories with a showing
 in the next seven days, counted once per borough. A build-time snapshot, and
-the page says which day it counted from. The bands are fixed floors
+the page says which day it counted from. Darker means more. The bands are fixed floors
 (`FILM_BAND_FLOORS`), not quantiles of this week, so a shade means the same
 thing every week. A borough whose venues have nothing on is grey and one with
 no venues a dashed outline, never a step of the ramp, so neither reads as a
@@ -304,7 +318,11 @@ generate-borough-boundaries`), as the stations are: dissolving `data-analysed`'s
 47MB of MSOA zones takes ~25s, which every build worker would pay.
 `getBoroughMapShapes` projects them to SVG paths at build time, so the page
 ships paths rather than a map library, and the map and its links are in the
-static HTML.
+static HTML. An MSOA zone split by the river is a MultiPolygon, whose
+coordinates are polygons rather than rings; reading them as rings once
+dropped Pimlico from Westminster and Erith from Bexley, leaving holes in the
+map. Both the generator and `getVenueBorough` now read each part as a polygon
+and fail on a malformed ring rather than dropping the zone.
 
 ## Festival & Film Club Indexes
 

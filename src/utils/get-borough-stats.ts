@@ -61,18 +61,19 @@ const plural = (count: number, word: string) =>
   `${count.toLocaleString("en-GB")} ${word}${count === 1 ? "" : "s"}`;
 
 /**
- * One line on a borough's week: "Lewisham: 4 films at 3 of its 16 venues".
- * Says how many of its venues had anything on, because a borough full of
- * venues with nothing on is the finding the map exists to show.
+ * What a borough's week comes to, for the line beside its name: "4 films
+ * across 4 screenings, at 3 of its 16 venues". Says how many of its venues had
+ * anything on, because a borough full of venues with nothing on is the finding
+ * the map exists to show. Screenings sit beside films so both are to hand: the
+ * map is shaded by films, which a multiplex can't inflate.
  */
 export function describeBoroughWeek({
-  borough,
   venueCount,
   week,
-}: BoroughStats): string {
-  if (venueCount === 0) return `${borough.name}: no venues listed`;
+}: Pick<BoroughStats, "venueCount" | "week">): string {
+  if (venueCount === 0) return "No venues listed";
   if (week.films === 0) {
-    return `${borough.name}: nothing on at its ${plural(venueCount, "venue")}`;
+    return `Nothing on at its ${plural(venueCount, "venue")}`;
   }
   let where = `${week.venues.toLocaleString("en-GB")} of its ${plural(venueCount, "venue")}`;
   if (week.venues === venueCount) {
@@ -80,5 +81,5 @@ export function describeBoroughWeek({
     else if (venueCount === 2) where = "both its venues";
     else where = `all ${plural(venueCount, "venue")}`;
   }
-  return `${borough.name}: ${plural(week.films, "film")} at ${where}`;
+  return `${plural(week.films, "film")} across ${plural(week.screenings, "screening")}, at ${where}`;
 }

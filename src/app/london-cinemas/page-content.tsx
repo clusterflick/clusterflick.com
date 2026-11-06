@@ -1,8 +1,12 @@
+import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import LinkGrid from "@/components/link-grid";
-import BoroughMap from "@/components/borough-map";
+import BoroughMap, {
+  getBoroughMapLinkAttributes,
+} from "@/components/borough-map";
 import RankedBarChart from "@/components/ranked-bar-chart";
+import { REPORTS, getReportUrl } from "@/data/reports";
 import type { BoroughListItem } from "./page";
 import type { BoroughWeek } from "./get-borough-week";
 import styles from "./page.module.css";
@@ -33,6 +37,7 @@ export default function LondonCinemasPageContent({
     .filter((borough) => borough.href)
     .sort((a, b) => b.films - a.films);
   const most = ranked[0];
+  const boroughReports = REPORTS.filter((report) => report.boroughSlugs);
   const fewest = ranked[ranked.length - 1];
 
   return (
@@ -53,26 +58,35 @@ export default function LondonCinemasPageContent({
           )}{" "}
           Pick a borough to see its cinemas and what they&apos;re showing.
         </p>
+        {/* The map and the ranked list are one figure: the map shows where,
+            the list the exact order, and is the readout a phone gets, since a
+            tap on the map follows the link. Pointing at either picks out the
+            borough in both. */}
         <BoroughMap
           viewBox={map.viewBox}
           items={map.items}
           bands={map.bands}
           caption="Films showing in the next 7 days"
-          prompt="Point at a borough to see what's on there"
-        />
-      </ContentSection>
-
-      <ContentSection title="Every Borough This Week" as="h2">
-        <RankedBarChart
-          caption="Films showing in the next 7 days, by borough"
-          labelHeading="Borough"
-          valueHeading="Films"
-          items={week.map((borough) => ({
-            key: borough.slug,
-            label: borough.name,
-            value: borough.films,
-            href: borough.href,
-          }))}
+          prompt="Point at a borough or a row to see what's on there"
+          aside={
+            <RankedBarChart
+              caption="Films showing in the next 7 days, by borough"
+              hideCaption
+              labelHeading="Borough"
+              valueHeading="Films"
+              items={week.map((borough) => ({
+                key: borough.slug,
+                label: borough.name,
+                value: borough.films,
+                href: borough.href,
+                attributes: getBoroughMapLinkAttributes(
+                  borough.slug,
+                  borough.name,
+                  borough.readout,
+                ),
+              }))}
+            />
+          }
         />
         <p className={styles.note}>
           Counted over the seven days from {countedOn}, and recounted every time
@@ -81,6 +95,12 @@ export default function LondonCinemasPageContent({
           events aren&apos;t included. A film showing at two venues in a borough
           counts once.
         </p>
+        {boroughReports.map((report) => (
+          <p key={report.id} className={styles.intro}>
+            Read our report:{" "}
+            <Link href={getReportUrl(report)}>{report.title}</Link>.
+          </p>
+        ))}
       </ContentSection>
 
       <ContentSection title="Browse Cinemas by London Borough" as="h2">

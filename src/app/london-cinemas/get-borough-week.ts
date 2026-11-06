@@ -15,6 +15,8 @@ export type BoroughWeekItem = {
   /** Only boroughs with a venue have a page. */
   href?: string;
   films: number;
+  /** The map's line on the borough, so its row can drive the readout too. */
+  readout: string;
 };
 
 export interface BoroughWeek {
@@ -55,6 +57,7 @@ export function getBoroughWeek(
       name: entry.borough.name,
       href: hrefOf(entry),
       films: entry.week.films,
+      readout: describeBoroughWeek(entry),
     })),
   };
 }

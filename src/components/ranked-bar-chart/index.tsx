@@ -14,6 +14,12 @@ export type RankedBarChartItem = {
    * `split` legend. Only used when the chart has one.
    */
   splitValue?: number;
+  /**
+   * `data-*` attributes for the row, so something around the chart can tie a
+   * row to what it stands for (a borough on `BoroughMap`). A row marked
+   * `data-active` is drawn as if pointed at.
+   */
+  attributes?: Record<`data-${string}`, string>;
 };
 
 interface RankedBarChartProps {
@@ -31,6 +37,11 @@ interface RankedBarChartProps {
    * the accent colour, and `rest` names the remainder. Shows a legend.
    */
   split?: { split: string; rest: string };
+  /**
+   * Keeps the caption for screen readers only, for a chart whose figure
+   * already names it (the borough map's caption covers its ranked list).
+   */
+  hideCaption?: boolean;
 }
 
 /**
@@ -46,6 +57,7 @@ export default function RankedBarChart({
   valueHeading,
   formatValue = (value) => value.toLocaleString("en-GB"),
   split,
+  hideCaption = false,
 }: RankedBarChartProps) {
   const sorted = [...items].sort((a, b) => b.value - a.value);
   const max = Math.max(...sorted.map((item) => item.value), 1);
@@ -72,7 +84,11 @@ export default function RankedBarChart({
         </ul>
       )}
       <table className={styles.table}>
-        <caption className={split ? styles.visuallyHidden : styles.caption}>
+        <caption
+          className={
+            split || hideCaption ? styles.visuallyHidden : styles.caption
+          }
+        >
           {caption}
         </caption>
         <thead className={styles.visuallyHidden}>
@@ -88,6 +104,7 @@ export default function RankedBarChart({
             return (
               <tr
                 key={item.key}
+                {...item.attributes}
                 className={clsx(styles.row, item.highlight && styles.highlight)}
               >
                 <th scope="row" className={styles.label}>

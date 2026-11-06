@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import MapReadout from "./map-readout";
@@ -17,8 +18,28 @@ export interface BoroughMapItem {
   /** The area's own page; an area with none is drawn but not linked. */
   href?: string;
   band: BoroughMapBand;
-  /** What the readout says while the area is pointed at or focused. */
+  /**
+   * What the readout says beside the area's label while it is pointed at or
+   * focused: "4 films across 4 screenings, at 3 of its 16 venues".
+   */
   readout: string;
+}
+
+/**
+ * Attributes that let anything inside the map's frame (a row of the `aside`)
+ * stand for an area: pointing at it fills the readout and outlines the area,
+ * and pointing at the area marks it with `data-active`.
+ */
+export function getBoroughMapLinkAttributes(
+  key: string,
+  label: string,
+  readout: string,
+): Record<`data-${string}`, string> {
+  return {
+    "data-shape": `borough-map-${key}`,
+    "data-label": label,
+    "data-readout": readout,
+  };
 }
 
 interface BoroughMapProps {
@@ -32,6 +53,12 @@ interface BoroughMapProps {
   prompt: string;
   nothingOnLabel?: string;
   noVenuesLabel?: string;
+  /**
+   * Drawn beside the map on a wide screen and below it on a narrow one, inside
+   * the same frame, so rows carrying `getBoroughMapLinkAttributes` are linked
+   * to their areas both ways.
+   */
+  aside?: ReactNode;
 }
 
 const RAMP_SIZE = 5;
@@ -49,9 +76,9 @@ function bandClass(band: BoroughMapBand) {
  * the client. A touch reader's tap follows the link instead, so the figures
  * belong in a table beside it too (see `RankedBarChart`).
  *
- * The bands are one hue, getting lighter as the quantity grows, validated as a
+ * The bands are one hue, getting darker as the quantity grows, validated as a
  * ramp against the page's navy: every step reads apart from its neighbours and
- * the lowest still clears the background. The two non-quantities are grey
+ * the darkest still clears the background. The two non-quantities are grey
  * rather than a step of the ramp, so a borough with nothing on can't be read
  * as one with a little on.
  */
@@ -63,12 +90,13 @@ export default function BoroughMap({
   prompt,
   nothingOnLabel = "Nothing on",
   noVenuesLabel = "No venues listed",
+  aside,
 }: BoroughMapProps) {
   if (bands.length > RAMP_SIZE) {
     throw new Error(`BoroughMap has ${RAMP_SIZE} bands, given ${bands.length}`);
   }
   // The ramp is spread over however many bands are used, so three bands
-  // still run from the dimmest step to the brightest.
+  // still run from the lightest step to the darkest.
   const step = (band: number) =>
     bands.length === 1
       ? RAMP_SIZE - 1
@@ -109,7 +137,7 @@ export default function BoroughMap({
           </li>
         ))}
       </ul>
-      <MapReadout prompt={prompt} viewBox={viewBox}>
+      <MapReadout prompt={prompt} viewBox={viewBox} aside={aside}>
         <svg
           viewBox={viewBox}
           className={styles.map}
@@ -118,25 +146,24 @@ export default function BoroughMap({
         >
           {items.map((item) => {
             const className = clsx(styles.area, bandClass(resolve(item.band)));
-            const id = `borough-map-${item.key}`;
+            const link = getBoroughMapLinkAttributes(
+              item.key,
+              item.label,
+              item.readout,
+            );
+            const id = link["data-shape"];
+            const label = `${item.label}: ${item.readout}`;
             return item.href ? (
               <Link
                 key={item.key}
                 href={item.href}
-                aria-label={item.readout}
-                data-readout={item.readout}
-                data-shape={id}
+                aria-label={label}
+                {...link}
               >
                 <path id={id} d={item.path} className={className} />
               </Link>
             ) : (
-              <g
-                key={item.key}
-                data-readout={item.readout}
-                data-shape={id}
-                aria-label={item.readout}
-                role="img"
-              >
+              <g key={item.key} aria-label={label} role="img" {...link}>
                 <path id={id} d={item.path} className={className} />
               </g>
             );

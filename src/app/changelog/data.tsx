@@ -92,6 +92,21 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
+            <Link href="/london-cinemas">London Cinemas</Link> now opens on a
+            map of what&rsquo;s on in each borough over the coming week, shaded
+            by how many films are showing there, with every borough ranked
+            beside it. Point at a borough, or its row, to see its films,
+            screenings and how many of its venues have anything on, and click
+            through to its page. The same map showed up a gap in our borough
+            boundaries: parts of Pimlico and Erith weren&rsquo;t being drawn,
+            which is now fixed.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
             <Link href="/updates">New Listings</Link> is easier to scan. A
             film&rsquo;s venues are now counted by chain (&ldquo;9 Cineworld, 6
             Vue, Curzon Bloomsbury and 1 more&rdquo;) rather than named one by

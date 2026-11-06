@@ -29,7 +29,8 @@
   color: var(--color-muted-gray);
 }
 
-.row:hover {
+.row:hover,
+.row[data-active] {
   color: var(--color-light-gray);
 }
 
@@ -85,7 +86,8 @@
   border-radius: 0 4px 4px 0;
 }
 
-.row:hover .bar {
+.row:hover .bar,
+.row[data-active] .bar {
   opacity: 1;
 }
 

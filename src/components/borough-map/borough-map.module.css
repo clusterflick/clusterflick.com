@@ -33,16 +33,58 @@
   border-radius: 3px;
 }
 
+/* Map and aside side by side once the map can stay legible at 3/5 of the
+   column (--page-default's 1000px less gutters puts it at ~570px). The map
+   column sticks under the 63px site header while a taller aside scrolls past,
+   so the area a row stands for stays in view. */
 .frame {
-  position: relative;
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .frame {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .mapColumn {
+    position: sticky;
+    top: 79px;
+  }
 }
 
 /* One line, always taken, so pointing at the map never moves it. */
 .readout {
-  min-height: 1.5em;
+  min-height: 1.6em;
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--color-light-gray);
+}
+
+.readoutLabel {
+  color: var(--color-white);
+}
+
+/* The prompt is the only sign the map answers to a pointer, so it reads as a
+   hint rather than a caption: a pill, with a pointer beside it. */
+.prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 12px 2px 8px;
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.5);
+  border-radius: 999px;
+  background: rgba(var(--color-electric-blue-rgb), 0.12);
+  color: var(--color-white);
+  font-size: 14px;
+}
+
+.promptIcon {
+  width: 14px;
+  height: 14px;
+  fill: var(--color-electric-blue);
 }
 
 /* A tap follows the link, so on a touch screen the readout would only ever
@@ -80,8 +122,10 @@
   transition: opacity 0.15s ease;
 }
 
+/* Blue, the colour of the bars beside the map, so what's pointed at reads
+   the same in both. */
 .outline {
-  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke: var(--color-electric-blue);
   --area-stroke-width: 3;
 }
 
@@ -90,20 +134,21 @@
 }
 
 .map a:focus-visible .area {
-  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke: var(--color-electric-blue);
   --area-stroke-width: 3;
 }
 
-/* Neon pink, darker to lighter: validated as an ordinal ramp against
-   --color-deep-navy-alt (monotone lightness, visible steps, lowest 2.4:1). */
+/* Neon pink, lighter to darker as the figure grows: validated as an ordinal
+   ramp against --color-deep-navy-alt (monotone lightness, visible steps, and
+   the darkest still 2.4:1 against the page). */
 .band0 {
-  fill: #951b49;
-  background: #951b49;
+  fill: #f9a5c0;
+  background: #f9a5c0;
 }
 
 .band1 {
-  fill: #c32259;
-  background: #c32259;
+  fill: #f56996;
+  background: #f56996;
 }
 
 .band2 {
@@ -112,13 +157,13 @@
 }
 
 .band3 {
-  fill: #f56996;
-  background: #f56996;
+  fill: #c32259;
+  background: #c32259;
 }
 
 .band4 {
-  fill: #f9a5c0;
-  background: #f9a5c0;
+  fill: #951b49;
+  background: #951b49;
 }
 
 .nothingOn {

@@ -52,26 +52,24 @@ describe("getFilmBand", () => {
 describe("describeBoroughWeek", () => {
   it("says how many of the borough's venues had anything on", () => {
     expect(describeBoroughWeek(stats(16, 4, 3))).toBe(
-      "Lewisham: 4 films at 3 of its 16 venues",
+      "4 films across 4 screenings, at 3 of its 16 venues",
     );
     expect(describeBoroughWeek(stats(2, 1, 2))).toBe(
-      "Lewisham: 1 film at both its venues",
+      "1 film across 1 screening, at both its venues",
     );
     expect(describeBoroughWeek(stats(5, 8, 5))).toBe(
-      "Lewisham: 8 films at all 5 venues",
+      "8 films across 8 screenings, at all 5 venues",
     );
     expect(describeBoroughWeek(stats(1, 20, 1))).toBe(
-      "Lewisham: 20 films at its only venue",
+      "20 films across 20 screenings, at its only venue",
     );
   });
 
   it("names a week with nothing on, and a borough with no venues", () => {
     expect(describeBoroughWeek(stats(16, 0, 0))).toBe(
-      "Lewisham: nothing on at its 16 venues",
+      "Nothing on at its 16 venues",
     );
-    expect(describeBoroughWeek(stats(0, 0, 0))).toBe(
-      "Lewisham: no venues listed",
-    );
+    expect(describeBoroughWeek(stats(0, 0, 0))).toBe("No venues listed");
   });
 });
 

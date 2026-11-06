@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import BoroughMap, {
+  getBoroughMapLinkAttributes,
   type BoroughMapBand,
   type BoroughMapItem,
 } from "@/components/borough-map";
+import RankedBarChart from "@/components/ranked-bar-chart";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";
 import { FILM_BAND_LABELS } from "@/utils/get-borough-stats";
@@ -11,7 +13,9 @@ import { FILM_BAND_LABELS } from "@/utils/get-borough-stats";
  * `BoroughMap` shades London's boroughs by one quantity, each borough linking
  * to its page. The SVG is server-rendered, so the map and its links are in the
  * static HTML; pointing at or focusing a borough names it in the readout above
- * and outlines it in yellow.
+ * and outlines it in blue. An `aside` (a `RankedBarChart` of the same figures)
+ * sits beside it, and rows carrying `getBoroughMapLinkAttributes` are linked
+ * to their boroughs both ways.
  *
  * **When to use:**
  * - A figure per borough where where-in-London is the point (what's on in
@@ -19,8 +23,8 @@ import { FILM_BAND_LABELS } from "@/utils/get-borough-stats";
  *
  * **When NOT to use:**
  * - On its own. A tap on a phone follows the link, so the readout never shows
- *   there: pair it with a `RankedBarChart` of the same figures, which is also
- *   the table view.
+ *   there: give it a `RankedBarChart` of the same figures as its `aside`,
+ *   which is also the table view.
  * - For venues, which are points rather than areas: use `VenueMap`.
  */
 const meta = {
@@ -52,8 +56,10 @@ function itemsFor(
       band,
       readout:
         typeof band === "number"
-          ? `${borough.name}: ${FILM_BAND_LABELS[band]} films`
-          : `${borough.name}: ${band === "no-venues" ? "no venues listed" : "nothing on"}`,
+          ? `${FILM_BAND_LABELS[band]} films`
+          : band === "no-venues"
+            ? "No venues listed"
+            : "Nothing on",
     };
   });
 }
@@ -93,5 +99,39 @@ export const ThreeBands: Story = {
     ...Default.args,
     bands: ["Few", "Some", "Many"],
     items: itemsFor((_, index) => index % 3),
+  },
+};
+
+/**
+ * With the same figures ranked beside it, as on `/london-cinemas`: pointing at
+ * a row outlines its borough, and pointing at a borough marks its row.
+ */
+export const WithRankedList: Story = {
+  args: {
+    ...Default.args,
+    prompt: "Point at a borough or a row to see what's on there",
+    aside: (
+      <RankedBarChart
+        caption="Films showing in the next 7 days, by borough"
+        hideCaption
+        labelHeading="Borough"
+        valueHeading="Films"
+        items={LONDON_BOROUGHS.map((borough, index) => {
+          const films =
+            borough.slug === "lewisham" ? 4 : 20 + ((index * 37) % 120);
+          return {
+            key: borough.slug,
+            label: borough.name,
+            value: films,
+            href: `/london-cinemas/${borough.slug}`,
+            attributes: getBoroughMapLinkAttributes(
+              borough.slug,
+              borough.name,
+              `${films} films`,
+            ),
+          };
+        })}
+      />
+    ),
   },
 };
