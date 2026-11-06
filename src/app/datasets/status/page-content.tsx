@@ -19,6 +19,7 @@ export default function DataStatusPageContent({
     <StandardPageLayout
       title="Data Status"
       subtitle="When the published datasets have been released, and how often."
+      width="prose"
     >
       <div className={styles.content}>
         <StatusView status={status} latestUrl={latestUrl} />

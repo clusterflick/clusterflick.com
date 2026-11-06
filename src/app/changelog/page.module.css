@@ -11,16 +11,7 @@
 .tagline {
   font-size: 20px;
   line-height: 1.6;
-  max-width: 640px;
-}
-
-/* Content wrapper */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-  position: relative;
-  z-index: 1;
+  max-width: var(--measure-blurb);
 }
 
 /* ─── Timeline ─── */

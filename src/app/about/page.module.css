@@ -50,7 +50,7 @@
 }
 
 .tagline {
-  max-width: 560px;
+  max-width: var(--measure-blurb);
   margin: 0 auto;
   font-size: 18px;
   line-height: 1.6;
@@ -83,7 +83,7 @@
 }
 
 .content {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding: 0 20px 80px;
   position: relative;

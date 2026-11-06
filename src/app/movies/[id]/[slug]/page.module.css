@@ -4,9 +4,11 @@
   color: var(--color-light-gray);
 }
 
-/* Two-column hero layout for movie detail */
+/* Two-column hero layout for movie detail. Wider than every other page: the
+   308px poster column comes out of this width, and at --page-wide the details
+   beside it felt cramped. */
 .heroContent {
-  max-width: 1400px;
+  max-width: var(--page-film);
   margin: 0 auto;
   display: flex;
   gap: 40px;
@@ -101,7 +103,7 @@
 }
 
 .detailsContainer {
-  max-width: 1400px;
+  max-width: var(--page-film);
   margin: 0 auto;
   padding: 0 20px 60px 20px;
 }

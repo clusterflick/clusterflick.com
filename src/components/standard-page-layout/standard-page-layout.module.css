@@ -12,9 +12,19 @@
 
 /* Main content area below the hero + divider */
 .content {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding: 0 20px 80px;
   position: relative;
   z-index: 1;
+}
+
+/* The `width` prop. Default is the rule above; see "Page Widths" in
+   CLAUDE.md for which one a page takes. */
+.prose {
+  max-width: var(--page-prose);
+}
+
+.wide {
+  max-width: var(--page-wide);
 }

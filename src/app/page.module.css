@@ -9,7 +9,7 @@
 }
 
 .intro {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto 40px;
   padding: 8px 20px 0;
   text-align: center;
@@ -37,7 +37,7 @@
 }
 
 .picks {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto 48px;
   padding: 0 20px;
 }
@@ -120,7 +120,7 @@
 
 /* A summary with nothing to feature sits in the page's content column. */
 .summaryFallback {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto 40px;
   padding: 0 20px;
 }
@@ -148,7 +148,7 @@
 }
 
 .sections {
-  max-width: 1200px;
+  max-width: var(--page-wide);
   margin: 0 auto;
   padding: 0 20px;
 }

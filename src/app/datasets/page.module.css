@@ -1,9 +1,3 @@
-/* Mostly prose, so the measure stays narrower than the layout allows. */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 .body {
   font-size: 16px;
   line-height: 1.7;

@@ -1,7 +1,7 @@
 /* Collection overview shown inside the hero. Constrained for readability and
    centred to match the centre-aligned hero. */
 .heroBlurb {
-  max-width: 620px;
+  max-width: var(--measure-blurb);
   margin: 20px auto 0;
   line-height: 1.7;
 }
