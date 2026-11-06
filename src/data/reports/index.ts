@@ -16,6 +16,14 @@ export type Report = {
 
 export const REPORTS: Report[] = [
   {
+    id: "lewisham-2026",
+    title: "Lewisham's year without a cinema",
+    description:
+      "In 2026 so far, Lewisham has had 103 film screenings: as many as Westminster has by 3:00pm on a typical day.",
+    asOf: "2026-10-31",
+    boroughSlugs: ["lewisham"],
+  },
+  {
     id: "data-sources-2026",
     title: "Where Clusterflick's data comes from",
     description:
