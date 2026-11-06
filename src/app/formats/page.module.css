@@ -6,6 +6,21 @@
   margin-bottom: 32px;
 }
 
+/* The figures under the intro */
+
+.figures {
+  margin-bottom: 40px;
+}
+
+.sectionHeading {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--color-white-rgb), 0.45);
+  margin: 0 0 20px;
+}
+
 /* Format grid */
 
 .formatGrid {
@@ -23,7 +38,14 @@
   }
 }
 
-/* Meta row passed to EventCard */
+/* Meta row passed to ProgrammeCard */
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
 
 .filmCount {
   font-size: 13px;
@@ -32,4 +54,21 @@
   background: rgba(49, 158, 219, 0.12);
   padding: 2px 10px;
   border-radius: 20px;
+}
+
+.venues {
+  font-size: 13px;
+  color: rgba(var(--color-white-rgb), 0.55);
+}
+
+/* Formats with nothing on, named in one line after the sections. */
+
+.empty {
+  margin: 48px 0 0;
+  font-size: 14px;
+  color: rgba(var(--color-white-rgb), 0.55);
+}
+
+.emptyLabel {
+  font-weight: 600;
 }

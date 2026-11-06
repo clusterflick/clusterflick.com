@@ -3,17 +3,9 @@ import EventCard from "@/components/event-card";
 import ProgrammeCard from "@/components/programme-card";
 import StandardPageLayout from "@/components/standard-page-layout";
 import StatsBand, { type StatsBandItem } from "@/components/stats-band";
+import { getLede } from "@/utils/get-lede";
 import type { GenreListItem } from "./page";
 import styles from "./page.module.css";
-
-/**
- * The description's first sentence. The rest is written for search ("Find
- * horror films showing across London…") and says nothing a card's posters
- * and count don't, while crowding out the line that sets the genre's tone.
- */
-function getLede(description: string): string {
-  return description.split(/(?<=[.!?])\s/)[0];
-}
 
 interface GenresPageContentProps {
   genres: GenreListItem[];

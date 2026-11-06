@@ -77,6 +77,20 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
+            The <Link href="/formats">formats page</Link> has had the same
+            treatment as genres. Each format fans out posters of what it has on,
+            and says how many showings there are and where: IMAX 70mm, for
+            instance, is only at one venue. Rare formats like 16mm and VHS show
+            their next screening. The page leads with how many showings are
+            coming up on film, and formats with nothing on are now listed by
+            name at the bottom rather than as empty cards.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
             The <Link href="/venues">venues page</Link> now opens on a
             full-screen map of every venue, with the search sitting just below
             it. Once you scroll, the search sticks to the top of the page, so
