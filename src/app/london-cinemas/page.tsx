@@ -3,12 +3,14 @@ import { getStaticData } from "@/utils/get-static-data";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { formatDateLong } from "@/utils/format-date";
+import { getBoroughWeek } from "./get-borough-week";
 import LondonCinemasPageContent from "./page-content";
 
 export const metadata: Metadata = {
-  title: "London Cinemas — Browse Cinemas Across Every Borough",
+  title: "London Cinemas by Borough — What's On Across London",
   description:
-    "Discover cinemas across London, borough by borough. From independent arthouse venues and repertory cinemas to major multiplex chains — find screening venues near you, compare what's on, and book tickets.",
+    "A map of what's on at London's cinemas this week, borough by borough. See how many films are showing in each borough, from independent arthouse venues and repertory cinemas to major multiplex chains, and find the venues near you.",
   alternates: {
     canonical: "/london-cinemas",
   },
@@ -54,6 +56,11 @@ export default async function LondonCinemasPage() {
 
   const totalBoroughs = boroughs.length;
 
+  // A build-time snapshot, like the home page's counts: the page is rebuilt
+  // with every release, and says which day it counted from.
+  const now = Date.parse(new Date().toISOString());
+  const { map, week } = getBoroughWeek(data, venuesByBorough, now);
+
   // JSON-LD structured data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -82,6 +89,9 @@ export default async function LondonCinemasPage() {
       <LondonCinemasPageContent
         boroughs={boroughs}
         totalBoroughs={totalBoroughs}
+        map={map}
+        week={week}
+        countedOn={formatDateLong(now)}
       />
     </>
   );

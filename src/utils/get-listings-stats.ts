@@ -25,10 +25,15 @@ export interface ListingsStats {
  * The scale of the listings for the home page: what is on in the coming week,
  * counted over the same categories the catalogue shows by default so the films
  * figure is roughly what its link opens on.
+ *
+ * `venueIds` narrows every figure to those venues (a borough, say), so a part
+ * of London is counted by the same rule as the whole of it. `venuesTracked` is
+ * then the number of those venues the dataset holds.
  */
 export function getListingsStats(
   data: Pick<CinemaData, "movies" | "venues">,
   now: number,
+  venueIds?: ReadonlySet<string>,
 ): ListingsStats {
   const end = now + LISTINGS_STATS_DAYS * MS_PER_DAY;
   const venues = new Set<string>();
@@ -44,9 +49,10 @@ export function getListingsStats(
     let onThirtyFiveMm = false;
     for (const performance of movie.performances) {
       if (performance.time < now || performance.time >= end) continue;
+      const venueId = movie.showings[performance.showingId]?.venueId;
+      if (venueIds && (!venueId || !venueIds.has(venueId))) continue;
       showing = true;
       screenings++;
-      const venueId = movie.showings[performance.showingId]?.venueId;
       if (venueId) venues.add(venueId);
       if (performance.format?.source === FormatSource.ThirtyFiveMm) {
         thirtyFiveMmScreenings++;
@@ -61,7 +67,9 @@ export function getListingsStats(
     films,
     screenings,
     venues: venues.size,
-    venuesTracked: Object.keys(data.venues).length,
+    venuesTracked: venueIds
+      ? Object.keys(data.venues).filter((id) => venueIds.has(id)).length
+      : Object.keys(data.venues).length,
     thirtyFiveMm: {
       screenings: thirtyFiveMmScreenings,
       films: thirtyFiveMmFilms,

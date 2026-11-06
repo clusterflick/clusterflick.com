@@ -20,6 +20,35 @@ const BOROUGHS_DIR = path.join(
   "boroughs",
 );
 
+/**
+ * A zone's polygons. Most MSOA zones are one Polygon, but a zone split by the
+ * river or a boundary is a MultiPolygon, whose coordinates are polygons rather
+ * than rings: reading them as rings once dropped Pimlico from Westminster and
+ * Erith from Bexley. A ring too short to be a polygon is bad data, and fails
+ * the build rather than quietly losing a piece of a borough.
+ */
+function toPolygons(
+  feature: GeoJSON.Feature,
+  boroughName: string,
+): ReturnType<typeof polygon>[] {
+  const { geometry } = feature;
+  const parts =
+    geometry.type === "Polygon"
+      ? [geometry.coordinates]
+      : geometry.type === "MultiPolygon"
+        ? geometry.coordinates
+        : null;
+  if (!parts) {
+    throw new Error(`${boroughName}: unexpected ${geometry.type} zone`);
+  }
+  return parts.map((rings) => {
+    if (rings.some((ring) => ring.length < 4)) {
+      throw new Error(`${boroughName}: zone has a ring of under 4 points`);
+    }
+    return polygon(rings);
+  });
+}
+
 function loadBoundaries(): BoroughBoundary[] {
   if (cachedBoundaries) return cachedBoundaries;
 
@@ -28,15 +57,9 @@ function loadBoundaries(): BoroughBoundary[] {
     const filepath = path.join(BOROUGHS_DIR, filename);
     const geojson = JSON.parse(fs.readFileSync(filepath, "utf8"));
 
-    const polygons = geojson.features
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((feature: any) =>
-        feature.geometry.coordinates.every(
-          (ring: number[][]) => ring.length >= 4,
-        ),
-      )
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((feature: any) => polygon(feature.geometry.coordinates));
+    const polygons = geojson.features.flatMap((feature: GeoJSON.Feature) =>
+      toPolygons(feature, borough.name),
+    );
 
     return { borough, polygons };
   });

@@ -81,6 +81,9 @@ covers the need. The canonical components are:
   showing: logo, a fan of posters, the next screening), `EventCard` (the same
   with nothing showing), `FestivalTimeline` (festivals as bars across the
   coming weeks)
+- **Maps & charts:** `VenueMap` (venues as points, Leaflet), `BoroughMap`
+  (boroughs shaded by a figure, static SVG), `RankedBarChart` (bars as a
+  table, largest first)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
 - **Feedback:** `EmptyState`
@@ -275,6 +278,56 @@ while the pointer or focus is inside, and can be paused.
 (`getListingsStats`), so "Films" is roughly what its link opens on. The 35mm
 figure is left out in a week with none. The static HTML carries the real
 numbers and the count-up only rewrites text that is already right.
+
+## London Cinemas by Borough
+
+`/london-cinemas` leads with a map of what's on in each borough in the coming
+week (`BoroughMap`) with the same figures ranked beside it as its `aside`
+(`RankedBarChart`), then every borough A–Z. They are one figure rather than two
+sections: the map shows where, the list the exact order, and the list is the
+table view and the only readout a phone gets, since a tap on the map follows
+the link. Rows carry `getBoroughMapLinkAttributes`, so pointing at a row
+outlines its borough and pointing at a borough marks its row. Built in
+`getBoroughWeek`, shared with the page's story.
+
+**A week, not everything listed.** How far ahead a venue publishes varies far
+more than what it has on: measured, half the venues list 46 days ahead or
+less, a tenth only 8, and some over 200. Counting everything would mostly
+measure publishing habits (Lambeth goes from 79 films to 353, mostly the BFI's
+months ahead). A week is the window nearly every venue fills.
+
+**Shaded by films, not screenings.** One multiplex running a handful of films
+all day outweighs a borough of small venues on screenings (Sutton: one venue,
+21 films, 243 screenings). Screenings are in the readout instead of a toggle,
+so both figures are to hand without two sets of bands.
+
+**The figures are the home page's**, `getListingsStats` narrowed to a
+borough's venues: films in the catalogue's default categories with a showing
+in the next seven days, counted once per borough. A build-time snapshot, and
+the page says which day it counted from. Darker means more. The bands are fixed floors
+(`FILM_BAND_FLOORS`), not quantiles of this week, so a shade means the same
+thing every week. A borough whose venues have nothing on is grey and one with
+no venues a dashed outline, never a step of the ramp, so neither reads as a
+little on. The readout says how many of a borough's venues had anything on,
+because many venues showing little is the finding (Lewisham: 16 venues, 3 with
+anything on).
+
+**The outlines are generated and committed**
+(`src/data/london-borough-boundaries.json`, `npm run
+generate-borough-boundaries`), as the stations are: dissolving `data-analysed`'s
+47MB of MSOA zones takes ~25s, which every build worker would pay.
+`getBoroughMapShapes` projects them to SVG paths at build time, so the page
+ships paths rather than a map library, and the map and its links are in the
+static HTML. An MSOA zone split by the river is a MultiPolygon, whose
+coordinates are polygons rather than rings; reading them as rings once
+dropped Pimlico from Westminster and Erith from Bexley, leaving holes in the
+map. Both the generator and `getVenueBorough` now read each part as a polygon
+and fail on a malformed ring rather than dropping the zone.
+Each borough page's map image (`public/images/boroughs/<slug>.png`, from
+`scripts/fetch-borough-maps.js`) is drawn from the same dissolved outline, so
+a change to the outlines means regenerating those too. The script skips
+images that exist and needs a `GOOGLE_MAPS_API_KEY`, so delete the affected
+ones first.
 
 ## Festival & Film Club Indexes
 

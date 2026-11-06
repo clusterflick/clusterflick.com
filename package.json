@@ -12,6 +12,7 @@
     "fetch-published-data": "node ./scripts/fetch-published-data.js",
     "fetch-release-log": "node ./scripts/fetch-release-log.js",
     "fetch-london-stations": "node ./scripts/fetch-london-stations.js",
+    "generate-borough-boundaries": "node ./scripts/generate-borough-boundaries.js",
     "carry-forward-static": "node ./scripts/carry-forward-static.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",
     "test": "vitest run --project unit",
