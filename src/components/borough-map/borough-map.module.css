@@ -1,0 +1,141 @@
+.figure {
+  margin: 0;
+}
+
+.caption {
+  font-size: 14px;
+  color: var(--color-light-gray);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.frame {
+  position: relative;
+}
+
+/* One line, always taken, so pointing at the map never moves it. */
+.readout {
+  min-height: 1.5em;
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--color-light-gray);
+}
+
+/* A tap follows the link, so on a touch screen the readout would only ever
+   show its prompt. */
+@media (hover: none) {
+  .readout {
+    display: none;
+  }
+}
+
+.canvas {
+  position: relative;
+}
+
+.map,
+.overlay {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The gap between neighbours is the page's own navy, so each borough reads
+   as a shape of its own whatever its shade. Custom properties, because the
+   readout's outline is a <use> clone of the path, which only inherits them. */
+.area {
+  stroke: var(--area-stroke, var(--color-deep-navy-alt));
+  stroke-width: var(--area-stroke-width, 1.5);
+  stroke-linejoin: round;
+  transition: opacity 0.15s ease;
+}
+
+.outline {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
+.map a:focus {
+  outline: none;
+}
+
+.map a:focus-visible .area {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
+/* Neon pink, darker to lighter: validated as an ordinal ramp against
+   --color-deep-navy-alt (monotone lightness, visible steps, lowest 2.4:1). */
+.band0 {
+  fill: #951b49;
+  background: #951b49;
+}
+
+.band1 {
+  fill: #c32259;
+  background: #c32259;
+}
+
+.band2 {
+  fill: var(--color-neon-pink);
+  background: var(--color-neon-pink);
+}
+
+.band3 {
+  fill: #f56996;
+  background: #f56996;
+}
+
+.band4 {
+  fill: #f9a5c0;
+  background: #f9a5c0;
+}
+
+.nothingOn {
+  fill: var(--color-dark-navy);
+  background: var(--color-dark-navy);
+}
+
+.noVenues {
+  fill: transparent;
+  background: transparent;
+  --area-stroke: var(--color-muted-gray);
+}
+
+.swatch.noVenues {
+  border: 1px dashed var(--color-muted-gray);
+}
+
+.noVenues.area {
+  stroke-dasharray: 4 3;
+}

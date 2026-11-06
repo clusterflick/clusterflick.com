@@ -66,4 +66,24 @@ describe("getListingsStats", () => {
       thirtyFiveMm: { screenings: 2, films: 1 },
     });
   });
+
+  it("narrows every figure to the venues given", () => {
+    expect(getListingsStats(data, NOW, new Set(["b", "d"]))).toEqual({
+      films: 1,
+      screenings: 2,
+      venues: 1,
+      venuesTracked: 2,
+      thirtyFiveMm: { screenings: 2, films: 1 },
+    });
+  });
+
+  it("counts nothing for venues with nothing on", () => {
+    expect(getListingsStats(data, NOW, new Set(["c"]))).toEqual({
+      films: 0,
+      screenings: 0,
+      venues: 0,
+      venuesTracked: 1,
+      thirtyFiveMm: { screenings: 0, films: 0 },
+    });
+  });
 });

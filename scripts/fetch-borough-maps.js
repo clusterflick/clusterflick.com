@@ -4,17 +4,13 @@ const fsp = require("node:fs").promises;
 const path = require("node:path");
 const { pipeline } = require("node:stream/promises");
 const { Readable } = require("node:stream");
-const { union } = require("@turf/union");
 const { simplify } = require("@turf/simplify");
-const { featureCollection } = require("@turf/helpers");
+const {
+  LONDON_BOROUGHS,
+  dissolveBoroughBoundary,
+} = require("./lib/borough-boundaries");
 
 const OUTPUT_DIR = path.join(__dirname, "..", "public", "images", "boroughs");
-
-const BOROUGHS_DIR = path.join(
-  path.dirname(require.resolve("data-analysed/package.json")),
-  "data",
-  "boroughs",
-);
 
 const DELAY_MS = 1000;
 
@@ -39,43 +35,6 @@ const colors = {
   cyan: "\x1b[36m",
   gray: "\x1b[90m",
 };
-
-// ── Borough list (mirrors src/data/london-boroughs.ts) ──────────────────────
-const LONDON_BOROUGHS = [
-  { name: "Camden", slug: "camden" },
-  { name: "City of London", slug: "city-of-london" },
-  { name: "Greenwich", slug: "greenwich" },
-  { name: "Hackney", slug: "hackney" },
-  { name: "Hammersmith and Fulham", slug: "hammersmith-and-fulham" },
-  { name: "Islington", slug: "islington" },
-  { name: "Kensington and Chelsea", slug: "kensington-and-chelsea" },
-  { name: "Lambeth", slug: "lambeth" },
-  { name: "Lewisham", slug: "lewisham" },
-  { name: "Newham", slug: "newham" },
-  { name: "Southwark", slug: "southwark" },
-  { name: "Tower Hamlets", slug: "tower-hamlets" },
-  { name: "Wandsworth", slug: "wandsworth" },
-  { name: "Westminster", slug: "westminster" },
-  { name: "Barking and Dagenham", slug: "barking-and-dagenham" },
-  { name: "Barnet", slug: "barnet" },
-  { name: "Bexley", slug: "bexley" },
-  { name: "Brent", slug: "brent" },
-  { name: "Bromley", slug: "bromley" },
-  { name: "Croydon", slug: "croydon" },
-  { name: "Ealing", slug: "ealing" },
-  { name: "Enfield", slug: "enfield" },
-  { name: "Haringey", slug: "haringey" },
-  { name: "Harrow", slug: "harrow" },
-  { name: "Havering", slug: "havering" },
-  { name: "Hillingdon", slug: "hillingdon" },
-  { name: "Hounslow", slug: "hounslow" },
-  { name: "Kingston upon Thames", slug: "kingston-upon-thames" },
-  { name: "Merton", slug: "merton" },
-  { name: "Redbridge", slug: "redbridge" },
-  { name: "Richmond upon Thames", slug: "richmond-upon-thames" },
-  { name: "Sutton", slug: "sutton" },
-  { name: "Waltham Forest", slug: "waltham-forest" },
-];
 
 // ── Dark theme map styles (matches fetch-venue-maps.js) ─────────────────────
 const MAP_STYLES = [
@@ -160,39 +119,6 @@ function encodeSignedValue(value) {
   }
   encoded += String.fromCharCode(value + 63);
   return encoded;
-}
-
-/**
- * Load a borough's GeoJSON, dissolve the MSOA features into a single
- * boundary polygon, and simplify it for use in a Static Maps URL.
- */
-function dissolveBoroughBoundary(boroughName) {
-  const filename = boroughName.replace(/ /g, "-") + ".geojson";
-  const filepath = path.join(BOROUGHS_DIR, filename);
-  const geojson = JSON.parse(fs.readFileSync(filepath, "utf8"));
-
-  // Filter to valid polygons (each ring must have >= 4 points)
-  const valid = geojson.features.filter((feature) =>
-    feature.geometry.coordinates.every((ring) => ring.length >= 4),
-  );
-
-  if (valid.length === 0) {
-    throw new Error(`No valid polygon features found for ${boroughName}`);
-  }
-
-  // Dissolve: union all MSOA polygons into one borough boundary
-  let merged;
-  if (valid.length === 1) {
-    merged = valid[0];
-  } else {
-    merged = union(featureCollection(valid));
-  }
-
-  // Simplify to reduce point count for the URL
-  return simplify(merged, {
-    tolerance: SIMPLIFY_TOLERANCE,
-    highQuality: true,
-  });
 }
 
 /**
@@ -284,7 +210,10 @@ function buildStaticMapUrl(encodedRings, apiKey) {
 
     try {
       // Dissolve + simplify boundary
-      const boundary = dissolveBoroughBoundary(borough.name);
+      const boundary = dissolveBoroughBoundary(
+        borough.name,
+        SIMPLIFY_TOLERANCE,
+      );
       const encodedRings = getEncodedRings(boundary);
 
       const url = buildStaticMapUrl(encodedRings, apiKey);

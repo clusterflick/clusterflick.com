@@ -1,10 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import LondonCinemasPageContent from "@/app/london-cinemas/page-content";
 import type { BoroughListItem } from "@/app/london-cinemas/page";
+import {
+  getBoroughWeek,
+  type BoroughWeek,
+} from "@/app/london-cinemas/get-borough-week";
+import { formatDateLong } from "@/utils/format-date";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import type { Venue } from "@/types";
-import { fetchMetaData } from "../utils/fetch-story-data";
+import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import { groupVenuesByBoroughSimple } from "../utils/group-venues-by-borough-simple";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
@@ -17,9 +22,10 @@ import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";
  * use GeoJSON boundary data which requires Node.js fs access).
  */
 
-type LondonCinemasPageData = {
+type LondonCinemasPageData = BoroughWeek & {
   boroughs: BoroughListItem[];
   totalBoroughs: number;
+  countedOn: string;
 };
 
 async function loadLondonCinemasData(): Promise<LondonCinemasPageData | null> {
@@ -31,6 +37,14 @@ async function loadLondonCinemasData(): Promise<LondonCinemasPageData | null> {
   }
 
   const venuesByBorough = groupVenuesByBoroughSimple(venues);
+  const movies = await fetchAllMovies(metaData);
+  // The week counted from the dataset's first showing, so the story shows a
+  // full week whenever its data was downloaded.
+  const now = Math.min(
+    ...Object.values(movies).flatMap((movie) =>
+      movie.performances.map((performance) => performance.time),
+    ),
+  );
 
   const boroughs: BoroughListItem[] = LONDON_BOROUGHS.filter((b) =>
     venuesByBorough.has(b.slug),
@@ -43,7 +57,12 @@ async function loadLondonCinemasData(): Promise<LondonCinemasPageData | null> {
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  return { boroughs, totalBoroughs: boroughs.length };
+  return {
+    boroughs,
+    totalBoroughs: boroughs.length,
+    ...getBoroughWeek({ movies, venues }, venuesByBorough, now),
+    countedOn: formatDateLong(now),
+  };
 }
 
 function LondonCinemasPageWithRealData() {
@@ -56,6 +75,9 @@ function LondonCinemasPageWithRealData() {
         <LondonCinemasPageContent
           boroughs={data.boroughs}
           totalBoroughs={data.totalBoroughs}
+          map={data.map}
+          week={data.week}
+          countedOn={data.countedOn}
         />
       )}
     </StoryDataLoader>
@@ -93,8 +115,8 @@ export const Loading: Story = {
 };
 
 /**
- * London Cinemas page fully loaded with all boroughs that have
- * venues displayed in an alphabetical grid with venue counts.
+ * London Cinemas page fully loaded: the map of films showing in each
+ * borough, the same figures ranked, and every borough with venues A–Z.
  */
 export const Loaded: Story = {
   parameters: {

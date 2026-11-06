@@ -81,6 +81,9 @@ covers the need. The canonical components are:
   showing: logo, a fan of posters, the next screening), `EventCard` (the same
   with nothing showing), `FestivalTimeline` (festivals as bars across the
   coming weeks)
+- **Maps & charts:** `VenueMap` (venues as points, Leaflet), `BoroughMap`
+  (boroughs shaded by a figure, static SVG), `RankedBarChart` (bars as a
+  table, largest first)
 - **Typography:** `OutlineHeading`, `Tag`
 - **Form controls:** `Chip` (checkbox/radio), `Switch`
 - **Feedback:** `EmptyState`
@@ -275,6 +278,33 @@ while the pointer or focus is inside, and can be paused.
 (`getListingsStats`), so "Films" is roughly what its link opens on. The 35mm
 figure is left out in a week with none. The static HTML carries the real
 numbers and the count-up only rewrites text that is already right.
+
+## London Cinemas by Borough
+
+`/london-cinemas` leads with a map of what's on in each borough in the coming
+week (`BoroughMap`), the same figures ranked beneath it (`RankedBarChart`,
+which is also the table view and the only readout a phone gets, since a tap
+follows the link), then every borough A–Z. Built in `getBoroughWeek`, shared
+with the page's story.
+
+**The figures are the home page's**, `getListingsStats` narrowed to a
+borough's venues: films in the catalogue's default categories with a showing
+in the next seven days, counted once per borough. A build-time snapshot, and
+the page says which day it counted from. The bands are fixed floors
+(`FILM_BAND_FLOORS`), not quantiles of this week, so a shade means the same
+thing every week. A borough whose venues have nothing on is grey and one with
+no venues a dashed outline, never a step of the ramp, so neither reads as a
+little on. The readout says how many of a borough's venues had anything on,
+because many venues showing little is the finding (Lewisham: 16 venues, 3 with
+anything on).
+
+**The outlines are generated and committed**
+(`src/data/london-borough-boundaries.json`, `npm run
+generate-borough-boundaries`), as the stations are: dissolving `data-analysed`'s
+47MB of MSOA zones takes ~25s, which every build worker would pay.
+`getBoroughMapShapes` projects them to SVG paths at build time, so the page
+ships paths rather than a map library, and the map and its links are in the
+static HTML.
 
 ## Festival & Film Club Indexes
 
