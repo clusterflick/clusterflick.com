@@ -68,6 +68,7 @@ export default function LondonCinemasPageContent({
           bands={map.bands}
           caption="Films showing in the next 7 days"
           prompt="Point at a borough or a row to see what's on there"
+          touchPrompt="Tap a borough to see what's on there"
           aside={
             <RankedBarChart
               caption="Films showing in the next 7 days, by borough"

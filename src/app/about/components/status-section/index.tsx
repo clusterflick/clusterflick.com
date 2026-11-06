@@ -10,6 +10,7 @@ import {
   getHoursSince,
   STALE_AFTER_HOURS,
 } from "@/utils/release-status";
+import ReleaseDot from "@/components/release-dot";
 import SourcesPopup from "./sources-popup";
 import type { StatusStats } from "./get-status-stats";
 import styles from "./status-section.module.css";
@@ -82,25 +83,22 @@ export default function StatusSection({ stats }: StatusSectionProps) {
         className={clsx(styles.lastUpdated, isStale && styles.stale)}
         role={isStale ? "alert" : undefined}
       >
-        <span className={styles.indicator} aria-hidden="true" />
-        <span>
-          {isStale ? (
-            <>
-              No new data for <strong>{formatHours(hours)}</strong>, since{" "}
-              {when}.
-            </>
-          ) : isOnReaderClock ? (
-            <>
-              Data last refreshed <strong>{formatHours(hours, true)}</strong>,
-              on {when}.
-            </>
-          ) : (
-            <>Data last refreshed on {when}.</>
-          )}{" "}
-          <Link href="/datasets/status" className="nowrap">
-            Release history
-          </Link>
-        </span>
+        <ReleaseDot stale={isStale} />
+        {isStale ? (
+          <>
+            No new data for <strong>{formatHours(hours)}</strong>, since {when}.
+          </>
+        ) : isOnReaderClock ? (
+          <>
+            Data last refreshed <strong>{formatHours(hours, true)}</strong>, on{" "}
+            {when}.
+          </>
+        ) : (
+          <>Data last refreshed on {when}.</>
+        )}{" "}
+        <Link href="/datasets/status" className="nowrap">
+          Release history
+        </Link>
       </p>
       <div className={styles.statsGrid}>
         {items.map((stat) => {

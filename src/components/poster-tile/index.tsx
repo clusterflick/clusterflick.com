@@ -154,6 +154,12 @@ export default function PosterTile({
 }
 
 /** The grid `PosterTile`s sit in: six across a 960px column, two on a phone. */
-export function PosterTileList({ children }: { children: ReactNode }) {
-  return <ul className={styles.list}>{children}</ul>;
+export function PosterTileList({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <ul className={clsx(styles.list, className)}>{children}</ul>;
 }

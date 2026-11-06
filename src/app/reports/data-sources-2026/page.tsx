@@ -213,6 +213,7 @@ export default function DataSources2026Report() {
           intro="How we fetch from each place, from a plain request to a browser built to get past bot checks."
         >
           <RankedBarChart
+            wrapLabels
             caption="Places, by how we fetch from them"
             labelHeading="How we fetch"
             valueHeading="Places"

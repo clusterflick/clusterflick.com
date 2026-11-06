@@ -51,6 +51,8 @@ interface BoroughMapProps {
   caption: string;
   /** What the readout says while nothing is pointed at. */
   prompt: string;
+  /** The same on a touch screen, where an area is tapped rather than pointed at. */
+  touchPrompt?: string;
   nothingOnLabel?: string;
   noVenuesLabel?: string;
   /**
@@ -73,8 +75,10 @@ function bandClass(band: BoroughMapBand) {
  * London's boroughs shaded by one quantity, each linking to its own page. The
  * SVG is rendered on the server, so the map and its links are in the static
  * HTML; the readout naming what's pointed at is the only part that runs on
- * the client. A touch reader's tap follows the link instead, so the figures
- * belong in a table beside it too (see `RankedBarChart`).
+ * the client. On a touch screen the first tap on an area selects it and a
+ * second opens it. The figures belong in a table beside it too (see
+ * `RankedBarChart`): it is the exact order, and the readout a phone reader
+ * can scan without tapping every borough.
  *
  * The bands are one hue, getting darker as the quantity grows, validated as a
  * ramp against the page's navy: every step reads apart from its neighbours and
@@ -88,6 +92,7 @@ export default function BoroughMap({
   bands,
   caption,
   prompt,
+  touchPrompt,
   nothingOnLabel = "Nothing on",
   noVenuesLabel = "No venues listed",
   aside,
@@ -137,7 +142,12 @@ export default function BoroughMap({
           </li>
         ))}
       </ul>
-      <MapReadout prompt={prompt} viewBox={viewBox} aside={aside}>
+      <MapReadout
+        prompt={prompt}
+        touchPrompt={touchPrompt}
+        viewBox={viewBox}
+        aside={aside}
+      >
         <svg
           viewBox={viewBox}
           className={styles.map}

@@ -25,6 +25,7 @@ import DiscoverySections from "./discovery-sections";
 import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";
 import WatchlistRow from "./watchlist-row";
+import ReleaseDot from "@/components/release-dot";
 import styles from "./page.module.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
 
@@ -178,7 +179,7 @@ export default async function Home() {
           <StatsBand items={statItems} label="This week in London" />
           {!Number.isNaN(updatedAt) && (
             <p className={styles.freshness}>
-              <span className={styles.freshnessDot} aria-hidden="true" />
+              <ReleaseDot />
               Listings updated {formatShowingTime(updatedAt)},{" "}
               {formatDayAndDate(updatedAt)}
             </p>
