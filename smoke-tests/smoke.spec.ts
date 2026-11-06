@@ -492,7 +492,7 @@ test.describe("London Cinemas Pages", () => {
   }) => {
     await expect(page.locator("h1").first()).toContainText("London Cinemas");
     await expect(
-      page.getByText(/Find screening venues across \d+ London boroughs/),
+      page.getByText(/What's on this week across \d+ London boroughs/),
     ).toBeVisible();
 
     await londonCinemasPage.screenshot("london-cinemas-list");
