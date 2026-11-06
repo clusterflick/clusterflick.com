@@ -16,6 +16,7 @@ import {
   formatDateLong,
 } from "@/utils/format-date";
 import ReleaseSection from "../release-section";
+import DayStats from "../day-stats";
 import styles from "../updates.module.css";
 
 /**
@@ -120,7 +121,6 @@ export default async function UpdateDayPage({
   return (
     <StandardPageLayout
       title={formatDateLong(dateStringToLondonTimestamp(date))}
-      subtitle={summariseDay(day)}
       heroExtra={
         <p className={styles.heroNote}>
           <Link href="/updates">All updates</Link>, or{" "}
@@ -136,6 +136,9 @@ export default async function UpdateDayPage({
         </p>
       }
     >
+      {/* The band says what the subtitle used to, at a glance */}
+      <DayStats day={day} />
+
       <ol className={styles.timeline}>
         {day.releases.map((release) => (
           <ReleaseSection key={release.tag} release={release} />

@@ -15,6 +15,7 @@ import {
   getUpdateReleasePath,
   groupUpdatesByDay,
   readDiffBlobs,
+  getDayTotals,
   summariseDay,
   type UpdateFilm,
   type UpdateRelease,
@@ -686,7 +687,8 @@ describe("summariseDay", () => {
       ],
     });
 
-    expect(summary).toBe("2 films added, 4 showings added, 1 venue added");
+    // Showings count the new films' as well as the rollouts': 3 + 4 + 1
+    expect(summary).toBe("2 films added, 8 showings added, 1 venue added");
   });
 
   it("names only the kinds of change the day actually brought", () => {
@@ -775,5 +777,66 @@ describe("buildUpdates venue groups", () => {
     });
     // No group page, so nothing to count it under
     expect(b.group).toBeUndefined();
+  });
+});
+
+describe("getDayTotals", () => {
+  it("counts each venue once, however many films and runs reach it", () => {
+    const atVenues = (title: string, count: number, ids: string[]) => ({
+      ...updateFilm(title, count),
+      venues: ids.map((id) => ({ id, name: id, href: null })),
+    });
+
+    expect(
+      getDayTotals({
+        date: "2026-08-13",
+        releases: [
+          release("2026-08-13T17:05:00Z", {
+            newFilms: [atVenues("Fight Club", 3, ["a.com", "b.com"])],
+            moreShowings: [atVenues("Heat", 4, ["b.com", "c.com"])],
+          }),
+          release("2026-08-13T05:15:00Z", {
+            moreShowings: [atVenues("Bliss", 2, ["a.com"])],
+            newVenues: [{ id: "c.com", name: "c.com", href: null }],
+          }),
+        ],
+      }),
+    ).toEqual({ newFilms: 1, showings: 9, venuesUpdated: 3, newVenues: 1 });
+  });
+});
+
+describe("buildUpdates ordering", () => {
+  it("puts new films with artwork ahead of those without", () => {
+    const busy = movie("1", "Busy Event", ["a.com-1"]);
+    delete (busy as { posterPath?: string }).posterPath;
+    const quiet = movie("2", "Quiet Film", ["a.com-2"]);
+
+    const result = buildUpdates(
+      [
+        blob("2026-07-25T04:41:53Z", {
+          "a.com": venue({
+            showings: {
+              added: [
+                added("a.com-1", "Busy Event", [
+                  JUL_25 + DAY,
+                  JUL_25 + 2 * DAY,
+                  JUL_25 + 3 * DAY,
+                ]),
+                added("a.com-2", "Quiet Film", [JUL_25 + DAY]),
+              ],
+              removed: [],
+              modified: [],
+            },
+          }),
+        }),
+      ],
+      data([busy, quiet]),
+    );
+
+    // Fewer showings, but it has a poster to show
+    expect(result[0].newFilms.map(({ title }) => title)).toEqual([
+      "Quiet Film",
+      "Busy Event",
+    ]);
   });
 });

@@ -1,9 +1,8 @@
 import Link from "next/link";
-import OutlineHeading from "@/components/outline-heading";
 import PosterTile from "@/components/poster-tile";
 import { pluralise, summariseRelease } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
-import { formatDateLong, formatShowingTime } from "@/utils/format-date";
+import { formatShowingTime } from "@/utils/format-date";
 import VenueList from "./venue-list";
 import CappedList from "./capped-list";
 import styles from "./updates.module.css";
@@ -48,26 +47,40 @@ function FilmTile({ film }: { film: UpdateFilm }) {
  * Shared by the index — which shows the latest day — and the dated pages, so a
  * run reads identically wherever it is met, and the anchor the feed links to
  * resolves on whichever page happens to be carrying it.
+ *
+ * Headed by the time alone: the day is already the heading above it, on both
+ * pages, and repeating the full date in large outlined type on every run was
+ * most of what made a busy day feel heavy. `headingLevel` is 3 on the index,
+ * where the day is an h2 under the page's h1, and 2 on a day's own page.
  */
 export default function ReleaseSection({
   release,
+  headingLevel = 2,
 }: {
   release: UpdateRelease;
+  headingLevel?: 2 | 3;
 }) {
   const published = new Date(release.asOf);
+  const Heading = `h${headingLevel}` as const;
+  const SectionHeading = `h${headingLevel + 1}` as "h3" | "h4";
 
   return (
     <li id={release.tag} className={styles.release}>
-      <OutlineHeading as="h2" color="blue" className={styles.releaseHeading}>
-        {`${formatDateLong(published)} @ ${formatShowingTime(published.getTime())}`}
-      </OutlineHeading>
-      <p className={styles.releaseSummary}>{summariseRelease(release)}</p>
+      <div className={styles.releaseHeader}>
+        <Heading className={styles.releaseHeading}>
+          <span className={styles.visuallyHidden}>Updated at </span>
+          <time dateTime={release.asOf}>
+            {formatShowingTime(published.getTime())}
+          </time>
+        </Heading>
+        <p className={styles.releaseSummary}>{summariseRelease(release)}</p>
+      </div>
 
       {release.newVenues.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>
+          <SectionHeading className={styles.sectionHeading}>
             {release.newVenues.length === 1 ? "New venue" : "New venues"}
-          </h3>
+          </SectionHeading>
           <p className={styles.prose}>
             <VenueList venues={release.newVenues} />
           </p>
@@ -76,9 +89,9 @@ export default function ReleaseSection({
 
       {release.newFilms.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>
+          <SectionHeading className={styles.sectionHeading}>
             {pluralise(release.newFilms.length, "new film")}
-          </h3>
+          </SectionHeading>
           <CappedList
             layout="tiles"
             initialCount={INITIAL_FILMS}
@@ -92,7 +105,9 @@ export default function ReleaseSection({
 
       {release.moreShowings.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>More showings</h3>
+          <SectionHeading className={styles.sectionHeading}>
+            More showings
+          </SectionHeading>
           <CappedList
             className={styles.showings}
             initialCount={INITIAL_SHOWINGS}

@@ -9,7 +9,9 @@ import StatsBand from ".";
  * two on a phone.
  *
  * **When to use:** a handful of figures that are the point, each leading to
- * the page that lists what it counts — the home page's week in London.
+ * the page that lists what it counts — the home page's week in London. A
+ * figure with no `href` is drawn unlinked, for a count that is the whole story
+ * — a day's updates, whose films are listed right below it.
  *
  * **When NOT to use:** figures inside running text, or a chart of change over
  * time — use `RankedBarChart` or `ReleaseDayBars`. Never for more than four.
@@ -69,5 +71,23 @@ export const Default: Story = {
 export const ThreeFigures: Story = {
   args: {
     items: Default.args.items.slice(0, 3),
+  },
+};
+
+/** Unlinked figures, as the updates page heads a day with. */
+export const Unlinked: Story = {
+  args: {
+    label: "Friday, 6 November 2026",
+    items: [
+      { id: "films", value: 10, label: "New films" },
+      { id: "showings", value: 219, label: "New showings" },
+      {
+        id: "venues",
+        value: 18,
+        label: "Venues",
+        detail: "with something new",
+      },
+      { id: "new-venues", value: 2, label: "New venues", highlight: true },
+    ],
   },
 };

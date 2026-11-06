@@ -10,12 +10,22 @@
   white-space: nowrap;
 }
 
+/* ─── The day: its date and its figures ─── */
+
+/* Under the page's h1 on the index; a day's own page has the date as its h1. */
+.dayHeading {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
 /* ─── Timeline: one entry per pipeline run ─── */
 
 .timeline {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 40px 0 0;
   display: flex;
   flex-direction: column;
 }
@@ -27,21 +37,49 @@
 
 .release + .release {
   margin-top: 48px;
-  padding-top: 48px;
+}
+
+/* The run's time and what it brought, on one line where they fit. The time is
+   the heading but a small one: the day above already carries the date, and a
+   full outlined date per run was the loudest thing on a busy day. */
+.releaseHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 2px;
+  margin: 0 0 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
 }
 
 .releaseHeading {
-  font-size: 26px;
-  margin-bottom: 4px;
-  display: block;
+  margin: 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-electric-blue);
 }
 
 .releaseSummary {
-  margin: 0 0 24px;
-  padding-bottom: 10px;
+  margin: 0;
   font-size: 14px;
   opacity: 0.6;
-  border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ─── Sections within a run ─── */
@@ -197,8 +235,8 @@
 }
 
 @media (min-width: 700px) {
-  .releaseHeading {
-    font-size: 32px;
+  .dayHeading {
+    font-size: 26px;
   }
 
   .archiveHeading {

@@ -291,6 +291,14 @@ function accumulate(
   }
 }
 
+/** Whether a film's tile shows a poster rather than the placeholder pattern. */
+function hasArtwork(film: UpdateFilm): boolean {
+  return (
+    !!film.posterPath ||
+    !!film.includedMovies?.some(({ posterPath }) => posterPath)
+  );
+}
+
 /**
  * Turn a window of pipeline diffs into a reverse-chronological feed, one entry
  * per pipeline run.
@@ -420,11 +428,16 @@ export function buildUpdates(
 
     const byPerformances = (a: UpdateFilm, b: UpdateFilm) =>
       b.performanceCount - a.performanceCount || a.title.localeCompare(b.title);
+    // New films open as a capped grid of posters, so the ones with artwork go
+    // first: two rows of real posters say what kind of run this was far better
+    // than two rows of placeholder patterns. Nothing is dropped, only ordered.
+    const byArtworkThenPerformances = (a: UpdateFilm, b: UpdateFilm) =>
+      Number(hasArtwork(b)) - Number(hasArtwork(a)) || byPerformances(a, b);
 
     result.push({
       tag: blob.metadata.currentRelease,
       asOf: blob.metadata.asOf,
-      newFilms: newFilms.sort(byPerformances),
+      newFilms: newFilms.sort(byArtworkThenPerformances),
       moreShowings: moreShowings.sort(byPerformances),
       newVenues: [...venues.values()].sort((a, b) =>
         a.name.localeCompare(b.name),
@@ -484,32 +497,46 @@ export function groupUpdatesByDay(releases: UpdateRelease[]): UpdateDay[] {
   }));
 }
 
+/** What a whole day brought, summed across its runs. */
+export type DayTotals = {
+  newFilms: number;
+  /** Every performance added, whether to a new film or one already listed. */
+  showings: number;
+  /** Distinct venues that gained a film or a showing. */
+  venuesUpdated: number;
+  newVenues: number;
+};
+
 /**
- * One line describing a whole day, for the archive list on the index.
+ * Sum a day's runs. A film added in the morning and given more dates in the
+ * afternoon is two separate changes, and the day counts both, exactly as the
+ * day's page shows both.
  *
- * Built by summing the runs rather than by re-summarising their contents: a
- * film added in the morning and given more dates in the afternoon is two
- * separate changes, and the day's line counts both, exactly as the day's page
- * shows both.
+ * Showings count a new film's as well as the rollouts': both are screenings
+ * that weren't bookable before, and a day of nothing but new films would
+ * otherwise report no showings at all.
  */
+export function getDayTotals(day: UpdateDay): DayTotals {
+  const venueIds = new Set<string>();
+  let newFilms = 0;
+  let showings = 0;
+  let newVenues = 0;
+
+  for (const release of day.releases) {
+    newFilms += release.newFilms.length;
+    newVenues += release.newVenues.length;
+    for (const film of [...release.newFilms, ...release.moreShowings]) {
+      showings += film.performanceCount;
+      for (const { id } of film.venues) venueIds.add(id);
+    }
+  }
+
+  return { newFilms, showings, venuesUpdated: venueIds.size, newVenues };
+}
+
+/** One line describing a whole day, for the archive list and the day's meta. */
 export function summariseDay(day: UpdateDay): string {
-  const newFilms = day.releases.reduce(
-    (total, release) => total + release.newFilms.length,
-    0,
-  );
-  const showings = day.releases.reduce(
-    (total, release) =>
-      total +
-      release.moreShowings.reduce(
-        (runTotal, film) => runTotal + film.performanceCount,
-        0,
-      ),
-    0,
-  );
-  const newVenues = day.releases.reduce(
-    (total, release) => total + release.newVenues.length,
-    0,
-  );
+  const { newFilms, showings, newVenues } = getDayTotals(day);
 
   const parts: string[] = [];
   if (newFilms > 0) parts.push(`${pluralise(newFilms, "film")} added`);

@@ -18,6 +18,7 @@ import {
   formatDateLong,
 } from "@/utils/format-date";
 import ReleaseSection from "./release-section";
+import DayStats from "./day-stats";
 import styles from "./updates.module.css";
 
 export const metadata: Metadata = {
@@ -106,11 +107,23 @@ export default async function UpdatesPage() {
         />
       ) : (
         <>
-          <ol className={styles.timeline}>
-            {latest.releases.map((release) => (
-              <ReleaseSection key={release.tag} release={release} />
-            ))}
-          </ol>
+          <section aria-labelledby="latest-day">
+            <h2 id="latest-day" className={styles.dayHeading}>
+              <Link href={getUpdateDayPath(latest.date)}>
+                {formatDateLong(dateStringToLondonTimestamp(latest.date))}
+              </Link>
+            </h2>
+            <DayStats day={latest} />
+            <ol className={styles.timeline}>
+              {latest.releases.map((release) => (
+                <ReleaseSection
+                  key={release.tag}
+                  release={release}
+                  headingLevel={3}
+                />
+              ))}
+            </ol>
+          </section>
 
           {archiveItems.length > 0 && (
             <section className={styles.archive}>
