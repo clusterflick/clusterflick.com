@@ -43,6 +43,31 @@
   border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
 }
 
+/* On a wide screen the date moves into the prose rail beside its changes (see
+   StandardPageLayout's `.prose`), sticking under the header while they scroll
+   past, as ContentSection's headings do on the other prose pages. */
+@container prose (min-width: 1040px) {
+  .day {
+    display: grid;
+    grid-template-columns: var(--prose-rail) minmax(0, 1fr);
+    column-gap: var(--prose-gap);
+    align-items: start;
+    margin-left: calc(-1 * (var(--prose-rail) + var(--prose-gap)));
+  }
+
+  .day + .day {
+    margin-top: 40px;
+    padding-top: 40px;
+  }
+
+  .dayHeading {
+    position: sticky;
+    top: 83px;
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+}
+
 .changes {
   list-style: none;
   padding: 0;

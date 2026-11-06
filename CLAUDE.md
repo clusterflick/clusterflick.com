@@ -122,7 +122,18 @@ A page's content sits in one of four columns, tokens on `:root` in
 which page you copied:
 
 - **`--page-prose` (800px)** — reading pages: the data licence, the bot page,
-  the changelog, the datasets pages. Long lines are hard to read.
+  the changelog, the datasets pages. Long lines are hard to read, so this is
+  one 800px column — until the screen has room for more (a 1040px container,
+  about a 1080px window). Then the column widens to `--page-wide` and each
+  section's heading moves into a rail beside its text, sticking under the
+  header as the text scrolls. An 800px strip in the middle of a big screen
+  left most of it empty and made the page longer than it needed to be; the
+  rail uses the width while keeping the text column a readable length.
+  `ContentSection` and the changelog's days take the rail (the `prose`
+  container query, with `--prose-rail` and `--prose-gap` set by
+  `StandardPageLayout`), and anything else lines up with the text column. A
+  new block on a prose page that has a heading of its own should take the
+  rail the same way.
 - **`--page-default` (1000px)** — cards and lists: venues, festivals, clubs,
   boroughs, groups, a venue or programme page. The default.
 - **`--page-wide` (1200px)** — poster rows and discovery: the home page. The

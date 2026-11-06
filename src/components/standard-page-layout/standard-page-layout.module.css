@@ -21,8 +21,35 @@
 
 /* The `width` prop. Default is the rule above; see "Page Widths" in
    CLAUDE.md for which one a page takes. */
+
+/* Prose reads as one 800px column until the screen has room for more, then
+   sets each section's heading in a rail beside its text, so a wide screen
+   holds more of the page rather than framing a narrow strip of it. The
+   column is the wide page width, so the container can measure the room;
+   `.proseBody` keeps the single column at the prose width until then.
+   ContentSection and the changelog's days read the rail from the `prose`
+   container and the two custom properties below. */
 .prose {
-  max-width: var(--page-prose);
+  --prose-rail: 240px;
+  --prose-gap: 56px;
+  max-width: var(--page-wide);
+  container: prose / inline-size;
+}
+
+/* The prose page width, less the 20px gutters `.content` supplies. */
+.proseBody {
+  max-width: calc(var(--page-prose) - 40px);
+  margin: 0 auto;
+}
+
+/* Keep in step with the rail rules in ContentSection and the changelog. */
+@container prose (min-width: 1040px) {
+  /* The rail sits in this padding: anything that isn't a railed section
+     lines up with the text column, and railed sections pull back into it. */
+  .proseBody {
+    max-width: none;
+    padding-left: calc(var(--prose-rail) + var(--prose-gap));
+  }
 }
 
 .wide {

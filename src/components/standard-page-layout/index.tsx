@@ -10,7 +10,8 @@ import styles from "./standard-page-layout.module.css";
 
 /**
  * The content column's width, by what the page mostly holds:
- * - `prose` — reading pages (the data licence, the changelog)
+ * - `prose` — reading pages (the data licence, the changelog). One column,
+ *   with section headings moved into a rail beside the text on wide screens
  * - `default` — cards and lists (venues, festivals, clubs, boroughs)
  * - `wide` — poster rows and discovery content
  * Full-bleed content goes in `afterContent` instead.
@@ -138,7 +139,11 @@ export default function StandardPageLayout({
             width === "wide" && styles.wide,
           )}
         >
-          {children}
+          {width === "prose" ? (
+            <div className={styles.proseBody}>{children}</div>
+          ) : (
+            children
+          )}
         </div>
       )}
       {afterContent}
