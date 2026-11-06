@@ -131,6 +131,7 @@ type MoviePerformanceStatus = {
 export enum AccessibilityFeature {
   AudioDescription = "audioDescription",
   BabyFriendly = "babyFriendly",
+  DogFriendly = "dogFriendly",
   HardOfHearing = "hardOfHearing",
   Relaxed = "relaxed",
   Subtitled = "subtitled",

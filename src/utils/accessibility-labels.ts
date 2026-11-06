@@ -7,6 +7,7 @@ import { AccessibilityFeature } from "@/types";
 export const ACCESSIBILITY_LABELS: Record<AccessibilityFeature, string> = {
   [AccessibilityFeature.AudioDescription]: "Audio Description",
   [AccessibilityFeature.BabyFriendly]: "Baby Friendly",
+  [AccessibilityFeature.DogFriendly]: "Dog Friendly",
   [AccessibilityFeature.HardOfHearing]: "Hard of Hearing",
   [AccessibilityFeature.Relaxed]: "Relaxed",
   [AccessibilityFeature.Subtitled]: "Subtitles",
@@ -15,6 +16,7 @@ export const ACCESSIBILITY_LABELS: Record<AccessibilityFeature, string> = {
 export const ACCESSIBILITY_EMOJIS: Record<AccessibilityFeature, string> = {
   [AccessibilityFeature.AudioDescription]: "🔊",
   [AccessibilityFeature.BabyFriendly]: "👶",
+  [AccessibilityFeature.DogFriendly]: "🐕",
   [AccessibilityFeature.HardOfHearing]: "👂",
   [AccessibilityFeature.Relaxed]: "🧘",
   [AccessibilityFeature.Subtitled]: "💬",
