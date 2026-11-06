@@ -19,16 +19,16 @@ export default function VenuesPageContent({
   boundary,
 }: VenuesPageContentProps) {
   return (
+    // The page opens on the map, full screen with the title over it, so it
+    // has no hero. Everything sits in the full-width slot: the map runs edge
+    // to edge, and the search bar can only stick while its parent is in view,
+    // so the parent has to hold the list as well.
     <StandardPageLayout
-      title="Every Cinema in London"
-      subtitle={`${totalVenues.toLocaleString("en-GB")} venues across London`}
-      // Everything sits in the full-width slot: the search bar and the map run
-      // edge to edge, and the bar can only stick while its parent is in view,
-      // so the parent has to hold the list as well. The text keeps to the
-      // usual column inside it.
+      hideHero
       afterContent={
-        <div className={styles.page}>
-          <div className={styles.column}>
+        <VenuesExplorer
+          title="Every Cinema in London"
+          intro={
             <p className={styles.intro}>
               Film screenings from {totalVenues.toLocaleString("en-GB")} venues
               across{" "}
@@ -43,14 +43,11 @@ export default function VenuesPageContent({
               the latest blockbusters at a multiplex or a rare 35mm print at a
               neighbourhood arthouse, you&apos;ll find it here.
             </p>
-          </div>
-
-          <VenuesExplorer
-            groups={groups}
-            mapVenues={mapVenues}
-            boundary={boundary}
-          />
-        </div>
+          }
+          groups={groups}
+          mapVenues={mapVenues}
+          boundary={boundary}
+        />
       }
     >
       {null}

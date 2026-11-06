@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   MapContainer,
   TileLayer,
@@ -52,12 +59,6 @@ const REFIT_DEBOUNCE_MS = 450;
 // Stop a single-venue match from slamming all the way to street level.
 const REFIT_MAX_ZOOM = 14;
 const FIT_PADDING: [number, number] = [32, 32];
-// A bleed map fades out over its top and bottom edges (`--fade` in the CSS,
-// at its widest). Framing and popups keep clear of the fade, so nothing the map
-// is showing you sits in the part you can barely see.
-const BLEED_FADE_PX = 56;
-const BLEED_FIT_PADDING: [number, number] = [32, 32 + BLEED_FADE_PX];
-const BLEED_POPUP_PADDING: [number, number] = [16, BLEED_FADE_PX + 8];
 // How long the "use two fingers" / "use Ctrl + scroll" hint stays up after the
 // gesture that prompted it stops.
 const GESTURE_HINT_MS = 1500;
@@ -134,7 +135,10 @@ function createClusterIcon(cluster: L.MarkerCluster) {
 function renderVenueMarker(
   venue: VenueMapVenue,
   icon: L.DivIcon,
-  popupPadding?: [number, number],
+  popupPadding?: Pick<
+    L.PopupOptions,
+    "autoPanPaddingTopLeft" | "autoPanPaddingBottomRight"
+  >,
 ) {
   return (
     <Marker
@@ -145,7 +149,7 @@ function renderVenueMarker(
       opacity={venue.filmCount > 0 ? 1 : 0.5}
       zIndexOffset={venue.highlighted ? 1000 : 0}
     >
-      <Popup autoPanPadding={popupPadding}>
+      <Popup {...popupPadding}>
         <Link href={venue.href} className={styles.popupTitle}>
           <MapPinIcon size={20} className={styles.popupIcon} />
           {venue.name}
@@ -184,8 +188,8 @@ interface LeafletVenueMapProps {
   distanceRingsMiles?: number[];
   /** Fill the parent's height instead of the fixed in-page footprint. */
   fill?: boolean;
-  /** Edge to edge with faded top and bottom; see `VenueMap`. */
-  bleed?: boolean;
+  /** Pixels at the top covered by an overlay; see `VenueMap`. */
+  insetTop?: number;
   /**
    * Leave one-finger drags and plain wheel scrolls to the page, as an embedded
    * map should: on a touch screen the map pans with two fingers, and a wheel
@@ -205,7 +209,7 @@ export default function LeafletVenueMap({
   boundary,
   distanceRingsMiles,
   fill = false,
-  bleed = false,
+  insetTop = 0,
   cooperativeGestures = false,
 }: LeafletVenueMapProps) {
   const { position, loading, error, requestLocation } = useGeolocationContext();
@@ -214,8 +218,23 @@ export default function LeafletVenueMap({
   const wrapperRef = useRef<HTMLDivElement>(null);
   // The text outlives `visible` so the hint can fade out rather than blank.
   const [gestureHint, setGestureHint] = useState({ text: "", visible: false });
-  const fitPadding = bleed ? BLEED_FIT_PADDING : FIT_PADDING;
-  const popupPadding = bleed ? BLEED_POPUP_PADDING : undefined;
+  const fitPadding = useMemo(
+    () => ({
+      paddingTopLeft: L.point(FIT_PADDING[0], FIT_PADDING[1] + insetTop),
+      paddingBottomRight: L.point(FIT_PADDING[0], FIT_PADDING[1]),
+    }),
+    [insetTop],
+  );
+  const popupPadding = useMemo(
+    () =>
+      insetTop
+        ? {
+            autoPanPaddingTopLeft: L.point(16, insetTop + 8),
+            autoPanPaddingBottomRight: L.point(16, 16),
+          }
+        : undefined,
+    [insetTop],
+  );
 
   // On a touch-first device one finger scrolls the page: with Leaflet's drag
   // handler off, its container's touch-action lets the browser scroll, while
@@ -323,7 +342,7 @@ export default function LeafletVenueMap({
 
     if (!didFit.current) {
       map.fitBounds(fitTarget, {
-        padding: fitPadding,
+        ...fitPadding,
         maxZoom: REFIT_MAX_ZOOM,
       });
       didFit.current = true;
@@ -332,7 +351,7 @@ export default function LeafletVenueMap({
 
     const timer = setTimeout(() => {
       map.flyToBounds(fitTarget, {
-        padding: fitPadding,
+        ...fitPadding,
         maxZoom: REFIT_MAX_ZOOM,
         duration: 0.6,
       });
@@ -352,6 +371,12 @@ export default function LeafletVenueMap({
     <div
       ref={wrapperRef}
       className={fill ? `${styles.wrapper} ${styles.fill}` : styles.wrapper}
+      // Read by the controls' offsets in the CSS.
+      style={
+        insetTop
+          ? ({ "--inset-top": `${insetTop}px` } as CSSProperties)
+          : undefined
+      }
     >
       <MapContainer
         className={styles.map}

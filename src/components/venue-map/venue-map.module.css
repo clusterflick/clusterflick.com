@@ -24,57 +24,11 @@
   border-radius: 0;
 }
 
-/* Edge to edge (`bleed`): no frame, taller, and faded into the page over the
-   top and bottom so it reads as part of the page rather than a box set into
-   it. A mask rather than a gradient overlay, because the page's background is
-   a gradient and any flat colour would draw a hard edge. The sides need no
-   fade — they run off the window. */
-.bleed {
-  --fade: 40px;
-}
-
-.bleed .wrapper,
-.bleed .skeleton {
-  height: max(320px, 50svh);
-  border: 0;
-  border-radius: 0;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    #000 var(--fade),
-    #000 calc(100% - var(--fade)),
-    transparent
-  );
-}
-
-@media (min-width: 768px) {
-  .bleed {
-    /* Mirrored as BLEED_FADE_PX in leaflet-venue-map.tsx. */
-    --fade: 56px;
-  }
-
-  .bleed .wrapper,
-  .bleed .skeleton {
-    height: clamp(480px, 65vh, 680px);
-  }
-}
-
-/* Controls sit inside the fully opaque band, not half-faded in the edge.
-   Leaflet's controls carry a 10px margin of their own. */
-.bleed :global(.leaflet-top) {
-  top: calc(var(--fade) - 10px);
-}
-
-.bleed :global(.leaflet-bottom) {
-  bottom: calc(var(--fade) - 10px);
-}
-
-.bleed .controls {
-  top: var(--fade);
-}
-
-.bleed .error {
-  bottom: calc(var(--fade) + 12px);
+/* `insetTop`: something is laid over the top of the map (the venues page's
+   heading), so the controls start below it. Leaflet's controls carry a 10px
+   margin of their own. */
+.wrapper :global(.leaflet-top) {
+  top: var(--inset-top, 0px);
 }
 
 .map {
@@ -99,7 +53,7 @@
 /* --- Controls overlay --- */
 .controls {
   position: absolute;
-  top: 12px;
+  top: calc(var(--inset-top, 0px) + 12px);
   right: 12px;
   z-index: 1000;
   /* The locate button is transparent-filled, so pins and cluster bubbles

@@ -24,11 +24,16 @@ interface VenueMapProps {
   /** Fill the parent's height, e.g. inside a full-screen dialog. */
   fill?: boolean;
   /**
-   * Edge to edge: no frame, taller, and faded into the page at the top and
-   * bottom. The parent must already span the window — the map doesn't break
-   * out of a column itself.
+   * Leave one-finger drags and plain wheel scrolls to the page. On by default
+   * for a map in the page; off for `fill`, unless the filled parent is itself
+   * part of a scrolling page.
    */
-  bleed?: boolean;
+  cooperativeGestures?: boolean;
+  /**
+   * Pixels at the top covered by something laid over the map, such as a
+   * heading. Framing, popups and the controls keep below it.
+   */
+  insetTop?: number;
 }
 
 export default function VenueMap({
@@ -36,22 +41,19 @@ export default function VenueMap({
   boundary,
   distanceRingsMiles,
   fill,
-  bleed,
+  cooperativeGestures = !fill,
+  insetTop,
 }: VenueMapProps) {
-  const map = (
+  return (
     <LeafletVenueMap
       venues={venues}
       boundary={boundary}
       distanceRingsMiles={distanceRingsMiles}
       fill={fill}
-      bleed={bleed}
       // A map in the page shares its scroll with the page, so one finger and
       // a plain wheel scroll the page. Full screen there's no page to scroll.
-      cooperativeGestures={!fill}
+      cooperativeGestures={cooperativeGestures}
+      insetTop={insetTop}
     />
   );
-
-  // The frame sizes the skeleton too, which `dynamic`'s loading fallback can't
-  // be handed props for — without it the page would jump when the map loads.
-  return bleed ? <div className={styles.bleed}>{map}</div> : map;
 }

@@ -1,6 +1,6 @@
-/* The page lives in StandardPageLayout's full-width slot (see page-content),
-   so it supplies what the layout's content column would: its stacking above
-   the hero, the column, and the space before the footer. */
+/* The page lives in StandardPageLayout's full-width slot with no hero (see
+   page-content), so it supplies what the layout's content area would: its
+   stacking context, the column, and the space before the footer. */
 .page {
   position: relative;
   z-index: 1;
@@ -13,17 +13,57 @@
   padding: 0 20px;
 }
 
+/* Map hero */
+
+/* The first screen, less the search bar under it: the map starts under the
+   fixed, translucent header, and the bar rests on the bottom edge. The bar's
+   height is measured; the fallback is its height on a phone, so the first
+   paint is close. The floor keeps a landscape phone's map usable, at the cost
+   of the bar starting below the fold there. */
+.mapHero {
+  position: relative;
+  height: calc(100svh - var(--search-bar-height, 97px));
+  min-height: 360px;
+}
+
+/* Darkens the top of the map so the outlined title reads over any tiles. */
+.titleOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  /* The fixed header covers the first 63px. */
+  padding: calc(63px + 20px) 20px 28px;
+  text-align: center;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-midnight-navy-rgb), 0.9) 0%,
+    rgba(var(--color-midnight-navy-rgb), 0.7) 60%,
+    rgba(var(--color-midnight-navy-rgb), 0) 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .titleOverlay {
+    padding-top: calc(63px + 32px);
+    padding-bottom: 40px;
+  }
+}
+
+/* As StandardPageLayout sizes its hero titles. */
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
 .intro {
   font-size: 16px;
   line-height: 1.7;
-  margin-bottom: 24px;
+  margin: 32px 0 40px;
 }
 
 /* Search bar */
-
-.searchBar {
-  margin-bottom: 8px;
-}
 
 /* Lines up with the column below: the bar supplies 16px of gutter (24px from
    768px), the column 20px. */
@@ -76,10 +116,6 @@
   .searchResultCount:empty {
     display: none;
   }
-}
-
-.mapSection {
-  margin-bottom: 24px;
 }
 
 /* Venue groups */

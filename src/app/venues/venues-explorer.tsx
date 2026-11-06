@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import type { VenueGroupData } from "./page";
 import {
@@ -10,6 +17,7 @@ import {
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";
+import OutlineHeading from "@/components/outline-heading";
 import SearchInput from "@/components/search-input";
 import StickyBar from "@/components/sticky-bar";
 import Switch from "@/components/switch";
@@ -22,19 +30,47 @@ const GROUP_SLUG_BY_LABEL = new Map(
   VENUE_GROUPS.map((group) => [group.groupName, group.slug]),
 );
 
+/** Follows an element's rendered height, which wrapping text can change. */
+function useElementHeight<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [height, setHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() =>
+      setHeight(element.getBoundingClientRect().height),
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, height] as const;
+}
+
 interface VenuesExplorerProps {
+  /** The page's h1, laid over the top of the map. */
+  title: string;
+  /** Between the search bar and the list. */
+  intro: ReactNode;
   groups: VenueGroupData[];
   mapVenues: VenueMapVenue[];
   boundary?: GeoJSON.GeoJsonObject;
 }
 
 export default function VenuesExplorer({
+  title,
+  intro,
   groups,
   mapVenues,
   boundary,
 }: VenuesExplorerProps) {
   const [query, setQuery] = useState("");
   const [hideEmpty, setHideEmpty] = useState(false);
+  // The map fills the screen less the search bar, so the bar sits on the
+  // bottom edge until the page scrolls; the venues are framed below the title.
+  const [barRef, barHeight] = useElementHeight<HTMLDivElement>();
+  const [titleRef, titleBottom] = useElementHeight<HTMLDivElement>();
 
   const normalizedQuery = query.trim() ? normalizeForSearch(query) : "";
   const isFiltering = Boolean(normalizedQuery) || hideEmpty;
@@ -71,11 +107,33 @@ export default function VenuesExplorer({
   );
 
   return (
-    <>
-      {/* Above the map it filters, and stuck under the header the whole way
-          down the list, so changing the search never means scrolling back up
-          past the map. */}
-      <StickyBar className={styles.searchBar}>
+    <div
+      className={styles.page}
+      style={
+        barHeight
+          ? ({ "--search-bar-height": `${barHeight}px` } as CSSProperties)
+          : undefined
+      }
+    >
+      <section className={styles.mapHero}>
+        <VenueMap
+          venues={filteredMapVenues}
+          boundary={boundary}
+          fill
+          cooperativeGestures
+          insetTop={titleBottom ?? undefined}
+        />
+        {/* Over the map, not beside it, and transparent to the pointer so
+            the map under it still pans and its pins still open. */}
+        <div ref={titleRef} className={styles.titleOverlay}>
+          <OutlineHeading className={styles.title}>{title}</OutlineHeading>
+        </div>
+      </section>
+
+      {/* Straight after the map, so it rests on the bottom edge of the first
+          screen and then sticks under the header the whole way down the
+          list: changing the search never means scrolling back up. */}
+      <StickyBar ref={barRef}>
         <div className={styles.searchControls}>
           <SearchInput
             id="venues-search"
@@ -106,11 +164,9 @@ export default function VenuesExplorer({
         </div>
       </StickyBar>
 
-      <div className={styles.mapSection}>
-        <VenueMap venues={filteredMapVenues} boundary={boundary} bleed />
-      </div>
-
       <div className={styles.column}>
+        {intro}
+
         {filteredGroups.map((group) => {
           const groupSlug = GROUP_SLUG_BY_LABEL.get(group.label);
           return (
@@ -151,6 +207,6 @@ export default function VenuesExplorer({
             <p className={styles.noResults}>No venues have showings listed</p>
           ))}
       </div>
-    </>
+    </div>
   );
 }

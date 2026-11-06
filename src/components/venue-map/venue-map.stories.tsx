@@ -17,8 +17,8 @@ import VenueMap, { type VenueMapVenue } from "@/components/venue-map";
  * out of the clusters, as the near-me page does for the reader's locals, and
  * `detail` to replace the popup's "N films showing" line. `fill` drops the
  * fixed in-page height so the map fills its parent (see `VenueMapDialog`).
- * `bleed` drops the frame and fades the top and bottom into the page, for a
- * map running edge to edge (the `/venues` page).
+ * `insetTop` keeps framing, popups and controls below something laid over the
+ * top of the map, such as the `/venues` page's heading.
  *
  * Embedded in a page (anything but `fill`), the map leaves one-finger drags
  * and plain wheel scrolls to the page: on a touch screen it pans with two
@@ -150,10 +150,11 @@ export const SingleVenue: Story = {
   },
 };
 
-/** Edge to edge with a faded top and bottom, as on the `/venues` page. */
-export const Bleed: Story = {
+/** With 160px at the top covered, as by the `/venues` page's heading: the
+ * controls start below it and the venues are framed beneath it. */
+export const InsetTop: Story = {
   args: {
     venues: sampleVenues,
-    bleed: true,
+    insetTop: 160,
   },
 };
