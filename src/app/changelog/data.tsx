@@ -74,6 +74,35 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-06",
     changes: [
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            Published a report on{" "}
+            <Link href="/reports/lewisham-2026">
+              Lewisham&rsquo;s year without a cinema
+            </Link>
+            : from 1 January to 19 October 2026 the listings found 88 film
+            screenings in Lewisham, against 74,327 in Westminster. Reports now
+            have an <Link href="/reports">index of their own</Link>, linked from
+            the footer, and a borough&rsquo;s page links to any report about it.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            <Link href="/updates">New Listings</Link> is easier to scan. A
+            film&rsquo;s venues are now counted by chain (&ldquo;9 Cineworld, 6
+            Vue, Curzon Bloomsbury and 1 more&rdquo;) rather than named one by
+            one, and each day opens on fewer new films and rollouts, with the
+            rest behind &ldquo;Show all&rdquo;. On a phone, a long line of
+            figures beside a day now drops underneath it instead of cutting the
+            day&rsquo;s name short.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
