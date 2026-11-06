@@ -141,10 +141,10 @@
   transition: opacity 0.15s ease;
 }
 
-/* Blue, the colour of the bars beside the map, so what's pointed at reads
-   the same in both. */
+/* Yellow, which no band of the pink ramp comes near, so the borough pointed
+   at stands out whatever its shade. */
 .outline {
-  --area-stroke: var(--color-electric-blue);
+  --area-stroke: var(--color-buttery-yellow);
   --area-stroke-width: 3;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .map a:focus-visible .area {
-  --area-stroke: var(--color-electric-blue);
+  --area-stroke: var(--color-buttery-yellow);
   --area-stroke-width: 3;
 }
 

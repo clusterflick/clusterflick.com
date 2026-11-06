@@ -13,7 +13,7 @@ import { FILM_BAND_LABELS } from "@/utils/get-borough-stats";
  * `BoroughMap` shades London's boroughs by one quantity, each borough linking
  * to its page. The SVG is server-rendered, so the map and its links are in the
  * static HTML; pointing at or focusing a borough names it in the readout above
- * and outlines it in blue. An `aside` (a `RankedBarChart` of the same figures)
+ * and outlines it in yellow. An `aside` (a `RankedBarChart` of the same figures)
  * sits beside it, and rows carrying `getBoroughMapLinkAttributes` are linked
  * to their boroughs both ways.
  *
