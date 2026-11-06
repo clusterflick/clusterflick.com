@@ -89,6 +89,19 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            <Link href="/updates">New Listings</Link> now tells you what each
+            day did to your watchlist. If you&rsquo;re{" "}
+            <Link href="/personalise">signed in</Link>, a panel at the top names
+            the films on your watchlist that got new showings, how many and
+            where, with a link to plan them, and those films are marked where
+            they appear further down the page.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
@@ -107,13 +120,16 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
-            <Link href="/updates">New Listings</Link> is easier to scan. A
-            film&rsquo;s venues are now counted by chain (&ldquo;9 Cineworld, 6
-            Vue, Curzon Bloomsbury and 1 more&rdquo;) rather than named one by
-            one, and each day opens on fewer new films and rollouts, with the
-            rest behind &ldquo;Show all&rdquo;. On a phone, a long line of
-            figures beside a day now drops underneath it instead of cutting the
-            day&rsquo;s name short.
+            <Link href="/updates">New Listings</Link> is easier to scan. Each
+            day opens with its figures &ndash; new films, new showings and the
+            venues that changed &ndash; and each update is headed by its time
+            rather than the full date again. A film&rsquo;s venues are now
+            counted by chain (&ldquo;9 Cineworld, 6 Vue, Curzon Bloomsbury and 1
+            more&rdquo;) rather than named one by one, and each update opens on
+            fewer new films and rollouts, with films that have a poster first
+            and the rest behind &ldquo;Show all&rdquo;. On a phone, a long line
+            of figures beside a day now drops underneath it instead of cutting
+            the day&rsquo;s name short.
           </>
         ),
       },
