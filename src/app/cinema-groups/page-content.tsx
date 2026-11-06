@@ -1,50 +1,114 @@
 import StandardPageLayout from "@/components/standard-page-layout";
-import ContentSection from "@/components/content-section";
+import ProgrammeCard from "@/components/programme-card";
 import LinkGrid from "@/components/link-grid";
+import { getLede } from "@/utils/get-lede";
+import type { CinemaGroupsIndex } from "@/utils/get-cinema-groups-index";
 import styles from "./page.module.css";
 
-export type CinemaGroupListItem = {
-  slug: string;
-  name: string;
-  href: string;
-  description: string;
-  venueCount: number;
-};
-
-interface CinemaGroupsPageContentProps {
-  groups: CinemaGroupListItem[];
+interface CinemaGroupsPageContentProps extends CinemaGroupsIndex {
+  /** The day the week was counted from, e.g. "Friday 6 November 2026". */
+  countedOn: string;
 }
 
+const plural = (count: number, one: string, many: string) =>
+  `${count.toLocaleString("en-GB")} ${count === 1 ? one : many}`;
+
 export default function CinemaGroupsPageContent({
-  groups,
+  activeGroups,
+  inactiveGroups,
+  totalVenues,
+  totalScreenings,
+  countedOn,
 }: CinemaGroupsPageContentProps) {
-  const totalVenues = groups.reduce((sum, g) => sum + g.venueCount, 0);
+  const groups = [...activeGroups, ...inactiveGroups];
+  const chainVenues = groups.reduce((sum, g) => sum + g.venueCount, 0);
+  const chainScreenings = activeGroups.reduce(
+    (sum, g) => sum + g.screenings,
+    0,
+  );
+  // The chains' share of the week against their share of the venues: the
+  // one figure the page can give that no single chain's page can.
+  const percent = (part: number, whole: number) =>
+    Math.round((part / whole) * 100);
+  const showShares = totalVenues > 0 && totalScreenings > 0;
 
   return (
     <StandardPageLayout
       title="London Cinema Groups"
-      subtitle={`${groups.length} cinema chains across London, from independent picture houses to major multiplexes`}
+      subtitle={`What's on this week at ${plural(groups.length, "cinema chain", "cinema chains")} across London, from arthouse picture houses to the big multiplexes`}
     >
-      <ContentSection title="Browse London Cinemas by Group" as="h2">
-        <p className={styles.intro}>
-          Many of London&apos;s cinemas belong to a chain or group, each with
-          its own character — from arthouse programmers and premium boutique
-          cinemas to the big multiplex brands. Explore all{" "}
-          {totalVenues.toLocaleString("en-GB")} venues across these{" "}
-          {groups.length} groups to see every location and what&apos;s currently
-          showing.
-        </p>
-      </ContentSection>
+      <p className={styles.intro}>
+        Many of London&apos;s cinemas belong to a chain, each with its own
+        character.
+        {showShares && (
+          <>
+            {" "}
+            Between them, these {plural(
+              chainVenues,
+              "venue",
+              "venues",
+            )} are {percent(chainVenues, totalVenues)}% of the places we list,
+            but this week they run {percent(chainScreenings, totalScreenings)}%
+            of London&apos;s screenings.
+          </>
+        )}{" "}
+        Each card leads with the films only that chain is showing, so you can
+        see what sets it apart.
+      </p>
 
-      <LinkGrid
-        items={groups.map((group) => ({
-          key: group.slug,
-          href: group.href,
-          label: group.name,
-          count: group.venueCount,
-        }))}
-        minItemWidth={260}
-      />
+      <ul className={styles.grid}>
+        {activeGroups.map((group) => (
+          <li key={group.slug}>
+            <ProgrammeCard
+              href={group.href}
+              name={group.name}
+              imagePath={group.imagePath}
+              description={getLede(group.description)}
+              posters={group.posters}
+              meta={
+                <span className={styles.meta}>
+                  <span className={styles.filmCount}>
+                    {plural(group.films, "film", "films")} ·{" "}
+                    {plural(group.screenings, "showing", "showings")}
+                  </span>
+                  <span className={styles.detail}>
+                    {plural(group.venueCount, "venue", "venues")}
+                    {group.onlyHere > 0 &&
+                      ` · ${group.onlyHere.toLocaleString("en-GB")} only here`}
+                  </span>
+                </span>
+              }
+            />
+          </li>
+        ))}
+      </ul>
+
+      <p className={styles.note}>
+        Counted over the seven days from {countedOn}, and recounted every time
+        the listings update. Films are what the catalogue shows by default
+        (films, multi-film events and shorts). &ldquo;Only here&rdquo; is a film
+        no venue outside the chain is showing that week, among the venues we
+        list.
+      </p>
+
+      {inactiveGroups.length > 0 && (
+        <section className={styles.section} aria-labelledby="other-groups">
+          <h2 id="other-groups" className={styles.sectionHeading}>
+            {activeGroups.length > 0 ? "Nothing on this week" : "All chains"}
+          </h2>
+          <p className={styles.sectionIntro}>
+            Their screenings appear here as soon as they&apos;re announced.
+          </p>
+          <LinkGrid
+            items={inactiveGroups.map((group) => ({
+              key: group.slug,
+              href: group.href,
+              label: group.name,
+              count: group.venueCount,
+            }))}
+          />
+        </section>
+      )}
     </StandardPageLayout>
   );
 }
