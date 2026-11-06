@@ -16,14 +16,16 @@ const READER_INPUT = ["touchstart", "pointerdown", "wheel", "keydown"] as const;
 /**
  * Keeps a new page at the top once Next.js has put it there.
  *
- * Next scrolls to the top on a link's navigation, and on desktop and in
- * headless Chromium that is where the page stays. On Chrome for Android it
- * didn't: following a footer link from the bottom of a page, with the
- * address bar hidden, landed ~50px down, with the top of the hero under the
- * header. A swipe down then showed the rest, so the page really was scrolled
- * and not just covered. The shift happens after Next's scroll and nothing
- * here causes it, so it is put back: for a moment after a navigation, any
- * scroll away from the top the reader didn't make is undone.
+ * Next scrolls to the top on a link's navigation, and in Chrome, desktop or
+ * Android, that is where the page stays. In Firefox for Android it didn't:
+ * following a footer link from the bottom of a page, with its bottom address
+ * bar hidden by the scroll, landed ~50px down, with the top of the hero under
+ * the header. A swipe down then showed the rest, so the page really was
+ * scrolled and not just covered. It happens after Next's scroll, about the
+ * height of the address bar, and nothing here causes it, so it is put back:
+ * for a moment after a navigation, any scroll away from the top the reader
+ * didn't make is undone. The address bar showing or hiding resizes the visual
+ * viewport rather than scrolling the window, so that is watched too.
  *
  * Only for a forward navigation to a new path. Back and Forward are the
  * browser's to restore, an address with a hash is scrolled to its anchor,
@@ -68,12 +70,14 @@ export function NavigationScrollReset() {
       cancelAnimationFrame(frame);
       window.clearTimeout(timeout);
       window.removeEventListener("scroll", toTop);
+      window.visualViewport?.removeEventListener("resize", toTop);
       for (const type of READER_INPUT) {
         window.removeEventListener(type, stop, true);
       }
     };
     const timeout = window.setTimeout(stop, SETTLE_MS);
     window.addEventListener("scroll", toTop, { passive: true });
+    window.visualViewport?.addEventListener("resize", toTop);
     for (const type of READER_INPUT) {
       window.addEventListener(type, stop, { capture: true, passive: true });
     }
