@@ -148,6 +148,13 @@ which page you copied:
 rather than rebuilding the header, hero and divider around a `.content` of its
 own. A bespoke hero goes in `hero`.
 
+Opening content that should centre on the page — a status line, the links to
+sibling pages — goes in `lead`. It renders above the body at the prose text
+measure, centred on the whole column, so on a prose page it stays out of the
+heading rail instead of sitting off to the right in the text column, and it
+ends 60px above the body, the gap between sections. `/datasets` and
+`/datasets/status` use it.
+
 Narrower elements inside a page share two measures (content only, so add any
 gutter on top): **`--measure-blurb` (640px)** for hero taglines and blurbs,
 and **`--measure-notice` (700px)** for the notices and offers under the

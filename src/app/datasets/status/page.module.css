@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin: 12px 0 28px;
+  margin: 12px 0 0;
   text-align: center;
 }
 

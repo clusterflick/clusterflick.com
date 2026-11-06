@@ -37,10 +37,13 @@
 }
 
 /* The `lead` prop: centred on the page at the prose measure, outside the
-   heading rail. */
+   heading rail. Set off from the body by ContentSection's 60px, the gap
+   between sections, so the first section reads as one of them rather than
+   as a caption to the lead; a lead's own blocks leave their bottom margin
+   to this. */
 .lead {
   max-width: calc(var(--page-prose) - 40px);
-  margin: 0 auto;
+  margin: 0 auto 60px;
 }
 
 /* The prose page width, less the 20px gutters `.content` supplies. */
