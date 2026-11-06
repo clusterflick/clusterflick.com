@@ -1,5 +1,59 @@
 .intro {
   font-size: 16px;
   line-height: 1.7;
-  margin-bottom: 0;
+  margin-bottom: 32px;
+}
+
+.grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Meta row passed to ProgrammeCard, as the formats index draws it. */
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.filmCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-electric-blue);
+  background: rgba(var(--color-electric-blue-rgb), 0.12);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.detail {
+  font-size: 13px;
+  color: rgba(var(--color-white-rgb), 0.55);
+}
+
+.section {
+  margin-top: 48px;
+}
+
+.sectionHeading {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.sectionIntro {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: -12px 0 16px;
 }

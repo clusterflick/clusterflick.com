@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
-import { VENUE_GROUPS } from "@/data/venue-groups";
+import { getVenueImagePath } from "@/utils/get-venue-image";
+import { getCinemaGroupsIndex } from "@/utils/get-cinema-groups-index";
 import CinemaGroupsPageContent from "./page-content";
 
 const title = "London Cinema Groups & Chains";
 const description =
-  "Browse London's cinema chains and groups — Picturehouse, Everyman, Curzon, ODEON, Vue, Cineworld and more. See every venue in each group and what's showing now.";
+  "What's on at London's cinema chains this week — Picturehouse, Everyman, Curzon, ODEON, Vue, Cineworld and more. See each chain's films, what only it is showing, and every venue.";
 
 export const metadata: Metadata = {
   title,
@@ -33,17 +33,14 @@ export default async function CinemaGroupsPage() {
   const data = await getStaticData();
   const map = groupVenuesByGroup(data.venues);
 
-  const groups = VENUE_GROUPS.filter((group) => map.has(group.slug))
-    .map((group) => ({
-      slug: group.slug,
-      name: group.name,
-      href: getVenueGroupUrl(group),
-      description: group.description,
-      venueCount: (map.get(group.slug) || []).length,
-    }))
-    .sort(
-      (a, b) => b.venueCount - a.venueCount || a.name.localeCompare(b.name),
-    );
+  // A build-time snapshot of the coming week, as the home page's counts are:
+  // the page is rebuilt with every release.
+  const now = Date.parse(new Date().toISOString());
+  const index = getCinemaGroupsIndex(data, map, {
+    now,
+    getImagePath: getVenueImagePath,
+  });
+  const groups = [...index.activeGroups, ...index.inactiveGroups];
 
   const jsonLd = [
     {
@@ -85,7 +82,7 @@ export default async function CinemaGroupsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CinemaGroupsPageContent groups={groups} />
+      <CinemaGroupsPageContent {...index} />
     </>
   );
 }

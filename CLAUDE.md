@@ -329,6 +329,29 @@ a change to the outlines means regenerating those too. The script skips
 images that exist and needs a `GOOGLE_MAPS_API_KEY`, so delete the affected
 ones first.
 
+## Cinema Groups Index
+
+`/cinema-groups` is a `ProgrammeCard` per chain with something on in the
+coming week, most films first, and the chains with nothing on (Rooftop Cinema
+Club out of season) named in a `LinkGrid` beneath. Built in
+`getCinemaGroupsIndex`, shared with the page's story. Its figures are the home
+page's rule again (default categories, next seven days), so a chain's count
+agrees with `/london-cinemas` and the home page.
+
+**A chain's card leads with what only it is showing**: films no venue
+outside the chain has in the week, among the venues we list. That is what
+tells chains apart — the same releases top every multiplex, while the
+arthouse chains each have a dozen or more of their own (Curzon 18,
+Picturehouse 16, BFI 25 in a measured week; Vue 3). Those posters come first,
+busiest first, then the chain's busiest films, and each card prefers films no
+earlier card has used, as the formats index does. **There is no "next
+screening"**: a chain always has one starting within minutes, so naming it
+would say nothing.
+
+The intro sets the chains' share of venues against their share of the week's
+screenings (19% against 90% when written), the one figure the index can give
+that no chain's own page can.
+
 ## Festival & Film Club Indexes
 
 `/festivals` and `/film-clubs` lead with what's on, not who runs it. Both are

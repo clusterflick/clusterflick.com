@@ -74,6 +74,20 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-06",
     changes: [
       {
+        tag: "Improvement",
+        body: () => (
+          <>
+            <Link href="/cinema-groups">Cinema Groups</Link> now shows
+            what&rsquo;s on at each chain this week, rather than just listing
+            them. Each card leads with posters of the films only that chain is
+            showing, so you can see what sets Curzon, Picturehouse or the BFI
+            apart, with its films, showings and venues beneath. Between them the
+            chains are a fifth of the venues we list but run nine in ten of
+            London&rsquo;s screenings.
+          </>
+        ),
+      },
+      {
         tag: "New feature",
         body: () => (
           <>
