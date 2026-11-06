@@ -107,12 +107,12 @@ export default async function UpdatesPage() {
         />
       ) : (
         <>
-          <section aria-labelledby="latest-day">
-            <h2 id="latest-day" className={styles.dayHeading}>
-              <Link href={getUpdateDayPath(latest.date)}>
-                {formatDateLong(dateStringToLondonTimestamp(latest.date))}
-              </Link>
-            </h2>
+          <section>
+            {/* Outlined as the runs' headings used to be. The day's own page
+                has its date as the pink page title instead. */}
+            <OutlineHeading as="h2" color="blue" className={styles.dayHeading}>
+              {formatDateLong(dateStringToLondonTimestamp(latest.date))}
+            </OutlineHeading>
             <DayStats day={latest} />
             <ol className={styles.timeline}>
               {latest.releases.map((release) => (

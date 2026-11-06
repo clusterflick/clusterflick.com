@@ -12,12 +12,12 @@
 
 /* ─── The day: its date and its figures ─── */
 
-/* Under the page's h1 on the index; a day's own page has the date as its h1. */
+/* The latest day on the index, under the page's h1. A day's own page has the
+   date as its h1 instead. */
 .dayHeading {
-  margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.3;
+  display: block;
+  margin-bottom: 20px;
+  font-size: 26px;
 }
 
 /* ─── Timeline: one entry per pipeline run ─── */
@@ -102,6 +102,13 @@
   line-height: 1.5;
 }
 
+/* Links in running text drop the global bold: colour and underline already
+   mark them, and a sentence of bold names (a run's new venues, a rollout's
+   venue list below) read as a wall. */
+.prose a {
+  font-weight: normal;
+}
+
 /* ─── More showings: text only, already dense ─── */
 
 .showings {
@@ -118,6 +125,13 @@
   line-height: 1.5;
   padding-left: 16px;
   position: relative;
+}
+
+/* The film leads its line, so it keeps a little weight over the venues after
+   it, but not the global bold: ten bold titles stacked was the heaviest part
+   of the section. */
+.showing > a {
+  font-weight: 500;
 }
 
 /* Venue names sit in white with the underline left blue. A run can name a dozen
@@ -236,7 +250,7 @@
 
 @media (min-width: 700px) {
   .dayHeading {
-    font-size: 26px;
+    font-size: 32px;
   }
 
   .archiveHeading {

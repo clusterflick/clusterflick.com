@@ -28,14 +28,21 @@ function VenueName({ venue }: { venue: UpdateVenue }) {
 export default function VenueList({
   venues,
   className,
+  condense = true,
 }: {
   venues: UpdateVenue[];
   className?: string;
+  /**
+   * Off for a run's new venues: a handful join at a time, each is news in its
+   * own right, and counting them by chain would hide the names that are the
+   * point. On for the venues a film reached, where a rollout names dozens.
+   */
+  condense?: boolean;
 }) {
   const [showAll, setShowAll] = useState(false);
 
   const condensed = condenseVenues(venues, COLLAPSED_COUNT);
-  const isCollapsed = !showAll && condensed.isCondensed;
+  const isCollapsed = condense && !showAll && condensed.isCondensed;
 
   const items: Array<{ key: string; node: ReactNode }> = isCollapsed
     ? condensed.entries.map((entry) =>

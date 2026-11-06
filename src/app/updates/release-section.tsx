@@ -82,7 +82,7 @@ export default function ReleaseSection({
             {release.newVenues.length === 1 ? "New venue" : "New venues"}
           </SectionHeading>
           <p className={styles.prose}>
-            <VenueList venues={release.newVenues} />
+            <VenueList venues={release.newVenues} condense={false} />
           </p>
         </section>
       )}
