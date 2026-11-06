@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import Image from "next/image";
 import NavCard from "@/components/nav-card";
+import NeonLogo from "@/components/neon-logo";
 import styles from "./event-card.module.css";
 
 export interface EventCardProps {
@@ -10,6 +11,9 @@ export interface EventCardProps {
   description: string | null;
   /** Bottom meta row — caller provides domain-specific content (dates, film count, etc.) */
   meta: ReactNode;
+  /** The logo is a neon sign on its own dark tile (the genre icons), drawn
+   *  edge to edge and lit up on hover. See `NeonLogo`. */
+  neonLogo?: boolean;
 }
 
 /**
@@ -34,22 +38,27 @@ export default function EventCard({
   imagePath,
   description,
   meta,
+  neonLogo = false,
 }: EventCardProps) {
   return (
     <NavCard href={href} className={styles.card}>
-      <div className={styles.logo}>
-        {imagePath ? (
-          <Image
-            src={imagePath}
-            alt={`${name} logo`}
-            width={96}
-            height={96}
-            className={styles.logoImage}
-          />
-        ) : (
-          <div className={styles.logoPlaceholder} />
-        )}
-      </div>
+      {imagePath && neonLogo ? (
+        <NeonLogo src={imagePath} size={96} className={styles.neonLogo} />
+      ) : (
+        <div className={styles.logo}>
+          {imagePath ? (
+            <Image
+              src={imagePath}
+              alt={`${name} logo`}
+              width={96}
+              height={96}
+              className={styles.logoImage}
+            />
+          ) : (
+            <div className={styles.logoPlaceholder} />
+          )}
+        </div>
+      )}
       <div className={styles.body}>
         <div className={styles.name} data-testid="event-card-name">
           {name}
