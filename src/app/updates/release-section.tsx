@@ -12,11 +12,14 @@ import styles from "./updates.module.css";
  * How much of a run opens on the page before the reader asks for the rest.
  *
  * A season announcement can add over a hundred films in one run, which is worth
- * a page of its own only if the reader wants it — four rows of posters, or a
- * screenful of showings, is enough to see what kind of run this was.
+ * a page of its own only if the reader wants it. Two rows of posters on desktop
+ * is enough to see what kind of run this was, and a busy day carries two or
+ * three runs, each opening this much. Showings are sorted by how many were
+ * added, so the ten shown are the big rollouts and what waits behind the
+ * button is the tail of single showings.
  */
-const INITIAL_FILMS = 24;
-const INITIAL_SHOWINGS = 30;
+const INITIAL_FILMS = 12;
+const INITIAL_SHOWINGS = 10;
 
 /**
  * Venues collapse to a count past the first so a season announcement of thirty

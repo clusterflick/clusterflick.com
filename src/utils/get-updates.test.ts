@@ -12,12 +12,14 @@ import {
 } from "@/types";
 import {
   buildUpdates,
+  condenseVenues,
   getUpdateReleasePath,
   groupUpdatesByDay,
   readDiffBlobs,
   summariseDay,
   type UpdateFilm,
   type UpdateRelease,
+  type UpdateVenue,
 } from "./get-updates";
 
 const DAY = 86_400_000;
@@ -727,5 +729,138 @@ describe("readDiffBlobs", () => {
 
   it("yields no updates when the directory is missing", () => {
     expect(readDiffBlobs(join(tmpdir(), "no-such-diffed-data"))).toEqual([]);
+  });
+});
+
+describe("buildUpdates venue groups", () => {
+  it("attaches the chain to a venue whose group has a page", () => {
+    const cinemaData = data(
+      [movie("550", "Fight Club", ["a.com-1", "b.com-1"])],
+      ["a.com", "b.com"],
+    );
+    Object.assign(cinemaData.venues["a.com"], {
+      structure: "group",
+      groupName: "Cineworld",
+    });
+    Object.assign(cinemaData.venues["b.com"], {
+      structure: "group",
+      groupName: "Some Hotel Chain",
+    });
+
+    const result = buildUpdates(
+      [
+        blob("2026-07-25T04:41:53Z", {
+          "a.com": venue({
+            showings: {
+              added: [added("a.com-1", "Fight Club", [JUL_25 + DAY])],
+              removed: [],
+              modified: [],
+            },
+          }),
+          "b.com": venue({
+            name: "Venue b.com",
+            showings: {
+              added: [added("b.com-1", "Fight Club", [JUL_25 + DAY])],
+              removed: [],
+              modified: [],
+            },
+          }),
+        }),
+      ],
+      cinemaData,
+    );
+
+    const [a, b] = result[0].newFilms[0].venues;
+    expect(a.group).toEqual({
+      name: "Cineworld",
+      href: "/cinema-groups/cineworld",
+    });
+    // No group page, so nothing to count it under
+    expect(b.group).toBeUndefined();
+  });
+});
+
+describe("condenseVenues", () => {
+  const chain = (name: string) => ({
+    name,
+    href: `/cinema-groups/${name.toLowerCase()}`,
+  });
+  const v = (id: string, group?: string): UpdateVenue => ({
+    id,
+    name: id,
+    href: null,
+    ...(group ? { group: chain(group) } : {}),
+  });
+  const describeEntries = (venues: UpdateVenue[], limit = 3) => {
+    const { entries, hiddenVenues, isCondensed } = condenseVenues(
+      venues,
+      limit,
+    );
+    return {
+      entries: entries.map((entry) =>
+        entry.kind === "group"
+          ? `${entry.count} ${entry.group.name}`
+          : entry.venue.id,
+      ),
+      hiddenVenues,
+      isCondensed,
+    };
+  };
+
+  it("leaves a short list of standalone venues alone", () => {
+    expect(describeEntries([v("a"), v("b"), v("c")])).toEqual({
+      entries: ["a", "b", "c"],
+      hiddenVenues: 0,
+      isCondensed: false,
+    });
+  });
+
+  it("names a lone venue of a chain rather than counting it", () => {
+    expect(describeEntries([v("a", "Vue"), v("b")]).entries).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+
+  it("counts chains, largest first, ahead of standalone venues", () => {
+    expect(
+      describeEntries([
+        v("a"),
+        v("vue-1", "Vue"),
+        v("cw-1", "Cineworld"),
+        v("cw-2", "Cineworld"),
+        v("cw-3", "Cineworld"),
+        v("vue-2", "Vue"),
+      ]),
+    ).toEqual({
+      entries: ["3 Cineworld", "2 Vue", "a"],
+      hiddenVenues: 0,
+      isCondensed: true,
+    });
+  });
+
+  it("cuts to the limit and counts the venues behind the cut", () => {
+    expect(
+      describeEntries([
+        v("cw-1", "Cineworld"),
+        v("cw-2", "Cineworld"),
+        v("a"),
+        v("b"),
+        v("c"),
+        v("d"),
+      ]),
+    ).toEqual({
+      entries: ["2 Cineworld", "a", "b"],
+      hiddenVenues: 2,
+      isCondensed: true,
+    });
+  });
+
+  it("shows the last item rather than cutting it alone", () => {
+    expect(describeEntries([v("a"), v("b"), v("c"), v("d")])).toEqual({
+      entries: ["a", "b", "c", "d"],
+      hiddenVenues: 0,
+      isCondensed: false,
+    });
   });
 });
