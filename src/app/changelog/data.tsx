@@ -89,6 +89,18 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New feature",
+        body: () => (
+          <>
+            <Link href="/updates">New Listings</Link> now tells you what each
+            day did to your watchlist. If you&rsquo;re{" "}
+            <Link href="/personalise">signed in</Link>, it names the films on
+            your watchlist that got new showings, and marks them where they
+            appear.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
@@ -107,13 +119,10 @@ export const CHANGELOG: ChangelogDay[] = [
         tag: "Improvement",
         body: () => (
           <>
-            <Link href="/updates">New Listings</Link> is easier to scan. A
-            film&rsquo;s venues are now counted by chain (&ldquo;9 Cineworld, 6
-            Vue, Curzon Bloomsbury and 1 more&rdquo;) rather than named one by
-            one, and each day opens on fewer new films and rollouts, with the
-            rest behind &ldquo;Show all&rdquo;. On a phone, a long line of
-            figures beside a day now drops underneath it instead of cutting the
-            day&rsquo;s name short.
+            <Link href="/updates">New Listings</Link> is easier to scan. Each
+            day opens with its figures, a film&rsquo;s venues are counted by
+            chain rather than named one by one, and less is shown before
+            &ldquo;Show all&rdquo;.
           </>
         ),
       },

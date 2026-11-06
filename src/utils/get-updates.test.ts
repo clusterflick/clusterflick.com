@@ -15,6 +15,7 @@ import {
   getUpdateReleasePath,
   groupUpdatesByDay,
   readDiffBlobs,
+  getDayFilms,
   getDayTotals,
   summariseDay,
   type UpdateFilm,
@@ -604,6 +605,7 @@ describe("buildUpdates", () => {
 
 const updateFilm = (title: string, performanceCount: number): UpdateFilm => ({
   key: title,
+  movieId: null,
   title,
   href: null,
   venues: [{ id: "a.com", name: "Venue a.com", href: null }],
@@ -838,5 +840,77 @@ describe("buildUpdates ordering", () => {
       "Quiet Film",
       "Busy Event",
     ]);
+  });
+});
+
+describe("getDayFilms", () => {
+  const film = (
+    id: string | null,
+    title: string,
+    count: number,
+    venueIds: string[],
+  ): UpdateFilm => ({
+    ...updateFilm(title, count),
+    movieId: id,
+    venues: venueIds.map((venueId) => ({
+      id: venueId,
+      name: venueId,
+      href: null,
+    })),
+  });
+
+  it("folds a film's runs into one entry, new if any run brought it in", () => {
+    const films = getDayFilms({
+      date: "2026-08-13",
+      releases: [
+        release("2026-08-13T17:05:00Z", {
+          moreShowings: [film("550", "Fight Club", 4, ["b.com", "a.com"])],
+        }),
+        release("2026-08-13T05:15:00Z", {
+          newFilms: [film("550", "Fight Club", 3, ["a.com"])],
+          moreShowings: [film("949", "Heat", 2, ["c.com"])],
+        }),
+      ],
+    });
+
+    expect(
+      films.map(
+        ({ movieId, isNew, performanceCount, venueCount, soleVenue }) => ({
+          movieId,
+          isNew,
+          performanceCount,
+          venueCount,
+          soleVenue,
+        }),
+      ),
+    ).toEqual([
+      {
+        movieId: "550",
+        isNew: true,
+        performanceCount: 7,
+        venueCount: 2,
+        soleVenue: null,
+      },
+      {
+        movieId: "949",
+        isNew: false,
+        performanceCount: 2,
+        venueCount: 1,
+        soleVenue: "c.com",
+      },
+    ]);
+  });
+
+  it("leaves out entries that resolved to no film", () => {
+    const films = getDayFilms({
+      date: "2026-08-13",
+      releases: [
+        release("2026-08-13T17:05:00Z", {
+          newFilms: [film(null, "Mystery Event", 1, ["a.com"])],
+        }),
+      ],
+    });
+
+    expect(films).toEqual([]);
   });
 });

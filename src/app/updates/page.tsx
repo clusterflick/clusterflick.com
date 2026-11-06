@@ -8,6 +8,7 @@ import EmptyState from "@/components/empty-state";
 import { getStaticData } from "@/utils/get-static-data";
 import {
   buildUpdates,
+  getDayFilms,
   getUpdateDayPath,
   groupUpdatesByDay,
   readDiffBlobs,
@@ -18,6 +19,7 @@ import {
   formatDateLong,
 } from "@/utils/format-date";
 import ReleaseSection from "./release-section";
+import WatchlistHighlights from "./watchlist-highlights";
 import DayStats from "./day-stats";
 import styles from "./updates.module.css";
 
@@ -114,6 +116,7 @@ export default async function UpdatesPage() {
               {formatDateLong(dateStringToLondonTimestamp(latest.date))}
             </OutlineHeading>
             <DayStats day={latest} />
+            <WatchlistHighlights films={getDayFilms(latest)} headingLevel={3} />
             <ol className={styles.timeline}>
               {latest.releases.map((release) => (
                 <ReleaseSection
