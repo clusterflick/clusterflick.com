@@ -101,18 +101,22 @@ function TextPatternPoster({
         interactive && styles.interactive,
       )}
     >
-      <div className={styles.textPattern} aria-hidden="true">
-        {Array.from({ length: rowCount }).map((_, i) => (
-          <div
-            key={i}
-            className={clsx(styles.textRow, i % 2 === 1 && styles.filled)}
-            style={{
-              transform: `translateX(${(-i * offsetStep) / (i % 2 === 1 ? 1 : 2)}px)`,
-            }}
-          >
-            <span className={styles.textContent}>{repeatedText}</span>
-          </div>
-        ))}
+      {/* The frame clips the pattern, so it can be inset to sit inside the
+          same border a real poster at this size sits in */}
+      <div className={styles.patternFrame}>
+        <div className={styles.textPattern} aria-hidden="true">
+          {Array.from({ length: rowCount }).map((_, i) => (
+            <div
+              key={i}
+              className={clsx(styles.textRow, i % 2 === 1 && styles.filled)}
+              style={{
+                transform: `translateX(${(-i * offsetStep) / (i % 2 === 1 ? 1 : 2)}px)`,
+              }}
+            >
+              <span className={styles.textContent}>{repeatedText}</span>
+            </div>
+          ))}
+        </div>
       </div>
       <span className={styles.srOnly}>{title}</span>
       {overlay}
