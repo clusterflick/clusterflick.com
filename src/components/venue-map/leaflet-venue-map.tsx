@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   MapContainer,
   TileLayer,
@@ -52,6 +59,9 @@ const REFIT_DEBOUNCE_MS = 450;
 // Stop a single-venue match from slamming all the way to street level.
 const REFIT_MAX_ZOOM = 14;
 const FIT_PADDING: [number, number] = [32, 32];
+// How long the "use two fingers" / "use Ctrl + scroll" hint stays up after the
+// gesture that prompted it stops.
+const GESTURE_HINT_MS = 1500;
 
 // Faint Greater London outline. Non-interactive so it never intercepts clicks.
 const BOUNDARY_STYLE = {
@@ -122,7 +132,14 @@ function createClusterIcon(cluster: L.MarkerCluster) {
   });
 }
 
-function renderVenueMarker(venue: VenueMapVenue, icon: L.DivIcon) {
+function renderVenueMarker(
+  venue: VenueMapVenue,
+  icon: L.DivIcon,
+  popupPadding?: Pick<
+    L.PopupOptions,
+    "autoPanPaddingTopLeft" | "autoPanPaddingBottomRight"
+  >,
+) {
   return (
     <Marker
       key={venue.id}
@@ -132,7 +149,7 @@ function renderVenueMarker(venue: VenueMapVenue, icon: L.DivIcon) {
       opacity={venue.filmCount > 0 ? 1 : 0.5}
       zIndexOffset={venue.highlighted ? 1000 : 0}
     >
-      <Popup>
+      <Popup {...popupPadding}>
         <Link href={venue.href} className={styles.popupTitle}>
           <MapPinIcon size={20} className={styles.popupIcon} />
           {venue.name}
@@ -171,6 +188,20 @@ interface LeafletVenueMapProps {
   distanceRingsMiles?: number[];
   /** Fill the parent's height instead of the fixed in-page footprint. */
   fill?: boolean;
+  /** Pixels at the top covered by an overlay; see `VenueMap`. */
+  insetTop?: number;
+  /**
+   * Leave one-finger drags and plain wheel scrolls to the page, as an embedded
+   * map should: on a touch screen the map pans with two fingers, and a wheel
+   * zooms it only with Ctrl (⌘ on a Mac) held. Trackpad pinches arrive as
+   * Ctrl + wheel, so they still zoom. A hint says so when the page scrolls
+   * instead.
+   */
+  cooperativeGestures?: boolean;
+}
+
+function isApplePlatform() {
+  return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 }
 
 export default function LeafletVenueMap({
@@ -178,10 +209,101 @@ export default function LeafletVenueMap({
   boundary,
   distanceRingsMiles,
   fill = false,
+  insetTop = 0,
+  cooperativeGestures = false,
 }: LeafletVenueMapProps) {
   const { position, loading, error, requestLocation } = useGeolocationContext();
   const [map, setMap] = useState<L.Map | null>(null);
   const didFit = useRef(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // The text outlives `visible` so the hint can fade out rather than blank.
+  const [gestureHint, setGestureHint] = useState({ text: "", visible: false });
+  const fitPadding = useMemo(
+    () => ({
+      paddingTopLeft: L.point(FIT_PADDING[0], FIT_PADDING[1] + insetTop),
+      paddingBottomRight: L.point(FIT_PADDING[0], FIT_PADDING[1]),
+    }),
+    [insetTop],
+  );
+  const popupPadding = useMemo(
+    () =>
+      insetTop
+        ? {
+            autoPanPaddingTopLeft: L.point(16, insetTop + 8),
+            autoPanPaddingBottomRight: L.point(16, 16),
+          }
+        : undefined,
+    [insetTop],
+  );
+
+  // On a touch-first device one finger scrolls the page: with Leaflet's drag
+  // handler off, its container's touch-action lets the browser scroll, while
+  // pinching still zooms and pans the map. Mouse-first devices keep dragging,
+  // since a mouse drag never meant to scroll.
+  useEffect(() => {
+    if (!map || !cooperativeGestures) return;
+    const coarse = window.matchMedia("(pointer: coarse)");
+    const apply = () => {
+      if (coarse.matches) map.dragging.disable();
+      else map.dragging.enable();
+    };
+    apply();
+    coarse.addEventListener("change", apply);
+    return () => {
+      coarse.removeEventListener("change", apply);
+      map.dragging.enable();
+    };
+  }, [map, cooperativeGestures]);
+
+  // Leaflet listens for wheel on its container, so a capturing listener on
+  // the wrapper above it decides first: a plain wheel is stopped there (but
+  // not prevented, so the page scrolls) and a Ctrl/⌘ wheel goes on to zoom.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !cooperativeGestures) return;
+
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
+    const showHint = (text: string) => {
+      setGestureHint({ text, visible: true });
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(
+        () => setGestureHint((hint) => ({ ...hint, visible: false })),
+        GESTURE_HINT_MS,
+      );
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) return;
+      event.stopPropagation();
+      showHint(
+        isApplePlatform()
+          ? "Use ⌘ + scroll to zoom the map"
+          : "Use Ctrl + scroll to zoom the map",
+      );
+    };
+
+    // A tap on a pin is one finger too, so only a moving finger — the page
+    // scrolling where the reader may have meant the map — gets the hint.
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length === 1 && !map?.dragging.enabled()) {
+        showHint("Use two fingers to move the map");
+      } else if (event.touches.length > 1) {
+        clearTimeout(hideTimer);
+        setGestureHint((hint) => ({ ...hint, visible: false }));
+      }
+    };
+
+    wrapper.addEventListener("wheel", onWheel, { capture: true });
+    wrapper.addEventListener("touchmove", onTouchMove, {
+      capture: true,
+      passive: true,
+    });
+    return () => {
+      clearTimeout(hideTimer);
+      wrapper.removeEventListener("wheel", onWheel, { capture: true });
+      wrapper.removeEventListener("touchmove", onTouchMove, { capture: true });
+    };
+  }, [map, cooperativeGestures]);
 
   const showRings = !!distanceRingsMiles?.length && !!position;
 
@@ -220,7 +342,7 @@ export default function LeafletVenueMap({
 
     if (!didFit.current) {
       map.fitBounds(fitTarget, {
-        padding: FIT_PADDING,
+        ...fitPadding,
         maxZoom: REFIT_MAX_ZOOM,
       });
       didFit.current = true;
@@ -229,14 +351,14 @@ export default function LeafletVenueMap({
 
     const timer = setTimeout(() => {
       map.flyToBounds(fitTarget, {
-        padding: FIT_PADDING,
+        ...fitPadding,
         maxZoom: REFIT_MAX_ZOOM,
         duration: 0.6,
       });
     }, REFIT_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [map, fitTarget]);
+  }, [map, fitTarget, fitPadding]);
 
   const handleLocate = useCallback(async () => {
     const pos = await requestLocation();
@@ -246,7 +368,16 @@ export default function LeafletVenueMap({
   }, [requestLocation, map]);
 
   return (
-    <div className={fill ? `${styles.wrapper} ${styles.fill}` : styles.wrapper}>
+    <div
+      ref={wrapperRef}
+      className={fill ? `${styles.wrapper} ${styles.fill}` : styles.wrapper}
+      // Read by the controls' offsets in the CSS.
+      style={
+        insetTop
+          ? ({ "--inset-top": `${insetTop}px` } as CSSProperties)
+          : undefined
+      }
+    >
       <MapContainer
         className={styles.map}
         center={LONDON_CENTRE}
@@ -293,12 +424,14 @@ export default function LeafletVenueMap({
         >
           {venues
             .filter((venue) => !venue.highlighted)
-            .map((venue) => renderVenueMarker(venue, venueIcon))}
+            .map((venue) => renderVenueMarker(venue, venueIcon, popupPadding))}
         </MarkerClusterGroup>
         {/* Outside the cluster group, so a local never folds into a bubble. */}
         {venues
           .filter((venue) => venue.highlighted)
-          .map((venue) => renderVenueMarker(venue, highlightedVenueIcon))}
+          .map((venue) =>
+            renderVenueMarker(venue, highlightedVenueIcon, popupPadding),
+          )}
         {position && (
           <Marker
             position={[position.lat, position.lon]}
@@ -321,6 +454,16 @@ export default function LeafletVenueMap({
         >
           {loading ? "Locating…" : position ? "Recentre on me" : "Locate me"}
         </Button>
+      </div>
+
+      {/* Visual only: it describes pointer gestures, which a screen reader
+          user isn't making, and keyboard panning is unaffected. */}
+      <div
+        className={styles.gestureHint}
+        data-visible={gestureHint.visible || undefined}
+        aria-hidden="true"
+      >
+        {gestureHint.text && <span>{gestureHint.text}</span>}
       </div>
 
       {error && (

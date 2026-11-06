@@ -59,6 +59,12 @@ interface StandardPageLayoutProps {
    * just noise below it.
    */
   hideFooter?: boolean;
+  /**
+   * Omit the hero and the divider under it. For a page whose top is a feature
+   * of its own, rendered in `afterContent` along with the page's heading —
+   * the venues page, which opens on a full-screen map with its title over it.
+   */
+  hideHero?: boolean;
 }
 
 /**
@@ -86,28 +92,30 @@ export default function StandardPageLayout({
   children,
   afterContent,
   hideFooter = false,
+  hideHero = false,
 }: StandardPageLayoutProps) {
   return (
     <main id="main-content">
       <PreloadCinemaData />
       <PageHeader backUrl={backUrl} backText={backText} />
 
-      {hero ?? (
-        <HeroSection
-          backgroundImage="/images/light-circles.jpg"
-          backgroundImageAlt="Decorative light circles"
-          backdropHeight="standard"
-          align="center"
-        >
-          <OutlineHeading className={styles.title}>
-            {title ?? ""}
-          </OutlineHeading>
-          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
-          {heroExtra}
-        </HeroSection>
-      )}
+      {!hideHero &&
+        (hero ?? (
+          <HeroSection
+            backgroundImage="/images/light-circles.jpg"
+            backgroundImageAlt="Decorative light circles"
+            backdropHeight="standard"
+            align="center"
+          >
+            <OutlineHeading className={styles.title}>
+              {title ?? ""}
+            </OutlineHeading>
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+            {heroExtra}
+          </HeroSection>
+        ))}
 
-      <Divider />
+      {!hideHero && <Divider />}
 
       {children && <div className={styles.content}>{children}</div>}
       {afterContent}

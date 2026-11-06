@@ -212,7 +212,10 @@ test.describe("Venue Pages", () => {
     await expect(page.locator("h1").first()).toContainText(
       "Every Cinema in London",
     );
-    await expect(page.getByText(/\d+ venues across London/)).toBeVisible();
+    // The count is in the intro under the map; the title has no subtitle.
+    await expect(
+      page.getByText(/Film screenings from \d+ venues across/),
+    ).toBeVisible();
 
     await venuesPage.screenshot("venues-list");
   });

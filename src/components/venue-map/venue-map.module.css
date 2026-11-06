@@ -24,6 +24,13 @@
   border-radius: 0;
 }
 
+/* `insetTop`: something is laid over the top of the map (the venues page's
+   heading), so the controls start below it. Leaflet's controls carry a 10px
+   margin of their own. */
+.wrapper :global(.leaflet-top) {
+  top: var(--inset-top, 0px);
+}
+
 .map {
   width: 100%;
   height: 100%;
@@ -46,7 +53,7 @@
 /* --- Controls overlay --- */
 .controls {
   position: absolute;
-  top: 12px;
+  top: calc(var(--inset-top, 0px) + 12px);
   right: 12px;
   z-index: 1000;
   /* The locate button is transparent-filled, so pins and cluster bubbles
@@ -56,6 +63,37 @@
   background: #0b1114;
   /* Matches the small button's own radius, so no plate corners peek out. */
   border-radius: 4px;
+}
+
+/* "Use two fingers to move the map" — over the middle of the map, where the
+   gesture was, and never in the way of one. */
+.gestureHint {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gestureHint[data-visible] {
+  opacity: 1;
+  transition-duration: 0.15s;
+}
+
+.gestureHint span {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(var(--color-midnight-navy-rgb), 0.9);
+  color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .error {
