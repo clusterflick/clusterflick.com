@@ -4,11 +4,17 @@
   margin: 0;
 }
 
+/* Wraps rather than squeezing: when the label and its detail don't fit on one
+   line, the detail drops beneath the label instead of truncating it. A long
+   detail ("129 films added, 12,447 showings added, 9 venues added") used to
+   leave a phone with "Monday, …" — the label is what the row is for. */
 .item {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 2px;
   padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -38,8 +44,9 @@
   color: var(--color-neon-pink);
 }
 
+/* Allowed to wrap, for a detail too long for a line of its own on a narrow
+   phone; a detail that fits beside its label never needs to. */
 .detail {
   font-size: 13px;
   color: var(--color-muted-gray);
-  white-space: nowrap;
 }
