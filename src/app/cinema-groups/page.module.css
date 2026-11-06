@@ -42,13 +42,6 @@
   color: rgba(var(--color-white-rgb), 0.55);
 }
 
-.note {
-  margin: 16px 0 0;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--color-muted-gray);
-}
-
 .section {
   margin-top: 48px;
 }

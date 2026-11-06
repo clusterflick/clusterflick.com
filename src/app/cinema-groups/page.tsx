@@ -3,7 +3,6 @@ import { getStaticData } from "@/utils/get-static-data";
 import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getCinemaGroupsIndex } from "@/utils/get-cinema-groups-index";
-import { formatDateLong } from "@/utils/format-date";
 import CinemaGroupsPageContent from "./page-content";
 
 const title = "London Cinema Groups & Chains";
@@ -34,9 +33,8 @@ export default async function CinemaGroupsPage() {
   const data = await getStaticData();
   const map = groupVenuesByGroup(data.venues);
 
-  // A build-time snapshot of the coming week, as the home page's counts and
-  // /london-cinemas are: the page is rebuilt with every release, and says
-  // which day it counted from.
+  // A build-time snapshot of the coming week, as the home page's counts are:
+  // the page is rebuilt with every release.
   const now = Date.parse(new Date().toISOString());
   const index = getCinemaGroupsIndex(data, map, {
     now,
@@ -84,7 +82,7 @@ export default async function CinemaGroupsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CinemaGroupsPageContent {...index} countedOn={formatDateLong(now)} />
+      <CinemaGroupsPageContent {...index} />
     </>
   );
 }

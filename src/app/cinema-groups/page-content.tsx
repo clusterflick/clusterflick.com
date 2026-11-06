@@ -5,10 +5,7 @@ import { getLede } from "@/utils/get-lede";
 import type { CinemaGroupsIndex } from "@/utils/get-cinema-groups-index";
 import styles from "./page.module.css";
 
-interface CinemaGroupsPageContentProps extends CinemaGroupsIndex {
-  /** The day the week was counted from, e.g. "Friday 6 November 2026". */
-  countedOn: string;
-}
+type CinemaGroupsPageContentProps = CinemaGroupsIndex;
 
 const plural = (count: number, one: string, many: string) =>
   `${count.toLocaleString("en-GB")} ${count === 1 ? one : many}`;
@@ -18,7 +15,6 @@ export default function CinemaGroupsPageContent({
   inactiveGroups,
   totalVenues,
   totalScreenings,
-  countedOn,
 }: CinemaGroupsPageContentProps) {
   const groups = [...activeGroups, ...inactiveGroups];
   const chainVenues = groups.reduce((sum, g) => sum + g.venueCount, 0);
@@ -82,14 +78,6 @@ export default function CinemaGroupsPageContent({
           </li>
         ))}
       </ul>
-
-      <p className={styles.note}>
-        Counted over the seven days from {countedOn}, and recounted every time
-        the listings update. Films are what the catalogue shows by default
-        (films, multi-film events and shorts). &ldquo;Only here&rdquo; is a film
-        no venue outside the chain is showing that week, among the venues we
-        list.
-      </p>
 
       {inactiveGroups.length > 0 && (
         <section className={styles.section} aria-labelledby="other-groups">

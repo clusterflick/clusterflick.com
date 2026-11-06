@@ -5,7 +5,6 @@ import {
   type CinemaGroupsIndex,
 } from "@/utils/get-cinema-groups-index";
 import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
-import { formatDateLong } from "@/utils/format-date";
 import type { Venue } from "@/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
@@ -33,7 +32,7 @@ const GROUP_IMAGE_PATHS: Record<string, string> = {
   "electric-cinema": "/images/venues/electric-cinema.png",
 };
 
-type CinemaGroupsPageData = CinemaGroupsIndex & { countedOn: string };
+type CinemaGroupsPageData = CinemaGroupsIndex;
 
 async function loadCinemaGroupsData(): Promise<CinemaGroupsPageData | null> {
   const metaData = await fetchMetaData();
@@ -52,13 +51,10 @@ async function loadCinemaGroupsData(): Promise<CinemaGroupsPageData | null> {
     ),
   );
 
-  return {
-    ...getCinemaGroupsIndex({ movies, venues }, groupVenuesByGroup(venues), {
-      now,
-      getImagePath: (slug) => GROUP_IMAGE_PATHS[slug] ?? null,
-    }),
-    countedOn: formatDateLong(now),
-  };
+  return getCinemaGroupsIndex({ movies, venues }, groupVenuesByGroup(venues), {
+    now,
+    getImagePath: (slug) => GROUP_IMAGE_PATHS[slug] ?? null,
+  });
 }
 
 function CinemaGroupsPageWithRealData() {
