@@ -13,7 +13,11 @@ export interface StatsBandItem {
   label: string;
   /** What the number counts: "showing this week". */
   detail?: string;
-  href: string;
+  /**
+   * Where the figure leads. Without one it is drawn as a plain figure, for a
+   * count that is the whole story (a day's updates) rather than a way in.
+   */
+  href?: string;
   /** Picks the number out in yellow, for the one that is a curiosity. */
   highlight?: boolean;
 }
@@ -98,15 +102,17 @@ export default function StatsBand({
 
   return (
     <ul ref={bandRef} className={styles.band} aria-label={label}>
-      {items.map((item) => (
-        <li key={item.id} className={styles.item}>
-          <Link
-            href={item.href}
-            className={clsx(styles.stat, item.highlight && styles.highlight)}
-            aria-label={[format(item.value), item.label, item.detail]
-              .filter(Boolean)
-              .join(" ")}
-          >
+      {items.map((item) => {
+        const className = clsx(
+          styles.stat,
+          item.href && styles.linked,
+          item.highlight && styles.highlight,
+        );
+        const ariaLabel = [format(item.value), item.label, item.detail]
+          .filter(Boolean)
+          .join(" ");
+        const content = (
+          <>
             <span className={styles.value} data-value={item.value} aria-hidden>
               {format(item.value)}
             </span>
@@ -118,9 +124,29 @@ export default function StatsBand({
                 {item.detail}
               </span>
             )}
-          </Link>
-        </li>
-      ))}
+          </>
+        );
+
+        return (
+          <li key={item.id} className={styles.item}>
+            {item.href ? (
+              <Link
+                href={item.href}
+                className={className}
+                aria-label={ariaLabel}
+              >
+                {content}
+              </Link>
+            ) : (
+              // role="text" isn't standard; a labelled group reads the figure
+              // as one phrase, as the link's label does.
+              <div className={className} role="group" aria-label={ariaLabel}>
+                {content}
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

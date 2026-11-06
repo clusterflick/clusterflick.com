@@ -34,7 +34,7 @@
   transition: background-color 0.25s ease;
 }
 
-.stat:hover {
+.linked:hover {
   color: inherit;
   border-bottom: none;
   background: rgba(var(--color-white-rgb), 0.035);
@@ -73,7 +73,7 @@
   transition: color 0.25s ease;
 }
 
-.stat:hover .value {
+.linked:hover .value {
   color: var(--color-neon-pink);
 }
 
