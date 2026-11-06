@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { condenseVenues } from "@/utils/get-updates";
+import { condenseVenues } from "@/utils/condense-venues";
 import type { UpdateVenue } from "@/utils/get-updates";
 import styles from "./updates.module.css";
 
