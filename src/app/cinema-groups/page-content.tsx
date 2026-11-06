@@ -63,14 +63,17 @@ export default function CinemaGroupsPageContent({
               posters={group.posters}
               meta={
                 <span className={styles.meta}>
+                  {/* "Only here" sits beside the film count it is a part
+                      of, so it reads as films; beside the venues it read
+                      as venues. */}
                   <span className={styles.filmCount}>
-                    {plural(group.films, "film", "films")} ·{" "}
-                    {plural(group.screenings, "showing", "showings")}
-                  </span>
-                  <span className={styles.detail}>
-                    {plural(group.venueCount, "venue", "venues")}
+                    {plural(group.films, "film", "films")}
                     {group.onlyHere > 0 &&
                       ` · ${group.onlyHere.toLocaleString("en-GB")} only here`}
+                  </span>
+                  <span className={styles.detail}>
+                    {plural(group.screenings, "showing", "showings")} at{" "}
+                    {plural(group.venueCount, "venue", "venues")}
                   </span>
                 </span>
               }
