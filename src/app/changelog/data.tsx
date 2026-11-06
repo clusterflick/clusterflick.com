@@ -81,8 +81,8 @@ export const CHANGELOG: ChangelogDay[] = [
             <Link href="/reports/lewisham-2026">
               Lewisham&rsquo;s year without a cinema
             </Link>
-            : from 1 January to 19 October 2026 the listings found 88 film
-            screenings in Lewisham, against 74,327 in Westminster. Reports now
+            : from 1 January to 31 October 2026 the listings found 103 film
+            screenings in Lewisham, against 77,699 in Westminster. Reports now
             have an <Link href="/reports">index of their own</Link>, linked from
             the footer, and a borough&rsquo;s page links to any report about it.
           </>
