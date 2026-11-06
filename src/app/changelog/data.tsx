@@ -89,6 +89,18 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/genres">genres page</Link> has been livened up.
+            Each genre now fans out posters of its busiest films, so you can see
+            what it has on before you open it, and the page leads with the four
+            genres with the most films showing right now. The neon genre signs
+            stay, and now flicker on when you hover over them.
+          </>
+        ),
+      },
     ],
   },
   {
