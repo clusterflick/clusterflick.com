@@ -67,17 +67,28 @@ function dissolveBoroughBoundary(boroughName, tolerance) {
   const filepath = path.join(BOROUGHS_DIR, filename);
   const geojson = JSON.parse(fs.readFileSync(filepath, "utf8"));
 
-  // Filter to valid polygons (each ring must have >= 4 points)
-  const valid = geojson.features.filter((feature) =>
-    feature.geometry.coordinates.every((ring) => ring.length >= 4),
-  );
+  // A zone split by the river or a boundary is a MultiPolygon, whose
+  // coordinates are polygons rather than rings: reading them as rings once
+  // dropped Pimlico from Westminster and Erith from Bexley. A ring too short
+  // to be a polygon is bad data, so fail rather than lose part of a borough.
+  const zones = geojson.features;
+  for (const zone of zones) {
+    const { type, coordinates } = zone.geometry;
+    if (type !== "Polygon" && type !== "MultiPolygon") {
+      throw new Error(`${boroughName}: unexpected ${type} zone`);
+    }
+    const polygons = type === "Polygon" ? [coordinates] : coordinates;
+    if (polygons.some((rings) => rings.some((ring) => ring.length < 4))) {
+      throw new Error(`${boroughName}: zone has a ring of under 4 points`);
+    }
+  }
 
-  if (valid.length === 0) {
-    throw new Error(`No valid polygon features found for ${boroughName}`);
+  if (zones.length === 0) {
+    throw new Error(`No zones found for ${boroughName}`);
   }
 
   const merged =
-    valid.length === 1 ? valid[0] : union(featureCollection(valid));
+    zones.length === 1 ? zones[0] : union(featureCollection(zones));
 
   return simplify(merged, { tolerance, highQuality: true });
 }
