@@ -88,6 +88,11 @@ export default function BotPage() {
           for those the bot uses a standard browser, and its visits will look
           like ordinary traffic in your logs.
         </p>
+        <p className={styles.body}>
+          Its other requests carry a <code>From</code> header with the contact
+          address below, so if <code>hello@clusterflick.com</code> turns up in
+          your logs, that&apos;s this bot.
+        </p>
       </ContentSection>
 
       <ContentSection title="Getting in touch">
