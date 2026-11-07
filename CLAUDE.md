@@ -287,9 +287,10 @@ week (`BoroughMap`) with the same figures ranked beside it as its `aside`
 sections: the map shows where, the list the exact order, and the list is the
 table view. On a touch screen a first tap on a borough selects it, filling the
 readout and marking its row, and a second tap opens it (`MapReadout`); a tap
-that went straight to the page left the map unreadable on a phone. Rows carry `getBoroughMapLinkAttributes`, so pointing at a row
-outlines its borough and pointing at a borough marks its row. Built in
-`getBoroughWeek`, shared with the page's story.
+that went straight to the page left the map unreadable on a phone. Rows carry
+`getBoroughMapLinkAttributes`, so pointing at a row outlines its borough and
+pointing at a borough marks its row. Built in `getBoroughWeek`, shared with the
+page's story.
 
 **A week, not everything listed.** How far ahead a venue publishes varies far
 more than what it has on: measured, half the venues list 46 days ahead or
