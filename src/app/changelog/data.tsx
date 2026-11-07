@@ -71,6 +71,27 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-07",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            You can now find{" "}
+            <Link href="/accessibility#dogFriendly">
+              dog friendly screenings
+            </Link>
+            , where you&rsquo;re welcome to bring your dog along. They sit
+            beside baby friendly in the accessibility filter, and we&rsquo;re
+            picking them up from Picturehouse, Curzon&rsquo;s Sunday Dog Days,
+            The Chiswick Cinema and Bar Trash. You don&rsquo;t need a dog to go,
+            and it&rsquo;s just as useful if you&rsquo;d rather avoid them.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-06",
     changes: [
       {
