@@ -25,6 +25,10 @@
   color: var(--color-muted-gray);
 }
 
+.freshnessStale {
+  color: var(--color-buttery-yellow);
+}
+
 .picks {
   max-width: var(--page-wide);
   margin: 0 auto 48px;
