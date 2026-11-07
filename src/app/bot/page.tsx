@@ -89,9 +89,9 @@ export default function BotPage() {
           like ordinary traffic in your logs.
         </p>
         <p className={styles.body}>
-          Its other requests carry a <code>From</code> header with the contact
-          address below, so if <code>hello@clusterflick.com</code> turns up in
-          your logs, that&apos;s this bot.
+          Most of its other requests carry a <code>From</code> header with the
+          contact address below, so if <code>hello@clusterflick.com</code> turns
+          up in your logs, that&apos;s this bot.
         </p>
       </ContentSection>
 
