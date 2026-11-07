@@ -21,7 +21,7 @@ import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Accessible Cinema",
-  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at ${VENUE_COUNT} venues.`,
+  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly, dog friendly and subtitled showings at ${VENUE_COUNT} venues.`,
   alternates: {
     canonical: "/accessibility",
   },
@@ -44,6 +44,11 @@ const FEATURE_CONFIG: Record<
     description:
       "Screenings designed to welcome parents or carers with babies and young children. Typically includes lower volume, lights slightly raised, and pram parking. Also covers kids club and family programming.",
     shortDescription: "For parents and carers with young children",
+  },
+  [AccessibilityFeature.DogFriendly]: {
+    description:
+      "Screenings where you are welcome to bring your dog. You don't need one to go — everyone is welcome — and some venues lower the sound for the dogs' sake. Worth knowing, too, if you'd rather avoid dogs.",
+    shortDescription: "Bring your dog along",
   },
   [AccessibilityFeature.HardOfHearing]: {
     description:
@@ -209,7 +214,7 @@ export default async function AccessibilityPage() {
   const faqs = [
     {
       question: "What accessibility features can I find screenings for?",
-      answer: `Audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings, across ${VENUE_COUNT} London venues.`,
+      answer: `Audio described, captioned (hard of hearing), relaxed, baby friendly, dog friendly and subtitled screenings, across ${VENUE_COUNT} London venues.`,
     },
     {
       question: "Where does the accessibility data come from?",

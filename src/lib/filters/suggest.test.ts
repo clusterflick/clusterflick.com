@@ -49,6 +49,7 @@ interface MovieSpec {
   time?: number;
   notes?: string;
   subtitled?: boolean;
+  dogFriendly?: boolean;
 }
 
 function makeMovie(id: string, spec: MovieSpec): Movie {
@@ -58,7 +59,14 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     showingId,
     time: spec.time ?? IN_WINDOW,
     ...(spec.notes ? { notes: spec.notes } : {}),
-    ...(spec.subtitled ? { accessibility: { subtitled: true } } : {}),
+    ...(spec.subtitled || spec.dogFriendly
+      ? {
+          accessibility: {
+            ...(spec.subtitled ? { subtitled: true } : {}),
+            ...(spec.dogFriendly ? { dogFriendly: true } : {}),
+          },
+        }
+      : {}),
     ...(spec.source ? { format: { source: spec.source } } : {}),
   };
 
@@ -585,6 +593,22 @@ describe("suggestFilterRelaxations", () => {
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show Subtitles screenings"]);
+    },
+  );
+
+  it.each(["dog", "dogs", "dog friendly", "Dog-Friendly", "dogs welcome"])(
+    "reads %s as the dog friendly requirement",
+    (query) => {
+      const movies = makeMovies({
+        "1": { title: "Heat", dogFriendly: true },
+      });
+      const state = set(getDefaultState(), FilterId.Search, query);
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show Dog Friendly screenings"]);
     },
   );
 
