@@ -19,12 +19,12 @@ import { FORMATS } from "@/data/formats";
 import StatsBand, { type StatsBandItem } from "@/components/stats-band";
 import { getFeaturedScreenings } from "@/utils/get-featured-screenings";
 import { getListingsStats } from "@/utils/get-listings-stats";
-import { formatDayAndDate, formatShowingTime } from "@/utils/format-date";
 import { FormatSource } from "@/types";
 import DiscoverySections from "./discovery-sections";
 import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";
 import WatchlistRow from "./watchlist-row";
+import ListingsFreshness from "./listings-freshness";
 import styles from "./page.module.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
 
@@ -177,11 +177,7 @@ export default async function Home() {
           </p>
           <StatsBand items={statItems} label="This week in London" />
           {!Number.isNaN(updatedAt) && (
-            <p className={styles.freshness}>
-              <span className={styles.freshnessDot} aria-hidden="true" />
-              Listings updated {formatShowingTime(updatedAt)},{" "}
-              {formatDayAndDate(updatedAt)}
-            </p>
+            <ListingsFreshness generatedAt={data.generatedAt} />
           )}
         </header>
 

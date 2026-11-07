@@ -114,7 +114,11 @@
     font-size: 13px;
   }
 
-  .label {
+  /* Only for a chart whose labels are phrases (`wrapLabels`). A wrapped row
+     is taller than its neighbours, which opens a gap between their bars, so
+     short names (boroughs: "Hammersmith and Fulham" is the longest) stay on
+     one line and the bars take what is left. */
+  .wrapLabels .label {
     white-space: normal;
     width: 40%;
   }

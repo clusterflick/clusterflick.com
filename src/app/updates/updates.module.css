@@ -305,6 +305,21 @@
   margin-top: 28px;
 }
 
+/* A phone's tile cap (`PHONE_TILES` in capped-list.tsx): two or three
+   columns below 600px, so six tiles is two or three rows rather than the six
+   rows the desktop cap of twelve made. */
+@media (max-width: 599px) {
+  .phoneCapped > li:nth-child(n + 7) {
+    display: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .showMorePhoneOnly {
+    display: none;
+  }
+}
+
 /* ─── Archive of earlier days ─── */
 
 .archive {

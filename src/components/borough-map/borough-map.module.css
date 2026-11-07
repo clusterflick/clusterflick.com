@@ -106,11 +106,45 @@
   fill: var(--color-electric-blue);
 }
 
-/* A tap follows the link, so on a touch screen the readout would only ever
-   show its prompt. */
+/* The area's name and, after a first tap, what a second one does. */
+.readoutHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.readoutHint {
+  flex: none;
+  font-size: 13px;
+  color: var(--color-electric-blue);
+}
+
+.promptTouch {
+  display: none;
+}
+
+/* On a touch screen the first tap on an area selects it (see MapReadout), so
+   the readout is how its figures are read there. A phone is too narrow for
+   the detail on one line, so it may take two, with the box sized to them. */
 @media (hover: none) {
   .readout {
+    height: 68px;
+  }
+
+  .readoutDetail {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .promptPointer {
     display: none;
+  }
+
+  .promptTouch {
+    display: inline;
   }
 }
 

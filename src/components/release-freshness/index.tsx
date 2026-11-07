@@ -10,6 +10,7 @@ import {
   STALE_AFTER_HOURS,
   type ReleaseRef,
 } from "@/utils/release-status";
+import ReleaseDot from "@/components/release-dot";
 import styles from "./release-freshness.module.css";
 
 export interface ReleaseFreshnessProps {
@@ -84,7 +85,7 @@ export default function ReleaseFreshness({
       className={clsx(styles.freshness, isStale && styles.stale)}
       role={isStale ? "alert" : undefined}
     >
-      <span className={styles.indicator} aria-hidden="true" />
+      <ReleaseDot stale={isStale} />
       {isStale ? (
         <span>
           <strong>

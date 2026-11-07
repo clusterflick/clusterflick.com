@@ -20,20 +20,13 @@
 }
 
 .freshness {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   margin: 16px 0 0;
   font-size: 13px;
   color: var(--color-muted-gray);
 }
 
-/* Green is the release-status colour: a fresh release, never decoration. */
-.freshnessDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-release-green);
+.freshnessStale {
+  color: var(--color-buttery-yellow);
 }
 
 .picks {

@@ -42,6 +42,13 @@ interface RankedBarChartProps {
    * already names it (the borough map's caption covers its ranked list).
    */
   hideCaption?: boolean;
+  /**
+   * Lets labels wrap on a phone, for labels that are phrases ("Plain request
+   * with a browser user agent") and would leave no room for the bars on one
+   * line. Off by default: a wrapped row is taller than the rest, which breaks
+   * the run of bars, so names stay on one line.
+   */
+  wrapLabels?: boolean;
 }
 
 /**
@@ -58,6 +65,7 @@ export default function RankedBarChart({
   formatValue = (value) => value.toLocaleString("en-GB"),
   split,
   hideCaption = false,
+  wrapLabels = false,
 }: RankedBarChartProps) {
   const sorted = [...items].sort((a, b) => b.value - a.value);
   const max = Math.max(...sorted.map((item) => item.value), 1);
@@ -83,7 +91,7 @@ export default function RankedBarChart({
           </li>
         </ul>
       )}
-      <table className={styles.table}>
+      <table className={clsx(styles.table, wrapLabels && styles.wrapLabels)}>
         <caption
           className={
             split || hideCaption ? styles.visuallyHidden : styles.caption
