@@ -22,6 +22,10 @@ interface MapReadoutProps {
   aside?: ReactNode;
 }
 
+/** Where the map is brought to: under the 63px site header, as `.mapColumn`
+ *  sticks at on a wide screen. */
+const MAP_TOP = 79;
+
 type Active = { label: string; readout: string; shape: string } | null;
 
 function activeFrom(event: SyntheticEvent): Active {
@@ -44,9 +48,11 @@ function activeFrom(event: SyntheticEvent): Active {
  * A touch screen has no pointing, so a tap on an area selects it rather than
  * following its link, and a second tap on the same area follows it. Without
  * that a tap went straight to the borough's page, and the map's figures could
- * only be read from the list. Only taps on the map are held back: a row of
- * the aside is a plain link, and its figures are already written in it. A
- * mouse click and a keyboard Enter follow the link at once, as before.
+ * only be read from the list. A row of the aside works the same way: a first
+ * tap selects its borough, and a second tap on either the row or the area
+ * opens it. The list sits under the map on a phone, so a row's tap brings the
+ * map back into view if it has scrolled away, or the selection would happen
+ * off screen. A mouse click and a keyboard Enter follow the link at once.
  */
 export default function MapReadout({
   prompt,
@@ -62,14 +68,12 @@ export default function MapReadout({
   // its own across browsers, and a keyboard press has no pointerdown at all
   const pressRef = useRef<string>("mouse");
   const frameRef = useRef<HTMLDivElement>(null);
+  const mapColumnRef = useRef<HTMLDivElement>(null);
   const update = (event: SyntheticEvent) => setActive(activeFrom(event));
   const shape = active?.shape;
 
   const handleClick = (event: MouseEvent) => {
     if (pressRef.current !== "touch") return;
-    const target = event.target as Element;
-    // Only the map's areas: the aside's rows are links like any other
-    if (!target.closest?.("svg")) return;
     const area = activeFrom(event);
     if (!area) {
       setTapped(null);
@@ -80,6 +84,24 @@ export default function MapReadout({
     event.preventDefault();
     setTapped(area.shape);
     setActive(area);
+    if (!(event.target as Element).closest?.("svg")) revealMap();
+  };
+
+  // Brings the map fully into view under the site header, unless it already
+  // is: on a phone the list runs on below it, and on a wide screen the map is
+  // sticky beside the list, so there it never moves.
+  const revealMap = () => {
+    const column = mapColumnRef.current;
+    if (!column) return;
+    const { top, bottom } = column.getBoundingClientRect();
+    if (top >= MAP_TOP && bottom <= window.innerHeight) return;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollBy({
+      top: top - MAP_TOP,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   };
 
   useEffect(() => {
@@ -120,12 +142,16 @@ export default function MapReadout({
         if (pressRef.current !== "touch") update(event);
       }}
       onBlur={(event) => {
+        // A tap moves focus without saying where (a tap on the map focuses
+        // nothing), which read as leaving the frame and cleared the borough a
+        // row's tap had just selected. Taps manage the selection themselves.
+        if (pressRef.current === "touch") return;
         if (frameRef.current?.contains(event.relatedTarget as Node)) return;
         setActive(null);
         setTapped(null);
       }}
     >
-      <div className={styles.mapColumn}>
+      <div ref={mapColumnRef} className={styles.mapColumn}>
         <div className={styles.readout} aria-hidden="true">
           {active ? (
             <>
