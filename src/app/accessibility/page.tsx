@@ -18,52 +18,14 @@ import {
 } from "@/utils/accessibility-labels";
 import styles from "./page.module.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
+import { getAccessibilityFeature } from "@/data/accessibility-features";
+import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
 
 export const metadata: Metadata = {
   title: "Accessible Cinema",
   description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly, dog friendly and subtitled showings at ${VENUE_COUNT} venues.`,
   alternates: {
     canonical: "/accessibility",
-  },
-};
-
-/**
- * Feature metadata: descriptions sourced from the project accessibility docs,
- * plus visual identifiers for each feature.
- */
-const FEATURE_CONFIG: Record<
-  AccessibilityFeature,
-  { description: string; shortDescription: string }
-> = {
-  [AccessibilityFeature.AudioDescription]: {
-    description:
-      "Screenings with a supplementary audio track that describes visual elements — actions, expressions, and scene changes — for blind or visually impaired viewers.",
-    shortDescription: "For blind or visually impaired viewers",
-  },
-  [AccessibilityFeature.BabyFriendly]: {
-    description:
-      "Screenings designed to welcome parents or carers with babies and young children. Typically includes lower volume, lights slightly raised, and pram parking. Also covers kids club and family programming.",
-    shortDescription: "For parents and carers with young children",
-  },
-  [AccessibilityFeature.DogFriendly]: {
-    description:
-      "Screenings where you are welcome to bring your dog. You don't need one to go — everyone is welcome — and some venues lower the sound for the dogs' sake. Worth knowing, too, if you'd rather avoid dogs.",
-    shortDescription: "Bring your dog along",
-  },
-  [AccessibilityFeature.HardOfHearing]: {
-    description:
-      "Screenings with captions or other support for deaf or hard-of-hearing viewers. This covers open captions, closed captions, SDH (Subtitles for the Deaf and Hard of Hearing), and BSL (British Sign Language) interpreted screenings.",
-    shortDescription: "For deaf or hard-of-hearing viewers",
-  },
-  [AccessibilityFeature.Relaxed]: {
-    description:
-      "Screenings with adjustments for neurodiverse audiences, including autistic viewers and people with learning disabilities or sensory sensitivities. Features lower sound, slightly raised lights, no trailers, and a calm, tolerant atmosphere.",
-    shortDescription: "For neurodiverse audiences",
-  },
-  [AccessibilityFeature.Subtitled]: {
-    description:
-      "Screenings with subtitles translating dialogue into another language (typically English). This is for language accessibility — making foreign-language films accessible to a broader audience.",
-    shortDescription: "For language accessibility",
   },
 };
 
@@ -101,6 +63,9 @@ function computeAccessibilityStats(data: CinemaData): {
 } {
   const features = Object.values(AccessibilityFeature);
   const allMovies = Object.values(data.movies);
+  // Upcoming performances only, as each feature's own page counts them, so a
+  // figure doesn't change between this page and the one it links to.
+  const nowTs = new Date(data.generatedAt).getTime();
 
   // Per-feature stats
   const featureStats: FeatureStats[] = features.map((feature) => {
@@ -111,7 +76,7 @@ function computeAccessibilityStats(data: CinemaData): {
     for (const movie of allMovies) {
       let moviePerfCount = 0;
       for (const perf of movie.performances) {
-        if (perf.accessibility?.[feature]) {
+        if (perf.time >= nowTs && perf.accessibility?.[feature]) {
           moviePerfCount++;
           performanceCount++;
           const showing = movie.showings[perf.showingId];
@@ -159,6 +124,7 @@ function computeAccessibilityStats(data: CinemaData): {
   for (const movie of allMovies) {
     for (const perf of movie.performances) {
       if (
+        perf.time >= nowTs &&
         perf.accessibility &&
         Object.values(perf.accessibility).some(Boolean)
       ) {
@@ -223,7 +189,7 @@ export default async function AccessibilityPage() {
     },
     ...Object.values(AccessibilityFeature).map((feature) => ({
       question: `What does a "${ACCESSIBILITY_LABELS[feature]}" screening mean?`,
-      answer: FEATURE_CONFIG[feature].description,
+      answer: getAccessibilityFeature(feature).description,
     })),
   ];
 
@@ -391,9 +357,9 @@ export default async function AccessibilityPage() {
       <div className={styles.content}>
         <div className={styles.featuresContainer}>
           {features.map((featureStat) => {
-            const config = FEATURE_CONFIG[featureStat.feature];
+            const config = getAccessibilityFeature(featureStat.feature);
             const label = ACCESSIBILITY_LABELS[featureStat.feature];
-            const filterUrl = `/catalogue?accessibility=${featureStat.feature}`;
+            const featureUrl = getAccessibilityFeatureUrl(featureStat.feature);
 
             return (
               <section
@@ -406,7 +372,9 @@ export default async function AccessibilityPage() {
                     {ACCESSIBILITY_EMOJIS[featureStat.feature]}
                   </span>
                   <div>
-                    <h3 className={styles.featureTitle}>{label}</h3>
+                    <h3 className={styles.featureTitle}>
+                      <Link href={featureUrl}>{label}</Link>
+                    </h3>
                     <p className={styles.featureShortDesc}>
                       {config.shortDescription}
                     </p>
@@ -496,14 +464,14 @@ export default async function AccessibilityPage() {
                       </div>
                     )}
 
-                    <ButtonLink href={filterUrl}>
-                      Browse {label} screenings →
+                    <ButtonLink href={featureUrl}>
+                      See all {config.title.toLowerCase()} →
                     </ButtonLink>
                   </>
                 ) : (
                   <p className={styles.noScreenings}>
-                    No {label.toLowerCase()} screenings are currently listed.
-                    Check back soon — data is refreshed several times a day.
+                    No {config.title.toLowerCase()} are currently listed. Check
+                    back soon — data is refreshed several times a day.
                   </p>
                 )}
               </section>

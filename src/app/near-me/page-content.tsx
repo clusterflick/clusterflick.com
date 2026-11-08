@@ -16,6 +16,7 @@ import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
+import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
 import { formatDateShort } from "@/utils/format-date";
 import type { Position, AccessibilityFeature } from "@/types";
 import StandardPageLayout from "@/components/standard-page-layout";
@@ -446,7 +447,7 @@ export default function NearMePageContent({
                         items={nearbyAccessibility.map(
                           ({ feature, venueCount }) => ({
                             key: feature,
-                            href: `/accessibility/#${feature}`,
+                            href: getAccessibilityFeatureUrl(feature),
                             label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
                             detail: `at ${venueCount} nearby ${venueCount === 1 ? "cinema" : "cinemas"}`,
                           }),

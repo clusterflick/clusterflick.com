@@ -50,5 +50,8 @@ describe("sitemap", () => {
     expect(urls).toContain(
       "https://clusterflick.com/cinema-groups/picturehouse/",
     );
+    expect(urls).toContain(
+      "https://clusterflick.com/accessibility/audio-description/",
+    );
   });
 });
