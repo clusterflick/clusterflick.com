@@ -23,7 +23,6 @@ import {
   estimateLookupMinutes,
   lookUpRowsOnTmdb,
 } from "@/lib/user-lists/tmdb-lookup";
-import FilmSearch from "./film-search";
 import styles from "./page.module.css";
 
 const LIST_NAMES: Record<UserListId, string> = {
@@ -118,10 +117,9 @@ function downloadCsv(fileName: string, csv: string) {
 
 /**
  * Whether the lists show their editing buttons (Remove, and Seen it on the
- * watchlist), importing from and exporting to
- * Letterboxd, and adding a film that isn't showing. Tucked under the account
- * bar: all of it is occasional. The search comes last as the one part that
- * grows, so its results push nothing else down.
+ * watchlist), and importing from and exporting to Letterboxd. Tucked under the
+ * account bar: all of it is occasional. Adding a film is not, so its search
+ * sits in the open below the bar (`FilmSearch`).
  */
 export default function ListManagement({
   showEditing,
@@ -144,7 +142,6 @@ export default function ListManagement({
       </section>
       <ImportSection />
       <ExportSection />
-      <FilmSearch />
     </div>
   );
 }

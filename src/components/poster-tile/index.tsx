@@ -153,6 +153,18 @@ export default function PosterTile({
   );
 }
 
+/** `PosterTileList`'s track minimum and column gap, as its stylesheet sets. */
+export const TILE_MIN_WIDTH = 140;
+export const TILE_GAP = 16;
+
+/** How many tiles a `PosterTileList` this wide fits across. */
+export function getTileColumnCount(width: number) {
+  return Math.max(
+    1,
+    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
+  );
+}
+
 /** The grid `PosterTile`s sit in: six across a 960px column, two on a phone. */
 export function PosterTileList({
   children,

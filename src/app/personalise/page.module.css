@@ -211,10 +211,8 @@
     column-gap: 32px;
   }
 
-  /* Editing takes a row of its own above import and export, which pair up;
-     film search takes one below them. */
-  .managementSection:first-child,
-  .managementWide {
+  /* Editing takes a row of its own above import and export, which pair up. */
+  .managementSection:first-child {
     grid-column: 1 / -1;
   }
 
@@ -224,11 +222,6 @@
   .importReview {
     grid-column: 1 / -1;
     order: 1;
-  }
-
-  /* After the review, which belongs next to the import that opened it. */
-  .managementWide {
-    order: 2;
   }
 
   /* The account panel has two short sections, side by side. */
@@ -574,12 +567,44 @@
   gap: 8px;
 }
 
-.filmSearch {
-  margin-bottom: 16px;
+/* The film search, in the open between the account bar and the watchlist. */
+.filmSearchSection {
+  /* Clear of the fixed header when the empty watchlist scrolls to it. */
+  scroll-margin-top: 80px;
+  margin-bottom: 40px;
 }
 
 .filmSearchInput {
   flex: 1;
+}
+
+.filmSearchResults {
+  margin-top: 4px;
+}
+
+.filmSearchMore {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+/* The step out to TheMovieDB, under what's showing. */
+.filmSearchAll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 16px;
+}
+
+.filmSearchAllText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+.filmSearchAllText strong {
+  color: var(--color-light-gray);
 }
 
 /* My Venues: venue cards in columns, each with Remove (or Undo) beneath it. */
