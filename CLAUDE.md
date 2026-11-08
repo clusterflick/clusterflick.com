@@ -1866,6 +1866,11 @@ it to that. Departed films are left out: their pages stay up so links land,
 but each says little more than that the film has stopped showing, and they
 were two fifths of the sitemap.
 
+**`lastmod` only where a page has a date of its own** (update days, their
+landing page, reports). Stamping every entry with the build time claimed 2,500
+pages changed on every deploy, several times a day, and Google stops trusting
+a sitemap's dates once they are routinely wrong — the true ones included.
+
 **Departed film pages are `noindex`** (`follow` still on). Google was
 already filing them as soft 404s or declining to index them, and re-checking
 them spent crawling the films that are showing needed. Film pages churn
