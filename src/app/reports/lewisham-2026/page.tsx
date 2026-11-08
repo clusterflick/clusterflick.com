@@ -300,7 +300,7 @@ export default function Lewisham2026Report() {
               Clusterflick and link to this page.
             </li>
             <li>
-              <strong>Cited in.</strong>{" "}
+              <strong>Coverage.</strong>{" "}
               <a
                 href={LEWISHAM_LETTER_SQUATTERS}
                 target="_blank"
