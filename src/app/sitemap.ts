@@ -42,12 +42,17 @@ function pageUrl(path: string): string {
   return `${SITE}${path.endsWith("/") ? path : `${path}/`}`;
 }
 
+// `lastModified` is only given where a page has a date of its own: the update
+// days, their landing page and the reports. Everything else used to carry the
+// build's `generatedAt`, which moves on every deploy, several times a day, so
+// 2,500 entries claimed to have changed in the last hour, the licence and the
+// bot page included. Google stops trusting a sitemap's dates once they are
+// routinely wrong, which would discard the true ones too; no date is better.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await getStaticData();
 
   const moviePages = Object.values(data.movies).map((movie: Movie) => ({
     url: pageUrl(getMovieUrl(movie)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   }));
@@ -59,7 +64,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const venuePages = Object.values(data.venues).map((venue: Venue) => ({
     url: pageUrl(getVenueUrl(venue)),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
@@ -70,98 +74,84 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     venuesByBorough.has(b.slug),
   ).map((b) => ({
     url: pageUrl(getBoroughUrl(b)),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.5,
   }));
 
   const festivalListPage = {
     url: pageUrl("/festivals"),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const festivalPages = FESTIVALS.map((festival) => ({
     url: pageUrl(getFestivalUrl(festival)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   }));
 
   const filmClubListPage = {
     url: pageUrl("/film-clubs"),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   };
 
   const filmClubPages = FILM_CLUBS.map((club) => ({
     url: pageUrl(getFilmClubUrl(club)),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
   const cinemaGroupListPage = {
     url: pageUrl("/cinema-groups"),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   };
 
   const genreListPage = {
     url: pageUrl("/genres"),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const genrePages = GENRES.map((genre) => ({
     url: pageUrl(getGenreUrl(genre)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const formatListPage = {
     url: pageUrl("/formats"),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const formatPages = FORMATS.map((format) => ({
     url: pageUrl(getFormatUrl(format)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const accessibilityFeaturePages = ACCESSIBILITY_FEATURES.map((feature) => ({
     url: pageUrl(getAccessibilityFeatureUrl(feature.id)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const movieListListPage = {
     url: pageUrl("/lists"),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
 
   const movieListPages = MOVIE_LISTS.map((list) => ({
     url: pageUrl(getMovieListUrl(list)),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
   }));
 
   const collectionListPage = {
     url: pageUrl("/collections"),
-    lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.7,
   };
@@ -169,7 +159,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const collectionPages = Object.values(getCollectionsData()).map(
     (collection) => ({
       url: pageUrl(getCollectionUrl(collection)),
-      lastModified: data.generatedAt,
       changeFrequency: "daily" as const,
       priority: 0.6,
     }),
@@ -181,7 +170,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     venuesByGroup.has(group.slug),
   ).map((group) => ({
     url: pageUrl(getVenueGroupUrl(group)),
-    lastModified: data.generatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
@@ -200,79 +188,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ].map(({ path, lastModified }) => ({
     url: pageUrl(path),
-    lastModified: lastModified ?? data.generatedAt,
+    lastModified,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
-
-  const staticPages = [
-    {
-      url: pageUrl("/"),
-      lastModified: data.generatedAt,
-      changeFrequency: "daily" as const,
-      priority: 1,
-    },
-    {
-      url: pageUrl("/catalogue"),
-      lastModified: data.generatedAt,
-      changeFrequency: "daily" as const,
-      priority: 1,
-    },
-    {
-      url: pageUrl("/updates"),
-      lastModified: data.generatedAt,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: pageUrl("/about"),
-      lastModified: data.generatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: pageUrl("/accessibility"),
-      lastModified: data.generatedAt,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: pageUrl("/changelog"),
-      lastModified: data.generatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.5,
-    },
-    {
-      url: pageUrl("/datasets"),
-      lastModified: data.generatedAt,
-      changeFrequency: "monthly" as const,
-      priority: 0.4,
-    },
-    {
-      url: pageUrl("/data-licence"),
-      lastModified: data.generatedAt,
-      changeFrequency: "yearly" as const,
-      priority: 0.4,
-    },
-    {
-      url: pageUrl("/bot"),
-      lastModified: data.generatedAt,
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    },
-    {
-      url: pageUrl("/venues"),
-      lastModified: data.generatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-    {
-      url: pageUrl("/london-cinemas"),
-      lastModified: data.generatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-  ];
 
   // Only the days still inside the fetch window are listed — the whole set of
   // dated pages, since that is all that exists. A day that ages out drops off
@@ -286,6 +205,75 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "daily" as const,
     priority: 0.5,
   }));
+
+  const staticPages = [
+    {
+      url: pageUrl("/"),
+      changeFrequency: "daily" as const,
+      priority: 1,
+    },
+    {
+      url: pageUrl("/catalogue"),
+      changeFrequency: "daily" as const,
+      priority: 1,
+    },
+    {
+      url: pageUrl("/updates"),
+      lastModified: updateDayPages[0]?.lastModified,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    },
+    {
+      url: pageUrl("/about"),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    {
+      url: pageUrl("/accessibility"),
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    },
+    {
+      url: pageUrl("/changelog"),
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    },
+    {
+      url: pageUrl("/datasets"),
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    },
+    {
+      url: pageUrl("/data-licence"),
+      changeFrequency: "yearly" as const,
+      priority: 0.4,
+    },
+    {
+      url: pageUrl("/bot"),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    },
+    {
+      url: pageUrl("/datasets/status"),
+      changeFrequency: "daily" as const,
+      priority: 0.3,
+    },
+    {
+      url: pageUrl("/venues"),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    {
+      url: pageUrl("/london-cinemas"),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    },
+    {
+      url: pageUrl("/near-me"),
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    },
+  ];
 
   return [
     ...staticPages,
