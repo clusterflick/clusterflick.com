@@ -1603,9 +1603,15 @@ Showing now and Not showing, each drawn closed as a pile of posters that is
 one button ("Click to expand" on hover, "Tap to expand" on a touch screen,
 the count beside it). Opening it flies each poster in the pile to its tile
 (measured before and after, animated with `element.animate`, nothing for a
-reduced-motion reader) and fades the rest in; Collapse under the list
-gathers them back, scrolling up to the pile if closing left it above the
-screen. The pile is a picture, not links: the button carries the name, and
+reduced-motion reader) and fades the rest in, while the caption flies to the
+top right as a "Hide them" toggle, so it can be closed from where it was
+opened. A second sits under the list; closing from there scrolls back up to
+the pile if it would otherwise be above the screen. **The pile fills its row
+at a fixed overlap**: a laptop draws more posters, a phone fewer, rather than
+the same posters spread out or crushed together. The caption moves beside the
+posters from 720px of row, measured on the stack rather than by a media
+query, so the posters it lays out and the room it leaves agree; at 630px a
+media query on the window put it beside posters laid out for the full width. The pile is a picture, not links: the button carries the name, and
 focus moves to the first tile on opening and back to the button on closing.
 A group that fits on one row is drawn as it is, since a pile of three hides
 nothing. **Last chance and More than a screening are never stacked**: they
@@ -1729,8 +1735,10 @@ are showing come first**, found as the reader types (`searchShowingFilms`,
 matching as the catalogue's search box does, closest first) from the dataset
 the page already has: instant, and nothing leaves the browser. Twelve are
 drawn, with a link to the catalogue for the rest. **TheMovieDB is the second
-step**, on Enter or "Search all films, showing or not" under what's showing —
-the main button when nothing showing matches. Its results drop films already
+step**, on Enter or "Not showing? Search all films" beside the Showing now
+heading — beside rather than under the results, which can run to two rows and
+left it unseen. When nothing showing matches it is the main button, under the
+box. Its results drop films already
 drawn above, and are hidden once the box says something else, the button
 offered again. It used to sit in the list tools, because the usual way to add
 a film is from its own page and every search cost a Worker request; with what's

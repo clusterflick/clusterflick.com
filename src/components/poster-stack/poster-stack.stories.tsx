@@ -53,8 +53,9 @@ function Stack({
 /**
  * `PosterStack` draws a long list of films as a pile of posters, the whole
  * pile one button. Opening it deals the posters out into the full
- * `PosterTileList`, each flying to its own tile, and Collapse gathers them
- * back. Pointed at, the pile straightens and says "Click to expand"; on a
+ * `PosterTileList`, each flying to its own tile, while the count flies to the
+ * top right as the toggle that gathers them back. A second toggle follows the
+ * list, for a reader who has scrolled to its end. Pointed at, the pile straightens and says "Click to expand"; on a
  * touch screen it says "Tap to expand" from the start.
  *
  * **When to use:** a long list that isn't the reason for the visit — a
@@ -86,7 +87,7 @@ export const Closed: Story = {
   args: { count: 40 },
 };
 
-/** Opened: the full list, with Collapse under it. */
+/** Opened: the full list, with Hide them above and below it. */
 export const Expanded: Story = {
   args: { count: 40 },
   play: async ({ canvasElement }) => {
@@ -94,19 +95,23 @@ export const Expanded: Story = {
     await userEvent.click(
       canvas.getByRole("button", { name: "Seen: show all 40 films" }),
     );
-    await expect(
-      await canvas.findByRole("button", { name: "Collapse" }),
-    ).toBeVisible();
+    const toggles = await canvas.findAllByRole("button", {
+      name: "Seen: hide all 40 films",
+    });
+    await expect(toggles).toHaveLength(2);
     await expect(canvas.getAllByRole("link")).toHaveLength(40);
   },
 };
 
-/** Opened and closed again: back to the pile, focus on it. */
+/** Opened and closed again from the top: back to the pile, focus on it. */
 export const Collapsed: Story = {
   args: { count: 40, defaultExpanded: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "Collapse" }));
+    const [toggle] = canvas.getAllByRole("button", {
+      name: "Seen: hide all 40 films",
+    });
+    await userEvent.click(toggle);
     await expect(
       canvas.getByRole("button", { name: "Seen: show all 40 films" }),
     ).toHaveFocus();

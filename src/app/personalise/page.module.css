@@ -588,12 +588,31 @@
   color: var(--color-muted-gray);
 }
 
-/* The step out to TheMovieDB, under what's showing. */
+/* "Showing now" with the step out to TheMovieDB at its right, wrapping
+   beneath it on a phone. */
+.filmSearchHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 24px 0 12px;
+}
+
+.filmSearchHeader .groupTitle {
+  margin: 0;
+}
+
 .filmSearchAll {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
+  margin: 0;
+}
+
+/* Nothing showing matched: the step out is the only thing to do. */
+.filmSearchNone {
   margin-top: 16px;
 }
 

@@ -9,6 +9,7 @@ import {
   type RefObject,
 } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 import SearchInput from "@/components/search-input";
 import Button from "@/components/button";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -54,7 +55,8 @@ type TmdbState =
  * Films that are showing are found as the reader types, from the dataset the
  * page has already loaded: instant, and free, since nothing leaves the
  * browser. TheMovieDB, for a film that isn't showing (or never will be), is
- * the second step, on Enter or the "Search all films" button. That goes
+ * the second step, on Enter or the "Search all films" button beside the
+ * "Showing now" heading (or under the box, when nothing showing matches). That goes
  * through the search Worker, and every request counts against its per-reader
  * rate limit, so it never runs as the reader types.
  */
@@ -162,7 +164,22 @@ export default function FilmSearch({
           ) : (
             shown.length > 0 && (
               <>
-                <h3 className={styles.groupTitle}>Showing now</h3>
+                {/* The way on to every film sits beside the heading, where the
+                    eye lands first, rather than under results that may run
+                    to two rows. */}
+                <div className={styles.filmSearchHeader}>
+                  <h3 className={styles.groupTitle}>Showing now</h3>
+                  {!tmdbCurrent && (
+                    <p className={styles.filmSearchAll}>
+                      <span className={styles.filmSearchAllText}>
+                        Not showing?
+                      </span>
+                      <Button variant="secondary" size="sm" onClick={searchAll}>
+                        Search all films
+                      </Button>
+                    </p>
+                  )}
+                </div>
                 <div className={styles.lane}>
                   <PosterTileList>
                     {shown.map((movie) => (
@@ -195,27 +212,21 @@ export default function FilmSearch({
             )
           )}
 
-          {searchable && !tmdbCurrent && !loading && (
-            <div className={styles.filmSearchAll}>
-              <p className={styles.filmSearchAllText}>
+          {(nothingShowing || (error && searchable)) && !tmdbCurrent && (
+            <p className={clsx(styles.filmSearchAll, styles.filmSearchNone)}>
+              <span className={styles.filmSearchAllText}>
                 {error ? (
                   "We couldn't load what's showing."
-                ) : nothingShowing ? (
+                ) : (
                   <>
                     Nothing showing matches <strong>{deferredQuery}</strong>.
                   </>
-                ) : (
-                  "Not what you're looking for?"
                 )}
-              </p>
-              <Button
-                variant={nothingShowing || error ? "primary" : "secondary"}
-                size="sm"
-                onClick={searchAll}
-              >
+              </span>
+              <Button size="sm" onClick={searchAll}>
                 Search all films, showing or not
               </Button>
-            </div>
+            </p>
           )}
 
           {tmdbCurrent && tmdb.step === "searching" && (

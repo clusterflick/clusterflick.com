@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { flushSync } from "react-dom";
+import clsx from "clsx";
 import Button from "@/components/button";
 import EventPoster, {
   type EventPosterIncludedMovie,
@@ -46,14 +47,23 @@ export interface PosterStackProps {
 }
 
 /** Most posters drawn in the stack, however wide the row. */
-const MAX_DRAWN = 14;
-/** The tightest the posters overlap: past this, fewer are drawn. */
-const MIN_STEP = 22;
-/** The loosest: each poster shows at most this much of itself. */
-const MAX_STEP_RATIO = 0.42;
+const MAX_DRAWN = 30;
+/**
+ * How much of each poster shows past the one on top of it. Fixed, so the pile
+ * is as dense on a phone as on a laptop: a wider row draws more posters, not
+ * the same posters spread out, and a narrow one fewer rather than a crush.
+ */
+const STEP_RATIO = 0.42;
 /** The caption beside the posters, on a row wide enough for it. */
 const CAPTION_WIDTH = 180;
-const WIDE_FROM = 600;
+/**
+ * The row width the caption moves beside the posters from. Measured on the
+ * stack itself rather than a media query, so the posters it lays out and the
+ * room it leaves agree.
+ */
+const WIDE_FROM = 720;
+/** The row width the posters grow to the size of a tile's from. */
+const LARGE_FROM = 1000;
 /** The stack's padding, each side, as its stylesheet sets. */
 const PADDING = 20;
 /** A little untidy, as a pile of posters is. Degrees, repeating. */
@@ -67,6 +77,20 @@ const FADE_DURATION = 360;
 const FADE_STAGGER = 10;
 /** Tiles past this are below the fold on any screen: not worth animating. */
 const MAX_FADED = 48;
+
+/**
+ * Moves an element from where `from` is to where it now sits: the caption
+ * becoming the toggle, and back. Moved rather than scaled, since the two are
+ * laid out differently and text stretched between them reads as a glitch.
+ */
+function flyFrom(element: HTMLElement, from: { left: number; top: number }) {
+  const to = element.getBoundingClientRect();
+  const transform = `translate(${from.left - to.left}px, ${from.top - to.top}px)`;
+  element.animate([{ transform }, { transform: "none" }], {
+    duration: FLY_DURATION,
+    easing: EASE,
+  });
+}
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -119,8 +143,10 @@ function getFlipTransform(
  * what a reader came to act on: they'd have to open it first.
  *
  * Closed, the stack is a plain button: the posters inside are pictures, not
- * links, and the button carries the name. Open, focus moves to the first tile,
- * and a Collapse button follows the list.
+ * links, and the button carries the name. Open, focus moves to the first tile.
+ * The caption flies to the top right as the toggle to close it again, so it
+ * is where the stack was opened from, and a second one follows the list for a
+ * reader who has scrolled to its end.
  */
 export default function PosterStack({
   items,
@@ -143,6 +169,8 @@ export default function PosterStack({
   const listRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const postersRef = useRef<HTMLSpanElement>(null);
+  const captionRef = useRef<HTMLSpanElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
 
   // Before the row is measured, six across: the 960px column's count.
@@ -155,21 +183,16 @@ export default function PosterStack({
     );
   }
 
-  const wide = (width ?? 0) >= WIDE_FROM;
-  const posterWidth = wide ? 112 : 84;
+  const rowWidth = width ?? 960;
+  const wide = rowWidth >= WIDE_FROM;
+  const posterWidth = rowWidth >= LARGE_FROM ? 128 : wide ? 112 : 84;
   const available = Math.max(
     posterWidth,
-    (width ?? 960) - PADDING * 2 - (wide ? CAPTION_WIDTH : 0),
+    rowWidth - PADDING * 2 - (wide ? CAPTION_WIDTH : 0),
   );
-  const fits = Math.floor((available - posterWidth) / MIN_STEP) + 1;
+  const step = posterWidth * STEP_RATIO;
+  const fits = Math.floor((available - posterWidth) / step) + 1;
   const drawnCount = Math.max(1, Math.min(items.length, MAX_DRAWN, fits));
-  const step =
-    drawnCount > 1
-      ? Math.min(
-          posterWidth * MAX_STEP_RATIO,
-          (available - posterWidth) / (drawnCount - 1),
-        )
-      : 0;
   const drawn = items.slice(0, drawnCount);
 
   /** Where each poster in the stack sits, untransformed. */
@@ -192,10 +215,15 @@ export default function PosterStack({
 
   const expand = () => {
     const from = getPosterRects();
+    const caption = captionRef.current?.getBoundingClientRect();
     flushSync(() => setExpanded(true));
     const tiles = getTiles(listRef.current);
 
     if (!prefersReducedMotion()) {
+      // The caption becomes the toggle to close it again, at the top right.
+      const toggle = toggleRef.current;
+      if (caption && toggle) flyFrom(toggle, caption);
+
       tiles.forEach((tile, index) => {
         const start = from[index];
         if (start) {
@@ -247,6 +275,7 @@ export default function PosterStack({
     const from = getTiles(listRef.current)
       .slice(0, drawnCount)
       .map((tile) => getTileArt(tile).getBoundingClientRect());
+    const toggle = toggleRef.current?.getBoundingClientRect();
     const scrollBefore = window.scrollY;
     flushSync(() => setExpanded(false));
 
@@ -266,6 +295,13 @@ export default function PosterStack({
           )
         : [];
       const to = getPosterRects();
+      const caption = captionRef.current;
+      if (toggle && caption) {
+        flyFrom(caption, {
+          left: toggle.left,
+          top: toggle.top - scrolled,
+        });
+      }
       posters.forEach((poster, index) => {
         const start = from[index];
         if (!start || !to[index]) return;
@@ -294,6 +330,8 @@ export default function PosterStack({
 
   const count = `${items.length.toLocaleString("en-GB")} films`;
 
+  const collapseLabel = `${label}: hide all ${count}`;
+
   return (
     <div
       ref={(node) => {
@@ -304,6 +342,23 @@ export default function PosterStack({
     >
       {expanded ? (
         <>
+          <div className={styles.header}>
+            <button
+              ref={toggleRef}
+              type="button"
+              className={styles.toggle}
+              onClick={collapse}
+              aria-expanded
+              aria-controls={listId}
+              aria-label={collapseLabel}
+            >
+              <strong className={styles.toggleCount}>{count}</strong>
+              <span className={styles.toggleAction}>
+                Hide them
+                <ChevronDownIcon size={14} />
+              </span>
+            </button>
+          </div>
           <div
             id={listId}
             ref={listRef}
@@ -321,8 +376,9 @@ export default function PosterStack({
               onClick={collapse}
               aria-expanded
               aria-controls={listId}
+              aria-label={collapseLabel}
             >
-              Collapse
+              Hide them
             </Button>
           </div>
         </>
@@ -330,7 +386,7 @@ export default function PosterStack({
         <button
           ref={buttonRef}
           type="button"
-          className={styles.stack}
+          className={clsx(styles.stack, wide && styles.stackWide)}
           onClick={expand}
           aria-expanded={false}
           aria-label={`${label}: show all ${count}`}
@@ -375,7 +431,7 @@ export default function PosterStack({
               <span className={styles.promptTouch}>Tap to expand</span>
             </span>
           </span>
-          <span className={styles.caption} aria-hidden="true">
+          <span ref={captionRef} className={styles.caption} aria-hidden="true">
             <strong className={styles.count}>{count}</strong>
             <span className={styles.seeAll}>
               See them all

@@ -10,8 +10,9 @@
 }
 
 /* The lane the open list sits in, so opening it doesn't change its panel:
-   bled 8px past the column as the lanes are. Stacked on a phone, the caption
-   beside the posters once there's room. */
+   bled 8px past the column as the lanes are. The caption sits under the
+   posters, and beside them once the component has measured room for it
+   (`.stackWide`). */
 .stack {
   display: flex;
   flex-direction: column;
@@ -32,11 +33,9 @@
     border-color 0.2s ease;
 }
 
-@media (min-width: 600px) {
-  .stack {
-    flex-direction: row;
-    align-items: center;
-  }
+.stackWide {
+  flex-direction: row;
+  align-items: center;
 }
 
 .stack:hover {
@@ -146,6 +145,56 @@
 }
 
 .stack:hover .seeAll {
+  color: var(--color-neon-pink);
+}
+
+/* The caption, once the stack is open: at the top right, as the toggle that
+   closes it. */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 8px;
+  margin-right: -8px;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.toggleCount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+}
+
+.toggleAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-electric-blue);
+  transition: color 0.2s ease;
+}
+
+.toggleAction svg {
+  rotate: 180deg;
+}
+
+.toggle:hover .toggleAction {
   color: var(--color-neon-pink);
 }
 
