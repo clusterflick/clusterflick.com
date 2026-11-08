@@ -5,6 +5,7 @@ import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
+import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";
@@ -197,7 +198,7 @@ export default function EventDetailPageContent({
         <LinkedList
           items={accessibilityStats.map(({ feature, filmCount }) => ({
             key: feature,
-            href: `/accessibility/#${feature}`,
+            href: getAccessibilityFeatureUrl(feature),
             label: `${ACCESSIBILITY_EMOJIS[feature]} ${ACCESSIBILITY_LABELS[feature]}`,
             detail: `${filmCount} ${filmCount === 1 ? "film" : "films"}`,
           }))}

@@ -17,6 +17,8 @@ import { GENRES } from "@/data/genres";
 import { getGenreUrl } from "@/utils/get-genre-url";
 import { FORMATS } from "@/data/formats";
 import { getFormatUrl } from "@/utils/get-format-url";
+import { ACCESSIBILITY_FEATURES } from "@/data/accessibility-features";
+import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
 import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getCollectionsData } from "@/utils/get-collections-data";
@@ -131,6 +133,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const formatPages = FORMATS.map((format) => ({
     url: pageUrl(getFormatUrl(format)),
+    lastModified: data.generatedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.6,
+  }));
+
+  const accessibilityFeaturePages = ACCESSIBILITY_FEATURES.map((feature) => ({
+    url: pageUrl(getAccessibilityFeatureUrl(feature.id)),
     lastModified: data.generatedAt,
     changeFrequency: "daily" as const,
     priority: 0.6,
@@ -289,6 +298,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...genrePages,
     formatListPage,
     ...formatPages,
+    ...accessibilityFeaturePages,
     movieListListPage,
     ...movieListPages,
     collectionListPage,

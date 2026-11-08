@@ -357,6 +357,29 @@ The intro sets the chains' share of venues against their share of the week's
 screenings (19% against 90% when written), the one figure the index can give
 that no chain's own page can.
 
+## Accessible Screenings
+
+`/accessibility` is the index: figures for every feature together, the venues
+with the most accessible films, and a section per feature. Each feature also
+has a page of its own at `/accessibility/<slug>`, built like a format page
+(`EventDetailPageContent`: the films with an upcoming screening carrying the
+feature, the cinemas running them, and a `base=all` link into the catalogue).
+The features are a fixed set, so every one has a page whether or not anything
+is on, and their slugs, titles and descriptions live in
+`src/data/accessibility-features.ts`, which both pages read. Links that name a
+feature (venue, borough, programme and near-me pages) go to its page through
+`getAccessibilityFeatureUrl`.
+
+**Both count upcoming screenings only**, from the build's `generatedAt`, so a
+figure on the index is the figure on the page it links to.
+
+**Subtitled is a bucket.** Venues label subtitles for viewers who can't hear
+well and subtitles translating a film the same way, and often don't say which;
+the pipeline files a screening under Hard of Hearing only when the hearing
+support is clear. The copy says it covers both, and the two pages link to each
+other. Don't describe it as one or the other until the data can tell them
+apart.
+
 ## Festival & Film Club Indexes
 
 `/festivals` and `/film-clubs` lead with what's on, not who runs it. Both are
