@@ -349,10 +349,10 @@ export default function LondonCinemas2026Report() {
                 href: "#around-the-world",
               },
               {
-                id: "not-cinemas",
-                value: notCinemas,
-                label: "Not cinemas",
-                detail: `of the ${DATA.venuesWithScreenings} places that screened films: pubs, libraries, churches and more`,
+                id: "places",
+                value: DATA.venuesWithScreenings,
+                label: "Places",
+                detail: `${Math.round((notCinemas / DATA.venuesWithScreenings) * 10)} in 10 of them aren't cinemas: pubs, libraries, churches and more`,
                 href: "#not-just-cinemas",
               },
             ]}

@@ -1,4 +1,5 @@
 .band {
+  --color-band-text: rgba(var(--color-light-gray-rgb), 0.72);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -71,7 +72,9 @@
   line-height: 1.05;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  color: var(--color-white);
+  /* Light grey rather than white: at this size white glared, and grey leaves
+     the hover pink and the highlight yellow to stand out. */
+  color: var(--color-light-gray);
   transition: color 0.25s ease;
 }
 
@@ -88,10 +91,12 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-muted-gray);
+  color: var(--color-band-text);
 }
 
+/* The detail often carries the point ("almost half shown just once"), so it
+   is lifted from the muted grey: ~10:1 against the page, not 5.6:1. */
 .detail {
   font-size: 13px;
-  color: var(--color-muted-gray);
+  color: var(--color-band-text);
 }
