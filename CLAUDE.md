@@ -18,6 +18,7 @@ Pages at clusterflick.com.
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
+- `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -1584,8 +1585,18 @@ Ids are TheMovieDB's, which the dataset's genre and person ids already are.
     press, or in a second paced pass before the import's review. If the
     lookup fails, nothing is added.
     A film already listed (Seen it on the watchlist) has its details from its
-    first add and may pass none. Films listed before this existed get theirs
-    from a one-off migration script.
+    first add and may pass none.
+- **Films listed before that get theirs from a migration**
+  (`scripts/migrate-film-details.js`), run by hand with a service-account
+  key that never leaves the machine running it. It dedupes every listed film
+  across every user, looks each up on TMDB directly (so the Worker's
+  per-reader limit doesn't apply), and replaces each user's document in a
+  transaction that re-reads their lists, so a film added meanwhile keeps its
+  details. Any lookup that still fails stops it before a single write. It
+  reads TMDB as the Worker does, repeated in
+  `scripts/lib/film-details-migration.js` since a Node script can't load the
+  site's TypeScript: change one, change the other. Safe to run again; a run
+  with nothing to change writes nothing.
 - **Cast stops at five** (`FILM_DETAILS_CAST_LIMIT`): favourite actors are
   leading roles, and the document has a 1 MiB limit.
 - **Unmatched films get no details.** Their genres are only the venue's
