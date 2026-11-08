@@ -2,7 +2,7 @@
  * The numbers behind /reports/london-cinemas-2026: a snapshot, not a live
  * count. Produced by export_london.py (see the report's working).
  *
- * Every screening listed from 2026-01-01 to 2026-10-19 was rebuilt from the
+ * Every screening listed from 2026-01-01 to 2026-10-31 was rebuilt from the
  * daily data-combined releases, each release supplying the screenings up to the
  * next one, so nothing is counted twice. Only film screenings count: films,
  * shorts, double bills and TV. A venue that changed id is counted once.
@@ -20,13 +20,13 @@
  */
 export const LONDON_CINEMAS_2026 = {
   from: "2026-01-01",
-  to: "2026-10-19",
-  londonScreenings: 826804,
-  venuesWithScreenings: 418,
+  to: "2026-10-31",
+  londonScreenings: 863909,
+  venuesWithScreenings: 444,
   mostScreenedFilms: [
     {
       title: "Spider-Man: Brand New Day",
-      screenings: 34025,
+      screenings: 34257,
     },
     {
       title: "Toy Story 5",
@@ -34,7 +34,7 @@ export const LONDON_CINEMAS_2026 = {
     },
     {
       title: "The Odyssey",
-      screenings: 29680,
+      screenings: 29851,
     },
   ],
   mostScreeningsOfOneFilm: {
@@ -43,7 +43,7 @@ export const LONDON_CINEMAS_2026 = {
     type: "Cinema",
     current: true,
     title: "Spider-Man: Brand New Day",
-    screenings: 1337,
+    screenings: 1365,
   },
   repertory: [
     {
@@ -51,35 +51,35 @@ export const LONDON_CINEMAS_2026 = {
       name: "The Nickel",
       type: "Cinema",
       current: true,
-      value: 85.8,
+      value: 86,
     },
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
       type: "Cinema",
       current: true,
-      value: 69.4,
+      value: 70,
     },
     {
       id: "closeupfilmcentre.com",
       name: "Close-Up Film Centre",
       type: "Cinema",
       current: true,
-      value: 68.6,
+      value: 68.9,
     },
     {
       id: "bfi.org.uk-southbank",
       name: "BFI Southbank",
       type: "Cinema",
       current: true,
-      value: 42.7,
+      value: 42.9,
     },
     {
       id: "thegardencinema.co.uk",
       name: "The Garden Cinema",
       type: "Cinema",
       current: true,
-      value: 21.8,
+      value: 21.7,
     },
     {
       id: "ica.art",
@@ -90,8 +90,8 @@ export const LONDON_CINEMAS_2026 = {
     },
   ],
   nickel: {
-    onceShare: 76,
-    films: 428,
+    onceShare: 74,
+    films: 438,
     medianYear: 1982,
   },
   mostDifferentFilms: [
@@ -100,21 +100,21 @@ export const LONDON_CINEMAS_2026 = {
       name: "BFI Southbank",
       type: "Cinema",
       current: true,
-      value: 807,
+      value: 856,
     },
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
       type: "Cinema",
       current: true,
-      value: 758,
+      value: 775,
     },
     {
       id: "cineworld.co.uk-the-o2-greenwich",
       name: "Cineworld The O2 Greenwich",
       type: "Cinema",
       current: true,
-      value: 547,
+      value: 577,
     },
   ],
   mostDecades: {
@@ -129,60 +129,67 @@ export const LONDON_CINEMAS_2026 = {
   formats: [
     {
       format: "35mm",
-      total: 641,
-      odyssey: 246,
+      total: 744,
+      odyssey: 247,
     },
     {
       format: "70mm",
-      total: 347,
-      odyssey: 317,
+      total: 357,
+      odyssey: 327,
     },
     {
       format: "imax-70mm",
-      total: 322,
-      odyssey: 322,
+      total: 343,
+      odyssey: 341,
     },
     {
       format: "16mm",
-      total: 20,
+      total: 26,
       odyssey: 0,
     },
     {
       format: "vhs",
-      total: 8,
+      total: 11,
       odyssey: 0,
     },
   ],
-  printScreenings: 1330,
-  odysseyPrintScreenings: 885,
+  printScreenings: 1470,
+  odysseyPrintScreenings: 915,
   printVenues: [
     {
       id: "princecharlescinema.com",
       name: "Prince Charles Cinema",
       type: "Cinema",
       current: true,
-      value: 223,
-    },
-    {
-      id: "bfi.org.uk-southbank",
-      name: "BFI Southbank",
-      type: "Cinema",
-      current: true,
-      value: 59,
+      value: 254,
     },
     {
       id: "odeon.co.uk-leicester-square",
       name: "ODEON Luxe Leicester Square",
       type: "Cinema",
       current: true,
-      value: 55,
+      value: 76,
+    },
+    {
+      id: "bfi.org.uk-southbank",
+      name: "BFI Southbank",
+      type: "Cinema",
+      current: true,
+      value: 71,
     },
     {
       id: "picturehouses.com-central",
       name: "Picturehouse Central",
       type: "Cinema",
       current: true,
-      value: 32,
+      value: 59,
+    },
+    {
+      id: "everymancinema.com-screen-on-the-green",
+      name: "Everyman Screen on the Green",
+      type: "Cinema",
+      current: true,
+      value: 26,
     },
     {
       id: "curzon.com-soho",
@@ -191,13 +198,6 @@ export const LONDON_CINEMAS_2026 = {
       current: true,
       value: 22,
     },
-    {
-      id: "everymancinema.com-screen-on-the-green",
-      name: "Everyman Screen on the Green",
-      type: "Cinema",
-      current: true,
-      value: 18,
-    },
   ],
   sixteenMillimetre: [
     {
@@ -205,7 +205,14 @@ export const LONDON_CINEMAS_2026 = {
       name: "The Castle Cinema",
       type: "Cinema",
       current: true,
-      value: 9,
+      value: 12,
+    },
+    {
+      id: "thenickel.co.uk",
+      name: "The Nickel",
+      type: "Cinema",
+      current: true,
+      value: 5,
     },
     {
       id: "cinemamuseum.org.uk",
@@ -222,13 +229,6 @@ export const LONDON_CINEMAS_2026 = {
       value: 4,
     },
     {
-      id: "thenickel.co.uk",
-      name: "The Nickel",
-      type: "Cinema",
-      current: true,
-      value: 2,
-    },
-    {
       id: "mildmay.club",
       name: "The Mildmay Club",
       type: "Music Venue",
@@ -242,7 +242,7 @@ export const LONDON_CINEMAS_2026 = {
       name: "Dalston Superstore",
       type: "Pub & Bar",
       current: true,
-      value: 3,
+      value: 4,
       borough: "Hackney",
     },
     {
@@ -250,7 +250,7 @@ export const LONDON_CINEMAS_2026 = {
       name: "The Nickel",
       type: "Cinema",
       current: true,
-      value: 3,
+      value: 4,
       borough: "Camden",
     },
     {
@@ -260,6 +260,14 @@ export const LONDON_CINEMAS_2026 = {
       current: true,
       value: 2,
       borough: "Hackney",
+    },
+    {
+      id: "worldwidecoven.net",
+      name: "Coven",
+      type: "Pub & Bar",
+      current: true,
+      value: 1,
+      borough: "Westminster",
     },
   ],
   oldestFilms: [
@@ -305,59 +313,59 @@ export const LONDON_CINEMAS_2026 = {
     },
   ],
   languageFrom: "2026-08-21",
-  languageScreenings: 819379,
+  languageScreenings: 855992,
   languageCoverage: 99.97,
-  nonEnglishShare: 11.9,
-  languages: 92,
+  nonEnglishShare: 12.1,
+  languages: 93,
   nonEnglish: [
     {
       id: "institut-francais.org.uk",
       name: "Ciné Lumière",
       type: "Cultural Centre",
       current: true,
-      value: 82.7,
+      value: 82.6,
     },
     {
       id: "closeupfilmcentre.com",
       name: "Close-Up Film Centre",
       type: "Cinema",
       current: true,
-      value: 79.6,
+      value: 78.9,
     },
     {
       id: "metrocinema.co.uk",
       name: "Metro Cinema",
       type: "Cinema",
       current: true,
-      value: 75.6,
+      value: 75.1,
     },
     {
       id: "cineworld.co.uk-ilford",
       name: "Cineworld Ilford",
       type: "Cinema",
       current: true,
-      value: 63.2,
+      value: 63.5,
     },
     {
       id: "ica.art",
       name: "Institute of Contemporary Arts",
       type: "Cinema",
       current: true,
-      value: 58.3,
+      value: 58.2,
     },
     {
       id: "cineworld.co.uk-hounslow",
       name: "Cineworld Hounslow",
       type: "Cinema",
       current: true,
-      value: 51.3,
+      value: 51.7,
     },
   ],
   languageMix: {
     "institut-francais.org.uk": [
       {
         language: "fr",
-        screenings: 742,
+        screenings: 793,
       },
       {
         language: "it",
@@ -379,11 +387,11 @@ export const LONDON_CINEMAS_2026 = {
       },
       {
         language: "fr",
-        screenings: 59,
+        screenings: 63,
       },
       {
         language: "ja",
-        screenings: 29,
+        screenings: 30,
       },
       {
         language: "it",
@@ -393,15 +401,15 @@ export const LONDON_CINEMAS_2026 = {
     "metrocinema.co.uk": [
       {
         language: "hi",
-        screenings: 945,
+        screenings: 998,
       },
       {
         language: "ml",
-        screenings: 217,
+        screenings: 230,
       },
       {
         language: "gu",
-        screenings: 141,
+        screenings: 143,
       },
       {
         language: "te",
@@ -411,55 +419,55 @@ export const LONDON_CINEMAS_2026 = {
     "cineworld.co.uk-ilford": [
       {
         language: "hi",
-        screenings: 1897,
-      },
-      {
-        language: "ml",
-        screenings: 1567,
+        screenings: 1973,
       },
       {
         language: "ta",
-        screenings: 1492,
+        screenings: 1614,
+      },
+      {
+        language: "ml",
+        screenings: 1585,
       },
       {
         language: "te",
-        screenings: 1487,
+        screenings: 1578,
       },
     ],
     "ica.art": [
       {
         language: "fr",
-        screenings: 201,
+        screenings: 210,
       },
       {
         language: "es",
-        screenings: 125,
+        screenings: 132,
       },
       {
         language: "ja",
-        screenings: 120,
+        screenings: 127,
       },
       {
         language: "pt",
-        screenings: 90,
+        screenings: 92,
       },
     ],
     "cineworld.co.uk-hounslow": [
       {
         language: "hi",
-        screenings: 1978,
+        screenings: 2062,
       },
       {
         language: "te",
-        screenings: 1274,
+        screenings: 1347,
       },
       {
         language: "pa",
-        screenings: 1058,
+        screenings: 1073,
       },
       {
         language: "ta",
-        screenings: 925,
+        screenings: 1019,
       },
     ],
   },
@@ -476,7 +484,7 @@ export const LONDON_CINEMAS_2026 = {
       name: "The Barbican",
       type: "Cinema",
       current: true,
-      value: 41,
+      value: 42,
     },
   ],
   mostNonEnglishScreenings: {
@@ -484,18 +492,18 @@ export const LONDON_CINEMAS_2026 = {
     name: "Cineworld Ilford",
     type: "Cinema",
     current: true,
-    value: 7582,
+    value: 7945,
   },
   relaxed: {
-    screenings: 1108,
-    venues: 83,
+    screenings: 1160,
+    venues: 84,
     leaders: [
       {
         id: "lumiereromford.com",
         name: "Lumiere Cinema Romford",
         type: "Cinema",
         current: true,
-        value: 137,
+        value: 142,
       },
       {
         id: "bfi.org.uk-southbank",
@@ -509,33 +517,33 @@ export const LONDON_CINEMAS_2026 = {
         name: "Curzon Camden",
         type: "Cinema",
         current: true,
-        value: 41,
+        value: 42,
       },
       {
         id: "curzon.com-kingston",
         name: "Curzon Kingston",
         type: "Cinema",
         current: true,
-        value: 41,
+        value: 42,
       },
       {
         id: "curzon.com-aldgate",
         name: "Curzon Aldgate",
         type: "Cinema",
         current: true,
-        value: 40,
+        value: 41,
       },
       {
-        id: "omniplex.co.uk-sutton",
-        name: "Omniplex Sutton",
+        id: "curzon.com-hoxton",
+        name: "Curzon Hoxton",
         type: "Cinema",
         current: true,
-        value: 40,
+        value: 41,
       },
     ],
   },
   hardOfHearing: {
-    screenings: 14305,
+    screenings: 14959,
     venues: 103,
     leaders: [
       {
@@ -543,41 +551,41 @@ export const LONDON_CINEMAS_2026 = {
         name: "BFI Southbank",
         type: "Cinema",
         current: true,
-        value: 855,
+        value: 893,
       },
       {
         id: "picturehouses.com-greenwich",
         name: "Greenwich Picturehouse",
         type: "Cinema",
         current: true,
-        value: 825,
+        value: 853,
       },
       {
         id: "picturehouses.com-finsbury-park",
         name: "Finsbury Park Picturehouse",
         type: "Cinema",
         current: true,
-        value: 505,
+        value: 511,
       },
     ],
   },
   venueTypes: {
     Cinema: 129,
-    "Pub & Bar": 41,
-    "Community Centre": 24,
+    "Pub & Bar": 47,
+    "Community Centre": 26,
+    "Creative Space": 24,
     "University & College": 23,
-    "Cultural Centre": 21,
-    "Arts Centre": 20,
-    "Library & Archive": 20,
-    "Creative Space": 20,
+    "Cultural Centre": 22,
+    "Library & Archive": 22,
+    "Arts Centre": 21,
+    "Place of Worship": 18,
+    "Park & Outdoor Space": 16,
     "Community Cinema": 15,
-    "Park & Outdoor Space": 15,
-    "Place of Worship": 14,
-    "Music Venue": 13,
-    "Café & Restaurant": 11,
+    "Music Venue": 15,
+    "Café & Restaurant": 12,
     Hotel: 10,
+    Museum: 10,
     Theatre: 9,
-    Museum: 8,
     Other: 8,
     Shop: 7,
     "Screening Room": 6,

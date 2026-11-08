@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
@@ -95,17 +96,27 @@ const [printLeader, printRunnerUp] = DATA.printVenues;
 const [oldest] = DATA.oldestFilms;
 const [sixteen] = DATA.sixteenMillimetre;
 // Named here rather than exported: the films are the copy, not a measure.
-const sixteenSample = "Buster Keaton's The General to The Big Sleep";
+const sixteenSample = "Buster Keaton's The General to The Evil Dead";
 const vhsBars = DATA.vhs.filter((v) => v.type === "Pub & Bar");
 const vhsOthers = DATA.vhs.filter((v) => v.type !== "Pub & Bar");
-// The VHS line names two Hackney bars and one other venue.
-if (
-  vhsBars.length !== 2 ||
-  vhsOthers.length !== 1 ||
-  vhsBars.some((v) => v.borough !== "Hackney")
-) {
+// The VHS line names the bars by borough, then the one other venue.
+if (vhsBars.length < 2 || vhsOthers.length !== 1) {
   throw new Error("The VHS venues no longer match the report's copy");
 }
+const vhsBarBoroughs = [...new Set(vhsBars.map((v) => v.borough))];
+
+const capitalise = (text: string) => text[0].toUpperCase() + text.slice(1);
+const NUMBER_WORDS = ["no", "one", "two", "three", "four", "five", "six"];
+
+/** "more than three times", for a ratio of at least 2. */
+const timesAsMany = (value: number, than: number) => {
+  const whole = Math.floor(value / than);
+  const words = ["", "", "twice", "three times", "four times", "five times"];
+  if (!words[whole]) throw new Error(`No wording for ${whole} times as many`);
+  return value / than - whole < 0.1
+    ? words[whole]
+    : `more than ${words[whole]}`;
+};
 const [mostInternational] = DATA.nonEnglish;
 const [relaxedLeader, relaxedRunnerUp] = DATA.relaxed.leaders;
 const [hohLeader, hohRunnerUp] = DATA.hardOfHearing.leaders;
@@ -285,7 +296,7 @@ export default function LondonCinemas2026Report() {
             <ReportHighlight
               title="Most film on film"
               stat={fmt(printLeader.value)}
-              statLabel={`print screenings, not counting The Odyssey. Almost four times as many as ${printRunnerUp.name}.`}
+              statLabel={`print screenings, not counting The Odyssey. ${capitalise(timesAsMany(printLeader.value, printRunnerUp.value))} as many as ${printRunnerUp.name}.`}
               venue={cardVenue(printLeader)}
             />
             <ReportHighlight
@@ -303,9 +314,26 @@ export default function LondonCinemas2026Report() {
             items={venueRows(DATA.printVenues)}
           />
           <p className={styles.body}>
-            And VHS isn&apos;t dead: all {vhs.total} VHS screenings were at two
-            Hackney bars, {venueLink(vhsBars[0])} and {venueLink(vhsBars[1])},
-            and at {venueLink(vhsOthers[0])}.
+            And VHS isn&apos;t dead. All {vhs.total} VHS screenings were at{" "}
+            {venueLink(vhsOthers[0])} and{" "}
+            {NUMBER_WORDS[vhsBars.length] ?? vhsBars.length} bars:{" "}
+            {vhsBarBoroughs.map((borough, index) => {
+              const bars = vhsBars.filter((v) => v.borough === borough);
+              return (
+                <Fragment key={borough}>
+                  {index > 0 &&
+                    (index === vhsBarBoroughs.length - 1 ? ", and " : ", ")}
+                  {bars.map((bar, i) => (
+                    <Fragment key={bar.id}>
+                      {i > 0 && (i === bars.length - 1 ? " and " : ", ")}
+                      {venueLink(bar)}
+                    </Fragment>
+                  ))}{" "}
+                  in {borough}
+                </Fragment>
+              );
+            })}
+            .
           </p>
           <div className={styles.action}>
             <ButtonLink href="/formats" variant="secondary">
@@ -377,7 +405,7 @@ export default function LondonCinemas2026Report() {
             <ReportHighlight
               title="Most relaxed screenings"
               stat={fmt(relaxedLeader.value)}
-              statLabel={`relaxed screenings, three times as many as ${relaxedRunnerUp.name}`}
+              statLabel={`relaxed screenings, ${timesAsMany(relaxedLeader.value, relaxedRunnerUp.value)} as many as ${relaxedRunnerUp.name}`}
               venue={cardVenue(relaxedLeader)}
             />
           </div>
