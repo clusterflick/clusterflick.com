@@ -1,0 +1,117 @@
+/* The row's heading mirrors PosterRow's, so the discovery rows read as one system. */
+.row {
+  margin-bottom: 36px;
+  /* Room above the cards for their hover lift, which the scroller would
+     otherwise clip: a horizontal scroller clips vertically too. */
+  --poster-scroller-padding-top: 4px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+/* 4px less than PosterRow's, given back as the scroller's padding above. */
+.intro {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+  margin: 0 0 12px;
+}
+
+/* Wide rather than tall: the occasion is the headline, not the poster. */
+.card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 16px;
+  width: min(360px, 82vw);
+  padding: 14px;
+  border-radius: 12px;
+  color: inherit;
+  font-weight: 400;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.card:hover {
+  color: inherit;
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.55);
+  transform: translateY(-2px);
+}
+
+/* The poster blurred behind the card, as the home page's feature does. */
+.wash {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) saturate(1.4);
+  opacity: 0.28;
+  transition: opacity 0.25s ease;
+}
+
+.card:hover .wash {
+  opacity: 0.4;
+}
+
+.poster {
+  align-self: start;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px -10px rgba(var(--color-black-rgb), 0.9);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.when {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-neon-pink);
+}
+
+.occasion {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-white);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.film {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  transition: color 0.25s ease;
+}
+
+.card:hover .film {
+  color: var(--color-neon-pink);
+}
+
+.venue {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}

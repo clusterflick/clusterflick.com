@@ -1,11 +1,42 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
+/**
+ * Which of `generate-summary`'s highlight lists put a film in front of the
+ * model. Each film is claimed by exactly one.
+ */
+export type EditorialHighlightKind =
+  | "format"
+  | "occasion"
+  | "one-off"
+  | "final-showing"
+  | "unusual-venue"
+  | "hidden-gem"
+  | "new"
+  | "popular";
+
+/** Why a film is in the summary's candidate set. */
+export interface EditorialHighlight {
+  kind: EditorialHighlightKind;
+  /** A card label: "35mm print", "Final showing", "Showing at 96 venues". */
+  label: string;
+  /**
+   * The showing the highlight is about. Absent for a film picked for its reach
+   * ("popular") rather than for one showing.
+   */
+  performance?: { time: number; venueId: string };
+}
+
 /** A known entity mentioned in the summary, keyed by the exact phrase used. */
 export interface EditorialSummaryLink {
   phrase: string;
   movieId?: string;
   venueId?: string;
+  /**
+   * Film links only. Absent from summaries written before it was added, so a
+   * reader has to cope without it.
+   */
+  highlight?: EditorialHighlight;
 }
 
 export interface EditorialSummary {
@@ -30,6 +61,15 @@ export function getEditorialSummary(): EditorialSummary | null {
     const content = readFileSync(summaryPath, "utf-8");
     const summary = JSON.parse(content) as EditorialSummary;
     if (!summary.text) return null;
+    // Still renders, as prose with nothing featured, but a file this old is
+    // usually a local one left over from before highlights: `npm run dev`
+    // doesn't regenerate it, so say so rather than quietly showing the fallback.
+    const filmLinks = (summary.links ?? []).filter((link) => link.movieId);
+    if (filmLinks.length > 0 && filmLinks.every((link) => !link.highlight)) {
+      console.warn(
+        "editorial-summary.json has no highlights, so the home page will feature nothing. It predates them: run `npm run generate-summary` to rebuild it.",
+      );
+    }
     return summary;
   } catch {
     return null;

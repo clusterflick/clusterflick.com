@@ -1,0 +1,9 @@
+/* As a club page's browse links: centred, wrapping onto a second line on a
+   phone rather than squeezing. */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+}

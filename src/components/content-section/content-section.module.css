@@ -2,6 +2,12 @@
   margin-bottom: 60px;
 }
 
+/* A section linked to as #id lands below the fixed 63px site header, with
+   room to spare, rather than with its heading underneath it. */
+.section[id] {
+  scroll-margin-top: 83px;
+}
+
 .title {
   font-size: 32px;
   font-weight: 700;
@@ -64,4 +70,50 @@
 .centered .intro {
   margin-left: auto;
   margin-right: auto;
+}
+
+/* On a prose page with room for it, the heading moves into a rail beside the
+   section's text (see StandardPageLayout's `.prose`): the section pulls back
+   into the padding the page leaves for the rail, the heading takes the first
+   column and sticks under the header while its text scrolls, and everything
+   else takes the second. Only on a prose page, since the container is named;
+   never for a centred section, nor for one nested inside another, which reads
+   as part of its parent's text. Keep the width in step with `.proseBody`. */
+@container prose (min-width: 1040px) {
+  .section:not(.centered, .section .section) {
+    display: grid;
+    grid-template-columns: var(--prose-rail) minmax(0, 1fr);
+    column-gap: var(--prose-gap);
+    align-items: start;
+    margin-left: calc(-1 * (var(--prose-rail) + var(--prose-gap)));
+  }
+
+  .section:not(.centered, .section .section) > * {
+    grid-column: 2;
+  }
+
+  /* Spanning every row the text takes, so a long heading never opens a gap
+     under the first paragraph; the rows past the text are empty and take no
+     height. */
+  .section:not(.centered, .section .section) > .title,
+  .section:not(.centered, .section .section) > .titleRow {
+    grid-column: 1;
+    grid-row: 1 / span 50;
+    position: sticky;
+    top: 83px;
+  }
+
+  .section:not(.centered, .section .section) > .title,
+  .section:not(.centered, .section .section) > .titleRow .title {
+    font-size: 26px;
+    line-height: 1.25;
+    margin-bottom: 0;
+  }
+
+  /* An action can't share 240px with the heading, so it goes beneath it. */
+  .section:not(.centered, .section .section) > .titleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }

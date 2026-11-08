@@ -11,6 +11,7 @@ import {
 import {
   formatDateLong,
   getLondonMidnightTimestamp,
+  addLondonDays,
   MS_PER_DAY,
 } from "@/utils/format-date";
 import { FilterId, type FilterState, type MoviesRecord } from "./types";
@@ -48,6 +49,7 @@ interface MovieSpec {
   time?: number;
   notes?: string;
   subtitled?: boolean;
+  dogFriendly?: boolean;
 }
 
 function makeMovie(id: string, spec: MovieSpec): Movie {
@@ -57,7 +59,14 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     showingId,
     time: spec.time ?? IN_WINDOW,
     ...(spec.notes ? { notes: spec.notes } : {}),
-    ...(spec.subtitled ? { accessibility: { subtitled: true } } : {}),
+    ...(spec.subtitled || spec.dogFriendly
+      ? {
+          accessibility: {
+            ...(spec.subtitled ? { subtitled: true } : {}),
+            ...(spec.dogFriendly ? { dogFriendly: true } : {}),
+          },
+        }
+      : {}),
     ...(spec.source ? { format: { source: spec.source } } : {}),
   };
 
@@ -584,6 +593,22 @@ describe("suggestFilterRelaxations", () => {
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show Subtitles screenings"]);
+    },
+  );
+
+  it.each(["dog", "dogs", "dog friendly", "Dog-Friendly", "dogs welcome"])(
+    "reads %s as the dog friendly requirement",
+    (query) => {
+      const movies = makeMovies({
+        "1": { title: "Heat", dogFriendly: true },
+      });
+      const state = set(getDefaultState(), FilterId.Search, query);
+
+      expect(
+        suggestFilterRelaxations({ movies, state })
+          .filter((s) => s.kind === "filter")
+          .map((s) => s.headline),
+      ).toEqual(["Show Dog Friendly screenings"]);
     },
   );
 
@@ -1203,7 +1228,7 @@ describe("suggestFilterRelaxations", () => {
 
     it("falls back to the date itself beyond a fortnight", () => {
       // Counting to "in 23 days" is harder than reading the date.
-      const far = TODAY + 23 * MS_PER_DAY;
+      const far = addLondonDays(TODAY, 23);
       const movies = makeMovies({
         "1": { title: "Eternal Sunshine", time: far },
       });
@@ -1216,7 +1241,7 @@ describe("suggestFilterRelaxations", () => {
     });
 
     it("reaches for a relative day inside a fortnight", () => {
-      const soon = TODAY + 8 * MS_PER_DAY;
+      const soon = addLondonDays(TODAY, 8);
       const movies = makeMovies({
         "1": { title: "Eternal Sunshine", time: soon },
       });

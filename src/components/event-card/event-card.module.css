@@ -24,6 +24,10 @@
   flex-shrink: 0;
 }
 
+.neonLogo {
+  margin: 0 auto;
+}
+
 .logoImage {
   object-fit: contain;
   width: 100%;

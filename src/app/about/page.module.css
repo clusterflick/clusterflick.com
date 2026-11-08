@@ -1,10 +1,20 @@
 /* Extra bottom padding for about page hero */
 .hero {
-  padding-bottom: 60px;
+  padding-bottom: 40px;
 }
 
 .logoLarge {
-  margin: 0 auto 28px;
+  margin: 0 auto 20px;
+  width: 200px;
+
+  .logoImage {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 600px) {
+    width: 140px;
+  }
   position: relative;
 
   &::before {
@@ -13,8 +23,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
+    width: 190%;
+    aspect-ratio: 1;
     background: radial-gradient(
       circle,
       rgba(var(--color-midnight-navy-rgb), 0.9) 0%,
@@ -26,18 +36,59 @@
   }
 }
 
+/* Fluid so the outlined wordmark fits a phone: at a fixed 64px it ran off
+   both edges at 390px. */
 .title {
-  font-size: 64px;
-  margin-bottom: 24px;
+  font-size: clamp(40px, 11vw, 64px);
+  margin-bottom: 16px;
+}
+
+.headline {
+  font-size: clamp(20px, 4vw, 24px);
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
 .tagline {
-  font-size: 20px;
+  max-width: var(--measure-blurb);
+  margin: 0 auto;
+  font-size: 18px;
   line-height: 1.6;
+  color: var(--color-light-gray);
+}
+
+/* A set width, not the hero's shrink-to-fit: the centred hero sizes a block
+   to its widest line, which here was the "Data last refreshed" sentence, so
+   the cards changed width when it gained "2 hours ago" on the reader's
+   clock. The prose text measure, about what that sentence used to give. */
+.stats {
+  width: 100%;
+  max-width: calc(var(--page-prose) - 40px);
+  margin: 32px auto 0;
+}
+
+.featureCard {
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 14px 18px 16px;
+
+  h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+}
+
+/* The social and partner cards are a scannable list, so they sit tighter
+   than LinkCard's standalone default. */
+.compactCard {
+  min-height: 0;
+  padding: 12px 16px;
+  gap: 12px;
 }
 
 .content {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding: 0 20px 80px;
   position: relative;
@@ -46,8 +97,8 @@
 
 .partnerLogo {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -60,9 +111,19 @@
   }
 }
 
+.partnerInitial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+  font-weight: 700;
+}
+
 .partnerDescription {
   display: block;
-  margin-top: 6px;
+  margin-top: 2px;
   font-size: 14px;
   opacity: 0.7;
   line-height: 1.5;
@@ -86,14 +147,59 @@
   margin-top: 8px;
 }
 
-/* Sits between the TMDB block and the closing disclaimer, so it needs air on
-   both sides rather than reading as a caption to the logo above it. */
+/* Sits under the TMDB block, so it needs air above it rather than reading as
+   a caption to the logo. */
 .acknowledgement {
-  margin: 32px 0 16px;
+  margin: 40px 0 14px;
 }
 
-/* The licence sits alongside the format cards rather than under them — it is
-   the terms those downloads come with, not an afterthought. */
-.licenceLink {
+.ratingSources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ratingSource {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.4);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-neon-pink);
+    color: var(--color-neon-pink);
+  }
+}
+
+.acknowledgementNote {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+/* The licence notices, as one panel of small print. */
+.notices {
+  margin-top: 40px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+
+  .disclaimer {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+}
+
+/* The published-data pages, under the Showing Data intro. */
+.dataLinks {
   margin-top: 28px;
 }

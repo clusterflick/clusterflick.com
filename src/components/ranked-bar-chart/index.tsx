@@ -14,6 +14,12 @@ export type RankedBarChartItem = {
    * `split` legend. Only used when the chart has one.
    */
   splitValue?: number;
+  /**
+   * `data-*` attributes for the row, so something around the chart can tie a
+   * row to what it stands for (a borough on `BoroughMap`). A row marked
+   * `data-active` is drawn as if pointed at.
+   */
+  attributes?: Record<`data-${string}`, string>;
 };
 
 interface RankedBarChartProps {
@@ -31,6 +37,18 @@ interface RankedBarChartProps {
    * the accent colour, and `rest` names the remainder. Shows a legend.
    */
   split?: { split: string; rest: string };
+  /**
+   * Keeps the caption for screen readers only, for a chart whose figure
+   * already names it (the borough map's caption covers its ranked list).
+   */
+  hideCaption?: boolean;
+  /**
+   * Lets labels wrap on a phone, for labels that are phrases ("Plain request
+   * with a browser user agent") and would leave no room for the bars on one
+   * line. Off by default: a wrapped row is taller than the rest, which breaks
+   * the run of bars, so names stay on one line.
+   */
+  wrapLabels?: boolean;
 }
 
 /**
@@ -46,6 +64,8 @@ export default function RankedBarChart({
   valueHeading,
   formatValue = (value) => value.toLocaleString("en-GB"),
   split,
+  hideCaption = false,
+  wrapLabels = false,
 }: RankedBarChartProps) {
   const sorted = [...items].sort((a, b) => b.value - a.value);
   const max = Math.max(...sorted.map((item) => item.value), 1);
@@ -71,8 +91,12 @@ export default function RankedBarChart({
           </li>
         </ul>
       )}
-      <table className={styles.table}>
-        <caption className={split ? styles.visuallyHidden : styles.caption}>
+      <table className={clsx(styles.table, wrapLabels && styles.wrapLabels)}>
+        <caption
+          className={
+            split || hideCaption ? styles.visuallyHidden : styles.caption
+          }
+        >
           {caption}
         </caption>
         <thead className={styles.visuallyHidden}>
@@ -88,6 +112,7 @@ export default function RankedBarChart({
             return (
               <tr
                 key={item.key}
+                {...item.attributes}
                 className={clsx(styles.row, item.highlight && styles.highlight)}
               >
                 <th scope="row" className={styles.label}>

@@ -13,6 +13,7 @@
 /* A column, so an action can sit at the foot of a tile stretched to its
    row's height, lining up with its neighbours' whatever their titles wrap to. */
 .tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -20,7 +21,9 @@
 
 /* The whole tile is the link, so it carries none of the global anchor styling
    and drives the hover state for everything inside it. */
+/* Positioned so a poster's list markers sit in its top-right corner. */
 .link {
+  position: relative;
   display: block;
   border-bottom: none;
   color: inherit;

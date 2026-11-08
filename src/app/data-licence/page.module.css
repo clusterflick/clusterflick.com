@@ -11,17 +11,7 @@
 .tagline {
   font-size: 20px;
   line-height: 1.6;
-  max-width: 640px;
-}
-
-/* Content wrapper — narrower than the About page's card grids, because this is
-   mostly prose and long measures are hard to read. */
-.content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-  position: relative;
-  z-index: 1;
+  max-width: var(--measure-blurb);
 }
 
 .body {
@@ -30,10 +20,10 @@
   margin: 0 0 20px;
 }
 
-/* CardGrid has no trailing margin of its own, and the prose below explains the
-   cards, so it needs a gap wider than the one between two paragraphs. */
-.datasets {
-  margin-bottom: 32px;
+/* Closes the description of what's covered, so it takes the wider gap a
+   section break would. */
+.dataPageLinks {
+  margin: 8px 0 12px;
 }
 
 /* ─── Attribution snippets ─── */

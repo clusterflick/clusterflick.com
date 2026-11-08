@@ -1,24 +1,9 @@
 /**
- * The two datasets published for reuse, and the internal artifacts that are
- * not. Kept beside the page rather than in `src/data` because nothing else
- * needs them — the About page links to the same two datasets, but describes
- * them for a different audience.
+ * The credit to copy, and the internal artifacts that are not licensed for
+ * reuse. Kept beside the page rather than in `src/data` because nothing else
+ * needs them. Where the datasets live is in `@/app/datasets/data`, beside the
+ * page that documents them.
  */
-
-export const LICENSED_DATASETS = [
-  {
-    name: "Data file per venue",
-    url: "https://github.com/clusterflick/data-transformed/releases/latest",
-    description:
-      "Individual JSON files for the showings at each venue, all following the same schema. The fullest form of the data, and the one to build on.",
-  },
-  {
-    name: "Calendar file per venue",
-    url: "https://github.com/clusterflick/data-calendar/releases/latest",
-    description:
-      "Individual ICS files for the showings at each venue. Subscribe to one, or hand them to anything that speaks iCalendar.",
-  },
-];
 
 /**
  * The same credit in the three forms people actually need to paste. Kept

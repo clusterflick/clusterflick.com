@@ -1,0 +1,115 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import clsx from "clsx";
+import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
+import { formatShowingTime, formatDateLong } from "@/utils/format-date";
+import {
+  formatHours,
+  getHoursSince,
+  STALE_AFTER_HOURS,
+  type ReleaseRef,
+} from "@/utils/release-status";
+import ReleaseDot from "@/components/release-dot";
+import styles from "./release-freshness.module.css";
+
+export interface ReleaseFreshnessProps {
+  /** The newest release the page was built with */
+  latest: ReleaseRef;
+  /** When the page was built: the clock the static HTML is rendered against */
+  builtAt: string;
+  /**
+   * Where to check for anything newer once the page has loaded. Off in
+   * stories, which have no published data to read.
+   */
+  latestUrl?: string | null;
+}
+
+interface LatestJson {
+  releases?: Record<string, ReleaseRef | null>;
+}
+
+/**
+ * How long ago the newest dataset release was, worked out in the reader's
+ * browser rather than at build time. A page built from a pipeline that has
+ * since stopped would otherwise go on saying "2 hours ago" forever. Past
+ * `STALE_AFTER_HOURS` it turns into a warning.
+ *
+ * The static HTML names the release and its date but no age, since an age
+ * counted from the build time is wrong by the time anyone reads it, and
+ * swapping it for the real one on load read as a flicker. The age is added
+ * once the page is on the reader's clock, which then also asks latest.json
+ * whether anything newer has been released since the page was built.
+ */
+export default function ReleaseFreshness({
+  latest: built,
+  builtAt,
+  latestUrl = "/datasets/latest.json",
+}: ReleaseFreshnessProps) {
+  const now = useNow(builtAt);
+  const isOnReaderClock = useIsOnReaderClock();
+  const [published, setPublished] = useState<ReleaseRef | null>(null);
+
+  useEffect(() => {
+    if (!latestUrl) return;
+    let cancelled = false;
+    fetch(latestUrl)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((json: LatestJson | null) => {
+        if (cancelled || !json?.releases) return;
+        const newest = Object.values(json.releases)
+          .filter((release): release is ReleaseRef => !!release?.publishedAt)
+          .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
+        if (newest) setPublished(newest);
+      })
+      // The build's own figure stands; it can only be older, never wrong
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [latestUrl]);
+
+  // latest.json can only be newer than the build, unless it's a cached copy
+  // from before it
+  const latest =
+    published && published.publishedAt > built.publishedAt ? published : built;
+
+  const hours = getHoursSince(latest.publishedAt, now);
+  const isStale = hours >= STALE_AFTER_HOURS;
+  const when = `${formatDateLong(latest.publishedAt)} at ${formatShowingTime(
+    new Date(latest.publishedAt).getTime(),
+  )}`;
+
+  return (
+    <p
+      className={clsx(styles.freshness, isStale && styles.stale)}
+      role={isStale ? "alert" : undefined}
+    >
+      <ReleaseDot stale={isStale} />
+      {isStale ? (
+        <span>
+          <strong>
+            {isOnReaderClock
+              ? `No new data for ${formatHours(hours)}.`
+              : `No new data since ${when}.`}
+          </strong>{" "}
+          {isOnReaderClock && <>The last release was on {when}. </>}
+          Releases have come several times a day, so the pipeline has most
+          likely stopped.
+        </span>
+      ) : (
+        <span>
+          Last new data{" "}
+          {isOnReaderClock ? (
+            <>
+              <strong>{formatHours(hours, true)}</strong>, release
+            </>
+          ) : (
+            "from release"
+          )}{" "}
+          <code>{latest.tag}</code> on {when}.
+        </span>
+      )}
+    </p>
+  );
+}

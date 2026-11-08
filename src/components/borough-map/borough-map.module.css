@@ -1,0 +1,239 @@
+.figure {
+  margin: 0;
+}
+
+.caption {
+  font-size: 14px;
+  color: var(--color-light-gray);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+/* Map and aside side by side once the map can stay legible at 3/5 of the
+   column (--page-default's 1000px less gutters puts it at ~570px). The map
+   column sticks under the 63px site header while a taller aside scrolls past,
+   so the area a row stands for stays in view. */
+.frame {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .frame {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .mapColumn {
+    position: sticky;
+    top: 79px;
+  }
+}
+
+/* A fixed box of two lines, name over figures, each held to one line: the
+   readout changes as the pointer crosses the map, and a box that grew or
+   wrapped with its text made everything under it jump. The prompt is centred
+   in the same box. */
+.readout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 52px;
+  margin: 0 0 8px;
+  color: var(--color-light-gray);
+}
+
+.readoutLabel,
+.readoutDetail {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.readoutLabel {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-white);
+}
+
+.readoutDetail {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* The prompt is the only sign the map answers to a pointer, so it reads as a
+   hint rather than a caption: a pill, with a pointer beside it. */
+.prompt {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 12px 2px 8px;
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.5);
+  border-radius: 999px;
+  background: rgba(var(--color-electric-blue-rgb), 0.12);
+  color: var(--color-white);
+  font-size: 14px;
+}
+
+.promptIcon {
+  width: 14px;
+  height: 14px;
+  fill: var(--color-electric-blue);
+}
+
+/* The area's name and, after a first tap, what a second one does. */
+.readoutHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.readoutHint {
+  flex: none;
+  font-size: 13px;
+  color: var(--color-electric-blue);
+}
+
+.promptTouch {
+  display: none;
+}
+
+/* On a touch screen the first tap on an area selects it (see MapReadout), so
+   the readout is how its figures are read there. A phone is too narrow for
+   the detail on one line, so it may take two, with the box sized to them. */
+@media (hover: none) {
+  .readout {
+    height: 68px;
+  }
+
+  .readoutDetail {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .promptPointer {
+    display: none;
+  }
+
+  .promptTouch {
+    display: inline;
+  }
+}
+
+.canvas {
+  position: relative;
+}
+
+.map,
+.overlay {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The gap between neighbours is the page's own navy, so each borough reads
+   as a shape of its own whatever its shade. Custom properties, because the
+   readout's outline is a <use> clone of the path, which only inherits them. */
+.area {
+  stroke: var(--area-stroke, var(--color-deep-navy-alt));
+  stroke-width: var(--area-stroke-width, 1.5);
+  stroke-linejoin: round;
+  transition: opacity 0.15s ease;
+}
+
+/* Yellow, which no band of the pink ramp comes near, so the borough pointed
+   at stands out whatever its shade. */
+.outline {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
+.map a:focus {
+  outline: none;
+}
+
+.map a:focus-visible .area {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
+/* Neon pink, lighter to darker as the figure grows: validated as an ordinal
+   ramp against --color-deep-navy-alt (monotone lightness, visible steps, and
+   the darkest still 2.4:1 against the page). */
+.band0 {
+  fill: #f9a5c0;
+  background: #f9a5c0;
+}
+
+.band1 {
+  fill: #f56996;
+  background: #f56996;
+}
+
+.band2 {
+  fill: var(--color-neon-pink);
+  background: var(--color-neon-pink);
+}
+
+.band3 {
+  fill: #c32259;
+  background: #c32259;
+}
+
+.band4 {
+  fill: #951b49;
+  background: #951b49;
+}
+
+.nothingOn {
+  fill: var(--color-dark-navy);
+  background: var(--color-dark-navy);
+}
+
+.noVenues {
+  fill: transparent;
+  background: transparent;
+  --area-stroke: var(--color-muted-gray);
+}
+
+.swatch.noVenues {
+  border: 1px dashed var(--color-muted-gray);
+}
+
+.noVenues.area {
+  stroke-dasharray: 4 3;
+}

@@ -16,18 +16,24 @@ import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
+import StatsBand, { type StatsBandItem } from "@/components/stats-band";
+import { getFeaturedScreenings } from "@/utils/get-featured-screenings";
+import { getListingsStats } from "@/utils/get-listings-stats";
+import { FormatSource } from "@/types";
 import DiscoverySections from "./discovery-sections";
+import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";
 import WatchlistRow from "./watchlist-row";
+import ListingsFreshness from "./listings-freshness";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   // The root page shares a segment with the layout that defines the title
   // template, so the "| Clusterflick" suffix isn't applied automatically here.
   title:
     "What's On at London Cinemas — Discover Films Showing Now | Clusterflick",
-  description:
-    "Discover what's worth seeing across 450+ London venues — the films showing most widely, new additions and last chance screenings.",
+  description: `Discover what's worth seeing across ${VENUE_COUNT} London venues — the films showing most widely, new additions and last chance screenings.`,
   alternates: {
     canonical: "/",
   },
@@ -80,6 +86,60 @@ export default async function Home() {
     collections: data.collections,
   });
 
+  // The films the summary names, with why and when, and the week's scale. Both
+  // are build-time snapshots; the featured screenings re-check the reader's
+  // clock on the client so a lapsed showing drops out.
+  const builtAt = new Date().toISOString();
+  const now = Date.parse(builtAt);
+  const featured = getFeaturedScreenings(summary, data, now);
+  const stats = getListingsStats(data, now);
+  const thirtyFiveMm = FORMATS.find(
+    (format) => format.id === FormatSource.ThirtyFiveMm,
+  );
+  const statItems: StatsBandItem[] = [
+    {
+      id: "films",
+      value: stats.films,
+      label: "Films",
+      detail: "showing this week",
+      href: "/catalogue",
+    },
+    {
+      id: "screenings",
+      value: stats.screenings,
+      label: "Screenings",
+      detail: "in the next 7 days",
+      href: "/planner",
+    },
+    {
+      id: "venues",
+      value: stats.venues,
+      label: "Venues",
+      detail: `screening, of ${stats.venuesTracked} we track`,
+      href: "/venues",
+    },
+  ];
+  if (thirtyFiveMm && stats.thirtyFiveMm.screenings > 0) {
+    statItems.push({
+      id: "35mm",
+      value: stats.thirtyFiveMm.screenings,
+      label: "On 35mm",
+      detail: `${stats.thirtyFiveMm.films} ${stats.thirtyFiveMm.films === 1 ? "film" : "films"} on celluloid`,
+      href: getFormatUrl(thirtyFiveMm),
+      highlight: true,
+    });
+  }
+  const updatedAt = Date.parse(data.generatedAt);
+
+  const summaryProse = summary
+    ? summary.text
+        .split(/(?:\\n|\n)+/)
+        .filter((para) => para.trim().length > 0)
+        .map((para, index) => (
+          <p key={index}>{linkifySummary(para, summaryTargets)}</p>
+        ))
+    : null;
+
   return (
     <>
       <script
@@ -95,35 +155,49 @@ export default async function Home() {
         }}
       />
       <MainHeader showFilters={false} />
-      <PageWrapper className={styles.page}>
+      <PageWrapper
+        className={featured.length > 0 ? styles.pageWithFeature : styles.page}
+      >
+        {featured.length > 0 && (
+          <FeaturedHero featured={featured} builtAt={builtAt} />
+        )}
+
         <header className={styles.intro}>
           <OutlineHeading as="h1" className={styles.introTitle}>
-            What&apos;s On at London Cinemas
+            Every Film Showing in London
           </OutlineHeading>
           <p className={styles.introLead}>
-            Every film showing in London — 450+ venues, one search.
-            <br />
             From blockbusters at{" "}
-            <Link href="/cinema-groups/picturehouse">
-              Picturehouses
-            </Link> and <Link href="/cinema-groups/everyman">Everyman</Link> to
-            independent gems at the{" "}
-            <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
+            <Link href="/cinema-groups/picturehouse">Picturehouses</Link> and{" "}
+            <Link href="/cinema-groups/everyman">Everyman</Link> to independent
+            gems at the <Link href="/venues/bfi-southbank">BFI</Link>,{" "}
             <Link href="/venues/genesis-cinema">Genesis</Link> and the{" "}
             <Link href="/venues/prince-charles-cinema">Prince Charles</Link>{" "}
             cinemas.
           </p>
-          {summary && (
-            <div className={styles.summary} data-source={summary.source}>
-              {summary.text
-                .split(/(?:\\n|\n)+/)
-                .filter((para) => para.trim().length > 0)
-                .map((para, index) => (
-                  <p key={index}>{linkifySummary(para, summaryTargets)}</p>
-                ))}
-            </div>
+          <StatsBand items={statItems} label="This week in London" />
+          {!Number.isNaN(updatedAt) && (
+            <ListingsFreshness generatedAt={data.generatedAt} />
           )}
         </header>
+
+        {featured.length > 0 ? (
+          <FeaturedPicks
+            featured={featured}
+            builtAt={builtAt}
+            summary={summaryProse}
+          />
+        ) : (
+          // A summary with nothing to feature (one written before highlights
+          // existed) is shown as prose, as it always was.
+          summaryProse && (
+            <div className={styles.summaryFallback}>
+              <div className={styles.summary} data-source={summary?.source}>
+                {summaryProse}
+              </div>
+            </div>
+          )
+        )}
 
         <div className={styles.sections}>
           <div className={styles.browseCta}>
@@ -133,7 +207,9 @@ export default async function Home() {
           <WatchlistRow />
 
           <DiscoverySections
-            fallback={<DiscoveryRowsView rows={serverRows} />}
+            fallback={
+              <DiscoveryRowsView rows={serverRows} venues={data.venues} />
+            }
           />
 
           <div className={styles.browseCta}>

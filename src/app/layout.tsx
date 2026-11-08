@@ -7,8 +7,10 @@ import { GeolocationProvider } from "@/state/geolocation-context";
 import { UserProvider } from "@/state/user-context";
 import { SeenFilterSync } from "@/state/seen-filter-sync";
 import { VenueOriginSync } from "@/state/venue-origin-sync";
+import { NavigationScrollReset } from "@/state/navigation-scroll-reset";
 import DataLoadNoticeClient from "@/components/data-load-notice/data-load-notice-client";
 import "./globals.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -26,8 +28,7 @@ export const metadata: Metadata = {
       "Every Film Showing in London — Search London Cinema Listings | Clusterflick",
     template: "%s | Clusterflick",
   },
-  description:
-    "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.",
+  description: `Every film showing in London, from ${VENUE_COUNT} venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.`,
   keywords: [
     "cinema",
     "movies",
@@ -46,8 +47,7 @@ export const metadata: Metadata = {
     url: "https://clusterflick.com",
     siteName: "Clusterflick",
     title: "Clusterflick – Every film showing in London",
-    description:
-      "Every film showing in London, from 450+ venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.",
+    description: `Every film showing in London, from ${VENUE_COUNT} venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.`,
     images: [
       {
         url: "/images/og-image.png",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Clusterflick – Every film showing in London",
-    description: "Every film showing in London — 450+ venues, one search.",
+    description: `Every film showing in London — ${VENUE_COUNT} venues, one search.`,
     creator: "@clusterflick",
     images: ["/images/og-image.png"],
   },
@@ -117,6 +117,7 @@ export default function RootLayout({
               <UserProvider>
                 <SeenFilterSync />
                 <VenueOriginSync />
+                <NavigationScrollReset />
                 {children}
               </UserProvider>
             </GeolocationProvider>

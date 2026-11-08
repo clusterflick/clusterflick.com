@@ -68,7 +68,7 @@
     "start end";
   align-items: center;
   gap: 8px;
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
 }
 

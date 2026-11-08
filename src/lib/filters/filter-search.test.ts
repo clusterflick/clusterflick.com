@@ -57,6 +57,9 @@ describe("searchFilterGroups", () => {
     expect(names("subtitled")).toEqual(["Accessibility: Subtitles"]);
     expect(names("sci-fi")).toEqual(["Genre: Science Fiction"]);
     expect(names("quiz")).toEqual(["Event type: Quizzes"]);
+    expect(names("dog")).toEqual(["Accessibility: Dog Friendly"]);
+    expect(names("dogs")).toEqual(["Accessibility: Dog Friendly"]);
+    expect(names("dog friendly")).toEqual(["Accessibility: Dog Friendly"]);
   });
 
   it("never offers a format's default", () => {

@@ -1,0 +1,139 @@
+.figure {
+  margin: 0;
+}
+
+/* Six columns don't fit a phone; the table scrolls rather than squashing. */
+.scroller {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.table {
+  width: 100%;
+  /* Below this the cells are too narrow for a name like DesignMyNight. */
+  min-width: 920px;
+  border-collapse: separate;
+  border-spacing: 4px;
+  table-layout: fixed;
+  font-size: 13px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.corner {
+  width: 150px;
+  vertical-align: bottom;
+  color: var(--color-muted-gray);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.axisTerms,
+.axisRobots {
+  display: block;
+}
+
+.axisTerms {
+  text-align: right;
+}
+
+.columnHeading {
+  vertical-align: bottom;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  padding: 0 6px 6px;
+  line-height: 1.3;
+}
+
+.rowHeading {
+  /* Stays in view while the cells scroll past on a narrow screen. */
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--color-midnight-navy);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  padding-right: 8px;
+  line-height: 1.3;
+}
+
+.cell {
+  vertical-align: top;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  height: 100px;
+}
+
+.clash {
+  border: 2px dashed rgba(var(--color-neon-pink-rgb), 0.45);
+}
+
+.clashFilled {
+  border-color: var(--color-neon-pink);
+  background-color: rgba(var(--color-neon-pink-rgb), 0.16);
+}
+
+.count {
+  display: block;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white);
+  margin-bottom: 8px;
+}
+
+.names {
+  overflow-wrap: anywhere;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.45;
+}
+
+.more {
+  color: var(--color-muted-gray);
+}
+
+.empty {
+  color: var(--color-muted-gray);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.legendSwatch {
+  flex: none;
+  width: 18px;
+  height: 14px;
+  border: 2px dashed var(--color-neon-pink);
+  border-radius: 3px;
+}
+
+.scrollHint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+@media (min-width: 1000px) {
+  .scrollHint {
+    display: none;
+  }
+}

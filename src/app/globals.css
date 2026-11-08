@@ -12,6 +12,8 @@
   --color-neon-pink: #f12869;
   --color-purple-accent: #643296;
   --color-white: #ffffff;
+  /* Status only, never decoration: a day with a release on /datasets/status */
+  --color-release-green: #2fbf71;
 
   /* RGB components for alpha variants */
   --color-black-rgb: 0, 0, 0;
@@ -29,6 +31,18 @@
      (POSTER_WIDTH, GAP) to reserve its height — change both together. */
   --film-grid-column: 200px;
   --film-grid-gap: 8px;
+
+  /* Page widths: the outer column a page's content sits in, gutter included.
+     Pick by what the page mostly holds — see "Page Widths" in CLAUDE.md. Media
+     queries can't read these, so a breakpoint tied to one says so beside it. */
+  --page-prose: 800px; /* reading pages, as a single column */
+  --page-default: 1000px; /* list and detail pages */
+  --page-wide: 1200px; /* poster rows and discovery, and the footer */
+  --page-film: 1400px; /* the film page's poster-beside-details hero */
+
+  /* Measures inside a page, content only (add any gutter on top). */
+  --measure-blurb: 640px; /* hero taglines and blurbs */
+  --measure-notice: 700px; /* notices and offers under the search controls */
 }
 
 html,

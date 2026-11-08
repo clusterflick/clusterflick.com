@@ -8,6 +8,7 @@ import EmptyState from "@/components/empty-state";
 import { getStaticData } from "@/utils/get-static-data";
 import {
   buildUpdates,
+  getDayFilms,
   getUpdateDayPath,
   groupUpdatesByDay,
   readDiffBlobs,
@@ -18,6 +19,8 @@ import {
   formatDateLong,
 } from "@/utils/format-date";
 import ReleaseSection from "./release-section";
+import WatchlistHighlights from "./watchlist-highlights";
+import DayStats from "./day-stats";
 import styles from "./updates.module.css";
 
 export const metadata: Metadata = {
@@ -106,11 +109,24 @@ export default async function UpdatesPage() {
         />
       ) : (
         <>
-          <ol className={styles.timeline}>
-            {latest.releases.map((release) => (
-              <ReleaseSection key={release.tag} release={release} />
-            ))}
-          </ol>
+          <section>
+            {/* Outlined as the runs' headings used to be. The day's own page
+                has its date as the pink page title instead. */}
+            <OutlineHeading as="h2" color="blue" className={styles.dayHeading}>
+              {formatDateLong(dateStringToLondonTimestamp(latest.date))}
+            </OutlineHeading>
+            <DayStats day={latest} />
+            <WatchlistHighlights films={getDayFilms(latest)} headingLevel={3} />
+            <ol className={styles.timeline}>
+              {latest.releases.map((release) => (
+                <ReleaseSection
+                  key={release.tag}
+                  release={release}
+                  headingLevel={3}
+                />
+              ))}
+            </ol>
+          </section>
 
           {archiveItems.length > 0 && (
             <section className={styles.archive}>

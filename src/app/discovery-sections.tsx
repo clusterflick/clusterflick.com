@@ -45,5 +45,9 @@ export default function DiscoverySections({
     [ready, movies, metaData],
   );
 
-  return rows ? <DiscoveryRowsView rows={rows} /> : <>{fallback}</>;
+  return rows ? (
+    <DiscoveryRowsView rows={rows} venues={metaData?.venues} />
+  ) : (
+    <>{fallback}</>
+  );
 }

@@ -17,11 +17,11 @@ import {
   ACCESSIBILITY_EMOJIS,
 } from "@/utils/accessibility-labels";
 import styles from "./page.module.css";
+import { VENUE_COUNT } from "@/utils/venue-count";
 
 export const metadata: Metadata = {
   title: "Accessible Cinema",
-  description:
-    "Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly and subtitled showings at 450+ venues.",
+  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly, dog friendly and subtitled showings at ${VENUE_COUNT} venues.`,
   alternates: {
     canonical: "/accessibility",
   },
@@ -44,6 +44,11 @@ const FEATURE_CONFIG: Record<
     description:
       "Screenings designed to welcome parents or carers with babies and young children. Typically includes lower volume, lights slightly raised, and pram parking. Also covers kids club and family programming.",
     shortDescription: "For parents and carers with young children",
+  },
+  [AccessibilityFeature.DogFriendly]: {
+    description:
+      "Screenings where you are welcome to bring your dog. You don't need one to go — everyone is welcome — and some venues lower the sound for the dogs' sake. Worth knowing, too, if you'd rather avoid dogs.",
+    shortDescription: "Bring your dog along",
   },
   [AccessibilityFeature.HardOfHearing]: {
     description:
@@ -209,8 +214,7 @@ export default async function AccessibilityPage() {
   const faqs = [
     {
       question: "What accessibility features can I find screenings for?",
-      answer:
-        "Audio described, captioned (hard of hearing), relaxed, baby friendly and subtitled screenings, across 450+ London venues.",
+      answer: `Audio described, captioned (hard of hearing), relaxed, baby friendly, dog friendly and subtitled screenings, across ${VENUE_COUNT} London venues.`,
     },
     {
       question: "Where does the accessibility data come from?",
@@ -280,7 +284,7 @@ export default async function AccessibilityPage() {
           <strong>Cinema for everyone.</strong>
           <br />
           Find screenings with audio description, captions, relaxed
-          environments, and more across 450+ London venues.
+          environments, and more across {VENUE_COUNT} London venues.
         </p>
         <p className={styles.heroNote}>
           Our accessibility data is sourced directly from each venue and
@@ -499,7 +503,7 @@ export default async function AccessibilityPage() {
                 ) : (
                   <p className={styles.noScreenings}>
                     No {label.toLowerCase()} screenings are currently listed.
-                    Check back soon — data is refreshed daily.
+                    Check back soon — data is refreshed several times a day.
                   </p>
                 )}
               </section>

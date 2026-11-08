@@ -1,0 +1,79 @@
+.logo {
+  display: block;
+  overflow: visible;
+}
+
+/* Lengths in an SVG element's transform are viewBox units, so `--rise` (also
+   in viewBox units) moves a kernel from the mouth of the box to its place. */
+.kernel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 700ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  animation-delay: calc(250ms + var(--order) * 70ms);
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--rise)) scale(0.3);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The box gives a little as the first kernels leave it. */
+.box {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: puff 500ms ease-out 250ms both;
+}
+
+@keyframes puff {
+  0%,
+  100% {
+    transform: none;
+  }
+  35% {
+    transform: scale(1.03, 0.97);
+  }
+}
+
+/* A separate element from the pop, so moving the pointer away ends the hop
+   without replaying the pop. */
+.hop {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.logo:hover .hop {
+  animation: hop 520ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+  animation-delay: calc(var(--order) * 35ms);
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-28px) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(4px) scale(1.04, 0.96);
+  }
+}
+
+/* The global rule only shortens animations, and the stagger's delays would
+   still hold kernels in the box for a moment. At rest from the start. */
+@media (prefers-reduced-motion: reduce) {
+  .kernel,
+  .box,
+  .logo:hover .hop {
+    animation: none;
+  }
+}

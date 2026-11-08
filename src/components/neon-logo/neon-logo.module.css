@@ -1,0 +1,70 @@
+.sign {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* The bloom: the sign again, blurred past its tile's edge and screened over
+   it, so only its light adds anything. Contrast first, so the tile's navy is
+   pushed towards black before it is brightened: without it the whole tile
+   lifted to a dull blue and the strokes glowed less against it. Stronger
+   contrast keeps the tile darker still but dims the thin strokes once blurred. */
+.glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  filter: contrast(1.3) saturate(1.6) brightness(2.4) blur(8px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Lit by the card's link, which is the element that is hovered or focused. */
+a:hover .glow,
+a:focus-visible .glow,
+.lit .glow {
+  opacity: 1;
+}
+
+a:hover .glow,
+a:focus-visible .glow {
+  animation: flicker-on 0.55s steps(1, end);
+}
+
+@keyframes flicker-on {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  25% {
+    opacity: 0.1;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  55% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a:hover .glow,
+  a:focus-visible .glow {
+    animation: none;
+  }
+}

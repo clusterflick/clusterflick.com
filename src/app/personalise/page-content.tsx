@@ -46,7 +46,7 @@ import { getVenueUrl } from "@/utils/get-venue-url";
 import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { OPEN_FILTERS_HASH } from "@/hooks/use-open-filters-hash";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
-import { formatShowingTime, getDaysFromNow } from "@/utils/format-date";
+import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
 import { FILM_SEARCH_INPUT_ID } from "./film-search";
 import type { MoviePerformance } from "@/types";
@@ -205,22 +205,12 @@ function getSortTitle(title: string) {
     .replace(/[^a-z0-9]/g, "");
 }
 
-const dayFormatter = new Intl.DateTimeFormat("en-GB", {
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-  timeZone: "Europe/London",
-});
-
 /**
  * "Tomorrow, 20:30". A note is read to decide whether to book, so it names the
  * day plainly where it can. The venue goes on a line of its own.
  */
 function formatShowing(time: number) {
-  const days = getDaysFromNow(time, 1);
-  const day =
-    days === 0 ? "Today" : days === 1 ? "Tomorrow" : dayFormatter.format(time);
-  return `${day}, ${formatShowingTime(time)}`;
+  return `${formatRelativeDay(time, Date.now())}, ${formatShowingTime(time)}`;
 }
 
 /** PosterTileList's track minimum and gap. */

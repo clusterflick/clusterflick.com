@@ -94,15 +94,24 @@ test.describe("Films Grid (browse & filter)", () => {
     await filmsPage.screenshot("after-scroll-middle");
   });
 
-  test("search for first movie title shows exactly 1 match", async () => {
+  test("search for first movie title narrows the grid to that movie", async () => {
     const firstMovieTitle = await filmsPage.getFirstMovieTitle();
+    const firstMovieHref = await filmsPage.getFirstPosterHref();
+    const posterCountBefore = await filmsPage.countVisiblePosters();
     expect(firstMovieTitle).toBeTruthy();
+    expect(firstMovieHref).toBeTruthy();
 
     await filmsPage.searchForMovie(firstMovieTitle!);
 
+    // Not "exactly 1": search ignores punctuation and matches substrings, so a
+    // one-word title also finds every title containing that word ("#Cult"
+    // finds "Rio Forever Cult Lates"). The grid is in title order and this was
+    // its first film, so it stays first in any subset of it.
     await expect(async () => {
       const searchResultCount = await filmsPage.countVisiblePosters();
-      expect(searchResultCount).toBe(1);
+      expect(searchResultCount).toBeGreaterThanOrEqual(1);
+      expect(searchResultCount).toBeLessThan(posterCountBefore);
+      expect(await filmsPage.getFirstPosterHref()).toBe(firstMovieHref);
     }).toPass({ timeout: 5000 });
 
     await filmsPage.screenshot("after-search");
@@ -203,7 +212,10 @@ test.describe("Venue Pages", () => {
     await expect(page.locator("h1").first()).toContainText(
       "Every Cinema in London",
     );
-    await expect(page.getByText(/\d+ venues across London/)).toBeVisible();
+    // The count is in the intro under the map; the title has no subtitle.
+    await expect(
+      page.getByText(/Film screenings from \d+ venues across/),
+    ).toBeVisible();
 
     await venuesPage.screenshot("venues-list");
   });
@@ -249,6 +261,7 @@ test.describe("Venue Pages", () => {
 // A venue busy enough that any week of the year has something programmed, so
 // the test can assert on real events rather than an empty grid.
 const CALENDAR_VENUE_SLUG = "prince-charles-cinema";
+const CALENDAR_VENUE_ID = "princecharlescinema.com";
 
 test.describe("Venue Calendar Page", () => {
   let calendarPage: VenueCalendarPage;
@@ -257,6 +270,16 @@ test.describe("Venue Calendar Page", () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     calendarPage = new VenueCalendarPage(page);
     await calendarPage.goto(CALENDAR_VENUE_SLUG);
+  });
+
+  // The page reads the published feed itself — the same address a calendar
+  // app subscribes to (see CLAUDE.md, Published Data) — not a copy of it.
+  test("calendar loads the published feed", async ({ page }) => {
+    const feed = page.waitForResponse((response) =>
+      response.url().endsWith(`/datasets/calendars/${CALENDAR_VENUE_ID}.ics`),
+    );
+    await calendarPage.goto(CALENDAR_VENUE_SLUG);
+    expect((await feed).status()).toBe(200);
   });
 
   test("calendar renders showings from the ICS feed", async () => {
@@ -313,6 +336,148 @@ test.describe("Venue Calendar Page", () => {
   });
 });
 
+// The datasets licensed for reuse, hosted at fixed addresses (see CLAUDE.md,
+// Published Data). People link to these and fetch them on a schedule, so a
+// missing file or a cache rule that stopped matching breaks someone else's
+// site rather than ours.
+test.describe("Published Data", () => {
+  const PUBLISHED_PATHS = [
+    "/datasets/index.json",
+    "/datasets/latest.json",
+    "/datasets/schema.json",
+    `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+  ];
+
+  test("the index describes every venue, its files and the releases", async ({
+    request,
+  }) => {
+    const response = await request.get("/datasets/index.json");
+    expect(response.status()).toBe(200);
+    const index = await response.json();
+
+    expect(index.releases.data.tag).toBeTruthy();
+    expect(index.releases.calendar.tag).toBeTruthy();
+    expect(index.schema).toBe("/datasets/schema.json");
+    expect(index.venues[CALENDAR_VENUE_ID]).toMatchObject({
+      name: expect.any(String),
+      address: expect.any(String),
+      geo: { lat: expect.any(Number), lon: expect.any(Number) },
+      page: `https://clusterflick.com/venues/${CALENDAR_VENUE_SLUG}/`,
+      data: `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+      calendar: `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+    });
+  });
+
+  // Pollers read latest.json instead of the index, so the two must agree, and
+  // it must stay small: anything more belongs in the index.
+  test("latest.json carries the index's releases and nothing else", async ({
+    request,
+  }) => {
+    const [latest, index] = await Promise.all(
+      ["/datasets/latest.json", "/datasets/index.json"].map(async (path) => {
+        const response = await request.get(path);
+        expect(response.status(), path).toBe(200);
+        return response.json();
+      }),
+    );
+
+    expect(Object.keys(latest).sort()).toEqual(["generatedAt", "releases"]);
+    expect(latest).toEqual({
+      generatedAt: index.generatedAt,
+      releases: index.releases,
+    });
+  });
+
+  // The way in for an agent that looks for one (https://llmstxt.org), which
+  // should land on the datasets rather than scrape the pages.
+  test("llms.txt is served and points at the datasets", async ({ request }) => {
+    const response = await request.get("/llms.txt");
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("text/plain");
+
+    const text = await response.text();
+    expect(text).toMatch(/^# Clusterflick\n/);
+    expect(text).toContain("https://clusterflick.com/datasets/index.json");
+  });
+
+  test("the datasets page and its release history are served", async ({
+    page,
+  }) => {
+    await page.goto(`${SITE_URL}/datasets/`);
+    await expect(
+      page.getByRole("heading", { name: "Datasets", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("Last new data")).toBeVisible();
+
+    await page.goto(`${SITE_URL}/datasets/status/`);
+    await expect(
+      page.getByRole("heading", { name: "When releases land" }),
+    ).toBeVisible();
+  });
+
+  // The licence page used to document the datasets too, and people link to it
+  test("the data licence still links to the datasets", async ({ page }) => {
+    await page.goto(`${SITE_URL}/data-licence/`);
+    await expect(
+      page.getByRole("link", { name: "About the datasets" }),
+    ).toHaveAttribute("href", /\/datasets\/?$/);
+  });
+
+  test("the schema for the data files is served", async ({ request }) => {
+    const response = await request.get("/datasets/schema.json");
+    expect(response.status()).toBe(200);
+    expect((await response.json()).type).toBe("array");
+  });
+
+  test("a venue's data and calendar files are served", async ({ request }) => {
+    const data = await request.get(
+      `/datasets/venues/${CALENDAR_VENUE_ID}.json`,
+    );
+    expect(data.status()).toBe(200);
+    expect(Array.isArray(await data.json())).toBe(true);
+
+    const calendar = await request.get(
+      `/datasets/calendars/${CALENDAR_VENUE_ID}.ics`,
+    );
+    expect(calendar.status()).toBe(200);
+    expect(await calendar.text()).toMatch(/^BEGIN:VCALENDAR/);
+  });
+
+  // A browser app should be able to read them directly.
+  test("published files allow cross-origin reads", async ({ request }) => {
+    for (const path of PUBLISHED_PATHS) {
+      const response = await request.get(path);
+      expect(response.headers()["access-control-allow-origin"], path).toBe("*");
+    }
+  });
+
+  // The zone's JSON rule caches `.json` for a year, and nothing caches `.ics`
+  // at all. These fixed names need the `/datasets/` rule instead: cached at
+  // the edge, and never held by a browser for more than an hour.
+  // Only the live site sits behind Cloudflare, so a local run skips this.
+  test("published files are cached briefly at the edge", async ({
+    request,
+  }) => {
+    test.skip(
+      new URL(SITE_URL).hostname !== "clusterflick.com",
+      "Cache headers are set by Cloudflare in front of the live site",
+    );
+
+    for (const path of PUBLISHED_PATHS) {
+      const response = await request.get(path);
+      const headers = response.headers();
+      const maxAge = Number(
+        /max-age=(\d+)/.exec(headers["cache-control"] ?? "")?.[1],
+      );
+      expect(maxAge, `${path} cache-control`).toBeLessThanOrEqual(3600);
+      expect(["DYNAMIC", "BYPASS"], `${path} cf-cache-status`).not.toContain(
+        headers["cf-cache-status"],
+      );
+    }
+  });
+});
+
 let londonCinemasPage: LondonCinemasPage;
 
 test.describe("London Cinemas Pages", () => {
@@ -327,7 +492,7 @@ test.describe("London Cinemas Pages", () => {
   }) => {
     await expect(page.locator("h1").first()).toContainText("London Cinemas");
     await expect(
-      page.getByText(/Find screening venues across \d+ London boroughs/),
+      page.getByText(/What's on this week across \d+ London boroughs/),
     ).toBeVisible();
 
     await londonCinemasPage.screenshot("london-cinemas-list");

@@ -19,7 +19,13 @@ interface MovieFilterSectionProps {
   vocabulary: MovieOption[];
   /** Current selection; `null` or empty means no filter. */
   selected: string[] | null;
+  /**
+   * Every film on the reader's watchlist, showing or not. Empty while signed
+   * out or before the lists load, which hides the watchlist chip.
+   */
+  watchlistIds: string[];
   toggleMovie: (movieId: string) => void;
+  selectMovies: (movieIds: string[]) => void;
   clearMovies: () => void;
 }
 
@@ -32,11 +38,19 @@ interface MovieFilterSectionProps {
  * filter state, since a film off today can be back tomorrow, and are
  * acknowledged in one line so a selection of nothing-showing doesn't read as
  * an empty filter.
+ *
+ * A signed-in reader gets a "My Watchlist" chip above the search, which
+ * selects the whole list as "Explore watchlist" on /personalise does — but
+ * from here, so it combines with whatever else is set (My Venues, say)
+ * without a round trip. It reads as checked while the selection is exactly
+ * the watchlist.
  */
 export default function MovieFilterSection({
   vocabulary,
   selected,
+  watchlistIds,
   toggleMovie,
+  selectMovies,
   clearMovies,
 }: MovieFilterSectionProps) {
   const [showAll, setShowAll] = useState(false);
@@ -45,6 +59,15 @@ export default function MovieFilterSection({
   const chosenOptions = vocabulary.filter((option) => chosenSet.has(option.id));
   const notShowing = chosenSet.size - chosenOptions.length;
   const collapsed = !showAll && chosenOptions.length > MAX_VISIBLE_CHIPS;
+  const watchlistSelected =
+    watchlistIds.length > 0 &&
+    chosenSet.size === watchlistIds.length &&
+    watchlistIds.every((id) => chosenSet.has(id));
+  // The count is what the reader gets: the films on the list that are showing.
+  const watchlistSet = new Set(watchlistIds);
+  const watchlistShowing = vocabulary.filter((option) =>
+    watchlistSet.has(option.id),
+  ).length;
 
   if (vocabulary.length === 0) return null;
 
@@ -100,6 +123,25 @@ export default function MovieFilterSection({
           {notShowing} {notShowing === 1 ? "film" : "films"} not currently
           showing.
         </p>
+      )}
+
+      {watchlistIds.length > 0 && (
+        <div
+          className={styles.chipGroup}
+          role="group"
+          aria-label="Film quick filters"
+        >
+          <Chip
+            type="checkbox"
+            name="movies-watchlist"
+            label="My Watchlist"
+            count={watchlistShowing}
+            checked={watchlistSelected}
+            onChange={(checked) =>
+              checked ? selectMovies(watchlistIds) : clearMovies()
+            }
+          />
+        </div>
       )}
 
       <EntityQuickAdd

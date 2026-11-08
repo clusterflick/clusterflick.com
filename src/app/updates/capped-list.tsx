@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import clsx from "clsx";
 import Button from "@/components/button";
 import { PosterTileList } from "@/components/poster-tile";
 import styles from "./updates.module.css";
@@ -15,9 +16,20 @@ import styles from "./updates.module.css";
  * first two rows of them — while the entries themselves stay in the payload, so
  * revealing the rest needs no fetch and loses nothing.
  *
+ * A grid of tiles opens on fewer on a phone (`PHONE_TILES`): the twelve that
+ * make two rows across a desktop are six rows of two there, which put a whole
+ * screen of posters above the next run. The phone cap is CSS rather than a
+ * smaller slice, since the static HTML can't know the reader's width; the
+ * tiles it hides are already in the DOM, and its button only shows on a
+ * phone when the desktop cap leaves nothing hidden.
+ *
  * As with the venue lists, there is no way back: once a reader has asked to see
  * everything, hiding it again only takes away what they asked for.
  */
+/** Tiles shown on a phone before the button. Matches `.phoneCapped` in
+ *  updates.module.css, which can't read it: `nth-child` takes no variables. */
+const PHONE_TILES = 6;
+
 export default function CappedList({
   items,
   initialCount,
@@ -39,19 +51,30 @@ export default function CappedList({
   // toggle only appears once it hides at least two.
   const isCollapsed = !showAll && items.length > initialCount + 1;
   const visible = isCollapsed ? items.slice(0, initialCount) : items;
+  const isPhoneCollapsed =
+    layout === "tiles" && !showAll && items.length > PHONE_TILES + 1;
 
   return (
     <>
       {layout === "tiles" ? (
-        <PosterTileList>{visible}</PosterTileList>
+        <PosterTileList
+          className={clsx(isPhoneCollapsed && styles.phoneCapped)}
+        >
+          {visible}
+        </PosterTileList>
       ) : (
         <ul className={className}>{visible}</ul>
       )}
-      {isCollapsed && (
+      {(isCollapsed || isPhoneCollapsed) && (
         // Outlined rather than a link: it sits between a poster grid and a
         // section of blue title links, where a bare link read as one more
         // entry in the list rather than the way to open the rest of it.
-        <div className={styles.showMore}>
+        <div
+          className={clsx(
+            styles.showMore,
+            !isCollapsed && styles.showMorePhoneOnly,
+          )}
+        >
           <Button variant="secondary" onClick={() => setShowAll(true)}>
             {showAllLabel}
           </Button>

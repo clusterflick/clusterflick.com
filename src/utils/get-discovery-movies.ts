@@ -6,6 +6,7 @@ import {
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
 } from "@/lib/filters/modules/categories";
 import {
+  addLondonDays,
   formatDayAndDate,
   getLondonMidnightTimestamp,
   MS_PER_DAY,
@@ -86,6 +87,10 @@ export interface ScoredMovie {
   movie: Movie;
   performanceCount: number;
   subtitle?: string;
+  /** A label drawn on the poster, for what a glance has to catch. */
+  badge?: { label: string; color: "yellow" };
+  /** The occasion itself, for a row that leads with it rather than the film. */
+  occasion?: { label: string; time: number; venueId: string };
 }
 
 export interface NewAdditions {
@@ -124,7 +129,7 @@ export function getDiscoveryWindow(
   days = 7,
   start: number = getLondonMidnightTimestamp(),
 ): DiscoveryWindow {
-  return { rangeStart: start, rangeEnd: start + (days + 1) * MS_PER_DAY };
+  return { rangeStart: start, rangeEnd: addLondonDays(start, days + 1) };
 }
 
 function upcomingPerformances(movie: Movie, window: DiscoveryWindow) {
@@ -415,6 +420,12 @@ export function getLastChanceMovies(
       movie,
       performanceCount,
       subtitle: formatLastShowing(finalTime),
+      // On the poster itself: the subtitle only shows on hover on desktop,
+      // and the date is the point of the row.
+      badge: {
+        label: `Ends ${formatDayAndDate(finalTime)}`,
+        color: "yellow" as const,
+      },
     }));
 }
 
@@ -533,6 +544,11 @@ export function getHighlyRated(
 // pointing at.
 const COLLECTION_MIN_SHOWING = 2;
 const COLLECTION_LIMIT = 12;
+/**
+ * The home page's "Sagas & Series" needs at least this many collections to be
+ * shown at all: a row holding one collection reads as broken, not as a row.
+ */
+export const COLLECTION_ROW_MIN = 2;
 
 /**
  * Collections with several of their films showing in the window — franchises
@@ -610,10 +626,11 @@ export function getOccasionMovies(
     { venueIds },
   )
     .slice(0, limit)
-    .map(({ movie, performance, label, filmPerformanceCount }) => ({
+    .map(({ movie, performance, venueId, label, filmPerformanceCount }) => ({
       movie,
       performanceCount: filmPerformanceCount,
       subtitle: formatOccasion({ label, performance }),
+      occasion: { label, time: performance.time, venueId },
     }));
 }
 
@@ -667,8 +684,16 @@ export function computeDiscoveryRows(
       movies,
       getDiscoveryWindow(OCCASIONS_WINDOW_DAYS, window.rangeStart),
     ),
-    collections: getCollectionRow(movies, options.collections ?? {}, window),
+    collections: atLeast(
+      getCollectionRow(movies, options.collections ?? {}, window),
+      COLLECTION_ROW_MIN,
+    ),
   };
+}
+
+/** The list, or nothing when it is too short to stand as a row. */
+function atLeast<T>(items: T[], min: number): T[] {
+  return items.length >= min ? items : [];
 }
 
 /** The discovery rows scoped to the venues near a reader (the near-me page). */

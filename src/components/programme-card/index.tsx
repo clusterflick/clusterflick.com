@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import Image from "next/image";
 import NavCard from "@/components/nav-card";
 import MoviePoster from "@/components/movie-poster";
+import NeonLogo from "@/components/neon-logo";
 import styles from "./programme-card.module.css";
 
 export interface ProgrammeCardPoster {
@@ -20,6 +21,9 @@ export interface ProgrammeCardProps {
   next?: { title: string; when: string } | null;
   /** Bottom meta row — caller provides domain-specific content (dates, film count, etc.) */
   meta: ReactNode;
+  /** The logo is a neon sign on its own dark tile (the genre icons), drawn
+   *  edge to edge and lit up on hover. See `NeonLogo`. */
+  neonLogo?: boolean;
 }
 
 /**
@@ -45,23 +49,28 @@ export default function ProgrammeCard({
   posters,
   next,
   meta,
+  neonLogo = false,
 }: ProgrammeCardProps) {
   return (
     <NavCard href={href} className={styles.card}>
       <div className={styles.header}>
-        <div className={styles.logo}>
-          {imagePath ? (
-            <Image
-              src={imagePath}
-              alt=""
-              width={56}
-              height={56}
-              className={styles.logoImage}
-            />
-          ) : (
-            <div className={styles.logoPlaceholder} />
-          )}
-        </div>
+        {imagePath && neonLogo ? (
+          <NeonLogo src={imagePath} size={56} />
+        ) : (
+          <div className={styles.logo}>
+            {imagePath ? (
+              <Image
+                src={imagePath}
+                alt=""
+                width={56}
+                height={56}
+                className={styles.logoImage}
+              />
+            ) : (
+              <div className={styles.logoPlaceholder} />
+            )}
+          </div>
+        )}
         <div className={styles.name} data-testid="programme-card-name">
           {name}
         </div>

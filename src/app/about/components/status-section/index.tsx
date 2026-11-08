@@ -1,153 +1,121 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useCinemaData } from "@/state/cinema-data-context";
+import clsx from "clsx";
+import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
 import { formatDatePart, formatTimePart } from "@/utils/format-date";
-import LoadingIndicator from "@/components/loading-indicator";
+import {
+  formatHours,
+  getHoursSince,
+  STALE_AFTER_HOURS,
+} from "@/utils/release-status";
+import ReleaseDot from "@/components/release-dot";
 import SourcesPopup from "./sources-popup";
+import type { StatusStats } from "./get-status-stats";
 import styles from "./status-section.module.css";
 
 // Shows every event on the films page: all categories, all dates, all venues.
 const ALL_EVENTS_HREF = "/catalogue?base=all";
 
-export default function StatusSection() {
-  const { metaData, movies, isLoading, isEmpty, getData } = useCinemaData();
+interface StatusSectionProps {
+  /** Counted at build time by `getStatusStats`. */
+  stats: StatusStats;
+}
+
+/**
+ * The release's figures. Client-side only for the sources popup; the numbers
+ * arrive as props, so the static HTML carries them.
+ */
+export default function StatusSection({ stats }: StatusSectionProps) {
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
-
-  // Fetch data once on mount - getData is stable but changes identity on re-render,
-  // and we intentionally only want this to run once
-  useEffect(() => {
-    getData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Most venues we track are listing something at any given time, but not all —
-  // some are seasonal, some go quiet between programmes. Showing the active
-  // count against the total says both how much is on and how much we cover.
-  const venueCounts = useMemo(() => {
-    if (!metaData) return { active: null, total: null };
-
-    const total = Object.keys(metaData.venues).length;
-    if (isLoading || isEmpty) return { active: null, total };
-
-    const active = new Set<string>();
-    for (const movie of Object.values(movies)) {
-      for (const showing of Object.values(movie.showings)) {
-        if (showing.venueId in metaData.venues) {
-          active.add(showing.venueId);
-        }
-      }
-    }
-
-    return { active: active.size, total };
-  }, [metaData, movies, isLoading, isEmpty]);
-
-  const externalSources = useMemo(() => {
-    if (isLoading || isEmpty || !metaData) return null;
-
-    const venueIds = Object.keys(metaData.venues);
-    const showingCounts = new Map<string, number>();
-
-    for (const movie of Object.values(movies)) {
-      for (const showingId of Object.keys(movie.showings)) {
-        // Showings scraped from venue sites have IDs starting with {venueId}-
-        if (venueIds.some((id) => showingId.startsWith(`${id}-`))) {
-          continue;
-        }
-
-        // Extract the source domain from external showing IDs
-        // Format: {sourceDomain}-{eventSpecificId}. The match is lazy because
-        // the event part can itself hold a domain — BFI festival IDs end in
-        // the host venue's ("bfi.org.uk-bfi-festivals-<uuid>-curzon.com-…"),
-        // and a greedy match counted each of those as a source of its own.
-        const match = showingId.match(/^(.+?\.[a-z]{2,})-/);
-        if (match) {
-          const source = match[1];
-          showingCounts.set(source, (showingCounts.get(source) ?? 0) + 1);
-        }
-      }
-    }
-
-    return [...showingCounts.entries()]
-      .map(([source, count]) => ({ source, count }))
-      .sort((a, b) => a.source.localeCompare(b.source));
-  }, [metaData, movies, isLoading, isEmpty]);
-
-  const eventCount = useMemo(
-    () => (isLoading || isEmpty ? null : Object.keys(movies).length),
-    [movies, isLoading, isEmpty],
+  // The age is worked out on the reader's clock: counted from the build, it
+  // would say "2 hours ago" for as long as the page went unrebuilt. Until
+  // then the static HTML gives only the date, which is true at any time.
+  const now = useNow(stats.generatedAt);
+  const isOnReaderClock = useIsOnReaderClock();
+  const hours = getHoursSince(stats.generatedAt, now);
+  const isStale = isOnReaderClock && hours >= STALE_AFTER_HOURS;
+  const when = (
+    <>
+      <strong className="nowrap">{formatDatePart(stats.generatedAt)}</strong>{" "}
+      <strong className="nowrap">at {formatTimePart(stats.generatedAt)}</strong>
+    </>
   );
 
-  const showingCount = useMemo(() => {
-    if (isLoading || isEmpty) return null;
-    return Object.values(movies).reduce(
-      (total, movie) => total + movie.performances.length,
-      0,
-    );
-  }, [movies, isLoading, isEmpty]);
-
-  const stats: Array<{
+  const items: Array<{
     label: string;
-    value: number | null;
+    value: number;
     /** Renders as "value of total", for a value that is part of a larger set */
-    total?: number | null;
+    total?: number;
     href?: string;
     onClick?: () => void;
   }> = [
     {
-      label: "Venues",
-      value: venueCounts.active,
-      total: venueCounts.total,
+      // "294 of 511 venues" alone read as most of the site being broken; the
+      // label says what the first figure counts.
+      label: "Venues Listing",
+      value: stats.venues.active,
+      total: stats.venues.total,
       href: "/venues",
     },
     {
       label: "Event Sources",
-      value: externalSources ? externalSources.length : null,
-      onClick: externalSources ? () => setIsSourcesOpen(true) : undefined,
+      value: stats.sources.length,
+      onClick: () => setIsSourcesOpen(true),
     },
     {
       label: "Events",
-      value: eventCount,
+      value: stats.events,
       href: ALL_EVENTS_HREF,
     },
     {
       label: "Showings",
-      value: showingCount,
+      value: stats.showings,
+      // Every showing, laid out by day: what this figure counts.
+      href: "/planner?base=all",
     },
   ];
 
   return (
     <div className={styles.container}>
-      {metaData && (
-        <p className={styles.lastUpdated}>
-          Data last refreshed on{" "}
-          <strong className="nowrap">
-            {formatDatePart(metaData.generatedAt)}
-          </strong>{" "}
-          <strong className="nowrap">
-            at {formatTimePart(metaData.generatedAt)}
-          </strong>
-        </p>
-      )}
+      <p
+        className={clsx(styles.lastUpdated, isStale && styles.stale)}
+        role={isStale ? "alert" : undefined}
+      >
+        <ReleaseDot stale={isStale} />
+        {isStale ? (
+          <>
+            No new data for <strong>{formatHours(hours)}</strong>, since {when}.
+          </>
+        ) : isOnReaderClock ? (
+          <>
+            Data last refreshed <strong>{formatHours(hours, true)}</strong>, on{" "}
+            {when}.
+          </>
+        ) : (
+          <>Data last refreshed on {when}.</>
+        )}{" "}
+        <Link href="/datasets/status" className="nowrap">
+          Release history
+        </Link>
+      </p>
       <div className={styles.statsGrid}>
-        {stats.map((stat) => {
-          const content =
-            stat.value === null ? (
-              <LoadingIndicator size="sm" />
-            ) : (
-              <>
-                <span className={styles.statValue}>
-                  {stat.value.toLocaleString("en-GB")}
-                  {stat.total != null && (
-                    <span className={styles.statSuffix}>
-                      {" "}
-                      of {stat.total.toLocaleString("en-GB")}
-                    </span>
-                  )}
-                </span>
-                <span className={styles.statLabel}>{stat.label}</span>
-              </>
-            );
+        {items.map((stat) => {
+          const content = (
+            <>
+              <span className={styles.statValue}>
+                {stat.value.toLocaleString("en-GB")}
+                {stat.total != null && (
+                  <span className={styles.statSuffix}>
+                    {" "}
+                    of {stat.total.toLocaleString("en-GB")}
+                  </span>
+                )}
+              </span>
+              <span className={styles.statLabel}>{stat.label}</span>
+            </>
+          );
 
           if (stat.href) {
             return (
@@ -184,7 +152,7 @@ export default function StatusSection() {
       <SourcesPopup
         isOpen={isSourcesOpen}
         onClose={() => setIsSourcesOpen(false)}
-        sources={externalSources ?? []}
+        sources={stats.sources}
       />
     </div>
   );

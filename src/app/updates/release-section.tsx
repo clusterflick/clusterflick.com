@@ -1,22 +1,25 @@
 import Link from "next/link";
-import OutlineHeading from "@/components/outline-heading";
 import PosterTile from "@/components/poster-tile";
 import { pluralise, summariseRelease } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
-import { formatDateLong, formatShowingTime } from "@/utils/format-date";
+import { formatShowingTime } from "@/utils/format-date";
 import VenueList from "./venue-list";
 import CappedList from "./capped-list";
+import WatchlistTag from "./watchlist-tag";
 import styles from "./updates.module.css";
 
 /**
  * How much of a run opens on the page before the reader asks for the rest.
  *
  * A season announcement can add over a hundred films in one run, which is worth
- * a page of its own only if the reader wants it — four rows of posters, or a
- * screenful of showings, is enough to see what kind of run this was.
+ * a page of its own only if the reader wants it. Two rows of posters on desktop
+ * is enough to see what kind of run this was, and a busy day carries two or
+ * three runs, each opening this much. Showings are sorted by how many were
+ * added, so the ten shown are the big rollouts and what waits behind the
+ * button is the tail of single showings.
  */
-const INITIAL_FILMS = 24;
-const INITIAL_SHOWINGS = 30;
+const INITIAL_FILMS = 12;
+const INITIAL_SHOWINGS = 10;
 
 /**
  * Venues collapse to a count past the first so a season announcement of thirty
@@ -35,6 +38,7 @@ function FilmTile({ film }: { film: UpdateFilm }) {
       includedMovies={film.includedMovies}
       href={film.href ?? undefined}
       details={[venueLabel, pluralise(film.performanceCount, "showing")]}
+      movieId={film.movieId ?? undefined}
     />
   );
 }
@@ -45,37 +49,51 @@ function FilmTile({ film }: { film: UpdateFilm }) {
  * Shared by the index — which shows the latest day — and the dated pages, so a
  * run reads identically wherever it is met, and the anchor the feed links to
  * resolves on whichever page happens to be carrying it.
+ *
+ * Headed by the time alone: the day is already the heading above it, on both
+ * pages, and repeating the full date in large outlined type on every run was
+ * most of what made a busy day feel heavy. `headingLevel` is 3 on the index,
+ * where the day is an h2 under the page's h1, and 2 on a day's own page.
  */
 export default function ReleaseSection({
   release,
+  headingLevel = 2,
 }: {
   release: UpdateRelease;
+  headingLevel?: 2 | 3;
 }) {
   const published = new Date(release.asOf);
+  const Heading = `h${headingLevel}` as const;
+  const SectionHeading = `h${headingLevel + 1}` as "h3" | "h4";
 
   return (
     <li id={release.tag} className={styles.release}>
-      <OutlineHeading as="h2" color="blue" className={styles.releaseHeading}>
-        {`${formatDateLong(published)} @ ${formatShowingTime(published.getTime())}`}
-      </OutlineHeading>
-      <p className={styles.releaseSummary}>{summariseRelease(release)}</p>
+      <div className={styles.releaseHeader}>
+        <Heading className={styles.releaseHeading}>
+          <span className={styles.visuallyHidden}>Updated at </span>
+          <time dateTime={release.asOf}>
+            {formatShowingTime(published.getTime())}
+          </time>
+        </Heading>
+        <p className={styles.releaseSummary}>{summariseRelease(release)}</p>
+      </div>
 
       {release.newVenues.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>
+          <SectionHeading className={styles.sectionHeading}>
             {release.newVenues.length === 1 ? "New venue" : "New venues"}
-          </h3>
+          </SectionHeading>
           <p className={styles.prose}>
-            <VenueList venues={release.newVenues} />
+            <VenueList venues={release.newVenues} condense={false} />
           </p>
         </section>
       )}
 
       {release.newFilms.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>
+          <SectionHeading className={styles.sectionHeading}>
             {pluralise(release.newFilms.length, "new film")}
-          </h3>
+          </SectionHeading>
           <CappedList
             layout="tiles"
             initialCount={INITIAL_FILMS}
@@ -89,7 +107,9 @@ export default function ReleaseSection({
 
       {release.moreShowings.length > 0 && (
         <section className={styles.section}>
-          <h3 className={styles.sectionHeading}>More showings</h3>
+          <SectionHeading className={styles.sectionHeading}>
+            More showings
+          </SectionHeading>
           <CappedList
             className={styles.showings}
             initialCount={INITIAL_SHOWINGS}
@@ -101,6 +121,7 @@ export default function ReleaseSection({
                 ) : (
                   film.title
                 )}
+                {film.movieId && <WatchlistTag movieId={film.movieId} />}
                 {" — "}
                 {pluralise(film.performanceCount, "new showing")}
                 {" at "}

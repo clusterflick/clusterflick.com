@@ -11,7 +11,7 @@
 .tagline {
   font-size: 20px;
   line-height: 1.6;
-  max-width: 600px;
+  max-width: var(--measure-blurb);
 }
 
 .heroNote {
@@ -24,7 +24,7 @@
 
 /* Content wrapper */
 .content {
-  max-width: 1000px;
+  max-width: var(--page-default);
   margin: 0 auto;
   padding: 0 20px 60px;
   position: relative;
@@ -45,7 +45,7 @@
 .overviewIntro {
   font-size: 18px;
   line-height: 1.5;
-  max-width: 600px;
+  max-width: var(--measure-blurb);
   margin: 0 auto 40px;
   color: var(--color-light-gray);
 }

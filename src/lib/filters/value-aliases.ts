@@ -23,6 +23,9 @@ export const ACCESSIBILITY_ALIASES: Record<AccessibilityFeature, string[]> = {
     "parent and child",
     "carer and baby",
   ],
+  // "dog" and "dogs" already reach the label: it's a run of its words, and
+  // endings fold
+  [AccessibilityFeature.DogFriendly]: ["dogs welcome", "bring your dog"],
   [AccessibilityFeature.HardOfHearing]: ["HOH"],
   [AccessibilityFeature.Relaxed]: [
     "relaxed screening",

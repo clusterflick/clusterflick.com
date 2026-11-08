@@ -10,12 +10,131 @@
   white-space: nowrap;
 }
 
+/* ─── The day: its date and its figures ─── */
+
+/* The latest day on the index, under the page's h1. A day's own page has the
+   date as its h1 instead. */
+.dayHeading {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+/* ─── The reader's watchlist, signed in ─── */
+
+/* Pink, the site's accent for what is about the reader, and boxed so it reads
+   as a note to them rather than one more section of the day's changes. */
+.watchlist {
+  margin-top: 32px;
+  padding: 20px 20px 22px;
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 10px;
+  background: rgba(var(--color-neon-pink-rgb), 0.07);
+}
+
+.watchlistHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 18px;
+}
+
+.watchlistTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.watchlistEyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-neon-pink);
+}
+
+.watchlistHeading {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-white);
+}
+
+.watchlistFilms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px 20px;
+}
+
+.watchlistFilm {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.watchlistPoster {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+.watchlistText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.watchlistTitle {
+  font-weight: 600;
+}
+
+.watchlistVenue {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.watchlistMore {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* After a title in More showings: the poster markers' yellow and icon, so a
+   watchlist film reads the same here as on the posters above. */
+.watchlistTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid rgba(var(--color-buttery-yellow-rgb), 0.5);
+  border-radius: 100px;
+  background: rgba(var(--color-buttery-yellow-rgb), 0.08);
+  color: var(--color-buttery-yellow);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: 2px;
+}
+
 /* ─── Timeline: one entry per pipeline run ─── */
 
 .timeline {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 40px 0 0;
   display: flex;
   flex-direction: column;
 }
@@ -27,21 +146,49 @@
 
 .release + .release {
   margin-top: 48px;
-  padding-top: 48px;
+}
+
+/* The run's time and what it brought, on one line where they fit. The time is
+   the heading but a small one: the day above already carries the date, and a
+   full outlined date per run was the loudest thing on a busy day. */
+.releaseHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 2px;
+  margin: 0 0 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
 }
 
 .releaseHeading {
-  font-size: 26px;
-  margin-bottom: 4px;
-  display: block;
+  margin: 0;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-electric-blue);
 }
 
 .releaseSummary {
-  margin: 0 0 24px;
-  padding-bottom: 10px;
+  margin: 0;
   font-size: 14px;
   opacity: 0.6;
-  border-bottom: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ─── Sections within a run ─── */
@@ -64,6 +211,13 @@
   line-height: 1.5;
 }
 
+/* Links in running text drop the global bold: colour and underline already
+   mark them, and a sentence of bold names (a run's new venues, a rollout's
+   venue list below) read as a wall. */
+.prose a {
+  font-weight: normal;
+}
+
 /* ─── More showings: text only, already dense ─── */
 
 .showings {
@@ -80,6 +234,13 @@
   line-height: 1.5;
   padding-left: 16px;
   position: relative;
+}
+
+/* The film leads its line, so it keeps a little weight over the venues after
+   it, but not the global bold: ten bold titles stacked was the heaviest part
+   of the section. */
+.showing > a {
+  font-weight: 500;
 }
 
 /* Venue names sit in white with the underline left blue. A run can name a dozen
@@ -144,6 +305,21 @@
   margin-top: 28px;
 }
 
+/* A phone's tile cap (`PHONE_TILES` in capped-list.tsx): two or three
+   columns below 600px, so six tiles is two or three rows rather than the six
+   rows the desktop cap of twelve made. */
+@media (max-width: 599px) {
+  .phoneCapped > li:nth-child(n + 7) {
+    display: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .showMorePhoneOnly {
+    display: none;
+  }
+}
+
 /* ─── Archive of earlier days ─── */
 
 .archive {
@@ -197,7 +373,7 @@
 }
 
 @media (min-width: 700px) {
-  .releaseHeading {
+  .dayHeading {
     font-size: 32px;
   }
 

@@ -9,19 +9,34 @@ import type {
 } from "@/types";
 import { getMovieUrl, SHOW_ALL_HASH } from "./get-movie-url";
 import { getVenueUrl } from "./get-venue-url";
+import { getVenueGroupUrl } from "./get-venue-group-url";
+import { VENUE_GROUPS } from "@/data/venue-groups";
 import { timestampToLondonDateString } from "./format-date";
+
+/** The cinema chain a venue belongs to, when the chain has a page here. */
+export type UpdateVenueGroup = {
+  /** Display name, as the group page heads itself, e.g. "ODEON". */
+  name: string;
+  href: string;
+};
 
 /** A venue a film newly appeared at, or gained dates at, in a given run. */
 export type UpdateVenue = {
   id: string;
   name: string;
   href: string | null;
+  group?: UpdateVenueGroup;
 };
 
 /** One film's worth of change in a single run, across every venue involved. */
 export type UpdateFilm = {
   /** Stable within a run; the movie id when matched, else the title. */
   key: string;
+  /**
+   * The film's id in the current dataset, which is also what a reader's lists
+   * are keyed by. Null for an entry that resolved to no film.
+   */
+  movieId: string | null;
   title: string;
   /**
    * Link to the film's page, when it is still in the current dataset. Carries
@@ -246,6 +261,7 @@ function accumulate(
       firstSeen: movie ? firstSeenIndex.get(movie.id) : undefined,
       film: {
         key,
+        movieId: movie?.id ?? null,
         title: movie?.title ?? showing.title,
         href: movie ? `${getMovieUrl(movie)}${SHOW_ALL_HASH}` : null,
         posterPath: movie?.posterPath,
@@ -281,6 +297,14 @@ function accumulate(
   }
 }
 
+/** Whether a film's tile shows a poster rather than the placeholder pattern. */
+function hasArtwork(film: UpdateFilm): boolean {
+  return (
+    !!film.posterPath ||
+    !!film.includedMovies?.some(({ posterPath }) => posterPath)
+  );
+}
+
 /**
  * Turn a window of pipeline diffs into a reverse-chronological feed, one entry
  * per pipeline run.
@@ -297,6 +321,12 @@ export function buildUpdates(
   blobs: DiffBlob[],
   data: CinemaData,
 ): UpdateRelease[] {
+  const groupsByName = new Map<string, UpdateVenueGroup>(
+    VENUE_GROUPS.map((group) => [
+      group.groupName,
+      { name: group.name, href: getVenueGroupUrl(group) },
+    ]),
+  );
   const showingIndex = buildShowingIndex(data.movies);
   const firstSeenIndex = buildFirstSeenIndex(data.movies);
 
@@ -324,10 +354,12 @@ export function buildUpdates(
     for (const [venueId, diffVenue] of Object.entries(blob.venues)) {
       const known = data.venues[venueId];
       const name = known?.name ?? diffVenue.name ?? venueId;
+      const group = known ? groupsByName.get(known.groupName ?? "") : undefined;
       const venue: UpdateVenue = {
         id: venueId,
         name,
         href: known ? getVenueUrl(known) : null,
+        ...(group && known?.structure === "group" ? { group } : {}),
       };
 
       if (diffVenue.venueAdded) {
@@ -402,11 +434,16 @@ export function buildUpdates(
 
     const byPerformances = (a: UpdateFilm, b: UpdateFilm) =>
       b.performanceCount - a.performanceCount || a.title.localeCompare(b.title);
+    // New films open as a capped grid of posters, so the ones with artwork go
+    // first: two rows of real posters say what kind of run this was far better
+    // than two rows of placeholder patterns. Nothing is dropped, only ordered.
+    const byArtworkThenPerformances = (a: UpdateFilm, b: UpdateFilm) =>
+      Number(hasArtwork(b)) - Number(hasArtwork(a)) || byPerformances(a, b);
 
     result.push({
       tag: blob.metadata.currentRelease,
       asOf: blob.metadata.asOf,
-      newFilms: newFilms.sort(byPerformances),
+      newFilms: newFilms.sort(byArtworkThenPerformances),
       moreShowings: moreShowings.sort(byPerformances),
       newVenues: [...venues.values()].sort((a, b) =>
         a.name.localeCompare(b.name),
@@ -466,32 +503,125 @@ export function groupUpdatesByDay(releases: UpdateRelease[]): UpdateDay[] {
   }));
 }
 
+/** One film's changes across a whole day, for the reader's watchlist panel. */
+export type DayFilm = Pick<
+  UpdateFilm,
+  "title" | "href" | "posterPath" | "includedMovies"
+> & {
+  movieId: string;
+  /** New to the listings in one of the day's runs, not only given more dates. */
+  isNew: boolean;
+  performanceCount: number;
+  venueCount: number;
+  /** The venue's name when there is only one, which says more than a count. */
+  soleVenue: string | null;
+};
+
 /**
- * One line describing a whole day, for the archive list on the index.
+ * Every film the day changed, once each, most new showings first.
  *
- * Built by summing the runs rather than by re-summarising their contents: a
- * film added in the morning and given more dates in the afternoon is two
- * separate changes, and the day's line counts both, exactly as the day's page
- * shows both.
+ * A film can be in several of a day's runs — added in the morning, given more
+ * dates in the afternoon — and a reader asking "what happened to my films
+ * today" wants one answer per film, so its runs are folded together: their
+ * showings summed, their venues counted once, and new if any run brought it
+ * in. Entries that resolved to no film are left out, having no id a list could
+ * hold.
+ *
+ * Every film the day changed is sent to every reader, since whose watchlist
+ * holds what is only known in the browser, so each carries only what the
+ * panel shows: a count of venues rather than the list of them.
  */
+export function getDayFilms(day: UpdateDay): DayFilm[] {
+  const byId = new Map<string, { film: DayFilm; venues: UpdateVenue[] }>();
+
+  for (const release of day.releases) {
+    const runFilms = [
+      ...release.newFilms.map((film) => ({ film, isNew: true })),
+      ...release.moreShowings.map((film) => ({ film, isNew: false })),
+    ];
+    for (const { film, isNew } of runFilms) {
+      if (!film.movieId) continue;
+      let entry = byId.get(film.movieId);
+      if (!entry) {
+        entry = {
+          venues: [],
+          film: {
+            movieId: film.movieId,
+            title: film.title,
+            href: film.href,
+            posterPath: film.posterPath,
+            includedMovies: film.includedMovies,
+            isNew: false,
+            performanceCount: 0,
+            venueCount: 0,
+            soleVenue: null,
+          },
+        };
+        byId.set(film.movieId, entry);
+      }
+      entry.film.isNew ||= isNew;
+      entry.film.performanceCount += film.performanceCount;
+      for (const venue of film.venues) {
+        if (!entry.venues.some(({ id }) => id === venue.id)) {
+          entry.venues.push(venue);
+        }
+      }
+    }
+  }
+
+  return [...byId.values()]
+    .map(({ film, venues }) => ({
+      ...film,
+      venueCount: venues.length,
+      soleVenue: venues.length === 1 ? venues[0].name : null,
+    }))
+    .sort(
+      (a, b) =>
+        b.performanceCount - a.performanceCount ||
+        a.title.localeCompare(b.title),
+    );
+}
+
+/** What a whole day brought, summed across its runs. */
+export type DayTotals = {
+  newFilms: number;
+  /** Every performance added, whether to a new film or one already listed. */
+  showings: number;
+  /** Distinct venues that gained a film or a showing. */
+  venuesUpdated: number;
+  newVenues: number;
+};
+
+/**
+ * Sum a day's runs. A film added in the morning and given more dates in the
+ * afternoon is two separate changes, and the day counts both, exactly as the
+ * day's page shows both.
+ *
+ * Showings count a new film's as well as the rollouts': both are screenings
+ * that weren't bookable before, and a day of nothing but new films would
+ * otherwise report no showings at all.
+ */
+export function getDayTotals(day: UpdateDay): DayTotals {
+  const venueIds = new Set<string>();
+  let newFilms = 0;
+  let showings = 0;
+  let newVenues = 0;
+
+  for (const release of day.releases) {
+    newFilms += release.newFilms.length;
+    newVenues += release.newVenues.length;
+    for (const film of [...release.newFilms, ...release.moreShowings]) {
+      showings += film.performanceCount;
+      for (const { id } of film.venues) venueIds.add(id);
+    }
+  }
+
+  return { newFilms, showings, venuesUpdated: venueIds.size, newVenues };
+}
+
+/** One line describing a whole day, for the archive list and the day's meta. */
 export function summariseDay(day: UpdateDay): string {
-  const newFilms = day.releases.reduce(
-    (total, release) => total + release.newFilms.length,
-    0,
-  );
-  const showings = day.releases.reduce(
-    (total, release) =>
-      total +
-      release.moreShowings.reduce(
-        (runTotal, film) => runTotal + film.performanceCount,
-        0,
-      ),
-    0,
-  );
-  const newVenues = day.releases.reduce(
-    (total, release) => total + release.newVenues.length,
-    0,
-  );
+  const { newFilms, showings, newVenues } = getDayTotals(day);
 
   const parts: string[] = [];
   if (newFilms > 0) parts.push(`${pluralise(newFilms, "film")} added`);

@@ -82,8 +82,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+.source {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  font-weight: 600;
+  word-break: normal;
+}
+
 .list li code {
-  color: var(--color-electric-blue);
+  color: var(--color-muted-gray);
+  font-size: 13px;
 }
 
 .list li:last-child {

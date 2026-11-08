@@ -3,6 +3,7 @@ import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
+import ContentSection from "@/components/content-section";
 import { handlers } from "../../../.storybook/msw/handlers";
 
 /**
@@ -27,6 +28,9 @@ import { handlers } from "../../../.storybook/msw/handlers";
  * - `hero` — optional fully-rendered hero (e.g. `DetailPageHero`) that replaces
  *   the default title-based hero; pass EITHER `title` OR `hero`, not both. Used
  *   by the venue/event detail pages.
+ * - `width` — the content column: `prose` for reading pages, `default` (the
+ *   default) for cards and lists, `wide` for poster rows. See "Page Widths"
+ *   in CLAUDE.md.
  * - `afterContent` — optional full-width content rendered below the constrained
  *   wrapper (e.g. an edge-to-edge poster grid).
  * - `backUrl` / `backText` — forwarded to `PageHeader`.
@@ -74,7 +78,7 @@ export const WithSubtitle: Story = {
     children: (
       <p style={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.7 }}>
         Page content appears here, below the hero and divider, inside a
-        constrained 1000px-wide wrapper.
+        constrained wrapper at the default page width.
       </p>
     ),
   },
@@ -91,6 +95,43 @@ export const TitleOnly: Story = {
     backText: "Back to film list",
     children: (
       <p style={{ color: "rgba(255,255,255,0.7)" }}>Festival list goes here.</p>
+    ),
+  },
+};
+
+const PROSE_PARAGRAPH = (
+  <p style={{ lineHeight: 1.7, margin: "0 0 20px" }}>
+    Clusterflick&apos;s listings are published for reuse under CC BY 4.0. Use
+    them for anything, commercial or not, as long as you say where they came
+    from and link back, so that whoever reads your work can find the source and
+    check it for themselves.
+  </p>
+);
+
+/**
+ * `width="prose"` — a reading page such as the data licence or the bot page,
+ * built from `ContentSection`s.
+ */
+export const Prose: Story = {
+  args: {
+    title: "Data Licence",
+    subtitle: "What you can do with the data, and how to credit it.",
+    width: "prose",
+    children: (
+      <>
+        <ContentSection title="What's covered">
+          {PROSE_PARAGRAPH}
+          {PROSE_PARAGRAPH}
+        </ContentSection>
+        <ContentSection title="How to credit Clusterflick">
+          {PROSE_PARAGRAPH}
+        </ContentSection>
+        <ContentSection title="What isn't covered">
+          {PROSE_PARAGRAPH}
+          {PROSE_PARAGRAPH}
+          {PROSE_PARAGRAPH}
+        </ContentSection>
+      </>
     ),
   },
 };
