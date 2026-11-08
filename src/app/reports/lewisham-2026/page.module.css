@@ -4,6 +4,15 @@
   margin-bottom: 16px;
 }
 
+.lead p.update {
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 12px 16px;
+  border-left: 3px solid var(--color-neon-pink);
+  background: rgba(var(--color-white-rgb), 0.04);
+  color: var(--color-light-gray);
+}
+
 .stats {
   display: grid;
   grid-template-columns: 1fr;
