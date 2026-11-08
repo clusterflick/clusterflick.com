@@ -19,6 +19,8 @@ const TIME_OUT_CLOSURE =
   "https://www.timeout.com/london/news/lewishams-only-cinema-has-just-been-shuttered-and-the-community-is-reeling-110424";
 const LADYWELL_LIVE_DELAY =
   "https://ladywell-live.org/2026/09/26/independent-group-castle-cinema-to-take-over-former-catford-mews-site-and-open-cinema-in-the-summer/";
+const LEWISHAM_LETTER_SQUATTERS =
+  "https://lewishamletter.co.uk/shocking-photos-show-havoc-wreaked-by-catford-mews-squatters/";
 const SCRIPTS_GIST =
   "https://gist.github.com/alistairjcbrown/4a304f1d9e5e62ef8d61afe0ebfeac39";
 
@@ -156,6 +158,18 @@ export default function Lewisham2026Report() {
             </a>
             .
           </p>
+          <p className={styles.update}>
+            <strong>Update, {formatReportDate("2026-11-07")}:</strong> The
+            Catford Mews building has been badly damaged by squatters,{" "}
+            <a
+              href={LEWISHAM_LETTER_SQUATTERS}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              the Lewisham Letter reports
+            </a>
+            , in an article that cites this report.
+          </p>
           <p>
             Clusterflick collects the listings of every place we can find that
             screens films in London: cinemas, but also libraries, pubs,
@@ -284,6 +298,17 @@ export default function Lewisham2026Report() {
               with credit, under CC BY 4.0 like the data behind them: see our{" "}
               <Link href="/data-licence">data licence</Link>. Please credit
               Clusterflick and link to this page.
+            </li>
+            <li>
+              <strong>Cited in.</strong>{" "}
+              <a
+                href={LEWISHAM_LETTER_SQUATTERS}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Lewisham Letter
+              </a>
+              , {formatReportDate("2026-11-07")}.
             </li>
           </ul>
         </ContentSection>
