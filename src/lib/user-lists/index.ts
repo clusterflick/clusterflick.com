@@ -242,6 +242,16 @@ async function getFilmDetailsDocRef(db: Firestore, uid: string) {
   return doc(db, "users", uid, "meta", "films");
 }
 
+/** The listed films' details — see `FilmDetailsData`. */
+export async function fetchFilmDetails(
+  db: Firestore,
+  uid: string,
+): Promise<FilmDetailsData> {
+  const { getDoc } = await import("firebase/firestore/lite");
+  const data = (await getDoc(await getFilmDetailsDocRef(db, uid))).data();
+  return { films: data?.films ?? {}, people: data?.people ?? {} };
+}
+
 async function addDetailsToBatch(
   batch: WriteBatch,
   db: Firestore,

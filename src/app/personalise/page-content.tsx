@@ -54,6 +54,7 @@ import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
+import SeenStats from "./seen-stats";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -517,6 +518,7 @@ function SignedIn({
             lists={lists}
             showEditing={showEditing}
           />
+          <SeenStats seen={lists[UserListId.Seen]} />
         </>
       ) : (
         <LoadingIndicator message="Loading your lists…" />

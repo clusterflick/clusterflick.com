@@ -1699,6 +1699,30 @@ buttons opens every stack, since a closed one would hide them. Signed in, the pa
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
+**Seen has stats beneath it** (`SeenStats`, `getSeenStats` in
+`@/lib/user-lists/seen-stats`), read from the film details document, which
+only this page loads, again whenever the Seen list's films change: the
+headline figures in a `StatsBand`, the time as days and double bills, and
+the records (longest, shortest, oldest, newest) as `PosterTile`s. Directors,
+actors, genres, decades and languages sit behind "Show more stats", since
+four charts would double the page.
+
+- **Years come from the list entries, everything else from the details**, so
+  an unmatched film counts towards the decades and nothing else, and a
+  footnote says how many films had nothing to count. Watch dates are never
+  used: an entry's date is when it was added, and an import adds hundreds in
+  a day.
+- **Nothing shows below five films** (`MIN_STATS_FILMS`); a line says how
+  many to go. Within the stats, a ranking needs people with two films or
+  more, decades need two decades and languages two languages, and a record
+  that would repeat the other of its pair (one film both longest and
+  shortest) is left out.
+- **Signed out, nothing renders**, as the stats are inside the signed-in
+  page.
+- Decade labels shorten between the ends and the centuries ("1920s, ’30s …
+  2000s, ’10s, 2020s") and a long span scrolls, as eleven full labels don't
+  fit across a phone.
+
 **The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
 two groups above Showing now, each soonest first:
 
