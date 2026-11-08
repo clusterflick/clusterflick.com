@@ -1,5 +1,6 @@
 /* Clear of the fixed header when closing a long list scrolls back to it. */
 .root {
+  position: relative;
   scroll-margin-top: 80px;
 }
 
@@ -149,11 +150,13 @@
 }
 
 /* The caption, once the stack is open: at the top right, as the toggle that
-   closes it. */
+   closes it. Lifted out of the flow into the heading's row above the lane, so
+   opening and closing the stack never moves the posters' top edge. */
 .header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  z-index: 1;
 }
 
 .toggle {

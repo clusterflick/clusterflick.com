@@ -1605,7 +1605,9 @@ the count beside it). Opening it flies each poster in the pile to its tile
 (measured before and after, animated with `element.animate`, nothing for a
 reduced-motion reader) and fades the rest in, while the caption flies to the
 top right as a "Hide them" toggle, so it can be closed from where it was
-opened. A second sits under the list; closing from there scrolls back up to
+opened. The toggle is lifted out of the flow into the heading's row above the
+lane, so the posters' top edge stays put as the stack opens and closes; in the
+flow it pushed the list down 38px on opening and pulled it back on closing. A second sits under the list; closing from there scrolls back up to
 the pile if it would otherwise be above the screen. **The pile fills its row
 at a fixed overlap**: a laptop draws more posters, a phone fewer, rather than
 the same posters spread out or crushed together. The caption moves beside the
