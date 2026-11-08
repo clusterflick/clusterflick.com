@@ -39,6 +39,28 @@
   white-space: nowrap;
 }
 
+/* Four records across or two by two, never three and one: the tile list's
+   own columns fit as many as the width allows. Capped, so a single column
+   page doesn't blow the posters up, and centred under the figures there. */
+.records {
+  container-type: inline-size;
+}
+
+.records .recordList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* The width, or auto margins in the block's flex column shrink the list
+     to its content and the posters with it. */
+  width: 100%;
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+@container (min-width: 520px) {
+  .records .recordList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .block {
   display: flex;
   flex-direction: column;

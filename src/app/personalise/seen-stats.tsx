@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
 import ContentSection from "@/components/content-section";
 import StatsBand from "@/components/stats-band";
 import RankedBarChart from "@/components/ranked-bar-chart";
@@ -8,6 +9,7 @@ import ExpandableSection from "@/components/expandable-section";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { GENRES } from "@/data/genres";
 import { FilterId } from "@/lib/filters/types";
 import type { UserListEntry } from "@/lib/user-lists";
@@ -54,6 +56,9 @@ export default function SeenStats({
   seen: Record<string, UserListEntry>;
 }) {
   const { readFilmDetails } = useUserContext();
+  // Matches `.summary`'s breakpoint in seen-stats.module.css. Beside the
+  // records the figures go two to a row; across the page, in a row of four.
+  const besideRecords = useMediaQuery("(min-width: 1000px)");
   const [details, setDetails] = useState<FilmDetailsData | null>(null);
   // A key rather than the list, so an edit that changes no film doesn't
   // read the document again.
@@ -94,7 +99,7 @@ export default function SeenStats({
       <div className={styles.stats}>
         <div className={styles.summary}>
           <StatsBand
-            layout="grid"
+            layout={besideRecords ? "grid" : "row"}
             label="Your film stats"
             items={[
               { id: "films", value: stats.films, label: "Films" },
@@ -122,7 +127,7 @@ export default function SeenStats({
             to count.
           </p>
         )}
-        <ExpandableSection title="More Stats">
+        <ExpandableSection title="More Stats" scrollOnExpand={false}>
           <MoreStats stats={stats} />
         </ExpandableSection>
       </div>
@@ -169,11 +174,11 @@ function Records({ stats }: { stats: Stats }) {
   if (cards.length === 0) return null;
 
   return (
-    <div className={styles.block}>
+    <div className={clsx(styles.block, styles.records)}>
       {/* Each tile's note says which record it is; the heading is for
           screen readers, so the tiles line up with the figures beside them. */}
       <h3 className={styles.visuallyHidden}>Records</h3>
-      <PosterTileList>
+      <PosterTileList className={styles.recordList}>
         {cards.map(({ label, record, detail }) => {
           const movie = movies[record.id];
           return (

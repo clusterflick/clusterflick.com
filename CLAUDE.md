@@ -1697,7 +1697,9 @@ the page its point. Not showing opens from the start when nothing on the list
 is showing, so the watchlist never looks empty, and turning on the editing
 buttons opens every stack, since a closed one would hide them. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
-across, and aligns to the poster columns as `/planner` does.
+across, and aligns to the poster columns as `/planner` does. The 24px gutter
+stays at every width: at 1240px six columns otherwise fill the window
+exactly, and the lanes' 8px bleed scrolled the page sideways.
 
 **The Seen list's stats lead the page** (`SeenStats`, `getSeenStats` in
 `@/lib/user-lists/seen-stats`), under the account bar and above the search:
@@ -1707,7 +1709,12 @@ loads, again whenever the Seen list's films change: the headline figures in
 a `StatsBand` and the records (longest and shortest sit by runtime, oldest
 and newest by year with how long ago) as `PosterTile`s, side by side from
 1000px with the band two figures to a row (`layout="grid"`): four figures
-across and four posters across each left half the row empty. Directors,
+across and four posters across each left half the row empty. Below that the
+band is its usual row of four, with the records centred under it. The records
+are their own grid, four across or two by two, never the three-and-one the
+tile list's fitted columns gave at some widths. "Show more stats" doesn't
+scroll on opening (`ExpandableSection`'s `scrollOnExpand`): the charts open
+right beneath it, so centring the trigger only moved the page. Directors,
 actors, genres, decades and languages sit behind "Show more stats", as
 `RankedBarChart`s (decades with `keepOrder`, in date order) and language
 chips, in two columns of about the same height — the short rankings and the
