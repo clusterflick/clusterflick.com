@@ -1,0 +1,145 @@
+.figure {
+  margin: 0;
+}
+
+.caption {
+  font-size: 14px;
+  color: var(--color-light-gray);
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.row {
+  color: var(--color-light-gray);
+}
+
+.label {
+  font-weight: 400;
+  text-align: left;
+  padding: 5px 12px 5px 0;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.label a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cell {
+  padding: 5px 0;
+}
+
+.strip {
+  display: flex;
+  height: 22px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.segment {
+  flex: 1 1 0;
+  min-width: 1px;
+}
+
+.detail {
+  padding: 5px 0 5px 12px;
+  white-space: nowrap;
+  width: 1%;
+  text-align: right;
+  color: var(--color-muted-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.highlight .label {
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.highlight .detail {
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+/* A row there for contrast: its name and figure step back, its colours
+   don't, since the colours are the comparison. */
+.muted .label,
+.muted .detail {
+  color: var(--color-muted-gray);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--color-light-gray);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* On a phone the name takes a row of its own, so the strips keep the width. */
+@media (max-width: 600px) {
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  /* Out of the table layout, the header row needs to be a block for the
+     visually-hidden clipping to hold, or it widens the page. */
+  .table thead,
+  .table thead tr {
+    display: block;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 8px;
+    margin-bottom: 10px;
+  }
+
+  .label {
+    width: auto;
+    padding: 0;
+  }
+
+  .detail {
+    width: auto;
+    padding: 0;
+  }
+
+  .cell {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 0;
+  }
+}

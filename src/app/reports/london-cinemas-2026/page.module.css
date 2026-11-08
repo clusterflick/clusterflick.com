@@ -63,29 +63,6 @@
   margin-top: 24px;
 }
 
-.films {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.films li {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.1);
-}
-
-.filmTitle {
-  font-weight: 600;
-}
-
-.filmVenue {
-  color: var(--color-light-gray);
-}
-
 .highlights {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -112,4 +89,33 @@
   flex-shrink: 0;
   margin-top: 2px;
   color: var(--color-electric-blue);
+}
+
+/* A headline figure with its film's poster beside the number. */
+.statWithPoster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.statPoster {
+  flex: 0 0 auto;
+  width: 44px;
+}
+
+/* A paragraph about one film, with its poster beside it. */
+.withPoster {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.withPoster .body {
+  margin: 0;
+}
+
+.sidePoster {
+  flex: 0 0 auto;
+  width: 64px;
 }

@@ -10,6 +10,8 @@ export interface BoroughMapShapes {
   viewBox: string;
   /** Path data per borough slug. */
   paths: Record<string, string>;
+  /** Where a point falls in the viewBox, so other marks line up with the map. */
+  project: (lon: number, lat: number) => [x: number, y: number];
 }
 
 /** Width of the viewBox; the height follows from London's shape. */
@@ -55,19 +57,27 @@ export function getBoroughMapShapes(): BoroughMapShapes {
   const scale = WIDTH / ((maxLon - minLon) * lonScale);
   const height = Math.ceil((maxLat - minLat) * scale);
   const round = (n: number) => Math.round(n * 10) / 10;
-  const project = ([lon, lat]: number[]) =>
-    `${round((lon - minLon) * lonScale * scale)},${round((maxLat - lat) * scale)}`;
+  const project = (lon: number, lat: number): [number, number] => [
+    round((lon - minLon) * lonScale * scale),
+    round((maxLat - lat) * scale),
+  ];
 
   const paths: Record<string, string> = {};
   for (const [slug, geometry] of Object.entries(geometries)) {
     paths[slug] = polygonsOf(geometry)
       .flatMap((polygon) =>
         // GeoJSON rings close on their first point; Z does that instead.
-        polygon.map((ring) => `M${ring.slice(0, -1).map(project).join("L")}Z`),
+        polygon.map(
+          (ring) =>
+            `M${ring
+              .slice(0, -1)
+              .map(([lon, lat]) => project(lon, lat).join(","))
+              .join("L")}Z`,
+        ),
       )
       .join("");
   }
 
-  cached = { viewBox: `0 0 ${WIDTH} ${height}`, paths };
+  cached = { viewBox: `0 0 ${WIDTH} ${height}`, paths, project };
   return cached;
 }

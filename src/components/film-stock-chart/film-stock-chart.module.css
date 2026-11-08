@@ -1,0 +1,153 @@
+.figure {
+  margin: 0;
+}
+
+.caption {
+  font-size: 14px;
+  color: var(--color-light-gray);
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.row {
+  color: var(--color-light-gray);
+}
+
+.label {
+  font-weight: 400;
+  text-align: left;
+  padding: 7px 12px 7px 0;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+}
+
+/* The full width is unexposed stock; the screenings fill it from the left. */
+.stock {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--thickness);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.film {
+  background: rgba(var(--color-light-gray-rgb), 0.1);
+}
+
+/* Half-inch tape: brown oxide, with no perforations. */
+.tape {
+  background: rgba(120, 72, 40, 0.35);
+  border-radius: 1px;
+}
+
+.exposed {
+  display: flex;
+  height: 100%;
+  min-width: 3px;
+}
+
+.segment,
+.segmentSplit {
+  display: block;
+  flex: 1 1 0;
+}
+
+.segment {
+  background: var(--color-electric-blue);
+}
+
+.segmentSplit {
+  background: var(--color-neon-pink);
+}
+
+/* Perforations along both edges, over the stock and its fill alike. Sized
+   from the bar's thickness, as a real stock's are from its gauge, with a
+   floor so 16mm's still show. */
+.film::before,
+.film::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: max(2px, calc(var(--thickness) * 0.1));
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-deep-navy) 0 max(2px, calc(var(--thickness) * 0.1)),
+    transparent max(2px, calc(var(--thickness) * 0.1))
+      max(5px, calc(var(--thickness) * 0.24))
+  );
+  pointer-events: none;
+}
+
+.film::before {
+  top: max(1px, calc(var(--thickness) * 0.07));
+}
+
+.film::after {
+  bottom: max(1px, calc(var(--thickness) * 0.07));
+}
+
+.value {
+  flex: 0 0 auto;
+  min-width: 6ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--color-electric-blue);
+}
+
+.swatchSplit {
+  background: var(--color-neon-pink);
+}
+
+@media (max-width: 480px) {
+  .table {
+    font-size: 13px;
+  }
+}

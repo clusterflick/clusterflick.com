@@ -4,12 +4,18 @@ import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import RankedBarChart from "@/components/ranked-bar-chart";
+import DecadeFingerprint from "@/components/decade-fingerprint";
+import FilmStockChart from "@/components/film-stock-chart";
+import VenueDotMap from "@/components/venue-dot-map";
+import MoviePoster from "@/components/movie-poster";
+import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import ReportHighlight from "@/components/report-highlight";
 import { ButtonLink } from "@/components/button";
 import { CalendarIcon } from "@/components/icons";
 import { LONDON_CINEMAS_2026 as DATA } from "@/data/reports/london-cinemas-2026";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
+import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";
 import { formatReportDate } from "../format-report-date";
 import styles from "./page.module.css";
 
@@ -31,6 +37,82 @@ const FORMAT_LABELS: Record<string, string> = {
   "imax-70mm": "IMAX 70mm",
   "16mm": "16mm",
   vhs: "VHS",
+};
+
+// Each format's stock, drawn to its gauge: film width in mm, or half-inch tape.
+const FORMAT_STOCK: Record<string, { gauge: number; stock: "film" | "tape" }> =
+  {
+    "35mm": { gauge: 35, stock: "film" },
+    "70mm": { gauge: 70, stock: "film" },
+    "imax-70mm": { gauge: 70, stock: "film" },
+    "16mm": { gauge: 16, stock: "film" },
+    vhs: { gauge: 12.7, stock: "tape" },
+  };
+
+// The map's kinds of place. "Not a cinema" means any type but Cinema, as the
+// headline counts it, so a community cinema is coloured, not grey.
+const PLACE_GROUPS = [
+  {
+    key: "cinema",
+    label: "Cinemas",
+    color: "rgba(var(--color-light-gray-rgb), 0.35)",
+    muted: true,
+    types: ["Cinema"],
+  },
+  {
+    key: "pubs",
+    label: "Pubs, bars and music venues",
+    color: "var(--color-neon-pink)",
+    types: ["Pub & Bar", "Music Venue"],
+  },
+  {
+    key: "community",
+    label: "Community spaces and places of worship",
+    color: "var(--color-buttery-yellow)",
+    types: [
+      "Community Centre",
+      "Community Cinema",
+      "Cultural Centre",
+      "Place of Worship",
+    ],
+  },
+  {
+    key: "learning",
+    label: "Libraries, museums and universities",
+    color: "var(--color-electric-blue)",
+    types: ["Library & Archive", "Museum", "University & College"],
+  },
+  {
+    key: "arts",
+    label: "Arts centres, galleries and theatres",
+    color: "#b07be0",
+    types: ["Arts Centre", "Creative Space", "Gallery", "Theatre"],
+  },
+  {
+    key: "other",
+    label: "Everywhere else",
+    color: "var(--color-release-green)",
+    types: [] as string[],
+  },
+];
+const placeGroupOf = (type: string) =>
+  (
+    PLACE_GROUPS.find((group) => group.types.includes(type)) ??
+    PLACE_GROUPS[PLACE_GROUPS.length - 1]
+  ).key;
+
+/** A named film's poster path, fixed when the report was made. */
+const posterOf = (movieId: string) =>
+  (DATA.posters as Record<string, string | null>)[movieId] ?? undefined;
+
+/** "2 to 27 October", or "28 September to 3 October" across a month. */
+const formatDayRange = (from: string, to: string) => {
+  const date = (iso: string) => new Date(`${iso}T12:00:00Z`);
+  const part = (iso: string, options: Intl.DateTimeFormatOptions) =>
+    date(iso).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
+  return from.slice(0, 7) === to.slice(0, 7)
+    ? `${part(from, { day: "numeric" })} to ${part(to, { day: "numeric", month: "long" })}`
+    : `${part(from, { day: "numeric", month: "long" })} to ${part(to, { day: "numeric", month: "long" })}`;
 };
 
 // TheMovieDB uses "cn" for Cantonese, which isn't a standard language code.
@@ -90,6 +172,19 @@ const odysseyFreeFormats = DATA.formats
   .filter((f) => f.format === "16mm" || f.format === "vhs")
   .every((f) => f.odyssey === 0);
 const notCinemas = DATA.venuesWithScreenings - DATA.venueTypes.Cinema;
+const mapShapes = getBoroughMapShapes();
+const mapItems = DATA.venuePoints.map((venue) => {
+  const [x, y] = mapShapes.project(venue.lon, venue.lat);
+  return {
+    key: venue.id,
+    x,
+    y,
+    group: placeGroupOf(venue.type),
+    label: `${venue.name} (${venue.type})`,
+  };
+});
+const odysseyPoster = posterOf(DATA.odysseyMovieId);
+const vistaVision = DATA.vistaVision;
 const [nickel] = DATA.repertory;
 const [mostFilms] = DATA.mostDifferentFilms;
 const [printLeader, printRunnerUp] = DATA.printVenues;
@@ -231,7 +326,18 @@ export default function LondonCinemas2026Report() {
               {Math.round(DATA.londonScreenings / topFilm.screenings)}{" "}
               screenings in London
             </dt>
-            <dd>{fmt(topFilm.screenings)}</dd>
+            <dd className={styles.statWithPoster}>
+              <span className={styles.statPoster}>
+                <MoviePoster
+                  title={topFilm.title}
+                  posterPath={posterOf(topFilm.movieId)}
+                  size="xsmall"
+                  interactive={false}
+                  fluid
+                />
+              </span>
+              {fmt(topFilm.screenings)}
+            </dd>
           </div>
           <div className={styles.stat}>
             <dt>
@@ -261,33 +367,53 @@ export default function LondonCinemas2026Report() {
               venue={cardVenue(mostFilms)}
             />
           </div>
-          <RankedBarChart
-            caption="Share of screenings of films at least 25 years old"
+          <DecadeFingerprint
+            caption={`Screenings by the decade of their film, with ${DATA.mostScreeningsOfOneFilm.name} for comparison`}
             labelHeading="Venue"
-            valueHeading="Share of screenings"
-            formatValue={percent}
-            items={venueRows(DATA.repertory)}
+            detailHeading="Films at least 25 years old"
+            items={DATA.decadeFingerprints.map((venue, index) => ({
+              key: venue.id,
+              label: venue.name,
+              href: venue.current ? getVenueUrl(venue) : undefined,
+              highlight: index === 0,
+              muted: venue.id === DATA.mostScreeningsOfOneFilm.id,
+              decades: venue.decades,
+              detail: `${percent(venue.oldShare)} 25+ years old`,
+            }))}
           />
         </ContentSection>
 
         <ContentSection title="Film on film">
           <WindowNote what="screening formats" from={DATA.formatFrom} />
-          <p className={styles.body}>
-            {fmt(DATA.printScreenings)} screenings were from a film print (and{" "}
-            {vhs.total} from VHS). {fmt(DATA.odysseyPrintScreenings)} of the
-            prints were The Odyssey, on 35mm, 70mm and IMAX 70mm. Without it,
-            70mm almost disappears, and what&apos;s left on film is mostly 35mm.
-            {odysseyFreeFormats &&
-              " (16mm and VHS remain an Odyssey-free zone.)"}
-          </p>
-          <RankedBarChart
-            caption="Screenings from film and tape, by format"
+          <div className={styles.withPoster}>
+            <span className={styles.sidePoster}>
+              <MoviePoster
+                title="The Odyssey"
+                posterPath={odysseyPoster}
+                size="xsmall"
+                interactive={false}
+                fluid
+              />
+            </span>
+            <p className={styles.body}>
+              {fmt(DATA.printScreenings)} screenings were from a film print (and{" "}
+              {vhs.total} from VHS). {fmt(DATA.odysseyPrintScreenings)} of the
+              prints were The Odyssey, on 35mm, 70mm and IMAX 70mm. Without it,
+              70mm almost disappears, and what&apos;s left on film is mostly
+              35mm.
+              {odysseyFreeFormats &&
+                " (16mm and VHS remain an Odyssey-free zone.)"}
+            </p>
+          </div>
+          <FilmStockChart
+            caption="Screenings from film and tape, by format, each drawn to its gauge"
             labelHeading="Format"
             valueHeading="Screenings"
             split={{ split: "Everything else", rest: "The Odyssey" }}
             items={DATA.formats.map((f) => ({
               key: f.format,
               label: FORMAT_LABELS[f.format] ?? f.format,
+              ...(FORMAT_STOCK[f.format] ?? { gauge: 35, stock: "film" }),
               value: f.total,
               splitValue: f.total - f.odyssey,
             }))}
@@ -307,6 +433,26 @@ export default function LondonCinemas2026Report() {
               venue={cardVenue(sixteen)}
             />
           </div>
+          {vistaVision && (
+            <div className={styles.withPoster}>
+              <span className={styles.sidePoster}>
+                <MoviePoster
+                  title={vistaVision.title}
+                  posterPath={posterOf(vistaVision.movieId)}
+                  size="xsmall"
+                  interactive={false}
+                  fluid
+                />
+              </span>
+              <p className={styles.body}>
+                {venueLink(vistaVision)} showed {vistaVision.title} in
+                VistaVision from{" "}
+                {formatDayRange(vistaVision.from, vistaVision.to)}:{" "}
+                {vistaVision.screenings} screenings of 35mm film run sideways
+                through the projector.
+              </p>
+            </div>
+          )}
           <RankedBarChart
             caption="Screenings from a physical print, not counting The Odyssey"
             labelHeading="Venue"
@@ -354,16 +500,16 @@ export default function LondonCinemas2026Report() {
               venue={cardVenue(oldest)}
             />
           </div>
-          <ol className={styles.films}>
+          <PosterTileList>
             {DATA.oldestFilms.map((film) => (
-              <li key={`${film.title}-${film.id}`}>
-                <span className={styles.filmTitle}>
-                  {film.title} ({film.year})
-                </span>
-                <span className={styles.filmVenue}>at {venueLink(film)}</span>
-              </li>
+              <PosterTile
+                key={`${film.movieId}-${film.id}`}
+                title={film.title}
+                posterPath={posterOf(film.movieId)}
+                details={[String(film.year), film.name]}
+              />
             ))}
-          </ol>
+          </PosterTileList>
         </ContentSection>
 
         <ContentSection title="Around the world">
@@ -431,6 +577,13 @@ export default function LondonCinemas2026Report() {
           title="Not just cinemas"
           intro={`${DATA.venueTypes.Cinema} cinemas screened films this year. So did ${DATA.venueTypes["Pub & Bar"]} pubs and bars, ${DATA.venueTypes["Library & Archive"]} libraries, ${DATA.venueTypes["Place of Worship"]} places of worship and ${DATA.venueTypes.Hotel} hotels.`}
         >
+          <VenueDotMap
+            caption={`Every place that screened a film this year. The ${notCinemas} that aren't cinemas are in colour.`}
+            viewBox={mapShapes.viewBox}
+            outlines={Object.values(mapShapes.paths)}
+            groups={PLACE_GROUPS}
+            items={mapItems}
+          />
           <RankedBarChart
             caption="Places that screened films this year, by type"
             labelHeading="Type of venue"
