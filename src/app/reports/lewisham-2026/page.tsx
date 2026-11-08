@@ -49,9 +49,12 @@ const communityCinemas = DATA.lewishamVenues.filter(
 );
 const castleCinema = VENUE_GROUPS.find((g) => g.slug === "castle-cinema")!;
 
-// Fixed round floors rather than quantiles, so the key is easy to read. The
-// lowest band holds Lewisham alone: the next borough had 6,182 screenings, and
-// sharing a shade with it would hide the point of the map.
+// Natural breaks (Jenks, five classes) over all 33 boroughs, on the log of
+// their screenings, since the counts span nearly a thousandfold and the gaps
+// that matter are ratios. The breaks fell at 103 | 6,182 | 18,344 | 29,089 |
+// 50,021, rounded here to readable floors; only Lambeth (29,089) moves, one
+// band down. Lewisham sits alone in the lowest band because that is where the
+// method puts it, not because the floors were chosen to isolate it.
 const SCREENING_BAND_FLOORS = [0, 1000, 15000, 30000, 50000];
 const screeningBands = SCREENING_BAND_FLOORS.map((floor, index) => {
   const next = SCREENING_BAND_FLOORS[index + 1];
@@ -329,6 +332,13 @@ export default function Lewisham2026Report() {
               screenings in Lewisham we missed, tell us at{" "}
               <a href="mailto:hello@clusterflick.com">hello@clusterflick.com</a>
               .
+            </li>
+            <li>
+              <strong>The map&apos;s shades.</strong> The bands are where the
+              borough figures fall into natural groups, found by an algorithm
+              (Jenks natural breaks) over all 33 boroughs on a logarithmic
+              scale, then rounded. Lewisham is in a band of its own because the
+              method put it there.
             </li>
             <li>
               <strong>Population.</strong> ONS mid-2024 estimates: Lewisham{" "}
