@@ -26,6 +26,13 @@ interface StatsBandProps {
   items: StatsBandItem[];
   /** Names the band for assistive technology. */
   label?: string;
+  /**
+   * `row` (the default) puts every figure side by side from 760px, for a
+   * band across the page. `grid` keeps two to a row at every width, for a
+   * band sharing its row with something else, where four across would
+   * squeeze the figures.
+   */
+  layout?: "row" | "grid";
 }
 
 const COUNT_UP_MS = 1400;
@@ -42,6 +49,7 @@ const format = (value: number) => value.toLocaleString("en-GB");
 export default function StatsBand({
   items,
   label = "At a glance",
+  layout = "row",
 }: StatsBandProps) {
   const bandRef = useRef<HTMLUListElement>(null);
 
@@ -101,7 +109,11 @@ export default function StatsBand({
   }, [items]);
 
   return (
-    <ul ref={bandRef} className={styles.band} aria-label={label}>
+    <ul
+      ref={bandRef}
+      className={clsx(styles.band, layout === "grid" && styles.grid)}
+      aria-label={label}
+    >
       {items.map((item) => {
         const className = clsx(
           styles.stat,

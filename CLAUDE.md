@@ -1704,11 +1704,15 @@ across, and aligns to the poster columns as `/planner` does.
 they are what a reader with a long list comes back for, and the lists below
 are long. They are read from the film details document, which only this page
 loads, again whenever the Seen list's films change: the headline figures in
-a `StatsBand`, then the records (longest and shortest sit by runtime, oldest
-and newest by year with how long ago) as `PosterTile`s. Directors, actors,
-genres, decades and languages sit behind "Show more stats", as
+a `StatsBand` and the records (longest and shortest sit by runtime, oldest
+and newest by year with how long ago) as `PosterTile`s, side by side from
+1000px with the band two figures to a row (`layout="grid"`): four figures
+across and four posters across each left half the row empty. Directors,
+actors, genres, decades and languages sit behind "Show more stats", as
 `RankedBarChart`s (decades with `keepOrder`, in date order) and language
-chips. A line turning the hours into days and double bills was tried and
+chips, in two columns of about the same height — the short rankings and the
+decades in one, the long genre list and the languages in the other — since
+side by side in pairs each chart left a gap under the shorter. A line turning the hours into days and double bills was tried and
 taken out; it didn't earn its place.
 
 - **Years come from the list entries, everything else from the details**, so

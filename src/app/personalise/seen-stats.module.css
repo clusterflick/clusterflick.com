@@ -16,6 +16,29 @@
   color: var(--color-muted-gray);
 }
 
+/* The figures beside the records, where there's room for both: four figures
+   across and four posters across each left half the row empty. */
+.summary {
+  display: grid;
+  gap: 24px 40px;
+  align-items: center;
+}
+
+@media (min-width: 1000px) {
+  .summary {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .block {
   display: flex;
   flex-direction: column;
@@ -38,9 +61,15 @@
   padding-top: 16px;
 }
 
-.chart {
+.column {
   flex: 1 1 400px;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.chart {
   margin: 0;
   display: flex;
   flex-direction: column;

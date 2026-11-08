@@ -92,24 +92,28 @@ export default function SeenStats({
   return (
     <ContentSection title="Your Film Stats">
       <div className={styles.stats}>
-        <StatsBand
-          label="Your film stats"
-          items={[
-            { id: "films", value: stats.films, label: "Films" },
-            {
-              id: "hours",
-              value: stats.hours,
-              label: "Hours",
-              highlight: true,
-            },
-            { id: "directors", value: stats.directors, label: "Directors" },
-            {
-              id: "languages",
-              value: stats.languages.length,
-              label: "Languages",
-            },
-          ]}
-        />
+        <div className={styles.summary}>
+          <StatsBand
+            layout="grid"
+            label="Your film stats"
+            items={[
+              { id: "films", value: stats.films, label: "Films" },
+              {
+                id: "hours",
+                value: stats.hours,
+                label: "Hours",
+                highlight: true,
+              },
+              { id: "directors", value: stats.directors, label: "Directors" },
+              {
+                id: "languages",
+                value: stats.languages.length,
+                label: "Languages",
+              },
+            ]}
+          />
+          <Records stats={stats} />
+        </div>
         {stats.films > stats.withDetails && (
           <p className={styles.footnote}>
             Counted from {plural(stats.withDetails, "film")}.{" "}
@@ -118,7 +122,6 @@ export default function SeenStats({
             to count.
           </p>
         )}
-        <Records stats={stats} />
         <ExpandableSection title="More Stats">
           <MoreStats stats={stats} />
         </ExpandableSection>
@@ -167,7 +170,9 @@ function Records({ stats }: { stats: Stats }) {
 
   return (
     <div className={styles.block}>
-      <h3 className={styles.heading}>Records</h3>
+      {/* Each tile's note says which record it is; the heading is for
+          screen readers, so the tiles line up with the figures beside them. */}
+      <h3 className={styles.visuallyHidden}>Records</h3>
       <PosterTileList>
         {cards.map(({ label, record, detail }) => {
           const movie = movies[record.id];
@@ -205,86 +210,100 @@ function MoreStats({ stats }: { stats: Stats }) {
   const busiest = Math.max(0, ...stats.decades.map(({ count }) => count));
   const moreLanguages = stats.languages.length - LANGUAGES_SHOWN;
 
-  return (
-    <div className={styles.charts}>
-      {people.map(
-        ({ caption, heading, ranked, filterId }) =>
-          // Nobody with two films: a ranking of ones says nothing.
-          ranked.length > 0 && (
-            <div key={caption} className={styles.chart}>
-              <RankedBarChart
-                caption={caption}
-                labelHeading={heading}
-                valueHeading="Films"
-                items={ranked.map((person, index) => ({
-                  key: person.id,
-                  label: person.name,
-                  value: person.count,
-                  href: getPersonFilterUrl(filterId, person.id),
-                  highlight: index === 0,
-                }))}
-              />
-            </div>
-          ),
-      )}
-      {stats.genres.length > 0 && (
-        <div className={styles.chart}>
+  // Nobody with two films: a ranking of ones says nothing.
+  const peopleCharts = people.map(
+    ({ caption, heading, ranked, filterId }) =>
+      ranked.length > 0 && (
+        <div key={caption} className={styles.chart}>
           <RankedBarChart
-            caption="Genres"
-            labelHeading="Genre"
+            caption={caption}
+            labelHeading={heading}
             valueHeading="Films"
-            items={stats.genres.map((genre, index) => ({
-              key: genre.id,
-              label: genre.name,
-              value: genre.count,
-              href: GENRE_SLUGS[genre.id]
-                ? getGenreUrl(GENRE_SLUGS[genre.id])
-                : undefined,
+            items={ranked.map((person, index) => ({
+              key: person.id,
+              label: person.name,
+              value: person.count,
+              href: getPersonFilterUrl(filterId, person.id),
               highlight: index === 0,
             }))}
           />
-          <p className={styles.footnote}>
-            A film can have several genres, so these add up to more than your
-            films.
-          </p>
         </div>
-      )}
-      {stats.decades.length > 1 && (
-        <div className={styles.chart}>
-          <RankedBarChart
-            caption="By decade"
-            labelHeading="Decade"
-            valueHeading="Films"
-            keepOrder
-            items={stats.decades.map(({ decade, count }) => ({
-              key: String(decade),
-              label: `${decade}s`,
-              value: count,
-              highlight: count === busiest,
-            }))}
-          />
+      ),
+  );
+  const genresChart = stats.genres.length > 0 && (
+    <div key="genres" className={styles.chart}>
+      <RankedBarChart
+        caption="Genres"
+        labelHeading="Genre"
+        valueHeading="Films"
+        items={stats.genres.map((genre, index) => ({
+          key: genre.id,
+          label: genre.name,
+          value: genre.count,
+          href: GENRE_SLUGS[genre.id]
+            ? getGenreUrl(GENRE_SLUGS[genre.id])
+            : undefined,
+          highlight: index === 0,
+        }))}
+      />
+      <p className={styles.footnote}>
+        A film can have several genres, so these add up to more than your films.
+      </p>
+    </div>
+  );
+  const decadesChart = stats.decades.length > 1 && (
+    <div key="decades" className={styles.chart}>
+      <RankedBarChart
+        caption="By decade"
+        labelHeading="Decade"
+        valueHeading="Films"
+        keepOrder
+        items={stats.decades.map(({ decade, count }) => ({
+          key: String(decade),
+          label: `${decade}s`,
+          value: count,
+          highlight: count === busiest,
+        }))}
+      />
+    </div>
+  );
+  const languagesChart = stats.languages.length > 1 && (
+    <div key="languages" className={styles.chart}>
+      <h3 className={styles.chartHeading}>
+        Films in {plural(stats.languages.length, "language")}
+      </h3>
+      <ul className={styles.languages}>
+        {stats.languages.slice(0, LANGUAGES_SHOWN).map(({ code, count }) => (
+          <li key={code} className={styles.language}>
+            {formatLanguage(code)}{" "}
+            <span className={styles.languageCount}>{count}</span>
+          </li>
+        ))}
+        {moreLanguages > 0 && (
+          <li className={styles.language}>{moreLanguages} more</li>
+        )}
+      </ul>
+    </div>
+  );
+
+  // Two columns of about the same height: the short people rankings and the
+  // decades on one side, the long genre list and the languages on the other.
+  // Side by side, each chart sat beside one of a different length and left a
+  // gap under the shorter. One column on a phone, in this order.
+  const columns = [
+    [...peopleCharts, decadesChart],
+    [genresChart, languagesChart],
+  ]
+    .map((charts) => charts.filter(Boolean))
+    .filter((charts) => charts.length > 0);
+
+  return (
+    <div className={styles.charts}>
+      {columns.map((charts, index) => (
+        <div key={index} className={styles.column}>
+          {charts}
         </div>
-      )}
-      {stats.languages.length > 1 && (
-        <div className={styles.chart}>
-          <h3 className={styles.chartHeading}>
-            Films in {plural(stats.languages.length, "language")}
-          </h3>
-          <ul className={styles.languages}>
-            {stats.languages
-              .slice(0, LANGUAGES_SHOWN)
-              .map(({ code, count }) => (
-                <li key={code} className={styles.language}>
-                  {formatLanguage(code)}{" "}
-                  <span className={styles.languageCount}>{count}</span>
-                </li>
-              ))}
-            {moreLanguages > 0 && (
-              <li className={styles.language}>{moreLanguages} more</li>
-            )}
-          </ul>
-        </div>
-      )}
+      ))}
     </div>
   );
 }

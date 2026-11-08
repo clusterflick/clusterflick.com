@@ -91,3 +91,21 @@ export const Unlinked: Story = {
     ],
   },
 };
+
+/**
+ * `layout="grid"`: two to a row at every width, for a band sharing its row
+ * with something else (the Seen stats beside their records).
+ */
+export const Grid: Story = {
+  args: {
+    items: Default.args.items.slice(0, 4),
+    layout: "grid",
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480 }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
