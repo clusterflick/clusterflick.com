@@ -7,6 +7,7 @@ import type { Movie } from "@/types";
 import { BookmarkIcon, EyeIcon } from "@/components/icons";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
+import type { FilmDetailsData } from "@/lib/user-lists/film-details";
 import styles from "./user-list-buttons.module.css";
 
 const LISTS: Record<
@@ -26,6 +27,13 @@ const LISTS: Record<
 interface UserListButtonsProps {
   /** What the lists keep about the film — see `UserListEntry`. */
   movie: Pick<Movie, "id" | "title" | "year" | "posterPath">;
+  /**
+   * The film's details, saved with it — see `FilmDetailsData`. Either the
+   * details, for a film whose page or the dataset has them, or a function
+   * looking them up on a press, for a film from TMDB's search, so only a
+   * reader who adds it pays for the lookup. If that throws, nothing is added.
+   */
+  details: FilmDetailsData | (() => Promise<FilmDetailsData>);
   /**
    * Side by side, spanning a film page's poster (the default), or one above
    * the other, for a tile too narrow to fit both labels across.
@@ -51,10 +59,14 @@ interface UserListButtonsProps {
  */
 export default function UserListButtons({
   movie,
+  details,
   layout = "inline",
 }: UserListButtonsProps) {
   const { status, lists, addToList, removeFromList } = useUserContext();
   const [error, setError] = useState(false);
+  // While a press is saving: a TMDB film's details are looked up first, and a
+  // second press meanwhile would act on the state before it.
+  const [busy, setBusy] = useState(false);
 
   if (status === "unavailable") return null;
 
@@ -82,15 +94,22 @@ export default function UserListButtons({
 
   const toggle = async (listId: UserListId, isOn: boolean) => {
     setError(false);
+    setBusy(true);
     try {
       if (isOn) {
         await removeFromList(listId, movie.id);
       } else {
-        await addToList(listId, movie);
+        await addToList(
+          listId,
+          movie,
+          typeof details === "function" ? await details() : details,
+        );
       }
     } catch (caught) {
       console.error("Failed to update list", caught);
       setError(true);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -108,7 +127,8 @@ export default function UserListButtons({
               aria-pressed={isOn}
               // Lists still loading: the state isn't known, so neither is
               // what a press would do.
-              disabled={!lists}
+              disabled={!lists || busy}
+              aria-busy={busy}
               onClick={() => toggle(listId, isOn)}
               className={clsx(styles.button, isOn && styles.on)}
             >

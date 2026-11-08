@@ -57,6 +57,7 @@ import PlayingAtSection, {
   type VenuePlayCount,
 } from "./components/playing-at-section";
 import ShowingsSection from "./components/showings-section";
+import { collectFilmDetails } from "@/lib/user-lists/film-details";
 import styles from "./page.module.css";
 
 type PageContentProps = {
@@ -347,7 +348,10 @@ export default function PageContent({
             size="large"
             interactive={false}
           />
-          <UserListButtons movie={movie} />
+          <UserListButtons
+            movie={movie}
+            details={collectFilmDetails([movie], people)}
+          />
           {formats.length > 0 && (
             <div className={styles.formatsDesktop}>
               <FormatsList formats={formats} variant="poster" />

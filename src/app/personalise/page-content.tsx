@@ -40,7 +40,10 @@ import {
 } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { useFilmDetailsSync } from "@/hooks/use-film-details-sync";
+import {
+  collectFilmDetails,
+  EMPTY_FILM_DETAILS,
+} from "@/lib/user-lists/film-details";
 import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
@@ -465,7 +468,6 @@ function SignedIn({
   venueImagePaths: Record<string, string>;
 }) {
   const { lists, favouriteVenues } = useUserContext();
-  useFilmDetailsSync();
   // Off by default, and for each visit: editing is occasional, and buttons
   // under every poster read as the page's main business.
   const [showEditing, setShowEditing] = useState(false);
@@ -728,10 +730,17 @@ function UserListSection({
     // entry, so the old one is kept for the undo to put back.
     const seen = lists[UserListId.Seen][id] ?? null;
     setRemoved((current) => ({ ...current, [id]: { entry, seen } }));
-    // As its page would add it, while it's still in the dataset.
-    addToList(UserListId.Seen, movies[id] ?? { id, ...entry }).catch(() =>
-      forget(id),
-    );
+    // As its page would add it, while it's still in the dataset. The film is
+    // already listed, so it has its details from when it was added; the
+    // dataset's copy is passed when there is one, and nothing otherwise.
+    const movie = movies[id];
+    addToList(
+      UserListId.Seen,
+      movie ?? { id, ...entry },
+      movie && metaData
+        ? collectFilmDetails([movie], metaData.people)
+        : EMPTY_FILM_DETAILS,
+    ).catch(() => forget(id));
   };
 
   const onUndo = (id: string, { entry, seen }: Removal) => {

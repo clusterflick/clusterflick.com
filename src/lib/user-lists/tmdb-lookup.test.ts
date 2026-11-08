@@ -3,13 +3,16 @@ import { TmdbSearchError } from "@/lib/tmdb-search";
 import {
   BATCH_INTERVAL_MS,
   estimateLookupMinutes,
+  lookUpDetailsOnTmdb,
   lookUpRowsOnTmdb,
 } from "./tmdb-lookup";
 
 const matchTmdb = vi.hoisted(() => vi.fn());
+const fetchTmdbDetails = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/tmdb-search", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/tmdb-search")>()),
   matchTmdb,
+  fetchTmdbDetails,
 }));
 
 /** A clock that only moves when the lookup waits. */
@@ -33,6 +36,7 @@ const getIdToken = async () => "token";
 
 beforeEach(() => {
   matchTmdb.mockReset();
+  fetchTmdbDetails.mockReset();
 });
 
 describe("lookUpRowsOnTmdb", () => {
@@ -123,5 +127,56 @@ describe("estimateLookupMinutes", () => {
     expect(estimateLookupMinutes(1)).toBe(1);
     expect(estimateLookupMinutes(195)).toBe(1);
     expect(estimateLookupMinutes(2000)).toBe(11);
+  });
+});
+
+describe("lookUpDetailsOnTmdb", () => {
+  /** TMDB's answer for an id: a film with one director named after it. */
+  const tmdbFilm = (id: string) => ({
+    id,
+    genres: ["18"],
+    directors: [{ id: `d${id}`, name: `Director ${id}` }],
+    cast: [],
+  });
+  const ids = (count: number) =>
+    Array.from({ length: count }, (_, i) => String(1000 + i));
+
+  it("fetches batches of 15, paced as the lookup is, into one set", async () => {
+    fetchTmdbDetails.mockImplementation(async (batch: string[]) =>
+      batch.map(tmdbFilm),
+    );
+    const time = fakeTime();
+    const progress: number[] = [];
+
+    const details = await lookUpDetailsOnTmdb(ids(20), {
+      getIdToken,
+      ...time,
+      onProgress: (done) => progress.push(done),
+    });
+
+    expect(fetchTmdbDetails.mock.calls.map(([batch]) => batch.length)).toEqual([
+      15, 5,
+    ]);
+    expect(time.waits).toEqual([BATCH_INTERVAL_MS]);
+    expect(progress).toEqual([15, 20]);
+    expect(Object.keys(details.films)).toHaveLength(20);
+    expect(details.people.d1000).toBe("Director 1000");
+  });
+
+  it("fails rather than add a film TMDB can't describe", async () => {
+    fetchTmdbDetails.mockResolvedValue([tmdbFilm("1000"), null]);
+    await expect(
+      lookUpDetailsOnTmdb(["1000", "1001"], { getIdToken, ...fakeTime() }),
+    ).rejects.toThrow("1001");
+  });
+
+  it("fails once retries run out", async () => {
+    fetchTmdbDetails.mockRejectedValue(
+      new TmdbSearchError("unavailable", "down"),
+    );
+    await expect(
+      lookUpDetailsOnTmdb(ids(1), { getIdToken, ...fakeTime() }),
+    ).rejects.toMatchObject({ reason: "unavailable" });
+    expect(fetchTmdbDetails).toHaveBeenCalledTimes(3);
   });
 });

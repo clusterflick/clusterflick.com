@@ -4,6 +4,7 @@ import {
   FILM_DETAILS_CAST_LIMIT,
   fromTmdbDetails,
   isTmdbId,
+  pickFilmDetails,
   type FilmDetailsSource,
 } from "./film-details";
 
@@ -112,6 +113,26 @@ describe("fromTmdbDetails", () => {
         "949": { genres: ["80"], directors: ["1"], cast: ["2"], runtime: 170 },
       },
       people: { "1": "Michael Mann", "2": "Al Pacino" },
+    });
+  });
+});
+
+describe("pickFilmDetails", () => {
+  it("keeps the films asked for and only the names they use", () => {
+    expect(
+      pickFilmDetails(
+        {
+          films: {
+            "949": { genres: [], directors: ["1"], cast: ["2"] },
+            "603": { genres: [], directors: ["3"], cast: ["2"] },
+          },
+          people: { "1": "Michael Mann", "2": "Shared", "3": "Lana" },
+        },
+        ["949", "unknown"],
+      ),
+    ).toEqual({
+      films: { "949": { genres: [], directors: ["1"], cast: ["2"] } },
+      people: { "1": "Michael Mann", "2": "Shared" },
     });
   });
 });

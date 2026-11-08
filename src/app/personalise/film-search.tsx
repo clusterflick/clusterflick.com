@@ -10,6 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import clsx from "clsx";
+import type { Movie } from "@/types";
 import SearchInput from "@/components/search-input";
 import Button from "@/components/button";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -20,6 +21,10 @@ import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { normalizeForSearch } from "@/lib/filters/normalize";
 import { searchShowingFilms } from "@/lib/user-lists/search-showing-films";
+import {
+  collectFilmDetails,
+  fetchFilmDetailsFromTmdb,
+} from "@/lib/user-lists/film-details";
 import {
   searchTmdb,
   TmdbSearchError,
@@ -85,10 +90,18 @@ export default function FilmSearch({
   ref?: RefObject<HTMLElement | null>;
 }) {
   const { getIdToken } = useUserContext();
-  const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
+  const { movies, metaData, hasAttemptedLoad, isLoading, error } =
+    useCinemaData();
   const [query, setQuery] = useState("");
   const [tmdb, setTmdb] = useState<TmdbState>({ step: "idle" });
   const inFlight = useRef<AbortController | null>(null);
+
+  // A film that's showing has its details in the dataset, which only the
+  // results drawn from it reach, so it's read when the film is added.
+  const getDatasetDetails = async (movie: Movie) => {
+    if (!metaData) throw new Error("Listings not loaded");
+    return collectFilmDetails([movie], metaData.people);
+  };
   const trimmed = query.trim();
   // Deferred, so typing stays responsive while a pass over the dataset runs.
   const deferredQuery = useDeferredValue(trimmed);
@@ -233,7 +246,11 @@ export default function FilmSearch({
                             ...(allFilms ? ["Showing now"] : []),
                           ]}
                           action={
-                            <UserListButtons movie={movie} layout="stacked" />
+                            <UserListButtons
+                              movie={movie}
+                              details={() => getDatasetDetails(movie)}
+                              layout="stacked"
+                            />
                           }
                         />
                       ))}
@@ -254,7 +271,18 @@ export default function FilmSearch({
                               ...(film ? ["Showing now"] : []),
                             ]}
                             action={
-                              <UserListButtons movie={entry} layout="stacked" />
+                              <UserListButtons
+                                movie={entry}
+                                details={() =>
+                                  film
+                                    ? getDatasetDetails(film)
+                                    : fetchFilmDetailsFromTmdb(
+                                        [result.id],
+                                        getIdToken,
+                                      )
+                                }
+                                layout="stacked"
+                              />
                             }
                           />
                         );

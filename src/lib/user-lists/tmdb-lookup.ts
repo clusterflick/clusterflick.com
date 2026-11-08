@@ -1,9 +1,15 @@
 import {
+  DETAILS_BATCH_SIZE,
   MATCH_BATCH_SIZE,
   matchTmdb,
   TmdbSearchError,
   type TmdbSearchResult,
 } from "@/lib/tmdb-search";
+import {
+  EMPTY_FILM_DETAILS,
+  fetchFilmDetailsFromTmdb,
+  type FilmDetailsData,
+} from "./film-details";
 import type { LetterboxdRow } from "./letterboxd-csv";
 
 /**
@@ -133,4 +139,28 @@ export async function lookUpRowsOnTmdb(
     onProgress?.(Math.min(start + MATCH_BATCH_SIZE, rows.length));
   }
   return lookup;
+}
+
+/**
+ * Each film's details from TheMovieDB, for films an import found there that
+ * aren't showing, a batch at a time and paced as the lookup is. Throws if a
+ * batch can't be looked up, or names a film TMDB can't describe: an import
+ * adds every film with its details or none of them.
+ */
+export async function lookUpDetailsOnTmdb(
+  ids: string[],
+  { getIdToken, signal, onProgress, sleep, now }: TmdbLookupOptions,
+): Promise<FilmDetailsData> {
+  const details: FilmDetailsData = structuredClone(EMPTY_FILM_DETAILS);
+  const runBatch = createBatchRunner({ signal, sleep, now });
+  for (let start = 0; start < ids.length; start += DETAILS_BATCH_SIZE) {
+    const batch = ids.slice(start, start + DETAILS_BATCH_SIZE);
+    const found = await runBatch(() =>
+      fetchFilmDetailsFromTmdb(batch, getIdToken, signal),
+    );
+    Object.assign(details.films, found.films);
+    Object.assign(details.people, found.people);
+    onProgress?.(Math.min(start + DETAILS_BATCH_SIZE, ids.length));
+  }
+  return details;
 }

@@ -1,5 +1,5 @@
 import type { Movie, Venue } from "@/types";
-import type { Firestore } from "firebase/firestore/lite";
+import type { Firestore, WriteBatch } from "firebase/firestore/lite";
 import type { FilmDetailsData } from "./film-details";
 
 /**
@@ -104,18 +104,25 @@ export async function fetchUserData(
   };
 }
 
+/**
+ * Adds a film with its details, in one write: either both are saved or
+ * neither is, so a film is never listed without its details. Details with no
+ * films — an unmatched film, which has none to give — write the entry alone.
+ */
 export async function addToUserList(
   db: Firestore,
   uid: string,
   listId: UserListId,
   movieId: Movie["id"],
   entry: UserListEntry,
+  details: FilmDetailsData,
   /** Lists the film leaves in the same write, so the two can't disagree. */
   removeFrom: UserListId[] = [],
 ): Promise<void> {
-  const { setDoc, deleteField } = await import("firebase/firestore/lite");
+  const { writeBatch, deleteField } = await import("firebase/firestore/lite");
+  const batch = writeBatch(db);
   // Merge rather than update: the document doesn't exist until the first add.
-  await setDoc(
+  batch.set(
     await getUserDocRef(db, uid),
     {
       [listId]: { [movieId]: entry },
@@ -125,22 +132,26 @@ export async function addToUserList(
     },
     { merge: true },
   );
+  await addDetailsToBatch(batch, db, uid, details);
+  await batch.commit();
 }
 
 /**
- * Adds many films in one write — an import. Films in `removeFrom` leave it in
- * the same write, as with a single add.
+ * Adds many films with their details in one write — an import. Films in
+ * `removeFrom` leave it in the same write, as with a single add.
  */
 export async function addManyToUserList(
   db: Firestore,
   uid: string,
   listId: UserListId,
   entries: Record<Movie["id"], UserListEntry>,
+  details: FilmDetailsData,
   removeFrom: UserListId[] = [],
 ): Promise<void> {
-  const { setDoc, deleteField } = await import("firebase/firestore/lite");
+  const { writeBatch, deleteField } = await import("firebase/firestore/lite");
   const ids = Object.keys(entries);
-  await setDoc(
+  const batch = writeBatch(db);
+  batch.set(
     await getUserDocRef(db, uid),
     {
       [listId]: entries,
@@ -153,6 +164,8 @@ export async function addManyToUserList(
     },
     { merge: true },
   );
+  await addDetailsToBatch(batch, db, uid, details);
+  await batch.commit();
 }
 
 /**
@@ -229,36 +242,14 @@ async function getFilmDetailsDocRef(db: Firestore, uid: string) {
   return doc(db, "users", uid, "meta", "films");
 }
 
-export async function fetchFilmDetails(
-  db: Firestore,
-  uid: string,
-): Promise<FilmDetailsData> {
-  const { getDoc } = await import("firebase/firestore/lite");
-  const data = (await getDoc(await getFilmDetailsDocRef(db, uid))).data();
-  return { films: data?.films ?? {}, people: data?.people ?? {} };
-}
-
-/**
- * Merges films' details into the companion document — see `FilmDetailsData` —
- * and takes out the films and people in `remove`, in one write.
- */
-export async function saveFilmDetails(
+async function addDetailsToBatch(
+  batch: WriteBatch,
   db: Firestore,
   uid: string,
   details: FilmDetailsData,
-  remove: { films?: string[]; people?: string[] } = {},
-): Promise<void> {
-  const { setDoc, deleteField } = await import("firebase/firestore/lite");
-  const removing = (ids: string[] = []) =>
-    Object.fromEntries(ids.map((id) => [id, deleteField()]));
-  await setDoc(
-    await getFilmDetailsDocRef(db, uid),
-    {
-      films: { ...removing(remove.films), ...details.films },
-      people: { ...removing(remove.people), ...details.people },
-    },
-    { merge: true },
-  );
+) {
+  if (Object.keys(details.films).length === 0) return;
+  batch.set(await getFilmDetailsDocRef(db, uid), details, { merge: true });
 }
 
 /** Deletes everything stored for the user: the lists and the film details. */

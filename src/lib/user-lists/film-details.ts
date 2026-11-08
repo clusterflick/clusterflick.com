@@ -1,5 +1,5 @@
 import type { Movie, Person } from "@/types";
-import type { TmdbFilmDetails } from "@/lib/tmdb-search";
+import { fetchTmdbDetails, type TmdbFilmDetails } from "@/lib/tmdb-search";
 
 /**
  * Top-billed cast kept per film. "Favourite actor" is about leading roles,
@@ -118,61 +118,38 @@ export function fromTmdbDetails(results: TmdbFilmDetails[]): FilmDetailsData {
   return data;
 }
 
-export type FilmDetailsPlan = {
-  /** Listed films without details whose details the dataset holds. */
-  fromDataset: FilmDetailsSource[];
-  /** Listed films without details to look up on TMDB. */
-  fromTmdb: Movie["id"][];
-  /** Films with details that are on no list any more. */
-  staleFilms: Movie["id"][];
-};
-
-/**
- * What it takes to bring the details in line with the lists. A film in the
- * dataset is read from it, which costs nothing; one that isn't is looked up
- * on TMDB if its id is TMDB's. An unmatched film gets neither — see
- * `collectFilmDetails` — and is left without details for good.
- */
-export function planFilmDetailsSync(
-  listedIds: Iterable<Movie["id"]>,
+/** The details of just `ids`, and only the names those films use. */
+export function pickFilmDetails(
   details: FilmDetailsData,
-  movies: Record<Movie["id"], FilmDetailsSource | undefined>,
-): FilmDetailsPlan {
-  const listed = new Set(listedIds);
-  const plan: FilmDetailsPlan = {
-    fromDataset: [],
-    fromTmdb: [],
-    staleFilms: [],
-  };
-  for (const id of listed) {
-    if (id in details.films) continue;
-    const movie = movies[id];
-    if (movie) {
-      if (!movie.isUnmatched) plan.fromDataset.push(movie);
-    } else if (isTmdbId(id)) {
-      plan.fromTmdb.push(id);
+  ids: Movie["id"][],
+): FilmDetailsData {
+  const picked: FilmDetailsData = { films: {}, people: {} };
+  for (const id of ids) {
+    const film = details.films[id];
+    if (!film) continue;
+    picked.films[id] = film;
+    for (const person of [...film.directors, ...film.cast]) {
+      const name = details.people[person];
+      if (name) picked.people[person] = name;
     }
   }
-  plan.staleFilms = Object.keys(details.films).filter((id) => !listed.has(id));
-  return plan;
+  return picked;
 }
 
 /**
- * People the remaining films no longer name, once `removedFilms` are gone and
- * `added` is merged in. Names are kept once for every film, so they outlive a
- * film only if another one names them.
+ * Details for films that aren't in the dataset, from TMDB through the search
+ * Worker. Every id must be a film TMDB has: they come from TMDB's own search
+ * or match, so one it can't describe is an error, not a film without details.
  */
-export function getStalePeople(
-  details: FilmDetailsData,
-  added: FilmDetailsData,
-  removedFilms: Movie["id"][],
-): string[] {
-  const removed = new Set(removedFilms);
-  const named = new Set<string>();
-  const films = { ...details.films, ...added.films };
-  for (const [id, film] of Object.entries(films)) {
-    if (removed.has(id)) continue;
-    for (const person of [...film.directors, ...film.cast]) named.add(person);
+export async function fetchFilmDetailsFromTmdb(
+  ids: Movie["id"][],
+  getIdToken: (forceRefresh?: boolean) => Promise<string>,
+  signal?: AbortSignal,
+): Promise<FilmDetailsData> {
+  const results = await fetchTmdbDetails(ids, getIdToken, signal);
+  const missing = ids.filter((_, index) => !results[index]);
+  if (missing.length > 0) {
+    throw new Error(`TMDB has no details for ${missing.join(", ")}`);
   }
-  return Object.keys(details.people).filter((id) => !named.has(id));
+  return fromTmdbDetails(results.flatMap((film) => film ?? []));
 }
