@@ -497,6 +497,9 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
       />
+      {/* At the top: they're what a reader with a long Seen list comes back
+          for, and the lists below are long. */}
+      {lists && <SeenStats seen={lists[UserListId.Seen]} />}
       <FilmSearch ref={filmSearchRef} />
       {lists ? (
         <>
@@ -518,7 +521,6 @@ function SignedIn({
             lists={lists}
             showEditing={showEditing}
           />
-          <SeenStats seen={lists[UserListId.Seen]} />
         </>
       ) : (
         <LoadingIndicator message="Loading your lists…" />

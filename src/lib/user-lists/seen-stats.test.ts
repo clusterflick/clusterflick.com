@@ -77,11 +77,24 @@ describe("getSeenStats", () => {
     expect(stats.directors).toBe(3);
   });
 
-  it("adds up the running time, and what it comes to", () => {
+  it("adds up the running time", () => {
     // 170 + 136 + 153 + 157 minutes.
     expect(stats.hours).toBe(10);
-    expect(stats.days).toBe(0);
-    expect(stats.doubleBills).toBe(3);
+  });
+
+  it("breaks a tie for newest by when the film was added", () => {
+    const sameYear = {
+      tuner: { title: "Tuner", year: "2026", addedAt: 1 },
+      digger: { title: "Digger", year: "2026", addedAt: 3 },
+      odyssey: { title: "The Odyssey", year: "2026", addedAt: 2 },
+    };
+    const records = getSeenStats(
+      sameYear,
+      { films: {}, people: {} },
+      genreNames,
+    ).records;
+    expect(records.newest?.id).toBe("digger");
+    expect(records.oldest?.id).toBe("tuner");
   });
 
   it("finds the records, years from the list itself", () => {

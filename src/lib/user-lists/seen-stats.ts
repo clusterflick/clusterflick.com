@@ -6,8 +6,6 @@ import type { FilmDetailsData } from "./film-details";
 const TOP_PEOPLE = 5;
 /** A ranking of one film each says nothing, so a person needs this many. */
 const MIN_PERSON_FILMS = 2;
-/** A double bill, give or take the interval: two films and a break. */
-const DOUBLE_BILL_HOURS = 4;
 
 export type RankedPerson = { id: string; name: string; count: number };
 export type GenreCount = { id: string; name: string; count: number };
@@ -28,9 +26,6 @@ export type SeenStats = {
   withDetails: number;
   /** Total running time, in whole hours. */
   hours: number;
-  /** That time as whole days back to back, and as double bills. */
-  days: number;
-  doubleBills: number;
   /** Distinct directors across the films. */
   directors: number;
   languages: LanguageCount[];
@@ -110,9 +105,14 @@ export function getSeenStats(
   const dated = ids
     .filter((id) => getYear(seen[id]) !== undefined)
     .map((id) => ({ id, entry: seen[id] }))
+    // Within a year, by when the film went on the list: the year alone left
+    // eight 2026 films tied for newest, and the one added most recently is
+    // the likelier to be the newest film. A stopgap until a release date is
+    // stored; an import adds many at once, which falls back to the title.
     .sort(
       (a, b) =>
         (getYear(a.entry) ?? 0) - (getYear(b.entry) ?? 0) ||
+        a.entry.addedAt - b.entry.addedAt ||
         title(a).localeCompare(title(b)),
     );
 
@@ -131,8 +131,6 @@ export function getSeenStats(
     films: ids.length,
     withDetails: films.length,
     hours,
-    days: Math.round(minutes / 60 / 24),
-    doubleBills: Math.round(minutes / 60 / DOUBLE_BILL_HOURS),
     directors: new Set(films.flatMap(({ film }) => film.directors)).size,
     languages: [...count(films.flatMap(({ film }) => film.language ?? []))]
       .map(([code, n]) => ({ code, count: n }))

@@ -110,7 +110,6 @@ export default function SeenStats({
             },
           ]}
         />
-        <TimeMadeTangible stats={stats} />
         {stats.films > stats.withDetails && (
           <p className={styles.footnote}>
             Counted from {plural(stats.withDetails, "film")}.{" "}
@@ -128,31 +127,19 @@ export default function SeenStats({
   );
 }
 
-function TimeMadeTangible({ stats }: { stats: Stats }) {
-  if (stats.days >= 2) {
-    return (
-      <p className={styles.tangible}>
-        That&apos;s <strong>{plural(stats.days, "day")}</strong> of cinema back
-        to back, or <strong>{plural(stats.doubleBills, "double bill")}</strong>.
-      </p>
-    );
-  }
-  if (stats.doubleBills >= 2) {
-    return (
-      <p className={styles.tangible}>
-        That&apos;s <strong>{plural(stats.doubleBills, "double bill")}</strong>{" "}
-        of cinema.
-      </p>
-    );
-  }
-  return null;
-}
-
 function Records({ stats }: { stats: Stats }) {
   const { movies } = useCinemaData();
   const { longest, shortest, oldest, newest } = stats.records;
   const runtime = (record: SeenRecord) =>
     formatDuration((record.runtime ?? 0) * 60_000, { compact: true });
+  // On the reader's clock: the page is client-rendered, so this is today.
+  const thisYear = new Date().getFullYear();
+  const yearsAgo = (record: SeenRecord) => {
+    const years = thisYear - Number(record.entry.year);
+    if (years <= 0) return "This year";
+    if (years === 1) return "Last year";
+    return `${years} years ago`;
+  };
   // A list of one film's length, or one year, has a single record of each
   // pair, not two of the same.
   const cards = [
@@ -163,17 +150,17 @@ function Records({ stats }: { stats: Stats }) {
     },
     shortest &&
       shortest.id !== longest?.id && {
-        label: "Shortest",
+        label: "Shortest sit",
         record: shortest,
         detail: runtime(shortest),
       },
-    // The year is already under the title, so these need only the label.
-    oldest && { label: "Oldest", record: oldest },
+    oldest && { label: "Oldest", record: oldest, detail: yearsAgo(oldest) },
     newest &&
       newest.id !== oldest?.id &&
       newest.entry.year !== oldest?.entry.year && {
         label: "Newest",
         record: newest,
+        detail: yearsAgo(newest),
       },
   ].flatMap((card) => card || []);
   if (cards.length === 0) return null;
@@ -200,17 +187,6 @@ function Records({ stats }: { stats: Stats }) {
   );
 }
 
-/**
- * "1920s" at the ends and where a century turns, "’50s" between: eleven full
- * labels don't fit across a phone, and the ends and centuries say which
- * century the short ones are in.
- */
-function formatDecade(decade: number, index: number, total: number) {
-  return index === 0 || index === total - 1 || decade % 100 === 0
-    ? `${decade}s`
-    : `\u2019${String(decade % 100).padStart(2, "0")}s`;
-}
-
 function MoreStats({ stats }: { stats: Stats }) {
   const people = [
     {
@@ -226,8 +202,7 @@ function MoreStats({ stats }: { stats: Stats }) {
       filterId: FilterId.Cast as const,
     },
   ];
-  const maxDecade = Math.max(1, ...stats.decades.map(({ count }) => count));
-  const busiest = stats.decades.find(({ count }) => count === maxDecade);
+  const busiest = Math.max(0, ...stats.decades.map(({ count }) => count));
   const moreLanguages = stats.languages.length - LANGUAGES_SHOWN;
 
   return (
@@ -275,31 +250,20 @@ function MoreStats({ stats }: { stats: Stats }) {
         </div>
       )}
       {stats.decades.length > 1 && (
-        <figure className={styles.chart}>
-          <figcaption className={styles.chartHeading}>By decade</figcaption>
-          <ol className={styles.decades}>
-            {stats.decades.map(({ decade, count }, index) => (
-              <li key={decade} className={styles.decade}>
-                <span className={styles.decadeCount}>{count}</span>
-                <span aria-hidden="true" className={styles.decadeTrack}>
-                  <span
-                    className={styles.decadeBar}
-                    data-busiest={count === maxDecade || undefined}
-                    style={{ height: `${(count / maxDecade) * 100}%` }}
-                  />
-                </span>
-                <span className={styles.decadeLabel}>
-                  {formatDecade(decade, index, stats.decades.length)}
-                </span>
-              </li>
-            ))}
-          </ol>
-          {busiest && (
-            <p className={styles.footnote}>
-              Your busiest decade is the {busiest.decade}s.
-            </p>
-          )}
-        </figure>
+        <div className={styles.chart}>
+          <RankedBarChart
+            caption="By decade"
+            labelHeading="Decade"
+            valueHeading="Films"
+            keepOrder
+            items={stats.decades.map(({ decade, count }) => ({
+              key: String(decade),
+              label: `${decade}s`,
+              value: count,
+              highlight: count === busiest,
+            }))}
+          />
+        </div>
       )}
       {stats.languages.length > 1 && (
         <div className={styles.chart}>

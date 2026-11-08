@@ -1699,19 +1699,28 @@ buttons opens every stack, since a closed one would hide them. Signed in, the pa
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
-**Seen has stats beneath it** (`SeenStats`, `getSeenStats` in
-`@/lib/user-lists/seen-stats`), read from the film details document, which
-only this page loads, again whenever the Seen list's films change: the
-headline figures in a `StatsBand`, the time as days and double bills, and
-the records (longest, shortest, oldest, newest) as `PosterTile`s. Directors,
-actors, genres, decades and languages sit behind "Show more stats", since
-four charts would double the page.
+**The Seen list's stats lead the page** (`SeenStats`, `getSeenStats` in
+`@/lib/user-lists/seen-stats`), under the account bar and above the search:
+they are what a reader with a long list comes back for, and the lists below
+are long. They are read from the film details document, which only this page
+loads, again whenever the Seen list's films change: the headline figures in
+a `StatsBand`, then the records (longest and shortest sit by runtime, oldest
+and newest by year with how long ago) as `PosterTile`s. Directors, actors,
+genres, decades and languages sit behind "Show more stats", as
+`RankedBarChart`s (decades with `keepOrder`, in date order) and language
+chips. A line turning the hours into days and double bills was tried and
+taken out; it didn't earn its place.
 
 - **Years come from the list entries, everything else from the details**, so
   an unmatched film counts towards the decades and nothing else, and a
   footnote says how many films had nothing to count. Watch dates are never
-  used: an entry's date is when it was added, and an import adds hundreds in
+  shown: an entry's date is when it was added, and an import adds hundreds in
   a day.
+- **Newest and oldest tie on the year**, as no release date is stored. Within
+  a year the film added most recently is newest (and the one added earliest
+  oldest), which usually picks the film just seen over one from earlier that
+  year; an import's films, added at once, fall back to the title. Storing
+  TMDB's release date with the details would settle it properly.
 - **Nothing shows below five films** (`MIN_STATS_FILMS`); a line says how
   many to go. Within the stats, a ranking needs people with two films or
   more, decades need two decades and languages two languages, and a record
@@ -1719,9 +1728,6 @@ four charts would double the page.
   shortest) is left out.
 - **Signed out, nothing renders**, as the stats are inside the signed-in
   page.
-- Decade labels shorten between the ends and the centuries ("1920s, ’30s …
-  2000s, ’10s, 2020s") and a long span scrolls, as eleven full labels don't
-  fit across a phone.
 
 **The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
 two groups above Showing now, each soonest first:

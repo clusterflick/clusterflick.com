@@ -263,7 +263,74 @@ const STATS_PEOPLE: Record<string, string> = {
   stewart: "James Stewart",
   lang: "Fritz Lang",
   marker: "Chris Marker",
+  coen: "Joel Coen",
+  pta: "Paul Thomas Anderson",
+  tarantino: "Quentin Tarantino",
 };
+
+/** Five films with nothing in common but the decade. */
+const SPARSE_FILMS: [string, string, string, FilmDetails][] = [
+  [
+    "heat",
+    "Heat",
+    "1995",
+    {
+      genres: ["80", "18"],
+      directors: ["mann"],
+      cast: ["pacino"],
+      runtime: 170,
+      language: "en",
+    },
+  ],
+  [
+    "fargo",
+    "Fargo",
+    "1996",
+    {
+      genres: ["80", "18"],
+      directors: ["coen"],
+      cast: [],
+      runtime: 98,
+      language: "en",
+    },
+  ],
+  [
+    "magnolia",
+    "Magnolia",
+    "1999",
+    {
+      genres: ["18"],
+      directors: ["pta"],
+      cast: [],
+      runtime: 188,
+      language: "en",
+    },
+  ],
+  [
+    "casino",
+    "Casino",
+    "1995",
+    {
+      genres: ["80"],
+      directors: ["scorsese"],
+      cast: ["deniro"],
+      runtime: 179,
+      language: "en",
+    },
+  ],
+  [
+    "jackie-brown",
+    "Jackie Brown",
+    "1997",
+    {
+      genres: ["80", "53"],
+      directors: ["tarantino"],
+      cast: [],
+      runtime: 154,
+      language: "en",
+    },
+  ],
+];
 
 /**
  * A Seen list with its films' details, so the stats show under it: the
@@ -325,6 +392,41 @@ export const SignedInFewSeen: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(await canvas.findByText(/2 to go/)).toBeInTheDocument();
+  },
+};
+
+/**
+ * Just past the threshold, with nothing repeated: five films, each by a
+ * different director with a different cast, all from one decade and in one
+ * language. The headline figures and records show; behind "Show more stats"
+ * only the genres do, as rankings of one film each say nothing.
+ */
+export const SignedInSparseStats: Story = {
+  args: {
+    user: {
+      ...SignedInWithLists.args.user,
+      lists: {
+        [UserListId.Watchlist]:
+          SignedInWithLists.args.user.lists![UserListId.Watchlist],
+        [UserListId.Seen]: Object.fromEntries(
+          SPARSE_FILMS.map(([id, title, year], index) => [
+            id,
+            { title, year, addedAt: 1_757_000_000_000 + index },
+          ]),
+        ),
+      },
+      readFilmDetails: async () => ({
+        films: Object.fromEntries(
+          SPARSE_FILMS.map(([id, , , details]) => [id, details]),
+        ),
+        people: STATS_PEOPLE,
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findByRole("heading", { name: "Your Film Stats" });
+    await expect(canvas.queryByText("Directors you watch most")).toBeNull();
   },
 };
 
