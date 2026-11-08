@@ -229,14 +229,36 @@ async function getFilmDetailsDocRef(db: Firestore, uid: string) {
   return doc(db, "users", uid, "meta", "films");
 }
 
-/** Merges films' details into the companion document — see `FilmDetailsData`. */
+export async function fetchFilmDetails(
+  db: Firestore,
+  uid: string,
+): Promise<FilmDetailsData> {
+  const { getDoc } = await import("firebase/firestore/lite");
+  const data = (await getDoc(await getFilmDetailsDocRef(db, uid))).data();
+  return { films: data?.films ?? {}, people: data?.people ?? {} };
+}
+
+/**
+ * Merges films' details into the companion document — see `FilmDetailsData` —
+ * and takes out the films and people in `remove`, in one write.
+ */
 export async function saveFilmDetails(
   db: Firestore,
   uid: string,
   details: FilmDetailsData,
+  remove: { films?: string[]; people?: string[] } = {},
 ): Promise<void> {
-  const { setDoc } = await import("firebase/firestore/lite");
-  await setDoc(await getFilmDetailsDocRef(db, uid), details, { merge: true });
+  const { setDoc, deleteField } = await import("firebase/firestore/lite");
+  const removing = (ids: string[] = []) =>
+    Object.fromEntries(ids.map((id) => [id, deleteField()]));
+  await setDoc(
+    await getFilmDetailsDocRef(db, uid),
+    {
+      films: { ...removing(remove.films), ...details.films },
+      people: { ...removing(remove.people), ...details.people },
+    },
+    { merge: true },
+  );
 }
 
 /** Deletes everything stored for the user: the lists and the film details. */

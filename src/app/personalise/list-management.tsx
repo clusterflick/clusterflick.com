@@ -23,6 +23,7 @@ import {
   estimateLookupMinutes,
   lookUpRowsOnTmdb,
 } from "@/lib/user-lists/tmdb-lookup";
+import { isTmdbId as isTmdbFilmId } from "@/lib/user-lists/film-details";
 import styles from "./page.module.css";
 
 const LIST_NAMES: Record<UserListId, string> = {
@@ -506,10 +507,9 @@ function ExportSection() {
   const onExport = (listId: UserListId) => {
     if (!lists) return;
     // An unmatched film's id is the pipeline's own, not TheMovieDB's. For a
-    // film that has left the dataset there's no telling, so an id is trusted
-    // if it's numeric, as TheMovieDB's are.
+    // film that has left the dataset only the id's shape can tell.
     const isTmdbId = (id: string) =>
-      /^\d+$/.test(id) && !movies[id]?.isUnmatched;
+      isTmdbFilmId(id) && !movies[id]?.isUnmatched;
     const date = new Date().toISOString().slice(0, 10);
     downloadCsv(
       `clusterflick-${listId}-${date}.csv`,

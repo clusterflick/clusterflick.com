@@ -7,8 +7,9 @@ import {
 import type { LetterboxdRow } from "./letterboxd-csv";
 
 /**
- * The Worker's per-reader limit on match batches. Starting one every
- * 60s / 13 keeps an import just inside it.
+ * The Worker's per-reader limit on match batches, and separately on details
+ * batches. Starting one every 60s / 13 keeps an import, or a backfill, just
+ * inside it.
  */
 const BATCHES_PER_MINUTE = 13;
 export const BATCH_INTERVAL_MS = Math.ceil(60_000 / BATCHES_PER_MINUTE);
@@ -58,41 +59,33 @@ export function estimateLookupMinutes(count: number) {
   return Math.max(1, Math.ceil((waits * BATCH_INTERVAL_MS) / 60_000));
 }
 
+export type BatchRunnerOptions = {
+  signal?: AbortSignal;
+  /** Injected by tests, so paced batches don't take minutes. */
+  sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
+  now?: () => number;
+};
+
 /**
- * Looks each row up on TheMovieDB, a batch at a time, paced to the Worker's
- * rate limit. Rows TMDB has no match for are `missing`. A batch that can't be
- * looked up at all — after waiting out a rate limit, and a couple of retries
- * for anything else — throws, rather than counting its films as missing: the
- * reader would lose them from the import without knowing.
+ * Runs calls to the Worker's batch endpoints one at a time, paced to its
+ * per-reader limit. A rate limit is waited out, and anything else retried a
+ * couple of times before the error is thrown: the caller decides what a batch
+ * that couldn't be looked up means, which is never that its films are missing.
  */
-export async function lookUpRowsOnTmdb(
-  rows: LetterboxdRow[],
-  {
-    getIdToken,
-    signal,
-    onProgress,
-    sleep: wait = sleep,
-    now = Date.now,
-  }: TmdbLookupOptions,
-): Promise<TmdbLookup> {
-  const lookup: TmdbLookup = { found: [], missing: [] };
+export function createBatchRunner({
+  signal,
+  sleep: wait = sleep,
+  now = Date.now,
+}: BatchRunnerOptions = {}) {
   let lastStart = -Infinity;
-
-  for (let start = 0; start < rows.length; start += MATCH_BATCH_SIZE) {
-    const batch = rows.slice(start, start + MATCH_BATCH_SIZE);
-    const films = batch.map(({ title, year }) => ({
-      title,
-      ...(year !== undefined && { year }),
-    }));
-
-    let results: (TmdbSearchResult | null)[] | undefined;
+  return async function runBatch<T>(call: () => Promise<T>): Promise<T> {
     let retries = 0;
-    while (!results) {
+    for (;;) {
       const due = lastStart + BATCH_INTERVAL_MS - now();
       if (due > 0) await wait(due, signal);
       lastStart = now();
       try {
-        results = await matchTmdb(films, getIdToken, signal);
+        return await call();
       } catch (error) {
         if (signal?.aborted) throw error;
         if (
@@ -108,7 +101,31 @@ export async function lookUpRowsOnTmdb(
         }
       }
     }
+  };
+}
 
+/**
+ * Looks each row up on TheMovieDB, a batch at a time, paced to the Worker's
+ * rate limit. Rows TMDB has no match for are `missing`. A batch that can't be
+ * looked up at all — after waiting out a rate limit, and a couple of retries
+ * for anything else — throws, rather than counting its films as missing: the
+ * reader would lose them from the import without knowing.
+ */
+export async function lookUpRowsOnTmdb(
+  rows: LetterboxdRow[],
+  { getIdToken, signal, onProgress, sleep, now }: TmdbLookupOptions,
+): Promise<TmdbLookup> {
+  const lookup: TmdbLookup = { found: [], missing: [] };
+  const runBatch = createBatchRunner({ signal, sleep, now });
+
+  for (let start = 0; start < rows.length; start += MATCH_BATCH_SIZE) {
+    const batch = rows.slice(start, start + MATCH_BATCH_SIZE);
+    const films = batch.map(({ title, year }) => ({
+      title,
+      ...(year !== undefined && { year }),
+    }));
+
+    const results = await runBatch(() => matchTmdb(films, getIdToken, signal));
     results.forEach((film, index) => {
       if (film) lookup.found.push({ row: batch[index], film });
       else lookup.missing.push(batch[index]);

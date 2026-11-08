@@ -40,6 +40,7 @@ import {
 } from "@/components/icons";
 import { REQUIRES_RECENT_LOGIN, useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
+import { useFilmDetailsSync } from "@/hooks/use-film-details-sync";
 import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
@@ -464,6 +465,7 @@ function SignedIn({
   venueImagePaths: Record<string, string>;
 }) {
   const { lists, favouriteVenues } = useUserContext();
+  useFilmDetailsSync();
   // Off by default, and for each visit: editing is occasional, and buttons
   // under every poster read as the page's main business.
   const [showEditing, setShowEditing] = useState(false);

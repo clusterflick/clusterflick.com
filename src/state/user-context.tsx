@@ -26,6 +26,7 @@ import {
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
   restoreUserListEntries,
+  fetchFilmDetails,
   saveFilmDetails,
   SIGNED_IN_FLAG_KEY,
   toUserListEntry,
@@ -34,7 +35,10 @@ import {
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
-import { collectFilmDetails } from "@/lib/user-lists/film-details";
+import {
+  collectFilmDetails,
+  type FilmDetailsData,
+} from "@/lib/user-lists/film-details";
 import { useCinemaData } from "@/state/cinema-data-context";
 
 /**
@@ -105,6 +109,16 @@ export type UserContextType = {
   ) => Promise<void>;
   addFavouriteVenue: (venue: Pick<Venue, "id" | "name">) => Promise<void>;
   removeFavouriteVenue: (venueId: Venue["id"]) => Promise<void>;
+  /**
+   * The listed films' details — see `FilmDetailsData`. Not held in state like
+   * the lists: only /personalise reads them, so it reads them when it needs.
+   */
+  readFilmDetails: () => Promise<FilmDetailsData>;
+  /** Merges details in, and takes out the films and people in `remove`. */
+  writeFilmDetails: (
+    details: FilmDetailsData,
+    remove?: { films?: string[]; people?: string[] },
+  ) => Promise<void>;
 };
 
 /**
@@ -472,6 +486,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user, favouriteVenues],
   );
 
+  const readFilmDetails = useCallback<
+    UserContextType["readFilmDetails"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    return fetchFilmDetails(db, user.uid);
+  }, [getServices, user]);
+
+  const writeFilmDetails = useCallback<UserContextType["writeFilmDetails"]>(
+    async (details, remove) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      await saveFilmDetails(db, user.uid, details, remove);
+    },
+    [getServices, user],
+  );
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -490,6 +521,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       restoreToList,
       addFavouriteVenue,
       removeFavouriteVenue,
+      readFilmDetails,
+      writeFilmDetails,
     }),
     [
       status,
@@ -507,6 +540,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       restoreToList,
       addFavouriteVenue,
       removeFavouriteVenue,
+      readFilmDetails,
+      writeFilmDetails,
     ],
   );
 
@@ -542,6 +577,8 @@ export function MockUserProvider({
     restoreToList: noop,
     addFavouriteVenue: noop,
     removeFavouriteVenue: noop,
+    readFilmDetails: async () => ({ films: {}, people: {} }),
+    writeFilmDetails: noop,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;
