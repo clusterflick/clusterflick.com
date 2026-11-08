@@ -591,6 +591,9 @@
 /* "Showing now" with the step out to TheMovieDB at its right, wrapping
    beneath it on a phone. */
 .filmSearchHeader {
+  /* The Search all films button's height, so the row keeps it when the
+     button gives way to a line of text. */
+  min-height: 28px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -151,16 +151,19 @@ export default function FilmSearch({
     }
   };
 
-  // Films that are showing and already drawn above aren't repeated; one past
+  // One list: the films showing first, then what TheMovieDB adds once asked.
+  // Its films that are showing and already drawn aren't repeated; one past
   // the limit is TheMovieDB's to show, linked as the dataset's film.
-  const tmdbResults =
-    tmdbCurrent && tmdb.step === "done"
-      ? tmdb.results.filter(({ id }) => !shownIds.has(id))
-      : [];
+  const allFilms = tmdbCurrent && tmdb.step === "done";
+  const tmdbResults = allFilms
+    ? tmdb.results.filter(({ id }) => !shownIds.has(id))
+    : [];
+  const searching = tmdbCurrent && tmdb.step === "searching";
   // Without the listings there's no telling what's showing, and saying
   // nothing matches would be wrong: TheMovieDB is offered instead.
   const nothingShowing =
     searchable && !loading && !error && showing.length === 0;
+  const hasResults = shown.length > 0 || tmdbResults.length > 0;
 
   return (
     <section ref={ref} className={styles.filmSearchSection}>
@@ -180,68 +183,115 @@ export default function FilmSearch({
           {loading ? (
             <LoadingIndicator message="Checking what's showing…" size="sm" />
           ) : (
-            shown.length > 0 && (
+            (shown.length > 0 || allFilms) && (
               <>
-                {/* The way on to every film is offered twice: beside the
-                    heading, where the eye lands first, and as a last tile,
-                    where it ends up. */}
+                {/* The heading says what the grid holds, and the way on to
+                    every film sits beside it. The row keeps its height
+                    whatever is beside the heading, so nothing below it moves
+                    as the search runs and answers. */}
                 <div className={styles.filmSearchHeader}>
-                  <h3 className={styles.groupTitle}>Showing now</h3>
-                  {!tmdbCurrent && (
-                    <p className={styles.filmSearchAll}>
+                  <h3 className={styles.groupTitle}>
+                    {allFilms ? "All films" : "Showing now"}
+                  </h3>
+                  <p className={styles.filmSearchAll}>
+                    {allFilms ? (
                       <span className={styles.filmSearchAllText}>
-                        Not showing?
+                        Showing now first
                       </span>
-                      <Button variant="secondary" size="sm" onClick={searchAll}>
-                        Search all films
-                      </Button>
-                    </p>
-                  )}
-                </div>
-                <div className={styles.lane}>
-                  <PosterTileList>
-                    {shown.map((movie) => (
-                      <PosterTile
-                        key={movie.id}
-                        title={movie.title}
-                        posterPath={movie.posterPath}
-                        includedMovies={movie.includedMovies}
-                        href={getMovieUrl(movie)}
-                        details={movie.year ? [movie.year] : undefined}
-                        action={
-                          <UserListButtons movie={movie} layout="stacked" />
-                        }
-                      />
-                    ))}
-                    {/* Where the eye ends up having scanned the results and
-                        not found the film: shaped like one more of them, so
-                        it reads as part of the answer rather than a footnote
-                        beneath it. Holds its place while the search runs. */}
-                    {(!tmdbCurrent || tmdb.step === "searching") && (
-                      <li className={styles.searchAllTile}>
-                        <button
-                          type="button"
-                          className={styles.searchAllCard}
+                    ) : searching ? (
+                      <span className={styles.filmSearchAllText}>
+                        Searching all films…
+                      </span>
+                    ) : (
+                      <>
+                        <span className={styles.filmSearchAllText}>
+                          Not showing?
+                        </span>
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           onClick={searchAll}
-                          disabled={tmdb.step === "searching"}
                         >
-                          <SearchIcon />
-                          <span className={styles.searchAllQuestion}>
-                            Not seeing it?
-                          </span>
-                          <span className={styles.searchAllPill}>
-                            {tmdb.step === "searching"
-                              ? "Searching…"
-                              : "Search all films"}
-                          </span>
-                          <span className={styles.searchAllHint}>
-                            Including ones not showing
-                          </span>
-                        </button>
-                      </li>
+                          Search all films
+                        </Button>
+                      </>
                     )}
-                  </PosterTileList>
+                  </p>
                 </div>
+                {hasResults ? (
+                  <div className={styles.lane}>
+                    <PosterTileList>
+                      {shown.map((movie) => (
+                        <PosterTile
+                          key={movie.id}
+                          title={movie.title}
+                          posterPath={movie.posterPath}
+                          includedMovies={movie.includedMovies}
+                          href={getMovieUrl(movie)}
+                          details={[
+                            ...(movie.year ? [movie.year] : []),
+                            ...(allFilms ? ["Showing now"] : []),
+                          ]}
+                          action={
+                            <UserListButtons movie={movie} layout="stacked" />
+                          }
+                        />
+                      ))}
+                      {tmdbResults.map((result) => {
+                        // A film that's showing is ours as well as TMDB's: it
+                        // links to its page, and goes on a list as its page
+                        // would put it there.
+                        const film = movies[result.id];
+                        const entry = film ?? result;
+                        return (
+                          <PosterTile
+                            key={result.id}
+                            title={entry.title}
+                            posterPath={entry.posterPath}
+                            href={film ? getMovieUrl(film) : undefined}
+                            details={[
+                              entry.year ?? "Year unknown",
+                              ...(film ? ["Showing now"] : []),
+                            ]}
+                            action={
+                              <UserListButtons movie={entry} layout="stacked" />
+                            }
+                          />
+                        );
+                      })}
+                      {/* Where the eye ends up having scanned the results and
+                          not found the film: shaped like one more of them, so
+                          it reads as part of the answer rather than a
+                          footnote beneath it. Holds its place while the
+                          search runs, and gives way to what it finds. */}
+                      {!allFilms && (
+                        <li className={styles.searchAllTile}>
+                          <button
+                            type="button"
+                            className={styles.searchAllCard}
+                            onClick={searchAll}
+                            disabled={searching}
+                          >
+                            <SearchIcon />
+                            <span className={styles.searchAllQuestion}>
+                              Not seeing it?
+                            </span>
+                            <span className={styles.searchAllPill}>
+                              {searching ? "Searching…" : "Search all films"}
+                            </span>
+                            <span className={styles.searchAllHint}>
+                              Including ones not showing
+                            </span>
+                          </button>
+                        </li>
+                      )}
+                    </PosterTileList>
+                  </div>
+                ) : (
+                  <p className={styles.empty}>
+                    No films match <strong>{trimmed}</strong>, showing or not.
+                  </p>
+                )}
                 {showing.length > shown.length && (
                   <p className={styles.filmSearchMore}>
                     {showing.length.toLocaleString("en-GB")} films showing
@@ -273,53 +323,13 @@ export default function FilmSearch({
               </Button>
             </p>
           )}
-
-          {tmdbCurrent && tmdb.step === "searching" && (
+          {searching && shown.length === 0 && (
             <LoadingIndicator message="Searching all films…" size="sm" />
           )}
           {tmdbCurrent && tmdb.step === "error" && (
             <p className={styles.error} role="alert">
               {tmdb.message}
             </p>
-          )}
-          {tmdbCurrent && tmdb.step === "done" && (
-            <>
-              <h3 className={styles.groupTitle}>All films</h3>
-              {tmdbResults.length === 0 ? (
-                <p className={styles.empty}>
-                  {tmdb.results.length === 0
-                    ? "No films match that title on TheMovieDB either."
-                    : "Nothing beyond the films showing above."}
-                </p>
-              ) : (
-                <div className={styles.lane}>
-                  <PosterTileList>
-                    {tmdbResults.map((result) => {
-                      // A film that's showing is ours as well as TMDB's: it
-                      // links to its page, and goes on a list as its page
-                      // would put it there.
-                      const film = movies[result.id];
-                      const entry = film ?? result;
-                      return (
-                        <PosterTile
-                          key={result.id}
-                          title={entry.title}
-                          posterPath={entry.posterPath}
-                          href={film ? getMovieUrl(film) : undefined}
-                          details={[
-                            entry.year ?? "Year unknown",
-                            ...(film ? ["Showing now"] : []),
-                          ]}
-                          action={
-                            <UserListButtons movie={entry} layout="stacked" />
-                          }
-                        />
-                      );
-                    })}
-                  </PosterTileList>
-                </div>
-              )}
-            </>
           )}
         </div>
       )}
