@@ -1767,9 +1767,14 @@ button. The tile is where the eye ends having scanned the results and not
 found the film, and being shaped like a result it reads as part of the answer;
 a line of text under the results, and then a button by the heading, were both
 easy to miss. When nothing showing matches, the step is the main button under
-the box. Its results drop films already
-drawn above, and are hidden once the box says something else, the button
-offered again. It used to sit in the list tools, because the usual way to add
+the box. **The answer is one grid, not two**: its results join the films
+already drawn, after them and without repeating any, and the heading turns
+from "Showing now" to "All films", with each showing film marked "Showing
+now". Two sections answered the same search twice. The heading's row keeps
+its height whether it holds the button, "Searching all films…" or "Showing
+now first", so nothing below it moves as the search runs: the button
+dropping out of it shifted the grid up. TheMovieDB's results are hidden once
+the box says something else, the button offered again. It used to sit in the list tools, because the usual way to add
 a film is from its own page and every search cost a Worker request; with what's
 showing searched for free, the box costs nothing until the reader asks for
 more. The site can't call TMDB itself — the
