@@ -10,6 +10,7 @@ import VenueDotMap from "@/components/venue-dot-map";
 import MoviePoster from "@/components/movie-poster";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import ReportHighlight from "@/components/report-highlight";
+import StatsBand from "@/components/stats-band";
 import { ButtonLink } from "@/components/button";
 import { CalendarIcon } from "@/components/icons";
 import { LONDON_CINEMAS_2026 as DATA } from "@/data/reports/london-cinemas-2026";
@@ -30,6 +31,16 @@ type RankedVenue = ReportVenue & { value: number };
 const fmt = (n: number) => n.toLocaleString("en-GB");
 const percent = (n: number) => `${Math.round(n)}%`;
 const period = `${formatReportDate(DATA.from)} to ${formatReportDate(DATA.to)}`;
+/** "January to October 2026": the period by month, for the headline band. */
+const monthRange = [DATA.from, DATA.to]
+  .map((iso) =>
+    new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
+      month: "long",
+      timeZone: "UTC",
+    }),
+  )
+  .join(" to ")
+  .concat(` ${DATA.to.slice(0, 4)}`);
 
 const FORMAT_LABELS: Record<string, string> = {
   "35mm": "35mm",
@@ -172,6 +183,11 @@ const odysseyFreeFormats = DATA.formats
   .filter((f) => f.format === "16mm" || f.format === "vhs")
   .every((f) => f.odyssey === 0);
 const notCinemas = DATA.venuesWithScreenings - DATA.venueTypes.Cinema;
+// "Almost half" is the copy; a share outside it needs new words.
+const shownOnceShare = DATA.filmsShownOnce / DATA.distinctFilms;
+if (shownOnceShare < 0.45 || shownOnceShare >= 0.5) {
+  throw new Error("Films shown once are no longer almost half");
+}
 const mapShapes = getBoroughMapShapes();
 const mapItems = DATA.venuePoints.map((venue) => {
   const [x, y] = mapShapes.project(venue.lon, venue.lat);
@@ -301,57 +317,74 @@ export default function LondonCinemas2026Report() {
         <div className={styles.lead}>
           <p>
             Clusterflick collects the listings of every place we can find that
-            screens films in London. From {period}, we found{" "}
-            {fmt(DATA.londonScreenings)} film screenings at{" "}
-            {DATA.venuesWithScreenings} venues.
-          </p>
-          <p>
-            A few films took a huge share of them. {topFilm.title} was screened{" "}
-            {fmt(topFilm.screenings)} times,{" "}
-            {fmt(DATA.mostScreeningsOfOneFilm.screenings)} of them at{" "}
-            {venueLink(DATA.mostScreeningsOfOneFilm)} alone. But London&apos;s
-            programme is far wider than its multiplexes, and much of it is
-            somewhere you might not think to look. This is who shows what.
+            screens films in London, and counted every film screening from{" "}
+            {period}. London&apos;s programme is far wider than its multiplexes,
+            and much of it is somewhere you might not think to look. This is who
+            shows what.
           </p>
         </div>
 
-        <dl className={styles.stats}>
-          <div className={styles.stat}>
-            <dt>Film screenings in London this year</dt>
-            <dd>{fmt(DATA.londonScreenings)}</dd>
-          </div>
-          <div className={styles.stat}>
-            <dt>
-              Of them were {topFilm.title}, one in every{" "}
-              {Math.round(DATA.londonScreenings / topFilm.screenings)}{" "}
-              screenings in London
-            </dt>
-            <dd className={styles.statWithPoster}>
-              <span className={styles.statPoster}>
-                <MoviePoster
-                  title={topFilm.title}
-                  posterPath={posterOf(topFilm.movieId)}
-                  size="xsmall"
-                  interactive={false}
-                  fluid
-                />
-              </span>
-              {fmt(topFilm.screenings)}
-            </dd>
-          </div>
-          <div className={styles.stat}>
-            <dt>
-              Of the {DATA.venuesWithScreenings} places that screened films
-              aren&apos;t cinemas,{" "}
-              {percent((notCinemas / DATA.venuesWithScreenings) * 100)} of them
-            </dt>
-            <dd>{notCinemas}</dd>
-          </div>
-        </dl>
+        <div className={styles.band}>
+          <StatsBand
+            label="London's year in film"
+            items={[
+              {
+                id: "screenings",
+                value: DATA.londonScreenings,
+                label: "Screenings",
+                detail: monthRange,
+              },
+              {
+                id: "films",
+                value: DATA.distinctFilms,
+                label: "Films",
+                detail: "and programmes, almost half of them shown just once",
+                href: "#adventurous",
+              },
+              {
+                id: "languages",
+                value: DATA.languages,
+                label: "Languages",
+                detail: `${DATA.nonEnglishShare.toFixed(0)}% of screenings weren't in English`,
+                href: "#around-the-world",
+              },
+              {
+                id: "not-cinemas",
+                value: notCinemas,
+                label: "Not cinemas",
+                detail: `of the ${DATA.venuesWithScreenings} places that screened films: pubs, libraries, churches and more`,
+                href: "#not-just-cinemas",
+              },
+            ]}
+          />
+        </div>
+
+        <aside className={styles.counterpoint}>
+          <span className={styles.counterpointPoster}>
+            <MoviePoster
+              title={topFilm.title}
+              posterPath={posterOf(topFilm.movieId)}
+              size="xsmall"
+              interactive={false}
+              fluid
+            />
+          </span>
+          <p>
+            <span className={styles.counterpointEyebrow}>And yet</span>
+            <span className={styles.counterpointStat}>
+              1 in {Math.round(DATA.londonScreenings / topFilm.screenings)}
+            </span>
+            screenings were one film: {topFilm.title}, screened{" "}
+            {fmt(topFilm.screenings)} times,{" "}
+            {fmt(DATA.mostScreeningsOfOneFilm.screenings)} of them at{" "}
+            {venueLink(DATA.mostScreeningsOfOneFilm)} alone.
+          </p>
+        </aside>
 
         <ContentSection
+          id="adventurous"
           title="The most adventurous programmes"
-          intro="Most screens show this year's releases. A few give most of their time to older films, and show each one only once or twice."
+          intro={`Most screens show this year's releases. A few give most of their time to older films, and show each one only once or twice: ${fmt(DATA.filmsShownOnce)} of the ${fmt(DATA.distinctFilms)} films and programmes screened this year were shown just once.`}
         >
           <div className={styles.highlights}>
             <ReportHighlight
@@ -512,7 +545,7 @@ export default function LondonCinemas2026Report() {
           </PosterTileList>
         </ContentSection>
 
-        <ContentSection title="Around the world">
+        <ContentSection id="around-the-world" title="Around the world">
           <p className={styles.body}>
             {DATA.nonEnglishShare.toFixed(0)}% of London&apos;s screenings were
             of films not in English, in {DATA.languages} original languages.{" "}
@@ -574,6 +607,7 @@ export default function LondonCinemas2026Report() {
         </ContentSection>
 
         <ContentSection
+          id="not-just-cinemas"
           title="Not just cinemas"
           intro={`${DATA.venueTypes.Cinema} cinemas screened films this year. So did ${DATA.venueTypes["Pub & Bar"]} pubs and bars, ${DATA.venueTypes["Library & Archive"]} libraries, ${DATA.venueTypes["Place of Worship"]} places of worship and ${DATA.venueTypes.Hotel} hotels.`}
         >

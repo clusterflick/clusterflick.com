@@ -52,6 +52,8 @@ export const LONDON_CINEMAS_2026 = {
     title: "Spider-Man: Brand New Day",
     screenings: 1365,
   },
+  distinctFilms: 7253,
+  filmsShownOnce: 3599,
   repertory: [
     {
       id: "thenickel.co.uk",

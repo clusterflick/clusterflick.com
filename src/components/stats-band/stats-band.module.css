@@ -25,7 +25,9 @@
   display: grid;
   gap: 4px;
   justify-items: center;
-  align-content: center;
+  /* From the top, so the figures line up across the band however long the
+     detail under each runs. */
+  align-content: start;
   padding: 22px 10px;
   text-align: center;
   color: inherit;

@@ -4,45 +4,6 @@
   margin-bottom: 16px;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin: 32px 0 60px;
-}
-
-@media (min-width: 700px) {
-  .stats {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.stat {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 20px;
-  border-radius: 8px;
-  background: rgba(var(--color-white-rgb), 0.04);
-  border: 1px solid rgba(var(--color-white-rgb), 0.1);
-}
-
-.stat dd {
-  margin: 0;
-  font-family: var(--font-montserrat), sans-serif;
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--color-neon-pink);
-}
-
-.stat dt {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--color-light-gray);
-}
-
 .body {
   font-size: 16px;
   line-height: 1.7;
@@ -91,18 +52,6 @@
   color: var(--color-electric-blue);
 }
 
-/* A headline figure with its film's poster beside the number. */
-.statWithPoster {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.statPoster {
-  flex: 0 0 auto;
-  width: 44px;
-}
-
 /* A paragraph about one film, with its poster beside it. */
 .withPoster {
   display: flex;
@@ -118,4 +67,51 @@
 .sidePoster {
   flex: 0 0 auto;
   width: 64px;
+}
+
+.band {
+  margin: 32px 0 24px;
+}
+
+/* The turn after the band: one film against all of them. */
+.counterpoint {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0 0 60px;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.5);
+  background: rgba(var(--color-neon-pink-rgb), 0.06);
+}
+
+.counterpoint p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+}
+
+.counterpointPoster {
+  flex: 0 0 auto;
+  width: 72px;
+}
+
+.counterpointStat {
+  display: block;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-neon-pink);
+  margin-bottom: 4px;
+}
+
+.counterpointEyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-buttery-yellow);
 }
