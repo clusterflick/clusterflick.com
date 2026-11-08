@@ -1,4 +1,5 @@
 import type { Movie, Person } from "@/types";
+import { fetchTmdbDetails, type TmdbFilmDetails } from "@/lib/tmdb-search";
 
 /**
  * Top-billed cast kept per film. "Favourite actor" is about leading roles,
@@ -86,4 +87,69 @@ export function collectFilmDetails(
     };
   }
   return result;
+}
+
+/**
+ * Whether a listed film's id is TheMovieDB's. An unmatched film's id is the
+ * pipeline's own: eight hex characters, sometimes all digits, and asking TMDB
+ * about one of those would describe a different film, or none. TMDB's ids are
+ * under eight digits (about 1.6 million in 2026) and never start with a zero,
+ * so the two can't be confused until TMDB passes ten million films.
+ */
+export function isTmdbId(id: string) {
+  return /^[1-9]\d{0,6}$/.test(id);
+}
+
+/** Details from the search Worker, ready to merge into the document. */
+export function fromTmdbDetails(results: TmdbFilmDetails[]): FilmDetailsData {
+  const data: FilmDetailsData = { films: {}, people: {} };
+  for (const film of results) {
+    for (const person of [...film.directors, ...film.cast]) {
+      data.people[person.id] = person.name;
+    }
+    data.films[film.id] = {
+      genres: film.genres,
+      directors: film.directors.map(({ id }) => id),
+      cast: film.cast.slice(0, FILM_DETAILS_CAST_LIMIT).map(({ id }) => id),
+      ...(film.runtime && { runtime: film.runtime }),
+      ...(film.language && { language: film.language }),
+    };
+  }
+  return data;
+}
+
+/** The details of just `ids`, and only the names those films use. */
+export function pickFilmDetails(
+  details: FilmDetailsData,
+  ids: Movie["id"][],
+): FilmDetailsData {
+  const picked: FilmDetailsData = { films: {}, people: {} };
+  for (const id of ids) {
+    const film = details.films[id];
+    if (!film) continue;
+    picked.films[id] = film;
+    for (const person of [...film.directors, ...film.cast]) {
+      const name = details.people[person];
+      if (name) picked.people[person] = name;
+    }
+  }
+  return picked;
+}
+
+/**
+ * Details for films that aren't in the dataset, from TMDB through the search
+ * Worker. Every id must be a film TMDB has: they come from TMDB's own search
+ * or match, so one it can't describe is an error, not a film without details.
+ */
+export async function fetchFilmDetailsFromTmdb(
+  ids: Movie["id"][],
+  getIdToken: (forceRefresh?: boolean) => Promise<string>,
+  signal?: AbortSignal,
+): Promise<FilmDetailsData> {
+  const results = await fetchTmdbDetails(ids, getIdToken, signal);
+  const missing = ids.filter((_, index) => !results[index]);
+  if (missing.length > 0) {
+    throw new Error(`TMDB has no details for ${missing.join(", ")}`);
+  }
+  return fromTmdbDetails(results.flatMap((film) => film ?? []));
 }

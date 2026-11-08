@@ -26,7 +26,6 @@ import {
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
   restoreUserListEntries,
-  saveFilmDetails,
   SIGNED_IN_FLAG_KEY,
   toUserListEntry,
   UserListId,
@@ -34,8 +33,10 @@ import {
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
-import { collectFilmDetails } from "@/lib/user-lists/film-details";
-import { useCinemaData } from "@/state/cinema-data-context";
+import {
+  pickFilmDetails,
+  type FilmDetailsData,
+} from "@/lib/user-lists/film-details";
 
 /**
  * - `unavailable` — this build has no Firebase config; personalisation is off.
@@ -77,9 +78,16 @@ export type UserContextType = {
   getIdToken: (forceRefresh?: boolean) => Promise<string>;
   /** Deletes the user's lists and then their account. */
   deleteAccount: () => Promise<void>;
+  /**
+   * Adds a film with its details, saved together or not at all — see
+   * `FilmDetailsData`. Every way of adding a film supplies them, so none is
+   * listed without. A film already on a list can pass empty details: it has
+   * its details from when it was first added.
+   */
   addToList: (
     listId: UserListId,
     movie: Pick<Movie, "id" | "title" | "year" | "posterPath">,
+    details: FilmDetailsData,
   ) => Promise<void>;
   removeFromList: (listId: UserListId, movieId: Movie["id"]) => Promise<void>;
   /**
@@ -90,6 +98,7 @@ export type UserContextType = {
   importToList: (
     listId: UserListId,
     entries: Record<Movie["id"], UserListEntry>,
+    details: FilmDetailsData,
   ) => Promise<Movie["id"][]>;
   /**
    * Puts a removed entry back exactly as it was — its original `addedAt`, and
@@ -181,36 +190,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     useState<FavouriteVenues | null>(null);
   const servicesRef = useRef<FirebaseServices | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
-
-  // Read through a ref so the listings arriving chunk by chunk don't remake
-  // every callback, and with them the context value, on every page.
-  const { movies, metaData } = useCinemaData();
-  const cinemaDataRef = useRef({ movies, metaData });
-  useEffect(() => {
-    cinemaDataRef.current = { movies, metaData };
-  }, [movies, metaData]);
-
-  /**
-   * Saves the details of newly listed films that are in the dataset, for the
-   * lists' stats and filters. Best effort, after the list write: they can be
-   * fetched again later, and a failure here must never lose an add. Films not
-   * in the dataset (or not loaded yet) are left for a later backfill.
-   */
-  const recordFilmDetails = useCallback(
-    (db: FirebaseServices["db"], uid: string, ids: Movie["id"][]) => {
-      const { movies: loaded, metaData: meta } = cinemaDataRef.current;
-      if (!meta) return;
-      const details = collectFilmDetails(
-        ids.flatMap((id) => (loaded[id] ? [loaded[id]] : [])),
-        meta.people,
-      );
-      if (Object.keys(details.films).length === 0) return;
-      saveFilmDetails(db, uid, details).catch((error) =>
-        console.error("Failed to save film details", error),
-      );
-    },
-    [],
-  );
 
   /** Load the SDK once and start following the auth state. */
   const getServices = useCallback(async () => {
@@ -317,7 +296,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [getServices]);
 
   const addToList = useCallback<UserContextType["addToList"]>(
-    async (listId, movie) => {
+    async (listId, movie, details) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
       const entry = toUserListEntry(movie);
@@ -336,14 +315,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return next;
       });
       try {
-        await addToUserList(db, user.uid, listId, movie.id, entry, removeFrom);
+        await addToUserList(
+          db,
+          user.uid,
+          listId,
+          movie.id,
+          entry,
+          details,
+          removeFrom,
+        );
       } catch (error) {
         setLists(previous);
         throw error;
       }
-      recordFilmDetails(db, user.uid, [movie.id]);
     },
-    [getServices, user, lists, recordFilmDetails],
+    [getServices, user, lists],
   );
 
   const removeFromList = useCallback<UserContextType["removeFromList"]>(
@@ -368,7 +354,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
 
   const importToList = useCallback<UserContextType["importToList"]>(
-    async (listId, entries) => {
+    async (listId, entries, details) => {
       const { db } = await getServices();
       if (!user || !lists) throw new Error("Not signed in");
       // Already listed keeps its entry, and with it when it was added.
@@ -392,15 +378,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return next;
       });
       try {
-        await addManyToUserList(db, user.uid, listId, added, removeFrom);
+        // Only the films added: one already listed keeps what it has.
+        await addManyToUserList(
+          db,
+          user.uid,
+          listId,
+          added,
+          pickFilmDetails(details, ids),
+          removeFrom,
+        );
       } catch (error) {
         setLists(previous);
         throw error;
       }
-      recordFilmDetails(db, user.uid, ids);
       return ids;
     },
-    [getServices, user, lists, recordFilmDetails],
+    [getServices, user, lists],
   );
 
   const restoreToList = useCallback<UserContextType["restoreToList"]>(

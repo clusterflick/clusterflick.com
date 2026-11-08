@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   collectFilmDetails,
   FILM_DETAILS_CAST_LIMIT,
+  fromTmdbDetails,
+  isTmdbId,
+  pickFilmDetails,
   type FilmDetailsSource,
 } from "./film-details";
 
@@ -75,5 +78,61 @@ describe("collectFilmDetails", () => {
     const details = collectFilmDetails([film], people);
     expect(details.films["949"].directors).toEqual(["1"]);
     expect(details.people).not.toHaveProperty("999");
+  });
+});
+
+describe("isTmdbId", () => {
+  it.each(["949", "1", "1600000"])("takes %s as TMDB's", (id) => {
+    expect(isTmdbId(id)).toBe(true);
+  });
+
+  it.each([
+    ["a pipeline id", "a1b2c3d4"],
+    ["an all-digit pipeline id", "12345678"],
+    ["one starting with a zero", "01234567"],
+    ["an empty id", ""],
+  ])("refuses %s", (_, id) => {
+    expect(isTmdbId(id)).toBe(false);
+  });
+});
+
+describe("fromTmdbDetails", () => {
+  it("stores ids on the film and names once", () => {
+    expect(
+      fromTmdbDetails([
+        {
+          id: "949",
+          genres: ["80"],
+          directors: [{ id: "1", name: "Michael Mann" }],
+          cast: [{ id: "2", name: "Al Pacino" }],
+          runtime: 170,
+        },
+      ]),
+    ).toEqual({
+      films: {
+        "949": { genres: ["80"], directors: ["1"], cast: ["2"], runtime: 170 },
+      },
+      people: { "1": "Michael Mann", "2": "Al Pacino" },
+    });
+  });
+});
+
+describe("pickFilmDetails", () => {
+  it("keeps the films asked for and only the names they use", () => {
+    expect(
+      pickFilmDetails(
+        {
+          films: {
+            "949": { genres: [], directors: ["1"], cast: ["2"] },
+            "603": { genres: [], directors: ["3"], cast: ["2"] },
+          },
+          people: { "1": "Michael Mann", "2": "Shared", "3": "Lana" },
+        },
+        ["949", "unknown"],
+      ),
+    ).toEqual({
+      films: { "949": { genres: [], directors: ["1"], cast: ["2"] } },
+      people: { "1": "Michael Mann", "2": "Shared" },
+    });
   });
 });

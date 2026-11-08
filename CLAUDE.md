@@ -1571,16 +1571,29 @@ the dataset. A separate document because the lists load on every page for the
 markers, and credits would triple them for data only `/personalise` reads.
 Ids are TheMovieDB's, which the dataset's genre and person ids already are.
 
-- **Captured on add** from the dataset (`recordFilmDetails` in the user
-  context), after the list write and best effort: details can be fetched
-  again, and a failure must never lose an add. Films not in the loaded
-  dataset — a departed page, a TMDB search result, an import TMDB found — get
-  none yet; a backfill through the search Worker is the planned fill.
+- **Every add saves them, in the same write as the entry** (a Firestore
+  batch in `addToUserList` / `addManyToUserList`): both are saved or
+  neither, so no film is listed without its details. `addToList` and
+  `importToList` take them as an argument, so a new way of adding a film
+  won't compile until it supplies them. Where they come from:
+  - a film that's showing: the dataset (`collectFilmDetails`), on its page,
+    in the film search and in an import;
+  - a departed film: its page's own data, worked out on the server;
+  - a TMDB search result, or a film an import found on TMDB: the search
+    Worker's details endpoint (`fetchFilmDetailsFromTmdb`), looked up on the
+    press, or in a second paced pass before the import's review. If the
+    lookup fails, nothing is added.
+    A film already listed (Seen it on the watchlist) has its details from its
+    first add and may pass none. Films listed before this existed get theirs
+    from a one-off migration script.
 - **Cast stops at five** (`FILM_DETAILS_CAST_LIMIT`): favourite actors are
   leading roles, and the document has a 1 MiB limit.
 - **Unmatched films get no details.** Their genres are only the venue's
   categories or the Uncategorised placeholder; stats should count them as
   "without details", not guess.
+- **Ids are checked before TMDB is asked** (`isTmdbId`): under eight digits
+  with no leading zero, since an unmatched film's pipeline id is eight hex
+  characters and can be all digits.
 - **Removing a film leaves its details**, so readers join the document on the
   lists rather than reading it alone.
 - **Its fields are exempt from indexing** (`firestore.indexes.json`), since

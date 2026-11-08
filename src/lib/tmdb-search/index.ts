@@ -126,3 +126,56 @@ export async function matchTmdb(
   }
   return (await response.json()).results;
 }
+
+/**
+ * The most films one details call takes, as for a match: what the Worker can
+ * look up within a Workers Free request's 50 subrequests.
+ */
+export const DETAILS_BATCH_SIZE = 15;
+
+export type TmdbPerson = { id: string; name: string };
+
+/** A film's genres and credits as the Worker returns them. Ids are TMDB's. */
+export type TmdbFilmDetails = {
+  id: string;
+  genres: string[];
+  directors: TmdbPerson[];
+  /** Billing order, top-billed only. */
+  cast: TmdbPerson[];
+  /** Minutes. */
+  runtime?: number;
+  /** ISO 639-1 code of the original language. */
+  language?: string;
+};
+
+/**
+ * Each film's genres and credits by TMDB id, or null where TMDB has no such
+ * film, in the order asked. Throws `TmdbSearchError`, with `rate-limited` for
+ * a 429, rather than reporting films it couldn't look up as missing.
+ */
+export async function fetchTmdbDetails(
+  ids: string[],
+  getIdToken: GetIdToken,
+  signal?: AbortSignal,
+): Promise<(TmdbFilmDetails | null)[]> {
+  const response = await fetchWithToken(
+    "/api/tmdb/details",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+      signal,
+    },
+    getIdToken,
+  );
+  if (response.status === 429) {
+    throw new TmdbSearchError("rate-limited", "Too many lookups at once.");
+  }
+  if (!response.ok) {
+    throw new TmdbSearchError(
+      "unavailable",
+      "We couldn't reach TheMovieDB. Please try again later.",
+    );
+  }
+  return (await response.json()).results;
+}

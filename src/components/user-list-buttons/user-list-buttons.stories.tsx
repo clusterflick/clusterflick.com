@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import UserListButtons from "@/components/user-list-buttons";
 import { MockUserProvider, type UserContextType } from "@/state/user-context";
 import { UserListId, type UserListEntry } from "@/lib/user-lists";
+import { EMPTY_FILM_DETAILS } from "@/lib/user-lists/film-details";
 
 const movie = {
   id: "843",
@@ -27,7 +28,11 @@ function Wrapper({
       {/* The width of the film page's poster column, or of a narrow
           PosterTile, which they fill. */}
       <div style={{ width: layout === "stacked" ? 140 : 308 }}>
-        <UserListButtons movie={movie} layout={layout} />
+        <UserListButtons
+          movie={movie}
+          details={EMPTY_FILM_DETAILS}
+          layout={layout}
+        />
       </div>
     </MockUserProvider>
   );

@@ -13,6 +13,7 @@ import { PlayIcon } from "@/components/icons";
 import UserListButtons from "@/components/user-list-buttons";
 import GenresList from "./components/genres-list";
 import CastCrewSection from "./components/cast-crew-section";
+import { collectFilmDetails } from "@/lib/user-lists/film-details";
 import styles from "./page.module.css";
 
 type DepartedContentProps = {
@@ -70,7 +71,10 @@ export default function DepartedContent({
             title={movie.title}
             size="large"
           />
-          <UserListButtons movie={movie} />
+          <UserListButtons
+            movie={movie}
+            details={collectFilmDetails([movie], people)}
+          />
         </div>
 
         <div className={styles.mainInfo}>

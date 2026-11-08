@@ -21,8 +21,14 @@ import {
 } from "@/lib/user-lists/letterboxd-csv";
 import {
   estimateLookupMinutes,
+  lookUpDetailsOnTmdb,
   lookUpRowsOnTmdb,
 } from "@/lib/user-lists/tmdb-lookup";
+import {
+  collectFilmDetails,
+  isTmdbId as isTmdbFilmId,
+  type FilmDetailsData,
+} from "@/lib/user-lists/film-details";
 import styles from "./page.module.css";
 
 const LIST_NAMES: Record<UserListId, string> = {
@@ -52,12 +58,19 @@ type ImportReviewState = {
   alreadyListed: number;
   /** Films TheMovieDB has no match for. */
   missing: LetterboxdRow[];
+  /** Every film in `entries`' details, saved with them. */
+  details: FilmDetailsData;
 };
 
 type ImportState =
   | { step: "idle" }
   | {
       step: "looking-up";
+      /**
+       * Finding the films that aren't showing, then fetching their genres and
+       * credits — each a pass over TheMovieDB.
+       */
+      phase: "match" | "details";
       listId: UserListId;
       fileName: string;
       /** Films being looked up on TheMovieDB, and how many are done. */
@@ -148,13 +161,15 @@ export default function ListManagement({
 
 function ImportSection() {
   const { lists, importToList, getIdToken } = useUserContext();
-  const { movies, hasAttemptedLoad, isLoading, error } = useCinemaData();
+  const { movies, metaData, hasAttemptedLoad, isLoading, error } =
+    useCinemaData();
   const [state, setState] = useState<ImportState>({ step: "idle" });
   const inputRef = useRef<HTMLInputElement>(null);
   const targetRef = useRef<UserListId>(UserListId.Watchlist);
   const lookupRef = useRef<AbortController | null>(null);
   // Matching starts with what's showing, so it waits for the data.
-  const ready = !!lists && hasAttemptedLoad && !isLoading && !error;
+  const ready =
+    !!lists && !!metaData && hasAttemptedLoad && !isLoading && !error;
 
   const choose = (listId: UserListId) => {
     targetRef.current = listId;
@@ -165,7 +180,7 @@ function ImportSection() {
     const file = event.target.files?.[0];
     // Cleared, so choosing the same file again still fires a change.
     event.target.value = "";
-    if (!file || !lists) return;
+    if (!file || !lists || !metaData) return;
     const listId = targetRef.current;
     const listed = lists[listId];
 
@@ -213,24 +228,27 @@ function ImportSection() {
     for (const [id, entry] of Object.entries(matched)) add(id, entry);
 
     let missing: LetterboxdRow[] = [];
-    if (toLookUp.length > 0) {
-      const controller = new AbortController();
-      lookupRef.current = controller;
-      setState({
-        step: "looking-up",
-        listId,
-        fileName: file.name,
-        total: toLookUp.length,
-        done: 0,
-      });
-      try {
+    let details: FilmDetailsData;
+    const controller = new AbortController();
+    lookupRef.current = controller;
+    const onProgress = (done: number) =>
+      setState((current) =>
+        current.step === "looking-up" ? { ...current, done } : current,
+      );
+    try {
+      if (toLookUp.length > 0) {
+        setState({
+          step: "looking-up",
+          phase: "match",
+          listId,
+          fileName: file.name,
+          total: toLookUp.length,
+          done: 0,
+        });
         const lookup = await lookUpRowsOnTmdb(toLookUp, {
           getIdToken,
           signal: controller.signal,
-          onProgress: (done) =>
-            setState((current) =>
-              current.step === "looking-up" ? { ...current, done } : current,
-            ),
+          onProgress,
         });
         const now = Date.now();
         for (const { row, film } of lookup.found) {
@@ -242,17 +260,47 @@ function ImportSection() {
           });
         }
         missing = lookup.missing;
-      } catch {
-        if (controller.signal.aborted) return;
-        setState({
-          step: "error",
-          message:
-            "We couldn't reach TheMovieDB to look up the films that aren't showing, so nothing has been added. Please try again later.",
-        });
-        return;
-      } finally {
-        lookupRef.current = null;
       }
+
+      // Every film is added with its details: from the dataset for those
+      // showing, from TheMovieDB for the rest — before the review, so
+      // confirming it saves them together.
+      const ids = Object.keys(entries);
+      const showingIds = ids.filter((id) => movies[id]);
+      const notShowingIds = ids.filter((id) => !movies[id]);
+      details = collectFilmDetails(
+        showingIds.map((id) => movies[id]),
+        metaData.people,
+      );
+      if (notShowingIds.length > 0) {
+        setState({
+          step: "looking-up",
+          phase: "details",
+          listId,
+          fileName: file.name,
+          total: notShowingIds.length,
+          done: 0,
+        });
+        const fromTmdb = await lookUpDetailsOnTmdb(notShowingIds, {
+          getIdToken,
+          signal: controller.signal,
+          onProgress,
+        });
+        details = {
+          films: { ...details.films, ...fromTmdb.films },
+          people: { ...details.people, ...fromTmdb.people },
+        };
+      }
+    } catch {
+      if (controller.signal.aborted) return;
+      setState({
+        step: "error",
+        message:
+          "We couldn't reach TheMovieDB to look up the films that aren't showing, so nothing has been added. Please try again later.",
+      });
+      return;
+    } finally {
+      lookupRef.current = null;
     }
 
     setState({
@@ -265,6 +313,7 @@ function ImportSection() {
       alreadyListed:
         alreadyListedIds.size + (unmatched.length - toLookUp.length),
       missing,
+      details,
     });
   };
 
@@ -277,7 +326,11 @@ function ImportSection() {
     if (state.step !== "review") return;
     setState({ ...state, step: "importing" });
     try {
-      const added = await importToList(state.listId, state.entries);
+      const added = await importToList(
+        state.listId,
+        state.entries,
+        state.details,
+      );
       setState({ step: "done", listId: state.listId, count: added.length });
     } catch {
       setState({
@@ -374,7 +427,10 @@ function ImportProgress({
   return (
     <div className={styles.importReview}>
       <p className={styles.managementText} role="status">
-        Looking up {plural(state.total, "film")} that{" "}
+        {state.phase === "match"
+          ? "Looking up"
+          : "Fetching genres and credits for"}{" "}
+        {plural(state.total, "film")} that{" "}
         {state.total === 1 ? "isn't" : "aren't"} showing on TheMovieDB:{" "}
         {state.done.toLocaleString("en-GB")} done, about{" "}
         {plural(minutes, "minute")} to go. Keep this page open.
@@ -506,10 +562,9 @@ function ExportSection() {
   const onExport = (listId: UserListId) => {
     if (!lists) return;
     // An unmatched film's id is the pipeline's own, not TheMovieDB's. For a
-    // film that has left the dataset there's no telling, so an id is trusted
-    // if it's numeric, as TheMovieDB's are.
+    // film that has left the dataset only the id's shape can tell.
     const isTmdbId = (id: string) =>
-      /^\d+$/.test(id) && !movies[id]?.isUnmatched;
+      isTmdbFilmId(id) && !movies[id]?.isUnmatched;
     const date = new Date().toISOString().slice(0, 10);
     downloadCsv(
       `clusterflick-${listId}-${date}.csv`,
