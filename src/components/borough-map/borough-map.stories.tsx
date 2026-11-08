@@ -78,6 +78,20 @@ export const Default: Story = {
 };
 
 /**
+ * One area outlined as the one the map is about, as a report does for its
+ * borough. Drawn last, so no neighbour covers its outline.
+ */
+export const Highlighted: Story = {
+  args: {
+    ...Default.args,
+    items: Default.args!.items!.map((item) => ({
+      ...item,
+      highlight: item.key === "lewisham",
+    })),
+  },
+};
+
+/**
  * The two states that aren't a quantity: venues with nothing on are grey, and
  * a borough with no venues is an unlinked dashed outline. Each appears in the
  * key only when some borough is in it.

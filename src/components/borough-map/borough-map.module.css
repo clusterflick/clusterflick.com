@@ -182,6 +182,11 @@
   --area-stroke-width: 3;
 }
 
+.highlight {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
 .map a:focus {
   outline: none;
 }

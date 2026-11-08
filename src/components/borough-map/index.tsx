@@ -19,6 +19,11 @@ export interface BoroughMapItem {
   href?: string;
   band: BoroughMapBand;
   /**
+   * The area the map is about, outlined in yellow, as `RankedBarChart`
+   * draws its highlighted row in the accent colour.
+   */
+  highlight?: boolean;
+  /**
    * What the readout says beside the area's label while it is pointed at or
    * focused: "4 films across 4 screenings, at 3 of its 16 venues".
    */
@@ -154,8 +159,17 @@ export default function BoroughMap({
           role="group"
           aria-label={caption}
         >
-          {items.map((item) => {
-            const className = clsx(styles.area, bandClass(resolve(item.band)));
+          {/* Highlighted areas last, so no neighbour is drawn over their
+              outline. */}
+          {[
+            ...items.filter((item) => !item.highlight),
+            ...items.filter((item) => item.highlight),
+          ].map((item) => {
+            const className = clsx(
+              styles.area,
+              bandClass(resolve(item.band)),
+              item.highlight && styles.highlight,
+            );
             const link = getBoroughMapLinkAttributes(
               item.key,
               item.label,

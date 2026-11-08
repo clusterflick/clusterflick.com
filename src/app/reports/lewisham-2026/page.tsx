@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
+import BoroughMap, {
+  getBoroughMapLinkAttributes,
+} from "@/components/borough-map";
 import RankedBarChart from "@/components/ranked-bar-chart";
 import VenueCard from "@/components/venue-card";
 import { ButtonLink } from "@/components/button";
@@ -9,6 +12,7 @@ import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { LEWISHAM_2026 as DATA } from "@/data/reports/lewisham-2026";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
@@ -44,6 +48,31 @@ const communityCinemas = DATA.lewishamVenues.filter(
   (v) => v.type === "Community Cinema",
 );
 const castleCinema = VENUE_GROUPS.find((g) => g.slug === "castle-cinema")!;
+
+// Fixed round floors rather than quantiles, so the key is easy to read. The
+// lowest band holds Lewisham alone: the next borough had 6,182 screenings, and
+// sharing a shade with it would hide the point of the map.
+const SCREENING_BAND_FLOORS = [0, 1000, 15000, 30000, 50000];
+const screeningBands = SCREENING_BAND_FLOORS.map((floor, index) => {
+  const next = SCREENING_BAND_FLOORS[index + 1];
+  if (next === undefined) return `${fmt(floor)}+`;
+  if (floor === 0) return `Under ${fmt(next)}`;
+  return `${fmt(floor)}–${fmt(next - 1)}`;
+});
+const screeningBand = (screenings: number) =>
+  SCREENING_BAND_FLOORS.findLastIndex((floor) => screenings >= floor);
+
+const shapes = getBoroughMapShapes();
+const boroughRows = DATA.boroughs.map((b) => {
+  const borough = LONDON_BOROUGHS.find((x) => x.slug === b.slug)!;
+  return {
+    slug: b.slug,
+    name: borough.name,
+    href: getBoroughUrl(borough),
+    screenings: b.screenings,
+    readout: `${fmt(b.screenings)} film screenings`,
+  };
+});
 
 // "14:30" → "2:30pm"
 const [passHour, passMinute] = DATA.westminsterPassesLewishamAt
@@ -204,20 +233,41 @@ export default function Lewisham2026Report() {
           title="Every borough"
           intro={`Lewisham's bar is there: it is ${lewisham} screenings long. The next lowest, the ${runnerUpName}, had ${runnerUpTimes} times as many.`}
         >
-          <RankedBarChart
+          <BoroughMap
+            viewBox={shapes.viewBox}
+            bands={screeningBands}
             caption={`Film screenings by borough, ${period}`}
-            labelHeading="Borough"
-            valueHeading="Film screenings"
-            items={DATA.boroughs.map((b) => {
-              const borough = LONDON_BOROUGHS.find((x) => x.slug === b.slug)!;
-              return {
-                key: b.slug,
-                label: borough.name,
-                value: b.screenings,
-                href: getBoroughUrl(borough),
-                highlight: b.slug === "lewisham",
-              };
-            })}
+            prompt="Point at a borough or a row to see its screenings"
+            touchPrompt="Tap a borough or a row to see its screenings"
+            items={boroughRows.map((b) => ({
+              key: b.slug,
+              label: b.name,
+              path: shapes.paths[b.slug],
+              href: b.href,
+              band: screeningBand(b.screenings),
+              highlight: b.slug === "lewisham",
+              readout: b.readout,
+            }))}
+            aside={
+              <RankedBarChart
+                caption={`Film screenings by borough, ${period}`}
+                hideCaption
+                labelHeading="Borough"
+                valueHeading="Film screenings"
+                items={boroughRows.map((b) => ({
+                  key: b.slug,
+                  label: b.name,
+                  value: b.screenings,
+                  href: b.href,
+                  highlight: b.slug === "lewisham",
+                  attributes: getBoroughMapLinkAttributes(
+                    b.slug,
+                    b.name,
+                    b.readout,
+                  ),
+                }))}
+              />
+            }
           />
         </ContentSection>
 
