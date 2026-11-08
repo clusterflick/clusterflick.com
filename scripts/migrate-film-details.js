@@ -114,6 +114,31 @@ async function fetchTmdbMovie(id, token) {
   }
 }
 
+/**
+ * Checks the token once before anything else, so a bad one stops the run
+ * with a reason instead of failing every lookup. TMDB's v3 API key is the
+ * likely mix-up: it is 32 hex characters, and isn't accepted as a Bearer
+ * token.
+ */
+async function checkTmdbToken(token) {
+  const hint =
+    "TMDB_TOKEN must be the API Read Access Token (a long token starting " +
+    '"eyJ") from themoviedb.org/settings/api, not the API Key.';
+  if (/^[0-9a-f]{32}$/i.test(token)) {
+    throw new Error(`TMDB_TOKEN looks like an API Key. ${hint}`);
+  }
+  const response = await fetch(`${TMDB_BASE}/authentication`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+  if (response.status === 401) {
+    throw new Error(`TMDB rejected TMDB_TOKEN. ${hint}`);
+  }
+  if (!response.ok) {
+    throw new Error(`TMDB responded ${response.status} to the token check`);
+  }
+}
+
 /** Every film's details, by id; collects failures rather than stopping. */
 async function fetchAll(ids, token) {
   const fetched = new Map();
@@ -163,6 +188,7 @@ async function main() {
   const token = requireEnv("TMDB_TOKEN");
   requireEnv("GOOGLE_APPLICATION_CREDENTIALS");
   const projectId = requireEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  await checkTmdbToken(token);
 
   const { initializeApp, applicationDefault } = require("firebase-admin/app");
   const { getFirestore, FieldPath } = require("firebase-admin/firestore");
