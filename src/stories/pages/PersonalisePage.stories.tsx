@@ -139,8 +139,8 @@ const SEEN_TITLES = [
 ];
 
 /**
- * A long Seen list, cut to its first three rows with a "Show all" button, and a
- * watchlist whose films that aren't showing are folded behind a toggle.
+ * A long Seen list, drawn as a stack of posters that opens into the full list,
+ * and a watchlist whose films that aren't showing sit beneath the rest.
  */
 export const SignedInLongLists: Story = {
   args: {
@@ -176,7 +176,10 @@ export const SignedInLongLists: Story = {
   },
 };
 
-/** The list tools opened from the account bar, with editing buttons shown. */
+/**
+ * The list tools opened from the account bar, with editing buttons shown —
+ * which opens every stack, since a closed one would hide them.
+ */
 export const SignedInManagingLists: Story = {
   args: SignedInWithLists.args,
   play: async ({ canvasElement }) => {
@@ -219,7 +222,10 @@ const searchResults = {
   ],
 };
 
-/** Adding a film that isn't showing, from the TMDB search in the list tools. */
+/**
+ * Finding a film: what's showing as the reader types, then every film on
+ * TheMovieDB once they ask (Enter, or the button under what's showing).
+ */
 export const SignedInSearching: Story = {
   args: SignedInWithLists.args,
   parameters: {
@@ -231,9 +237,8 @@ export const SignedInSearching: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.type(
-      canvas.getByRole("textbox", { name: "Film title" }),
+      await canvas.findByRole("textbox", { name: "Film title" }),
       "love{enter}",
     );
     await canvas.findByRole("heading", { name: "Punch-Drunk Love" });
@@ -255,12 +260,10 @@ export const SignedInSearchRateLimited: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(await findManageListsToggle(canvas));
     await userEvent.type(
-      canvas.getByRole("textbox", { name: "Film title" }),
-      "dune",
+      await canvas.findByRole("textbox", { name: "Film title" }),
+      "dune{enter}",
     );
-    await userEvent.click(canvas.getByRole("button", { name: "Search" }));
     await canvas.findByRole("alert");
   },
 };

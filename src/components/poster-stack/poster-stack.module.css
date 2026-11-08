@@ -1,0 +1,215 @@
+/* Clear of the fixed header when closing a long list scrolls back to it. */
+.root {
+  position: relative;
+  scroll-margin-top: 80px;
+}
+
+/* The list is focused once opened, so a keyboard reader starts inside it; the
+   tile it lands on draws the ring, not the whole list. */
+.list:focus {
+  outline: none;
+}
+
+/* The lane the open list sits in, so opening it doesn't change its panel:
+   bled 8px past the column as the lanes are. The caption sits under the
+   posters, and beside them once the component has measured room for it
+   (`.stackWide`). */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px 20px;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
+  padding: 24px 20px 20px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background-color: rgba(var(--color-dark-navy-rgb), 0.35);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.stackWide {
+  flex-direction: row;
+  align-items: center;
+}
+
+.stack:hover {
+  background-color: rgba(var(--color-dark-navy-rgb), 0.55);
+  border-color: rgba(var(--color-white-rgb), 0.1);
+}
+
+.stack:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+/* The pile: posters placed by the component, overlapping, the first on top.
+   Its width is set from how many are drawn. */
+.posters {
+  position: relative;
+  flex-shrink: 0;
+  display: block;
+  height: calc(var(--poster-width) * 1.5);
+}
+
+.poster {
+  position: absolute;
+  top: 0;
+  display: block;
+  width: var(--poster-width);
+  rotate: var(--rotate);
+  border-radius: 6px;
+  box-shadow: 4px 0 12px rgba(var(--color-black-rgb), 0.55);
+  transition:
+    rotate 0.3s ease,
+    translate 0.3s ease;
+}
+
+/* Hovered, the pile straightens and lifts a little, ready to deal out. */
+.stack:hover .poster,
+.stack:focus-visible .poster {
+  rotate: 0deg;
+  translate: 0 -4px;
+}
+
+/* "Click to expand", over the pile while it's pointed at. A touch screen has
+   no hover to reveal it, so there it says "Tap to expand" and always shows. */
+.prompt {
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  bottom: 14px;
+  translate: -50% 0;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-white);
+  background: rgba(var(--color-midnight-navy-rgb), 0.85);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+  border-radius: 100px;
+  box-shadow: 0 0 16px rgba(var(--color-neon-pink-rgb), 0.35);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.stack:hover .prompt,
+.stack:focus-visible .prompt {
+  opacity: 1;
+}
+
+.promptTouch {
+  display: none;
+}
+
+@media (hover: none) {
+  .prompt {
+    opacity: 1;
+  }
+
+  .promptPointer {
+    display: none;
+  }
+
+  .promptTouch {
+    display: inline;
+  }
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.count {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+}
+
+.seeAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-electric-blue);
+  transition: color 0.2s ease;
+}
+
+.stack:hover .seeAll {
+  color: var(--color-neon-pink);
+}
+
+/* The caption, once the stack is open: at the top right, as the toggle that
+   closes it. Lifted out of the flow into the heading's row above the lane, so
+   opening and closing the stack never moves the posters' top edge. */
+.header {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  z-index: 1;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 8px;
+  margin-right: -8px;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.toggleCount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+}
+
+.toggleAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-electric-blue);
+  transition: color 0.2s ease;
+}
+
+.toggleAction svg {
+  rotate: 180deg;
+}
+
+.toggle:hover .toggleAction {
+  color: var(--color-neon-pink);
+}
+
+.collapse {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster,
+  .prompt {
+    transition: none;
+  }
+}

@@ -7,7 +7,6 @@ import {
   type CSSProperties,
   type FormEvent,
   type ReactNode,
-  type RefObject,
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,10 +15,12 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import VenueCard from "@/components/venue-card";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
-import ExpandableSection from "@/components/expandable-section";
+import PosterStack, { type PosterStackItem } from "@/components/poster-stack";
 import PosterTile, {
   PosterTileList,
   RemovedPosterTile,
+  TILE_GAP,
+  getTileColumnCount,
   type PosterTileNote,
 } from "@/components/poster-tile";
 import LoadingIndicator from "@/components/loading-indicator";
@@ -48,7 +49,7 @@ import { OPEN_FILTERS_HASH } from "@/hooks/use-open-filters-hash";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
-import { FILM_SEARCH_INPUT_ID } from "./film-search";
+import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -213,68 +214,13 @@ function formatShowing(time: number) {
   return `${formatRelativeDay(time, Date.now())}, ${formatShowingTime(time)}`;
 }
 
-/** PosterTileList's track minimum and gap. */
-const TILE_MIN_WIDTH = 140;
-const TILE_GAP = 16;
-
-/** How many tiles PosterTileList fits across a list this wide. */
-function getColumnCount(width: number) {
-  return Math.max(
-    1,
-    Math.floor((width + TILE_GAP) / (TILE_MIN_WIDTH + TILE_GAP)),
-  );
-}
-
 /**
  * The width PosterTileList's `auto-fill, minmax(140px, 1fr)` gives each tile
  * across a full-width list — the width the tiles in Showing now come out at.
  */
 function getFullWidthTileWidth(width: number) {
-  const columns = getColumnCount(width);
+  const columns = getTileColumnCount(width);
   return (width - (columns - 1) * TILE_GAP) / columns;
-}
-
-/** How many rows of Seen show before "Show all". */
-const SEEN_ROWS = 3;
-
-/**
- * Tiles cut to their first few rows, with a button for the rest. The cut
- * follows the column count, so it is always whole rows whatever the width.
- */
-function TruncatedTileList({
-  tiles,
-  rows,
-}: {
-  tiles: ReactNode[];
-  rows: number;
-}) {
-  const [laneRef, laneWidth] = useElementWidth<HTMLDivElement>();
-  const [showAll, setShowAll] = useState(false);
-  // Before the lane is measured, six across: the 960px column's count.
-  const columns = laneWidth ? getColumnCount(laneWidth) : 6;
-  const limit = columns * rows;
-  const hasMore = tiles.length > limit;
-
-  return (
-    <>
-      <div ref={laneRef} className={styles.lane}>
-        <PosterTileList>
-          {hasMore && !showAll ? tiles.slice(0, limit) : tiles}
-        </PosterTileList>
-      </div>
-      {hasMore && (
-        <div className={styles.showAll}>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowAll(!showAll)}
-          >
-            {showAll ? "Show fewer" : `Show all ${tiles.length}`}
-          </Button>
-        </div>
-      )}
-    </>
-  );
 }
 
 /** The parameters Firebase appends to the return URL of a sign-in link. */
@@ -524,36 +470,29 @@ function SignedIn({
   // One panel at a time: both open below the toolbar, and two stacked would
   // push the lists a screen down.
   const [panel, setPanel] = useState<AccountPanel | null>(null);
-  const accountBarRef = useRef<HTMLDivElement>(null);
-  const [filmSearchRequest, setFilmSearchRequest] = useState(0);
+  const filmSearchRef = useRef<HTMLElement>(null);
 
-  // The empty watchlist's "Manage lists" opens the list tools and takes the
-  // reader to the film search in them. After the render that mounts it.
-  useEffect(() => {
-    if (!filmSearchRequest) return;
-    accountBarRef.current?.scrollIntoView({
+  // The empty watchlist's "search for a film" takes the reader to the search
+  // above it.
+  const openFilmSearch = () => {
+    filmSearchRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
     document
       .getElementById(FILM_SEARCH_INPUT_ID)
       ?.focus({ preventScroll: true });
-  }, [filmSearchRequest]);
-
-  const openFilmSearch = () => {
-    setPanel("lists");
-    setFilmSearchRequest((count) => count + 1);
   };
 
   return (
     <div className={styles.wide}>
       <AccountBar
-        ref={accountBarRef}
         panel={panel}
         onPanelChange={setPanel}
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
       />
+      <FilmSearch ref={filmSearchRef} />
       {lists ? (
         <>
           <UserListSection
@@ -585,13 +524,11 @@ function SignedIn({
 type AccountPanel = "lists" | "account";
 
 function AccountBar({
-  ref,
   panel,
   onPanelChange,
   showEditing,
   onShowEditingChange,
 }: {
-  ref: RefObject<HTMLDivElement | null>;
   panel: AccountPanel | null;
   onPanelChange: (panel: AccountPanel | null) => void;
   showEditing: boolean;
@@ -619,7 +556,7 @@ function AccountBar({
   );
 
   return (
-    <div ref={ref} className={styles.card}>
+    <div className={styles.card}>
       <div className={styles.toolbar}>
         <div className={styles.toolbarGroup}>
           {panelToggle("lists", "Manage lists")}
@@ -729,7 +666,7 @@ function UserListSection({
   lists: UserLists;
   /** Editing buttons are hidden until asked for, from the account bar. */
   showEditing: boolean;
-  /** Opens the list tools at the film search, from the empty watchlist. */
+  /** Takes the reader to the film search, from the empty watchlist. */
   onOpenFilmSearch?: () => void;
 }) {
   const { addToList, removeFromList, restoreToList } = useUserContext();
@@ -818,15 +755,15 @@ function UserListSection({
               on any film&apos;s page to save it.
             </p>
             <p className={styles.emptyLine}>
-              Or search for one that isn&apos;t showing under{" "}
+              Or{" "}
               <button
                 type="button"
                 className={styles.inlineButton}
                 onClick={onOpenFilmSearch}
               >
-                Manage lists
+                search for a film
               </button>
-              .
+              , showing or not.
             </p>
             <p className={styles.emptyLead}>Looking for somewhere to start?</p>
             <DiscoveryLinks links={FILM_DISCOVERY_LINKS} />
@@ -940,6 +877,16 @@ function UserListSection({
       </div>
     ) : undefined;
 
+  // What a closed stack draws for a group: the same films, in the same order,
+  // as the tiles it opens into.
+  const toStackItems = (group: typeof entries): PosterStackItem[] =>
+    group.map(({ id, entry }) => ({
+      id,
+      title: entry.title,
+      posterPath: movies[id]?.posterPath ?? entry.posterPath,
+      includedMovies: movies[id]?.includedMovies,
+    }));
+
   if (!hasAttemptedLoad || isLoading) {
     return (
       <ContentSection title={title} titleBadge={count} action={action}>
@@ -953,25 +900,39 @@ function UserListSection({
   if (error) {
     return (
       <ContentSection title={title} titleBadge={count} action={action}>
-        <div className={styles.lane}>
-          <PosterTileList>
-            {entries.map((entry) => toTile(entry, true))}
-          </PosterTileList>
-        </div>
+        <PosterStack
+          items={toStackItems(entries)}
+          label={title}
+          expandWhen={showEditing}
+        >
+          <div className={styles.lane}>
+            <PosterTileList>
+              {entries.map((entry) => toTile(entry, true))}
+            </PosterTileList>
+          </div>
+        </PosterStack>
       </ContentSection>
     );
   }
 
   // Seen is one list, showing or not: what matters is having seen it, and a
   // film that's showing still reads as one by being linked. Long, and rarely
-  // the reason for a visit, so it opens cut to its first few rows.
+  // the reason for a visit, so it opens as a stack. Opened by the editing
+  // buttons, which a stack would hide.
   if (listId === UserListId.Seen) {
     return (
       <ContentSection title={title} titleBadge={count} action={action}>
-        <TruncatedTileList
-          tiles={entries.map((entry) => toTile(entry, !!movies[entry.id]))}
-          rows={SEEN_ROWS}
-        />
+        <PosterStack
+          items={toStackItems(entries)}
+          label={title}
+          expandWhen={showEditing}
+        >
+          <div className={styles.lane}>
+            <PosterTileList>
+              {entries.map((entry) => toTile(entry, !!movies[entry.id]))}
+            </PosterTileList>
+          </div>
+        </PosterStack>
       </ContentSection>
     );
   }
@@ -1053,30 +1014,45 @@ function UserListSection({
           ))}
         </div>
       )}
+      {/* Each a stack once it is longer than a row: the news is above, and
+          these are the films to come back to. Opened by the editing buttons,
+          which a stack would hide. */}
       {showing.length > 0 && (
         <>
           <h3 className={styles.groupTitle}>Showing now</h3>
-          <div className={styles.lane}>
-            <PosterTileList>
-              {showing.map((entry) => toTile(entry, true))}
-            </PosterTileList>
-          </div>
+          <PosterStack
+            items={toStackItems(showing)}
+            label="Showing now"
+            expandWhen={showEditing}
+          >
+            <div className={styles.lane}>
+              <PosterTileList>
+                {showing.map((entry) => toTile(entry, true))}
+              </PosterTileList>
+            </div>
+          </PosterStack>
         </>
       )}
       {notShowing.length > 0 && (
-        // Folded away, as there's nothing to follow up: they're unlinked, with
-        // nowhere to book. Open from the start when it's all the list holds,
-        // so a watchlist of departed films doesn't look empty.
-        <ExpandableSection
-          title={`${notShowing.length} ${notShowing.length === 1 ? "film" : "films"} not showing`}
-          defaultExpanded={showing.length === 0 && highlightGroups.length === 0}
-        >
-          <div className={styles.lane}>
-            <PosterTileList>
-              {notShowing.map((entry) => toTile(entry, false))}
-            </PosterTileList>
-          </div>
-        </ExpandableSection>
+        // Unlinked, with nowhere to book. Open from the start when it's all
+        // the list holds, so a watchlist of departed films doesn't look empty.
+        <>
+          <h3 className={styles.groupTitle}>Not showing</h3>
+          <PosterStack
+            items={toStackItems(notShowing)}
+            label="Not showing"
+            defaultExpanded={
+              showing.length === 0 && highlightGroups.length === 0
+            }
+            expandWhen={showEditing}
+          >
+            <div className={styles.lane}>
+              <PosterTileList>
+                {notShowing.map((entry) => toTile(entry, false))}
+              </PosterTileList>
+            </div>
+          </PosterStack>
+        </>
       )}
     </ContentSection>
   );

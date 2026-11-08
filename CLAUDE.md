@@ -72,7 +72,8 @@ covers the need. The canonical components are:
   `ButtonAnchor` (external `<a>`)
 - **Posters:** `FilmPosterGrid` (browsing grid, title on hover),
   `PosterTile` + `PosterTileList` (compact tile with title and detail below,
-  plus an optional control)
+  plus an optional control), `PosterStack` (a long tile list closed to a pile
+  of posters that deals out into it)
 - **Home page:** `FeatureCarousel` (a few films rotating full-width),
   `PickCard` (a film picked for a reason, with when and where), `StatsBand`
   (large linked figures that count up), `OccasionRow` (wide cards leading
@@ -1588,18 +1589,38 @@ when nothing matched, so the static HTML is unchanged.
 **`/personalise` splits the watchlist into showing now and not showing**,
 using the client cinema data, since what's on is the question a watchlist is
 brought to. Films not showing are unlinked: whether a departed page still
-exists is only known at build time. With nothing to follow up, they fold
-behind an `ExpandableSection`, open from the start only when nothing on the
-list is showing, so the watchlist never looks empty. **Seen is one list**,
-showing or not: having seen a film is what matters, and a showing one still
-reads as such by being linked. It opens cut to three rows
-(`TruncatedTileList`, which counts columns from the measured lane width so
-the cut is always whole rows) with a "Show all" button. Each group is sorted by normalised title,
+exists is only known at build time. **Seen is one list**, showing or not:
+having seen a film is what matters, and a showing one still reads as such by
+being linked. Each group is sorted by normalised title,
 as /catalogue and /planner are — the pipeline's `normalizedTitle` for a film
 still in the dataset, the same folding applied to the snapshot's title for one
 that has left it. Films are `PosterTile`s, as on /updates, so the title reads
 under the poster and the Remove button sits beneath it, outside the tile's
-link — the pill the film page's list buttons use, pink on hover. Signed in, the page renders in `StandardPageLayout`'s
+link — the pill the film page's list buttons use, pink on hover.
+
+**Long lists open as a stack** (`PosterStack`): Seen, and the watchlist's
+Showing now and Not showing, each drawn closed as a pile of posters that is
+one button ("Click to expand" on hover, "Tap to expand" on a touch screen,
+the count beside it). Opening it flies each poster in the pile to its tile
+(measured before and after, animated with `element.animate`, nothing for a
+reduced-motion reader) and fades the rest in, while the caption flies to the
+top right as a "Hide them" toggle, so it can be closed from where it was
+opened. The toggle is lifted out of the flow into the heading's row above the
+lane, so the posters' top edge stays put as the stack opens and closes; in the
+flow it pushed the list down 38px on opening and pulled it back on closing. A second sits under the list; closing from there scrolls back up to
+the pile if it would otherwise be above the screen. **The pile fills its row
+at a fixed overlap**: a laptop draws more posters, a phone fewer, rather than
+the same posters spread out or crushed together. The caption moves beside the
+posters from 720px of row, measured on the stack rather than by a media
+query, so the posters it lays out and the room it leaves agree; at 630px a
+media query on the window put it beside posters laid out for the full width. The pile is a picture, not links: the button carries the name, and
+focus moves to the first tile on opening and back to the button on closing.
+A group that fits on one row is drawn as it is, since a pile of three hides
+nothing. **Last chance and More than a screening are never stacked**: they
+are the news a reader comes for, and a click between them and it would cost
+the page its point. Not showing opens from the start when nothing on the list
+is showing, so the watchlist never looks empty, and turning on the editing
+buttons opens every stack, since a closed one would hide them. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
 across, and aligns to the poster columns as `/planner` does.
 
@@ -1661,8 +1682,7 @@ account; signed out, the note is a footnote under the sign-in form instead.
 
 **List tools sit behind "Manage lists"**, collapsed by default, since
 everything in them is occasional (`list-management.tsx`).
-Editing takes a row of its own first, import and export pair up below it, and
-"Add a film" (below) comes last, as the one part whose results grow:
+Editing takes a row of its own first, and import and export pair up below it:
 
 - **Show editing buttons** — off by default, and per visit rather than stored:
   buttons under every poster read as the page's main business. Remove under
@@ -1711,10 +1731,25 @@ Editing takes a row of its own first, import and export pair up below it, and
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left
   out and Letterboxd falls back to title and year.
 
-**Any film can be added, showing or not** ("Add a film", `film-search.tsx`),
-by searching TheMovieDB in the list tools. It sits there rather than at the top
-of the page because the usual way to add a film is from its own page; the empty
-watchlist points to it. The site can't call TMDB itself — the
+**Any film can be added, showing or not**, from the search in the open
+between the account bar and the watchlist (`film-search.tsx`). **Films that
+are showing come first**, found as the reader types (`searchShowingFilms`,
+matching as the catalogue's search box does, closest first) from the dataset
+the page already has: instant, and nothing leaves the browser. Twelve are
+drawn, with a link to the catalogue for the rest. **TheMovieDB is the second
+step**, on Enter, on "Not showing? Search all films" beside the Showing now
+heading, or on a last tile in the results: a poster's footprint in dashes
+(as a removed film leaves one) asking "Not seeing it?", the whole card the
+button. The tile is where the eye ends having scanned the results and not
+found the film, and being shaped like a result it reads as part of the answer;
+a line of text under the results, and then a button by the heading, were both
+easy to miss. When nothing showing matches, the step is the main button under
+the box. Its results drop films already
+drawn above, and are hidden once the box says something else, the button
+offered again. It used to sit in the list tools, because the usual way to add
+a film is from its own page and every search cost a Worker request; with what's
+showing searched for free, the box costs nothing until the reader asks for
+more. The site can't call TMDB itself — the
 key would ship to every browser — so the search goes through a Cloudflare
 Worker, [clusterflick/api-tmdb-search](https://github.com/clusterflick/api-tmdb-search),
 on `clusterflick.com/api/tmdb/*` in front of the static site. It answers only
@@ -1723,10 +1758,9 @@ signed-in readers: `@/lib/tmdb-search` sends the Firebase ID token
 reports a 429 rather than retrying. The Worker's results already have a list
 entry's shape, keyed by TMDB id — the same id a matched film has here — so a
 result that is showing is the dataset's film (linked, and added as its page
-would add it) and the rest are added from TMDB's snapshot. It searches on
-submit, not as the reader types: they're after a title they already know, the
-answer is a grid rather than a menu, and every request counts against the
-Worker's per-reader rate limit. TMDB asks for attribution in an About or Credits section, not beside
+would add it) and the rest are added from TMDB's snapshot. It never runs as
+the reader types: every request counts against the Worker's per-reader rate
+limit. TMDB asks for attribution in an About or Credits section, not beside
 its results, so the About page's covers this. `next dev` rewrites
 `/api/tmdb/*` to the Worker's `wrangler dev` on port 8787; a static export can
 have no rewrites, so the build leaves them out.
@@ -1758,7 +1792,7 @@ find films.
 with its own neon icon (ticket, projector, 3D glasses). The button that fills
 a list is named in yellow with the icon it carries on the site
 (`ControlName`), so the reader knows it when they see it. The empty
-watchlist's "Manage lists" opens the list tools and focuses the film search.
+watchlist's "search for a film" scrolls to the film search and focuses it.
 The empty My Venues links to `/catalogue#open-filters`, which opens the filter
 overlay on arrival (`useOpenFiltersHash`, on /catalogue and /planner) — the My
 Venues pill lives there and no page describes it better. The hook must run

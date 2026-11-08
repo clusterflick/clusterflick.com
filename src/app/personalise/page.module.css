@@ -211,10 +211,8 @@
     column-gap: 32px;
   }
 
-  /* Editing takes a row of its own above import and export, which pair up;
-     film search takes one below them. */
-  .managementSection:first-child,
-  .managementWide {
+  /* Editing takes a row of its own above import and export, which pair up. */
+  .managementSection:first-child {
     grid-column: 1 / -1;
   }
 
@@ -224,11 +222,6 @@
   .importReview {
     grid-column: 1 / -1;
     order: 1;
-  }
-
-  /* After the review, which belongs next to the import that opened it. */
-  .managementWide {
-    order: 2;
   }
 
   /* The account panel has two short sections, side by side. */
@@ -574,12 +567,140 @@
   gap: 8px;
 }
 
-.filmSearch {
-  margin-bottom: 16px;
+/* The film search, in the open between the account bar and the watchlist. */
+.filmSearchSection {
+  /* Clear of the fixed header when the empty watchlist scrolls to it. */
+  scroll-margin-top: 80px;
+  margin-bottom: 40px;
 }
 
 .filmSearchInput {
   flex: 1;
+}
+
+.filmSearchResults {
+  margin-top: 4px;
+}
+
+.filmSearchMore {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+/* "Showing now" with the step out to TheMovieDB at its right, wrapping
+   beneath it on a phone. */
+.filmSearchHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 24px 0 12px;
+}
+
+.filmSearchHeader .groupTitle {
+  margin: 0;
+}
+
+.filmSearchAll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+/* The last tile of the showing results: a poster's footprint in dashes, as a
+   removed film leaves one, holding the step out to every film. The whole card
+   is the button. */
+.searchAllTile {
+  display: flex;
+  min-width: 0;
+}
+
+.searchAllCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  padding: 12px;
+  font: inherit;
+  text-align: center;
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-white-rgb), 0.02);
+  border: 1px dashed rgba(var(--color-white-rgb), 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.searchAllCard:hover:not(:disabled) {
+  color: var(--color-light-gray);
+  background: rgba(var(--color-neon-pink-rgb), 0.06);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+.searchAllCard:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 4px;
+}
+
+.searchAllCard:disabled {
+  cursor: progress;
+}
+
+.searchAllQuestion {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+/* The control's look, as Remove and the list buttons are pills. */
+.searchAllPill {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+.searchAllCard:hover:not(:disabled) .searchAllPill {
+  color: var(--color-white);
+  background: rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.searchAllHint {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Nothing showing matched: the step out is the only thing to do. */
+.filmSearchNone {
+  margin-top: 16px;
+}
+
+.filmSearchAllText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+.filmSearchAllText strong {
+  color: var(--color-light-gray);
 }
 
 /* My Venues: venue cards in columns, each with Remove (or Undo) beneath it. */
