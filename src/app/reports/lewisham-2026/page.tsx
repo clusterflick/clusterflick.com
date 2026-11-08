@@ -338,7 +338,9 @@ export default function Lewisham2026Report() {
               borough figures fall into natural groups, found by an algorithm
               (Jenks natural breaks) over all 33 boroughs on a logarithmic
               scale, then rounded. Lewisham is in a band of its own because the
-              method put it there.
+              method put it there. The map was added on{" "}
+              {formatReportDate("2026-11-09")}, after the report was first
+              published; the figures are unchanged.
             </li>
             <li>
               <strong>Population.</strong> ONS mid-2024 estimates: Lewisham{" "}
