@@ -611,6 +611,83 @@
   margin: 0;
 }
 
+/* The last tile of the showing results: a poster's footprint in dashes, as a
+   removed film leaves one, holding the step out to every film. The whole card
+   is the button. */
+.searchAllTile {
+  display: flex;
+  min-width: 0;
+}
+
+.searchAllCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  padding: 12px;
+  font: inherit;
+  text-align: center;
+  color: var(--color-muted-gray);
+  background: rgba(var(--color-white-rgb), 0.02);
+  border: 1px dashed rgba(var(--color-white-rgb), 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.searchAllCard:hover:not(:disabled) {
+  color: var(--color-light-gray);
+  background: rgba(var(--color-neon-pink-rgb), 0.06);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.6);
+}
+
+.searchAllCard:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 4px;
+}
+
+.searchAllCard:disabled {
+  cursor: progress;
+}
+
+.searchAllQuestion {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+}
+
+/* The control's look, as Remove and the list buttons are pills. */
+.searchAllPill {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+.searchAllCard:hover:not(:disabled) .searchAllPill {
+  color: var(--color-white);
+  background: rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.searchAllHint {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 /* Nothing showing matched: the step out is the only thing to do. */
 .filmSearchNone {
   margin-top: 16px;

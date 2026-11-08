@@ -1735,10 +1735,14 @@ are showing come first**, found as the reader types (`searchShowingFilms`,
 matching as the catalogue's search box does, closest first) from the dataset
 the page already has: instant, and nothing leaves the browser. Twelve are
 drawn, with a link to the catalogue for the rest. **TheMovieDB is the second
-step**, on Enter or "Not showing? Search all films" beside the Showing now
-heading — beside rather than under the results, which can run to two rows and
-left it unseen. When nothing showing matches it is the main button, under the
-box. Its results drop films already
+step**, on Enter, on "Not showing? Search all films" beside the Showing now
+heading, or on a last tile in the results: a poster's footprint in dashes
+(as a removed film leaves one) asking "Not seeing it?", the whole card the
+button. The tile is where the eye ends having scanned the results and not
+found the film, and being shaped like a result it reads as part of the answer;
+a line of text under the results, and then a button by the heading, were both
+easy to miss. When nothing showing matches, the step is the main button under
+the box. Its results drop films already
 drawn above, and are hidden once the box says something else, the button
 offered again. It used to sit in the list tools, because the usual way to add
 a film is from its own page and every search cost a Worker request; with what's

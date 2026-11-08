@@ -27,6 +27,24 @@ import {
 } from "@/lib/tmdb-search";
 import styles from "./page.module.css";
 
+const SearchIcon = () => (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 /** For the empty watchlist, which sends the reader here. */
 export const FILM_SEARCH_INPUT_ID = "personalise-film-search";
 
@@ -164,9 +182,9 @@ export default function FilmSearch({
           ) : (
             shown.length > 0 && (
               <>
-                {/* The way on to every film sits beside the heading, where the
-                    eye lands first, rather than under results that may run
-                    to two rows. */}
+                {/* The way on to every film is offered twice: beside the
+                    heading, where the eye lands first, and as a last tile,
+                    where it ends up. */}
                 <div className={styles.filmSearchHeader}>
                   <h3 className={styles.groupTitle}>Showing now</h3>
                   {!tmdbCurrent && (
@@ -195,6 +213,33 @@ export default function FilmSearch({
                         }
                       />
                     ))}
+                    {/* Where the eye ends up having scanned the results and
+                        not found the film: shaped like one more of them, so
+                        it reads as part of the answer rather than a footnote
+                        beneath it. Holds its place while the search runs. */}
+                    {(!tmdbCurrent || tmdb.step === "searching") && (
+                      <li className={styles.searchAllTile}>
+                        <button
+                          type="button"
+                          className={styles.searchAllCard}
+                          onClick={searchAll}
+                          disabled={tmdb.step === "searching"}
+                        >
+                          <SearchIcon />
+                          <span className={styles.searchAllQuestion}>
+                            Not seeing it?
+                          </span>
+                          <span className={styles.searchAllPill}>
+                            {tmdb.step === "searching"
+                              ? "Searching…"
+                              : "Search all films"}
+                          </span>
+                          <span className={styles.searchAllHint}>
+                            Including ones not showing
+                          </span>
+                        </button>
+                      </li>
+                    )}
                   </PosterTileList>
                 </div>
                 {showing.length > shown.length && (
