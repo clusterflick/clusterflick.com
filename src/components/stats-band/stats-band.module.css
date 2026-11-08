@@ -99,4 +99,6 @@
 .detail {
   font-size: 13px;
   color: var(--color-band-text);
+  /* Even lines rather than a full one and an orphaned word. */
+  text-wrap: balance;
 }
