@@ -50,5 +50,25 @@ describe("sitemap", () => {
     expect(urls).toContain(
       "https://clusterflick.com/cinema-groups/picturehouse/",
     );
+    expect(urls).toContain(
+      "https://clusterflick.com/accessibility/audio-description/",
+    );
+  });
+
+  it("lists the indexable pages that have no data-driven route", async () => {
+    const urls = (await sitemap()).map(({ url }) => url);
+
+    expect(urls).toContain("https://clusterflick.com/near-me/");
+    expect(urls).toContain("https://clusterflick.com/datasets/status/");
+  });
+
+  it("never stamps a page with the build time", async () => {
+    const entries = await sitemap();
+
+    expect(
+      entries.filter(
+        ({ lastModified }) => lastModified === "2026-10-20T00:00:00.000Z",
+      ),
+    ).toEqual([]);
   });
 });

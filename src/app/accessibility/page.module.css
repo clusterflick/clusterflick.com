@@ -179,6 +179,19 @@
   margin-bottom: 4px;
 }
 
+/* The heading links to the feature's own page. It keeps the heading's pink
+   rather than turning link-blue, with the global underline in a faint pink
+   that firms up on hover. */
+.featureTitle a {
+  color: inherit;
+  font-weight: inherit;
+  border-bottom-color: rgba(var(--color-neon-pink-rgb), 0.3);
+}
+
+.featureTitle a:hover {
+  border-bottom-color: var(--color-neon-pink);
+}
+
 .featureShortDesc {
   font-size: 16px;
   color: var(--color-electric-blue);

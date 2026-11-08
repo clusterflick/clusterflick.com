@@ -71,6 +71,28 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-08",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            Each kind of accessible screening now has a page of its own, from{" "}
+            <Link href="/accessibility/audio-description">audio described</Link>{" "}
+            and <Link href="/accessibility/relaxed">relaxed</Link> to{" "}
+            <Link href="/accessibility/dog-friendly">dog friendly</Link>{" "}
+            screenings. Each page has every film showing with that feature and
+            the cinemas running it, and{" "}
+            <Link href="/accessibility">Accessible Cinema</Link> links to them
+            all. Its &ldquo;See all&rdquo; buttons used to open the catalogue on
+            just the next week of films, so they showed far fewer screenings
+            than the page had just counted.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-07",
     changes: [
       {

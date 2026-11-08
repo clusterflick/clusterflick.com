@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
+import BoroughMap, {
+  getBoroughMapLinkAttributes,
+} from "@/components/borough-map";
 import RankedBarChart from "@/components/ranked-bar-chart";
 import VenueCard from "@/components/venue-card";
 import { ButtonLink } from "@/components/button";
@@ -9,6 +12,7 @@ import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { LEWISHAM_2026 as DATA } from "@/data/reports/lewisham-2026";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
@@ -19,6 +23,8 @@ const TIME_OUT_CLOSURE =
   "https://www.timeout.com/london/news/lewishams-only-cinema-has-just-been-shuttered-and-the-community-is-reeling-110424";
 const LADYWELL_LIVE_DELAY =
   "https://ladywell-live.org/2026/09/26/independent-group-castle-cinema-to-take-over-former-catford-mews-site-and-open-cinema-in-the-summer/";
+const LEWISHAM_LETTER_SQUATTERS =
+  "https://lewishamletter.co.uk/shocking-photos-show-havoc-wreaked-by-catford-mews-squatters/";
 const SCRIPTS_GIST =
   "https://gist.github.com/alistairjcbrown/4a304f1d9e5e62ef8d61afe0ebfeac39";
 
@@ -42,6 +48,34 @@ const communityCinemas = DATA.lewishamVenues.filter(
   (v) => v.type === "Community Cinema",
 );
 const castleCinema = VENUE_GROUPS.find((g) => g.slug === "castle-cinema")!;
+
+// Natural breaks (Jenks, five classes) over all 33 boroughs, on the log of
+// their screenings, since the counts span nearly a thousandfold and the gaps
+// that matter are ratios. The breaks fell at 103 | 6,182 | 18,344 | 29,089 |
+// 50,021, rounded here to readable floors; only Lambeth (29,089) moves, one
+// band down. Lewisham sits alone in the lowest band because that is where the
+// method puts it, not because the floors were chosen to isolate it.
+const SCREENING_BAND_FLOORS = [0, 1000, 15000, 30000, 50000];
+const screeningBands = SCREENING_BAND_FLOORS.map((floor, index) => {
+  const next = SCREENING_BAND_FLOORS[index + 1];
+  if (next === undefined) return `${fmt(floor)}+`;
+  if (floor === 0) return `Under ${fmt(next)}`;
+  return `${fmt(floor)}–${fmt(next - 1)}`;
+});
+const screeningBand = (screenings: number) =>
+  SCREENING_BAND_FLOORS.findLastIndex((floor) => screenings >= floor);
+
+const shapes = getBoroughMapShapes();
+const boroughRows = DATA.boroughs.map((b) => {
+  const borough = LONDON_BOROUGHS.find((x) => x.slug === b.slug)!;
+  return {
+    slug: b.slug,
+    name: borough.name,
+    href: getBoroughUrl(borough),
+    screenings: b.screenings,
+    readout: `${fmt(b.screenings)} film screenings`,
+  };
+});
 
 // "14:30" → "2:30pm"
 const [passHour, passMinute] = DATA.westminsterPassesLewishamAt
@@ -156,6 +190,18 @@ export default function Lewisham2026Report() {
             </a>
             .
           </p>
+          <p className={styles.update}>
+            <strong>Update, {formatReportDate("2026-11-07")}:</strong> The
+            Catford Mews building has been badly damaged by squatters,{" "}
+            <a
+              href={LEWISHAM_LETTER_SQUATTERS}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              the Lewisham Letter reports
+            </a>
+            , in an article that cites this report.
+          </p>
           <p>
             Clusterflick collects the listings of every place we can find that
             screens films in London: cinemas, but also libraries, pubs,
@@ -190,20 +236,41 @@ export default function Lewisham2026Report() {
           title="Every borough"
           intro={`Lewisham's bar is there: it is ${lewisham} screenings long. The next lowest, the ${runnerUpName}, had ${runnerUpTimes} times as many.`}
         >
-          <RankedBarChart
+          <BoroughMap
+            viewBox={shapes.viewBox}
+            bands={screeningBands}
             caption={`Film screenings by borough, ${period}`}
-            labelHeading="Borough"
-            valueHeading="Film screenings"
-            items={DATA.boroughs.map((b) => {
-              const borough = LONDON_BOROUGHS.find((x) => x.slug === b.slug)!;
-              return {
-                key: b.slug,
-                label: borough.name,
-                value: b.screenings,
-                href: getBoroughUrl(borough),
-                highlight: b.slug === "lewisham",
-              };
-            })}
+            prompt="Point at a borough or a row to see its screenings"
+            touchPrompt="Tap a borough or a row to see its screenings"
+            items={boroughRows.map((b) => ({
+              key: b.slug,
+              label: b.name,
+              path: shapes.paths[b.slug],
+              href: b.href,
+              band: screeningBand(b.screenings),
+              highlight: b.slug === "lewisham",
+              readout: b.readout,
+            }))}
+            aside={
+              <RankedBarChart
+                caption={`Film screenings by borough, ${period}`}
+                hideCaption
+                labelHeading="Borough"
+                valueHeading="Film screenings"
+                items={boroughRows.map((b) => ({
+                  key: b.slug,
+                  label: b.name,
+                  value: b.screenings,
+                  href: b.href,
+                  highlight: b.slug === "lewisham",
+                  attributes: getBoroughMapLinkAttributes(
+                    b.slug,
+                    b.name,
+                    b.readout,
+                  ),
+                }))}
+              />
+            }
           />
         </ContentSection>
 
@@ -267,6 +334,15 @@ export default function Lewisham2026Report() {
               .
             </li>
             <li>
+              <strong>The map&apos;s shades.</strong> The bands are where the
+              borough figures fall into natural groups, found by an algorithm
+              (Jenks natural breaks) over all 33 boroughs on a logarithmic
+              scale, then rounded. Lewisham is in a band of its own because the
+              method put it there. The map was added on{" "}
+              {formatReportDate("2026-11-08")}, after the report was first
+              published; the figures are unchanged.
+            </li>
+            <li>
               <strong>Population.</strong> ONS mid-2024 estimates: Lewisham{" "}
               {fmt(DATA.population.lewisham)}, London{" "}
               {fmt(DATA.population.london)}.
@@ -284,6 +360,17 @@ export default function Lewisham2026Report() {
               with credit, under CC BY 4.0 like the data behind them: see our{" "}
               <Link href="/data-licence">data licence</Link>. Please credit
               Clusterflick and link to this page.
+            </li>
+            <li>
+              <strong>Coverage.</strong>{" "}
+              <a
+                href={LEWISHAM_LETTER_SQUATTERS}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Lewisham Letter
+              </a>
+              , {formatReportDate("2026-11-07")}.
             </li>
           </ul>
         </ContentSection>

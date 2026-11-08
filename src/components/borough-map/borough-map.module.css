@@ -182,6 +182,11 @@
   --area-stroke-width: 3;
 }
 
+.highlight {
+  --area-stroke: var(--color-buttery-yellow);
+  --area-stroke-width: 3;
+}
+
 .map a:focus {
   outline: none;
 }
@@ -193,15 +198,17 @@
 
 /* Neon pink, lighter to darker as the figure grows: validated as an ordinal
    ramp against --color-deep-navy-alt (monotone lightness, visible steps, and
-   the darkest still 2.4:1 against the page). */
+   the darkest still 2:1 against the page). The ends are stretched as far as
+   that allows (OKLCH lightness 0.91 to 0.41, neon pink at the middle step), so
+   neighbouring bands sit ~0.12 apart rather than ~0.09. */
 .band0 {
-  fill: #f9a5c0;
-  background: #f9a5c0;
+  fill: #ffd5da;
+  background: #ffd5da;
 }
 
 .band1 {
-  fill: #f56996;
-  background: #f56996;
+  fill: #ff8ca1;
+  background: #ff8ca1;
 }
 
 .band2 {
@@ -210,13 +217,13 @@
 }
 
 .band3 {
-  fill: #c32259;
-  background: #c32259;
+  fill: #c0004d;
+  background: #c0004d;
 }
 
 .band4 {
-  fill: #951b49;
-  background: #951b49;
+  fill: #8d0036;
+  background: #8d0036;
 }
 
 .nothingOn {

@@ -1,0 +1,22 @@
+/* About blurb shown inside the feature hero. Constrained for readability and
+   centred to match the centre-aligned hero. */
+.heroBlurb {
+  max-width: var(--measure-blurb);
+  margin: 20px auto 0;
+  line-height: 1.7;
+}
+
+.heroBlurb p {
+  margin: 0 0 12px;
+}
+
+.heroBlurb p:last-child {
+  margin-bottom: 0;
+}
+
+/* Cross-links to near-neighbour features — a secondary aside under the main
+   call to action, so it reads quieter than the browse link above it. */
+.relatedFeatures {
+  font-size: 0.9em;
+  opacity: 0.85;
+}
