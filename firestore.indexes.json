@@ -1,0 +1,15 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "films",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "people",
+      "indexes": []
+    }
+  ]
+}

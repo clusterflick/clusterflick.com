@@ -26,6 +26,7 @@ import {
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
   restoreUserListEntries,
+  saveFilmDetails,
   SIGNED_IN_FLAG_KEY,
   toUserListEntry,
   UserListId,
@@ -33,6 +34,8 @@ import {
   type UserListEntry,
   type UserLists,
 } from "@/lib/user-lists";
+import { collectFilmDetails } from "@/lib/user-lists/film-details";
+import { useCinemaData } from "@/state/cinema-data-context";
 
 /**
  * - `unavailable` — this build has no Firebase config; personalisation is off.
@@ -179,6 +182,36 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const servicesRef = useRef<FirebaseServices | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
+  // Read through a ref so the listings arriving chunk by chunk don't remake
+  // every callback, and with them the context value, on every page.
+  const { movies, metaData } = useCinemaData();
+  const cinemaDataRef = useRef({ movies, metaData });
+  useEffect(() => {
+    cinemaDataRef.current = { movies, metaData };
+  }, [movies, metaData]);
+
+  /**
+   * Saves the details of newly listed films that are in the dataset, for the
+   * lists' stats and filters. Best effort, after the list write: they can be
+   * fetched again later, and a failure here must never lose an add. Films not
+   * in the dataset (or not loaded yet) are left for a later backfill.
+   */
+  const recordFilmDetails = useCallback(
+    (db: FirebaseServices["db"], uid: string, ids: Movie["id"][]) => {
+      const { movies: loaded, metaData: meta } = cinemaDataRef.current;
+      if (!meta) return;
+      const details = collectFilmDetails(
+        ids.flatMap((id) => (loaded[id] ? [loaded[id]] : [])),
+        meta.people,
+      );
+      if (Object.keys(details.films).length === 0) return;
+      saveFilmDetails(db, uid, details).catch((error) =>
+        console.error("Failed to save film details", error),
+      );
+    },
+    [],
+  );
+
   /** Load the SDK once and start following the auth state. */
   const getServices = useCallback(async () => {
     if (servicesRef.current) return servicesRef.current;
@@ -308,8 +341,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setLists(previous);
         throw error;
       }
+      recordFilmDetails(db, user.uid, [movie.id]);
     },
-    [getServices, user, lists],
+    [getServices, user, lists, recordFilmDetails],
   );
 
   const removeFromList = useCallback<UserContextType["removeFromList"]>(
@@ -363,9 +397,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setLists(previous);
         throw error;
       }
+      recordFilmDetails(db, user.uid, ids);
       return ids;
     },
-    [getServices, user, lists],
+    [getServices, user, lists, recordFilmDetails],
   );
 
   const restoreToList = useCallback<UserContextType["restoreToList"]>(

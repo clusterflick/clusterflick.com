@@ -1,5 +1,6 @@
 import type { Movie, Venue } from "@/types";
 import type { Firestore } from "firebase/firestore/lite";
+import type { FilmDetailsData } from "./film-details";
 
 /**
  * Set on sign-in, cleared on sign-out. Carries no personal data: it exists so
@@ -223,10 +224,29 @@ export async function removeFavouriteVenue(
   );
 }
 
+async function getFilmDetailsDocRef(db: Firestore, uid: string) {
+  const { doc } = await import("firebase/firestore/lite");
+  return doc(db, "users", uid, "meta", "films");
+}
+
+/** Merges films' details into the companion document — see `FilmDetailsData`. */
+export async function saveFilmDetails(
+  db: Firestore,
+  uid: string,
+  details: FilmDetailsData,
+): Promise<void> {
+  const { setDoc } = await import("firebase/firestore/lite");
+  await setDoc(await getFilmDetailsDocRef(db, uid), details, { merge: true });
+}
+
+/** Deletes everything stored for the user: the lists and the film details. */
 export async function deleteUserLists(
   db: Firestore,
   uid: string,
 ): Promise<void> {
   const { deleteDoc } = await import("firebase/firestore/lite");
+  // Firestore never deletes a subcollection with its parent, so the details go
+  // explicitly.
+  await deleteDoc(await getFilmDetailsDocRef(db, uid));
   await deleteDoc(await getUserDocRef(db, uid));
 }
