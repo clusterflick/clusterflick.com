@@ -339,7 +339,7 @@ export default function Lewisham2026Report() {
               (Jenks natural breaks) over all 33 boroughs on a logarithmic
               scale, then rounded. Lewisham is in a band of its own because the
               method put it there. The map was added on{" "}
-              {formatReportDate("2026-11-09")}, after the report was first
+              {formatReportDate("2026-11-08")}, after the report was first
               published; the figures are unchanged.
             </li>
             <li>
