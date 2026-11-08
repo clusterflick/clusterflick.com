@@ -91,3 +91,25 @@ export const Unlinked: Story = {
     ],
   },
 };
+
+/**
+ * One figure far longer than the rest shown in thousands, with the exact
+ * number in its detail, as the London report opens.
+ */
+export const Compact: Story = {
+  args: {
+    label: "London's year in film",
+    items: [
+      {
+        id: "screenings",
+        value: 863909,
+        compact: true,
+        label: "Screenings",
+        detail: "863,909, January to October 2026",
+      },
+      { id: "films", value: 7253, label: "Films" },
+      { id: "languages", value: 93, label: "Languages" },
+      { id: "places", value: 444, label: "Places" },
+    ],
+  },
+};

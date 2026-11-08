@@ -20,6 +20,12 @@ export interface StatsBandItem {
   href?: string;
   /** Picks the number out in yellow, for the one that is a curiosity. */
   highlight?: boolean;
+  /**
+   * Shows the figure in thousands ("864k"), for one much longer than its
+   * neighbours. Screen readers still hear the exact number, so the exact
+   * figure belongs in the detail too.
+   */
+  compact?: boolean;
 }
 
 interface StatsBandProps {
@@ -29,7 +35,12 @@ interface StatsBandProps {
 }
 
 const COUNT_UP_MS = 1400;
-const format = (value: number) => value.toLocaleString("en-GB");
+const format = (value: number, compact = false) =>
+  compact
+    ? `${Math.round(value / 1000).toLocaleString("en-GB")}k`
+    : value.toLocaleString("en-GB");
+const formatNumber = (number: HTMLElement, value: number) =>
+  format(value, number.dataset.compact !== undefined);
 
 /**
  * A row of large linked figures, for the scale of something at a glance. When
@@ -53,7 +64,7 @@ export default function StatsBand({
     const numbers = [...band.querySelectorAll<HTMLElement>("[data-value]")];
     const showReal = () => {
       for (const number of numbers) {
-        number.textContent = format(Number(number.dataset.value));
+        number.textContent = formatNumber(number, Number(number.dataset.value));
       }
     };
     let frame = 0;
@@ -71,7 +82,9 @@ export default function StatsBand({
             return;
           }
           armed = true;
-          for (const number of numbers) number.textContent = format(0);
+          for (const number of numbers) {
+            number.textContent = formatNumber(number, 0);
+          }
           return;
         }
         if (entry.intersectionRatio < 0.4) return;
@@ -81,7 +94,8 @@ export default function StatsBand({
           const progress = Math.min(1, (now - start) / COUNT_UP_MS);
           const eased = 1 - Math.pow(1 - progress, 4);
           for (const number of numbers) {
-            number.textContent = format(
+            number.textContent = formatNumber(
+              number,
               Math.round(Number(number.dataset.value) * eased),
             );
           }
@@ -113,8 +127,13 @@ export default function StatsBand({
           .join(" ");
         const content = (
           <>
-            <span className={styles.value} data-value={item.value} aria-hidden>
-              {format(item.value)}
+            <span
+              className={styles.value}
+              data-value={item.value}
+              data-compact={item.compact || undefined}
+              aria-hidden
+            >
+              {format(item.value, item.compact)}
             </span>
             <span className={styles.label} aria-hidden>
               {item.label}

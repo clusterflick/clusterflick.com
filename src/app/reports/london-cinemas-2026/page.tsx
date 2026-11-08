@@ -331,8 +331,9 @@ export default function LondonCinemas2026Report() {
               {
                 id: "screenings",
                 value: DATA.londonScreenings,
+                compact: true,
                 label: "Screenings",
-                detail: monthRange,
+                detail: `${fmt(DATA.londonScreenings)}, ${monthRange}`,
               },
               {
                 id: "films",
