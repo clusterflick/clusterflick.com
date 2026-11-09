@@ -35,8 +35,14 @@ export type MovieListEntry = {
   /**
    * A TMDB id. The surest match there is: the dataset keys its movies by TMDB
    * id, so this resolves by direct lookup rather than any kind of search.
+   * `npm run add-movie-list-tmdb-ids` fills them in.
+   *
+   * A work released in parts (Gangs of Wasseypur, The Decalogue) takes its
+   * first part's id: one id per entry, so seeing the first part counts. `null`
+   * says on purpose that TMDB has no film for the entry (it files The Sorrow
+   * and the Pity as TV), so nothing can match it.
    */
-  tmdbId?: string;
+  tmdbId?: string | null;
 };
 
 type MovieListBase = {

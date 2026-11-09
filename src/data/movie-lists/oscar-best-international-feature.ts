@@ -80,7 +80,8 @@ export const OSCAR_BEST_INTERNATIONAL_FEATURE: MovieListEntry[] = [
     tmdbId: "26451",
   },
   { title: "Z", year: 1969, tmdbId: "2721" },
-  { title: "War and Peace (film series)", year: 1968 },
+  // Released in four parts; a multi-part work takes its first part's id.
+  { title: "War and Peace (film series)", year: 1968, tmdbId: "29266" },
   { title: "Closely Watched Trains", year: 1967, tmdbId: "789" },
   { title: "A Man and a Woman", year: 1966, tmdbId: "42726" },
   { title: "The Shop on Main Street", year: 1965, tmdbId: "25905" },

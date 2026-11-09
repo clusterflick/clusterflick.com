@@ -56,7 +56,14 @@ export const GUARDIAN_100_BEST_21ST_CENTURY: MovieListEntry[] = [
   { rank: 31, title: "Anomalisa", year: 2015, tmdbId: "291270" },
   { rank: 32, title: "Gravity", year: 2013, tmdbId: "49047" },
   { rank: 33, title: "The Royal Tenenbaums", year: 2001, tmdbId: "9428" },
-  { rank: 34, title: "The Child", altTitles: ["L’Enfant"], year: 2002 },
+  // The Dardennes' L'Enfant, a 2005 film: 2002 here was a slip.
+  {
+    rank: 34,
+    title: "The Child",
+    altTitles: ["L’Enfant"],
+    year: 2005,
+    tmdbId: "11490",
+  },
   { rank: 35, title: "45 Years", year: 2015, tmdbId: "311291" },
   { rank: 36, title: "A Separation", year: 2011, tmdbId: "60243" },
   { rank: 37, title: "Dogville", year: 2003, tmdbId: "553" },
@@ -96,7 +103,8 @@ export const GUARDIAN_100_BEST_21ST_CENTURY: MovieListEntry[] = [
   { rank: 56, title: "Behind the Candelabra", year: 2013, tmdbId: "119675" },
   { rank: 57, title: "Leave No Trace", year: 2018, tmdbId: "443463" },
   { rank: 58, title: "Wuthering Heights", year: 2011, tmdbId: "9364" },
-  { rank: 59, title: "Gangs of Wasseypur", year: 2012 },
+  // Released in two parts; a multi-part work takes its first part's id.
+  { rank: 59, title: "Gangs of Wasseypur", year: 2012, tmdbId: "117691" },
   { rank: 60, title: "Ted", year: 2012, tmdbId: "72105" },
   { rank: 61, title: "The Souvenir", year: 2019, tmdbId: "473019" },
   { rank: 62, title: "Waiting for Happiness", year: 2002, tmdbId: "47226" },

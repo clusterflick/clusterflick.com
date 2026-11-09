@@ -61,7 +61,7 @@ export const EMPIRE_100_GREATEST: MovieListEntry[] = [
   { rank: 29, title: "12 Angry Men", year: 1957, tmdbId: "389" },
   { rank: 30, title: "Casablanca", year: 1942, tmdbId: "289" },
   { rank: 31, title: "The Thing", year: 1982, tmdbId: "1091" },
-  { rank: 32, title: "Seven", year: 1995 },
+  { rank: 32, title: "Seven", year: 1995, tmdbId: "807" },
   {
     rank: 33,
     title: "The Lord Of The Rings: The Two Towers",

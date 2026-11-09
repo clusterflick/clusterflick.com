@@ -266,7 +266,10 @@ describe("getMovieListsForMovie", () => {
   });
 
   it("returns nothing for a film on no lists", () => {
-    const movies = record([movie({ id: "16", title: "Obscure Local Short" })]);
-    expect(getMovieListsForMovie("16", movies)).toEqual([]);
+    // Not a TMDB id: the lists hold real ones, and "16" is on one now.
+    const movies = record([
+      movie({ id: "obscure-short", title: "Obscure Local Short" }),
+    ]);
+    expect(getMovieListsForMovie("obscure-short", movies)).toEqual([]);
   });
 });

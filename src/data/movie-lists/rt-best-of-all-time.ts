@@ -207,7 +207,14 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     rtSlug: "three_colors_red",
     tmdbId: "110",
   },
-  { rank: 30, title: "The Decalogue", year: 1989, rtSlug: "the_decalogue" },
+  // Ten films; TMDB lists each, and a multi-part work takes its first's id.
+  {
+    rank: 30,
+    title: "The Decalogue",
+    year: 1989,
+    rtSlug: "the_decalogue",
+    tmdbId: "118662",
+  },
   {
     rank: 31,
     title: "A Separation",
@@ -421,11 +428,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     rtSlug: "inside_out_2015",
     tmdbId: "150540",
   },
+  // TMDB files this as a TV series, so no film can match it.
   {
     rank: 63,
     title: "The Sorrow and the Pity",
     year: 1969,
     rtSlug: "the_sorrow_and_the_pity_1970",
+    tmdbId: null,
   },
   {
     rank: 64,
@@ -1162,7 +1171,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     rtSlug: "through_a_glass_darkly",
     tmdbId: "11602",
   },
-  { rank: 175, title: "Hamilton", year: 2020, rtSlug: "hamilton_2020" },
+  {
+    rank: 175,
+    title: "Hamilton",
+    year: 2020,
+    rtSlug: "hamilton_2020",
+    tmdbId: "556574",
+  },
   {
     rank: 176,
     title: "Honeyland",

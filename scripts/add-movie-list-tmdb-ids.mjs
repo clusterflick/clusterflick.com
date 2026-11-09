@@ -112,7 +112,8 @@ async function main() {
     const entries = (await import(pathToFileURL(file).href))[list.exportName];
     const todo = entries
       .map((entry, index) => ({ entry, index }))
-      .filter(({ entry }) => !entry.tmdbId);
+      // An id, or null for a film TMDB doesn't have, is settled.
+      .filter(({ entry }) => entry.tmdbId === undefined);
     const results = new Array(entries.length);
 
     const failed = await forEachLimited(

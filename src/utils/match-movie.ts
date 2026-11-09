@@ -11,7 +11,7 @@ export type MovieMatchQuery = {
   year?: number;
   imdbId?: string;
   rtSlug?: string;
-  tmdbId?: string;
+  tmdbId?: string | null;
 };
 
 /**
