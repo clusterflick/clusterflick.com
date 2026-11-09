@@ -13,11 +13,21 @@ export const EMPIRE_100_GREATEST: MovieListEntry[] = [
   { rank: 1, title: "Jaws", year: 1975 },
   { rank: 2, title: "The Godfather", year: 1972 },
   { rank: 3, title: "The Shawshank Redemption", year: 1994 },
-  { rank: 4, title: "Star Wars: The Empire Strikes Back", year: 1980 },
+  {
+    rank: 4,
+    title: "Star Wars: The Empire Strikes Back",
+    year: 1980,
+    tmdbId: "1891",
+  },
   { rank: 5, title: "Aliens", year: 1986 },
   { rank: 6, title: "Inception", year: 2010 },
   { rank: 7, title: "Goodfellas", year: 1990 },
-  { rank: 8, title: "Star Wars: Episode IV – A New Hope", year: 1977 },
+  {
+    rank: 8,
+    title: "Star Wars: Episode IV – A New Hope",
+    year: 1977,
+    tmdbId: "11",
+  },
   {
     rank: 9,
     title: "The Lord Of The Rings: The Fellowship Of The Ring",

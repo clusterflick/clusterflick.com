@@ -85,6 +85,7 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     title: "Star Wars: Episode IV - A New Hope",
     year: 1977,
     rtSlug: "star_wars_episode_iv_a_new_hope",
+    tmdbId: "11",
   },
   {
     rank: 22,
@@ -307,7 +308,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     rtSlug: "let_the_right_one_in",
   },
   { rank: 91, title: "No Other Land", year: 2024, rtSlug: "no_other_land" },
-  { rank: 92, title: "Crip Camp", year: 2020, rtSlug: "crip_camp" },
+  {
+    rank: 92,
+    title: "Crip Camp",
+    year: 2020,
+    rtSlug: "crip_camp",
+    tmdbId: "653725",
+  },
   {
     rank: 93,
     title: "The Best Years of Our Lives",
@@ -389,7 +396,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     year: 1943,
     rtSlug: "1018688-shadow_of_a_doubt",
   },
-  { rank: 119, title: "007: Goldfinger", year: 1964, rtSlug: "goldfinger" },
+  {
+    rank: 119,
+    title: "007: Goldfinger",
+    year: 1964,
+    rtSlug: "goldfinger",
+    tmdbId: "658",
+  },
   { rank: 120, title: "Murderball", year: 2005, rtSlug: "murderball" },
   { rank: 121, title: "High and Low", year: 1963, rtSlug: "high_and_low" },
   {
@@ -658,7 +671,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     year: 2003,
     rtSlug: "capturing_the_friedmans",
   },
-  { rank: 193, title: "The Mirror", year: 1975, rtSlug: "the_mirror_1975" },
+  {
+    rank: 193,
+    title: "The Mirror",
+    year: 1975,
+    rtSlug: "the_mirror_1975",
+    tmdbId: "1396",
+  },
   {
     rank: 194,
     title: "Meet Me in St. Louis",
@@ -682,7 +701,7 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
   { rank: 199, title: "Free Solo", year: 2018, rtSlug: "free_solo" },
   { rank: 200, title: "Ran", year: 1985, rtSlug: "ran" },
   { rank: 201, title: "Sing Sing", year: 2023, rtSlug: "sing_sing" },
-  { rank: 202, title: "Sunrise", year: 1927, rtSlug: "sunrise" },
+  { rank: 202, title: "Sunrise", year: 1927, rtSlug: "sunrise", tmdbId: "631" },
   { rank: 203, title: "76 Days", year: 2020, rtSlug: "76_days" },
   { rank: 204, title: "Aladdin", year: 1992, rtSlug: "aladdin_1992" },
   {
@@ -820,7 +839,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
   { rank: 247, title: "The Killers", year: 1946, rtSlug: "1080205-killers" },
   { rank: 248, title: "Star Trek", year: 2009, rtSlug: "star_trek_11" },
   { rank: 249, title: "The Fallen Idol", year: 1948, rtSlug: "fallen_idol" },
-  { rank: 250, title: "Jalsaghar", year: 1960, rtSlug: "jalsaghar" },
+  {
+    rank: 250,
+    title: "Jalsaghar",
+    year: 1960,
+    rtSlug: "jalsaghar",
+    tmdbId: "822",
+  },
   {
     rank: 251,
     title: "Black Narcissus",
@@ -921,6 +946,7 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
     title: "Star Wars: Episode V - The Empire Strikes Back",
     year: 1980,
     rtSlug: "star_wars_episode_v_the_empire_strikes_back",
+    tmdbId: "1891",
   },
   { rank: 277, title: "Stray Dog", year: 1949, rtSlug: "1020312-stray_dog" },
   {
@@ -944,7 +970,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
   },
   { rank: 282, title: "Brazil", year: 1985, rtSlug: "1003033-brazil" },
   { rank: 283, title: "Local Hero", year: 1983, rtSlug: "local_hero" },
-  { rank: 284, title: "The Red Circle", year: 1970, rtSlug: "le_cercle_rouge" },
+  {
+    rank: 284,
+    title: "The Red Circle",
+    year: 1970,
+    rtSlug: "le_cercle_rouge",
+    tmdbId: "11657",
+  },
   {
     rank: 285,
     title: "I Was Born, But ...",
@@ -962,7 +994,13 @@ export const RT_BEST_OF_ALL_TIME: MovieListEntry[] = [
   { rank: 289, title: "Aliens", year: 1986, rtSlug: "1000617-aliens" },
   { rank: 290, title: "Yojimbo", year: 1961, rtSlug: "yojimbo" },
   { rank: 291, title: "Playtime", year: 1967, rtSlug: "playtime" },
-  { rank: 292, title: "My Left Foot", year: 1989, rtSlug: "my_left_foot" },
+  {
+    rank: 292,
+    title: "My Left Foot",
+    year: 1989,
+    rtSlug: "my_left_foot",
+    tmdbId: "10161",
+  },
   { rank: 293, title: "8 1/2", year: 1963, rtSlug: "8-12" },
   { rank: 294, title: "Sling Blade", year: 1996, rtSlug: "sling_blade" },
   {
