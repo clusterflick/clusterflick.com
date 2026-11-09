@@ -8,7 +8,8 @@ import type { MovieListEntry } from "./types";
  *
  * Runs from 1949, when the Golden Lion replaced the Grand International Prize.
  * Five years have joint winners, and both are kept. No competitive award was
- * made between 1969 and 1979, so those years are absent.
+ * made between 1969 and 1979, nor in 1953 and 1956, when the jury declared the
+ * prize void, so those years are absent.
  *
  * `year` is the festival year, which can trail the film's release — hence this
  * list's `yearTolerance`.
@@ -63,30 +64,6 @@ export const GOLDEN_LION_WINNERS: MovieListEntry[] = [
   { title: "Marianne and Juliane", year: 1981 },
   { title: "Atlantic City", year: 1980 },
   { title: "Gloria", year: 1980 },
-  {
-    title: "No award given, this edition of the festival was not competitive",
-    year: 1979,
-  },
-  {
-    title: "No award given, the festival was not organized this year",
-    year: 1978,
-  },
-  {
-    title: "No award given, the festival was not organized this year",
-    year: 1977,
-  },
-  {
-    title: "No award given, the festival was not organized during these years",
-    year: 1973,
-  },
-  {
-    title: "No award given, the editions of the festival were not competitive",
-    year: 1970,
-  },
-  {
-    title: "No award given, this edition of the festival was not competitive",
-    year: 1969,
-  },
   { title: "Artists Under the Big Top: Perplexed", year: 1968 },
   { title: "Belle de Jour", year: 1967 },
   { title: "The Battle of Algiers", year: 1966 },
@@ -101,18 +78,8 @@ export const GOLDEN_LION_WINNERS: MovieListEntry[] = [
   { title: "The Great War", year: 1959 },
   { title: "Rickshaw Man", year: 1958 },
   { title: "Aparajito", year: 1957 },
-  {
-    title:
-      "No award given, the jury was unable to decide the winner and the prize was declared void",
-    year: 1956,
-  },
   { title: "Ordet", year: 1955 },
   { title: "Romeo and Juliet", year: 1954 },
-  {
-    title:
-      "No award given, the jury was unable to decide the winner and the prize was declared void",
-    year: 1953,
-  },
   { title: "Forbidden Games", year: 1952 },
   { title: "Rashomon", year: 1951 },
   { title: "Justice Is Done", year: 1950 },

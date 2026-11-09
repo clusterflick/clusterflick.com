@@ -7,7 +7,8 @@
 /**
  * A title reduced to what two spellings of it share: case, accents,
  * punctuation and "&" for "and" fold away, as the search Worker's matching
- * does. "Amélie" is "amelie"; "8½" keeps its digits.
+ * does, and so do British and American spellings of colour ("Three Colours:
+ * Blue" is TMDB's "Three Colors: Blue") and "½" ("8 1/2" is "8½").
  */
 function normaliseTitle(title) {
   return title
@@ -15,8 +16,18 @@ function normaliseTitle(title) {
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/&/g, " and ")
+    .replace(/½/g, "1/2")
+    .replace(/colour/g, "color")
     .replace(/[^\p{L}\p{N}]/gu, "");
 }
+
+/**
+ * How far ahead on votes the best-known of several same-titled films must be
+ * to be taken: a famous film and an obscure namesake from the same year
+ * ("Rocky" and a short filed under 1976) are far apart, two real films of the
+ * same name usually aren't.
+ */
+const VOTE_LEAD = 10;
 
 function releaseYear(result) {
   const year = result.release_date?.match(/^(\d{4})-/)?.[1];
@@ -55,14 +66,38 @@ function pickListMatch(entry, results, yearTolerance = 1) {
   const nearest = Math.min(...candidates.map(distance));
   const closest = candidates.filter((result) => distance(result) === nearest);
   if (closest.length > 1) {
-    return { status: "ambiguous", candidates: closest.map(describe) };
+    const byVotes = [...closest].sort(
+      (a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0),
+    );
+    const [top, next] = byVotes;
+    if (
+      (top.vote_count ?? 0) >=
+      VOTE_LEAD * Math.max(1, next.vote_count ?? 0)
+    ) {
+      return { status: "matched", tmdbId: String(top.id) };
+    }
+    return { status: "ambiguous", candidates: byVotes.map(describe) };
   }
   return { status: "matched", tmdbId: String(closest[0].id) };
 }
 
-/** A search result in a line a reader can check: id, title and year. */
+/** A search result in a line a reader can check: id, title, year and votes. */
 function describe(result) {
-  return `${result.id} ${result.title} (${releaseYear(result) ?? "no year"})`;
+  const votes =
+    result.vote_count !== undefined ? `, ${result.vote_count} votes` : "";
+  return `${result.id} ${result.title} (${releaseYear(result) ?? "no year"}${votes})`;
+}
+
+/**
+ * The best-known results, whatever their titles, for an entry nothing
+ * matched: usually the film under another name ("Se7en" for "Seven"), for
+ * the reader to pick from.
+ */
+function suggestCandidates(results, limit = 3) {
+  return [...results]
+    .sort((a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0))
+    .slice(0, limit)
+    .map(describe);
 }
 
 /**
@@ -134,6 +169,7 @@ function insertTmdbIds(source, exportName, ids) {
 module.exports = {
   normaliseTitle,
   pickListMatch,
+  suggestCandidates,
   findEntryObjects,
   insertTmdbIds,
 };

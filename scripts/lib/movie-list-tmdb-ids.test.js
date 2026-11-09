@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
+  suggestCandidates,
   findEntryObjects,
   insertTmdbIds,
   normaliseTitle,
@@ -17,6 +18,13 @@ const result = (id, title, date, originalTitle) => ({
 });
 
 describe("normaliseTitle", () => {
+  it("folds colour spellings and ½", () => {
+    expect(normaliseTitle("Three Colours: Blue")).toBe(
+      normaliseTitle("Three Colors: Blue"),
+    );
+    expect(normaliseTitle("8 1/2")).toBe(normaliseTitle("8½"));
+  });
+
   it("folds case, accents, punctuation and ampersands", () => {
     expect(normaliseTitle("Amélie")).toBe("amelie");
     expect(normaliseTitle("Lock, Stock & Two Smoking Barrels")).toBe(
@@ -70,6 +78,22 @@ describe("pickListMatch", () => {
     ).toMatchObject({ status: "ambiguous", candidates: expect.any(Array) });
   });
 
+  it("takes the far better-known of same-titled films from one year", () => {
+    const rocky = { title: "Rocky", year: 1976 };
+    expect(
+      pickListMatch(rocky, [
+        { ...result(1366, "Rocky", "1976-11-21"), vote_count: 9000 },
+        { ...result(1187746, "Rocky", "1976-01-01"), vote_count: 2 },
+      ]),
+    ).toEqual({ status: "matched", tmdbId: "1366" });
+    expect(
+      pickListMatch(rocky, [
+        { ...result(1, "Rocky", "1976-11-21"), vote_count: 300 },
+        { ...result(2, "Rocky", "1976-01-01"), vote_count: 100 },
+      ]).status,
+    ).toBe("ambiguous");
+  });
+
   it("never matches on a different title", () => {
     expect(
       pickListMatch({ title: "Heat", year: 1995 }, [
@@ -94,6 +118,20 @@ export const SAMPLE: MovieListEntry[] = [
   { rank: 3, title: "Done", year: 2001, tmdbId: "5" },
 ];
 `;
+
+describe("suggestCandidates", () => {
+  it("lists the best-known results, whatever their titles", () => {
+    expect(
+      suggestCandidates([
+        { ...result(1, "Seven Days", "1995-01-01"), vote_count: 3 },
+        { ...result(807, "Se7en", "1995-09-22"), vote_count: 21000 },
+      ]),
+    ).toEqual([
+      "807 Se7en (1995, 21000 votes)",
+      "1 Seven Days (1995, 3 votes)",
+    ]);
+  });
+});
 
 describe("insertTmdbIds", () => {
   it("finds every entry, past strings and comments", () => {

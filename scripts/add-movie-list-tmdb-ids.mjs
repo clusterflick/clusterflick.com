@@ -34,7 +34,11 @@ import { LIST_FILES } from "./add-movie-list-tmdb-ids.config.mjs";
 
 const require = createRequire(import.meta.url);
 const { checkTmdbToken, fetchTmdbJson, forEachLimited } = require("./lib/tmdb");
-const { insertTmdbIds, pickListMatch } = require("./lib/movie-list-tmdb-ids");
+const {
+  insertTmdbIds,
+  pickListMatch,
+  suggestCandidates,
+} = require("./lib/movie-list-tmdb-ids");
 
 const LISTS_DIR = path.join(
   import.meta.dirname,
@@ -81,7 +85,7 @@ async function resolveBySearch(entry, yearTolerance, token) {
     if (result.status !== "missing") return result;
     if (entry.year === undefined) break;
   }
-  return result;
+  return { ...result, candidates: suggestCandidates([...pool.values()]) };
 }
 
 function describeEntry(entry) {
@@ -177,8 +181,8 @@ async function main() {
       const detail =
         result.status === "failed"
           ? `lookup failed (${result.error}); run again`
-          : result.candidates
-            ? `${result.status}: ${result.candidates.join("; ")}`
+          : result.candidates?.length
+            ? `${result.status === "missing" ? "missing; TMDB's top results" : result.status}: ${result.candidates.join("; ")}`
             : result.status;
       console.log(`  ${list} ${describeEntry(entry)}: ${detail}`);
     }
