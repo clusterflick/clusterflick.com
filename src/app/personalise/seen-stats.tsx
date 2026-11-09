@@ -10,6 +10,10 @@ import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import Link from "next/link";
+import { ProgressRing } from "@/components/list-progress";
+import VenueCard from "@/components/venue-card";
+import { getListProgress } from "@/lib/user-lists/list-progress";
 import { GENRES } from "@/data/genres";
 import { FilterId } from "@/lib/filters/types";
 import type { UserListEntry } from "@/lib/user-lists";
@@ -50,10 +54,22 @@ const plural = (count: number, noun: string) =>
  * languages. Read from the listed films' details, which only this page loads,
  * and loaded again when the Seen list's films change.
  */
+export type MovieListProgressItem = {
+  id: string;
+  name: string;
+  href: string;
+  imagePath: string | null;
+  /** The list's films (`getMovieListTmdbIds`). */
+  tmdbIds: string[];
+};
+
 export default function SeenStats({
   seen,
+  movieLists = [],
 }: {
   seen: Record<string, UserListEntry>;
+  /** The film lists, from the build, for the reader's progress through them. */
+  movieLists?: MovieListProgressItem[];
 }) {
   const { readFilmDetails } = useUserContext();
   // Matches `.summary`'s breakpoint in seen-stats.module.css. Beside the
@@ -127,11 +143,58 @@ export default function SeenStats({
             to count.
           </p>
         )}
+        <ListsProgress seen={seen} movieLists={movieLists} />
         <ExpandableSection title="More Stats" scrollOnExpand={false}>
           <MoreStats stats={stats} />
         </ExpandableSection>
       </div>
     </ContentSection>
+  );
+}
+
+/**
+ * Every film list the reader has seen a film from, furthest through first,
+ * each a link to the list's page. Lists with none seen are left to /lists:
+ * a row of noughts says nothing about the reader.
+ */
+function ListsProgress({
+  seen,
+  movieLists,
+}: {
+  seen: Record<string, UserListEntry>;
+  movieLists: MovieListProgressItem[];
+}) {
+  const ranked = movieLists
+    .map((list) => ({ list, progress: getListProgress(list.tmdbIds, seen) }))
+    .filter(({ progress }) => progress.seen > 0)
+    .sort(
+      (a, b) =>
+        b.progress.seen / b.progress.total -
+          a.progress.seen / a.progress.total ||
+        b.progress.seen - a.progress.seen,
+    );
+  if (ranked.length === 0) return null;
+
+  return (
+    <div className={styles.block}>
+      <h3 className={styles.groupTitle}>Your progress through the lists</h3>
+      <ul className={styles.listsProgress}>
+        {ranked.map(({ list, progress }) => (
+          <li key={list.id}>
+            <VenueCard
+              href={list.href}
+              name={list.name}
+              imagePath={list.imagePath}
+              detail={`${progress.seen.toLocaleString("en-GB")} of ${progress.total.toLocaleString("en-GB")} seen`}
+              aside={<ProgressRing share={progress.seen / progress.total} />}
+            />
+          </li>
+        ))}
+      </ul>
+      <Link href="/lists" className={styles.allLists}>
+        All film lists
+      </Link>
+    </div>
   );
 }
 

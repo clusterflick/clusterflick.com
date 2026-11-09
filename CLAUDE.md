@@ -18,6 +18,7 @@ Pages at clusterflick.com.
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
+- `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB ids (see Film Lists); a dry run unless given `-- --write`; review the diff and commit it
 - `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
@@ -431,12 +432,35 @@ but its boundary (a perfect score) is inherent rather than chosen.
   re-evaluates every build. Review-count floors come from `@/utils/movie-ratings.mjs`, shared with
   the Critics' Picks row.
 
-**Matching** (`src/utils/get-movie-list-movies.ts`) resolves each entry in descending order of
-certainty: `tmdbId` (the dataset keys movies by TMDB id, so this is a direct lookup) → `imdbId` →
-`rtSlug` → title + year. Titles run through `getSearchVariants`, so roman numerals, ampersands and
-punctuation all match; `altTitles` covers original-language titles. `yearTolerance` defaults to 1
-and should be 2 for award lists, which cite the _award_ year — `La Strada` is a 1954 film that won
-in 1956.
+**Every curated entry carries its TMDB id** (`tmdbId`), the id the dataset and a reader's
+lists key films by, so a list can be held against a Seen list as well as matched to what's showing.
+`npm run add-movie-list-tmdb-ids` fills them in from TMDB and writes them into the list files:
+exact for an IMDb id (TMDB's find endpoint), otherwise a strict title search (`pickListMatch` in
+`scripts/lib/movie-list-tmdb-ids.js`: title, original or `altTitles` match, within the list's
+`yearTolerance`, nearest year, a tie left ambiguous). Whatever it can't match is listed for
+settling by hand; entries with an id are skipped, so a re-run or a new list costs only the rest.
+The script keeps its own table of list files (`add-movie-list-tmdb-ids.config.mjs`), since it
+can't load the registry through the `@/` alias, and a unit test holds it to the registry.
+
+**Matching** (`src/utils/get-movie-list-movies.ts`) is by `tmdbId` alone: the dataset keys its
+films by TMDB id, so an entry resolves by direct lookup. The title, year, IMDb id and RT slug fallbacks
+it used to try were dropped once every entry had an id; measured against a live release, all nine
+lists showed exactly the same films either way. `tmdbId` is required (`null` for a film TMDB doesn't
+have, which nothing matches), and a work released in parts takes its first part's id.
+`createMovieMatcher` (`@/utils/match-movie`) keeps the title-and-year resolution for the Letterboxd
+import, whose exports carry no TMDB id.
+
+**A reader's progress through a list** (`ListProgress`, signed in only) is
+their Seen list held against the list's ids (`getMovieListTmdbIds`, unique and
+non-null, so a list with a repeated or missing film counts fewer than its
+entries). On each `/lists` card it is "X of Y seen" and a ring at the card's
+bottom right; on the list's page a line saying how many unseen films are
+showing, linking to the catalogue with just those films selected
+(`getMoviesFilterUrl`); and on `/personalise`, under the Seen stats, every list the reader
+has seen a film from, furthest through first, as `VenueCard`s with the ring as
+the card's `aside` (lists with none seen are left to `/lists`). Curated lists
+only — a computed list's membership changes every build, so "of Y" would too.
+A multi-part work counts once its first part is seen.
 
 The index is built once per dataset and memoized in a `WeakMap`, because every movie page needs the
 reverse lookup.

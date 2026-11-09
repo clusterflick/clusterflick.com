@@ -2,8 +2,10 @@ import { getSearchVariants } from "@/lib/filters/normalize";
 import type { Movie } from "@/types";
 
 /**
- * What identifies a film from outside the dataset — a published list's entry,
- * a row of a Letterboxd export. Only the title is required.
+ * What identifies a film from outside the dataset — a row of a Letterboxd
+ * export, which names films by title and year. Only the title is required.
+ * (The movie lists don't come through here: their entries carry TMDB ids and
+ * are looked up directly.)
  */
 export type MovieMatchQuery = {
   title: string;
@@ -11,14 +13,13 @@ export type MovieMatchQuery = {
   year?: number;
   imdbId?: string;
   rtSlug?: string;
-  tmdbId?: string;
+  tmdbId?: string | null;
 };
 
 /**
- * A published list's year can differ from the dataset's by one — festival vs
+ * A year from outside can differ from the dataset's by one — festival vs
  * general release, or US vs UK dates — so title matches allow a year either
- * side. Award lists override this via `yearTolerance`, as they cite the award
- * year rather than the film's.
+ * side.
  */
 const DEFAULT_YEAR_TOLERANCE = 1;
 
@@ -76,7 +77,7 @@ function buildLookups(movies: Movie[]): Lookups {
 }
 
 /**
- * The showing film a list entry refers to, or null if it isn't on in London.
+ * The film a query refers to among those given, or null.
  *
  * Tried in descending order of certainty: TMDB id (the dataset's own key), then
  * IMDb id, then Rotten Tomatoes slug, then title + year. The title fallback

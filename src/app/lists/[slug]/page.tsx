@@ -18,6 +18,7 @@ import {
   type RatingFilterId,
 } from "@/lib/filters/modules/ratings";
 import ListDetailPageContent, { type RatingLink } from "./page-content";
+import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
 
 /**
  * The rating filter behind each source's lists. A list drawn from a rating
@@ -193,6 +194,7 @@ export default async function MovieListDetailPage({
         isAlias={isAlias}
         canonicalUrl={canonicalUrl}
         ratingLink={getRatingLink(list)}
+        tmdbIds={getMovieListTmdbIds(list)}
       />
     </>
   );

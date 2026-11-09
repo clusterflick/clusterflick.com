@@ -19,6 +19,8 @@ interface VenueCardProps {
   action?: ReactNode;
   /** Greyed out, e.g. while a removal can still be undone. */
   muted?: boolean;
+  /** Drawn at the card's right edge, e.g. a film list's progress ring. */
+  aside?: ReactNode;
 }
 
 export default function VenueCard({
@@ -31,6 +33,7 @@ export default function VenueCard({
   detail,
   action,
   muted = false,
+  aside,
 }: VenueCardProps) {
   const hasCounts = filmCount !== undefined && performanceCount !== undefined;
   const countText = !hasCounts
@@ -66,6 +69,7 @@ export default function VenueCard({
         )}
         {stats && <span className={styles.stats}>{stats}</span>}
       </div>
+      {aside && <div className={styles.aside}>{aside}</div>}
     </NavCard>
   );
 

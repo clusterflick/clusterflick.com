@@ -56,106 +56,36 @@ const filmsFor = (list: MovieList, movies: MoviesRecord) =>
   buildMovieListIndex(movies, [list]).byList.get(list.id) ?? [];
 
 describe("curated list matching", () => {
-  it("matches on IMDb id even when the local title differs", () => {
+  it("matches each entry by its TMDB id, whatever the titles say", () => {
     const movies = record([
-      movie({
-        id: "1",
-        title: "Something Else Entirely",
-        year: "1980",
-        imdb: { id: "tt0068646" } as Movie["imdb"],
-      }),
+      movie({ id: "238", title: "Renamed Locally", year: "1980" }),
     ]);
 
     const films = filmsFor(
       curatedList([
-        { rank: 1, title: "The Godfather", year: 1972, imdbId: "tt0068646" },
+        { rank: 1, title: "The Godfather", year: 1972, tmdbId: "238" },
       ]),
       movies,
     );
 
     expect(films).toHaveLength(1);
-    expect(films[0].movie.id).toBe("1");
+    expect(films[0].movie.id).toBe("238");
     expect(films[0].rank).toBe(1);
   });
 
-  it("matches the Rotten Tomatoes slug in its url", () => {
+  it("never matches by title, nor an entry TMDB has no film for", () => {
     const movies = record([
       movie({
-        id: "3",
-        title: "Renamed Locally",
-        year: "1972",
-        rottenTomatoes: {
-          url: "https://www.rottentomatoes.com/m/the_godfather",
-        } as Movie["rottenTomatoes"],
+        id: "unmatched-1",
+        title: "The Sorrow and the Pity",
+        year: "1969",
       }),
     ]);
 
     const films = filmsFor(
       curatedList([
-        {
-          rank: 1,
-          title: "The Godfather",
-          year: 1972,
-          rtSlug: "the_godfather",
-        },
+        { rank: 1, title: "The Sorrow and the Pity", year: 1969, tmdbId: null },
       ]),
-      movies,
-    );
-
-    expect(films[0]?.movie.id).toBe("3");
-  });
-
-  it("falls back to title and year, tolerating a year either side", () => {
-    const movies = record([
-      movie({ id: "4", title: "Seven Samurai", year: "1955" }),
-    ]);
-
-    const films = filmsFor(
-      curatedList([{ rank: 1, title: "Seven Samurai", year: 1954 }]),
-      movies,
-    );
-
-    expect(films[0]?.movie.id).toBe("4");
-  });
-
-  it("matches titles across roman numerals and punctuation", () => {
-    const movies = record([
-      movie({ id: "5", title: "The Godfather Part 2", year: "1974" }),
-    ]);
-
-    const films = filmsFor(
-      curatedList([{ rank: 1, title: "The Godfather, Part II", year: 1974 }]),
-      movies,
-    );
-
-    expect(films[0]?.movie.id).toBe("5");
-  });
-
-  it("matches on an alternative title when the main one doesn't", () => {
-    // The Guardian lists "A One and a Two"; the cinema lists it as "Yi Yi".
-    const movies = record([movie({ id: "17", title: "Yi Yi", year: "2000" })]);
-
-    const films = filmsFor(
-      curatedList([
-        {
-          rank: 26,
-          title: "A One and a Two",
-          altTitles: ["Yi Yi"],
-          year: 2000,
-        },
-      ]),
-      movies,
-    );
-
-    expect(films[0]?.movie.id).toBe("17");
-  });
-
-  it("rejects a title match when the year is too far off", () => {
-    // The 1998 remake is not the film the list means.
-    const movies = record([movie({ id: "6", title: "Psycho", year: "1998" })]);
-
-    const films = filmsFor(
-      curatedList([{ rank: 1, title: "Psycho", year: 1960 }]),
       movies,
     );
 
@@ -164,31 +94,49 @@ describe("curated list matching", () => {
 
   it("keeps published order and skips films that aren't showing", () => {
     const movies = record([
-      movie({ id: "7", title: "Casablanca", year: "1942" }),
-      movie({ id: "8", title: "Chinatown", year: "1974" }),
+      movie({ id: "289", title: "Casablanca", year: "1942" }),
+      movie({ id: "829", title: "Chinatown", year: "1974" }),
     ]);
 
     const films = filmsFor(
       curatedList([
-        { rank: 1, title: "Chinatown", year: 1974 },
-        { rank: 2, title: "Not Showing Anywhere", year: 1990 },
-        { rank: 3, title: "Casablanca", year: 1942 },
+        { rank: 1, title: "Chinatown", year: 1974, tmdbId: "829" },
+        { rank: 2, title: "Not Showing Anywhere", year: 1990, tmdbId: "1" },
+        { rank: 3, title: "Casablanca", year: 1942, tmdbId: "289" },
       ]),
       movies,
     );
 
-    expect(films.map((f) => f.movie.id)).toEqual(["8", "7"]);
+    expect(films.map((f) => f.movie.id)).toEqual(["829", "289"]);
     expect(films.map((f) => f.rank)).toEqual([1, 3]);
   });
 
+  it("lists a film once when two entries share its id", () => {
+    const movies = record([
+      movie({ id: "1891", title: "The Empire Strikes Back" }),
+    ]);
+
+    const films = filmsFor(
+      curatedList([
+        { rank: 1, title: "Star Wars: Episode V", tmdbId: "1891" },
+        { rank: 2, title: "The Empire Strikes Back", tmdbId: "1891" },
+      ]),
+      movies,
+    );
+
+    expect(films.map((f) => f.rank)).toEqual([1]);
+  });
+
   it("excludes films whose performances have all finished", () => {
-    const finished = movie({ id: "9", title: "Casablanca", year: "1942" });
+    const finished = movie({ id: "289", title: "Casablanca", year: "1942" });
     finished.performances = [
-      { showingId: "9-s", time: new Date("2000-01-01").getTime() },
+      { showingId: "289-s", time: new Date("2000-01-01").getTime() },
     ] as Movie["performances"];
 
     const films = filmsFor(
-      curatedList([{ rank: 1, title: "Casablanca", year: 1942 }]),
+      curatedList([
+        { rank: 1, title: "Casablanca", year: 1942, tmdbId: "289" },
+      ]),
       record([finished]),
     );
 
@@ -244,9 +192,13 @@ describe("the 100% Club", () => {
 
 describe("getMovieListsForMovie", () => {
   it("reports every registered list a film is on, with its rank", () => {
+    // The Rotten Tomatoes list's #1, by the id the list gives it.
+    const rt = MOVIE_LISTS.find(({ id }) => id === "rt-best-of-all-time");
+    const first = rt?.kind === "curated" ? rt.entries[0] : undefined;
+    const id = first?.tmdbId as string;
     const movies = record([
       movie({
-        id: "15",
+        id,
         title: "The Godfather",
         year: "1972",
         rottenTomatoes: {
@@ -257,7 +209,7 @@ describe("getMovieListsForMovie", () => {
     ]);
 
     const byId = Object.fromEntries(
-      getMovieListsForMovie("15", movies).map((m) => [m.id, m]),
+      getMovieListsForMovie(id, movies).map((m) => [m.id, m]),
     );
 
     expect(byId["rt-best-of-all-time"]?.rank).toBe(1);
@@ -266,7 +218,10 @@ describe("getMovieListsForMovie", () => {
   });
 
   it("returns nothing for a film on no lists", () => {
-    const movies = record([movie({ id: "16", title: "Obscure Local Short" })]);
-    expect(getMovieListsForMovie("16", movies)).toEqual([]);
+    // Not a TMDB id: the lists hold real ones, and "16" is on one now.
+    const movies = record([
+      movie({ id: "obscure-short", title: "Obscure Local Short" }),
+    ]);
+    expect(getMovieListsForMovie("obscure-short", movies)).toEqual([]);
   });
 });

@@ -33,10 +33,18 @@ export type MovieListEntry = {
   /** A `tt`-style IMDb id. */
   imdbId?: string;
   /**
-   * A TMDB id. The surest match there is: the dataset keys its movies by TMDB
-   * id, so this resolves by direct lookup rather than any kind of search.
+   * The entry's TMDB id, which is how it's matched: the dataset keys its films
+   * by TMDB id, as a reader's lists do, so a list resolves by direct lookup
+   * against both. Required, so a list can't be added without them;
+   * `npm run add-movie-list-tmdb-ids` fills them in. The title, year and other
+   * ids stay for reading the list and for that script's search.
+   *
+   * A work released in parts (Gangs of Wasseypur, The Decalogue) takes its
+   * first part's id: one id per entry, so seeing the first part counts. `null`
+   * says on purpose that TMDB has no film for the entry (it files The Sorrow
+   * and the Pity as TV), so nothing can match it.
    */
-  tmdbId?: string;
+  tmdbId: string | null;
 };
 
 type MovieListBase = {
@@ -54,8 +62,9 @@ type MovieListBase = {
   /** One-line summary, used on the index cards and in page metadata. */
   description: string;
   /**
-   * How far an entry's year may differ from the dataset's, in years, when
-   * falling back to title matching. Defaults to 1.
+   * How far an entry's year may differ from a film's, in years, when
+   * `npm run add-movie-list-tmdb-ids` searches TMDB for its id by title.
+   * Defaults to 1.
    *
    * Award lists cite the *award* year, which can trail the film by two — the
    * Academy's International Feature list has `La Strada` (a 1954 film) under

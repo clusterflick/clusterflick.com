@@ -1,0 +1,41 @@
+.ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.ring strong {
+  color: var(--color-white);
+}
+
+.svg {
+  flex: none;
+  /* From twelve o'clock, as a clock's hand goes. */
+  transform: rotate(-90deg);
+}
+
+.track,
+.progress {
+  fill: none;
+  stroke-width: 4;
+}
+
+.track {
+  stroke: rgba(var(--color-white-rgb), 0.12);
+}
+
+.progress {
+  stroke: var(--color-buttery-yellow);
+  stroke-linecap: round;
+}
+
+.line {
+  margin: 0;
+  color: var(--color-light-gray);
+}
+
+.line strong {
+  color: var(--color-buttery-yellow);
+}

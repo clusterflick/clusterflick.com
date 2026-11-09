@@ -12,6 +12,7 @@
     "fetch-published-data": "node ./scripts/fetch-published-data.js",
     "fetch-release-log": "node ./scripts/fetch-release-log.js",
     "migrate-film-details": "node ./scripts/migrate-film-details.js",
+    "add-movie-list-tmdb-ids": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./scripts/add-movie-list-tmdb-ids.mjs",
     "fetch-london-stations": "node ./scripts/fetch-london-stations.js",
     "generate-borough-boundaries": "node ./scripts/generate-borough-boundaries.js",
     "carry-forward-static": "node ./scripts/carry-forward-static.js",
