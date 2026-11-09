@@ -81,6 +81,25 @@ export const WithTagsAndNotes: Story = {
   },
 };
 
+/**
+ * Occasions are pink tags after the blue ones, naming whoever the venue did.
+ * A note the tags already say in full ("+ Q&A") is left out; one with more to
+ * it ("UK Premiere of 4K Restoration") stays.
+ */
+export const WithOccasions: Story = {
+  args: {
+    time: IN_TWO_HOURS,
+    venueName: "Ciné Lumière",
+    occasions: {
+      qAndA: { guests: ["Sophie Marceau"] },
+      premiere: { region: "uk" },
+    },
+    notes:
+      "+ Q&A\nUK Premiere of 4K Restoration\nPart of French Film Festival London",
+    children: actions(),
+  },
+};
+
 /** Past performances fade and carry a Finished badge in place of Book. */
 export const Past: Story = {
   args: {

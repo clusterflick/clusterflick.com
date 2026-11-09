@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { Category, type Movie, type MoviePerformanceOccasions } from "@/types";
-import { matchOccasions, OccasionKind } from "./rules";
+import {
+  getOccasionTags,
+  isNoteCoveredByOccasions,
+  matchOccasions,
+  OccasionKind,
+} from "./rules";
 import { findOccasions, findBestOccasionPerMovie } from "./index";
 
 const DAY = 86_400_000;
@@ -455,5 +460,75 @@ describe("findBestOccasionPerMovie", () => {
       "busy",
     ]);
     expect(found[3].movie.id).toBe("elsewhere");
+  });
+});
+
+describe("getOccasionTags", () => {
+  it("lists every occasion, with the names the venue gave", () => {
+    expect(
+      getOccasionTags({
+        qAndA: { guests: ["Gary Lewis"] },
+        intro: true,
+        premiere: { region: "uk" },
+        preview: true,
+      }),
+    ).toEqual(["Intro", "Q&A with Gary Lewis", "UK premiere", "Preview"]);
+    expect(getOccasionTags({ intro: { guests: ["Benjamin Crais"] } })).toEqual([
+      "Intro by Benjamin Crais",
+    ]);
+    expect(
+      getOccasionTags({ liveScore: { performers: ["Hugo Max"] } }),
+    ).toEqual(["Live score by Hugo Max"]);
+  });
+
+  it("has nothing for a performance without occasions", () => {
+    expect(getOccasionTags(undefined)).toEqual([]);
+    expect(getOccasionTags({})).toEqual([]);
+  });
+});
+
+describe("isNoteCoveredByOccasions", () => {
+  const blueNote = {
+    qAndA: { guests: ["Sophie Marceau"] },
+    premiere: { region: "uk" as const },
+  };
+
+  it("leaves out a bare billing the tags say in full", () => {
+    expect(isNoteCoveredByOccasions("+ Q&A", blueNote)).toBe(true);
+    expect(isNoteCoveredByOccasions("Q&A", { qAndA: true })).toBe(true);
+    expect(isNoteCoveredByOccasions("+ ScreenTalk", { qAndA: true })).toBe(
+      true,
+    );
+    expect(isNoteCoveredByOccasions("UK Premiere", blueNote)).toBe(true);
+    expect(isNoteCoveredByOccasions("Q&A with Sophie Marceau", blueNote)).toBe(
+      true,
+    );
+  });
+
+  it("needs every part of a joined billing covered", () => {
+    expect(
+      isNoteCoveredByOccasions("+ Intro + Q&A", { intro: true, qAndA: true }),
+    ).toBe(true);
+    expect(isNoteCoveredByOccasions("+ Intro + Q&A", { qAndA: true })).toBe(
+      false,
+    );
+  });
+
+  it("keeps a note that says more than the tags", () => {
+    expect(
+      isNoteCoveredByOccasions("UK Premiere of 4K Restoration", blueNote),
+    ).toBe(false);
+    expect(
+      isNoteCoveredByOccasions("Part of French Film Festival London", blueNote),
+    ).toBe(false);
+    expect(
+      isNoteCoveredByOccasions("Q&A with the director", { qAndA: true }),
+    ).toBe(false);
+  });
+
+  it("keeps a note naming an occasion the performance doesn't have", () => {
+    expect(isNoteCoveredByOccasions("+ Q&A", { intro: true })).toBe(false);
+    expect(isNoteCoveredByOccasions("London Premiere", blueNote)).toBe(false);
+    expect(isNoteCoveredByOccasions("+ Q&A", undefined)).toBe(false);
   });
 });

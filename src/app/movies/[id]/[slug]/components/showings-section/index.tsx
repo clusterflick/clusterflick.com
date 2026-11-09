@@ -117,6 +117,7 @@ function renderPerformanceCard(
       screen={performance.screen}
       accessibility={performance.accessibility}
       format={performance.format}
+      occasions={performance.occasions}
       notes={performance.notes}
       status={status}
     >
