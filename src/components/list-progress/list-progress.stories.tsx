@@ -27,7 +27,10 @@ const meta = {
   title: "Components/ListProgress",
   component: ListProgress,
   tags: ["autodocs"],
-  parameters: { backgrounds: { default: "dark" } },
+  parameters: {
+    backgrounds: { default: "dark" },
+    nextjs: { appDirectory: true },
+  },
   args: { tmdbIds: IDS },
   decorators: [
     (Story, { parameters }) => (

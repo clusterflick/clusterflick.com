@@ -3,6 +3,8 @@
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import clsx from "clsx";
+import Link from "next/link";
+import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { getListProgress } from "@/lib/user-lists/list-progress";
 import styles from "./list-progress.module.css";
 
@@ -17,7 +19,10 @@ export interface ListProgressProps {
    * list's own page: a sentence, with how many unseen films are showing.
    */
   variant?: "ring" | "line";
-  /** The list's films showing now, for the line's "4 you haven't seen". */
+  /**
+   * The list's films showing now, for the line's "4 you haven't seen", which
+   * opens the catalogue on those films.
+   */
   showingIds?: string[];
   className?: string;
 }
@@ -66,17 +71,24 @@ export default function ListProgress({
   const counts = `${seen.toLocaleString("en-GB")} of ${total.toLocaleString("en-GB")}`;
 
   if (variant === "line") {
-    const unseenShowing = (showingIds ?? []).filter(
-      (id) => !(id in seenList),
-    ).length;
+    const unseenShowing = (showingIds ?? []).filter((id) => !(id in seenList));
     return (
       <p className={clsx(styles.line, className)}>
         You&apos;ve seen <strong>{counts}</strong> films on this list
-        {seen === total
-          ? ", every one."
-          : unseenShowing > 0
-            ? `. ${unseenShowing} you haven't seen ${unseenShowing === 1 ? "is" : "are"} showing.`
-            : "."}
+        {seen === total ? (
+          ", every one."
+        ) : unseenShowing.length > 0 ? (
+          <>
+            . {/* Into the catalogue with just those films selected. */}
+            <Link href={getMoviesFilterUrl("/catalogue", unseenShowing)}>
+              {unseenShowing.length} you haven&apos;t seen{" "}
+              {unseenShowing.length === 1 ? "is" : "are"} showing
+            </Link>
+            .
+          </>
+        ) : (
+          "."
+        )}
       </p>
     );
   }

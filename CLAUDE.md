@@ -455,7 +455,8 @@ their Seen list held against the list's ids (`getMovieListTmdbIds`, unique and
 non-null, so a list with a repeated or missing film counts fewer than its
 entries). On each `/lists` card it is "X of Y seen" and a ring at the card's
 bottom right; on the list's page a line saying how many unseen films are
-showing; and on `/personalise`, under the Seen stats, every list the reader
+showing, linking to the catalogue with just those films selected
+(`getMoviesFilterUrl`); and on `/personalise`, under the Seen stats, every list the reader
 has seen a film from, furthest through first, as `VenueCard`s with the ring as
 the card's `aside` (lists with none seen are left to `/lists`). Curated lists
 only — a computed list's membership changes every build, so "of Y" would too.
