@@ -11,7 +11,8 @@ import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import Link from "next/link";
-import ListProgress from "@/components/list-progress";
+import { ProgressRing } from "@/components/list-progress";
+import VenueCard from "@/components/venue-card";
 import { getListProgress } from "@/lib/user-lists/list-progress";
 import { GENRES } from "@/data/genres";
 import { FilterId } from "@/lib/filters/types";
@@ -57,12 +58,10 @@ export type MovieListProgressItem = {
   id: string;
   name: string;
   href: string;
+  imagePath: string | null;
   /** The list's films (`getMovieListTmdbIds`). */
   tmdbIds: string[];
 };
-
-/** Lists shown in the stats: the reader's most complete, not all nine. */
-const LISTS_SHOWN = 3;
 
 export default function SeenStats({
   seen,
@@ -154,8 +153,9 @@ export default function SeenStats({
 }
 
 /**
- * The film lists the reader is furthest through, each a link to the list's
- * page. Only lists with a film seen: a strip of noughts says nothing.
+ * Every film list the reader has seen a film from, furthest through first,
+ * each a link to the list's page. Lists with none seen are left to /lists:
+ * a row of noughts says nothing about the reader.
  */
 function ListsProgress({
   seen,
@@ -172,20 +172,22 @@ function ListsProgress({
         b.progress.seen / b.progress.total -
           a.progress.seen / a.progress.total ||
         b.progress.seen - a.progress.seen,
-    )
-    .slice(0, LISTS_SHOWN);
+    );
   if (ranked.length === 0) return null;
 
   return (
     <div className={styles.block}>
-      <h3 className={styles.heading}>Your progress through the lists</h3>
+      <h3 className={styles.groupTitle}>Your progress through the lists</h3>
       <ul className={styles.listsProgress}>
-        {ranked.map(({ list }) => (
+        {ranked.map(({ list, progress }) => (
           <li key={list.id}>
-            <Link href={list.href} className={styles.listProgress}>
-              <span className={styles.listName}>{list.name}</span>
-              <ListProgress tmdbIds={list.tmdbIds} />
-            </Link>
+            <VenueCard
+              href={list.href}
+              name={list.name}
+              imagePath={list.imagePath}
+              detail={`${progress.seen.toLocaleString("en-GB")} of ${progress.total.toLocaleString("en-GB")} seen`}
+              aside={<ProgressRing share={progress.seen / progress.total} />}
+            />
           </li>
         ))}
       </ul>

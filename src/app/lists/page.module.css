@@ -62,3 +62,8 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.45);
 }
+
+/* The reader's progress sits at the card's bottom right, after the source. */
+.progress {
+  margin-left: auto;
+}

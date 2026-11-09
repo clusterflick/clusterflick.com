@@ -12,21 +12,24 @@ import type { FilmDetails } from "@/lib/user-lists/film-details";
 /** Lists for the stats' progress strip, held against the stats stories' Seen films. */
 const MOVIE_LISTS = [
   {
-    id: "sight-and-sound",
-    name: "Sight and Sound Greatest Films",
-    href: "/lists/sight-and-sound/",
+    id: "palme-dor-winners",
+    name: "Palme d'Or Winners",
+    href: "/lists/palme-dor-winners/",
+    imagePath: "/images/movie-lists/palme-dor-winners.jpg",
     tmdbIds: ["samurai", "rashomon", "mood", "heat", "a", "b", "c", "d"],
   },
   {
     id: "hong-kong",
     name: "Hong Kong Classics",
     href: "/lists/hong-kong/",
+    imagePath: null,
     tmdbIds: ["mood", "chungking", "e"],
   },
   {
     id: "imdb",
     name: "IMDb Top 250",
     href: "/lists/imdb-top-250/",
+    imagePath: "/images/movie-lists/imdb-top-250.jpg",
     tmdbIds: [
       "heat",
       "insider",
@@ -38,6 +41,7 @@ const MOVIE_LISTS = [
     id: "unseen",
     name: "A List With Nothing Seen",
     href: "/lists/unseen/",
+    imagePath: null,
     tmdbIds: ["f", "g"],
   },
 ];

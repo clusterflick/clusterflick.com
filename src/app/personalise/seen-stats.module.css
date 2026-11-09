@@ -67,13 +67,6 @@
   gap: 12px;
 }
 
-.heading {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-white);
-}
-
 /* The charts pair up where there's room: people beside people, genres
    beside decades. */
 .charts {
@@ -132,38 +125,21 @@
   color: var(--color-muted-gray);
 }
 
-/* The lists the reader is furthest through: a card each, side by side. */
+/* As the page's other group headings ("Showing now", "Last chance"). */
+.groupTitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-muted-gray);
+}
+
+/* Laid out as My Venues lays out its cards. */
 .listsProgress {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px 16px;
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.listProgress {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  height: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: rgba(var(--color-white-rgb), 0.04);
-  border: 1px solid rgba(var(--color-white-rgb), 0.1);
-  color: inherit;
-  font-weight: inherit;
-  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.1);
-}
-
-.listProgress:hover {
-  color: inherit;
-  border-color: var(--color-neon-pink);
-}
-
-.listName {
-  font-weight: 700;
-  color: var(--color-white);
 }
 
 .allLists {

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenueCard from "@/components/venue-card";
 import Button from "@/components/button";
+import { ProgressRing } from "@/components/list-progress";
 
 /**
  * `VenueCard` is a horizontal navigation card for a single venue. It shows a
@@ -156,5 +157,19 @@ export const WithoutLink: Story = {
     type: "Cinema",
     imagePath: null,
     detail: "No longer listed",
+  },
+};
+
+/**
+ * Something drawn at the right edge, as the film lists in the Seen stats on
+ * /personalise use the card: a list's logo, name and progress.
+ */
+export const WithAside: Story = {
+  args: {
+    href: "/lists/imdb-top-250/",
+    name: "IMDb Top 250",
+    imagePath: "/images/movie-lists/imdb-top-250.jpg",
+    detail: "112 of 250 seen",
+    aside: <ProgressRing share={112 / 250} />,
   },
 };

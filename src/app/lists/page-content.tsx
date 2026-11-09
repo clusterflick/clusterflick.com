@@ -46,7 +46,10 @@ export default function ListsPageContent({
                         {list.movieCount === 1 ? "film" : "films"} showing
                       </span>
                       <span className={styles.source}>{list.sourceName}</span>
-                      <ListProgress tmdbIds={list.tmdbIds} />
+                      <ListProgress
+                        tmdbIds={list.tmdbIds}
+                        className={styles.progress}
+                      />
                     </>
                   }
                 />
@@ -74,7 +77,10 @@ export default function ListsPageContent({
                       <span className={styles.noFilms}>
                         No films currently showing
                       </span>
-                      <ListProgress tmdbIds={list.tmdbIds} />
+                      <ListProgress
+                        tmdbIds={list.tmdbIds}
+                        className={styles.progress}
+                      />
                     </>
                   }
                 />

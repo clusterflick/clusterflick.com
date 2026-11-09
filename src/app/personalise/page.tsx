@@ -3,6 +3,7 @@ import { getVenueImagePaths } from "@/utils/get-venue-image";
 import { MOVIE_LISTS } from "@/data/movie-lists";
 import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
+import { getMovieListImagePath } from "@/utils/get-movie-list-image";
 import PersonalisePageContent from "./page-content";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function PersonalisePage() {
     id: list.id,
     name: list.name,
     href: getMovieListUrl(list),
+    imagePath: getMovieListImagePath(list.id),
     tmdbIds: getMovieListTmdbIds(list),
   })).filter(({ tmdbIds }) => tmdbIds.length > 0);
   return (

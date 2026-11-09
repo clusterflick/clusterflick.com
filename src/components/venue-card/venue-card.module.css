@@ -70,6 +70,12 @@ a.card:hover .name {
   margin-top: 2px;
 }
 
+.aside {
+  flex: none;
+  margin-left: auto;
+  display: flex;
+}
+
 .muted {
   opacity: 0.5;
 }

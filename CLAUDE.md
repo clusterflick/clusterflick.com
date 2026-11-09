@@ -453,11 +453,13 @@ import, whose exports carry no TMDB id.
 **A reader's progress through a list** (`ListProgress`, signed in only) is
 their Seen list held against the list's ids (`getMovieListTmdbIds`, unique and
 non-null, so a list with a repeated or missing film counts fewer than its
-entries): a ring and "X of Y seen" on each `/lists` card, a line on the list's
-page saying how many unseen films are showing, and on `/personalise` the three
-lists the reader is furthest through, by share, among those with one seen.
-Curated lists only — a computed list's membership changes every build, so
-"of Y" would too. A multi-part work counts once seen its first part.
+entries). On each `/lists` card it is "X of Y seen" and a ring at the card's
+bottom right; on the list's page a line saying how many unseen films are
+showing; and on `/personalise`, under the Seen stats, every list the reader
+has seen a film from, furthest through first, as `VenueCard`s with the ring as
+the card's `aside` (lists with none seen are left to `/lists`). Curated lists
+only — a computed list's membership changes every build, so "of Y" would too.
+A multi-part work counts once its first part is seen.
 
 The index is built once per dataset and memoized in a `WeakMap`, because every movie page needs the
 reverse lookup.
