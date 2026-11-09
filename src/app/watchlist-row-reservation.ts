@@ -17,8 +17,38 @@ export const WATCHLIST_ROW_SLOT_ID = "watchlist-row";
 export const WATCHLIST_ROW_HEIGHT_KEY = "clusterflick-watchlist-row-height";
 
 /**
- * Reserves only for a reader carrying the signed-in flag, so a stored height
- * outliving a sign-out reserves nothing. Storage can throw, and nothing here
- * is essential.
+ * "From Directors You Love", under it, arrives the same way and later still
+ * (it needs the film details too), so it reserves its height the same way.
  */
-export const WATCHLIST_ROW_RESERVATION_SCRIPT = `try{if(localStorage.getItem(${JSON.stringify(SIGNED_IN_FLAG_KEY)})){var h=parseInt(localStorage.getItem(${JSON.stringify(WATCHLIST_ROW_HEIGHT_KEY)}),10);if(h>0){var s=document.getElementById(${JSON.stringify(WATCHLIST_ROW_SLOT_ID)});s.style.setProperty("--reserved-height",h+"px");s.setAttribute("data-reserved","")}}}catch(e){}`;
+export const DIRECTORS_ROW_SLOT_ID = "directors-row";
+export const DIRECTORS_ROW_HEIGHT_KEY = "clusterflick-directors-row-height";
+
+/**
+ * The script reserving a row's slot. Reserves only for a reader carrying the
+ * signed-in flag, so a stored height outliving a sign-out reserves nothing.
+ * Storage can throw, and nothing here is essential.
+ */
+export function getRowReservationScript(slotId: string, heightKey: string) {
+  return `try{if(localStorage.getItem(${JSON.stringify(SIGNED_IN_FLAG_KEY)})){var h=parseInt(localStorage.getItem(${JSON.stringify(heightKey)}),10);if(h>0){var s=document.getElementById(${JSON.stringify(slotId)});s.style.setProperty("--reserved-height",h+"px");s.setAttribute("data-reserved","")}}}catch(e){}`;
+}
+
+export const WATCHLIST_ROW_RESERVATION_SCRIPT = getRowReservationScript(
+  WATCHLIST_ROW_SLOT_ID,
+  WATCHLIST_ROW_HEIGHT_KEY,
+);
+
+export const DIRECTORS_ROW_RESERVATION_SCRIPT = getRowReservationScript(
+  DIRECTORS_ROW_SLOT_ID,
+  DIRECTORS_ROW_HEIGHT_KEY,
+);
+
+/** Stores a row's settled height for next time, or clears it when empty. */
+export function storeRowHeight(heightKey: string, height: number) {
+  try {
+    if (height > 0) {
+      localStorage.setItem(heightKey, String(height));
+    } else {
+      localStorage.removeItem(heightKey);
+    }
+  } catch {}
+}

@@ -16,6 +16,7 @@ import { getRatingGroup, meetsRating } from "@/lib/filters/modules/ratings";
 import { FilterId } from "@/lib/filters/types";
 import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
 import { pruneByShowings } from "@/utils/prune-movies";
+import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
 
 export { getRating };
 
@@ -839,4 +840,113 @@ export function getWatchlistRow(
       performanceCount,
       subtitle,
     }));
+}
+
+/** Films by a director the reader has seen this many of, or more. */
+export const FAVOURITE_DIRECTOR_MIN_SEEN = 2;
+/** Fewer than this and the row is left out: one or two posters read as broken. */
+export const FAVOURITE_DIRECTORS_ROW_MIN = 3;
+const FAVOURITE_DIRECTORS_LIMIT = 24;
+
+/**
+ * "From Directors You Love": films showing in the next fortnight by a director
+ * the reader has seen `FAVOURITE_DIRECTOR_MIN_SEEN` or more films by. A
+ * fortnight, as the watchlist row above it looks, since the two are planned
+ * around together.
+ *
+ * Favourites (`getFavouriteDirectors`) come from the Seen list's film
+ * details, not the dataset, because most films a reader has seen finished
+ * their run long ago. A film counts for a director if they
+ * directed it or a film it screens (`getMovieAndIncluded`), as the directors
+ * filter reads it.
+ *
+ * Films already seen are left out, and so are those on the watchlist, which
+ * the row above already shows. The categories are the curated rows' defaults,
+ * since these are suggestions rather than films the reader chose. Ordered by
+ * how many of the director's films the reader has seen, then soonest; each
+ * subtitle names the director, the next showing and how many of theirs the
+ * reader has seen.
+ *
+ * Returns the films and the directors they're by, or nothing below
+ * `FAVOURITE_DIRECTORS_ROW_MIN` films.
+ */
+export function getFavouriteDirectorsRow(
+  movies: MoviesRecord,
+  favourites: ReadonlyMap<string, number>,
+  excludeIds: ReadonlySet<string>,
+  directorNames: Record<string, string>,
+  options: { now?: number; limit?: number } = {},
+): { movies: ScoredMovie[]; directorIds: string[] } {
+  const now = options.now ?? Date.now();
+  const rangeEnd = now + WATCHLIST_WINDOW_DAYS * MS_PER_DAY;
+  const empty = { movies: [], directorIds: [] };
+  if (favourites.size === 0) return empty;
+
+  const scored: (ScoredMovie & {
+    director: string;
+    seen: number;
+    sortTime: number;
+  })[] = [];
+  for (const movie of Object.values(movies)) {
+    if (excludeIds.has(movie.id) || !isDiscoverable(movie)) continue;
+    // The favourite the reader has seen most of, when a film has several.
+    const director = getMovieAndIncluded(movie, "directors")
+      .filter((id) => favourites.has(id) && directorNames[id])
+      .sort((a, b) => favourites.get(b)! - favourites.get(a)!)[0];
+    if (!director) continue;
+    const next = movie.performances
+      .filter((p) => p.time >= now && p.time < rangeEnd && !p.status?.soldOut)
+      .reduce<
+        MoviePerformance | undefined
+      >((soonest, p) => (!soonest || p.time < soonest.time ? p : soonest), undefined);
+    if (!next) continue;
+    scored.push({
+      movie,
+      performanceCount: movie.performances.filter(
+        (p) => p.time >= now && p.time < rangeEnd,
+      ).length,
+      // The date and count never split, so a long name pushes them whole
+      // onto a line of their own: "Christopher Nolan · / Sun 22 Nov · 4 seen".
+      subtitle: `${directorNames[director]} · ${[
+        formatDayAndDate(next.time),
+        `${favourites.get(director)} seen`,
+      ]
+        .join(" · ")
+        .replace(/ /g, " ")}`,
+      director,
+      seen: favourites.get(director)!,
+      sortTime: next.time,
+    });
+  }
+
+  if (scored.length < FAVOURITE_DIRECTORS_ROW_MIN) return empty;
+  const row = scored
+    .sort((a, b) => b.seen - a.seen || a.sortTime - b.sortTime)
+    .slice(0, options.limit ?? FAVOURITE_DIRECTORS_LIMIT);
+  return {
+    movies: row.map(({ movie, performanceCount, subtitle }) => ({
+      movie,
+      performanceCount,
+      subtitle,
+    })),
+    directorIds: [...new Set(row.map(({ director }) => director))],
+  };
+}
+
+/**
+ * The directors the reader has seen `FAVOURITE_DIRECTOR_MIN_SEEN` or more
+ * films by, with how many: `seenDirectors` holds each seen film's directors.
+ */
+export function getFavouriteDirectors(
+  seenDirectors: Iterable<string[]>,
+): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const directors of seenDirectors) {
+    for (const id of new Set(directors)) {
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+  }
+  return new Map(
+    [...counts].filter(([, n]) => n >= FAVOURITE_DIRECTOR_MIN_SEEN),
+  );
 }
