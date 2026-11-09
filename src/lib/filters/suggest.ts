@@ -1,5 +1,7 @@
 import { AccessibilityFeature, Category, Genre, Movie, Venue } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import { OCCASION_LABELS } from "@/utils/occasion-labels";
+import { OCCASION_ORDER } from "@/lib/occasions/rules";
 import {
   formatDateLong,
   formatDaysFromNow,
@@ -41,6 +43,7 @@ import {
   ACCESSIBILITY_ALIASES,
   CATEGORY_ALIASES,
   GENRE_ALIASES,
+  OCCASION_ALIASES,
   foldSuffix,
 } from "./value-aliases";
 
@@ -191,6 +194,13 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
     id: FilterId.FormatDimension,
     label: "Any dimension",
     action: "Search all dimensions",
+  },
+  // Beside the formats: a Q&A is a preference about the night, as 35mm is,
+  // not a requirement like accessibility.
+  {
+    id: FilterId.Occasions,
+    label: "Any occasion",
+    action: "Search screenings with or without an occasion",
   },
   {
     id: FilterId.HideFinished,
@@ -391,6 +401,18 @@ function buildVocabularies(context: SuggestContext): ValueVocabulary[] {
       })),
     });
   }
+
+  vocabularies.push({
+    filterId: FilterId.Occasions,
+    label: "Occasion",
+    noun: "screenings",
+    entries: OCCASION_ORDER.map((kind) => ({
+      name: OCCASION_LABELS[kind],
+      value: kind,
+      aliases: OCCASION_ALIASES[kind],
+      select: (state: FilterState) => set(state, FilterId.Occasions, [kind]),
+    })),
+  });
 
   vocabularies.push({
     filterId: FilterId.Accessibility,

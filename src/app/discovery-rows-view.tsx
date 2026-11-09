@@ -5,6 +5,7 @@ import type { Venue } from "@/types";
 import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import {
   getMarathonsUrl,
+  getOccasionsUrl,
   HIGHLY_RATED,
   type DiscoveryRows,
 } from "@/utils/get-discovery-movies";
@@ -66,6 +67,7 @@ export default function DiscoveryRowsView({
           venues,
           (movie) => `${getMovieUrl(movie)}${SHOW_ALL_HASH}`,
         )}
+        seeAllHref={getOccasionsUrl()}
       />
 
       <CollectionRow

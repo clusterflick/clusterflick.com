@@ -4,6 +4,8 @@ import {
   Category,
   type Movie,
   type MoviePerformance,
+  type MoviePerformanceOccasions,
+  OccasionType,
   FormatSource,
   type Genre,
   type Venue,
@@ -50,6 +52,7 @@ interface MovieSpec {
   notes?: string;
   subtitled?: boolean;
   dogFriendly?: boolean;
+  occasions?: MoviePerformanceOccasions;
 }
 
 function makeMovie(id: string, spec: MovieSpec): Movie {
@@ -68,6 +71,7 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
         }
       : {}),
     ...(spec.source ? { format: { source: spec.source } } : {}),
+    ...(spec.occasions ? { occasions: spec.occasions } : {}),
   };
 
   return {
@@ -472,6 +476,22 @@ describe("suggestFilterRelaxations", () => {
           .filter((s) => s.kind === "filter")
           .map((s) => s.headline),
       ).toEqual(["Show 70mm screenings", "Show IMAX 70mm screenings"]);
+    });
+
+    it("reads the word people use for an occasion as that occasion", () => {
+      const movies = makeMovies({
+        "1": { title: "The Eel", occasions: { intro: true } },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "introduction");
+
+      const [suggestion] = suggestFilterRelaxations({ movies, state });
+      expect(lines(suggestion)).toEqual([
+        "Show Intro screenings",
+        "Occasion: Intro",
+      ]);
+      expect(suggestion.state[FilterId.Occasions]).toEqual([
+        OccasionType.Intro,
+      ]);
     });
 
     it("reads a genre name, looked up by its record key", () => {
@@ -1404,6 +1424,22 @@ describe("getFilterValueOffers", () => {
     expect(lines(offer)).toEqual(["Show Action films", "Genre: Action"]);
     expect(offer.count).toBe(2);
     expect(offer.state[FilterId.Search]).toBe("");
+  });
+
+  it("offers an occasion a title also mentions", () => {
+    const movies = makeMovies({
+      "1": { title: "The Introduction" },
+      "2": { title: "The Eel", occasions: { intro: true } },
+      "3": {
+        title: "Teorema",
+        occasions: { intro: { guests: ["Aisha Rattan"] } },
+      },
+    });
+    const state = set(getDefaultState(), FilterId.Search, "introduction");
+
+    const [offer] = offers(movies, state);
+    expect(lines(offer)).toEqual(["Show Intro screenings", "Occasion: Intro"]);
+    expect(offer.count).toBe(2);
   });
 
   it("stays quiet when the titles are the bigger answer", () => {

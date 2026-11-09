@@ -1217,10 +1217,14 @@ and categories are the rows' own.
   live week). No filter tells a shorts programme from one short, and the data can't reliably either
   — some programmes carry no list of their films — so a short on that page was accepted over a
   filter of its own.
+- **More Than a Screening** → every kind of occasion (`getOccasionsUrl`), described as "with an
+  occasion". A superset too: the row is the occasions scored rare across the city, one night per
+  film, while the filter is the plain fact of an occasion, house-style intros included. The rarity
+  is the row's editorial cut; the grid is what else is more than a screening.
 
-The rest need filters that don't exist yet (last chance, just added), a sort (Showing Across
-London), or a costlier probe (More Than a Screening). Lists and collections need no link: their
-pages already show every member that is showing.
+The rest need filters that don't exist yet (last chance, just added) or a sort (Showing Across
+London). Lists and collections need no link: their pages already show every member that is
+showing.
 
 **The rating filters** (`src/lib/filters/modules/ratings.ts`) are three, one per source, built from
 one factory as the people and format filters are: Letterboxd (`?letterboxd=`, out of 5), IMDb
@@ -1264,6 +1268,25 @@ the list in the same terms, which is exploration the list page itself can't offe
 unlike the home row, since a list page shows every member whenever it's showing. It's shown even
 when nothing from the list is on, when it's the most useful thing on the page. Editorial lists
 (Oscars, Cannes, Empire…) have no scale to widen along, and no link.
+
+## Occasions Filter
+
+`FilterId.Occasions` (`src/lib/filters/modules/occasions.ts`) is the accessibility filter over
+`performance.occasions`: one pill per kind the pipeline publishes (`OccasionType`) plus None for
+ordinary screenings, nine in all, in the "Occasions" Refine row after Format. `null` is no filter,
+`[]` matches nothing, a `?occasions=` param. **The kinds aren't grouped**: in conversation, panel
+and guest appearance stay three pills, so a reader is told how many of each there are rather than
+a total of things we decided were alike. `OccasionType` and `MoviePerformanceOccasions` are held to
+the same keys by a type in `src/types.ts`, so a kind added to one won't compile without the other.
+
+**It widens like a format, not like accessibility.** An occasion is a preference about the night,
+as 35mm is, so the suggestion engine widens it beside the formats and may pair it; accessibility is
+a requirement, widened last and alone. Its words (`OCCASION_ALIASES`) feed the overlay's search
+menu and the filter-value offers, so "introduction" finds Intro — the pills keep the tags' short
+labels, and the long forms are how people ask.
+
+**Every kind counts, not just the rare ones**, as on the performance tags: it is a fact about one
+showing. Rarity belongs to the home row (`findOccasions`).
 
 ## Thin-Result Notice
 

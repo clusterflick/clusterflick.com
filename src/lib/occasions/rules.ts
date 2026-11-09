@@ -1,4 +1,9 @@
-import type { MoviePerformanceOccasions, PremiereRegion } from "@/types";
+import {
+  OccasionType,
+  type MoviePerformanceOccasions,
+  type PremiereRegion,
+} from "@/types";
+import { OCCASION_LABELS } from "@/utils/occasion-labels";
 
 /**
  * What makes a performance more than a screening.
@@ -199,37 +204,22 @@ export function matchOccasions(
 
 type OccasionKey = keyof MoviePerformanceOccasions;
 
-/** The order a performance's occasion tags are listed in. */
-const TAG_ORDER: OccasionKey[] = [
-  "liveScore",
-  "intro",
-  "qAndA",
-  "inConversation",
-  "panel",
-  "guestAppearance",
-  "premiere",
-  "preview",
-];
+/**
+ * The order a performance's occasion tags are listed in, and the filter's
+ * pills: the enum's order, most special first.
+ */
+export const OCCASION_ORDER = Object.values(OccasionType);
+// The enum's values are the published field's keys.
+const TAG_ORDER = OCCASION_ORDER as OccasionKey[];
 
-/** How each occasion reads as a tag, with nobody named and with names. */
-const TAG_LABEL: Record<
-  OccasionKey,
-  { bare: string; named?: (names: string) => string }
-> = {
-  liveScore: { bare: "Live score", named: (names) => `Live score by ${names}` },
-  intro: { bare: "Intro", named: (names) => `Intro by ${names}` },
-  qAndA: { bare: "Q&A", named: (names) => `Q&A with ${names}` },
-  inConversation: {
-    bare: "In conversation",
-    named: (names) => `In conversation with ${names}`,
-  },
-  panel: { bare: "Panel discussion", named: (names) => `Panel with ${names}` },
-  guestAppearance: {
-    bare: "Guest appearance",
-    named: (names) => `With ${names}`,
-  },
-  premiere: { bare: "Premiere" },
-  preview: { bare: "Preview" },
+/** How each occasion reads as a tag once someone is named. */
+const NAMED_TAG: Partial<Record<OccasionKey, (names: string) => string>> = {
+  liveScore: (names) => `Live score by ${names}`,
+  intro: (names) => `Intro by ${names}`,
+  qAndA: (names) => `Q&A with ${names}`,
+  inConversation: (names) => `In conversation with ${names}`,
+  panel: (names) => `Panel with ${names}`,
+  guestAppearance: (names) => `With ${names}`,
 };
 
 function namesOf(value: unknown): string[] {
@@ -257,9 +247,13 @@ export function getOccasionTags(
       const { region } = value as { region: PremiereRegion };
       return [`${REGION_LABEL[region]} premiere`];
     }
-    const { bare, named } = TAG_LABEL[key];
+    const named = NAMED_TAG[key];
     const names = namesOf(value);
-    return [named && names.length > 0 ? named(formatNames(names)) : bare];
+    return [
+      named && names.length > 0
+        ? named(formatNames(names))
+        : OCCASION_LABELS[key as OccasionType],
+    ];
   });
 }
 

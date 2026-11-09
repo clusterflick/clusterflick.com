@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Category } from "@/types";
+import { Category, OccasionType, OCCASION_NONE } from "@/types";
 import { FilterId } from "./types";
 import {
   getDefaultState,
@@ -182,6 +182,47 @@ describe("describeFilters describes the rating filters", () => {
     expect(events(state)).toBe(
       "Films rated 8.0+ on IMDb and 95%+ on Rotten Tomatoes",
     );
+  });
+});
+
+describe("describeFilters occasions", () => {
+  it("names the occasions selected", () => {
+    const state = set(getDefaultState(), FilterId.Occasions, [
+      OccasionType.QAndA,
+      OccasionType.Intro,
+    ]);
+    expect(events(state)).toBe("Films with Q&A or Intro");
+  });
+
+  it("reads every kind but None as any occasion", () => {
+    const state = set(
+      getDefaultState(),
+      FilterId.Occasions,
+      Object.values(OccasionType),
+    );
+    expect(events(state)).toBe("Films with an occasion");
+    expect(
+      chips(state).find((chip) => chip.filterIds[0] === FilterId.Occasions)
+        ?.label,
+    ).toBe("Any occasion");
+  });
+
+  it("joins accessibility and occasions as two clauses", () => {
+    let state = set(getDefaultState(), FilterId.Occasions, [
+      OccasionType.QAndA,
+    ]);
+    state = set(state, FilterId.Accessibility, ["subtitled"] as never);
+    expect(events(state)).toBe("Films with Subtitles and Q&A");
+  });
+
+  it("says when nothing is selected", () => {
+    const state = set(getDefaultState(), FilterId.Occasions, []);
+    expect(events(state)).toBe("No occasions selected");
+  });
+
+  it("names ordinary screenings as None does", () => {
+    const state = set(getDefaultState(), FilterId.Occasions, [OCCASION_NONE]);
+    expect(events(state)).toBe("Films with No occasion");
   });
 });
 

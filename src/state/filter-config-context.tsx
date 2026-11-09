@@ -14,6 +14,9 @@ import {
   AccessibilityFeature,
   AccessibilityFilterValue,
   ACCESSIBILITY_NONE,
+  OccasionFilterValue,
+  OccasionType,
+  OCCASION_NONE,
   Category,
 } from "@/types";
 import {
@@ -254,6 +257,10 @@ type FilterConfigContextType = {
   toggleAccessibility: (feature: AccessibilityFilterValue) => void;
   selectAllAccessibility: () => void;
   clearAllAccessibility: () => void;
+  // Occasions
+  toggleOccasion: (value: OccasionFilterValue) => void;
+  selectAllOccasions: () => void;
+  clearAllOccasions: () => void;
   // Format (source / presentation / dimension) — keyed by filter id
   toggleFormat: (
     filterId: FormatFilterId,
@@ -623,6 +630,46 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Occasions - as accessibility: null means all (no filter), [] means none,
+  // [...] means specific, with the "none" sentinel for ordinary screenings
+  const toggleOccasion = useCallback((value: OccasionFilterValue) => {
+    const allValues: OccasionFilterValue[] = [
+      OCCASION_NONE,
+      ...Object.values(OccasionType),
+    ];
+    setFilterState((prev) => {
+      const current = filterManager.get(prev, FilterId.Occasions);
+      if (current === null) {
+        return filterManager.set(
+          prev,
+          FilterId.Occasions,
+          allValues.filter((v) => v !== value),
+        );
+      }
+      if (current.includes(value)) {
+        return filterManager.set(
+          prev,
+          FilterId.Occasions,
+          current.filter((v) => v !== value),
+        );
+      }
+      const updated = [...current, value];
+      return filterManager.set(
+        prev,
+        FilterId.Occasions,
+        updated.length === allValues.length ? null : updated,
+      );
+    });
+  }, []);
+
+  const selectAllOccasions = useCallback(() => {
+    setFilterState((prev) => filterManager.set(prev, FilterId.Occasions, null));
+  }, []);
+
+  const clearAllOccasions = useCallback(() => {
+    setFilterState((prev) => filterManager.set(prev, FilterId.Occasions, []));
+  }, []);
+
   // Format groups — null means all selected (no filter), [] means none,
   // [...] means specific values. Shared toggle keyed by the group's filter id.
   const toggleFormat = useCallback(
@@ -919,6 +966,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
+      toggleOccasion,
+      selectAllOccasions,
+      clearAllOccasions,
       toggleFormat,
       selectAllFormat,
       clearAllFormat,
@@ -967,6 +1017,9 @@ export function FilterConfigProvider({ children }: { children: ReactNode }) {
       toggleAccessibility,
       selectAllAccessibility,
       clearAllAccessibility,
+      toggleOccasion,
+      selectAllOccasions,
+      clearAllOccasions,
       toggleFormat,
       selectAllFormat,
       clearAllFormat,

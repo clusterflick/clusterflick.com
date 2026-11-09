@@ -6,10 +6,25 @@
   --poster-scroller-padding-top: 4px;
 }
 
+/* CollectionRow's header: the title, with any "See all" across from it. */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
 .title {
   font-size: 22px;
   font-weight: 700;
-  margin: 0 0 4px;
+  margin: 0;
+}
+
+.seeAll {
+  flex-shrink: 0;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 /* 4px less than PosterRow's, given back as the scroller's padding above. */

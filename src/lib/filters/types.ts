@@ -1,4 +1,9 @@
-import { AccessibilityFilterValue, Category, Movie } from "@/types";
+import {
+  AccessibilityFilterValue,
+  Category,
+  Movie,
+  OccasionFilterValue,
+} from "@/types";
 
 /**
  * Enum of all filter IDs for consistent usage across the codebase.
@@ -22,6 +27,7 @@ export enum FilterId {
   FilmClubs = "filmClubs",
   Festivals = "festivals",
   Accessibility = "accessibility",
+  Occasions = "occasions",
   FormatSource = "formatSource",
   FormatPresentation = "formatPresentation",
   FormatDimension = "formatDimension",
@@ -57,6 +63,7 @@ export type FilterState = {
   [FilterId.FilmClubs]: string[] | null;
   [FilterId.Festivals]: string[] | null;
   [FilterId.Accessibility]: AccessibilityFilterValue[] | null;
+  [FilterId.Occasions]: OccasionFilterValue[] | null;
   [FilterId.FormatSource]: string[] | null;
   [FilterId.FormatPresentation]: string[] | null;
   [FilterId.FormatDimension]: string[] | null;
@@ -139,6 +146,7 @@ export type AnyFilterModule =
   | FilterModule<FilterId.FilmClubs>
   | FilterModule<FilterId.Festivals>
   | FilterModule<FilterId.Accessibility>
+  | FilterModule<FilterId.Occasions>
   | FilterModule<FilterId.FormatSource>
   | FilterModule<FilterId.FormatPresentation>
   | FilterModule<FilterId.FormatDimension>

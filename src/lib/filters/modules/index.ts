@@ -56,6 +56,7 @@ export type {
   Programme,
 } from "./programmes";
 export { accessibilityFilter } from "./accessibility";
+export { occasionsFilter } from "./occasions";
 export {
   formatSourceFilter,
   formatPresentationFilter,
