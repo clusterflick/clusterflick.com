@@ -13,9 +13,11 @@ export type { OccasionMatch } from "./rules";
 /**
  * A performance that is more than a screening, with the evidence for saying so.
  *
- * Detection ({@link matchOccasions}) is the easy half. The hard half is not
- * crying wolf, which is what the score is for: the same words mean different
- * things at different venues, and "rare" is the whole claim being made.
+ * Detection is the easy half, and the pipeline's: it publishes what each venue
+ * said as `performance.occasions`, which {@link matchOccasions} turns into
+ * kinds and labels. The hard half is not crying wolf, which is what the score
+ * is for: the same words mean different things at different venues, and
+ * "rare" is the whole claim being made.
  */
 export interface Occasion {
   movie: Movie;
@@ -191,19 +193,6 @@ function isDiscoverable(movie: Movie): boolean {
   return DEFAULT_CATEGORIES.has(getPrimaryCategory(movie));
 }
 
-/**
- * Everything a venue wrote about one performance, as one haystack — empty when
- * it wrote nothing beyond the film's own title, which is most of them.
- *
- * The newline matters: the two fields are separate sentences, and a name
- * capture must not run from the end of one into the start of the other.
- */
-function occasionText(movie: Movie, performance: MoviePerformance): string {
-  const title = movie.showings[performance.showingId]?.title;
-  if (!title && !performance.notes) return "";
-  return `${title ?? ""} \n ${performance.notes ?? ""}`;
-}
-
 export interface OccasionWindow {
   /** Performances from here on count towards a venue's profile. */
   start: number;
@@ -222,8 +211,9 @@ export interface OccasionWindow {
  * built from all upcoming performances rather than just the window — house
  * style doesn't change week to week, and a fortnight is a thin sample.
  *
- * Cheap enough to run on the client (it's a regex pass over ~30k strings), so
- * the home row can be recomputed after hydration like every other one.
+ * Cheap enough to run on the client (one pass over ~30k performances, most
+ * with no occasions to read), so the home row can be recomputed after
+ * hydration like every other one.
  */
 export function findOccasions(
   movies: MoviesRecord,
@@ -256,7 +246,7 @@ export function findOccasions(
       if (!venueId) continue;
       venueTotals.set(venueId, (venueTotals.get(venueId) ?? 0) + 1);
 
-      const matches = matchOccasions(occasionText(movie, performance));
+      const matches = matchOccasions(performance.occasions);
       if (matches.length === 0) continue;
 
       for (const match of matches) {
