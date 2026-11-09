@@ -145,10 +145,7 @@ export const CHANGELOG: ChangelogDay[] = [
             ICA&rsquo;s &ldquo;The Eel&rdquo;, whose page says it will be
             introduced by Benjamin Crais, now shows up in More Than a Screening
             on the <Link href="/">home page</Link> and{" "}
-            <Link href="/near-me">Near Me</Link>, and on your watchlist. The
-            labels read a little differently too: up to two guests are named
-            (&ldquo;Q&amp;A with Carol Morley and Monica Dolan&rdquo;), and
-            panels are called panels.
+            <Link href="/near-me">Near Me</Link>, and on your watchlist.
           </>
         ),
       },
