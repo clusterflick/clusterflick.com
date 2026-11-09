@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie } from "@/types";
+import { Category, type Movie, type MoviePerformanceOccasions } from "@/types";
 import { getWatchlistHighlights } from "./get-watchlist-highlights";
 
 const DAY = 86_400_000;
@@ -10,9 +10,12 @@ function makeMovie(
   id: string,
   days: number[],
   {
-    notes,
+    occasions,
     soldOut = [],
-  }: { notes?: Record<number, string>; soldOut?: number[] } = {},
+  }: {
+    occasions?: Record<number, MoviePerformanceOccasions>;
+    soldOut?: number[];
+  } = {},
 ): Movie {
   return {
     id,
@@ -30,7 +33,7 @@ function makeMovie(
       bookingUrl: `https://example.com/book/${id}-${index}`,
       showingId: id,
       time: NOW + day * DAY,
-      notes: notes?.[index],
+      occasions: occasions?.[index],
       ...(soldOut.includes(index) ? { status: { soldOut: true } } : {}),
     })),
   } as Movie;
@@ -63,7 +66,7 @@ describe("getWatchlistHighlights", () => {
 
   it("finds an occasion however far out it is", () => {
     const movies = index([
-      makeMovie("film", [2, 60], { notes: { 1: "Q&A with the director" } }),
+      makeMovie("film", [2, 60], { occasions: { 1: { qAndA: true } } }),
     ]);
     const { occasion } = getWatchlistHighlights(movies, ["film"], NOW).get(
       "film",
@@ -74,7 +77,7 @@ describe("getWatchlistHighlights", () => {
 
   it("flags an ending run as that alone, even with an occasion", () => {
     const movies = index([
-      makeMovie("film", [1, 3], { notes: { 1: "Q&A with the director" } }),
+      makeMovie("film", [1, 3], { occasions: { 1: { qAndA: true } } }),
     ]);
     const highlight = getWatchlistHighlights(movies, ["film"], NOW).get("film");
     expect(highlight?.finalShowing?.time).toBe(NOW + 3 * DAY);
@@ -84,7 +87,7 @@ describe("getWatchlistHighlights", () => {
   it("skips a sold-out occasion", () => {
     const movies = index([
       makeMovie("film", [2, 30], {
-        notes: { 0: "Q&A with the director" },
+        occasions: { 0: { qAndA: true } },
         soldOut: [0],
       }),
     ]);
@@ -95,7 +98,7 @@ describe("getWatchlistHighlights", () => {
 
   it("leaves out films that aren't asked about or aren't showing", () => {
     const movies = index([
-      makeMovie("other", [1], { notes: { 0: "Q&A with the director" } }),
+      makeMovie("other", [1], { occasions: { 0: { qAndA: true } } }),
     ]);
     const highlights = getWatchlistHighlights(movies, ["departed"], NOW);
     expect(highlights.size).toBe(0);

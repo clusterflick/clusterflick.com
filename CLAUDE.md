@@ -243,6 +243,15 @@ carries the variety.
   both this row and `/near-me`'s, which differ only in where a card leads: the
   home page opens the film on its full schedule, `/near-me` on its nearby
   showings.
+  What counts as an occasion is the pipeline's call: it reads each venue's
+  listing, title, notes and description and publishes
+  `performance.occasions` (`intro`, `qAndA`, `liveScore`, `premiere`, …, each
+  `true` or carrying `guests`, `performers` or a `region`). The description is
+  why it lives there - the ICA's "The Eel" says nothing in its title, while its
+  page names who introduces it. `matchOccasions` (`@/lib/occasions/rules`)
+  only turns that into this site's kinds and labels; how rare an occasion is,
+  which decides the row, is scored here in `findOccasions`, because only the
+  whole city shows what is house style at a venue.
 - **Last Chance** keeps its posters with a yellow "Ends Thu 5 Nov" `badge` on
   each (`PosterRow`'s top-left corner; top-right is the list markers), since the
   subtitle only shows on hover on desktop and the date is the point of the row.

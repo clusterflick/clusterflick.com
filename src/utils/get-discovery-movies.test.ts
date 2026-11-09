@@ -3,6 +3,7 @@ import {
   Category,
   type Movie,
   type MoviePerformance,
+  type MoviePerformanceOccasions,
   type IncludedMovie,
 } from "@/types";
 import type { MoviesRecord } from "@/lib/filters/types";
@@ -36,6 +37,8 @@ interface ShowingSpec {
   /** Performance times for this showing (defaults to one inside the window). */
   times?: number[];
   soldOut?: boolean;
+  /** What the pipeline found on every performance of the showing. */
+  occasions?: MoviePerformanceOccasions;
 }
 
 interface MovieOpts {
@@ -76,6 +79,7 @@ function makeMovie(
         showingId,
         time,
         ...(spec.soldOut ? { status: { soldOut: true } } : {}),
+        ...(spec.occasions ? { occasions: spec.occasions } : {}),
       });
     }
   });
@@ -571,9 +575,18 @@ describe("getOccasionMovies", () => {
 
   it("leads the subtitle with the occasion and the date it falls on", () => {
     const movies = asRecord([
-      makeMovie("a", [{ venueId: "v1", title: "A + Q&A with Mark Gatiss" }], {
-        posterPath: "/a.jpg",
-      }),
+      makeMovie(
+        "a",
+        [
+          {
+            venueId: "v1",
+            occasions: { qAndA: { guests: ["Mark Gatiss"] } },
+          },
+        ],
+        {
+          posterPath: "/a.jpg",
+        },
+      ),
     ]);
 
     const [row] = getOccasionMovies(movies, window);
@@ -585,7 +598,12 @@ describe("getOccasionMovies", () => {
 
   it("carries the occasion, its showing and its venue for a card to lead with", () => {
     const movies = asRecord([
-      makeMovie("a", [{ venueId: "v1", title: "A + Q&A with Mark Gatiss" }]),
+      makeMovie("a", [
+        {
+          venueId: "v1",
+          occasions: { qAndA: { guests: ["Mark Gatiss"] } },
+        },
+      ]),
     ]);
 
     const [row] = getOccasionMovies(movies, window);
@@ -598,10 +616,14 @@ describe("getOccasionMovies", () => {
 
   it("keeps a film with no poster, which MoviePoster draws from the title", () => {
     const movies = asRecord([
-      makeMovie("with-poster", [{ venueId: "v1", title: "One + Q&A" }], {
-        posterPath: "/one.jpg",
-      }),
-      makeMovie("no-poster", [{ venueId: "v2", title: "Two + Q&A" }]),
+      makeMovie(
+        "with-poster",
+        [{ venueId: "v1", occasions: { qAndA: true } }],
+        {
+          posterPath: "/one.jpg",
+        },
+      ),
+      makeMovie("no-poster", [{ venueId: "v2", occasions: { qAndA: true } }]),
     ]);
 
     expect(getOccasionMovies(movies, window)).toHaveLength(2);
@@ -656,8 +678,8 @@ describe("computeNearMeRows", () => {
 
   it("keeps only occasions at the nearby venues", () => {
     const movies = asRecord([
-      makeMovie("qa-here", [{ venueId: "near", title: "A + Q&A" }]),
-      makeMovie("qa-there", [{ venueId: "far", title: "B + Q&A" }]),
+      makeMovie("qa-here", [{ venueId: "near", occasions: { qAndA: true } }]),
+      makeMovie("qa-there", [{ venueId: "far", occasions: { qAndA: true } }]),
     ]);
 
     const { occasions } = computeNearMeRows(movies, NEAR, NOW);

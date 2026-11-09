@@ -197,6 +197,37 @@ export type MoviePerformanceFormat = {
   dimension?: FormatDimension;
 };
 
+/**
+ * An occasion with nothing more known about it, or the details the venue
+ * gave. Never `false`, and never an empty object - the pipeline's schema
+ * rules both out.
+ */
+type OccasionDetail<Details> = true | Details;
+type WithGuests = OccasionDetail<{ guests: string[] }>;
+
+export type PremiereRegion =
+  | "uk"
+  | "london"
+  | "european"
+  | "world"
+  | "international";
+
+/**
+ * What makes a performance more than a screening, as the pipeline read it
+ * from the venue's listing, title, notes and description. Whether it is rare
+ * enough to promote is decided here - see `@/lib/occasions`.
+ */
+export type MoviePerformanceOccasions = {
+  intro?: WithGuests;
+  qAndA?: WithGuests;
+  inConversation?: WithGuests;
+  panel?: WithGuests;
+  guestAppearance?: WithGuests;
+  liveScore?: OccasionDetail<{ performers: string[] }>;
+  premiere?: OccasionDetail<{ region: PremiereRegion }>;
+  preview?: true;
+};
+
 export type MoviePerformance = {
   bookingUrl: string;
   showingId: string;
@@ -206,6 +237,7 @@ export type MoviePerformance = {
   status?: MoviePerformanceStatus;
   accessibility?: MoviePerformanceAccessibility;
   format?: MoviePerformanceFormat;
+  occasions?: MoviePerformanceOccasions;
 };
 
 export enum Classification {
