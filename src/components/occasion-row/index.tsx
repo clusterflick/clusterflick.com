@@ -23,6 +23,9 @@ interface OccasionRowProps {
   items: OccasionRowItem[];
   /** Optional explanatory line shown under the title. */
   intro?: string;
+  /** Optional "see all" link shown beside the title. */
+  seeAllHref?: string;
+  seeAllLabel?: string;
 }
 
 /**
@@ -39,12 +42,25 @@ interface OccasionRowProps {
  * - Rows where the film is the point — use `PosterRow`.
  * - A short grid of picks each with a reason label — use `PickCard`.
  */
-export default function OccasionRow({ title, items, intro }: OccasionRowProps) {
+export default function OccasionRow({
+  title,
+  items,
+  intro,
+  seeAllHref,
+  seeAllLabel = "See all",
+}: OccasionRowProps) {
   if (items.length === 0) return null;
 
   return (
     <section className={styles.row}>
-      <h2 className={styles.title}>{title}</h2>
+      <div className={styles.header}>
+        <h2 className={styles.title}>{title}</h2>
+        {seeAllHref && (
+          <Link href={seeAllHref} className={styles.seeAll}>
+            {seeAllLabel} →
+          </Link>
+        )}
+      </div>
       {intro && <p className={styles.intro}>{intro}</p>}
       <PosterScroller scrollKey={title}>
         {items.map((item) => (

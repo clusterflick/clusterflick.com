@@ -228,6 +228,42 @@ export type MoviePerformanceOccasions = {
   preview?: true;
 };
 
+/**
+ * Each kind of occasion, as the key it has in {@link MoviePerformanceOccasions}
+ * - for the filter, which selects by kind, and its labels.
+ */
+export enum OccasionType {
+  LiveScore = "liveScore",
+  Intro = "intro",
+  QAndA = "qAndA",
+  InConversation = "inConversation",
+  Panel = "panel",
+  GuestAppearance = "guestAppearance",
+  Premiere = "premiere",
+  Preview = "preview",
+}
+
+/**
+ * Sentinel value representing "no occasion": the occasions filter's way to
+ * include ordinary screenings, as {@link ACCESSIBILITY_NONE} is for
+ * accessibility.
+ */
+export const OCCASION_NONE = "none" as const;
+
+/** Union type for occasion filter values: every kind plus "none". */
+export type OccasionFilterValue = OccasionType | typeof OCCASION_NONE;
+
+// Fails to compile if a kind is added to one of OccasionType and
+// MoviePerformanceOccasions without the other.
+type IsTrue<T extends true> = T;
+export type OccasionTypeMatchesPerformance = IsTrue<
+  [`${OccasionType}`] extends [keyof MoviePerformanceOccasions]
+    ? [keyof MoviePerformanceOccasions] extends [`${OccasionType}`]
+      ? true
+      : false
+    : false
+>;
+
 export type MoviePerformance = {
   bookingUrl: string;
   showingId: string;

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Category, type Movie, type MoviePerformanceOccasions } from "@/types";
 import {
+  getOccasionDetails,
   getOccasionTags,
   isNoteCoveredByOccasions,
   matchOccasions,
@@ -464,7 +465,7 @@ describe("findBestOccasionPerMovie", () => {
 });
 
 describe("getOccasionTags", () => {
-  it("lists every occasion, with the names the venue gave", () => {
+  it("names what each occasion is, never who", () => {
     expect(
       getOccasionTags({
         qAndA: { guests: ["Gary Lewis"] },
@@ -472,18 +473,49 @@ describe("getOccasionTags", () => {
         premiere: { region: "uk" },
         preview: true,
       }),
-    ).toEqual(["Intro", "Q&A with Gary Lewis", "UK premiere", "Preview"]);
-    expect(getOccasionTags({ intro: { guests: ["Benjamin Crais"] } })).toEqual([
-      "Intro by Benjamin Crais",
-    ]);
+    ).toEqual(["Intro", "Q&A", "UK premiere", "Preview"]);
     expect(
-      getOccasionTags({ liveScore: { performers: ["Hugo Max"] } }),
-    ).toEqual(["Live score by Hugo Max"]);
+      getOccasionTags({
+        panel: { guests: ["Charlotte Harrison", "Tim Robey"] },
+      }),
+    ).toEqual(["Panel discussion"]);
   });
 
   it("has nothing for a performance without occasions", () => {
     expect(getOccasionTags(undefined)).toEqual([]);
     expect(getOccasionTags({})).toEqual([]);
+  });
+});
+
+describe("getOccasionDetails", () => {
+  it("gives a line per occasion with someone named, every name in full", () => {
+    expect(
+      getOccasionDetails({
+        panel: { guests: ["Charlotte Harrison", "Tim Robey"] },
+        intro: true,
+      }),
+    ).toEqual(["Panel with Charlotte Harrison and Tim Robey"]);
+    expect(
+      getOccasionDetails({
+        qAndA: { guests: ["Claire Nicolas", "Abla Kandalaft", "Jamal Awar"] },
+        liveScore: { performers: ["Hugo Max"] },
+      }),
+    ).toEqual([
+      "Live score by Hugo Max",
+      "Q&A with Claire Nicolas, Abla Kandalaft and Jamal Awar",
+    ]);
+  });
+
+  it("softens a name written in capitals", () => {
+    expect(getOccasionDetails({ qAndA: { guests: ["SAMIRA AHMED"] } })).toEqual(
+      ["Q&A with Samira Ahmed"],
+    );
+  });
+
+  it("has nothing when nobody is named", () => {
+    expect(
+      getOccasionDetails({ qAndA: true, premiere: { region: "uk" } }),
+    ).toEqual([]);
   });
 });
 

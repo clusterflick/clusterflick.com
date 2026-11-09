@@ -1,4 +1,6 @@
 import { AccessibilityFeature, Category, Genre } from "@/types";
+import { OCCASION_LABELS } from "@/utils/occasion-labels";
+import { OCCASION_ORDER } from "@/lib/occasions/rules";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
 import { FilterId, FilterState } from "./types";
 import { filtersAtDefault, get, set } from "./manager";
@@ -14,6 +16,7 @@ import { normalizeToWords } from "./normalize";
 import {
   ACCESSIBILITY_ALIASES,
   CATEGORY_ALIASES,
+  OCCASION_ALIASES,
   GENRE_ALIASES,
   foldSuffix,
 } from "./value-aliases";
@@ -29,6 +32,7 @@ type ListFilterId =
   | FilterId.FormatPresentation
   | FilterId.FormatDimension
   | FilterId.Accessibility
+  | FilterId.Occasions
   | FilterId.Directors
   | FilterId.Cast
   | FilterId.FilmClubs
@@ -133,6 +137,17 @@ export function buildFilterSearchGroups(
       name: ACCESSIBILITY_LABELS[feature],
       kind: "Accessibility",
       aliases: ACCESSIBILITY_ALIASES[feature],
+    })),
+  );
+
+  groups.push(
+    OCCASION_ORDER.map((kind) => ({
+      key: `${FilterId.Occasions}:${kind}`,
+      filterId: FilterId.Occasions,
+      value: kind,
+      name: OCCASION_LABELS[kind],
+      kind: "Occasion",
+      aliases: OCCASION_ALIASES[kind],
     })),
   );
 

@@ -1,5 +1,7 @@
 import {
   AccessibilityFeature,
+  OccasionType,
+  OCCASION_NONE,
   ACCESSIBILITY_NONE,
   Category,
   Genre,
@@ -7,6 +9,7 @@ import {
   Venue,
 } from "@/types";
 import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import { OCCASION_LABELS } from "@/utils/occasion-labels";
 import {
   FORMAT_GROUPS,
   PEOPLE_GROUPS,
@@ -435,6 +438,33 @@ function describeAccessibility(state: FilterState): string | null | "none" {
 }
 
 /**
+ * Describes the occasions part of the filter, as accessibility is described:
+ * null when unfiltered, "none" when nothing is selected, labels otherwise.
+ */
+function describeOccasions(state: FilterState): string | null | "none" {
+  const occasions = state.occasions;
+  if (!occasions) return null;
+  if (occasions.length === 0) return "none";
+
+  // Every kind but None is "any occasion" - what More Than a Screening's
+  // "See all" asks for - and listing eight labels says less than that.
+  const kinds = Object.values(OccasionType);
+  if (
+    !occasions.includes(OCCASION_NONE) &&
+    kinds.every((kind) => occasions.includes(kind))
+  ) {
+    return "an occasion";
+  }
+
+  const labels = occasions.map((value) =>
+    value === OCCASION_NONE
+      ? "No occasion"
+      : (OCCASION_LABELS[value as OccasionType] ?? value),
+  );
+  return formatList(labels, 3, "", "or");
+}
+
+/**
  * Describes the director and cast filters as clauses to append to the events
  * description ("directed by Martin Scorsese"), not standalone ones.
  */
@@ -593,6 +623,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const categoryDesc = describeCategories(state, categories);
   const genreDesc = describeGenres(state, genres);
   const accessibilityDesc = describeAccessibility(state);
+  const occasionsDesc = describeOccasions(state);
   const { emptyTitle: formatEmptyTitle, labels: formatLabels } =
     describeFormats(state);
   const peoplePhrases = describePeople(state, people);
@@ -607,6 +638,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   const allCategories = !state.categories;
   const allGenres = !state.genres;
   const allAccessibility = !state.accessibility;
+  const allOccasions = !state.occasions;
   const allFormats = FORMAT_GROUPS.every((group) => !state[group.filterId]);
   const allPeople = peoplePhrases.length === 0;
   const allMovies = moviesPhrase === null;
@@ -621,6 +653,9 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
   } else if (accessibilityDesc === "none") {
     eventsDesc = "No accessibility features selected";
     selectionIsEmpty = true;
+  } else if (occasionsDesc === "none") {
+    eventsDesc = "No occasions selected";
+    selectionIsEmpty = true;
   } else if (formatEmptyTitle) {
     eventsDesc = `No ${formatEmptyTitle} selected`;
     selectionIsEmpty = true;
@@ -628,6 +663,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
     allCategories &&
     allGenres &&
     allAccessibility &&
+    allOccasions &&
     allFormats &&
     allPeople &&
     allMovies &&
@@ -654,9 +690,12 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
 
     eventsDesc = parts.join(" ");
 
-    // Add accessibility suffix if specific features selected
-    if (accessibilityDesc && accessibilityDesc !== "none") {
-      eventsDesc += ` with ${accessibilityDesc}`;
+    // Add accessibility and occasion suffixes if specific values selected
+    const withClauses = [accessibilityDesc, occasionsDesc].filter(
+      (desc): desc is string => !!desc && desc !== "none",
+    );
+    if (withClauses.length > 0) {
+      eventsDesc += ` with ${withClauses.join(" and ")}`;
     }
 
     // Add format suffix if specific formats selected
@@ -871,6 +910,17 @@ export function describeFilterChips(options: DescribeOptions): FilterChip[] {
     accessibilityDesc === "none"
       ? "No accessibility features"
       : (accessibilityDesc ?? ""),
+  );
+
+  const occasionsDesc = describeOccasions(state);
+  add(
+    "occasions",
+    [FilterId.Occasions],
+    occasionsDesc === "none"
+      ? "No occasions"
+      : occasionsDesc === "an occasion"
+        ? "Any occasion"
+        : (occasionsDesc ?? ""),
   );
 
   const { emptyTitle, labels } = describeFormats(state);

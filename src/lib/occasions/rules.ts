@@ -1,4 +1,9 @@
-import type { MoviePerformanceOccasions, PremiereRegion } from "@/types";
+import {
+  OccasionType,
+  type MoviePerformanceOccasions,
+  type PremiereRegion,
+} from "@/types";
+import { OCCASION_LABELS } from "@/utils/occasion-labels";
 
 /**
  * What makes a performance more than a screening.
@@ -199,37 +204,22 @@ export function matchOccasions(
 
 type OccasionKey = keyof MoviePerformanceOccasions;
 
-/** The order a performance's occasion tags are listed in. */
-const TAG_ORDER: OccasionKey[] = [
-  "liveScore",
-  "intro",
-  "qAndA",
-  "inConversation",
-  "panel",
-  "guestAppearance",
-  "premiere",
-  "preview",
-];
+/**
+ * The order a performance's occasion tags are listed in, and the filter's
+ * pills: the enum's order, most special first.
+ */
+export const OCCASION_ORDER = Object.values(OccasionType);
+// The enum's values are the published field's keys.
+const TAG_ORDER = OCCASION_ORDER as OccasionKey[];
 
-/** How each occasion reads as a tag, with nobody named and with names. */
-const TAG_LABEL: Record<
-  OccasionKey,
-  { bare: string; named?: (names: string) => string }
-> = {
-  liveScore: { bare: "Live score", named: (names) => `Live score by ${names}` },
-  intro: { bare: "Intro", named: (names) => `Intro by ${names}` },
-  qAndA: { bare: "Q&A", named: (names) => `Q&A with ${names}` },
-  inConversation: {
-    bare: "In conversation",
-    named: (names) => `In conversation with ${names}`,
-  },
-  panel: { bare: "Panel discussion", named: (names) => `Panel with ${names}` },
-  guestAppearance: {
-    bare: "Guest appearance",
-    named: (names) => `With ${names}`,
-  },
-  premiere: { bare: "Premiere" },
-  preview: { bare: "Preview" },
+/** How each occasion reads in full once someone is named. */
+const NAMED_DETAIL: Partial<Record<OccasionKey, (names: string) => string>> = {
+  liveScore: (names) => `Live score by ${names}`,
+  intro: (names) => `Intro by ${names}`,
+  qAndA: (names) => `Q&A with ${names}`,
+  inConversation: (names) => `In conversation with ${names}`,
+  panel: (names) => `Panel with ${names}`,
+  guestAppearance: (names) => `With ${names}`,
 };
 
 function namesOf(value: unknown): string[] {
@@ -238,9 +228,18 @@ function namesOf(value: unknown): string[] {
   return details.guests ?? details.performers ?? [];
 }
 
+/** Every name, in full: "A", "A and B", "A, B and C". */
+function listNames(names: string[]): string {
+  const softened = names.map(softenShouting);
+  if (softened.length <= 1) return softened.join("");
+  return `${softened.slice(0, -1).join(", ")} and ${softened.at(-1)}`;
+}
+
 /**
- * Every occasion on a performance as a tag label, one per occasion and with
- * the names the venue gave - "Intro by Benjamin Crais", "UK premiere".
+ * Every occasion on a performance as a tag: what it is, never who - "Panel
+ * discussion", "Intro", "UK premiere". Who goes on a line of its own
+ * ({@link getOccasionDetails}), since a tag holding "Panel with Charlotte
+ * Harrison and Tim Robey" wrapped and stopped reading as a tag.
  *
  * Unlike {@link matchOccasions} this keeps them all, intro and Q&A alike, and
  * says nothing about rarity: a tag is a fact about one showing, like
@@ -257,9 +256,23 @@ export function getOccasionTags(
       const { region } = value as { region: PremiereRegion };
       return [`${REGION_LABEL[region]} premiere`];
     }
-    const { bare, named } = TAG_LABEL[key];
-    const names = namesOf(value);
-    return [named && names.length > 0 ? named(formatNames(names)) : bare];
+    return [OCCASION_LABELS[key as OccasionType]];
+  });
+}
+
+/**
+ * Who the venue named for each occasion, a line each and every name in full:
+ * "Panel with Charlotte Harrison and Tim Robey". Occasions with nobody named
+ * have nothing to add to their tag, and no line.
+ */
+export function getOccasionDetails(
+  occasions: MoviePerformanceOccasions | undefined,
+): string[] {
+  if (!occasions) return [];
+  return TAG_ORDER.flatMap((key) => {
+    const named = NAMED_DETAIL[key];
+    const names = namesOf(occasions[key]);
+    return named && names.length > 0 ? [named(listNames(names))] : [];
   });
 }
 
@@ -284,8 +297,8 @@ const normalisePhrase = (text: string) =>
     .replace(/\s+/g, " ");
 
 /**
- * Whether a line of a performance's notes says nothing its occasion tags
- * don't - "+ Q&A" beside a "Q&A with Sophie Marceau" tag. Such a line is
+ * Whether a line of a performance's notes says nothing its occasion tags and
+ * details don't - "+ Q&A" beside a Q&A tag. Such a line is
  * left out of the card rather than out of the data: the notes are the
  * venue's own billing, and the published data and calendar feeds have no
  * tags to stand in for it.
@@ -297,7 +310,10 @@ export function isNoteCoveredByOccasions(
   occasions: MoviePerformanceOccasions | undefined,
 ): boolean {
   if (!occasions) return false;
-  const tags = getOccasionTags(occasions).map(normalisePhrase);
+  const shown = [
+    ...getOccasionTags(occasions),
+    ...getOccasionDetails(occasions),
+  ].map(normalisePhrase);
   const parts = note
     .split(/\s+[+&]\s+|^\s*\+\s*/)
     .map(normalisePhrase)
@@ -305,7 +321,7 @@ export function isNoteCoveredByOccasions(
   if (parts.length === 0) return false;
 
   return parts.every((part) => {
-    if (tags.includes(part)) return true;
+    if (shown.includes(part)) return true;
     return TAG_ORDER.some(
       (key) => occasions[key] && BARE_PHRASES[key]?.test(part),
     );

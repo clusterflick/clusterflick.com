@@ -1,4 +1,4 @@
-import { AccessibilityFeature, Category } from "@/types";
+import { AccessibilityFeature, Category, OccasionType } from "@/types";
 
 // The words people use for filter values, shared by the zero-result
 // suggestions (which read a whole query as naming a value) and the overlay's
@@ -38,6 +38,43 @@ export const ACCESSIBILITY_ALIASES: Record<AccessibilityFeature, string[]> = {
     "captions",
     "closed captions",
     "SDH",
+  ],
+};
+
+/**
+ * The words people search an occasion by. The pills keep the short forms the
+ * performance tags use ("Intro", "Q&A"), so the long ones are aliases here -
+ * "introduction" is how a reader asks for an intro.
+ */
+export const OCCASION_ALIASES: Record<OccasionType, string[]> = {
+  [OccasionType.LiveScore]: [
+    "live music",
+    "live accompaniment",
+    "live soundtrack",
+  ],
+  [OccasionType.Intro]: ["introduction", "introduced", "introduce"],
+  [OccasionType.QAndA]: [
+    "q and a",
+    "qa",
+    "screentalk",
+    "question and answer",
+    "questions and answers",
+  ],
+  // "conversation", "panel" and "guest" already reach their labels: each is
+  // a run of the label's words.
+  [OccasionType.InConversation]: ["talk"],
+  [OccasionType.Panel]: ["discussion", "debate"],
+  [OccasionType.GuestAppearance]: ["special guest", "in person"],
+  [OccasionType.Premiere]: [
+    "uk premiere",
+    "london premiere",
+    "world premiere",
+    "first screening",
+  ],
+  [OccasionType.Preview]: [
+    "preview screening",
+    "sneak preview",
+    "advance screening",
   ],
 };
 

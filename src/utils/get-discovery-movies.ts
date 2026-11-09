@@ -15,6 +15,7 @@ import { getRating } from "@/utils/movie-ratings.mjs";
 import { getRatingGroup, meetsRating } from "@/lib/filters/modules/ratings";
 import { FilterId } from "@/lib/filters/types";
 import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
+import { OCCASION_ORDER } from "@/lib/occasions/rules";
 import { pruneByShowings } from "@/utils/prune-movies";
 import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
 
@@ -450,6 +451,21 @@ function isMarathon(movie: Movie): boolean {
  */
 export function getMarathonsUrl(): string {
   return `/catalogue?categories=${[Category.MultipleMovies, Category.Shorts].join(",")}`;
+}
+
+/**
+ * The link behind More Than a Screening's "See all": every screening with an
+ * occasion, in the catalogue's default week.
+ *
+ * A superset of the row, knowingly, as the Marathons link is. The row is the
+ * occasions judged rare across the city (`findOccasions`): house style at a
+ * venue drops out, and each film appears once at its best night. The filter
+ * is the fact of an occasion, so the grid adds every introduced screening at a
+ * venue that introduces most of them. That is the honest answer to "what else
+ * is more than a screening?" - the rarity is the row's editorial cut.
+ */
+export function getOccasionsUrl(): string {
+  return `/catalogue?occasions=${OCCASION_ORDER.join(",")}`;
 }
 
 /**

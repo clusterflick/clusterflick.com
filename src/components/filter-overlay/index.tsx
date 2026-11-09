@@ -49,6 +49,7 @@ import ProgrammeFilterSection from "./programme-filter-section";
 import RatingFilterSection from "./rating-filter-section";
 import DateFilterSection from "./date-filter-section";
 import AccessibilityFilterSection from "./accessibility-filter-section";
+import OccasionsFilterSection from "./occasions-filter-section";
 import FormatFilterSection from "./format-filter-section";
 import GenreFilterSection from "./genre-filter-section";
 import RefineRow from "./refine-row";
@@ -102,6 +103,9 @@ export default function FilterOverlay({
     toggleAccessibility,
     selectAllAccessibility,
     clearAllAccessibility,
+    toggleOccasion,
+    selectAllOccasions,
+    clearAllOccasions,
     toggleFormat,
     selectAllFormat,
     clearAllFormat,
@@ -645,6 +649,15 @@ export default function FilterOverlay({
         toggleAccessibility={toggleAccessibility}
         selectAllAccessibility={selectAllAccessibility}
         clearAllAccessibility={clearAllAccessibility}
+      />
+    ),
+    occasions: (
+      <OccasionsFilterSection
+        movies={movies}
+        selected={filterState.occasions}
+        toggleOccasion={toggleOccasion}
+        selectAllOccasions={selectAllOccasions}
+        clearAllOccasions={clearAllOccasions}
       />
     ),
     format: (
