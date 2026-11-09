@@ -22,6 +22,7 @@ import {
   addManyToUserList,
   addToUserList,
   deleteUserLists,
+  fetchFilmDetails,
   fetchUserData,
   removeFavouriteVenue as removeFavouriteVenueFromDoc,
   removeFromUserList,
@@ -114,6 +115,11 @@ export type UserContextType = {
   ) => Promise<void>;
   addFavouriteVenue: (venue: Pick<Venue, "id" | "name">) => Promise<void>;
   removeFavouriteVenue: (venueId: Venue["id"]) => Promise<void>;
+  /**
+   * The listed films' details — see `FilmDetailsData`. Read on request rather
+   * than held like the lists: only /personalise needs them.
+   */
+  readFilmDetails: () => Promise<FilmDetailsData>;
 };
 
 /**
@@ -465,6 +471,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user, favouriteVenues],
   );
 
+  const readFilmDetails = useCallback<
+    UserContextType["readFilmDetails"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    return fetchFilmDetails(db, user.uid);
+  }, [getServices, user]);
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -483,6 +497,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       restoreToList,
       addFavouriteVenue,
       removeFavouriteVenue,
+      readFilmDetails,
     }),
     [
       status,
@@ -500,6 +515,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       restoreToList,
       addFavouriteVenue,
       removeFavouriteVenue,
+      readFilmDetails,
     ],
   );
 
@@ -535,6 +551,7 @@ export function MockUserProvider({
     restoreToList: noop,
     addFavouriteVenue: noop,
     removeFavouriteVenue: noop,
+    readFilmDetails: async () => ({ films: {}, people: {} }),
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

@@ -91,3 +91,23 @@ export const Plain: Story = {
     items: boroughs,
   },
 };
+
+/**
+ * `keepOrder`: rows stay in the order given, for a chart along a scale of its
+ * own, where sorting by size would lose the point.
+ */
+export const KeptInOrder: Story = {
+  args: {
+    caption: "Films by decade",
+    labelHeading: "Decade",
+    valueHeading: "Films",
+    keepOrder: true,
+    items: [
+      { key: "1950", label: "1950s", value: 4 },
+      { key: "1960", label: "1960s", value: 1 },
+      { key: "1970", label: "1970s", value: 0 },
+      { key: "1980", label: "1980s", value: 6, highlight: true },
+      { key: "1990", label: "1990s", value: 3 },
+    ],
+  },
+};

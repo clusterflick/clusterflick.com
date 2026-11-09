@@ -1,4 +1,9 @@
-import { PEOPLE_GROUPS, PeopleFilterId } from "@/lib/filters";
+// From the module, not the filters barrel, which would bundle the whole engine
+// into every page with a name link.
+import {
+  PEOPLE_GROUPS,
+  type PeopleFilterId,
+} from "@/lib/filters/modules/people";
 
 /**
  * The films grid, filtered to one person's credits — what a director or cast

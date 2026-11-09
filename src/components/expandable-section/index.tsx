@@ -20,6 +20,12 @@ interface ExpandableSectionProps {
    * mid-edit, and snapping shut under them is worse than staying open.
    */
   expandWhen?: boolean;
+  /**
+   * Centres the trigger on opening (the default), for a trigger at the foot of
+   * a long section. Off for one whose content opens in view right beneath it
+   * (the Seen stats on /personalise), where the scroll only moves the page.
+   */
+  scrollOnExpand?: boolean;
 }
 
 export default function ExpandableSection({
@@ -27,6 +33,7 @@ export default function ExpandableSection({
   children,
   defaultExpanded = false,
   expandWhen = false,
+  scrollOnExpand = true,
 }: ExpandableSectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded || expandWhen);
 
@@ -51,7 +58,7 @@ export default function ExpandableSection({
     // the trigger to the middle of the screen puts the new content in view.
     // Only on expand: collapsing loses nothing, so moving the page would just
     // be disorienting.
-    if (!nextExpanded) return;
+    if (!nextExpanded || !scrollOnExpand) return;
     requestAnimationFrame(() => {
       triggerRef.current?.scrollIntoView({
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches

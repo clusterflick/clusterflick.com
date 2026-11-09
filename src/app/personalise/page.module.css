@@ -127,8 +127,8 @@
     grid-template-columns: repeat(auto-fill, var(--film-grid-column));
     column-gap: var(--film-grid-gap);
     justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
+    /* The gutter stays: without it, at 1240px six columns fill the window
+       exactly and the lanes' 8px bleed scrolls the page sideways. */
   }
 
   .wide > * {

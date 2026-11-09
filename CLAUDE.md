@@ -1697,7 +1697,48 @@ the page its point. Not showing opens from the start when nothing on the list
 is showing, so the watchlist never looks empty, and turning on the editing
 buttons opens every stack, since a closed one would hide them. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
-across, and aligns to the poster columns as `/planner` does.
+across, and aligns to the poster columns as `/planner` does. The 24px gutter
+stays at every width: at 1240px six columns otherwise fill the window
+exactly, and the lanes' 8px bleed scrolled the page sideways.
+
+**The Seen list's stats lead the page** (`SeenStats`, `getSeenStats` in
+`@/lib/user-lists/seen-stats`), under the account bar and above the search:
+they are what a reader with a long list comes back for, and the lists below
+are long. They are read from the film details document, which only this page
+loads, again whenever the Seen list's films change: the headline figures in
+a `StatsBand` and the records (longest and shortest sit by runtime, oldest
+and newest by year with how long ago) as `PosterTile`s, side by side from
+1000px with the band two figures to a row (`layout="grid"`): four figures
+across and four posters across each left half the row empty. Below that the
+band is its usual row of four, with the records centred under it. The records
+are their own grid, four across or two by two, never the three-and-one the
+tile list's fitted columns gave at some widths. "Show more stats" doesn't
+scroll on opening (`ExpandableSection`'s `scrollOnExpand`): the charts open
+right beneath it, so centring the trigger only moved the page. Directors,
+actors, genres, decades and languages sit behind "Show more stats", as
+`RankedBarChart`s (decades with `keepOrder`, in date order) and language
+chips, in two columns of about the same height — the short rankings and the
+decades in one, the long genre list and the languages in the other — since
+side by side in pairs each chart left a gap under the shorter. A line turning the hours into days and double bills was tried and
+taken out; it didn't earn its place.
+
+- **Years come from the list entries, everything else from the details**, so
+  an unmatched film counts towards the decades and nothing else, and a
+  footnote says how many films had nothing to count. Watch dates are never
+  shown: an entry's date is when it was added, and an import adds hundreds in
+  a day.
+- **Newest and oldest tie on the year**, as no release date is stored. Within
+  a year the film added most recently is newest (and the one added earliest
+  oldest), which usually picks the film just seen over one from earlier that
+  year; an import's films, added at once, fall back to the title. Storing
+  TMDB's release date with the details would settle it properly.
+- **Nothing shows below five films** (`MIN_STATS_FILMS`); a line says how
+  many to go. Within the stats, a ranking needs people with two films or
+  more, decades need two decades and languages two languages, and a record
+  that would repeat the other of its pair (one film both longest and
+  shortest) is left out.
+- **Signed out, nothing renders**, as the stats are inside the signed-in
+  page.
 
 **The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
 two groups above Showing now, each soonest first:

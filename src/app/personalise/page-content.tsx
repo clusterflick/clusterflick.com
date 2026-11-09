@@ -54,6 +54,7 @@ import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
+import SeenStats from "./seen-stats";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -496,6 +497,9 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
       />
+      {/* At the top: they're what a reader with a long Seen list comes back
+          for, and the lists below are long. */}
+      {lists && <SeenStats seen={lists[UserListId.Seen]} />}
       <FilmSearch ref={filmSearchRef} />
       {lists ? (
         <>

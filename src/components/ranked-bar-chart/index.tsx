@@ -49,10 +49,16 @@ interface RankedBarChartProps {
    * the run of bars, so names stay on one line.
    */
   wrapLabels?: boolean;
+  /**
+   * Keeps the rows in the order given rather than largest first, for a chart
+   * along a scale of its own (films by decade), where the order is the point.
+   */
+  keepOrder?: boolean;
 }
 
 /**
- * Horizontal bars, largest first, with one or more rows emphasised. Rendered
+ * Horizontal bars, largest first (or in the order given, with `keepOrder`),
+ * with one or more rows emphasised. Rendered
  * as a table so the numbers are there for screen readers and as the table
  * view. Bars are scaled to the largest value; a value too small to see still
  * gets a sliver, so a row is never mistaken for zero.
@@ -66,8 +72,11 @@ export default function RankedBarChart({
   split,
   hideCaption = false,
   wrapLabels = false,
+  keepOrder = false,
 }: RankedBarChartProps) {
-  const sorted = [...items].sort((a, b) => b.value - a.value);
+  const sorted = keepOrder
+    ? items
+    : [...items].sort((a, b) => b.value - a.value);
   const max = Math.max(...sorted.map((item) => item.value), 1);
 
   return (
