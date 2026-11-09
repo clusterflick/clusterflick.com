@@ -71,6 +71,57 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-09",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            <Link href="/personalise">Personalise</Link> now opens with stats
+            about the films you&rsquo;ve seen, once you&rsquo;ve marked five:
+            how many films and hours, how many directors and languages, and your
+            longest and shortest sits and oldest and newest films. &ldquo;Show
+            more stats&rdquo; ranks the directors and actors you&rsquo;ve
+            watched most, and breaks your films down by genre, decade and
+            language. The search for adding films has moved to the top of the
+            page and finds films that are showing as you type. If the film
+            isn&rsquo;t among them, &ldquo;Not seeing it?&rdquo; searches every
+            film. Long lists now start as a stack of posters that deals out into
+            the full list when you click it.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            If you&rsquo;re <Link href="/personalise">signed in</Link> and have
+            seen two or more films by a director, the home page now has a
+            &ldquo;From Directors You Love&rdquo; row, just under your
+            watchlist. It shows their films with a showing in the next
+            fortnight, and says how many of their films you&rsquo;ve seen. Films
+            you&rsquo;ve already seen, or that are on your watchlist, are left
+            out. &ldquo;Explore their films&rdquo; opens the catalogue on those
+            directors with the films you&rsquo;ve seen hidden.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            The <Link href="/lists">film lists</Link> now track how far through
+            them you are. Each card shows how many of its films you&rsquo;ve
+            seen, and a list&rsquo;s page says how many of the ones you
+            haven&rsquo;t seen are showing, with a link to just those films in
+            the catalogue. Your <Link href="/personalise">Seen stats</Link> list
+            every list you&rsquo;ve made a start on, furthest through first.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-08",
     changes: [
       {
