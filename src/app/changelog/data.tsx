@@ -119,6 +119,34 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            We now spot more screenings that are more than a screening.
+            Q&amp;As, intros, live scores and premieres used to be found only in
+            a listing&rsquo;s title and notes. Now they&rsquo;re also read from
+            the venue&rsquo;s description of the screening, so one like the
+            ICA&rsquo;s &ldquo;The Eel&rdquo;, whose page says it will be
+            introduced by Benjamin Crais, now shows up in More Than a Screening
+            on the <Link href="/">home page</Link> and{" "}
+            <Link href="/near-me">Near Me</Link>, and on your watchlist. The
+            labels read a little differently too: up to two guests are named
+            (&ldquo;Q&amp;A with Carol Morley and Monica Dolan&rdquo;), and
+            panels are called panels.
+          </>
+        ),
+      },
+      {
+        tag: "Improvement",
+        body: () => (
+          <>
+            The <Link href="/lists/letterboxd-top-500">Letterboxd Top 500</Link>{" "}
+            has been brought up to date with Letterboxd&rsquo;s 9 November
+            update: 15 films have joined it and 15 have dropped off.
+          </>
+        ),
+      },
     ],
   },
   {
