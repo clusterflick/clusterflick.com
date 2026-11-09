@@ -67,10 +67,6 @@ export default function OccasionsFilterSection({
   return (
     <div className={styles.advancedFilterGroup}>
       <div className={styles.refineRowLead}>
-        <p className={styles.sectionDescription}>
-          Q&amp;As, introductions, live scores and premieres, as the venue
-          billed them.
-        </p>
         <div className={styles.selectionControls}>
           <Button
             variant="link"
