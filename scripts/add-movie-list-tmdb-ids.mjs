@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Gives every curated movie list entry its TMDB id (`tmdbId` in
  * `src/data/movie-lists/<list>.ts`), the id the dataset and a reader's lists

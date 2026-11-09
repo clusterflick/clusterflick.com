@@ -432,7 +432,7 @@ but its boundary (a perfect score) is inherent rather than chosen.
   re-evaluates every build. Review-count floors come from `@/utils/movie-ratings.mjs`, shared with
   the Critics' Picks row.
 
-**Every curated entry is to carry its TMDB id** (`tmdbId`), the id the dataset and a reader's
+**Every curated entry carries its TMDB id** (`tmdbId`), the id the dataset and a reader's
 lists key films by, so a list can be held against a Seen list as well as matched to what's showing.
 `npm run add-movie-list-tmdb-ids` fills them in from TMDB and writes them into the list files:
 exact for an IMDb id (TMDB's find endpoint), otherwise a strict title search (`pickListMatch` in
@@ -442,12 +442,13 @@ settling by hand; entries with an id are skipped, so a re-run or a new list cost
 The script keeps its own table of list files (`add-movie-list-tmdb-ids.config.mjs`), since it
 can't load the registry through the `@/` alias, and a unit test holds it to the registry.
 
-**Matching** (`src/utils/get-movie-list-movies.ts`) resolves each entry in descending order of
-certainty: `tmdbId` (the dataset keys movies by TMDB id, so this is a direct lookup) → `imdbId` →
-`rtSlug` → title + year. Titles run through `getSearchVariants`, so roman numerals, ampersands and
-punctuation all match; `altTitles` covers original-language titles. `yearTolerance` defaults to 1
-and should be 2 for award lists, which cite the _award_ year — `La Strada` is a 1954 film that won
-in 1956.
+**Matching** (`src/utils/get-movie-list-movies.ts`) is by `tmdbId` alone: the dataset keys its
+films by TMDB id, so an entry resolves by direct lookup. The title, year, IMDb id and RT slug fallbacks
+it used to try were dropped once every entry had an id; measured against a live release, all nine
+lists showed exactly the same films either way. `tmdbId` is required (`null` for a film TMDB doesn't
+have, which nothing matches), and a work released in parts takes its first part's id.
+`createMovieMatcher` (`@/utils/match-movie`) keeps the title-and-year resolution for the Letterboxd
+import, whose exports carry no TMDB id.
 
 The index is built once per dataset and memoized in a `WeakMap`, because every movie page needs the
 reverse lookup.

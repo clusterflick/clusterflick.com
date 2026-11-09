@@ -4,7 +4,6 @@ import {
   type MoviesRecord,
 } from "@/lib/filters/types";
 import { apply, getPermissiveState } from "@/lib/filters/manager";
-import { createMovieMatcher } from "@/utils/match-movie";
 import { MOVIE_LISTS, type MovieList } from "@/data/movie-lists";
 import type { Movie } from "@/types";
 
@@ -46,8 +45,8 @@ export function buildMovieListIndex(
     ...getPermissiveState(),
     [FilterId.HideFinished]: true,
   };
-  const showing = Object.values(apply(movies, state));
-  const match = createMovieMatcher(showing);
+  const showingById = apply(movies, state);
+  const showing = Object.values(showingById);
 
   const byList = new Map<string, MovieListFilm[]>();
   const byMovie = new Map<string, MovieListMembership[]>();
@@ -60,7 +59,9 @@ export function buildMovieListIndex(
       // Entries are stored in published order, so pushing in order keeps the
       // countdown intact without a further sort.
       for (const entry of list.entries) {
-        const movie = match(entry, list.yearTolerance);
+        // By TMDB id alone, the dataset's own key: exact, and every entry has
+        // one (or null for a film TMDB doesn't have).
+        const movie = entry.tmdbId ? showingById[entry.tmdbId] : undefined;
         if (!movie || seen.has(movie.id)) continue;
         seen.add(movie.id);
         films.push({
