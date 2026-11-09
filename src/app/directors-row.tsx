@@ -5,6 +5,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import PosterRow from "@/components/poster-row";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
+import { useFilterConfig } from "@/state/filter-config-context";
 import { UserListId } from "@/lib/user-lists";
 import { FilterId } from "@/lib/filters/types";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
@@ -35,6 +36,7 @@ import styles from "./page.module.css";
 export default function DirectorsRow() {
   const { status, lists, readFilmDetails } = useUserContext();
   const { movies, isLoading, hasAttemptedLoad } = useCinemaData();
+  const { setHideSeen } = useFilterConfig();
   const [details, setDetails] = useState<FilmDetailsData | null>(null);
   const [detailsFailed, setDetailsFailed] = useState(false);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -123,6 +125,14 @@ export default function DirectorsRow() {
             movies={row.movies}
             seeAllHref={getPeopleFilterUrl(FilterId.Directors, row.directorIds)}
             seeAllLabel="Explore their films"
+            // The row leaves out films already seen, so the grid it opens
+            // does too. Personal filters are never in a URL; switched on in
+            // the tab's state, this one survives the link's address being
+            // applied (`keepPersonalFilters`), and stays on after, as a
+            // standing preference does, until switched off in the overlay.
+            onSeeAllClick={() =>
+              lists && setHideSeen(Object.keys(lists[UserListId.Seen]))
+            }
             showAll
           />
         )}

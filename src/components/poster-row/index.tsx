@@ -32,6 +32,12 @@ interface PosterRowProps {
   seeAllHref?: string;
   seeAllLabel?: string;
   /**
+   * Runs as the "see all" link is followed, before the page changes: for a
+   * row whose link means more than its address can carry (the directors row
+   * switches on "Hide films I've seen", which is never written to a URL).
+   */
+  onSeeAllClick?: () => void;
+  /**
    * Append `#show-all` to each poster link so the movie page lists every
    * showing, ignoring the reader's filters. Used by rows (e.g. New Additions)
    * where the point is the full schedule, not just what the filters allow.
@@ -57,6 +63,7 @@ export default function PosterRow({
   titleAs: TitleTag = "h2",
   seeAllHref,
   seeAllLabel = "See all",
+  onSeeAllClick,
   showAll = false,
   movieUrlParams,
 }: PosterRowProps) {
@@ -69,7 +76,11 @@ export default function PosterRow({
       <div className={clsx(styles.header, intro && styles.headerTight)}>
         <TitleTag className={styles.title}>{title}</TitleTag>
         {seeAllHref && (
-          <Link href={seeAllHref} className={styles.seeAll}>
+          <Link
+            href={seeAllHref}
+            className={styles.seeAll}
+            onClick={onSeeAllClick}
+          >
             {seeAllLabel} →
           </Link>
         )}
