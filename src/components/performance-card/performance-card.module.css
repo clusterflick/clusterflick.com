@@ -137,6 +137,14 @@
   margin-top: 4px;
 }
 
+/* Who an occasion tag is with. Upright and brighter than the notes beneath,
+   being ours rather than the venue's billing. */
+.occasionDetail {
+  font-size: 13px;
+  color: var(--color-light-gray);
+  margin-top: 4px;
+}
+
 .performanceNotes {
   font-size: 12px;
   color: rgba(var(--color-light-gray-rgb), 0.8);
@@ -231,6 +239,15 @@
    same-height cards would read as a gap. */
 .compact .performanceTags:empty {
   display: none;
+}
+
+/* One line each in a strip of same-height cards. */
+.compact .occasionDetail {
+  font-size: 12px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .compact .performanceNotes {

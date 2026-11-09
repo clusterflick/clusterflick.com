@@ -10,6 +10,7 @@ import { getAccessibilityLabel } from "@/utils/accessibility-labels";
 import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
 import {
+  getOccasionDetails,
   getOccasionTags,
   isNoteCoveredByOccasions,
 } from "@/lib/occasions/rules";
@@ -209,6 +210,12 @@ export default function PerformanceCard({
           </Tag>
         ))}
       </div>
+      {/* Who, beneath the tags that say what: a name made a tag wrap. */}
+      {getOccasionDetails(occasions).map((detail) => (
+        <div key={detail} className={styles.occasionDetail}>
+          {detail}
+        </div>
+      ))}
       {noteLines.length > 0 && (
         <div className={styles.performanceNotes}>
           {noteLines.map((note, noteIndex) => (

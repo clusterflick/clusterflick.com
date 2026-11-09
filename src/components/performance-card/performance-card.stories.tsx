@@ -82,7 +82,8 @@ export const WithTagsAndNotes: Story = {
 };
 
 /**
- * Occasions are pink tags after the blue ones, naming whoever the venue did.
+ * Occasions are pink tags after the blue ones, saying what each is; who the
+ * venue named is a line beneath them.
  * A note the tags already say in full ("+ Q&A") is left out; one with more to
  * it ("UK Premiere of 4K Restoration") stays.
  */
