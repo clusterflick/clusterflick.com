@@ -450,6 +450,15 @@ have, which nothing matches), and a work released in parts takes its first part'
 `createMovieMatcher` (`@/utils/match-movie`) keeps the title-and-year resolution for the Letterboxd
 import, whose exports carry no TMDB id.
 
+**A reader's progress through a list** (`ListProgress`, signed in only) is
+their Seen list held against the list's ids (`getMovieListTmdbIds`, unique and
+non-null, so a list with a repeated or missing film counts fewer than its
+entries): a ring and "X of Y seen" on each `/lists` card, a line on the list's
+page saying how many unseen films are showing, and on `/personalise` the three
+lists the reader is furthest through, by share, among those with one seen.
+Curated lists only — a computed list's membership changes every build, so
+"of Y" would too. A multi-part work counts once seen its first part.
+
 The index is built once per dataset and memoized in a `WeakMap`, because every movie page needs the
 reverse lookup.
 

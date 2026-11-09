@@ -131,3 +131,42 @@
   font-size: 13px;
   color: var(--color-muted-gray);
 }
+
+/* The lists the reader is furthest through: a card each, side by side. */
+.listsProgress {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.1);
+  color: inherit;
+  font-weight: inherit;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.1);
+}
+
+.listProgress:hover {
+  color: inherit;
+  border-color: var(--color-neon-pink);
+}
+
+.listName {
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.allLists {
+  align-self: flex-start;
+  font-size: 14px;
+}

@@ -8,6 +8,7 @@ import {
   type ProgrammePoster,
 } from "@/utils/get-programme-summary";
 import { MOVIE_LISTS } from "@/data/movie-lists";
+import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
 import ListsPageContent from "./page-content";
 
 const DESCRIPTION =
@@ -43,6 +44,8 @@ export type MovieListItem = {
   movieCount: number;
   /** The first few films showing, in the list's own order. */
   posters: ProgrammePoster[];
+  /** Every film on the list, for a signed-in reader's progress through it. */
+  tmdbIds: string[];
 };
 
 export default async function ListsPage() {
@@ -59,6 +62,7 @@ export default async function ListsPage() {
       imagePath: getMovieListImagePath(list.id),
       movieCount: films.length,
       posters: pickPosters(films.map(({ movie }) => movie)),
+      tmdbIds: getMovieListTmdbIds(list),
     };
   });
 

@@ -9,6 +9,39 @@ import { MockUserProvider, type UserContextType } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import type { FilmDetails } from "@/lib/user-lists/film-details";
 
+/** Lists for the stats' progress strip, held against the stats stories' Seen films. */
+const MOVIE_LISTS = [
+  {
+    id: "sight-and-sound",
+    name: "Sight and Sound Greatest Films",
+    href: "/lists/sight-and-sound/",
+    tmdbIds: ["samurai", "rashomon", "mood", "heat", "a", "b", "c", "d"],
+  },
+  {
+    id: "hong-kong",
+    name: "Hong Kong Classics",
+    href: "/lists/hong-kong/",
+    tmdbIds: ["mood", "chungking", "e"],
+  },
+  {
+    id: "imdb",
+    name: "IMDb Top 250",
+    href: "/lists/imdb-top-250/",
+    tmdbIds: [
+      "heat",
+      "insider",
+      "taxi-driver",
+      ...Array.from({ length: 247 }, (_, i) => `imdb-${i}`),
+    ],
+  },
+  {
+    id: "unseen",
+    name: "A List With Nothing Seen",
+    href: "/lists/unseen/",
+    tmdbIds: ["f", "g"],
+  },
+];
+
 function PersonalisePageWrapper({ user }: { user: Partial<UserContextType> }) {
   return (
     <CinemaDataProvider>
@@ -20,6 +53,7 @@ function PersonalisePageWrapper({ user }: { user: Partial<UserContextType> }) {
                 "riocinema.org.uk": "/images/venues/riocinema.org.uk.png",
                 "actonecinema.co.uk": "/images/venues/actonecinema.co.uk.jpg",
               }}
+              movieLists={MOVIE_LISTS}
             />
           </MockUserProvider>
         </GeolocationProvider>
@@ -371,6 +405,12 @@ export const SignedInWithStats: Story = {
       await canvas.findByRole("link", { name: "Akira Kurosawa" }),
     ).toBeInTheDocument();
     await expect(await canvas.findByText("Cantonese")).toBeInTheDocument();
+    await expect(
+      await canvas.findByRole("link", { name: /Hong Kong Classics/ }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("link", { name: /Nothing Seen/ }),
+    ).not.toBeInTheDocument();
   },
 };
 

@@ -1,5 +1,6 @@
 import EventCard from "@/components/event-card";
 import ProgrammeCard from "@/components/programme-card";
+import ListProgress from "@/components/list-progress";
 import StandardPageLayout from "@/components/standard-page-layout";
 import type { MovieListItem } from "./page";
 import styles from "./page.module.css";
@@ -45,6 +46,7 @@ export default function ListsPageContent({
                         {list.movieCount === 1 ? "film" : "films"} showing
                       </span>
                       <span className={styles.source}>{list.sourceName}</span>
+                      <ListProgress tmdbIds={list.tmdbIds} />
                     </>
                   }
                 />
@@ -68,9 +70,12 @@ export default function ListsPageContent({
                   imagePath={list.imagePath}
                   description={list.description}
                   meta={
-                    <span className={styles.noFilms}>
-                      No films currently showing
-                    </span>
+                    <>
+                      <span className={styles.noFilms}>
+                        No films currently showing
+                      </span>
+                      <ListProgress tmdbIds={list.tmdbIds} />
+                    </>
                   }
                 />
               </li>

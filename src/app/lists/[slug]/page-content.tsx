@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
+import ListProgress from "@/components/list-progress";
 import EmptyState from "@/components/empty-state";
 import CanonicalRedirect from "@/components/canonical-redirect";
 import FilmPosterGrid from "@/components/film-poster-grid";
@@ -45,6 +46,8 @@ interface ListDetailPageContentProps {
   canonicalUrl: string;
   /** For lists drawn from a rating site; editorial lists have none. */
   ratingLink?: RatingLink;
+  /** Every film on the list, for a signed-in reader's progress through it. */
+  tmdbIds: string[];
 }
 
 export default function ListDetailPageContent({
@@ -62,6 +65,7 @@ export default function ListDetailPageContent({
   isAlias,
   canonicalUrl,
   ratingLink,
+  tmdbIds,
 }: ListDetailPageContentProps) {
   const showingCount = films.length;
   const countLabel =
@@ -133,6 +137,11 @@ export default function ListDetailPageContent({
             />
           )}
           <div className={styles.introText}>
+            <ListProgress
+              variant="line"
+              tmdbIds={tmdbIds}
+              showingIds={films.map(({ movie }) => movie.id)}
+            />
             <p className={styles.about}>
               {description}{" "}
               {criteria ? (

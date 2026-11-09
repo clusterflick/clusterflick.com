@@ -10,6 +10,9 @@ import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import Link from "next/link";
+import ListProgress from "@/components/list-progress";
+import { getListProgress } from "@/lib/user-lists/list-progress";
 import { GENRES } from "@/data/genres";
 import { FilterId } from "@/lib/filters/types";
 import type { UserListEntry } from "@/lib/user-lists";
@@ -50,10 +53,24 @@ const plural = (count: number, noun: string) =>
  * languages. Read from the listed films' details, which only this page loads,
  * and loaded again when the Seen list's films change.
  */
+export type MovieListProgressItem = {
+  id: string;
+  name: string;
+  href: string;
+  /** The list's films (`getMovieListTmdbIds`). */
+  tmdbIds: string[];
+};
+
+/** Lists shown in the stats: the reader's most complete, not all nine. */
+const LISTS_SHOWN = 3;
+
 export default function SeenStats({
   seen,
+  movieLists = [],
 }: {
   seen: Record<string, UserListEntry>;
+  /** The film lists, from the build, for the reader's progress through them. */
+  movieLists?: MovieListProgressItem[];
 }) {
   const { readFilmDetails } = useUserContext();
   // Matches `.summary`'s breakpoint in seen-stats.module.css. Beside the
@@ -127,11 +144,55 @@ export default function SeenStats({
             to count.
           </p>
         )}
+        <ListsProgress seen={seen} movieLists={movieLists} />
         <ExpandableSection title="More Stats" scrollOnExpand={false}>
           <MoreStats stats={stats} />
         </ExpandableSection>
       </div>
     </ContentSection>
+  );
+}
+
+/**
+ * The film lists the reader is furthest through, each a link to the list's
+ * page. Only lists with a film seen: a strip of noughts says nothing.
+ */
+function ListsProgress({
+  seen,
+  movieLists,
+}: {
+  seen: Record<string, UserListEntry>;
+  movieLists: MovieListProgressItem[];
+}) {
+  const ranked = movieLists
+    .map((list) => ({ list, progress: getListProgress(list.tmdbIds, seen) }))
+    .filter(({ progress }) => progress.seen > 0)
+    .sort(
+      (a, b) =>
+        b.progress.seen / b.progress.total -
+          a.progress.seen / a.progress.total ||
+        b.progress.seen - a.progress.seen,
+    )
+    .slice(0, LISTS_SHOWN);
+  if (ranked.length === 0) return null;
+
+  return (
+    <div className={styles.block}>
+      <h3 className={styles.heading}>Your progress through the lists</h3>
+      <ul className={styles.listsProgress}>
+        {ranked.map(({ list }) => (
+          <li key={list.id}>
+            <Link href={list.href} className={styles.listProgress}>
+              <span className={styles.listName}>{list.name}</span>
+              <ListProgress tmdbIds={list.tmdbIds} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link href="/lists" className={styles.allLists}>
+        All film lists
+      </Link>
+    </div>
   );
 }
 

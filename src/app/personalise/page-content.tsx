@@ -54,7 +54,7 @@ import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
 import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
-import SeenStats from "./seen-stats";
+import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -272,9 +272,12 @@ type LinkState =
 
 export default function PersonalisePageContent({
   venueImagePaths = {},
+  movieLists = [],
 }: {
   /** Venue id → logo, from the build (`getVenueImagePaths`). */
   venueImagePaths?: Record<string, string>;
+  /** The film lists, for progress through them in the Seen stats. */
+  movieLists?: MovieListProgressItem[];
 }) {
   const { status } = useUserContext();
 
@@ -286,7 +289,7 @@ export default function PersonalisePageContent({
       subtitle="Keep track of the films you want to see, where you like to see them, and the ones you've already seen."
       afterContent={
         status === "signed-in" ? (
-          <SignedIn venueImagePaths={venueImagePaths} />
+          <SignedIn venueImagePaths={venueImagePaths} movieLists={movieLists} />
         ) : undefined
       }
     >
@@ -465,8 +468,10 @@ function SignInForm() {
 
 function SignedIn({
   venueImagePaths,
+  movieLists,
 }: {
   venueImagePaths: Record<string, string>;
+  movieLists: MovieListProgressItem[];
 }) {
   const { lists, favouriteVenues } = useUserContext();
   // Off by default, and for each visit: editing is occasional, and buttons
@@ -499,7 +504,9 @@ function SignedIn({
       />
       {/* At the top: they're what a reader with a long Seen list comes back
           for, and the lists below are long. */}
-      {lists && <SeenStats seen={lists[UserListId.Seen]} />}
+      {lists && (
+        <SeenStats seen={lists[UserListId.Seen]} movieLists={movieLists} />
+      )}
       <FilmSearch ref={filmSearchRef} />
       {lists ? (
         <>
