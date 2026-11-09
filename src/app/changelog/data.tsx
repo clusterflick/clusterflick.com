@@ -120,6 +120,21 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Grosvenor Chapel"
+              url="https://www.grosvenorchapel.org.uk"
+            />
+            , the Georgian chapel in Mayfair that appears in Love Actually and
+            screens it, with other Christmas films, for the Mount Street
+            Neighbourhood Holiday Festival.
+          </>
+        ),
+      },
+      {
         tag: "Improvement",
         body: () => (
           <>
