@@ -864,7 +864,8 @@ const FAVOURITE_DIRECTORS_LIMIT = 24;
  * the row above already shows. The categories are the curated rows' defaults,
  * since these are suggestions rather than films the reader chose. Ordered by
  * how many of the director's films the reader has seen, then soonest; each
- * subtitle names the director and the next showing.
+ * subtitle names the director, the next showing and how many of theirs the
+ * reader has seen.
  *
  * Returns the films and the directors they're by, or nothing below
  * `FAVOURITE_DIRECTORS_ROW_MIN` films.
@@ -904,7 +905,14 @@ export function getFavouriteDirectorsRow(
       performanceCount: movie.performances.filter(
         (p) => p.time >= now && p.time < rangeEnd,
       ).length,
-      subtitle: `${directorNames[director]} · ${formatDayAndDate(next.time).replace(/ /g, " ")}`,
+      // The date and count never split, so a long name pushes them whole
+      // onto a line of their own: "Christopher Nolan · / Sun 22 Nov · 4 seen".
+      subtitle: `${directorNames[director]} · ${[
+        formatDayAndDate(next.time),
+        `${favourites.get(director)} seen`,
+      ]
+        .join(" · ")
+        .replace(/ /g, " ")}`,
       director,
       seen: favourites.get(director)!,
       sortTime: next.time,

@@ -787,7 +787,10 @@ describe("getFavouriteDirectorsRow", () => {
       "ran",
       "chungking",
     ]);
-    expect(row.movies[0].subtitle).toMatch(/^Akira Kurosawa ·/);
+    // Breakable only after the name: the date and count stay together.
+    expect(row.movies[0].subtitle).toMatch(
+      /^Akira Kurosawa · [^ ]+\u00A0·\u00A03\u00A0seen$/,
+    );
     expect(row.directorIds).toEqual(["ak", "kw"]);
   });
 

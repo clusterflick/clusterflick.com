@@ -1660,8 +1660,10 @@ director who directed it or a film it screens (`getMovieAndIncluded`). Films
 already seen are left out, and so are those on the watchlist, which the row
 above shows. Unlike that row it keeps to the curated rows' default
 categories, being suggestions. Ordered by how many of the director's films
-the reader has seen, then soonest; each subtitle names the director and the
-next showing; "Explore their films" opens the catalogue on the row's
+the reader has seen, then soonest; each subtitle names the director, then the
+next showing and how many of theirs the reader has seen ("Sun 22 Nov · 4
+seen"), joined so they never split and a long name pushes them whole onto a
+second line; "Explore their films" opens the catalogue on the row's
 directors (`getPeopleFilterUrl`). Hidden below three films
 (`FAVOURITE_DIRECTORS_ROW_MIN`), while signed out, and when the details can't
 be read. It reserves its last height as the watchlist row does
