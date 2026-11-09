@@ -18,6 +18,7 @@ Pages at clusterflick.com.
 - `npm run build-storybook` — Build Storybook (also used for Vitest story tests)
 - `npm run fetch-published-data` — Download the latest `data-transformed` and `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
+- `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB ids (see Film Lists); a dry run unless given `-- --write`; review the diff and commit it
 - `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
@@ -430,6 +431,16 @@ but its boundary (a perfect score) is inherent rather than chosen.
 - **Computed** — derived from rating data already in the dataset via a `score()` function, so it
   re-evaluates every build. Review-count floors come from `@/utils/movie-ratings.mjs`, shared with
   the Critics' Picks row.
+
+**Every curated entry is to carry its TMDB id** (`tmdbId`), the id the dataset and a reader's
+lists key films by, so a list can be held against a Seen list as well as matched to what's showing.
+`npm run add-movie-list-tmdb-ids` fills them in from TMDB and writes them into the list files:
+exact for an IMDb id (TMDB's find endpoint), otherwise a strict title search (`pickListMatch` in
+`scripts/lib/movie-list-tmdb-ids.js`: title, original or `altTitles` match, within the list's
+`yearTolerance`, nearest year, a tie left ambiguous). Whatever it can't match is listed for
+settling by hand; entries with an id are skipped, so a re-run or a new list costs only the rest.
+The script keeps its own table of list files (`add-movie-list-tmdb-ids.config.mjs`), since it
+can't load the registry through the `@/` alias, and a unit test holds it to the registry.
 
 **Matching** (`src/utils/get-movie-list-movies.ts`) resolves each entry in descending order of
 certainty: `tmdbId` (the dataset keys movies by TMDB id, so this is a direct lookup) → `imdbId` →
