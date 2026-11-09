@@ -9,6 +9,10 @@ import {
 import { getAccessibilityLabel } from "@/utils/accessibility-labels";
 import { getFormatLabels } from "@/utils/format-labels";
 import { formatShowingTime } from "@/utils/format-date";
+import {
+  getOccasionTags,
+  isNoteCoveredByOccasions,
+} from "@/lib/occasions/rules";
 import Tag from "@/components/tag";
 import { ButtonAnchor } from "@/components/button";
 import EventPoster, {
@@ -60,6 +64,7 @@ interface PerformanceCardProps {
   screen?: string;
   accessibility?: MoviePerformance["accessibility"];
   format?: MoviePerformance["format"];
+  occasions?: MoviePerformance["occasions"];
   notes?: string;
   /**
    * Names the film under the time — for lists that mix films (the planner's
@@ -91,6 +96,7 @@ export default function PerformanceCard({
   screen,
   accessibility,
   format,
+  occasions,
   notes,
   film,
   onFilmClick,
@@ -99,6 +105,11 @@ export default function PerformanceCard({
   className,
   children,
 }: PerformanceCardProps) {
+  // A note the occasion tags already say in full ("+ Q&A") is left out.
+  const noteLines = (notes ?? "")
+    .split("\n")
+    .filter((note) => note && !isNoteCoveredByOccasions(note, occasions));
+
   return (
     <div
       className={clsx(
@@ -190,10 +201,17 @@ export default function PerformanceCard({
             {getFormatLabels(format.dimension)}
           </Tag>
         ) : null}
+        {/* Pink, as the home page marks a night that won't come round again;
+            blue is for how the film is shown. */}
+        {getOccasionTags(occasions).map((label) => (
+          <Tag key={label} color="pink" size="sm">
+            {label}
+          </Tag>
+        ))}
       </div>
-      {notes && (
+      {noteLines.length > 0 && (
         <div className={styles.performanceNotes}>
-          {notes.split("\n").map((note, noteIndex) => (
+          {noteLines.map((note, noteIndex) => (
             <Fragment key={noteIndex}>
               {note}
               <br />

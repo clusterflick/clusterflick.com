@@ -75,6 +75,7 @@ export function PlannerLaneCard({
       screen={performance.screen}
       accessibility={performance.accessibility}
       format={performance.format}
+      occasions={performance.occasions}
       notes={performance.notes}
       film={film}
       onFilmClick={setUseBrowserBack}

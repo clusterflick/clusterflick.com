@@ -196,3 +196,118 @@ export function matchOccasions(
 
   return matches;
 }
+
+type OccasionKey = keyof MoviePerformanceOccasions;
+
+/** The order a performance's occasion tags are listed in. */
+const TAG_ORDER: OccasionKey[] = [
+  "liveScore",
+  "intro",
+  "qAndA",
+  "inConversation",
+  "panel",
+  "guestAppearance",
+  "premiere",
+  "preview",
+];
+
+/** How each occasion reads as a tag, with nobody named and with names. */
+const TAG_LABEL: Record<
+  OccasionKey,
+  { bare: string; named?: (names: string) => string }
+> = {
+  liveScore: { bare: "Live score", named: (names) => `Live score by ${names}` },
+  intro: { bare: "Intro", named: (names) => `Intro by ${names}` },
+  qAndA: { bare: "Q&A", named: (names) => `Q&A with ${names}` },
+  inConversation: {
+    bare: "In conversation",
+    named: (names) => `In conversation with ${names}`,
+  },
+  panel: { bare: "Panel discussion", named: (names) => `Panel with ${names}` },
+  guestAppearance: {
+    bare: "Guest appearance",
+    named: (names) => `With ${names}`,
+  },
+  premiere: { bare: "Premiere" },
+  preview: { bare: "Preview" },
+};
+
+function namesOf(value: unknown): string[] {
+  if (!value || value === true || typeof value !== "object") return [];
+  const details = value as { guests?: string[]; performers?: string[] };
+  return details.guests ?? details.performers ?? [];
+}
+
+/**
+ * Every occasion on a performance as a tag label, one per occasion and with
+ * the names the venue gave - "Intro by Benjamin Crais", "UK premiere".
+ *
+ * Unlike {@link matchOccasions} this keeps them all, intro and Q&A alike, and
+ * says nothing about rarity: a tag is a fact about one showing, like
+ * "Subtitled", so every introduced screening gets one.
+ */
+export function getOccasionTags(
+  occasions: MoviePerformanceOccasions | undefined,
+): string[] {
+  if (!occasions) return [];
+  return TAG_ORDER.flatMap((key) => {
+    const value = occasions[key];
+    if (!value) return [];
+    if (key === "premiere" && value !== true) {
+      const { region } = value as { region: PremiereRegion };
+      return [`${REGION_LABEL[region]} premiere`];
+    }
+    const { bare, named } = TAG_LABEL[key];
+    const names = namesOf(value);
+    return [named && names.length > 0 ? named(formatNames(names)) : bare];
+  });
+}
+
+/**
+ * The bare phrases a venue bills an occasion with, which its tag says in
+ * full. Only a whole phrase counts: "UK Premiere of 4K Restoration" says
+ * something the tag doesn't, and stays.
+ */
+const BARE_PHRASES: Partial<Record<OccasionKey, RegExp>> = {
+  qAndA: /^(?:live |post[- ]screening )?(?:q ?& ?a|q and a|screen ?talk)$/,
+  intro: /^(?:with an? )?(?:intro|introduction)$/,
+  liveScore: /^(?:with )?live (?:score|music|accompaniment)$/,
+  inConversation: /^in conversation$/,
+  panel: /^panel(?: discussion)?$/,
+  preview: /^preview(?: screening)?$/,
+};
+
+const normalisePhrase = (text: string) =>
+  text
+    .toLocaleLowerCase("en-GB")
+    .replace(/^[\s+&,:-]+|[\s.!:,-]+$/g, "")
+    .replace(/\s+/g, " ");
+
+/**
+ * Whether a line of a performance's notes says nothing its occasion tags
+ * don't - "+ Q&A" beside a "Q&A with Sophie Marceau" tag. Such a line is
+ * left out of the card rather than out of the data: the notes are the
+ * venue's own billing, and the published data and calendar feeds have no
+ * tags to stand in for it.
+ *
+ * A line may join several ("+ Intro + Q&A"); each part has to be covered.
+ */
+export function isNoteCoveredByOccasions(
+  note: string,
+  occasions: MoviePerformanceOccasions | undefined,
+): boolean {
+  if (!occasions) return false;
+  const tags = getOccasionTags(occasions).map(normalisePhrase);
+  const parts = note
+    .split(/\s+[+&]\s+|^\s*\+\s*/)
+    .map(normalisePhrase)
+    .filter(Boolean);
+  if (parts.length === 0) return false;
+
+  return parts.every((part) => {
+    if (tags.includes(part)) return true;
+    return TAG_ORDER.some(
+      (key) => occasions[key] && BARE_PHRASES[key]?.test(part),
+    );
+  });
+}
