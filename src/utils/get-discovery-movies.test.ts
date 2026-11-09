@@ -18,6 +18,8 @@ import {
   getRating,
   computeNearMeRows,
   getWatchlistRow,
+  getFavouriteDirectorsRow,
+  getFavouriteDirectors,
   type DiscoveryWindow,
 } from "./get-discovery-movies";
 
@@ -742,5 +744,94 @@ describe("getWatchlistRow", () => {
       "Last showing Thu 16 Nov",
       "Next showing Thu 16 Nov",
     ]);
+  });
+});
+
+describe("getFavouriteDirectorsRow", () => {
+  const NAMES = { kw: "Wong Kar-wai", ak: "Akira Kurosawa", once: "One-Off" };
+  // Seen: three by Kurosawa, two by Wong Kar-wai, one by a one-off.
+  const SEEN = getFavouriteDirectors([
+    ["ak"],
+    ["ak"],
+    ["ak", "kw"],
+    ["kw"],
+    ["once"],
+  ]);
+
+  it("counts directors seen twice or more as favourites", () => {
+    expect(SEEN).toEqual(
+      new Map([
+        ["ak", 3],
+        ["kw", 2],
+      ]),
+    );
+  });
+  const by = (id: string, directors: string[], day = 1, opts = {}) => ({
+    ...makeMovie(id, [{ venueId: "v", times: [NOW + day * DAY] }], opts),
+    directors,
+  });
+
+  it("offers favourites' films in the fortnight, most-seen director first", () => {
+    const movies = asRecord([
+      by("chungking", ["kw"], 1),
+      by("ran", ["ak"], 5),
+      by("ikiru", ["ak"], 3),
+      by("one-off", ["once"], 1),
+      by("later", ["ak"], 20),
+    ]);
+    const row = getFavouriteDirectorsRow(movies, SEEN, new Set(), NAMES, {
+      now: NOW,
+    });
+    expect(row.movies.map((s) => s.movie.id)).toEqual([
+      "ikiru",
+      "ran",
+      "chungking",
+    ]);
+    expect(row.movies[0].subtitle).toMatch(/^Akira Kurosawa ·/);
+    expect(row.directorIds).toEqual(["ak", "kw"]);
+  });
+
+  it("leaves out films seen or on the watchlist, and other categories", () => {
+    const movies = asRecord([
+      by("a", ["ak"]),
+      by("b", ["ak"]),
+      by("c", ["ak"]),
+      by("seen", ["ak"]),
+      by("listed", ["ak"]),
+      by("talk", ["ak"], 1, { category: Category.Talk }),
+    ]);
+    const row = getFavouriteDirectorsRow(
+      movies,
+      SEEN,
+      new Set(["seen", "listed"]),
+      NAMES,
+      { now: NOW },
+    );
+    expect(row.movies.map((s) => s.movie.id).sort()).toEqual(["a", "b", "c"]);
+  });
+
+  it("is empty below three films", () => {
+    const movies = asRecord([by("a", ["ak"]), by("b", ["kw"])]);
+    expect(
+      getFavouriteDirectorsRow(movies, SEEN, new Set(), NAMES, { now: NOW })
+        .movies,
+    ).toEqual([]);
+  });
+
+  it("is empty with no director seen twice", () => {
+    const movies = asRecord([
+      by("a", ["once"]),
+      by("b", ["once"]),
+      by("c", ["once"]),
+    ]);
+    expect(
+      getFavouriteDirectorsRow(
+        movies,
+        getFavouriteDirectors([["once"]]),
+        new Set(),
+        NAMES,
+        { now: NOW },
+      ).movies,
+    ).toEqual([]);
   });
 });

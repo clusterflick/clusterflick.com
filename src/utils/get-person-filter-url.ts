@@ -21,3 +21,14 @@ export function getPersonFilterUrl(
   if (!group) throw new Error(`No people filter group for "${filterId}"`);
   return `/catalogue?base=all&${group.urlParam}=${encodeURIComponent(personId)}`;
 }
+
+/** The films grid filtered to any of several people — "or", as the filter reads. */
+export function getPeopleFilterUrl(
+  filterId: PeopleFilterId,
+  personIds: string[],
+): string {
+  const group = PEOPLE_GROUPS.find(({ filterId: id }) => id === filterId);
+  if (!group) throw new Error(`No people filter group for "${filterId}"`);
+  const ids = personIds.map(encodeURIComponent).join(",");
+  return `/catalogue?base=all&${group.urlParam}=${ids}`;
+}

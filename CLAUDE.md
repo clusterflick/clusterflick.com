@@ -1650,6 +1650,27 @@ context). The reservation comes off in a layout effect once the row settles,
 which also stores the new height — or clears it when the row is empty, so a
 reader with nothing showing reserves nothing next time.
 
+**Under it, "From Directors You Love"** (`DirectorsRow`,
+`getFavouriteDirectorsRow`): films with a bookable showing in the next
+fortnight, the watchlist row's window, by a director the reader has seen two
+or more films by (`getFavouriteDirectors`, `FAVOURITE_DIRECTOR_MIN_SEEN`). The
+favourites come from the film details document rather than the dataset, since
+most films on a Seen list finished their run long ago, and a film counts for a
+director who directed it or a film it screens (`getMovieAndIncluded`). Films
+already seen are left out, and so are those on the watchlist, which the row
+above shows. Unlike that row it keeps to the curated rows' default
+categories, being suggestions. Ordered by how many of the director's films
+the reader has seen, then soonest; each subtitle names the director and the
+next showing; "Explore their films" opens the catalogue on the row's
+directors (`getPeopleFilterUrl`). Hidden below three films
+(`FAVOURITE_DIRECTORS_ROW_MIN`), while signed out, and when the details can't
+be read. It reserves its last height as the watchlist row does
+(`getRowReservationScript` and `storeRowHeight` in
+`watchlist-row-reservation`, the two sharing the slot's styles), and arrives
+later still, needing the details too. The user context reads those once a
+session (`readFilmDetails`, cached until an add or import writes new ones),
+so the stats and this row share one read.
+
 **`/updates` says what a day did to the watchlist** (`WatchlistHighlights`):
 a pink panel under the day's figures, "3 films on your watchlist got new
 showings", each film once however many of the day's runs touched it

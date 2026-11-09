@@ -195,6 +195,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [favouriteVenues, setFavouriteVenues] =
     useState<FavouriteVenues | null>(null);
   const servicesRef = useRef<FirebaseServices | null>(null);
+  /**
+   * The film details, read once a session and shared by the pages that need
+   * them (the Seen stats, the home page's directors row). An add or import
+   * writes new details, so it clears this and the next read fetches them.
+   */
+  const filmDetailsRef = useRef<{
+    uid: string;
+    details: Promise<FilmDetailsData>;
+  } | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   /** Load the SDK once and start following the auth state. */
@@ -334,6 +343,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setLists(previous);
         throw error;
       }
+      filmDetailsRef.current = null;
     },
     [getServices, user, lists],
   );
@@ -397,6 +407,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setLists(previous);
         throw error;
       }
+      filmDetailsRef.current = null;
       return ids;
     },
     [getServices, user, lists],
@@ -476,7 +487,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
   >(async () => {
     const { db } = await getServices();
     if (!user) throw new Error("Not signed in");
-    return fetchFilmDetails(db, user.uid);
+    const cached = filmDetailsRef.current;
+    if (cached?.uid === user.uid) return cached.details;
+    const details = fetchFilmDetails(db, user.uid);
+    filmDetailsRef.current = { uid: user.uid, details };
+    // A failed read isn't kept, so the next caller tries again.
+    details.catch(() => {
+      if (filmDetailsRef.current?.details === details) {
+        filmDetailsRef.current = null;
+      }
+    });
+    return details;
   }, [getServices, user]);
 
   const contextValue = useMemo<UserContextType>(

@@ -9,21 +9,12 @@ import { UserListId } from "@/lib/user-lists";
 import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
 import { getWatchlistRow } from "@/utils/get-discovery-movies";
 import {
+  storeRowHeight,
   WATCHLIST_ROW_HEIGHT_KEY,
   WATCHLIST_ROW_RESERVATION_SCRIPT,
   WATCHLIST_ROW_SLOT_ID,
 } from "./watchlist-row-reservation";
 import styles from "./page.module.css";
-
-function storeHeight(height: number) {
-  try {
-    if (height > 0) {
-      localStorage.setItem(WATCHLIST_ROW_HEIGHT_KEY, String(height));
-    } else {
-      localStorage.removeItem(WATCHLIST_ROW_HEIGHT_KEY);
-    }
-  } catch {}
-}
 
 /**
  * "From Your Watchlist" — the signed-in reader's watchlist films showing in
@@ -80,7 +71,9 @@ export default function WatchlistRow() {
     if (!settled || !slotRef.current) return;
     slotRef.current.style.removeProperty("--reserved-height");
     slotRef.current.removeAttribute("data-reserved");
-    if (signedIn) storeHeight(slotRef.current.offsetHeight);
+    if (signedIn) {
+      storeRowHeight(WATCHLIST_ROW_HEIGHT_KEY, slotRef.current.offsetHeight);
+    }
   }, [settled, signedIn, row]);
 
   return (

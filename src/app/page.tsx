@@ -24,6 +24,7 @@ import DiscoverySections from "./discovery-sections";
 import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";
 import WatchlistRow from "./watchlist-row";
+import DirectorsRow from "./directors-row";
 import ListingsFreshness from "./listings-freshness";
 import styles from "./page.module.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
@@ -205,6 +206,7 @@ export default async function Home() {
           </div>
 
           <WatchlistRow />
+          <DirectorsRow />
 
           <DiscoverySections
             fallback={
