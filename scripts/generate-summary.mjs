@@ -348,9 +348,17 @@ function computeSignals(meta, movies, now) {
     // genuine "discovery", so it's excluded from the special highlights.
     const isEvergreen = allFuture.length > EVERGREEN_MAX_FUTURE;
 
-    // The film's soonest showing this week — a real venue + date every candidate
-    // can carry, so the model never borrows specifics from another film.
-    const sortedUpcoming = [...upcoming].sort(
+    // Every highlight is about a showing a reader can still book. Sold-out
+    // showings count towards a film's reach above, but a pick sending a reader
+    // to a night they can't have is no pick at all — occasions and one-offs
+    // most of all, being the showings likeliest to sell out. Only some venues
+    // report availability, so this narrows what gets promoted, not guarantees.
+    const bookable = upcoming.filter(({ perf }) => !perf.status?.soldOut);
+
+    // The film's soonest bookable showing this week — a real venue + date every
+    // candidate can carry, so the model never borrows specifics from another
+    // film.
+    const sortedUpcoming = [...bookable].sort(
       (a, b) => a.perf.time - b.perf.time,
     );
     const rep = sortedUpcoming[0];
@@ -359,7 +367,7 @@ function computeSignals(meta, movies, now) {
     const repWhen = rep ? formatWhen(rep.perf.time, now) : null;
 
     // Special format / event (permanent attractions excluded).
-    const event = isEvergreen ? null : detectEvent(movie, upcoming);
+    const event = isEvergreen ? null : detectEvent(movie, bookable);
     if (event) {
       eventCandidates.push({
         id,
@@ -383,7 +391,7 @@ function computeSignals(meta, movies, now) {
     // A worthwhile film at an unconventional, non-cinema venue (a bar, gallery,
     // cultural institute, museum, university and the like).
     if (matched && !isEvergreen && rating) {
-      const unusual = upcoming.find((u) => {
+      const unusual = bookable.find((u) => {
         const type = venueType(meta, u.showing?.venueId);
         return type && !CINEMA_TYPES.has(type);
       });
@@ -409,8 +417,8 @@ function computeSignals(meta, movies, now) {
     }
 
     // One-off: the film's only future showing is this single one.
-    if (matched && allFuture.length === 1) {
-      const only = upcoming[0];
+    if (matched && allFuture.length === 1 && bookable.length === 1) {
+      const only = bookable[0];
       oneOffCandidates.push({
         id,
         title: movie.title,
@@ -468,7 +476,8 @@ function computeSignals(meta, movies, now) {
       !isEvergreen &&
       rating &&
       rating.norm >= GEM_RATING_MIN &&
-      venueCount <= GEM_MAX_VENUES
+      venueCount <= GEM_MAX_VENUES &&
+      rep
     ) {
       gemCandidates.push({
         id,
@@ -495,7 +504,7 @@ function computeSignals(meta, movies, now) {
       .filter((s) => typeof s === "number");
     const earliestSeen = seenValues.length ? Math.min(...seenValues) : Infinity;
     const releaseTime = getReleaseTime(movie);
-    if (matched && releaseTime !== null && earliestSeen >= newCutoff) {
+    if (matched && rep && releaseTime !== null && earliestSeen >= newCutoff) {
       const ageMs = now - releaseTime;
       let kind = "back on the big screen";
       let label = "Back on the big screen";

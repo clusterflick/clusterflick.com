@@ -160,6 +160,52 @@ describe("getFeaturedScreenings", () => {
     expect(featured.map((f) => f.movieId)).toEqual(["ran"]);
   });
 
+  it("skips a highlighted showing that has sold out since", () => {
+    const ran = data.movies.ran;
+    const soldOutData = {
+      ...data,
+      movies: {
+        ...data.movies,
+        ran: {
+          ...ran,
+          performances: ran.performances.map((p) => ({
+            ...p,
+            status: { soldOut: true },
+          })),
+        },
+      },
+    } as unknown as CinemaData;
+    const featured = getFeaturedScreenings(
+      summary("Ran and Her.", [ranLink, herLink]),
+      soldOutData,
+      NOW,
+    );
+    expect(featured.map((f) => f.movieId)).toEqual(["her"]);
+  });
+
+  it("keeps a highlight when another showing of the film is sold out", () => {
+    const her = data.movies.her;
+    const partlySoldOut = {
+      ...data,
+      movies: {
+        ...data.movies,
+        her: {
+          ...her,
+          // The first showing (day 1) is gone; the highlighted one (day 2) isn't.
+          performances: her.performances.map((p, index) =>
+            index === 0 ? { ...p, status: { soldOut: true } } : p,
+          ),
+        },
+      },
+    } as unknown as CinemaData;
+    const featured = getFeaturedScreenings(
+      summary("Her.", [herLink]),
+      partlySoldOut,
+      NOW,
+    );
+    expect(featured.map((f) => f.movieId)).toEqual(["her"]);
+  });
+
   it("skips films the dataset no longer holds, and venue links", () => {
     const featured = getFeaturedScreenings(
       summary("Gone, at The Chiswick Cinema, then Her.", [

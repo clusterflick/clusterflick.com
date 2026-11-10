@@ -69,6 +69,23 @@ function getCredit(movie: Movie, data: CinemaData): string | null {
 }
 
 /**
+ * Whether the highlighted showing is now reported sold out. It is found by
+ * time and venue, which is all a highlight records; a showing the dataset no
+ * longer lists is left to the checks above rather than treated as sold out.
+ */
+function isSoldOut(
+  movie: Movie,
+  { time, venueId }: { time: number; venueId: string },
+): boolean {
+  return movie.performances.some(
+    (p) =>
+      p.time === time &&
+      movie.showings[p.showingId]?.venueId === venueId &&
+      p.status?.soldOut,
+  );
+}
+
+/**
  * The films the editorial summary actually names, in the order it names them,
  * each with the reason `generate-summary` picked it and the showing that reason
  * is about. The summary's links cover every candidate the model was shown, most
@@ -77,7 +94,9 @@ function getCredit(movie: Movie, data: CinemaData): string | null {
  *
  * Skipped rather than guessed: a link from a summary written before highlights
  * existed, a film the dataset no longer holds, and a highlighted showing that
- * has already started (the summary is a build-time snapshot).
+ * has already started or has sold out since the summary was written (the
+ * summary is a build-time snapshot, and `generate-summary` only highlights
+ * showings that were bookable when it ran).
  */
 export function getFeaturedScreenings(
   summary: EditorialSummary | null,
@@ -116,6 +135,7 @@ export function getFeaturedScreenings(
     if (highlight.performance) {
       const venue = data.venues[highlight.performance.venueId];
       if (!venue || highlight.performance.time < now) continue;
+      if (isSoldOut(movie, highlight.performance)) continue;
       performance = {
         time: highlight.performance.time,
         venueName: venue.name,
