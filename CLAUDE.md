@@ -272,6 +272,16 @@ A summary written before highlights existed features nothing, and its prose is
 shown as before. A highlight is skipped rather than guessed when its film or
 venue has left the dataset or its showing has started.
 
+**A pick is a showing a reader can book.** `generate-summary.mjs` only
+highlights showings that aren't sold out, as the occasion row does: a "One
+night only" or a Q&A that has sold out is the one night nobody can have, and
+occasions are the showings likeliest to sell out. A film whose every showing
+this week is sold out can still be named for its reach (`popular`), which is
+about no one showing. `getFeaturedScreenings` checks again at build time and
+drops a highlight whose showing has sold out since the summary was written.
+Only some venues report availability, so this narrows what is promoted rather
+than guaranteeing it.
+
 **The hero uses posters, not backdrops.** Backdrop stills were tried and the
 poster read better: it keeps the site's colours, each slide looks alike, and
 plenty of films have no good still. The pipeline doesn't publish film
