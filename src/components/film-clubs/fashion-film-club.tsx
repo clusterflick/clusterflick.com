@@ -4,14 +4,15 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Fashion Film Club, created by Rosie Okotcha, spotlights the costumes and
-        creative impact of well-loved and underrated films. Its screenings at{" "}
+        Fashion Film Club, created by Rosie Okotcha, looks at films through
+        their costumes, spotlighting the fashion and creative impact of
+        well-loved titles and giving underrated ones, such as{" "}
+        <em>Jawbreaker</em> and <em>Jennifer&apos;s Body</em>, the attention
+        they missed first time round. Screenings at{" "}
         <Link href="/venues/rhizomatic">Rhizomatic!</Link> in{" "}
-        <Link href="/london-cinemas/tower-hamlets">Tower Hamlets</Link> have so
-        far been <em>Jawbreaker</em>, <em>Jennifer&apos;s Body</em> and{" "}
-        <em>Secretary</em>. Each evening begins with an hour to mingle and grab
-        a drink before the film, guests are encouraged to dress inspired by
-        what&apos;s showing, and the popcorn is free.
+        <Link href="/london-cinemas/tower-hamlets">Tower Hamlets</Link> begin
+        with an hour to mingle over a drink, and guests are encouraged to dress
+        inspired by the film.
       </p>
     </section>
   );
