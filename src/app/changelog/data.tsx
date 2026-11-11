@@ -88,6 +88,65 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/passenger-cinema">Passenger Cinema</Link>, a
+            volunteer-led cinema that travels through film, bringing films from
+            around the world to spaces across London. Next up is a Turkmen
+            evening at{" "}
+            <Venue name="All is Joy Studios" url="https://allisjoysoho.com" />{" "}
+            on 22 November: the 1963 musical drama The Contest, with Turkmen
+            food and live dutar music.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/fashion-film-club">Fashion Film Club</Link>,
+            screenings that spotlight the costumes of well-loved films, with an
+            hour to mingle beforehand and dressing up encouraged. Next up is
+            Secretary, followed by a quiz, at{" "}
+            <Venue
+              name="Rhizomatic!"
+              url="https://www.instagram.com/rhizomatic.ldn/"
+            />{" "}
+            on 25 November.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: ({ Venue }) => (
+          <>
+            Added <Link href="/film-clubs/cine-brazil">Cine Brazil</Link>, which
+            brings Brazilian cinema to UK audiences. Next up is the UK premiere
+            of Gugu&apos;s World, Brazil&apos;s submission for next year&apos;s
+            Academy Awards, at{" "}
+            <Venue
+              name="The Lexi Cinema"
+              url="https://thelexicinema.co.uk/TheLexiCinema.dll/WhatsOn"
+            />{" "}
+            from 15 November.
+          </>
+        ),
+      },
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            A new <Link href="/privacy">privacy page</Link> sets out what an
+            account holds and why, which services handle it, what the site keeps
+            in your browser, how long it&rsquo;s kept, and how to see, export,
+            correct or delete it.
+          </>
+        ),
+      },
     ],
   },
   {

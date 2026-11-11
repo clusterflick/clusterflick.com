@@ -702,4 +702,39 @@ export const FILM_CLUBS: FilmClub[] = [
       },
     ],
   },
+  {
+    id: "passenger-cinema",
+    name: "Passenger Cinema",
+    kind: "world",
+    url: "https://passengercinema.com",
+    aliases: [],
+    matchers: [
+      // Luma credits the host as "Hosted by Passenger Cinema"; the titles
+      // name the country rather than the club ("Turkmen Evening").
+      { [FilterId.ShowingTitleSearch]: "Passenger Cinema" },
+      { [FilterId.PerformanceNotesSearch]: "Passenger Cinema" },
+    ],
+  },
+  {
+    id: "fashion-film-club",
+    name: "Fashion Film Club",
+    kind: "experience",
+    url: "https://www.instagram.com/thefashionfilmclub/",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Fashion Film Club" },
+      { [FilterId.PerformanceNotesSearch]: "Fashion Film Club" },
+    ],
+  },
+  {
+    id: "cine-brazil",
+    name: "Cine Brazil",
+    kind: "world",
+    url: "https://www.cinebrazil.org",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Cine Brazil" },
+      { [FilterId.PerformanceNotesSearch]: "Cine Brazil" },
+    ],
+  },
 ];
