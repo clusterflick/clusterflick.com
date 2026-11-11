@@ -50,7 +50,7 @@ const PROCESSORS: Entry[] = [
   {
     name: "Cloudflare",
     value:
-      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below).",
+      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below), and the one that reads a public profile from Firebase to show it.",
   },
   {
     name: "GitHub Pages",
@@ -173,7 +173,10 @@ export default function PrivacyPage() {
           <li>
             <strong>Your public profile settings</strong>, if you set one up:
             the handle you chose and whether your profile is shown. Nothing on
-            it is public until you switch it on.
+            it is public until you switch it on. While it&apos;s on, anyone can
+            see your handle, how many films are on your watchlist and Seen list,
+            and the most recent of each, and search engines may list it. Never
+            your email address.
           </li>
           <li>
             <strong>Account records Firebase keeps itself</strong>, such as when

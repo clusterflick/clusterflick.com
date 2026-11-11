@@ -199,6 +199,10 @@ export const SignedInPublicProfilePrivate: Story = {
     await expect(
       canvas.getByText(/clusterflick\.com\/u\/film-fan\//),
     ).toBeInTheDocument();
+    // Works while private: the owner is told why it isn't showing.
+    await expect(
+      canvas.getByRole("link", { name: "View your profile" }),
+    ).toHaveAttribute("href", "/u/film-fan/");
   },
 };
 

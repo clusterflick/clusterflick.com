@@ -63,6 +63,12 @@ describe("sitemap", () => {
     expect(urls).toContain("https://clusterflick.com/privacy/");
   });
 
+  it("leaves out the profile shell and profiles, which are found by links", async () => {
+    const urls = (await sitemap()).map(({ url }) => url);
+
+    expect(urls.filter((url) => /\/(profile-shell|u)\//.test(url))).toEqual([]);
+  });
+
   it("never stamps a page with the build time", async () => {
     const entries = await sitemap();
 

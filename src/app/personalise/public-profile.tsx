@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import Button from "@/components/button";
+import Button, { ButtonAnchor } from "@/components/button";
 import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
@@ -210,10 +210,19 @@ export function PublicProfileSettings({
               }}
             />
             <p className={styles.managementText}>
-              Profile pages aren&apos;t live yet. When they are, yours will be
-              at clusterflick.com{getProfilePath(profile.handle)}, showing your
-              Seen list and watchlist, while this is on.
+              While this is on, anyone with the link can see your Seen list and
+              watchlist at clusterflick.com{getProfilePath(profile.handle)}.
+              While it&apos;s off, only you can open it.
             </p>
+            {/* An anchor, not a client-side link: the page is the profiles
+                Worker's, and isn't in the static export. */}
+            <ButtonAnchor
+              href={getProfilePath(profile.handle)}
+              variant="secondary"
+              size="sm"
+            >
+              View your profile
+            </ButtonAnchor>
           </>
         ) : (
           <p className={styles.managementText}>
