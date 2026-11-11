@@ -52,4 +52,3 @@ describe("parseProfile", () => {
     expect(parseProfile({ public: true })).toBeNull();
   });
 });
-

@@ -2051,10 +2051,9 @@ profile never publishes anything by itself.
 
 **Public profiles** (`@/lib/user-profile`) are a page at `/u/<handle>/`
 showing a reader's Seen list and watchlist, for readers granted
-`publicProfile`. Phase one, built, is the handle and the switch; the page
-itself (a static shell filled in by a Cloudflare Worker,
-`clusterflick/api-profiles`) is phase two, so nothing is public yet and the
-settings say so.
+`publicProfile` who switch it on. The site holds the handle, the switch and a
+shell page; a Cloudflare Worker, `clusterflick/api-profiles`, serves the
+profile.
 
 - **Two documents name each other.** `handles/{handle}` holds `{ uid }`: a
   document id exists once, which makes handles unique, and it is the Worker's
@@ -2082,10 +2081,33 @@ settings say so.
 - **The settings are a "Public profile" panel in the account bar**
   (`public-profile.tsx`), shown only with the capability: the handle, saved
   after checking it's free, with a warning before a rename frees the old
-  address, and the switch, disabled until a handle is saved. A refused batch
+  address, the switch, disabled until a handle is saved, and a link to the
+  page, which works while private too. A refused batch
   is reported as "taken", since another reader claiming the handle between
   the check and the save is the likely cause, and logged in case it isn't.
   `readProfile` reads it once a session, as `readCapabilities` does.
+- **The page is `/profile-shell/`, filled in by the Worker.** The export has
+  no page per reader, so the Worker owns `/u/*`: it reads the profile from
+  Firestore as a service account (nothing there is public), fetches this
+  page, and puts the profile in a `<script id="profile-data">`
+  (`@/lib/user-profile/page-data`). The page reads it after hydration, and
+  links the films that are showing, as `/personalise` does. Unknown, private
+  and revoked profiles are one not-found response, so they look alike to
+  everyone but the owner, recognised by their own profile document (only
+  they can read it), who is told theirs is private. The Worker's README has
+  the routes and what it sends.
+- **The shell's `<head>` is the Worker's to set.** Next renders the `<head>`
+  again in the browser from the page's inline RSC payload, so whatever the
+  shell's metadata says comes back after hydration. So it has no `robots` or
+  canonical (the Worker adds them: `noindex` when not found, `index, follow`
+  and `/u/<handle>/` for a public profile), and its title and description
+  are the fixed strings `PROFILE_SHELL_TITLE` and `PROFILE_SHELL_DESCRIPTION`,
+  which the Worker replaces in the `<head>` and the payload alike: keep them
+  plain text, and change them in both repos together. `/profile-shell/`
+  itself is kept from crawlers by `robots.txt` and left out of the sitemap.
+  Links to a profile are plain anchors (`ButtonAnchor`), never `next/link`:
+  the export has no such route to navigate to. `next dev` sends `/u/*` to the
+  Worker's `wrangler dev` on port 8788.
 - **The rules are tested against the emulator** (`firestore-rules/`,
   `npm run test:rules`, and a CI job of its own), through Firestore Lite with
   the module's own helpers, so the tests send the batches the site sends.

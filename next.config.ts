@@ -13,15 +13,18 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_DATA_FILENAME: getMetaDataFilename(),
     NEXT_PUBLIC_VENUE_COUNT_FLOOR: String(getVenueCountFloor()),
   },
-  // In production the TMDB search Worker (clusterflick/api-tmdb-search) sits
-  // on this path in front of the static site. `next dev` sends it to the
-  // Worker's `wrangler dev` instead; a static export can't have rewrites.
+  // In production two Workers sit in front of the static site: the TMDB
+  // search (clusterflick/api-tmdb-search) and public profiles
+  // (clusterflick/api-profiles). `next dev` sends their paths to each one's
+  // `wrangler dev` instead; a static export can't have rewrites.
   ...(process.env.NODE_ENV === "development" && {
     rewrites: async () => [
       {
         source: "/api/tmdb/:path*",
         destination: "http://localhost:8787/api/tmdb/:path*",
       },
+      { source: "/u", destination: "http://localhost:8788/u" },
+      { source: "/u/:path*", destination: "http://localhost:8788/u/:path*" },
     ],
   }),
   experimental: {
