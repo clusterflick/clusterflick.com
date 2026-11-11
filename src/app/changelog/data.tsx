@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-11",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Armenian Film Festival London"
+              url="https://armenianartsandfilm.com/film/"
+            />
+            , four days of Armenian cinema at the Institute of Contemporary
+            Arts: new films from Armenia and the Diaspora alongside classics,
+            restorations, shorts and masterclasses.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-09",
     changes: [
       {
