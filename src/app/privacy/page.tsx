@@ -167,6 +167,10 @@ export default function PrivacyPage() {
             on your Seen list.
           </li>
           <li>
+            <strong>Features switched on for your account</strong>, if we have
+            given you early access to any, with when each was switched on.
+          </li>
+          <li>
             <strong>Account records Firebase keeps itself</strong>, such as when
             the account was created and last signed in to.
           </li>
@@ -239,11 +243,11 @@ export default function PrivacyPage() {
         <p className={styles.body}>
           Deleting your account from{" "}
           <Link href="/personalise">Personalise</Link> deletes your lists, the
-          film details that go with them, and the account itself, straight away.
-          Removing a single film from a list removes it from that list. Metadata
-          about the film (duration, director, etc.) remains until the account is
-          deleted. The hosts above keep their own request logs for as long as
-          their own terms say.
+          film details that go with them, any features switched on for you, and
+          the account itself, straight away. Removing a single film from a list
+          removes it from that list. Metadata about the film (duration,
+          director, etc.) remains until the account is deleted. The hosts above
+          keep their own request logs for as long as their own terms say.
         </p>
       </ContentSection>
 

@@ -20,6 +20,7 @@ Pages at clusterflick.com.
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s release log into `/release-log/`, for `/datasets/status` (see Data Status)
 - `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB ids (see Film Lists); a dry run unless given `-- --write`; review the diff and commit it
 - `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
+- `npm run grant-capability -- <email> <capability>` — Grant a reader a capability (see Capabilities); `--revoke` takes it away, and it's a dry run unless given `--write`
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -2014,11 +2015,44 @@ before `applyUrlParams`, which replaces the whole address, hash included. The pa
 will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 
+**Capabilities are features granted one account at a time**
+(`@/lib/user-capabilities`): `emailAlerts` and `publicProfile` so far, each
+in `CAPABILITIES` with its copy, a `Record` so a new one won't compile
+without. A capability says a reader _may_ use a feature, and whether they do
+is their own setting, so everything acting on one checks both: the alerts job
+looks for the capability and then the reader's alerts, the profile Worker for
+the capability and then the profile being public. Revoking one switches the
+feature off and leaves the reader's settings alone, and being allowed a public
+profile never publishes anything by itself.
+
+- **They live in `users/{uid}/meta/capabilities`**, a map of id →
+  `{ grantedAt }`. Not in `users/{uid}`: the reader writes that, and its rule
+  allows only the list fields, so a capability there would fail every later
+  list write. The rules let the reader read and delete it (with their
+  account) and never write it; only `npm run grant-capability`, with the
+  Admin SDK, does. Its dry run and `--write` follow `migrate-film-details`,
+  and it refuses an id the registry doesn't hold (repeated in
+  `scripts/lib/capabilities.js`, held to the registry by a test), since the
+  site ignores unknown ids and a typo would be a grant that does nothing.
+- **Hiding a page is not the guard.** The site is static, so a configuration
+  page shown only to a reader with the capability is a convenience. What
+  enforces it is the rules on that feature's own writes (a `get()` of the
+  capabilities document) and the job or Worker running it, each checking for
+  itself.
+- **Read on request, once a session** (`readCapabilities` on the user
+  context, cached like the film details), as only `/personalise` reads them
+  so far. A grant shows on the reader's next visit.
+- **While a feature is being built, granting it shows a "Coming soon" panel**
+  on `/personalise` under the account bar (`ComingSoon`), naming each granted
+  capability with its `comingSoon` copy. Nothing renders without one, or if
+  the read fails. When a feature ships, its entry stops being "coming soon"
+  and the panel gives way to the feature's own settings.
+
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.
 
-**Deleting an account deletes the lists first**, film details included (a
-subcollection isn't deleted with its parent): once the account is gone, the
+**Deleting an account deletes the lists first**, film details and
+capabilities included (a subcollection isn't deleted with its parent): once the account is gone, the
 rules let nobody delete its documents. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
 finish.
