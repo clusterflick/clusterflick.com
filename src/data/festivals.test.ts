@@ -49,6 +49,7 @@ const OTHER_NOTES: [note: string, festivalId: string][] = [
     "fashion-in-film-festival",
   ],
   ["Part of Native Spirit Festival", "native-spirit-festival"],
+  ["Part of Armenian Film Festival 2026", "armenian-film-festival"],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {

@@ -1069,4 +1069,22 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "armenian-film-festival",
+    name: "Armenian Film Festival London",
+    url: "https://armenianartsandfilm.com/film/",
+    aliases: ["affl", "armenian-film-festival-london"],
+    matchers: [
+      {
+        // The ICA, the festival's home, notes each screening "Part of
+        // Armenian Film Festival 2026"
+        [FilterId.PerformanceNotesSearch]: "Armenian Film Festival",
+      },
+      {
+        // Matches "Armenian Film Festival Masterclass: …", and the festival's
+        // full name should a venue put it in the title instead
+        [FilterId.ShowingTitleSearch]: "Armenian Film Festival",
+      },
+    ],
+  },
 ];
