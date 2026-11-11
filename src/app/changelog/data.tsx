@@ -110,8 +110,8 @@ export const CHANGELOG: ChangelogDay[] = [
             Added{" "}
             <Link href="/film-clubs/fashion-film-club">Fashion Film Club</Link>,
             screenings that spotlight the costumes of well-loved films, with an
-            hour to mingle beforehand and a quiz afterwards. Next up is
-            Secretary at{" "}
+            hour to mingle beforehand and dressing up encouraged. Next up is
+            Secretary, followed by a quiz, at{" "}
             <Venue
               name="Rhizomatic!"
               url="https://www.instagram.com/rhizomatic.ldn/"
