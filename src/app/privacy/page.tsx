@@ -32,8 +32,10 @@ const PROCESSORS: Entry[] = [
     name: "Google Firebase",
     value: (
       <>
-        Holds your account and your lists, and sends your sign-in emails. Its
-        servers may be outside the UK; Google covers such transfers under its{" "}
+        Stores your lists, and the film details that go with them, in London (
+        <code className={styles.inlineCode}>europe-west2</code>). Your account
+        and sign-in emails are handled by Firebase Authentication, which Google
+        may process outside the UK; it covers such transfers under its{" "}
         <a
           href="https://firebase.google.com/terms/data-processing-terms"
           target="_blank"
