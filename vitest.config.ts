@@ -35,6 +35,18 @@ export default defineConfig({
       },
       {
         extends: true,
+        // The Firestore rules, against the emulator: `npm run test:rules`
+        // starts it (it needs Java) and runs this project inside it.
+        test: {
+          name: "rules",
+          environment: "node",
+          include: ["firestore-rules/**/*.test.ts"],
+          // One emulator, cleared between tests, so the files take turns.
+          fileParallelism: false,
+        },
+      },
+      {
+        extends: true,
         plugins: [
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest

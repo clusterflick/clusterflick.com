@@ -43,6 +43,13 @@ import {
   fetchCapabilities,
   type UserCapabilities,
 } from "@/lib/user-capabilities";
+import {
+  deleteProfile,
+  fetchProfile,
+  isHandleTaken,
+  saveProfile as saveProfileToDocs,
+  type UserProfile,
+} from "@/lib/user-profile";
 
 /**
  * - `unavailable` — this build has no Firebase config; personalisation is off.
@@ -82,7 +89,7 @@ export type UserContextType = {
    * rejected it.
    */
   getIdToken: (forceRefresh?: boolean) => Promise<string>;
-  /** Deletes the user's lists and then their account. */
+  /** Deletes the user's lists and profile, and then their account. */
   deleteAccount: () => Promise<void>;
   /**
    * Adds a film with its details, saved together or not at all — see
@@ -131,6 +138,18 @@ export type UserContextType = {
    * needs them so far.
    */
   readCapabilities: () => Promise<UserCapabilities>;
+  /**
+   * The reader's public profile settings, or null before they claim a
+   * handle — see `UserProfile`. Read on request and cached for the session.
+   */
+  readProfile: () => Promise<UserProfile | null>;
+  /**
+   * Saves the profile, claiming its handle (and releasing the old one) in
+   * the same write. Rejects if the handle was claimed by someone else first.
+   */
+  saveProfile: (profile: UserProfile) => Promise<void>;
+  /** Whether someone else holds the (normalised) handle. */
+  isHandleTaken: (handle: string) => Promise<boolean>;
 };
 
 /**
@@ -219,6 +238,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const capabilitiesRef = useRef<{
     uid: string;
     capabilities: Promise<UserCapabilities>;
+  } | null>(null);
+  /** The profile, read once a session and replaced by every save. */
+  const profileRef = useRef<{
+    uid: string;
+    profile: Promise<UserProfile | null>;
   } | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -320,6 +344,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Data first: once the account is gone, the rules no longer let anyone
     // delete its document. If the account deletion then needs a fresh sign-in,
     // the lists are already gone and the caller asks for one.
+    // The profile before the capabilities, though its deletion needs none:
+    // the handle goes with it, freeing it for someone else.
+    await deleteProfile(db, current.uid);
+    profileRef.current = null;
     await deleteCapabilities(db, current.uid);
     capabilitiesRef.current = null;
     await deleteUserLists(db, current.uid);
@@ -536,6 +564,49 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return capabilities;
   }, [getServices, user]);
 
+  const readProfile = useCallback<UserContextType["readProfile"]>(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    const cached = profileRef.current;
+    if (cached?.uid === user.uid) return cached.profile;
+    const profile = fetchProfile(db, user.uid);
+    profileRef.current = { uid: user.uid, profile };
+    // A failed read isn't kept, so the next caller tries again.
+    profile.catch(() => {
+      if (profileRef.current?.profile === profile) {
+        profileRef.current = null;
+      }
+    });
+    return profile;
+  }, [getServices, user]);
+
+  const saveProfile = useCallback<UserContextType["saveProfile"]>(
+    async (next) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      const previous = await readProfile();
+      try {
+        await saveProfileToDocs(db, user.uid, next, previous);
+      } catch (error) {
+        // The cached profile may be what made the batch fail (changed in
+        // another tab), so the next read goes back to Firestore.
+        profileRef.current = null;
+        throw error;
+      }
+      profileRef.current = { uid: user.uid, profile: Promise.resolve(next) };
+    },
+    [getServices, user, readProfile],
+  );
+
+  const checkHandleTaken = useCallback<UserContextType["isHandleTaken"]>(
+    async (handle) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      return isHandleTaken(db, handle, user.uid);
+    },
+    [getServices, user],
+  );
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -556,6 +627,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       removeFavouriteVenue,
       readFilmDetails,
       readCapabilities,
+      readProfile,
+      saveProfile,
+      isHandleTaken: checkHandleTaken,
     }),
     [
       status,
@@ -575,6 +649,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       removeFavouriteVenue,
       readFilmDetails,
       readCapabilities,
+      readProfile,
+      saveProfile,
+      checkHandleTaken,
     ],
   );
 
@@ -612,6 +689,9 @@ export function MockUserProvider({
     removeFavouriteVenue: noop,
     readFilmDetails: async () => ({ films: {}, people: {} }),
     readCapabilities: async () => ({}),
+    readProfile: async () => null,
+    saveProfile: noop,
+    isHandleTaken: async () => false,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

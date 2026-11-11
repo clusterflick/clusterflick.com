@@ -21,6 +21,7 @@ Pages at clusterflick.com.
 - `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB ids (see Film Lists); a dry run unless given `-- --write`; review the diff and commit it
 - `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
 - `npm run grant-capability -- <email> <capability>` — Grant a reader a capability (see Capabilities); `--revoke` takes it away, and it's a dry run unless given `--write`
+- `npm run test:rules` — Test `firestore.rules` against the Firestore emulator (see Public Profiles); needs Java (a JDK 21, e.g. `brew install openjdk@21` on its `PATH`)
 - `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
@@ -2045,13 +2046,56 @@ profile never publishes anything by itself.
 - **While a feature is being built, granting it shows a "Coming soon" panel**
   on `/personalise` under the account bar (`ComingSoon`), naming each granted
   capability with its `comingSoon` copy. Nothing renders without one, or if
-  the read fails. When a feature ships, its entry stops being "coming soon"
-  and the panel gives way to the feature's own settings.
+  the read fails. When a feature ships, its `comingSoon` becomes `null` and
+  the panel gives way to the feature's own settings, as Public profile's has.
+
+**Public profiles** (`@/lib/user-profile`) are a page at `/u/<handle>/`
+showing a reader's Seen list and watchlist, for readers granted
+`publicProfile`. Phase one, built, is the handle and the switch; the page
+itself (a static shell filled in by a Cloudflare Worker,
+`clusterflick/api-profiles`) is phase two, so nothing is public yet and the
+settings say so.
+
+- **Two documents name each other.** `handles/{handle}` holds `{ uid }`: a
+  document id exists once, which makes handles unique, and it is the Worker's
+  lookup. `users/{uid}/meta/profile` holds `{ handle, public }`, readable by
+  its owner only. Every change is one batch over both (`saveProfile`,
+  `deleteProfile`), and the rules accept a write only if, after the batch,
+  each still names the other: a claim creates both, a rename deletes the old
+  handle and creates the new one, and the profile can't be deleted without
+  its handle, so no handle is left reserved with nothing behind it. A handle
+  is never updated, and anyone signed in may get one (to be told it's taken)
+  but nobody may list them.
+- **Lowercase everywhere**: the address, the ids and what the page shows. The
+  field lowercases as it's typed, so there is one spelling to keep in step.
+  The pattern, lengths and reserved list are in `firestore.rules` as well as
+  the module, and a unit test holds the rules' copy to
+  `reserved-handles.json`. The list is short and curated, not a published
+  blocklist: handles sit under `/u/`, so they can't collide with a page, and
+  what's left is impersonating the site.
+- **Claiming, renaming and `public: true` need the capability;
+  `public: false` never does**, so a reader whose capability was revoked can
+  still take their profile down. Revoking deletes nothing: the page stops
+  being served, the handle stays theirs, and a new grant restores it.
+  `/personalise` then shows a notice offering to switch it off, in place of
+  the panel.
+- **The settings are a "Public profile" panel in the account bar**
+  (`public-profile.tsx`), shown only with the capability: the handle, saved
+  after checking it's free, with a warning before a rename frees the old
+  address, and the switch, disabled until a handle is saved. A refused batch
+  is reported as "taken", since another reader claiming the handle between
+  the check and the save is the likely cause, and logged in case it isn't.
+  `readProfile` reads it once a session, as `readCapabilities` does.
+- **The rules are tested against the emulator** (`firestore-rules/`,
+  `npm run test:rules`, and a CI job of its own), through Firestore Lite with
+  the module's own helpers, so the tests send the batches the site sends.
+  Change the rules, run them. Deploy the rules before the site, since the
+  site's writes fail until they're live.
 
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.
 
-**Deleting an account deletes the lists first**, film details and
+**Deleting an account deletes the lists first**, film details, profile and
 capabilities included (a subcollection isn't deleted with its parent): once the account is gone, the
 rules let nobody delete its documents. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
@@ -2122,6 +2166,8 @@ the short name.
 
 - **Storybook + Vitest:** Component tests run via `@storybook/addon-vitest` with
   Playwright browser provider (headless Chromium)
+- **Firestore rules:** `npm run test:rules` runs `firestore-rules/` against
+  the emulator (needs Java), in a CI job of its own
 - **Playwright:** E2E smoke tests in `smoke-tests/` targeting the deployed site
   (configurable via `SITE_URL` env var)
 - **Chromatic:** Visual regression testing via CI integration

@@ -28,8 +28,11 @@ export type UserCapabilities = Partial<Record<CapabilityId, CapabilityGrant>>;
 
 export type CapabilityDefinition = {
   title: string;
-  /** Shown on /personalise while the feature is still being built. */
-  comingSoon: string;
+  /**
+   * Shown on /personalise while the feature is still being built; null once
+   * it has settings of its own there.
+   */
+  comingSoon: string | null;
 };
 
 /**
@@ -45,8 +48,7 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
   },
   [CapabilityId.PublicProfile]: {
     title: "Public profile",
-    comingSoon:
-      "Soon you'll be able to share a page of the films you've seen and want to see, at an address of your own. It stays private until you choose to make it public.",
+    comingSoon: null,
   },
 };
 

@@ -19,6 +19,7 @@
     "carry-forward-static": "node ./scripts/carry-forward-static.js",
     "generate-summary": "node ./scripts/generate-summary.mjs",
     "test": "vitest run --project unit",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-clusterflick \"vitest run --project rules\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --stats-json",
     "smoke-test": "playwright test --config=smoke-tests/playwright.config.ts",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.58.1",
     "@storybook/addon-a11y": "^10.2.6",
     "@storybook/addon-docs": "^10.2.6",
@@ -69,6 +71,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "firebase-admin": "^14.5.0",
+    "firebase-tools": "^15.35.0",
     "lighthouse": "^13.0.3",
     "msw": "^2.12.8",
     "msw-storybook-addon": "^2.0.6",
