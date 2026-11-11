@@ -2069,7 +2069,7 @@ settings say so.
 - **Lowercase everywhere**: the address, the ids and what the page shows. The
   field lowercases as it's typed, so there is one spelling to keep in step.
   The pattern, lengths and reserved list are in `firestore.rules` as well as
-  the module, and a unit test holds the rules' copy to
+  the module, and a test beside the rules tests holds the rules' copy to
   `reserved-handles.json`. The list is short and curated, not a published
   blocklist: handles sit under `/u/`, so they can't collide with a page, and
   what's left is impersonating the site.

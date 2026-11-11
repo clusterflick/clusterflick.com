@@ -29,7 +29,6 @@ jobs:
           distribution: temurin
           java-version: "21"
       - run: npm ci
-      - run: npm test -- src/lib/user-profile
       - run: npm run test:rules
 
   lint_and_test:
