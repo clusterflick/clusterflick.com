@@ -240,9 +240,10 @@ export default function PrivacyPage() {
           Deleting your account from{" "}
           <Link href="/personalise">Personalise</Link> deletes your lists, the
           film details that go with them, and the account itself, straight away.
-          Removing a single film from a list leaves its details behind until the
-          account goes. The hosts above keep their own request logs for as long
-          as their own terms say.
+          Removing a single film from a list removes it from that list. Metadata
+          about the film (duration, director, etc.) remains until the account is
+          deleted. The hosts above keep their own request logs for as long as
+          their own terms say.
         </p>
       </ContentSection>
 
