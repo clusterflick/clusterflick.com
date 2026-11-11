@@ -103,8 +103,9 @@ export const SignedInEmpty: Story = {
 };
 
 /**
- * A reader granted capabilities whose features are still being built: the
- * banner under the account bar names them.
+ * A reader granted capabilities: the banner under the account bar names the
+ * ones still being built. Public profile has shipped, so it gets its own
+ * panel in the account bar instead.
  */
 export const SignedInComingSoon: Story = {
   args: {
@@ -127,7 +128,128 @@ export const SignedInComingSoon: Story = {
       }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Email alerts.")).toBeInTheDocument();
-    await expect(canvas.getByText("Public profile.")).toBeInTheDocument();
+    await expect(canvas.queryByText("Public profile.")).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", { name: "Public profile" }),
+    ).toBeInTheDocument();
+  },
+};
+
+const PROFILE_READER = {
+  status: "signed-in",
+  email: "reader@example.com",
+  lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+  favouriteVenues: {},
+} satisfies Partial<UserContextType>;
+
+const GRANTED_PUBLIC_PROFILE = async () => ({
+  [CapabilityId.PublicProfile]: { grantedAt: 0 },
+});
+
+async function openPublicProfile(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "Public profile" }),
+  );
+  return canvas;
+}
+
+/**
+ * Granted a public profile, not yet set up: a handle to claim, and the switch
+ * waits for it. A handle that can't be claimed says why as it's typed.
+ */
+export const SignedInPublicProfileNoHandle: Story = {
+  args: {
+    user: {
+      ...PROFILE_READER,
+      readCapabilities: GRANTED_PUBLIC_PROFILE,
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openPublicProfile(canvasElement);
+    await expect(canvas.getByText(/Save a handle first/)).toBeInTheDocument();
+    await expect(canvas.queryByRole("checkbox")).not.toBeInTheDocument();
+    const input = canvas.getByRole("textbox", { name: "Handle" });
+    await userEvent.type(input, "Admin");
+    // Lowercased as typed.
+    await expect(input).toHaveValue("admin");
+    await expect(
+      canvas.getByText("That handle isn't available"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", { name: "Save handle" }),
+    ).toBeDisabled();
+  },
+};
+
+/** A handle saved, the profile private: the switch is there, off. */
+export const SignedInPublicProfilePrivate: Story = {
+  args: {
+    user: {
+      ...PROFILE_READER,
+      readCapabilities: GRANTED_PUBLIC_PROFILE,
+      readProfile: async () => ({ handle: "film-fan", public: false }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openPublicProfile(canvasElement);
+    await expect(
+      canvas.getByRole("checkbox", { name: "Public" }),
+    ).not.toBeChecked();
+    await expect(
+      canvas.getByText(/clusterflick\.com\/u\/film-fan\//),
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * Public, and about to change the handle: the old address stops working, so
+ * it asks first.
+ */
+export const SignedInPublicProfileRenaming: Story = {
+  args: {
+    user: {
+      ...PROFILE_READER,
+      readCapabilities: GRANTED_PUBLIC_PROFILE,
+      readProfile: async () => ({ handle: "film-fan", public: true }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openPublicProfile(canvasElement);
+    await expect(
+      canvas.getByRole("checkbox", { name: "Public" }),
+    ).toBeChecked();
+    const input = canvas.getByRole("textbox", { name: "Handle" });
+    await userEvent.clear(input);
+    await userEvent.type(input, "film-buff");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Change handle" }),
+    );
+    await expect(
+      canvas.getByText(/\/u\/film-fan\/ will stop working straight away/),
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * The capability taken away while the profile was public: no panel, and a
+ * notice offering the one thing left to do, switching it off.
+ */
+export const SignedInPublicProfileWithdrawn: Story = {
+  args: {
+    user: {
+      ...PROFILE_READER,
+      readProfile: async () => ({ handle: "film-fan", public: true }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("button", { name: "Switch it off" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("button", { name: "Public profile" }),
+    ).not.toBeInTheDocument();
   },
 };
 

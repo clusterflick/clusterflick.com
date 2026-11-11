@@ -224,8 +224,10 @@
     order: 1;
   }
 
-  /* The account panel has two short sections, side by side. */
-  .accountManagement .managementSection:first-child {
+  /* The account and public profile panels have two short sections, side
+     by side. */
+  .accountManagement .managementSection:first-child,
+  .profileManagement .managementSection:first-child {
     grid-column: auto;
   }
 }
@@ -736,7 +738,8 @@
 /* Features granted to the reader that are still being built. Pink, the
    colour of the watchlist panel on /updates: news about the reader's own
    account. */
-.comingSoon {
+.comingSoon,
+.profileNotice {
   margin: 0 0 40px;
   padding: 16px 20px;
   font-size: 14px;
@@ -766,4 +769,15 @@
 
 .comingSoonList strong {
   color: var(--color-white);
+}
+
+/* The coming-soon panel's box, for the one thing a reader whose public
+   profile was withdrawn can still do about it. */
+.profileNoticeText {
+  margin: 0 0 12px;
+}
+
+/* Under the handle field, spaced as the error line is. */
+.renameConfirm {
+  margin-top: 12px;
 }

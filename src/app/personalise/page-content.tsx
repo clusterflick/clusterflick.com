@@ -56,6 +56,12 @@ import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
+import {
+  ProfileWithdrawnNotice,
+  PublicProfileSettings,
+  usePublicProfile,
+  type PublicProfileState,
+} from "./public-profile";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -239,11 +245,11 @@ function isSignInLink(url: URL) {
 const STORE_NOTE = (
   <>
     Your email address, so we can send you sign-in links, the films and venues
-    you add to your lists, and any features we&apos;ve switched on for your
-    account. Nothing else. We never sell your data. We never share your data
-    beyond the services the site runs on. You can delete your account, and
-    everything in it, from this page at any time.{" "}
-    <Link href="/privacy">How we handle your data</Link>
+    you add to your lists, any features we&apos;ve switched on for your account,
+    and your public profile&apos;s handle if you set one up. Nothing else. We
+    never sell your data. We never share your data beyond the services the site
+    runs on. You can delete your account, and everything in it, from this page
+    at any time. <Link href="/privacy">How we handle your data</Link>
   </>
 );
 
@@ -490,6 +496,7 @@ function SignedIn({
   // push the lists a screen down.
   const [panel, setPanel] = useState<AccountPanel | null>(null);
   const filmSearchRef = useRef<HTMLElement>(null);
+  const publicProfile = usePublicProfile();
 
   // The empty watchlist's "search for a film" takes the reader to the search
   // above it.
@@ -510,8 +517,17 @@ function SignedIn({
         onPanelChange={setPanel}
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
+        publicProfile={publicProfile?.granted ? publicProfile : null}
       />
       <ComingSoon />
+      {publicProfile &&
+        !publicProfile.granted &&
+        publicProfile.profile?.public && (
+          <ProfileWithdrawnNotice
+            profile={publicProfile.profile}
+            onSaved={publicProfile.onSaved}
+          />
+        )}
       {/* At the top: they're what a reader with a long Seen list comes back
           for, and the lists below are long. */}
       {lists && (
@@ -546,18 +562,21 @@ function SignedIn({
   );
 }
 
-type AccountPanel = "lists" | "account";
+type AccountPanel = "lists" | "profile" | "account";
 
 function AccountBar({
   panel,
   onPanelChange,
   showEditing,
   onShowEditingChange,
+  publicProfile,
 }: {
   panel: AccountPanel | null;
   onPanelChange: (panel: AccountPanel | null) => void;
   showEditing: boolean;
   onShowEditingChange: (show: boolean) => void;
+  /** Only for a reader with the capability: everyone else sees no panel. */
+  publicProfile: PublicProfileState | null;
 }) {
   const { email, signOut } = useUserContext();
 
@@ -585,6 +604,7 @@ function AccountBar({
       <div className={styles.toolbar}>
         <div className={styles.toolbarGroup}>
           {panelToggle("lists", "Manage lists")}
+          {publicProfile && panelToggle("profile", "Public profile")}
           {panelToggle("account", "Manage account")}
         </div>
         <div className={clsx(styles.toolbarGroup, styles.toolbarAccount)}>
@@ -604,6 +624,16 @@ function AccountBar({
           />
         )}
       </div>
+      {publicProfile && (
+        <div id="personalise-profile" hidden={panel !== "profile"}>
+          {panel === "profile" && (
+            <PublicProfileSettings
+              profile={publicProfile.profile}
+              onSaved={publicProfile.onSaved}
+            />
+          )}
+        </div>
+      )}
       <div id="personalise-account" hidden={panel !== "account"}>
         {panel === "account" && <AccountManagement />}
       </div>
@@ -639,7 +669,8 @@ function AccountManagement() {
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Delete account</h3>
         <p className={styles.managementText}>
-          Deletes your account and every list in it. This can&apos;t be undone.
+          Deletes your account, every list in it and your public profile. This
+          can&apos;t be undone.
         </p>
         <div className={styles.managementActions}>
           {confirmingDelete ? (

@@ -65,3 +65,7 @@ storybook-static
 # Firebase service-account keys, for scripts/migrate-film-details.js. Never commit one.
 *-firebase-adminsdk-*.json
 *service-account*.json
+
+# Firestore emulator
+firestore-debug.log
+firebase-debug.log

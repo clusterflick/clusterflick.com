@@ -2,8 +2,8 @@ rules_version = '2';
 
 // Each user may read and write only their own documents, and only the fields
 // the site writes: the film lists and the favourite venues, and the listed
-// films' details. Their capabilities they may only read. Everything else is
-// denied by default.
+// films' details, and their public profile with its handle. Their
+// capabilities they may only read. Everything else is denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
@@ -26,9 +26,79 @@ service cloud.firestore {
     match /users/{userId}/meta/capabilities {
       allow read, delete: if isOwner(userId);
     }
+
+    // A reader's public profile settings: their handle and whether the page
+    // is shown (see @/lib/user-profile). Its handle document must name them
+    // back after every write, so the two can't disagree.
+    match /users/{userId}/meta/profile {
+      allow read: if isOwner(userId);
+      // Only with its handle, so no handle is left reserved with no profile
+      // behind it.
+      allow delete: if isOwner(userId)
+        && !existsAfter(handlePath(resource.data.handle));
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['handle', 'public'])
+        && request.resource.data.handle is string
+        && request.resource.data.public is bool
+        && existsAfter(handlePath(request.resource.data.handle))
+        && getAfter(handlePath(request.resource.data.handle)).data.uid == userId
+        // Publishing or taking a new handle needs the capability; switching
+        // the page off never does, so a reader whose capability was revoked
+        // can still take it down.
+        && (hasCapability(userId, 'publicProfile')
+          || (resource != null
+            && request.resource.data.public == false
+            && request.resource.data.handle == resource.data.handle));
+    }
+
+    // One per claimed handle, holding its owner's uid: a document id exists
+    // once, which is what makes handles unique, and the profile Worker looks
+    // readers up by it. Any signed-in reader may get one, to be told it's
+    // taken; nobody may list them. Never updated: a rename deletes one and
+    // creates another, in the same batch as the profile.
+    match /handles/{handle} {
+      allow get: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && isClaimableHandle(handle)
+        && hasCapability(request.auth.uid, 'publicProfile')
+        && getAfter(profilePath(request.auth.uid)).data.handle == handle;
+      // A rename, or the profile going with the account.
+      allow delete: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && (!existsAfter(profilePath(request.auth.uid))
+          || getAfter(profilePath(request.auth.uid)).data.handle != handle);
+    }
+
+    // Inside this match, where `database` is in scope.
+    function hasCapability(userId, capability) {
+      let path = /databases/$(database)/documents/users/$(userId)/meta/capabilities;
+      return exists(path) && capability in get(path).data;
+    }
+
+    function profilePath(userId) {
+      return /databases/$(database)/documents/users/$(userId)/meta/profile;
+    }
+
+    function handlePath(handle) {
+      return /databases/$(database)/documents/handles/$(handle);
+    }
   }
 
   function isOwner(userId) {
     return request.auth != null && request.auth.uid == userId;
+  }
+
+  // As getHandleProblem in @/lib/user-profile. The reserved list is
+  // reserved-handles.json, held to this copy by a test.
+  function isClaimableHandle(handle) {
+    return handle.matches('^[a-z0-9_-]{3,30}$')
+      && !(handle in [
+        'about', 'admin', 'administrator', 'api', 'cinema', 'clusterflick',
+        'hello', 'help', 'london', 'me', 'mod', 'moderator', 'null',
+        'official', 'personalise', 'privacy', 'profile', 'root', 'security',
+        'settings', 'staff', 'support', 'system', 'u', 'undefined', 'www'
+      ]);
   }
 }

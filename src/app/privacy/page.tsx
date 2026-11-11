@@ -171,6 +171,11 @@ export default function PrivacyPage() {
             given you early access to any, with when each was switched on.
           </li>
           <li>
+            <strong>Your public profile settings</strong>, if you set one up:
+            the handle you chose and whether your profile is shown. Nothing on
+            it is public until you switch it on.
+          </li>
+          <li>
             <strong>Account records Firebase keeps itself</strong>, such as when
             the account was created and last signed in to.
           </li>
@@ -243,11 +248,13 @@ export default function PrivacyPage() {
         <p className={styles.body}>
           Deleting your account from{" "}
           <Link href="/personalise">Personalise</Link> deletes your lists, the
-          film details that go with them, any features switched on for you, and
-          the account itself, straight away. Removing a single film from a list
-          removes it from that list. Metadata about the film (duration,
-          director, etc.) remains until the account is deleted. The hosts above
-          keep their own request logs for as long as their own terms say.
+          film details that go with them, any features switched on for you, your
+          public profile and its handle, and the account itself, straight away.
+          A handle you change or delete is free for someone else to use at once.
+          Removing a single film from a list removes it from that list. Metadata
+          about the film (duration, director, etc.) remains until the account is
+          deleted. The hosts above keep their own request logs for as long as
+          their own terms say.
         </p>
       </ContentSection>
 

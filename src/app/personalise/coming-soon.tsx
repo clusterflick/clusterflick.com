@@ -11,7 +11,8 @@ import styles from "./page.module.css";
 
 /**
  * Names the features granted to this reader that are still being built, so a
- * grant is visible before there is anything to configure. Nothing renders for
+ * grant is visible before there is anything to configure; one that has
+ * shipped has its own settings instead. Nothing renders for
  * a reader with none, or if the capabilities can't be read: they're news, not
  * something the page depends on.
  */
@@ -23,7 +24,12 @@ export default function ComingSoon() {
     let cancelled = false;
     readCapabilities().then(
       (capabilities) => {
-        if (!cancelled) setGranted(getGrantedCapabilities(capabilities));
+        if (cancelled) return;
+        setGranted(
+          getGrantedCapabilities(capabilities).filter(
+            (id) => CAPABILITIES[id].comingSoon !== null,
+          ),
+        );
       },
       (error) => console.error("Failed to load capabilities", error),
     );

@@ -11,6 +11,26 @@ permissions:
   contents: read
 
 jobs:
+  # The Firestore rules are all that guards readers' data, so they are tested
+  # against the emulator, which needs Java. Apart from the site build, which
+  # needs neither.
+  firestore_rules:
+    name: Test Firestore rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - run: npm ci
+      - run: npm run test:rules
+
   lint_and_test:
     name: Run linter and build
     runs-on: ubuntu-latest
