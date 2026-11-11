@@ -32,16 +32,22 @@ the tooling, live across the
 - **Shareable Filters** — Share your current filter state via URL
 - **Hide Past Showings** — Toggle to filter out screenings that have already
   started
+- **Planner and Near Me** — See what's on day by day, or at the venues closest
+  to you
+- **Browse by Genre, Format and List** — Curated film lists, collections,
+  genres, formats, film clubs and cinema groups
+- **Personalisation** — Keep a watchlist and personalise what you see
+- **Updates** — A daily feed of newly added listings, with an RSS feed
+- **Datasets** — Download the listings data, with live pipeline status
 - **Virtualized Grid** — Fast, smooth browsing of hundreds of movie posters with
-  react-virtualized
+  react-virtuoso
 - **Static Export** — Fully static site for fast loading and easy deployment
 
 ## Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) 16 (Static Export)
 - **UI:** [React](https://react.dev/) 19
-- **Grid Rendering:**
-  [react-virtualized](https://github.com/bvaughn/react-virtualized)
+- **Grid Rendering:** [react-virtuoso](https://virtuoso.dev/)
 - **Styling:** CSS Modules
 - **Testing:** Storybook + Vitest, Playwright (smoke tests), Chromatic (visual
   regression)
@@ -91,6 +97,9 @@ npm run lint
 # Format code with Prettier
 npm run format
 
+# Run unit tests
+npm test
+
 # Run Storybook
 npm run storybook
 
@@ -100,6 +109,19 @@ npm run smoke-test
 # Run smoke tests against a local build
 npm run build && npm start
 SITE_URL=http://localhost:3000 npm run smoke-test
+```
+
+### Data Scripts
+
+```bash
+# Download the latest data-transformed and data-calendar releases into public/datasets/
+npm run fetch-published-data
+
+# Download data-analysed's release log into release-log/, for /datasets/status
+npm run fetch-release-log
+
+# Compress and chunk the combined data into public/data/
+npm run process-combined-data
 ```
 
 ## Project Structure
@@ -117,10 +139,18 @@ clusterflick.com/
 │   ├── app/               # Next.js App Router pages
 │   │   ├── about/         # About page
 │   │   ├── accessibility/ # Accessibility features & stats
+│   │   ├── datasets/      # Data downloads and pipeline status
+│   │   ├── data-licence/  # Data licence
 │   │   ├── festivals/     # Festival list + detail pages
+│   │   ├── film-clubs/    # Film club pages
+│   │   ├── lists/         # Curated film lists
 │   │   ├── london-cinemas/# Borough index pages
 │   │   ├── movies/[id]/[slug]/  # Movie detail pages
+│   │   ├── near-me/       # Venues near you
+│   │   ├── planner/       # Day-by-day planner
+│   │   ├── updates/       # Newly added listings feed
 │   │   ├── venues/[slug]/ # Venue detail pages
+│   │   ├── ...            # Genres, formats, collections, cinema groups, etc.
 │   │   └── page.tsx       # Home page (movie grid)
 │   ├── components/        # Reusable UI components
 │   ├── data/              # Static data (festivals, boroughs)
@@ -145,8 +175,9 @@ Clusterflick's data flows through several stages:
    splits it into chunks for efficient loading
 5. **Matching** — Movie data is matched with ratings from IMDb, Letterboxd,
    Metacritic, and Rotten Tomatoes
+   ([clusterflick/data-matched](https://github.com/clusterflick/data-matched))
 
-Data is refreshed automatically every morning.
+Listings are refreshed automatically several times a day.
 
 ## Related Repositories
 
@@ -154,6 +185,7 @@ Data is refreshed automatically every morning.
 | --------------------------------------------------------------------------------- | ------------------------------ |
 | [clusterflick/data-transformed](https://github.com/clusterflick/data-transformed) | Per-venue JSON data files      |
 | [clusterflick/data-combined](https://github.com/clusterflick/data-combined)       | Combined data grouped by movie |
+| [clusterflick/data-matched](https://github.com/clusterflick/data-matched)         | Ratings from review sites      |
 | [clusterflick/data-calendar](https://github.com/clusterflick/data-calendar)       | ICS calendar files per venue   |
 
 ## Data Access
@@ -164,7 +196,9 @@ The data is freely available in multiple formats:
 - **Combined JSON** — All showings in a single file, grouped by movie
 - **ICS Calendars** — Import cinema schedules into your calendar app
 
-Visit the [About page](https://clusterflick.com/about/) for download links.
+Visit the [Datasets page](https://clusterflick.com/datasets/) for download
+links, and the [Data licence](https://clusterflick.com/data-licence/) for terms
+of use.
 
 ## Contributing
 
