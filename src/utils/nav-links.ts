@@ -74,6 +74,7 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: "/datasets", label: "Datasets", group: "site" },
   { href: "/reports", label: "Reports", group: "site" },
   { href: "/data-licence", label: "Data Licence", group: "site" },
+  { href: "/privacy", label: "Privacy", group: "site" },
 ];
 
 /** `NAV_LINKS` bucketed into `NAV_GROUPS` order, for the menu and the footer. */

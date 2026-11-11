@@ -60,6 +60,7 @@ describe("sitemap", () => {
 
     expect(urls).toContain("https://clusterflick.com/near-me/");
     expect(urls).toContain("https://clusterflick.com/datasets/status/");
+    expect(urls).toContain("https://clusterflick.com/privacy/");
   });
 
   it("never stamps a page with the build time", async () => {

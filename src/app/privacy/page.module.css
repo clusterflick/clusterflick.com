@@ -1,0 +1,71 @@
+/* Hero */
+.hero {
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 56px;
+  margin-bottom: 24px;
+}
+
+.tagline {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: var(--measure-blurb);
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.list {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+  padding-left: 20px;
+}
+
+.list li {
+  margin-bottom: 8px;
+}
+
+/* ─── Processors and device storage ─── */
+
+.entries {
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entryName {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-electric-blue);
+}
+
+.entryValue {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.inlineCode {
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.updated {
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}

@@ -235,8 +235,15 @@ function isSignInLink(url: URL) {
   );
 }
 
-const STORE_NOTE =
-  "Your email address, so we can send you sign-in links, and the films and venues you add to your lists. Nothing else, and we never share it. You can delete your account, and everything in it, from this page at any time.";
+const STORE_NOTE = (
+  <>
+    Your email address, so we can send you sign-in links, and the films and
+    venues you add to your lists. Nothing else. We never sell your data. We
+    never share your data beyond the services the site runs on. You can delete
+    your account, and everything in it, from this page at any time.{" "}
+    <Link href="/privacy">How we handle your data</Link>
+  </>
+);
 
 function getErrorCode(error: unknown): string | undefined {
   return typeof error === "object" && error && "code" in error
