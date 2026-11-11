@@ -732,3 +732,38 @@
   align-items: center;
   gap: 6px;
 }
+
+/* Features granted to the reader that are still being built. Pink, the
+   colour of the watchlist panel on /updates: news about the reader's own
+   account. */
+.comingSoon {
+  margin: 0 0 40px;
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 12px;
+}
+
+.comingSoonTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.comingSoonList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comingSoonList li + li {
+  margin-top: 6px;
+}
+
+.comingSoonList strong {
+  color: var(--color-white);
+}

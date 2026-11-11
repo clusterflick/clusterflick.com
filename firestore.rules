@@ -2,7 +2,8 @@ rules_version = '2';
 
 // Each user may read and write only their own documents, and only the fields
 // the site writes: the film lists and the favourite venues, and the listed
-// films' details. Everything else is denied by default.
+// films' details. Their capabilities they may only read. Everything else is
+// denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
@@ -17,6 +18,13 @@ service cloud.firestore {
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId)
         && request.resource.data.keys().hasOnly(['films', 'people']);
+    }
+
+    // The features granted to the user (see CapabilityId). Granted only with
+    // the Admin SDK, which the rules don't apply to, so the user may read it
+    // and delete it with their account, and never write it.
+    match /users/{userId}/meta/capabilities {
+      allow read, delete: if isOwner(userId);
     }
   }
 

@@ -55,6 +55,7 @@ import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
 import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
+import ComingSoon from "./coming-soon";
 import type { MoviePerformance } from "@/types";
 import {
   UserListId,
@@ -237,10 +238,11 @@ function isSignInLink(url: URL) {
 
 const STORE_NOTE = (
   <>
-    Your email address, so we can send you sign-in links, and the films and
-    venues you add to your lists. Nothing else. We never sell your data. We
-    never share your data beyond the services the site runs on. You can delete
-    your account, and everything in it, from this page at any time.{" "}
+    Your email address, so we can send you sign-in links, the films and venues
+    you add to your lists, and any features we&apos;ve switched on for your
+    account. Nothing else. We never sell your data. We never share your data
+    beyond the services the site runs on. You can delete your account, and
+    everything in it, from this page at any time.{" "}
     <Link href="/privacy">How we handle your data</Link>
   </>
 );
@@ -509,6 +511,7 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
       />
+      <ComingSoon />
       {/* At the top: they're what a reader with a long Seen list comes back
           for, and the lists below are long. */}
       {lists && (

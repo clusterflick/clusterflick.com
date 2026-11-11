@@ -38,6 +38,11 @@ import {
   pickFilmDetails,
   type FilmDetailsData,
 } from "@/lib/user-lists/film-details";
+import {
+  deleteCapabilities,
+  fetchCapabilities,
+  type UserCapabilities,
+} from "@/lib/user-capabilities";
 
 /**
  * - `unavailable` — this build has no Firebase config; personalisation is off.
@@ -120,6 +125,12 @@ export type UserContextType = {
    * than held like the lists: only /personalise needs them.
    */
   readFilmDetails: () => Promise<FilmDetailsData>;
+  /**
+   * The features granted to this reader — see `CapabilityId`. Read on request
+   * and cached for the session, like the film details: only /personalise
+   * needs them so far.
+   */
+  readCapabilities: () => Promise<UserCapabilities>;
 };
 
 /**
@@ -203,6 +214,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const filmDetailsRef = useRef<{
     uid: string;
     details: Promise<FilmDetailsData>;
+  } | null>(null);
+  /** The capabilities, read once a session; only granted from outside. */
+  const capabilitiesRef = useRef<{
+    uid: string;
+    capabilities: Promise<UserCapabilities>;
   } | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -304,6 +320,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Data first: once the account is gone, the rules no longer let anyone
     // delete its document. If the account deletion then needs a fresh sign-in,
     // the lists are already gone and the caller asks for one.
+    await deleteCapabilities(db, current.uid);
+    capabilitiesRef.current = null;
     await deleteUserLists(db, current.uid);
     setLists(null);
     setFavouriteVenues(null);
@@ -500,6 +518,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return details;
   }, [getServices, user]);
 
+  const readCapabilities = useCallback<
+    UserContextType["readCapabilities"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    const cached = capabilitiesRef.current;
+    if (cached?.uid === user.uid) return cached.capabilities;
+    const capabilities = fetchCapabilities(db, user.uid);
+    capabilitiesRef.current = { uid: user.uid, capabilities };
+    // A failed read isn't kept, so the next caller tries again.
+    capabilities.catch(() => {
+      if (capabilitiesRef.current?.capabilities === capabilities) {
+        capabilitiesRef.current = null;
+      }
+    });
+    return capabilities;
+  }, [getServices, user]);
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -519,6 +555,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       addFavouriteVenue,
       removeFavouriteVenue,
       readFilmDetails,
+      readCapabilities,
     }),
     [
       status,
@@ -537,6 +574,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       addFavouriteVenue,
       removeFavouriteVenue,
       readFilmDetails,
+      readCapabilities,
     ],
   );
 
@@ -573,6 +611,7 @@ export function MockUserProvider({
     addFavouriteVenue: noop,
     removeFavouriteVenue: noop,
     readFilmDetails: async () => ({ films: {}, people: {} }),
+    readCapabilities: async () => ({}),
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

@@ -7,6 +7,7 @@ import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
 import { MockUserProvider, type UserContextType } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
+import { CapabilityId } from "@/lib/user-capabilities";
 import type { FilmDetails } from "@/lib/user-lists/film-details";
 
 /** Lists for the stats' progress strip, held against the stats stories' Seen films. */
@@ -98,6 +99,35 @@ export const SignedInEmpty: Story = {
       lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
       favouriteVenues: {},
     },
+  },
+};
+
+/**
+ * A reader granted capabilities whose features are still being built: the
+ * banner under the account bar names them.
+ */
+export const SignedInComingSoon: Story = {
+  args: {
+    user: {
+      status: "signed-in",
+      email: "reader@example.com",
+      lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+      favouriteVenues: {},
+      readCapabilities: async () => ({
+        [CapabilityId.EmailAlerts]: { grantedAt: 0 },
+        [CapabilityId.PublicProfile]: { grantedAt: 0 },
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", {
+        name: "Coming soon to your account",
+      }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("Email alerts.")).toBeInTheDocument();
+    await expect(canvas.getByText("Public profile.")).toBeInTheDocument();
   },
 };
 
