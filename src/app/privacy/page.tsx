@@ -71,10 +71,11 @@ const PROCESSORS: Entry[] = [
     name: "TheMovieDB",
     value: (
       <>
-        When you search for a film that isn&apos;t showing, or import from
-        Letterboxd, the titles and years you&apos;re looking for are sent to
-        TheMovieDB through our search service. Your email address and lists are
-        not.
+        Serves the film posters and images, so your browser fetches them from
+        TheMovieDB directly. When you search for a film that isn&apos;t showing,
+        or import from Letterboxd, the titles and years you&apos;re looking for
+        are also sent to TheMovieDB through our search service. Your email
+        address and lists are not.
       </>
     ),
   },
@@ -199,7 +200,7 @@ export default function PrivacyPage() {
 
       <ContentSection
         title="Who handles it for us"
-        intro="The services the site runs on, each acting on our behalf."
+        intro="The services the site runs on, and the ones your browser loads images and maps from."
       >
         <dl className={styles.entries}>
           {PROCESSORS.map((entry) => (
@@ -209,6 +210,12 @@ export default function PrivacyPage() {
             </div>
           ))}
         </dl>
+        <p className={styles.body}>
+          Everything else is a link: venues&apos; booking pages, trailers on
+          YouTube, and films on Letterboxd, IMDb and the rest load nothing until
+          you follow them. Once you do, that site&apos;s own privacy policy
+          applies.
+        </p>
       </ContentSection>
 
       <ContentSection
