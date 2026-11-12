@@ -185,10 +185,18 @@
   color: var(--color-muted-gray);
 }
 
-/* What the stats send though the list is hidden: not a warning in pink, but
-   brighter than the help around it, so it isn't skimmed past. */
+/* What the stats send though the list is hidden, in a box of its own at the
+   foot of the card: not a warning in pink, but set apart from the sections'
+   help so it isn't skimmed past. */
 .sectionCaveat {
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.12);
+  border-radius: 8px;
 }
 
 /* ---- Favourites ---- */
@@ -384,6 +392,22 @@
   margin-left: auto;
 }
 
+/* Wide, so it reads as the page's one button rather than one of several
+   small ones. On a phone the actions take their own row and Save fills it. */
+.saveButton {
+  min-width: 160px;
+}
+
+@media (max-width: 599px) {
+  .saveActions {
+    flex: 1 1 100%;
+  }
+
+  .saveButton {
+    flex: 1;
+  }
+}
+
 /* ---- Preview ---- */
 
 /* Sticks under the site header and scrolls on its own, so the profile stays
@@ -403,10 +427,12 @@
   color: var(--color-muted-gray);
 }
 
+/* An iframe (PreviewFrame), so the profile inside is laid out at this width
+   rather than the screen's, and scrolls on its own. */
 .previewFrame {
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  display: block;
+  width: 100%;
+  height: calc(100vh - 120px);
   background: var(--color-midnight-navy);
   border: 1px solid rgba(var(--color-white-rgb), 0.12);
   border-radius: 12px;

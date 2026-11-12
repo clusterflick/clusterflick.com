@@ -47,6 +47,82 @@
   border-radius: 6px;
 }
 
+/* A tile that is a button: the link's look, without the button's own. */
+.button {
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover .title,
+.button:focus-visible .title {
+  color: var(--color-neon-pink);
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+.button:disabled .title {
+  color: var(--color-light-gray);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.posterWithCue {
+  position: relative;
+  display: block;
+}
+
+/* What pressing the tile does, as a pill over the foot of the poster: there
+   while the tile is pointed at or focused, and for good once it's done. */
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-white);
+  background: var(--color-neon-pink);
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.button:hover .cue,
+.button:focus-visible .cue,
+.button:disabled .cue {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.button:disabled .cue {
+  color: var(--color-light-gray);
+  background: rgba(var(--color-midnight-navy-rgb), 0.85);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue {
+    transition: none;
+  }
+}
+
 .title {
   font-size: 14px;
   font-weight: 600;

@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
-import { getProfilePath, type UserProfile } from "@/lib/user-profile";
+import {
+  getProfileDisplayAddress,
+  getProfilePath,
+  type UserProfile,
+} from "@/lib/user-profile";
 import { PROFILE_SETTINGS_PATH } from "./profile/path";
 import styles from "./page.module.css";
 
@@ -121,8 +125,8 @@ export function PublicProfileSummary({
           {!profile
             ? "Choose an address and what your profile shows. It stays private until you make it public."
             : profile.public
-              ? `Public at clusterflick.com${getProfilePath(profile.handle)}.`
-              : `Private. Only you can open clusterflick.com${getProfilePath(profile.handle)}.`}
+              ? `Public at ${getProfileDisplayAddress(profile.handle)}.`
+              : `Private. Only you can open ${getProfileDisplayAddress(profile.handle)}.`}
           {profile?.public && !profile.sections && (
             <>
               {" "}

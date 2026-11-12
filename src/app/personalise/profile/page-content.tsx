@@ -39,6 +39,7 @@ import PublishCard, { SECTION_NAMES } from "./publish-card";
 import SaveBar from "./save-bar";
 import { useHandleAvailability } from "./use-handle-availability";
 import { PreviewDialog, ProfilePreview } from "./profile-preview";
+import PreviewFrame from "./preview-frame";
 import styles from "./page.module.css";
 
 const PERSONALISE_PATH = "/personalise/";
@@ -128,22 +129,19 @@ function NotGranted({ state }: { state: PublicProfileState }) {
 
 const LINK_FIELDS: Record<
   ProfileLinkId,
-  { label: string; placeholder: string; help: string }
+  { label: string; placeholder: string }
 > = {
   [ProfileLinkId.Letterboxd]: {
     label: "Letterboxd",
     placeholder: "letterboxd.com/your-name",
-    help: "Your username, or the address of your profile.",
   },
   [ProfileLinkId.Imdb]: {
     label: "IMDb",
     placeholder: "imdb.com/user/ur1234567",
-    help: "The address of your profile, from IMDb's Your profile page.",
   },
   [ProfileLinkId.Website]: {
     label: "Website",
     placeholder: "example.com",
-    help: "A site of your own: a blog, a newsletter. https only.",
   },
 };
 
@@ -336,7 +334,9 @@ function Editor({
                 type="text"
                 autoComplete="name"
                 maxLength={DISPLAY_NAME_MAX_LENGTH * 2}
-                aria-describedby="profile-name-help"
+                aria-describedby={
+                  problems.name ? "profile-name-help" : undefined
+                }
                 aria-invalid={problems.name ? true : undefined}
                 value={draft.name}
                 onChange={(event) =>
@@ -344,16 +344,14 @@ function Editor({
                 }
                 placeholder={value.handle || "Your name"}
               />
-              <span
-                id="profile-name-help"
-                className={clsx(
-                  styles.fieldHelp,
-                  problems.name && styles.fieldProblem,
-                )}
-              >
-                {problems.name ??
-                  `Up to ${DISPLAY_NAME_MAX_LENGTH} characters. Quotation marks, <, >, & and \\ can't be used.`}
-              </span>
+              {problems.name && (
+                <span
+                  id="profile-name-help"
+                  className={clsx(styles.fieldHelp, styles.fieldProblem)}
+                >
+                  {problems.name}
+                </span>
+              )}
             </div>
             {PROFILE_LINK_IDS.map((id) => (
               <div key={id} className={styles.field}>
@@ -371,7 +369,9 @@ function Editor({
                   autoComplete="off"
                   autoCapitalize="none"
                   spellCheck={false}
-                  aria-describedby={`profile-link-${id}-help`}
+                  aria-describedby={
+                    problems.links[id] ? `profile-link-${id}-help` : undefined
+                  }
                   aria-invalid={problems.links[id] ? true : undefined}
                   value={draft.links[id]}
                   onChange={(event) =>
@@ -381,15 +381,14 @@ function Editor({
                   }
                   placeholder={LINK_FIELDS[id].placeholder}
                 />
-                <span
-                  id={`profile-link-${id}-help`}
-                  className={clsx(
-                    styles.fieldHelp,
-                    problems.links[id] && styles.fieldProblem,
-                  )}
-                >
-                  {problems.links[id] ?? LINK_FIELDS[id].help}
-                </span>
+                {problems.links[id] && (
+                  <span
+                    id={`profile-link-${id}-help`}
+                    className={clsx(styles.fieldHelp, styles.fieldProblem)}
+                  >
+                    {problems.links[id]}
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -427,21 +426,19 @@ function Editor({
                   className={styles.sectionHelp}
                 >
                   {SECTION_DESCRIPTIONS[id]}
-                  {id === ProfileSectionId.SeenStats &&
-                    draft.sections[ProfileSectionId.SeenStats] &&
-                    !draft.sections[ProfileSectionId.Seen] && (
-                      <span className={styles.sectionCaveat}>
-                        {" "}
-                        Your stats are worked out in the visitor&apos;s browser,
-                        so your Seen list is still sent with the page while
-                        it&apos;s hidden. It isn&apos;t shown, but anyone
-                        reading the page&apos;s source could find it.
-                      </span>
-                    )}
                 </p>
               </li>
             ))}
           </ul>
+          {draft.sections[ProfileSectionId.SeenStats] &&
+            !draft.sections[ProfileSectionId.Seen] && (
+              <p className={styles.sectionCaveat}>
+                Your stats are worked out in the visitor&apos;s browser, so your
+                Seen list is still sent with the page while it&apos;s hidden. It
+                isn&apos;t shown, but anyone reading the page&apos;s source
+                could find it.
+              </p>
+            )}
         </SettingsCard>
 
         <SaveBar
@@ -470,7 +467,12 @@ function Editor({
       {wide && (
         <aside className={styles.previewColumn} aria-label="Preview">
           <p className={styles.previewLabel}>Preview · as visitors see it</p>
-          <div className={styles.previewFrame}>{preview}</div>
+          <PreviewFrame
+            title="Your profile, as visitors see it"
+            className={styles.previewFrame}
+          >
+            {preview}
+          </PreviewFrame>
         </aside>
       )}
 

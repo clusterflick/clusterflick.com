@@ -77,6 +77,7 @@ export function ProfilePreview({
         sections={profile.sections}
         lists={lists}
         filmDetails={filmDetails}
+        inPreview
       />
       {nothingShown ? (
         <p className={styles.previewEmpty}>

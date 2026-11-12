@@ -192,7 +192,7 @@ export const SignedInPublicProfilePrivate: Story = {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
       canvas.getByText(
-        /Private\. Only you can open clusterflick\.com\/u\/film-fan\//,
+        /Private\. Only you can open clusterflick\.com\/u\/film-fan\./,
       ),
     ).toBeInTheDocument();
     await expect(
@@ -220,7 +220,7 @@ export const SignedInPublicProfileBeforeSections: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByText(/Public at clusterflick\.com\/u\/film-fan\//),
+      canvas.getByText(/Public at clusterflick\.com\/u\/film-fan\./),
     ).toBeInTheDocument();
     await expect(
       canvas.getByText(/before you could choose what it shows/),

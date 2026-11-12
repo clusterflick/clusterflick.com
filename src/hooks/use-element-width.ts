@@ -14,7 +14,10 @@ export function useElementWidth<T extends HTMLElement>() {
 
   useEffect(() => {
     if (!element) return;
-    const observer = new ResizeObserver(([entry]) =>
+    // The element's own window's observer, which for one drawn into an
+    // iframe (the profile preview) is the iframe's.
+    const View = element.ownerDocument.defaultView ?? window;
+    const observer = new View.ResizeObserver(([entry]) =>
       setWidth(entry.contentRect.width),
     );
     observer.observe(element);

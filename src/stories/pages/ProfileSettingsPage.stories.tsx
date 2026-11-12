@@ -185,7 +185,7 @@ export const Publishing: Story = {
       await canvas.findByRole("heading", { name: "You're live" }),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByText("clusterflick.com/u/film-fan/"),
+      canvas.getByText("clusterflick.com/u/film-fan"),
     ).toBeInTheDocument();
     await expect(
       canvas.getByRole("button", { name: "Copy link" }),
@@ -239,7 +239,9 @@ export const Renaming: Story = {
     await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
-      canvas.getByText(/\/u\/film-fan\/ will stop working straight away/),
+      canvas.getByText(
+        /clusterflick\.com\/u\/film-fan will stop working straight away/,
+      ),
     ).toBeInTheDocument();
     await expect(args.user.saveProfile).not.toHaveBeenCalled();
     await userEvent.click(canvas.getByRole("button", { name: "Change it" }));
@@ -312,15 +314,20 @@ export const PickingFavourites: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: /Add a film/ }),
-    );
+    // Every empty place opens the search.
+    const [firstPlace] = await canvas.findAllByRole("button", {
+      name: /Add a film/,
+    });
+    await userEvent.click(firstPlace);
     const search = canvas.getByRole("textbox", {
       name: "Search for a favourite film",
     });
     await expect(search).toHaveFocus();
     await userEvent.type(search, "mood");
-    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
+    // The whole tile is the button.
+    await userEvent.click(
+      await canvas.findByRole("button", { name: /^Add: In the Mood for Love/ }),
+    );
     await expect(
       canvas.getByRole("button", { name: "Remove In the Mood for Love" }),
     ).toBeInTheDocument();
@@ -330,7 +337,12 @@ export const PickingFavourites: Story = {
     await userEvent.click(
       await canvas.findByRole("button", { name: "Search all films" }),
     );
-    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
+    await userEvent.click(
+      await canvas.findByRole("button", { name: /^Add: Heat/ }),
+    );
+    await expect(
+      canvas.getByRole("button", { name: /^Added: Heat/ }),
+    ).toBeDisabled();
     await userEvent.click(
       canvas.getByRole("button", { name: "Move Heat earlier" }),
     );

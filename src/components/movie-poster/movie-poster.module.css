@@ -170,12 +170,15 @@
 /* Hovering an enclosing link animates the artwork too, so a tile that wraps the
    whole card in a single link reacts as one target wherever the pointer sits —
    and reacts the same whether or not the film has a poster. Limited to xsmall
-   because only the updates feed wraps posters this way. */
-a:hover .poster.xsmall img {
+   because only tiles wrap posters this way. A tile that is a button (a
+   film to pick) reacts the same while it can be pressed. */
+a:hover .poster.xsmall img,
+button:not(:disabled):hover .poster.xsmall img {
   transform: scale(1.05);
 }
 
-a:hover .noPoster.xsmall .textPattern {
+a:hover .noPoster.xsmall .textPattern,
+button:not(:disabled):hover .noPoster.xsmall .textPattern {
   transform: rotate(-31deg) scale(1.05);
 }
 

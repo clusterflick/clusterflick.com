@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import clsx from "clsx";
 import Button, { ButtonAnchor } from "@/components/button";
 import {
+  getProfileDisplayAddress,
   getProfilePath,
   PROFILE_SECTION_IDS,
   ProfileSectionId,
@@ -111,7 +112,7 @@ export default function PublishCard({
   };
 
   if (isPublic && profile) {
-    const address = `clusterflick.com${getProfilePath(profile.handle)}`;
+    const address = getProfileDisplayAddress(profile.handle);
     return (
       <section
         className={clsx(
@@ -178,7 +179,7 @@ export default function PublishCard({
         <>
           <p className={personaliseStyles.managementText}>
             {profile
-              ? `Only you can open clusterflick.com${getProfilePath(profile.handle)}. Publish it when it looks right.`
+              ? `Only you can open ${getProfileDisplayAddress(profile.handle)}. Publish it when it looks right.`
               : "Choose an address and what your profile shows. Nothing is public until you publish it."}
           </p>
           <div className={personaliseStyles.managementActions}>
@@ -237,8 +238,8 @@ export default function PublishCard({
               )}
             {renameFrom && (
               <li>
-                clusterflick.com{getProfilePath(renameFrom)} will stop working,
-                and anyone can claim it.
+                {getProfileDisplayAddress(renameFrom)} will stop working, and
+                anyone can claim it.
               </li>
             )}
           </ul>

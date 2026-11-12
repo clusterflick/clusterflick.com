@@ -139,6 +139,15 @@ export function getProfilePath(handle: string): string {
   return `/u/${handle}/`;
 }
 
+/**
+ * A profile's address as it's written for people to read: no scheme and no
+ * trailing slash (`clusterflick.com/u/film-fan`). Links and copied addresses
+ * keep the slash, which is where the page lives.
+ */
+export function getProfileDisplayAddress(handle: string): string {
+  return `clusterflick.com/u/${handle}`;
+}
+
 export function parseProfile(
   data: Record<string, unknown> | undefined,
 ): UserProfile | null {

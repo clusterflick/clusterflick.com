@@ -2129,7 +2129,9 @@ displayName, links, favourites }`, readable by
   TheMovieDB on "Search all films", the film search's two steps
   (`favourites-picker.tsx`), into four places that can be dragged into
   order, or moved with their arrows from the keyboard; an empty place opens
-  the search. There's no section switch: picking none hides them. The count
+  the search. A result is picked by pressing its whole tile (`PosterTile`'s
+  `onClick`, with an "Add" `cue` over the poster on hover).
+  There's no section switch: picking none hides them. The count
   and patterns are repeated in the rules (held to the module by a test) and
   the Worker.
 - **A link to a profile previews with its first favourite's poster**, set
@@ -2144,7 +2146,14 @@ displayName, links, favourites }`, readable by
   the name, a line of the reader's taste (`getTasteLine`: "Mostly drama ·
   Big on the 2000s · 2 Wong Kar-wai films"), from the stats the page already
   shows and only with them, each part only where it's true enough to say.
-  The owner gets Edit profile and Copy link beneath.
+  The owner gets Edit profile and Copy link in the top right corner, out of
+  the flow, since they arrive once the owner is recognised and aren't part
+  of the profile; below 1100px the hero keeps a strip above the fan for
+  them, for everyone, so nothing moves when they appear. **Nothing in the
+  hero waits on anything**: the posters are the favourites' snapshots (the
+  dataset's only where a snapshot has none), and the wash is a fixed height
+  running on past the hero rather than the hero's height, which rescaled
+  every blurred poster as the hero's lines arrived.
 - **A profile is useful to a friend, not just a record.** On someone's
   profile the watchlist leads with how many of its films are showing this
   week, linking to the planner on just those (`getShowingThisWeek`), and its
@@ -2183,7 +2192,18 @@ displayName, links, favourites }`, readable by
   scrolling on its own, and on a narrower screen is a full-screen dialog
   opened from the save bar (and isn't drawn until then). It draws from the
   draft, saved or not, through the profile page's own `ProfileHero` and
-  `ProfileView`, so the two can't differ.
+  `ProfileView`, so the two can't differ. **Beside the settings it's an
+  iframe** (`PreviewFrame`): about 750px of a wide screen, drawn in the page
+  it took the profile's desktop layout and was cramped. The frame is still
+  this page's React tree, through a portal, so it keeps the reader's lists
+  and the listings; the page's stylesheets are copied in and kept in step,
+  with `<html>`'s and `<body>`'s classes and style, which carry the fonts.
+  Script that asks a window a question goes through `ViewWindowProvider`:
+  `useMediaQuery` asks the frame's, and `useElementWidth` and `PosterStack`
+  use their element's own window.
+- **Addresses are written without the trailing slash**
+  (`getProfileDisplayAddress`: `clusterflick.com/u/film-fan`); links and
+  copied addresses keep it, being where the page lives.
 - **Publishing is a moment, not a switch.** "Publish profile" first lists
   what goes public and what stays hidden, which is where the reader
   considers it (the rules make the same point by refusing `public: true`

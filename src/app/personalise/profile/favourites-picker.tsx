@@ -230,7 +230,7 @@ export default function FavouritesPicker({
                   <span className={styles.slotPlus} aria-hidden="true">
                     +
                   </span>
-                  {index === picks.length ? "Add a film" : "Empty"}
+                  Add a film
                 </button>
               </li>
             );
@@ -360,18 +360,14 @@ export default function FavouritesPicker({
                     ...(film.year ? [film.year] : []),
                     ...(allFilms && film.onSeen ? ["Seen"] : []),
                   ]}
-                  action={
-                    <Button
-                      size="sm"
-                      onClick={() => add(film)}
-                      disabled={full || pickedIds.has(film.id)}
-                    >
-                      {pickedIds.has(film.id)
-                        ? "Added"
-                        : full
-                          ? `${FAVOURITES_MAX} picked`
-                          : "Add"}
-                    </Button>
+                  onClick={() => add(film)}
+                  disabled={full || pickedIds.has(film.id)}
+                  cue={
+                    pickedIds.has(film.id)
+                      ? "Added"
+                      : full
+                        ? `${FAVOURITES_MAX} picked`
+                        : "Add"
                   }
                 />
               ))}
