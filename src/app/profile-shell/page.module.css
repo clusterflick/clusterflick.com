@@ -1,25 +1,3 @@
-/* As /personalise's list counts. */
-.count {
-  margin-left: 12px;
-  font-size: 0.6em;
-  color: var(--color-muted-gray);
-}
-
-/* As /personalise's lanes: a faint panel behind the posters, bleeding 8px
-   past the grid so the posters stay on the headings' edge. */
-.lane {
-  margin: 0 -8px;
-  padding: 18px 8px 12px;
-  background-color: rgba(var(--color-dark-navy-rgb), 0.35);
-  border-radius: 10px;
-}
-
-.more,
-.empty {
-  margin: 12px 0 0;
-  color: var(--color-muted-gray);
-}
-
 .ownerActions {
   display: flex;
   justify-content: center;

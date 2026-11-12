@@ -2,21 +2,26 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { ButtonLink } from "@/components/button";
-import ContentSection from "@/components/content-section";
 import LoadingIndicator from "@/components/loading-indicator";
-import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import StandardPageLayout from "@/components/standard-page-layout";
 import StatusPage, { StatusPageLoading } from "@/components/status-page";
 import { CapabilityId } from "@/lib/user-capabilities";
 import {
   parseProfilePageData,
   PROFILE_DATA_ELEMENT_ID,
-  type ProfileList,
   type ProfilePageData,
+  type PublicProfile,
 } from "@/lib/user-profile/page-data";
-import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { UserListId } from "@/lib/user-lists";
+import {
+  FavouriteVenuesSection,
+  UserListSection,
+} from "@/app/personalise/page-content";
+import SeenStats, {
+  type MovieListProgressItem,
+} from "@/app/personalise/seen-stats";
+import personaliseStyles from "@/app/personalise/page.module.css";
 import styles from "./page.module.css";
 
 const PERSONALISE_PATH = "/personalise/";
@@ -43,7 +48,7 @@ function useProfilePageData() {
   return useSyncExternalStore(subscribe, readPageData, () => undefined);
 }
 
-export default function ProfileShellContent() {
+export default function ProfileShellContent(build: ProfileBuildData) {
   const data = useProfilePageData();
   if (!data) {
     return (
@@ -52,7 +57,7 @@ export default function ProfileShellContent() {
       </StatusPageLoading>
     );
   }
-  return <ProfilePage data={data} />;
+  return <ProfilePage data={data} {...build} />;
 }
 
 /**
@@ -138,9 +143,25 @@ function useVisitor(handle: string | undefined): {
   );
 }
 
-export function ProfilePage({ data }: { data: ProfilePageData }) {
+/** What the page needs from the build, as `/personalise` has it. */
+export type ProfileBuildData = {
+  /** Venue id → logo (`getVenueImagePaths`). */
+  venueImagePaths: Record<string, string>;
+  /** The film lists, for progress through them in the Seen stats. */
+  movieLists: MovieListProgressItem[];
+};
+
+export function ProfilePage({
+  data,
+  venueImagePaths,
+  movieLists,
+}: { data: ProfilePageData } & ProfileBuildData) {
   return data.found ? (
-    <FoundProfile data={data} />
+    <FoundProfile
+      profile={data}
+      venueImagePaths={venueImagePaths}
+      movieLists={movieLists}
+    />
   ) : (
     <ProfileNotFound handle={data.handle} />
   );
@@ -150,17 +171,27 @@ function plural(count: number, one: string, many: string) {
   return `${count.toLocaleString("en-GB")} ${count === 1 ? one : many}`;
 }
 
+/**
+ * The profile as `/personalise` shows the owner their own, with its sections
+ * read only: the Seen stats, the watchlist, the favourite venues and the Seen
+ * list, in that order.
+ */
 function FoundProfile({
-  data,
-}: {
-  data: Extract<ProfilePageData, { found: true }>;
-}) {
-  const { visitor } = useVisitor(data.handle);
+  profile,
+  venueImagePaths,
+  movieLists,
+}: { profile: PublicProfile } & ProfileBuildData) {
+  const { handle, lists, favouriteVenues, filmDetails } = profile;
+  const { visitor } = useVisitor(handle);
+  const seen = Object.keys(lists[UserListId.Seen]).length;
+  const watchlist = Object.keys(lists[UserListId.Watchlist]).length;
+
+  // Full width, as /personalise is signed in: the page is mostly posters.
   return (
     <StandardPageLayout
-      title={data.handle}
-      subtitle={`${plural(data.seen.count, "film", "films")} seen, ${plural(
-        data.watchlist.count,
+      title={handle}
+      subtitle={`${plural(seen, "film", "films")} seen, ${plural(
+        watchlist,
         "film",
         "films",
       )} on the watchlist`}
@@ -173,75 +204,36 @@ function FoundProfile({
           </div>
         )
       }
-      width="wide"
-    >
-      <ProfileListSection
-        title="Watchlist"
-        list={data.watchlist}
-        empty={`${data.handle} has nothing on their watchlist yet.`}
-      />
-      <ProfileListSection
-        title="Seen"
-        list={data.seen}
-        empty={`${data.handle} hasn't marked any films as seen yet.`}
-      />
-    </StandardPageLayout>
-  );
-}
-
-function ProfileListSection({
-  title,
-  list,
-  empty,
-}: {
-  title: string;
-  list: ProfileList;
-  empty: string;
-}) {
-  const { movies } = useCinemaData();
-  const more = list.count - list.films.length;
-  return (
-    <ContentSection
-      title={title}
-      titleBadge={
-        <span className={styles.count}>
-          {list.count.toLocaleString("en-GB")}
-        </span>
+      afterContent={
+        <div className={personaliseStyles.wide}>
+          <SeenStats
+            seen={lists[UserListId.Seen]}
+            movieLists={movieLists}
+            details={filmDetails}
+          />
+          <UserListSection
+            listId={UserListId.Watchlist}
+            lists={lists}
+            showEditing={false}
+            publicView
+          />
+          <FavouriteVenuesSection
+            favouriteVenues={favouriteVenues}
+            showEditing={false}
+            venueImagePaths={venueImagePaths}
+            publicView
+          />
+          <UserListSection
+            listId={UserListId.Seen}
+            lists={lists}
+            showEditing={false}
+            publicView
+          />
+        </div>
       }
     >
-      {list.films.length === 0 ? (
-        <p className={styles.empty}>{empty}</p>
-      ) : (
-        <>
-          <div className={styles.lane}>
-            <PosterTileList>
-              {list.films.map((film) => (
-                <PosterTile
-                  key={film.id}
-                  title={film.title}
-                  // As on /personalise: the snapshot is all a film that's left
-                  // the dataset has, and one still in it may have a poster now.
-                  posterPath={movies[film.id]?.posterPath ?? film.posterPath}
-                  includedMovies={movies[film.id]?.includedMovies}
-                  // Linked only while showing: a departed page may not exist.
-                  href={
-                    movies[film.id]
-                      ? getMovieUrl({ id: film.id, title: film.title })
-                      : undefined
-                  }
-                  details={film.year ? [film.year] : undefined}
-                />
-              ))}
-            </PosterTileList>
-          </div>
-          {more > 0 && (
-            <p className={styles.more}>
-              and {plural(more, "more film", "more films")}
-            </p>
-          )}
-        </>
-      )}
-    </ContentSection>
+      {null}
+    </StandardPageLayout>
   );
 }
 

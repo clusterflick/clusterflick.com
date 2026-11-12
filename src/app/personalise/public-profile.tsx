@@ -210,9 +210,10 @@ export function PublicProfileSettings({
               }}
             />
             <p className={styles.managementText}>
-              While this is on, anyone with the link can see your Seen list and
-              watchlist at clusterflick.com{getProfilePath(profile.handle)}.
-              While it&apos;s off, only you can open it.
+              While this is on, anyone with the link can see your lists, your
+              venues and your film stats at clusterflick.com
+              {getProfilePath(profile.handle)}, as you see them here. While
+              it&apos;s off, only you can open it.
             </p>
             {/* An anchor, not a client-side link: the page is the profiles
                 Worker's, and isn't in the static export. */}
