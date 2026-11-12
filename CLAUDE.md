@@ -2050,14 +2050,14 @@ profile never publishes anything by itself.
   the panel gives way to the feature's own settings, as Public profile's has.
 
 **Public profiles** (`@/lib/user-profile`) are a page at `/u/<handle>/`
-showing a reader's Seen list and watchlist, for readers granted
+showing what a reader chooses of their lists, venues and stats, for readers granted
 `publicProfile` who switch it on. The site holds the handle, the switch and a
 shell page; a Cloudflare Worker, `clusterflick/api-profiles`, serves the
 profile.
 
 - **Two documents name each other.** `handles/{handle}` holds `{ uid }`: a
   document id exists once, which makes handles unique, and it is the Worker's
-  lookup. `users/{uid}/meta/profile` holds `{ handle, public }`, readable by
+  lookup. `users/{uid}/meta/profile` holds `{ handle, public, sections }`, readable by
   its owner only. Every change is one batch over both (`saveProfile`,
   `deleteProfile`), and the rules accept a write only if, after the batch,
   each still names the other: a claim creates both, a rename deletes the old
@@ -2072,20 +2072,44 @@ profile.
   `reserved-handles.json`. The list is short and curated, not a published
   blocklist: handles sit under `/u/`, so they can't collide with a page, and
   what's left is impersonating the site.
-- **Claiming, renaming and `public: true` need the capability;
-  `public: false` never does**, so a reader whose capability was revoked can
-  still take their profile down. Revoking deletes nothing: the page stops
+- **Claiming, renaming, choosing sections and `public: true` need the
+  capability; `public: false` never does**, and without the capability it is
+  the only change allowed (`affectedKeys().hasOnly(['public'])`), so a reader
+  whose capability was revoked can still take their profile down and nothing
+  else. Revoking deletes nothing: the page stops
   being served, the handle stays theirs, and a new grant restores it.
   `/personalise` then shows a notice offering to switch it off, in place of
   the panel.
-- **The settings are a "Public profile" panel in the account bar**
-  (`public-profile.tsx`), shown only with the capability: the handle, saved
-  after checking it's free, with a warning before a rename frees the old
-  address, the switch, disabled until a handle is saved, and a link to the
-  page, which works while private too. A refused batch
-  is reported as "taken", since another reader claiming the handle between
-  the check and the save is the likely cause, and logged in case it isn't.
-  `readProfile` reads it once a session, as `readCapabilities` does.
+- **The reader chooses what the page shows** (`sections`: Seen stats,
+  watchlist, favourite venues, Seen list, `ProfileSectionId`, repeated in the
+  rules and the Worker). Every section starts on, but **a profile can't go
+  public until a choice has been saved**: the rules refuse `public: true`
+  without `sections`, so publishing is never a step that skips seeing what's
+  on the page. A profile made public before sections existed has none and
+  shows everything, as it did; it can be switched off as it is, but changing
+  anything else means saving a choice first, and the settings say so.
+- **A hidden section is never sent, not just not drawn.** The Worker builds
+  its field mask from `sections`, so a hidden list never leaves Firestore,
+  and sends the page `sections` to tell a hidden list from an empty one
+  (`getShownSections`; none from an older Worker means everything). The
+  stats are the exception the settings explain: they are worked out in the
+  visitor's browser from the Seen list, so showing them sends the list even
+  while it is hidden, and their records name a few films. **Deploy the Worker
+  before the rules and the site**: the other way round, a reader could hide a
+  section that the old Worker still sends.
+- **The settings are their own page, `/personalise/profile/`**, in the order
+  they must be done: the handle (checked free, with a warning before a rename
+  frees the old address), what's shown (switches saved together), then the
+  public switch, disabled until both are saved and while the choice has
+  unsaved changes, since going public publishes what's saved. Below them a
+  preview draws the page as visitors will see it from the choice as it
+  stands, through `ProfileView`, the same component the profile page draws
+  with, so the two can't differ. The account bar's "Public profile" panel
+  (`public-profile.tsx`) only says where the profile stands and links there.
+  A refused batch is reported as "taken" when the handle changed, since
+  another reader claiming it between the check and the save is the likely
+  cause, and logged in case it isn't. `readProfile` reads it once a session,
+  as `readCapabilities` does.
 - **The page is `/profile-shell/`, filled in by the Worker.** The export has
   no page per reader, so the Worker owns `/u/*`: it reads the profile from
   Firestore as a service account (nothing there is public), fetches this
@@ -2094,7 +2118,8 @@ profile.
   the lists, favourite venues and film details arrive as Firestore's REST
   answer, undecoded, and the page decodes them after hydration
   (`@/lib/user-profile/page-data`, `firestore-rest`). The page is
-  `/personalise` read only: the same `SeenStats`, `UserListSection` and
+  `/personalise` read only, with only the sections shown (`ProfileView`):
+  the same `SeenStats`, `UserListSection` and
   `FavouriteVenuesSection`, with `publicView` (and `SeenStats`' `details`)
   keeping the editing away and speaking about the reader rather than to them.
   A change to those sections shows on profiles too. Unknown, private

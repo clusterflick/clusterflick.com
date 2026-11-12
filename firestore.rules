@@ -37,18 +37,28 @@ service cloud.firestore {
       allow delete: if isOwner(userId)
         && !existsAfter(handlePath(resource.data.handle));
       allow create, update: if isOwner(userId)
-        && request.resource.data.keys().hasOnly(['handle', 'public'])
+        && request.resource.data.keys().hasOnly(['handle', 'public', 'sections'])
         && request.resource.data.handle is string
         && request.resource.data.public is bool
+        && (!('sections' in request.resource.data)
+          || isProfileSections(request.resource.data.sections))
+        // Public only once the reader has chosen what the page shows. A
+        // profile made public before there was a choice has no sections and
+        // shows everything; it can stay as it is, but no write makes a
+        // profile public without them again.
+        && (request.resource.data.public == false
+          || 'sections' in request.resource.data)
         && existsAfter(handlePath(request.resource.data.handle))
         && getAfter(handlePath(request.resource.data.handle)).data.uid == userId
-        // Publishing or taking a new handle needs the capability; switching
-        // the page off never does, so a reader whose capability was revoked
-        // can still take it down.
+        // Publishing, taking a new handle or changing what's shown needs the
+        // capability; switching the page off never does, so a reader whose
+        // capability was revoked can still take it down. Only that: nothing
+        // else in the profile may change without the capability.
         && (hasCapability(userId, 'publicProfile')
           || (resource != null
             && request.resource.data.public == false
-            && request.resource.data.handle == resource.data.handle));
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['public'])));
     }
 
     // One per claimed handle, holding its owner's uid: a document id exists
@@ -88,6 +98,18 @@ service cloud.firestore {
 
   function isOwner(userId) {
     return request.auth != null && request.auth.uid == userId;
+  }
+
+  // As ProfileSectionId in @/lib/user-profile: every section, each shown or
+  // hidden, and nothing else. A test holds this list to the enum.
+  function isProfileSections(sections) {
+    return sections is map
+      && sections.keys().hasOnly(['seenStats', 'watchlist', 'favouriteVenues', 'seen'])
+      && sections.keys().hasAll(['seenStats', 'watchlist', 'favouriteVenues', 'seen'])
+      && sections.seenStats is bool
+      && sections.watchlist is bool
+      && sections.favouriteVenues is bool
+      && sections.seen is bool;
   }
 
   // As getHandleProblem in @/lib/user-profile. The reserved list is

@@ -224,10 +224,8 @@
     order: 1;
   }
 
-  /* The account and public profile panels have two short sections, side
-     by side. */
-  .accountManagement .managementSection:first-child,
-  .profileManagement .managementSection:first-child {
+  /* The account panel has two short sections, side by side. */
+  .accountManagement .managementSection:first-child {
     grid-column: auto;
   }
 }

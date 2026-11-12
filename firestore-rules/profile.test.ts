@@ -89,6 +89,14 @@ async function read(docPath: string) {
 
 const GRANTED = { publicProfile: { grantedAt: 1 } };
 
+/** A choice of what the page shows, as the site saves one. */
+const SECTIONS = {
+  seenStats: true,
+  watchlist: false,
+  favouriteVenues: false,
+  seen: true,
+};
+
 beforeAll(async () => {
   // Every refusal a test expects would otherwise be logged as an error.
   setLogLevel("silent");
@@ -244,7 +252,7 @@ describe("renaming", () => {
       saveProfile(
         signedInAs("alice"),
         "alice",
-        { handle: "alice-b", public: true },
+        { handle: "alice-b", public: true, sections: SECTIONS },
         { handle: "alice", public: true },
       ),
     );
@@ -287,13 +295,17 @@ describe("renaming", () => {
 });
 
 describe("the public switch", () => {
-  test("can be turned on with the capability", async () => {
+  test("can be turned on with the capability, once sections are chosen", async () => {
     await seed({
       "users/alice/meta/capabilities": GRANTED,
-      "users/alice/meta/profile": { handle: "alice", public: false },
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: false,
+        sections: SECTIONS,
+      },
       "handles/alice": { uid: "alice" },
     });
-    const previous = { handle: "alice", public: false };
+    const previous = { handle: "alice", public: false, sections: SECTIONS };
     await assertSucceeds(
       saveProfile(
         signedInAs("alice"),
@@ -304,13 +316,50 @@ describe("the public switch", () => {
     );
   });
 
-  test("can't be turned on once the capability is revoked", async () => {
+  test("can't be turned on before sections are chosen", async () => {
     await seed({
-      "users/alice/meta/capabilities": {},
+      "users/alice/meta/capabilities": GRANTED,
       "users/alice/meta/profile": { handle: "alice", public: false },
       "handles/alice": { uid: "alice" },
     });
     const previous = { handle: "alice", public: false };
+    await assertFails(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, public: true },
+        previous,
+      ),
+    );
+  });
+
+  test("a profile can't be claimed public in one go without sections", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    const alice = signedInAs("alice");
+    await assertFails(
+      saveProfile(alice, "alice", { handle: "alice", public: true }, null),
+    );
+    await assertSucceeds(
+      saveProfile(
+        alice,
+        "alice",
+        { handle: "alice", public: true, sections: SECTIONS },
+        null,
+      ),
+    );
+  });
+
+  test("can't be turned on once the capability is revoked", async () => {
+    await seed({
+      "users/alice/meta/capabilities": {},
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: false,
+        sections: SECTIONS,
+      },
+      "handles/alice": { uid: "alice" },
+    });
+    const previous = { handle: "alice", public: false, sections: SECTIONS };
     await assertFails(
       saveProfile(
         signedInAs("alice"),
@@ -349,6 +398,121 @@ describe("the public switch", () => {
         handle: "alice",
         public: "yes",
       }),
+    );
+  });
+});
+
+describe("sections", () => {
+  const PRIVATE = {
+    "users/alice/meta/capabilities": GRANTED,
+    "users/alice/meta/profile": { handle: "alice", public: false },
+    "handles/alice": { uid: "alice" },
+  };
+  const profileDoc = (db: Firestore) =>
+    doc(db, "users", "alice", "meta", "profile");
+
+  test("can be chosen while the profile is private", async () => {
+    await seed(PRIVATE);
+    const previous = { handle: "alice", public: false };
+    await assertSucceeds(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, sections: SECTIONS },
+        previous,
+      ),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual({
+      ...previous,
+      sections: SECTIONS,
+    });
+  });
+
+  const withoutSeen = Object.fromEntries(
+    Object.entries(SECTIONS).filter(([id]) => id !== "seen"),
+  );
+  test.each<[string, unknown]>([
+    ["one missing", withoutSeen],
+    ["one extra", { ...SECTIONS, email: true }],
+    ["one that isn't a boolean", { ...SECTIONS, seen: "yes" }],
+    ["not a map", true],
+  ])("not with %s", async (_, sections) => {
+    await seed(PRIVATE);
+    const alice = signedInAs("alice");
+    await assertFails(
+      setDoc(profileDoc(alice), { handle: "alice", public: false, sections }),
+    );
+  });
+
+  test("can't be taken off a public profile", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: true,
+        sections: SECTIONS,
+      },
+    });
+    const alice = signedInAs("alice");
+    await assertFails(
+      setDoc(profileDoc(alice), { handle: "alice", public: true }),
+    );
+  });
+
+  test("a profile public from before them can be switched off as it is", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": { handle: "alice", public: true },
+    });
+    const previous = { handle: "alice", public: true };
+    await assertSucceeds(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, public: false },
+        previous,
+      ),
+    );
+  });
+
+  test("a profile public from before them must choose them to change", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": { handle: "alice", public: true },
+    });
+    const previous = { handle: "alice", public: true };
+    await assertFails(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { handle: "alice-b", public: true },
+        previous,
+      ),
+    );
+  });
+
+  test("can't be changed once the capability is revoked, even switching off", async () => {
+    await seed({
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: true,
+        sections: SECTIONS,
+      },
+      "handles/alice": { uid: "alice" },
+    });
+    const previous = { handle: "alice", public: true, sections: SECTIONS };
+    const alice = signedInAs("alice");
+    await assertFails(
+      saveProfile(
+        alice,
+        "alice",
+        { ...previous, public: false, sections: { ...SECTIONS, seen: false } },
+        previous,
+      ),
+    );
+    // Switching off alone still works.
+    await assertSucceeds(
+      saveProfile(alice, "alice", { ...previous, public: false }, previous),
     );
   });
 });

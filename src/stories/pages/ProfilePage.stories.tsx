@@ -9,6 +9,7 @@ import { CapabilityId } from "@/lib/user-capabilities";
 import { UserListId } from "@/lib/user-lists";
 import type { FilmDetails } from "@/lib/user-lists/film-details";
 import type { ProfilePageData } from "@/lib/user-profile/page-data";
+import { ALL_PROFILE_SECTIONS, ProfileSectionId } from "@/lib/user-profile";
 
 function ProfilePageWrapper({
   data,
@@ -139,9 +140,10 @@ const SEEN_FILMS: [string, string, string, FilmDetails][] = [
   ],
 ];
 
-const FOUND: ProfilePageData = {
+const FOUND = {
   found: true,
   handle: "film-fan",
+  sections: ALL_PROFILE_SECTIONS,
   lists: {
     [UserListId.Seen]: Object.fromEntries(
       SEEN_FILMS.map(([id, title, year], index) => [
@@ -175,7 +177,7 @@ const FOUND: ProfilePageData = {
       tornatore: "Giuseppe Tornatore",
     },
   },
-};
+} satisfies ProfilePageData;
 
 const SIGNED_IN = {
   status: "signed-in",
@@ -214,7 +216,7 @@ export const Public: Story = {
   },
 };
 
-/** The owner, signed in: an "Edit profile" link to /personalise. */
+/** The owner, signed in: an "Edit profile" link to the profile settings. */
 export const PublicOwner: Story = {
   args: {
     data: FOUND,
@@ -228,7 +230,73 @@ export const PublicOwner: Story = {
     const canvas = within(canvasElement);
     await expect(
       await canvas.findByRole("link", { name: "Edit profile" }),
-    ).toHaveAttribute("href", "/personalise/");
+    ).toHaveAttribute("href", "/personalise/profile/");
+  },
+};
+
+/**
+ * The stats without the Seen list, and no watchlist or venues: only what was
+ * chosen, and the subtitle counts only what's shown.
+ */
+export const SomeSectionsHidden: Story = {
+  args: {
+    data: {
+      ...FOUND,
+      sections: {
+        [ProfileSectionId.SeenStats]: true,
+        [ProfileSectionId.Watchlist]: false,
+        [ProfileSectionId.FavouriteVenues]: false,
+        [ProfileSectionId.Seen]: false,
+      },
+      // A hidden section's data never arrives.
+      lists: { ...FOUND.lists, [UserListId.Watchlist]: {} },
+      favouriteVenues: {},
+    },
+    user: { status: "signed-out" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Film Stats" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("6 films seen")).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: /Watchlist/ }),
+    ).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: /Favourite Venues/ }),
+    ).not.toBeInTheDocument();
+    // The stats' own headings aside, no list headed Seen.
+    await expect(
+      canvas.queryByRole("heading", { name: /^Seen/ }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+/** Every section switched off: the handle, and a line saying so. */
+export const NothingShown: Story = {
+  args: {
+    data: {
+      found: true,
+      handle: "quiet-reader",
+      sections: {
+        [ProfileSectionId.SeenStats]: false,
+        [ProfileSectionId.Watchlist]: false,
+        [ProfileSectionId.FavouriteVenues]: false,
+        [ProfileSectionId.Seen]: false,
+      },
+      lists: { [UserListId.Seen]: {}, [UserListId.Watchlist]: {} },
+      favouriteVenues: {},
+      filmDetails: { films: {}, people: {} },
+    },
+    user: { status: "signed-out" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText("quiet-reader isn't sharing any lists yet."),
+    ).toBeInTheDocument();
+    await expect(canvas.queryByText(/films seen/)).not.toBeInTheDocument();
   },
 };
 
@@ -237,6 +305,7 @@ export const PublicEmptyLists: Story = {
     data: {
       found: true,
       handle: "new-reader",
+      sections: ALL_PROFILE_SECTIONS,
       lists: { [UserListId.Seen]: {}, [UserListId.Watchlist]: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

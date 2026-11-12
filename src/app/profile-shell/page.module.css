@@ -3,3 +3,9 @@
   justify-content: center;
   margin-top: 16px;
 }
+
+.nothingShown {
+  margin: 0;
+  text-align: center;
+  color: var(--color-muted-gray);
+}

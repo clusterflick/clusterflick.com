@@ -81,3 +81,14 @@
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
 }
+
+/* Disabled: dimmed, and the label doesn't brighten, since pressing does
+   nothing. */
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.disabled:hover .label {
+  color: var(--color-muted-gray);
+}

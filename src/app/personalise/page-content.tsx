@@ -58,7 +58,7 @@ import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
 import {
   ProfileWithdrawnNotice,
-  PublicProfileSettings,
+  PublicProfileSummary,
   usePublicProfile,
   type PublicProfileState,
 } from "./public-profile";
@@ -627,10 +627,7 @@ function AccountBar({
       {publicProfile && (
         <div id="personalise-profile" hidden={panel !== "profile"}>
           {panel === "profile" && (
-            <PublicProfileSettings
-              profile={publicProfile.profile}
-              onSaved={publicProfile.onSaved}
-            />
+            <PublicProfileSummary profile={publicProfile.profile} />
           )}
         </div>
       )}

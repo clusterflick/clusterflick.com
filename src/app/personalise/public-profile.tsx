@@ -1,18 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import clsx from "clsx";
-import Button, { ButtonAnchor } from "@/components/button";
-import Switch from "@/components/switch";
+import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
-import {
-  getHandleProblem,
-  getProfilePath,
-  HANDLE_MAX_LENGTH,
-  HANDLE_PROBLEM_MESSAGES,
-  type UserProfile,
-} from "@/lib/user-profile";
+import { getProfilePath, type UserProfile } from "@/lib/user-profile";
+import { PROFILE_SETTINGS_PATH } from "./profile/path";
 import styles from "./page.module.css";
 
 export type PublicProfileState = {
@@ -72,25 +65,22 @@ function isPermissionDenied(error: unknown) {
   );
 }
 
-const SAVE_FAILED = "Something went wrong saving that. Please try again.";
+export const SAVE_FAILED =
+  "Something went wrong saving that. Please try again.";
 
 /**
- * Opened from the account bar for a reader with the capability: their handle
- * and whether the page is shown. Nothing is public until the switch is on, and
- * the switch can't be turned on before a handle is saved.
+ * Saving the profile, for each of its settings: one save at a time, and a
+ * refused batch reported as a taken handle when the handle changed, since
+ * another reader claiming it between the check and the save is the likely
+ * cause. Anything else refused is logged.
  */
-export function PublicProfileSettings({
-  profile,
-  onSaved,
-}: Pick<PublicProfileState, "profile" | "onSaved">) {
-  const { saveProfile, isHandleTaken } = useUserContext();
-  const [handle, setHandle] = useState(profile?.handle ?? "");
-  const [confirmingRename, setConfirmingRename] = useState(false);
+export function useProfileSave(
+  profile: UserProfile | null,
+  onSaved: PublicProfileState["onSaved"],
+) {
+  const { saveProfile } = useUserContext();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const changed = handle !== (profile?.handle ?? "");
-  const problem = changed && handle ? getHandleProblem(handle) : null;
 
   const save = async (next: UserProfile) => {
     setSaving(true);
@@ -101,7 +91,6 @@ export function PublicProfileSettings({
       return true;
     } catch (saveError) {
       console.error("Failed to save profile", saveError);
-      // The rules refuse a handle someone else claimed after the check below.
       setError(
         isPermissionDenied(saveError) && next.handle !== profile?.handle
           ? "That handle is taken"
@@ -113,110 +102,42 @@ export function PublicProfileSettings({
     }
   };
 
-  // From the form, or from the rename confirmation beneath it.
-  const onSubmit = async (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-    if (!changed || !handle || getHandleProblem(handle)) return;
-    // Renaming frees the old address at once, so it asks first.
-    if (profile && !confirmingRename) {
-      setConfirmingRename(true);
-      return;
-    }
-    setConfirmingRename(false);
-    setSaving(true);
-    setError(null);
-    try {
-      if (await isHandleTaken(handle)) {
-        setError("That handle is taken");
-        return;
-      }
-    } catch (checkError) {
-      console.error("Failed to check handle", checkError);
-      setError(SAVE_FAILED);
-      return;
-    } finally {
-      setSaving(false);
-    }
-    await save({ handle, public: profile?.public ?? false });
-  };
+  return { save, saving, setSaving, error, setError };
+}
 
-  const message = problem ? HANDLE_PROBLEM_MESSAGES[problem] : error;
-
+/**
+ * Opened from the account bar for a reader with the capability: where their
+ * profile stands, and the way to its settings page, which has the room to
+ * preview what each choice shows.
+ */
+export function PublicProfileSummary({
+  profile,
+}: Pick<PublicProfileState, "profile">) {
   return (
-    <div className={clsx(styles.management, styles.profileManagement)}>
+    <div className={styles.management}>
       <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>Your handle</h3>
-        <p id="public-profile-handle-help" className={styles.managementText}>
-          The address of your profile page. Letters, numbers, - and _, from 3 to{" "}
-          {HANDLE_MAX_LENGTH} characters.
+        <h3 className={styles.managementTitle}>Your profile</h3>
+        <p className={styles.managementText}>
+          {!profile
+            ? "Choose an address and what your profile shows. It stays private until you make it public."
+            : profile.public
+              ? `Public at clusterflick.com${getProfilePath(profile.handle)}.`
+              : `Private. Only you can open clusterflick.com${getProfilePath(profile.handle)}.`}
+          {profile?.public && !profile.sections && (
+            <>
+              {" "}
+              It went public before you could choose what it shows, so it shows
+              everything: have a look at what&apos;s on it.
+            </>
+          )}
         </p>
-        <form className={styles.row} onSubmit={onSubmit}>
-          <input
-            className={styles.input}
-            type="text"
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            maxLength={HANDLE_MAX_LENGTH}
-            aria-label="Handle"
-            aria-describedby="public-profile-handle-help"
-            aria-invalid={problem ? true : undefined}
-            value={handle}
-            onChange={(event) => {
-              setHandle(event.target.value.toLowerCase());
-              setConfirmingRename(false);
-              setError(null);
-            }}
-            placeholder="your-name"
-          />
-          <Button
-            type="submit"
-            size="sm"
-            disabled={saving || !changed || !handle || problem !== null}
-          >
-            {profile ? "Change handle" : "Save handle"}
-          </Button>
-        </form>
-        {confirmingRename && profile && (
-          <div className={clsx(styles.managementActions, styles.renameConfirm)}>
-            <span className={styles.confirmText}>
-              {getProfilePath(profile.handle)} will stop working straight away,
-              and anyone can claim it.
-            </span>
-            <Button size="sm" onClick={onSubmit} disabled={saving}>
-              Change it
-            </Button>
-            <Button variant="link" onClick={() => setConfirmingRename(false)}>
-              Cancel
-            </Button>
-          </div>
-        )}
-        {message && (
-          <p className={styles.error} role="alert">
-            {message}
-          </p>
-        )}
-      </section>
-      <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>Show my profile</h3>
-        {profile ? (
-          <>
-            <Switch
-              id="public-profile-switch"
-              label="Public"
-              checked={profile.public}
-              onChange={(checked) => {
-                if (!saving) save({ ...profile, public: checked });
-              }}
-            />
-            <p className={styles.managementText}>
-              While this is on, anyone with the link can see your lists, your
-              venues and your film stats at clusterflick.com
-              {getProfilePath(profile.handle)}, as you see them here. While
-              it&apos;s off, only you can open it.
-            </p>
-            {/* An anchor, not a client-side link: the page is the profiles
-                Worker's, and isn't in the static export. */}
+        <div className={styles.managementActions}>
+          <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
+            {profile ? "Edit profile" : "Set up your profile"}
+          </ButtonLink>
+          {profile && (
+            // An anchor, not a client-side link: the page is the profiles
+            // Worker's, and isn't in the static export.
             <ButtonAnchor
               href={getProfilePath(profile.handle)}
               variant="secondary"
@@ -224,13 +145,8 @@ export function PublicProfileSettings({
             >
               View your profile
             </ButtonAnchor>
-          </>
-        ) : (
-          <p className={styles.managementText}>
-            Save a handle first. Your profile stays private until you switch it
-            on here.
-          </p>
-        )}
+          )}
+        </div>
       </section>
     </div>
   );

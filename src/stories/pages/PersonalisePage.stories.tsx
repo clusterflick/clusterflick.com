@@ -155,8 +155,8 @@ async function openPublicProfile(canvasElement: HTMLElement) {
 }
 
 /**
- * Granted a public profile, not yet set up: a handle to claim, and the switch
- * waits for it. A handle that can't be claimed says why as it's typed.
+ * Granted a public profile, not yet set up: the panel says so and leads to
+ * the settings page, where it's done.
  */
 export const SignedInPublicProfileNoHandle: Story = {
   args: {
@@ -167,22 +167,19 @@ export const SignedInPublicProfileNoHandle: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
-    await expect(canvas.getByText(/Save a handle first/)).toBeInTheDocument();
-    await expect(canvas.queryByRole("checkbox")).not.toBeInTheDocument();
-    const input = canvas.getByRole("textbox", { name: "Handle" });
-    await userEvent.type(input, "Admin");
-    // Lowercased as typed.
-    await expect(input).toHaveValue("admin");
     await expect(
-      canvas.getByText("That handle isn't available"),
+      canvas.getByText(/It stays private until you make it public/),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByRole("button", { name: "Save handle" }),
-    ).toBeDisabled();
+      canvas.getByRole("link", { name: "Set up your profile" }),
+    ).toHaveAttribute("href", "/personalise/profile/");
+    await expect(
+      canvas.queryByRole("link", { name: "View your profile" }),
+    ).not.toBeInTheDocument();
   },
 };
 
-/** A handle saved, the profile private: the switch is there, off. */
+/** A handle saved, the profile private: where it stands, and the way in. */
 export const SignedInPublicProfilePrivate: Story = {
   args: {
     user: {
@@ -194,11 +191,13 @@ export const SignedInPublicProfilePrivate: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByRole("checkbox", { name: "Public" }),
-    ).not.toBeChecked();
-    await expect(
-      canvas.getByText(/clusterflick\.com\/u\/film-fan\//),
+      canvas.getByText(
+        /Private\. Only you can open clusterflick\.com\/u\/film-fan\//,
+      ),
     ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "Edit profile" }),
+    ).toHaveAttribute("href", "/personalise/profile/");
     // Works while private: the owner is told why it isn't showing.
     await expect(
       canvas.getByRole("link", { name: "View your profile" }),
@@ -207,10 +206,10 @@ export const SignedInPublicProfilePrivate: Story = {
 };
 
 /**
- * Public, and about to change the handle: the old address stops working, so
- * it asks first.
+ * Public from before readers chose what it shows: it shows everything, and
+ * the panel asks them to look.
  */
-export const SignedInPublicProfileRenaming: Story = {
+export const SignedInPublicProfileBeforeSections: Story = {
   args: {
     user: {
       ...PROFILE_READER,
@@ -221,16 +220,10 @@ export const SignedInPublicProfileRenaming: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByRole("checkbox", { name: "Public" }),
-    ).toBeChecked();
-    const input = canvas.getByRole("textbox", { name: "Handle" });
-    await userEvent.clear(input);
-    await userEvent.type(input, "film-buff");
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Change handle" }),
-    );
+      canvas.getByText(/Public at clusterflick\.com\/u\/film-fan\//),
+    ).toBeInTheDocument();
     await expect(
-      canvas.getByText(/\/u\/film-fan\/ will stop working straight away/),
+      canvas.getByText(/before you could choose what it shows/),
     ).toBeInTheDocument();
   },
 };
