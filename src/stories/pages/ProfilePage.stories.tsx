@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 import { ProfilePage } from "@/app/profile-shell/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
 import { FilterConfigProvider } from "@/state/filter-config-context";
@@ -53,6 +53,12 @@ function ProfilePageWrapper({
  */
 const meta = {
   title: "Pages/Profile",
+  // The comparison cards' dismissals are kept in the browser, which every
+  // story shares: each starts with none.
+  beforeEach: () => {
+    localStorage.removeItem("clusterflick-profile-sign-up-dismissed");
+    localStorage.removeItem("clusterflick-profile-compare-dismissed");
+  },
   component: ProfilePageWrapper,
   parameters: {
     layout: "fullscreen",
@@ -228,42 +234,61 @@ export const Public: Story = {
     ).toEqual([]);
     await expect(canvas.queryByText("Remove")).not.toBeInTheDocument();
     await expect(canvas.queryByText("Edit profile")).not.toBeInTheDocument();
-    // Signed out, what they'd have in common is an invitation.
+    // Signed out, what they'd have in common is an invitation, which can
+    // be dismissed for good.
     await expect(
       canvas.getByRole("link", { name: "Start your lists" }),
     ).toHaveAttribute("href", "/personalise/");
+    await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
+    await expect(
+      canvas.queryByRole("link", { name: "Start your lists" }),
+    ).not.toBeInTheDocument();
+    await expect(
+      localStorage.getItem("clusterflick-profile-sign-up-dismissed"),
+    ).toBe("1");
   },
 };
 
-/**
- * Someone else, signed in: what they have in common with the owner, above
- * the owner's lists. Each kind of film in common is its own group.
- */
-export const VisitorInCommon: Story = {
-  args: {
-    data: FOUND,
-    user: {
-      ...SIGNED_IN,
-      lists: {
-        [UserListId.Watchlist]: {
-          "496243": { title: "Parasite", year: "2019", addedAt: 1 },
-          "949": { title: "Heat", year: "1995", addedAt: 1 },
-        },
-        [UserListId.Seen]: {
-          "843": { title: "In the Mood for Love", year: "2000", addedAt: 1 },
-          "a-long-gone-film": {
-            title: "A Film Long Gone",
-            year: "1950",
-            addedAt: 1,
-          },
-        },
+const VISITOR = {
+  ...SIGNED_IN,
+  lists: {
+    [UserListId.Watchlist]: {
+      "496243": { title: "Parasite", year: "2019", addedAt: 1 },
+      "949": { title: "Heat", year: "1995", addedAt: 1 },
+    },
+    [UserListId.Seen]: {
+      "843": { title: "In the Mood for Love", year: "2000", addedAt: 1 },
+      "a-long-gone-film": {
+        title: "A Film Long Gone",
+        year: "1950",
+        addedAt: 1,
       },
     },
   },
+} satisfies Partial<UserContextType>;
+
+/**
+ * Someone else, signed in: a card offering to compare, which opens what they
+ * have in common with the owner, a group for each kind of film. Hide brings
+ * the card back.
+ */
+export const VisitorComparing: Story = {
+  args: { data: FOUND, user: VISITOR },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
-      await canvas.findByRole("heading", { name: "You and film-fan" }),
+      await canvas.findByText(
+        (_, element) =>
+          element?.tagName === "P" &&
+          element.textContent === "You have 4 films in common with film-fan.",
+      ),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: "You and film-fan" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Compare" }));
+    await expect(
+      canvas.getByRole("heading", { name: "You and film-fan" }),
     ).toBeInTheDocument();
     for (const group of [
       /^You both want to see/,
@@ -275,16 +300,31 @@ export const VisitorInCommon: Story = {
         canvas.getByRole("heading", { name: group }),
       ).toBeInTheDocument();
     }
+    await userEvent.click(canvas.getByRole("button", { name: "Hide" }));
     await expect(
-      canvas.queryByRole("link", { name: "Start your lists" }),
-    ).not.toBeInTheDocument();
+      canvas.getByRole("button", { name: "Compare" }),
+    ).toBeInTheDocument();
   },
 };
 
-/**
- * Someone else, signed in, with nothing in common: said plainly, with what
- * would show here.
- */
+/** Dismissed, the compare card stays gone for this profile. */
+export const VisitorDismissing: Story = {
+  args: { data: FOUND, user: VISITOR },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Dismiss" }),
+    );
+    await expect(
+      canvas.queryByRole("button", { name: "Compare" }),
+    ).not.toBeInTheDocument();
+    await expect(
+      localStorage.getItem("clusterflick-profile-compare-dismissed"),
+    ).toBe('["film-fan"]');
+  },
+};
+
+/** Someone else, signed in, with nothing in common: said, with no button. */
 export const VisitorNothingInCommon: Story = {
   args: {
     data: FOUND,
@@ -296,8 +336,15 @@ export const VisitorNothingInCommon: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
-      await canvas.findByText(/No films in common yet/),
+      await canvas.findByText(
+        (_, element) =>
+          element?.tagName === "P" &&
+          element.textContent === "No films in common with film-fan yet.",
+      ),
     ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("button", { name: "Compare" }),
+    ).not.toBeInTheDocument();
   },
 };
 
@@ -330,9 +377,7 @@ export const VisitorListsHidden: Story = {
     await expect(
       await canvas.findByRole("heading", { name: "Film Stats" }),
     ).toBeInTheDocument();
-    await expect(
-      canvas.queryByRole("heading", { name: /^You and/ }),
-    ).not.toBeInTheDocument();
+    await expect(canvas.queryByText(/in common with/)).not.toBeInTheDocument();
   },
 };
 
@@ -354,9 +399,7 @@ export const PublicOwner: Story = {
     await expect(
       canvas.getByRole("button", { name: "Copy link" }),
     ).toBeInTheDocument();
-    await expect(
-      canvas.queryByRole("heading", { name: /^You and/ }),
-    ).not.toBeInTheDocument();
+    await expect(canvas.queryByText(/in common with/)).not.toBeInTheDocument();
   },
 };
 

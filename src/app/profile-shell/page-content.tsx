@@ -206,6 +206,7 @@ function FoundProfile({
         <ProfileView
           lead={
             <ProfileComparison
+              handle={handle}
               ownerName={displayName ?? handle}
               lists={lists}
               sections={sections}
