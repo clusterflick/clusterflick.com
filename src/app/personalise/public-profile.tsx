@@ -27,13 +27,17 @@ export type PublicProfileState = {
  * coming-soon panel, a setting nobody can reach is better than a broken page.
  */
 export function usePublicProfile(): PublicProfileState | null {
-  const { readCapabilities, readProfile } = useUserContext();
+  const { status, readCapabilities, readProfile } = useUserContext();
+  const signedIn = status === "signed-in";
   const [state, setState] = useState<{
     granted: boolean;
     profile: UserProfile | null;
   } | null>(null);
 
+  // Only once signed in: the settings page asks before Firebase has said who
+  // is, and reading then fails.
   useEffect(() => {
+    if (!signedIn) return;
     let cancelled = false;
     Promise.all([readCapabilities(), readProfile()]).then(
       ([capabilities, profile]) => {
@@ -48,7 +52,7 @@ export function usePublicProfile(): PublicProfileState | null {
     return () => {
       cancelled = true;
     };
-  }, [readCapabilities, readProfile]);
+  }, [signedIn, readCapabilities, readProfile]);
 
   const onSaved = useCallback(
     (profile: UserProfile) =>
