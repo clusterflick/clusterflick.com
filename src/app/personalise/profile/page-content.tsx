@@ -7,6 +7,7 @@ import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import StandardPageLayout from "@/components/standard-page-layout";
 import Switch from "@/components/switch";
+import PopcornLogo from "@/components/popcorn-logo";
 import { useUserContext } from "@/state/user-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
@@ -341,7 +342,13 @@ function Editor({
                 aria-invalid={problems.name ? true : undefined}
                 value={draft.name}
                 onChange={(event) =>
-                  update({ name: stripDisplayNameInput(event.target.value) })
+                  update({
+                    // Stopped at the limit, counted in characters as the
+                    // rules count them, rather than told off past it.
+                    name: [...stripDisplayNameInput(event.target.value)]
+                      .slice(0, DISPLAY_NAME_MAX_LENGTH)
+                      .join(""),
+                  })
                 }
                 placeholder={value.handle || "Your name"}
               />
@@ -434,12 +441,20 @@ function Editor({
           {draft.sections[ProfileSectionId.SeenStats] &&
             !draft.sections[ProfileSectionId.Seen] && (
               <p className={styles.sectionCaveat}>
-                Your stats are worked out in the visitor&apos;s browser, so your
-                Seen list is still sent with the page while it&apos;s hidden. It
-                isn&apos;t shown, but anyone reading the page&apos;s source
-                could find it.
+                Your stats are worked out on the page, so your Seen list is
+                still sent with it while it&apos;s hidden. It isn&apos;t shown,
+                but anyone reading the page&apos;s source could find it.
               </p>
             )}
+          {PROFILE_SECTION_IDS.every((id) => !draft.sections[id]) && (
+            <div className={styles.allOff}>
+              <PopcornLogo spilled size={200} />
+              <p className={styles.allOffText}>
+                That&apos;s everything switched off. Your profile shows just
+                your name, links and favourite films.
+              </p>
+            </div>
+          )}
         </SettingsCard>
 
         <SaveBar

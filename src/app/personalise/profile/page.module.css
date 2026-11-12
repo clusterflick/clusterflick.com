@@ -199,6 +199,24 @@
   border-radius: 8px;
 }
 
+/* Every section switched off: the popcorn, knocked over. */
+.allOff {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.allOffText {
+  margin: 0;
+  max-width: 36ch;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
 /* ---- Favourites ---- */
 
 /* The four places, filled in order, four across as the profile shows them. */
@@ -323,13 +341,12 @@
 }
 
 /* In place of the search once all four places are filled: blue, as news
-   rather than a problem, and balanced so no word is left on a line alone. */
+   rather than a problem. */
 .favouritesFull {
   margin: 0;
   padding: 12px 14px;
   font-size: 14px;
   line-height: 1.5;
-  text-wrap: balance;
   color: var(--color-light-gray);
   background: rgba(var(--color-electric-blue-rgb), 0.08);
   border: 1px solid rgba(var(--color-electric-blue-rgb), 0.45);

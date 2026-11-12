@@ -2089,6 +2089,9 @@ displayName, links, favourites }`, readable by
   on the page. A profile made public before sections existed has none and
   shows everything, as it did; it can be switched off as it is, but changing
   anything else means saving a choice first, and the settings say so.
+- **With every section switched off, the settings show the popcorn
+  knocked over** (`PopcornLogo`'s `spilled`) and say the profile now shows
+  only the name, links and favourites.
 - **A hidden section is never sent, not just not drawn.** The Worker builds
   its field mask from `sections`, so a hidden list never leaves Firestore,
   and sends the page `sections` to tell a hidden list from an empty one
@@ -2151,9 +2154,10 @@ displayName, links, favourites }`, readable by
   of the profile; below 1100px the hero keeps a strip above the fan for
   them, for everyone, so nothing moves when they appear. **Nothing in the
   hero waits on anything**: the posters are the favourites' snapshots (the
-  dataset's only where a snapshot has none), and the wash is a fixed height
-  running on past the hero rather than the hero's height, which rescaled
-  every blurred poster as the hero's lines arrived.
+  dataset's only where a snapshot has none), and each blurred poster's layer
+  is a fixed height from the hero's top rather than the hero's height, which
+  rescaled them as the hero's lines arrived. The wash stays clipped to the
+  hero: run on past its foot, it painted over the heading below.
 - **A profile is useful to a friend, not just a record.** On someone's
   profile the watchlist leads with how many of its films are showing this
   week, linking to the planner on just those (`getShowingThisWeek`), and its

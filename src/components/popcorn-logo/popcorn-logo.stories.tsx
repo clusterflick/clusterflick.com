@@ -9,6 +9,8 @@ import PopcornLogo from "@/components/popcorn-logo";
  * **When to use:**
  * - As the centrepiece of a hero where the logo is the subject, as on the
  *   about page.
+ * - `spilled`, as a small joke where everything has been emptied out: the
+ *   profile settings with every section switched off.
  *
  * **When NOT to use:**
  * - For the logo as a small mark (headers, footers, favicons) — use the static
@@ -34,4 +36,9 @@ export const Default: Story = {};
 /** The phone size the about page hero uses. */
 export const Small: Story = {
   args: { size: 140 },
+};
+
+/** Knocked over, as the profile settings show it with nothing switched on. */
+export const Spilled: Story = {
+  args: { spilled: true, size: 240 },
 };

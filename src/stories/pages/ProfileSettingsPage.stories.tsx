@@ -314,7 +314,24 @@ export const StatsWithoutSeenList: Story = {
       await canvas.findByRole("checkbox", { name: "Seen list" }),
     );
     await expect(
-      canvas.getByText(/your Seen list is still sent with the page/),
+      canvas.getByText(/your Seen list is\s+still sent with it/),
+    ).toBeInTheDocument();
+  },
+};
+
+/** Every section switched off: the popcorn, knocked over. */
+export const EverythingSwitchedOff: Story = {
+  args: { user: { ...READER, readProfile: async () => SAVED } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ["Seen stats", "Favourite venues", "Seen list"]) {
+      await userEvent.click(await canvas.findByRole("checkbox", { name }));
+    }
+    await expect(
+      canvas.getByRole("img", { name: "The Clusterflick popcorn, spilled" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText(/everything switched off/),
     ).toBeInTheDocument();
   },
 };

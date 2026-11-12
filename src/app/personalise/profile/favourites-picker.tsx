@@ -305,8 +305,9 @@ export default function FavouritesPicker({
           saying so. */}
       {full ? (
         <p className={styles.favouritesFull} role="status">
-          You&apos;ve filled your favourites! Remove one to change it for
-          something else.
+          You&apos;ve filled your favourites!
+          <br />
+          Remove one to change it for something else.
         </p>
       ) : (
         <form

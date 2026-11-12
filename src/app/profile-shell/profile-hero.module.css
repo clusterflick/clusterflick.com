@@ -1,10 +1,8 @@
-/* Clipped across but not down: the wash runs on past the hero's foot and
-   fades out over the page, so its size never depends on the hero's. */
 .hero {
   --poster: clamp(96px, 22vw, 168px);
   position: relative;
   isolation: isolate;
-  overflow-x: clip;
+  overflow: hidden;
   padding: 85px 20px 40px;
   text-align: center;
 }
@@ -36,10 +34,13 @@
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
 }
 
-/* With favourites, a fixed height, about what the hero holds, rather than
-   the hero's own: the hero grows as its lines arrive, and a wash sized to it
-   rescaled every blurred poster each time. */
-.withFan .wash {
+/* With favourites, each poster's layer is a fixed height from the top
+   rather than the hero's: sized to the hero, it rescaled every blurred
+   poster whenever a line arrived. Only the mask, which fades the wash out at
+   the hero's foot, follows the hero. The wash stays inside the hero: let it
+   run on past the foot and it painted over the heading below. */
+.withFan .washLayer {
+  top: -60px;
   bottom: auto;
   height: calc(var(--poster) * 1.5 + 420px);
 }
