@@ -71,6 +71,33 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-12",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "Haggerston Community Centre",
+                  url: "https://communityhalls.hackney.gov.uk",
+                },
+                {
+                  name: "Calouste Gulbenkian Foundation",
+                  url: "https://gulbenkian.pt",
+                },
+              ]}
+            />
+            : a council-run community centre by Haggerston station, and the
+            Gulbenkian Foundation&apos;s UK home on Hoxton Square.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-11",
     changes: [
       {
