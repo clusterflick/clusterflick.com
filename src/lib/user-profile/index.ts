@@ -9,6 +9,8 @@ import { type FavouriteFilm, readFavourites } from "./favourites";
 
 export * from "./identity";
 export * from "./favourites";
+export * from "./taste";
+export * from "./showing-this-week";
 
 /**
  * A reader's public profile settings: the handle their page lives at

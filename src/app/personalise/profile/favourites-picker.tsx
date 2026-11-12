@@ -2,12 +2,14 @@
 
 import {
   useDeferredValue,
-  useEffect,
   useMemo,
   useRef,
   useState,
+  type DragEvent,
   type FormEvent,
 } from "react";
+import clsx from "clsx";
+import MoviePoster from "@/components/movie-poster";
 import Button from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -23,13 +25,10 @@ import {
 } from "@/lib/tmdb-search";
 import {
   FAVOURITES_MAX,
-  sameFavourites,
   toFavouriteFilm,
   type FavouriteFilm,
 } from "@/lib/user-profile";
-import { useProfileSave } from "@/app/personalise/public-profile";
 import personaliseStyles from "@/app/personalise/page.module.css";
-import Step, { type StepProps } from "./step";
 import styles from "./page.module.css";
 
 /** How many matches are drawn at once: two rows; past that, another word. */
@@ -47,38 +46,45 @@ type TmdbState =
 /** A film that could be picked, from the Seen list or TheMovieDB. */
 type Candidate = FavouriteFilm & { onSeen: boolean };
 
+/** Moves one item of a list to another place in it. */
+function moveItem<T>(items: T[], from: number, to: number): T[] {
+  const next = [...items];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
 /**
- * Up to four films to head the profile, in the reader's order.
+ * Up to four films to head the profile, in the reader's order, as part of
+ * the settings' one draft.
  *
- * Picked from the Seen list first, searched as the reader types, since that
- * is almost always where favourites are; nothing leaves the browser for it.
- * TheMovieDB is the second step, as in the film search on /personalise: on
- * Enter or "Search all films", never as the reader types, since every
- * request counts against the search Worker's per-reader limit. Each pick is
- * saved as its own snapshot, so the Seen list can change without touching
- * it.
+ * The four places are drawn whether filled or not: an empty one opens the
+ * search, a filled one can be dragged to another place, or moved with its
+ * arrows, which are also the keyboard's way to do it.
+ *
+ * Films are picked from the Seen list first, searched as the reader types,
+ * since that is almost always where favourites are, and nothing leaves the
+ * browser for it. TheMovieDB is the second step, as in the film search on
+ * /personalise: on Enter or "Search all films", never as the reader types,
+ * since every request counts against the search Worker's per-reader limit.
+ * Each pick is its own snapshot, so the Seen list can change without
+ * touching it.
  */
-export default function FavouritesStep({
-  number,
-  profile,
-  onSaved,
-  onFavouritesChange,
-}: StepProps & {
-  number: number;
-  onFavouritesChange: (favourites: FavouriteFilm[]) => void;
+export default function FavouritesPicker({
+  value: picks,
+  onChange,
+}: {
+  value: FavouriteFilm[];
+  onChange: (favourites: FavouriteFilm[]) => void;
 }) {
   const { lists, getIdToken } = useUserContext();
   const { movies } = useCinemaData();
-  const { save, saving, error } = useProfileSave(profile, onSaved);
-  const saved = useMemo(() => profile?.favourites ?? [], [profile]);
-  const [picks, setPicks] = useState<FavouriteFilm[]>(saved);
   const [query, setQuery] = useState("");
   const [tmdb, setTmdb] = useState<TmdbState>({ step: "idle" });
   const inFlight = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    onFavouritesChange(picks);
-  }, [picks, onFavouritesChange]);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dropTarget, setDropTarget] = useState<number | null>(null);
 
   const trimmed = query.trim();
   const deferredQuery = useDeferredValue(trimmed);
@@ -163,89 +169,137 @@ export default function FavouritesStep({
 
   const pickedIds = new Set(picks.map(({ id }) => id));
   const full = picks.length >= FAVOURITES_MAX;
-  const changed = !sameFavourites(picks, saved);
-  const blockedBySections = Boolean(profile?.public && !profile.sections);
-
-  const move = (index: number, by: -1 | 1) =>
-    setPicks((current) => {
-      const next = [...current];
-      [next[index], next[index + by]] = [next[index + by], next[index]];
-      return next;
-    });
 
   // Saved without `onSeen`, which only says where a candidate was found.
   const add = (candidate: Candidate) => {
     const film = toFavouriteFilm(candidate.id, candidate);
-    if (!film) return;
-    setPicks((current) =>
-      current.length >= FAVOURITES_MAX ||
-      current.some(({ id }) => id === film.id)
-        ? current
-        : [...current, film],
-    );
+    if (!film || full || pickedIds.has(film.id)) return;
+    onChange([...picks, film]);
+  };
+  const remove = (id: string) =>
+    onChange(picks.filter((film) => film.id !== id));
+  const move = (from: number, to: number) =>
+    onChange(moveItem(picks, from, to));
+
+  // Dropped on a filled place, the film takes it; on an empty one, it goes
+  // last, as there's nothing after it to sit before.
+  const onDrop = (event: DragEvent, index: number) => {
+    event.preventDefault();
+    if (dragging !== null && dragging !== index) {
+      move(dragging, Math.min(index, picks.length - 1));
+    }
+    setDragging(null);
+    setDropTarget(null);
+  };
+
+  const focusSearch = () => {
+    searchRef.current?.focus();
+    searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   return (
-    <Step number={number} title="Favourite films">
-      <p className={personaliseStyles.managementText}>
-        Optional. Up to {FAVOURITES_MAX} films to head your profile, in your
-        order. Pick from what you&apos;ve seen, or search every film.
-      </p>
-
-      <PosterTileList className={styles.favouritePicks}>
+    <>
+      <ol className={styles.slots} aria-label="Your favourite films, in order">
         {Array.from({ length: FAVOURITES_MAX }, (_, index) => {
           const film = picks[index];
+          const dropProps = {
+            onDragOver: (event: DragEvent) => {
+              if (dragging === null) return;
+              event.preventDefault();
+              setDropTarget(index);
+            },
+            onDragLeave: () =>
+              setDropTarget((current) => (current === index ? null : current)),
+            onDrop: (event: DragEvent) => onDrop(event, index),
+          };
           if (!film) {
             return (
-              <li key={`empty-${index}`} className={styles.favouriteEmpty}>
-                {index === picks.length ? "Search below to add one" : ""}
+              <li
+                key={`empty-${index}`}
+                className={clsx(
+                  styles.slot,
+                  dropTarget === index && styles.slotTarget,
+                )}
+                {...dropProps}
+              >
+                <button
+                  type="button"
+                  className={styles.slotEmpty}
+                  onClick={focusSearch}
+                >
+                  <span className={styles.slotPlus} aria-hidden="true">
+                    +
+                  </span>
+                  {index === picks.length ? "Add a film" : "Empty"}
+                </button>
               </li>
             );
           }
           return (
-            <PosterTile
+            <li
               key={film.id}
-              title={film.title}
-              posterPath={film.posterPath}
-              details={film.year ? [film.year] : undefined}
-              action={
-                <div className={styles.favouriteActions}>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => move(index, -1)}
-                    disabled={index === 0}
-                    aria-label={`Move ${film.title} earlier`}
-                  >
-                    ←
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => move(index, 1)}
-                    disabled={index === picks.length - 1}
-                    aria-label={`Move ${film.title} later`}
-                  >
-                    →
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() =>
-                      setPicks((current) =>
-                        current.filter(({ id }) => id !== film.id),
-                      )
-                    }
-                    aria-label={`Remove ${film.title}`}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              }
-            />
+              className={clsx(
+                styles.slot,
+                dragging === index && styles.slotDragging,
+                dropTarget === index && styles.slotTarget,
+              )}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = "move";
+                setDragging(index);
+              }}
+              onDragEnd={() => {
+                setDragging(null);
+                setDropTarget(null);
+              }}
+              {...dropProps}
+            >
+              <div className={styles.slotPoster}>
+                <MoviePoster
+                  title={film.title}
+                  posterPath={film.posterPath}
+                  showOverlay={!film.posterPath}
+                  interactive={false}
+                  fluid
+                  headingLevel="h3"
+                />
+                <span className={styles.slotRank} aria-hidden="true">
+                  {index + 1}
+                </span>
+              </div>
+              <p className={styles.slotTitle}>{film.title}</p>
+              <div className={styles.slotControls}>
+                <button
+                  type="button"
+                  className={styles.slotButton}
+                  onClick={() => move(index, index - 1)}
+                  disabled={index === 0}
+                  aria-label={`Move ${film.title} earlier`}
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  className={styles.slotButton}
+                  onClick={() => move(index, index + 1)}
+                  disabled={index === picks.length - 1}
+                  aria-label={`Move ${film.title} later`}
+                >
+                  →
+                </button>
+                <button
+                  type="button"
+                  className={styles.slotButton}
+                  onClick={() => remove(film.id)}
+                  aria-label={`Remove ${film.title}`}
+                >
+                  ×
+                </button>
+              </div>
+            </li>
           );
         })}
-      </PosterTileList>
+      </ol>
 
       <form
         role="search"
@@ -254,6 +308,7 @@ export default function FavouritesStep({
       >
         <SearchInput
           id="profile-favourite-search"
+          inputRef={searchRef}
           value={query}
           onChange={(value) => {
             setQuery(value);
@@ -262,7 +317,11 @@ export default function FavouritesStep({
               setTmdb({ step: "idle" });
             }
           }}
-          placeholder="Search your Seen list"
+          placeholder={
+            full
+              ? "Remove one to add another"
+              : "Search your Seen list to add a film"
+          }
           ariaLabel="Search for a favourite film"
         />
       </form>
@@ -346,39 +405,6 @@ export default function FavouritesStep({
           )}
         </div>
       )}
-
-      <div className={personaliseStyles.managementActions}>
-        <Button
-          size="sm"
-          onClick={() => profile && save({ ...profile, favourites: picks })}
-          disabled={!profile || saving || !changed || blockedBySections}
-        >
-          Save favourites
-        </Button>
-        {!profile ? (
-          <span className={personaliseStyles.confirmText}>
-            Save a handle first.
-          </span>
-        ) : blockedBySections ? (
-          <span className={personaliseStyles.confirmText}>
-            Choose what your profile shows first, below.
-          </span>
-        ) : changed && saved.length > 0 ? (
-          <Button variant="link" onClick={() => setPicks(saved)}>
-            Undo changes
-          </Button>
-        ) : (
-          !changed &&
-          saved.length > 0 && (
-            <span className={personaliseStyles.confirmText}>Saved</span>
-          )
-        )}
-      </div>
-      {error && (
-        <p className={personaliseStyles.error} role="alert">
-          {error}
-        </p>
-      )}
-    </Step>
+    </>
   );
 }

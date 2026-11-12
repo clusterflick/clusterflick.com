@@ -38,9 +38,10 @@ function ProfileSettingsPageWrapper({
 }
 
 /**
- * `/personalise/profile/`: a reader's handle, what their profile shows, and
- * whether it's public, in that order, over a preview of the page. Going
- * public waits until what's shown has been saved once.
+ * `/personalise/profile/`: where the profile stands and the way to publish
+ * it, then the address, name and links, favourite films and what it shows,
+ * as one draft with one Save, beside a preview of the page (a dialog from
+ * the save bar on a narrow screen). Publishing first says what goes public.
  */
 const meta = {
   title: "Pages/Profile Settings Page",
@@ -63,6 +64,7 @@ const READER = {
   status: "signed-in",
   email: "reader@example.com",
   readCapabilities: GRANTED,
+  isHandleTaken: async () => false,
   lists: {
     [UserListId.Watchlist]: {
       "496243": { title: "Parasite", year: "2019", addedAt: 1_758_000_000_000 },
@@ -80,81 +82,187 @@ const READER = {
   },
 } satisfies Partial<UserContextType>;
 
-/** Nothing saved yet: a handle first, and the rest waits for it. */
-export const NoHandle: Story = {
-  args: { user: READER },
+const SAVED: UserProfile = {
+  handle: "film-fan",
+  public: false,
+  sections: { ...ALL_PROFILE_SECTIONS, [ProfileSectionId.Watchlist]: false },
+};
+
+/**
+ * Nothing saved yet: everything is one draft, the address checked as it's
+ * typed, and one Save claims it with the rest.
+ */
+export const NewProfile: Story = {
+  args: { user: { ...READER, saveProfile: fn(async () => {}) } },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const save = await canvas.findByRole("button", { name: "Save" });
+    await expect(save).toBeDisabled();
+    await expect(
+      canvas.getByRole("button", { name: "Publish profile" }),
+    ).toBeDisabled();
+    await expect(
+      canvas.getAllByText("Choose an address to save").length,
+    ).toBeGreaterThan(0);
+
+    await userEvent.type(
+      canvas.getByRole("textbox", { name: "Handle" }),
+      "Film-Fan",
+    );
+    await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
+    await userEvent.type(
+      canvas.getByRole("textbox", { name: "Name" }),
+      'Siobhán "Shiv"',
+    );
+    await expect(canvas.getByText("Unsaved changes")).toBeInTheDocument();
+    await userEvent.click(save);
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        handle: "film-fan",
+        displayName: "Siobhán Shiv",
+        sections: ALL_PROFILE_SECTIONS,
+        public: false,
+      } satisfies UserProfile),
+    );
+    await expect(
+      await canvas.findByText("All changes saved"),
+    ).toBeInTheDocument();
+  },
+};
+
+/** An address someone else has: said as it's typed, and Save waits. */
+export const HandleTaken: Story = {
+  args: { user: { ...READER, isHandleTaken: async () => true } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(
+    await userEvent.type(
       await canvas.findByRole("textbox", { name: "Handle" }),
+      "admin-ish",
+    );
+    await expect(
+      await canvas.findByText("That's taken. Try another."),
     ).toBeInTheDocument();
-    await expect(
-      canvas.getByRole("button", { name: "Save what's shown" }),
-    ).toBeDisabled();
-    await expect(
-      canvas.getByRole("checkbox", { name: "Public" }),
-    ).toBeDisabled();
-    await expect(
-      canvas.getAllByText("Save a handle first.").length,
-    ).toBeGreaterThan(0);
+    await expect(canvas.getByRole("button", { name: "Save" })).toBeDisabled();
   },
 };
 
 /**
- * A handle, but nothing chosen: every section starts on, and the public
- * switch waits for the choice to be saved. Turning one off takes it out of
- * the preview at once.
+ * Publishing: it first says what goes public and what stays hidden, then
+ * goes live, with the address to copy or share.
  */
-export const ChoosingSections: Story = {
+export const Publishing: Story = {
   args: {
     user: {
       ...READER,
-      readProfile: async () => ({ handle: "film-fan", public: false }),
+      readProfile: async () => SAVED,
       saveProfile: fn(async () => {}),
     },
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const publicSwitch = await canvas.findByRole("checkbox", {
-      name: "Public",
-    });
-    await expect(publicSwitch).toBeDisabled();
-    await expect(
-      canvas.getByText("Choose what your profile shows and save it first."),
-    ).toBeInTheDocument();
-    for (const label of [
-      "Seen stats",
-      "Watchlist",
-      "Favourite venues",
-      "Seen list",
-    ]) {
-      await expect(canvas.getByRole("checkbox", { name: label })).toBeChecked();
-    }
-
-    await expect(
-      await canvas.findByRole("heading", { name: /Favourite Venues/ }),
-    ).toBeInTheDocument();
     await userEvent.click(
-      canvas.getByRole("checkbox", { name: "Favourite venues" }),
+      await canvas.findByRole("button", { name: "Publish profile" }),
+    );
+    await expect(canvas.getByText(/Before it goes public/)).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Seen stats, Favourite venues and Seen list"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText(
+        (_, element) =>
+          element?.tagName === "LI" &&
+          element.textContent === "Hidden: Watchlist",
+      ),
+    ).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Publish" }));
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        ...SAVED,
+        public: true,
+      }),
     );
     await expect(
-      canvas.queryByRole("heading", { name: /Favourite Venues/ }),
-    ).not.toBeInTheDocument();
+      await canvas.findByRole("heading", { name: "You're live" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText("clusterflick.com/u/film-fan/"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("button", { name: "Copy link" }),
+    ).toBeInTheDocument();
+  },
+};
 
+/** Public: taking it down never waits for anything. */
+export const Public: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({ ...SAVED, public: true }),
+      saveProfile: fn(async () => {}),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Your profile is public" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "View your profile" }),
+    ).toHaveAttribute("href", "/u/film-fan/");
     await userEvent.click(
-      canvas.getByRole("button", { name: "Save what's shown" }),
+      canvas.getByRole("button", { name: "Make it private" }),
     );
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
-        handle: "film-fan",
+        ...SAVED,
         public: false,
-        sections: {
-          ...ALL_PROFILE_SECTIONS,
-          [ProfileSectionId.FavouriteVenues]: false,
-        },
-      } satisfies UserProfile),
+      }),
     );
-    await waitFor(() => expect(publicSwitch).toBeEnabled());
+  },
+};
+
+/** A rename frees the old address at once, so saving one asks first. */
+export const Renaming: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({ ...SAVED, public: true }),
+      saveProfile: fn(async () => {}),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const handle = await canvas.findByRole("textbox", { name: "Handle" });
+    await userEvent.clear(handle);
+    await userEvent.type(handle, "film-buff");
+    await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      canvas.getByText(/\/u\/film-fan\/ will stop working straight away/),
+    ).toBeInTheDocument();
+    await expect(args.user.saveProfile).not.toHaveBeenCalled();
+    await userEvent.click(canvas.getByRole("button", { name: "Change it" }));
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        ...SAVED,
+        handle: "film-buff",
+        public: true,
+      }),
+    );
+  },
+};
+
+/** Discard puts the draft back as it was saved. */
+export const Discarding: Story = {
+  args: { user: { ...READER, readProfile: async () => SAVED } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const name = await canvas.findByRole("textbox", { name: "Name" });
+    await userEvent.type(name, "Someone");
+    await userEvent.click(canvas.getByRole("button", { name: "Discard" }));
+    await expect(name).toHaveValue("");
+    await expect(canvas.getByText("All changes saved")).toBeInTheDocument();
   },
 };
 
@@ -163,16 +271,7 @@ export const ChoosingSections: Story = {
  * since the stats are worked out from it in the visitor's browser.
  */
 export const StatsWithoutSeenList: Story = {
-  args: {
-    user: {
-      ...READER,
-      readProfile: async () => ({
-        handle: "film-fan",
-        public: false,
-        sections: ALL_PROFILE_SECTIONS,
-      }),
-    },
-  },
+  args: { user: { ...READER, readProfile: async () => SAVED } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -181,147 +280,19 @@ export const StatsWithoutSeenList: Story = {
     await expect(
       canvas.getByText(/your Seen list is still sent with the page/),
     ).toBeInTheDocument();
-    // Changed and not saved: going public waits for the save.
-    await expect(
-      canvas.getByRole("checkbox", { name: "Public" }),
-    ).toBeDisabled();
-    await expect(
-      canvas.getByText("Save your changes to what it shows first."),
-    ).toBeInTheDocument();
-  },
-};
-
-/** Public, with a choice saved: it can be switched off at any time. */
-export const Public: Story = {
-  args: {
-    user: {
-      ...READER,
-      readProfile: async () => ({
-        handle: "film-fan",
-        public: true,
-        sections: {
-          ...ALL_PROFILE_SECTIONS,
-          [ProfileSectionId.Watchlist]: false,
-        },
-      }),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const publicSwitch = await canvas.findByRole("checkbox", {
-      name: "Public",
-    });
-    await expect(publicSwitch).toBeChecked();
-    await expect(publicSwitch).toBeEnabled();
-    await expect(
-      canvas.getByRole("link", { name: "View your profile" }),
-    ).toHaveAttribute("href", "/u/film-fan/");
-    await expect(
-      canvas.getByRole("checkbox", { name: "Watchlist" }),
-    ).not.toBeChecked();
   },
 };
 
 /**
- * Public from before sections existed: it shows everything, says so, and
- * can't be renamed until a choice is saved, which the rules would refuse.
- */
-export const PublicBeforeSections: Story = {
-  args: {
-    user: {
-      ...READER,
-      readProfile: async () => ({ handle: "film-fan", public: true }),
-    },
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(
-      await canvas.findByText(/went public before you could choose/),
-    ).toBeInTheDocument();
-    const input = canvas.getByRole("textbox", { name: "Handle" });
-    await userEvent.clear(input);
-    await userEvent.type(input, "film-buff");
-    await expect(
-      canvas.getByRole("button", { name: "Change handle" }),
-    ).toBeDisabled();
-    // Under the handle, the name and links, and the favourites, which wait
-    // too.
-    await expect(
-      canvas.getAllByText("Choose what your profile shows first, below."),
-    ).toHaveLength(3);
-  },
-};
-
-/**
- * A name and links: what a name can't hold drops out as it's typed, a pasted
- * profile address is read for its username, and a link that can't be read
- * says why and holds the save. The preview shows them as they're typed.
- */
-export const NameAndLinks: Story = {
-  args: {
-    user: {
-      ...READER,
-      readProfile: async () => ({
-        handle: "film-fan",
-        public: false,
-        sections: ALL_PROFILE_SECTIONS,
-      }),
-      saveProfile: fn(async () => {}),
-    },
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const name = await canvas.findByRole("textbox", { name: "Name" });
-    await userEvent.type(name, 'Siobhán "Shiv" O\'Brien');
-    await expect(name).toHaveValue("Siobhán Shiv O'Brien");
-    await expect(
-      canvas.getByRole("heading", { name: "Siobhán Shiv O'Brien" }),
-    ).toBeInTheDocument();
-
-    await userEvent.type(
-      canvas.getByRole("textbox", { name: "Letterboxd" }),
-      "https://letterboxd.com/film_fan/",
-    );
-    const imdb = canvas.getByRole("textbox", { name: "IMDb" });
-    await userEvent.type(imdb, "nm0000123");
-    await expect(
-      canvas.getByText(/The address of your IMDb profile/),
-    ).toBeInTheDocument();
-    const save = canvas.getByRole("button", { name: "Save" });
-    await expect(save).toBeDisabled();
-
-    await userEvent.clear(imdb);
-    await userEvent.type(imdb, "imdb.com/user/ur1234567/");
-    await expect(
-      canvas.getByRole("link", { name: "Letterboxd" }),
-    ).toHaveAttribute("href", "https://letterboxd.com/film_fan/");
-    await userEvent.click(save);
-    await waitFor(() =>
-      expect(args.user.saveProfile).toHaveBeenCalledWith({
-        handle: "film-fan",
-        public: false,
-        sections: ALL_PROFILE_SECTIONS,
-        displayName: "Siobhán Shiv O'Brien",
-        links: { letterboxd: "film_fan", imdb: "ur1234567" },
-      } satisfies UserProfile),
-    );
-  },
-};
-
-/**
- * Favourites: the Seen list is searched as it's typed, TheMovieDB only when
- * asked, and picks fill the four places in order, saved together.
+ * Favourites: an empty place opens the search, the Seen list is searched as
+ * it's typed, TheMovieDB only when asked, and picks are put in order.
  */
 export const PickingFavourites: Story = {
   args: {
     user: {
       ...READER,
       getIdToken: async () => "token",
-      readProfile: async () => ({
-        handle: "film-fan",
-        public: false,
-        sections: ALL_PROFILE_SECTIONS,
-      }),
+      readProfile: async () => SAVED,
       saveProfile: fn(async () => {}),
     },
   },
@@ -341,46 +312,58 @@ export const PickingFavourites: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const search = await canvas.findByRole("textbox", {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: /Add a film/ }),
+    );
+    const search = canvas.getByRole("textbox", {
       name: "Search for a favourite film",
     });
+    await expect(search).toHaveFocus();
     await userEvent.type(search, "mood");
-    await expect(
-      await canvas.findByRole("heading", { name: "From your Seen list" }),
-    ).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole("button", { name: "Add" }));
+    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
     await expect(
       canvas.getByRole("button", { name: "Remove In the Mood for Love" }),
     ).toBeInTheDocument();
 
     await userEvent.clear(search);
     await userEvent.type(search, "heat");
-    await expect(
-      await canvas.findByText(/Nothing on your Seen list matches/),
-    ).toBeInTheDocument();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Search all films" }),
+      await canvas.findByRole("button", { name: "Search all films" }),
     );
     await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
-    // Heat goes second; moved first, it leads.
     await userEvent.click(
       canvas.getByRole("button", { name: "Move Heat earlier" }),
     );
-
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Save favourites" }),
-    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
-        handle: "film-fan",
-        public: false,
-        sections: ALL_PROFILE_SECTIONS,
+        ...SAVED,
         favourites: [
           { id: "949", title: "Heat", year: "1995" },
           { id: "843", title: "In the Mood for Love", year: "2000" },
         ],
-      } satisfies UserProfile),
+      }),
     );
+  },
+};
+
+/**
+ * Public from before sections existed: it shows everything, says so, and
+ * saving is what records the choice.
+ */
+export const PublicBeforeSections: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({ handle: "film-fan", public: true }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/went public before you could choose/),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("Unsaved changes")).toBeInTheDocument();
   },
 };
 

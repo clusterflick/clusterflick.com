@@ -10,6 +10,7 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getShowingThisWeek } from "@/lib/user-profile/showing-this-week";
 import clsx from "clsx";
 import StandardPageLayout from "@/components/standard-page-layout";
 import VenueCard from "@/components/venue-card";
@@ -209,6 +210,11 @@ function ControlName({
  * left it has only its snapshot, so this folds that the same way the build's
  * `simplifySorting` does. Each group is drawn wholly from one or the other.
  */
+/** "Siobhán's", "James's": a name as the owner of something. */
+function possessive(name: string) {
+  return `${name}'s`;
+}
+
 function getSortTitle(title: string) {
   return title
     .toLowerCase()
@@ -720,6 +726,7 @@ export function UserListSection({
   showEditing,
   onOpenFilmSearch,
   publicView = false,
+  ownerName,
 }: {
   listId: UserListId;
   lists: UserLists;
@@ -729,6 +736,11 @@ export function UserListSection({
   onOpenFilmSearch?: () => void;
   /** Someone else's list, on their public profile. */
   publicView?: boolean;
+  /**
+   * Whose list it is, on their public profile: the watchlist's buttons and
+   * the line on what's showing speak of them by name.
+   */
+  ownerName?: string;
 }) {
   const { addToList, removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
@@ -935,16 +947,39 @@ export function UserListSection({
           href={getMoviesFilterUrl("/catalogue", listedIds)}
           size="sm"
         >
-          Explore watchlist
+          {ownerName
+            ? `Explore ${possessive(ownerName)} watchlist`
+            : "Explore watchlist"}
         </ButtonLink>
         <ButtonLink
           href={getMoviesFilterUrl("/planner", listedIds)}
           variant="secondary"
           size="sm"
         >
-          Plan watchlist
+          {ownerName
+            ? `Plan from ${possessive(ownerName)} watchlist`
+            : "Plan watchlist"}
         </ButtonLink>
       </div>
+    ) : undefined;
+
+  // On someone's profile, what a visitor can go and see with them: the
+  // watchlist's films with a showing to book this week, and the planner on
+  // just those. A reader's own page has its highlights for this.
+  const showingThisWeek =
+    publicView && ownerName && listId === UserListId.Watchlist
+      ? getShowingThisWeek(movies, listedIds, now)
+      : [];
+  const showingThisWeekLine =
+    showingThisWeek.length > 0 ? (
+      <>
+        {showingThisWeek.length === 1
+          ? `1 film ${ownerName} wants to see is showing this week.`
+          : `${showingThisWeek.length} films ${ownerName} wants to see are showing this week.`}{" "}
+        <Link href={getMoviesFilterUrl("/planner", showingThisWeek)}>
+          {showingThisWeek.length === 1 ? "Plan it" : "Plan them"}
+        </Link>
+      </>
     ) : undefined;
 
   // What a closed stack draws for a group: the same films, in the same order,
@@ -1052,7 +1087,12 @@ export function UserListSection({
   ].filter(({ tiles }) => tiles.length > 0);
 
   return (
-    <ContentSection title={title} titleBadge={count} action={action}>
+    <ContentSection
+      title={title}
+      titleBadge={count}
+      action={action}
+      intro={showingThisWeekLine}
+    >
       {highlightGroups.length > 0 && (
         // Side by side while both are short, each on its own row once either
         // needs the width. See `.highlightGroup`.

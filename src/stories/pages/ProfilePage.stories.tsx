@@ -201,6 +201,13 @@ export const Public: Story = {
     await expect(
       canvas.getByText("6 films seen, 2 films on the watchlist"),
     ).toBeInTheDocument();
+    // Their taste, from the stats: drama the most common genre, half the
+    // films from the 2000s, and two by one director.
+    await expect(
+      await canvas.findByText(
+        "Mostly drama · Big on the 2000s · 2 Wong Kar-wai films",
+      ),
+    ).toBeInTheDocument();
     // /personalise's sections, speaking about the reader, with no editing.
     await expect(
       await canvas.findByRole("heading", { name: "Film Stats" }),
@@ -218,7 +225,7 @@ export const Public: Story = {
   },
 };
 
-/** The owner, signed in: an "Edit profile" link to the profile settings. */
+/** The owner, signed in: "Edit profile" and "Copy link" under the hero. */
 export const PublicOwner: Story = {
   args: {
     data: FOUND,
@@ -233,12 +240,16 @@ export const PublicOwner: Story = {
     await expect(
       await canvas.findByRole("link", { name: "Edit profile" }),
     ).toHaveAttribute("href", "/personalise/profile/");
+    await expect(
+      canvas.getByRole("button", { name: "Copy link" }),
+    ).toBeInTheDocument();
   },
 };
 
 /**
- * Favourite films lead the page, in the reader's order: one that's showing
- * links to its page, one that isn't is drawn from its snapshot, unlinked.
+ * Favourite films head the page, fanned over a wash of their posters, in the
+ * reader's order: one that's showing links to its page, one that isn't is
+ * drawn from its snapshot, unlinked.
  */
 export const WithFavourites: Story = {
   args: {
@@ -254,16 +265,19 @@ export const WithFavourites: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const heading = await canvas.findByRole("heading", {
-      name: "Favourite Films",
-    });
-    const section = heading.closest("section") as HTMLElement;
-    const tiles = within(section).getAllByRole("listitem");
-    await expect(tiles).toHaveLength(3);
-    // In the reader's order.
-    await expect(tiles[0]).toHaveTextContent("Heat");
-    await expect(tiles[1]).toHaveTextContent("A Film Long Gone");
-    await expect(tiles[2]).toHaveTextContent("In the Mood for Love");
+    const fan = await canvas.findByRole("list", { name: "Favourite films" });
+    const posters = within(fan).getAllByRole("listitem");
+    await expect(posters).toHaveLength(3);
+    // In the reader's order; only what's showing is linked.
+    await expect(
+      within(posters[0]).getByLabelText("Heat (1995)"),
+    ).toBeInTheDocument();
+    await expect(
+      within(posters[1]).getByLabelText("A Film Long Gone (1950)"),
+    ).toBeInTheDocument();
+    await expect(
+      within(posters[2]).getByLabelText("In the Mood for Love (2000)"),
+    ).toBeInTheDocument();
   },
 };
 

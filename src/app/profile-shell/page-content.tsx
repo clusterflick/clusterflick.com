@@ -16,10 +16,9 @@ import { useUserContext } from "@/state/user-context";
 import { PROFILE_SECTION_IDS } from "@/lib/user-profile";
 import type { MovieListProgressItem } from "@/app/personalise/seen-stats";
 import { PROFILE_SETTINGS_PATH } from "@/app/personalise/profile/path";
-import ProfileView, {
-  getProfileHeading,
-  ProfileLinksRow,
-} from "./profile-view";
+import ProfileView from "./profile-view";
+import ProfileHero from "./profile-hero";
+import CopyLinkButton from "./copy-link-button";
 import styles from "./page.module.css";
 
 let cached: { text: string | null; data: ProfilePageData } | undefined;
@@ -165,7 +164,7 @@ export function ProfilePage({
 
 /**
  * The profile as `/personalise` shows the owner their own, read only, with
- * the sections they chose to show.
+ * the sections they chose to show, under a hero of their favourites.
  */
 function FoundProfile({
   profile,
@@ -177,33 +176,34 @@ function FoundProfile({
   const { visitor } = useVisitor(handle);
   const nothingShown =
     favourites.length === 0 && PROFILE_SECTION_IDS.every((id) => !sections[id]);
-  const { title, subtitle } = getProfileHeading({
-    handle,
-    displayName,
-    sections,
-    lists,
-  });
 
   // Full width, as /personalise is signed in: the page is mostly posters.
   return (
     <StandardPageLayout
-      title={title}
-      subtitle={subtitle}
-      heroExtra={
-        <>
-          <ProfileLinksRow links={links} />
-          {visitor === "owner" && (
-            <div className={styles.ownerActions}>
-              <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
-                Edit profile
-              </ButtonLink>
-            </div>
-          )}
-        </>
+      hero={
+        <ProfileHero
+          handle={handle}
+          displayName={displayName}
+          links={links}
+          favourites={favourites}
+          sections={sections}
+          lists={lists}
+          filmDetails={filmDetails}
+          actions={
+            visitor === "owner" && (
+              <>
+                <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
+                  Edit profile
+                </ButtonLink>
+                <CopyLinkButton handle={handle} />
+              </>
+            )
+          }
+        />
       }
       afterContent={
         <ProfileView
-          favourites={favourites}
+          ownerName={displayName ?? handle}
           sections={sections}
           lists={lists}
           favouriteVenues={favouriteVenues}

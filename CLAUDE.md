@@ -2120,31 +2120,59 @@ displayName, links, favourites }`, readable by
   usernames, so its pattern is the address's safe characters, not a claim
   about what Letterboxd allows.
 - **Up to four favourite films head the page** (`@/lib/user-profile/favourites`),
-  in the reader's order, as Letterboxd's Four Favourites do: four across or
-  two by two, never three and one, as the stats' records are. Each is its
+  in the reader's order, as Letterboxd's Four Favourites do. Each is its
   own snapshot (id, title, year, poster) in the profile document, **not a
   reference into the Seen list**: tidying Seen shouldn't undo a statement
   made once, a hidden Seen list stays wholly hidden rather than hidden but
   for four films pulled out of it, and a reader with no Seen list can still
   pick. They're picked from the Seen list as the reader types, then from
   TheMovieDB on "Search all films", the film search's two steps
-  (`favourites-step.tsx`). There's no section switch: picking none hides
-  them. A favourite that's showing links to its page; one that isn't is its
-  snapshot, unlinked. The count and patterns are repeated in the rules (held
-  to the module by a test) and the Worker.
-- **The settings are their own page, `/personalise/profile/`**, in the order
-  they must be done: the handle (checked free, with a warning before a rename
-  frees the old address), the name and links, favourite films, what's shown (switches saved together), then the
-  public switch, disabled until both are saved and while the choice has
-  unsaved changes, since going public publishes what's saved. Below them a
-  preview draws the page as visitors will see it from the choice as it
-  stands, through `ProfileView`, the same component the profile page draws
-  with, so the two can't differ. The account bar's "Public profile" panel
-  (`public-profile.tsx`) only says where the profile stands and links there.
-  A refused batch is reported as "taken" when the handle changed, since
-  another reader claiming it between the check and the save is the likely
-  cause, and logged in case it isn't. `readProfile` reads it once a session,
-  as `readCapabilities` does.
+  (`favourites-picker.tsx`), into four places that can be dragged into
+  order, or moved with their arrows from the keyboard; an empty place opens
+  the search. There's no section switch: picking none hides them. The count
+  and patterns are repeated in the rules (held to the module by a test) and
+  the Worker.
+- **The hero is the favourites** (`ProfileHero`, shared by the page and the
+  preview): fanned like a hand of cards over a blurred wash of their
+  posters, as the home page's carousel washes its poster, so each profile
+  looks like its owner. A favourite that's showing links to its page. Under
+  the name, a line of the reader's taste (`getTasteLine`: "Mostly drama ·
+  Big on the 2000s · 2 Wong Kar-wai films"), from the stats the page already
+  shows and only with them, each part only where it's true enough to say.
+  The owner gets Edit profile and Copy link beneath.
+- **A profile is useful to a friend, not just a record.** On someone's
+  profile the watchlist leads with how many of its films are showing this
+  week, linking to the planner on just those (`getShowingThisWeek`), and its
+  buttons speak of them ("Plan from Siobhán's watchlist"). It sets up
+  holding two readers' watchlists against each other.
+- **The settings are their own page, `/personalise/profile/`**, and one
+  draft (`@/lib/user-profile/draft`): where the profile stands and the way
+  to publish it, then the address, name and links, favourite films and
+  what it shows, unnumbered, since a reader coming back is editing rather
+  than setting up. Everything is saved with **one Save in a bar stuck to the
+  bottom of the screen**, a new handle included, so nothing has to be saved
+  before anything else; it says what stops a save, asks before a rename
+  frees the old address, and leaving with changes unsaved asks first. The
+  handle is checked as it's typed (`useHandleAvailability`), and again on
+  saving, since another reader can claim it in between.
+- **The preview sits beside the settings** from 1100px, sticky and
+  scrolling on its own, and on a narrower screen is a full-screen dialog
+  opened from the save bar (and isn't drawn until then). It draws from the
+  draft, saved or not, through the profile page's own `ProfileHero` and
+  `ProfileView`, so the two can't differ.
+- **Publishing is a moment, not a switch.** "Publish profile" first lists
+  what goes public and what stays hidden, which is where the reader
+  considers it (the rules make the same point by refusing `public: true`
+  without `sections`), then saves the draft and `public: true` in one
+  write, so what goes public is what the preview showed. The card then
+  flickers on like a neon sign, once, with the address, Copy link and the
+  phone's share sheet where there is one. Making it private never waits for
+  anything. The account bar's "Public profile" panel (`public-profile.tsx`)
+  only says where the profile stands and links here. A refused batch is
+  reported as "taken" when the handle changed, since another reader
+  claiming it between the check and the save is the likely cause, and
+  logged in case it isn't. `readProfile` reads it once a session, as
+  `readCapabilities` does.
 - **The page is `/profile-shell/`, filled in by the Worker.** The export has
   no page per reader, so the Worker owns `/u/*`: it reads the profile from
   Firestore as a service account (nothing there is public), fetches this
