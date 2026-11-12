@@ -2132,6 +2132,11 @@ displayName, links, favourites }`, readable by
   the search. There's no section switch: picking none hides them. The count
   and patterns are repeated in the rules (held to the module by a test) and
   the Worker.
+- **A link to a profile previews with its first favourite's poster**, set
+  by the Worker in place of the site's image (a `summary` card, the poster
+  beside the text). Only ever TMDB's image, so nothing a reader uploads is
+  shown under the site's name; a card drawn in the browser and stored per
+  reader was considered and left for later for that reason.
 - **The hero is the favourites** (`ProfileHero`, shared by the page and the
   preview): fanned like a hand of cards over a blurred wash of their
   posters, as the home page's carousel washes its poster, so each profile
