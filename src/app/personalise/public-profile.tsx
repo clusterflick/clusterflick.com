@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
+import ReleaseDot from "@/components/release-dot";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
 import {
@@ -126,11 +127,12 @@ export function PublicProfileSummary({
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Your profile</h3>
         <p className={styles.managementText}>
+          {profile && <ReleaseDot off={!profile.public} />}
           {!profile
-            ? "Choose an address and what your profile shows. It stays private until you make it public."
+            ? "Choose an address and what your profile shows. Nobody else can see it until you publish it."
             : profile.public
               ? `Public at ${getProfileDisplayAddress(profile.handle)}.`
-              : `Private. Only you can open ${getProfileDisplayAddress(profile.handle)}.`}
+              : "Private: nobody else can see it until you publish it."}
           {profile?.public && !profile.sections && (
             <>
               {" "}
@@ -143,7 +145,9 @@ export function PublicProfileSummary({
           <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
             {profile ? "Edit profile" : "Set up your profile"}
           </ButtonLink>
-          {profile && (
+          {/* Only once public: a private profile shows its owner nothing but
+              that it's private. */}
+          {profile?.public && (
             // An anchor, not a client-side link: the page is the profiles
             // Worker's, and isn't in the static export.
             <ButtonAnchor

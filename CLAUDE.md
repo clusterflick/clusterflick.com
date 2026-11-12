@@ -2204,14 +2204,18 @@ displayName, links, favourites }`, readable by
 - **Addresses are written without the trailing slash**
   (`getProfileDisplayAddress`: `clusterflick.com/u/film-fan`); links and
   copied addresses keep it, being where the page lives.
-- **Publishing is a moment, not a switch.** "Publish profile" first lists
-  what goes public and what stays hidden, which is where the reader
-  considers it (the rules make the same point by refusing `public: true`
-  without `sections`), then saves the draft and `public: true` in one
-  write, so what goes public is what the preview showed. The card then
-  flickers on like a neon sign, once, with the address, Copy link and the
-  phone's share sheet where there is one. Making it private never waits for
-  anything. The account bar's "Public profile" panel (`public-profile.tsx`)
+- **Publishing is one press, and a moment.** The switches and the preview
+  beside them are where the reader considers what's shared, and making it
+  private again is one press too, so a confirmation step listing the
+  sections was taken out. "Publish profile" saves the draft and
+  `public: true` in one write, so what goes public is what the preview
+  showed; only a new address in the draft asks first, since freeing the old
+  one can't be undone. The card then flickers on like a neon sign, once,
+  with the address, Copy link and the phone's share sheet where there is
+  one. A `ReleaseDot` says where it stands, here and in the account bar's
+  panel: green and pulsing while public, still pink while private. A
+  private profile offers no link to itself, since the owner would find only
+  a page saying it's private; the preview is how it looks. The account bar's "Public profile" panel (`public-profile.tsx`)
   only says where the profile stands and links here. A refused batch is
   reported as "taken" when the handle changed, since another reader
   claiming it between the check and the save is the likely cause, and

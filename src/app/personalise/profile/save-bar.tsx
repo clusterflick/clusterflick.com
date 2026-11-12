@@ -41,6 +41,7 @@ export default function SaveBar({
   /** Absent where the preview is already beside the settings. */
   onPreview?: () => void;
 }) {
+  const state = error ? "error" : changed ? "changed" : "saved";
   const status = error
     ? error
     : confirmingRename && renameFrom
@@ -56,11 +57,13 @@ export default function SaveBar({
       <p
         className={clsx(
           styles.saveStatus,
-          changed && !error && styles.saveStatusChanged,
-          error && styles.saveStatusError,
+          state === "saved" && styles.saveStatusSaved,
+          state === "changed" && styles.saveStatusChanged,
+          state === "error" && styles.saveStatusError,
         )}
         aria-live="polite"
       >
+        {state !== "error" && <StatusIcon saved={state === "saved"} />}
         {status}
       </p>
       <div className={styles.saveActions}>
@@ -102,5 +105,30 @@ export default function SaveBar({
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * A tick once everything is saved, in pink; a pencil while there are changes
+ * to save, in yellow. Drawn in the text's colour, which the status sets.
+ */
+function StatusIcon({ saved }: { saved: boolean }) {
+  return (
+    <svg
+      className={styles.saveStatusIcon}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {saved ? (
+        <path d="M5 12.5l4.5 4.5L19 7" />
+      ) : (
+        <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" />
+      )}
+    </svg>
   );
 }

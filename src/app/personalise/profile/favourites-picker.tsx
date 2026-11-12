@@ -301,32 +301,37 @@ export default function FavouritesPicker({
         })}
       </ol>
 
-      <form
-        role="search"
-        className={styles.favouriteSearch}
-        onSubmit={onSubmit}
-      >
-        <SearchInput
-          id="profile-favourite-search"
-          inputRef={searchRef}
-          value={query}
-          onChange={(value) => {
-            setQuery(value);
-            if (!value) {
-              inFlight.current?.abort();
-              setTmdb({ step: "idle" });
-            }
-          }}
-          placeholder={
-            full
-              ? "Remove one to add another"
-              : "Search your Seen list to add a film"
-          }
-          ariaLabel="Search for a favourite film"
-        />
-      </form>
+      {/* Full, there's nothing a search could add, so it gives way to
+          saying so. */}
+      {full ? (
+        <p className={styles.favouritesFull} role="status">
+          You&apos;ve filled your favourites! Remove one to change it for
+          something else.
+        </p>
+      ) : (
+        <form
+          role="search"
+          className={styles.favouriteSearch}
+          onSubmit={onSubmit}
+        >
+          <SearchInput
+            id="profile-favourite-search"
+            inputRef={searchRef}
+            value={query}
+            onChange={(value) => {
+              setQuery(value);
+              if (!value) {
+                inFlight.current?.abort();
+                setTmdb({ step: "idle" });
+              }
+            }}
+            placeholder="Search your Seen list to add a film"
+            ariaLabel="Search for a favourite film"
+          />
+        </form>
+      )}
 
-      {(searchable || tmdbCurrent) && (
+      {!full && (searchable || tmdbCurrent) && (
         <div aria-live="polite" className={styles.favouriteResults}>
           <div className={styles.favouriteResultsHeader}>
             <h3 className={personaliseStyles.groupTitle}>
@@ -361,14 +366,8 @@ export default function FavouritesPicker({
                     ...(allFilms && film.onSeen ? ["Seen"] : []),
                   ]}
                   onClick={() => add(film)}
-                  disabled={full || pickedIds.has(film.id)}
-                  cue={
-                    pickedIds.has(film.id)
-                      ? "Added"
-                      : full
-                        ? `${FAVOURITES_MAX} picked`
-                        : "Add"
-                  }
+                  disabled={pickedIds.has(film.id)}
+                  cue={pickedIds.has(film.id) ? "Added" : "Add"}
                 />
               ))}
             </PosterTileList>

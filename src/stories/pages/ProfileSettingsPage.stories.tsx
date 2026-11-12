@@ -147,8 +147,8 @@ export const HandleTaken: Story = {
 };
 
 /**
- * Publishing: it first says what goes public and what stays hidden, then
- * goes live, with the address to copy or share.
+ * Publishing: one press saves the draft and makes it public, and the card
+ * lights up with the address to copy or share.
  */
 export const Publishing: Story = {
   args: {
@@ -160,21 +160,12 @@ export const Publishing: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Your profile is private" }),
+    ).toBeInTheDocument();
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Publish profile" }),
+      canvas.getByRole("button", { name: "Publish profile" }),
     );
-    await expect(canvas.getByText(/Before it goes public/)).toBeInTheDocument();
-    await expect(
-      canvas.getByText("Seen stats, Favourite venues and Seen list"),
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByText(
-        (_, element) =>
-          element?.tagName === "LI" &&
-          element.textContent === "Hidden: Watchlist",
-      ),
-    ).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole("button", { name: "Publish" }));
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
         ...SAVED,
@@ -245,6 +236,44 @@ export const Renaming: Story = {
     ).toBeInTheDocument();
     await expect(args.user.saveProfile).not.toHaveBeenCalled();
     await userEvent.click(canvas.getByRole("button", { name: "Change it" }));
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        ...SAVED,
+        handle: "film-buff",
+        public: true,
+      }),
+    );
+  },
+};
+
+/**
+ * Publishing with a new address saves it too, so it asks first: the old
+ * address is freed, which can't be undone.
+ */
+export const PublishingWithRename: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => SAVED,
+      saveProfile: fn(async () => {}),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const handle = await canvas.findByRole("textbox", { name: "Handle" });
+    await userEvent.clear(handle);
+    await userEvent.type(handle, "film-buff");
+    await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Publish profile" }),
+    );
+    await expect(
+      canvas.getByText(/clusterflick\.com\/u\/film-fan will stop working/),
+    ).toBeInTheDocument();
+    await expect(args.user.saveProfile).not.toHaveBeenCalled();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Change it and publish" }),
+    );
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
         ...SAVED,
@@ -356,6 +385,37 @@ export const PickingFavourites: Story = {
         ],
       }),
     );
+  },
+};
+
+/** Four favourites: the search gives way to saying they're full. */
+export const FavouritesFull: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({
+        ...SAVED,
+        favourites: [
+          { id: "949", title: "Heat", year: "1995" },
+          { id: "843", title: "In the Mood for Love", year: "2000" },
+          { id: "11216", title: "Cinema Paradiso", year: "1988" },
+          { id: "1018", title: "Mulholland Drive", year: "2001" },
+        ],
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/You've filled your favourites!/),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("textbox", { name: "Search for a favourite film" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Remove Heat" }));
+    await expect(
+      canvas.getByRole("textbox", { name: "Search for a favourite film" }),
+    ).toBeInTheDocument();
   },
 };
 

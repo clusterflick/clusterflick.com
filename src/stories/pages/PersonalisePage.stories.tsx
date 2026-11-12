@@ -168,7 +168,7 @@ export const SignedInPublicProfileNoHandle: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByText(/It stays private until you make it public/),
+      canvas.getByText(/Nobody else can see it until you publish it/),
     ).toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Set up your profile" }),
@@ -191,17 +191,15 @@ export const SignedInPublicProfilePrivate: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByText(
-        /Private\. Only you can open clusterflick\.com\/u\/film-fan\./,
-      ),
+      canvas.getByText(/Private: nobody else can see it/),
     ).toBeInTheDocument();
     await expect(
       canvas.getByRole("link", { name: "Edit profile" }),
     ).toHaveAttribute("href", "/personalise/profile/");
-    // Works while private: the owner is told why it isn't showing.
+    // Private, the page would only say it's private.
     await expect(
-      canvas.getByRole("link", { name: "View your profile" }),
-    ).toHaveAttribute("href", "/u/film-fan/");
+      canvas.queryByRole("link", { name: "View your profile" }),
+    ).not.toBeInTheDocument();
   },
 };
 

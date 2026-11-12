@@ -89,28 +89,6 @@
   }
 }
 
-.confirm {
-  margin-top: 4px;
-}
-
-.confirmLead {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--color-light-gray);
-}
-
-.confirmList {
-  margin: 0 0 16px;
-  padding-left: 20px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-muted-gray);
-}
-
-.confirmList strong {
-  color: var(--color-light-gray);
-}
-
 /* ---- Fields ---- */
 
 .fields {
@@ -322,6 +300,18 @@
   margin-bottom: 16px;
 }
 
+/* In place of the search once all four places are filled. */
+.favouritesFull {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 8px;
+}
+
 .favouriteResults {
   margin-bottom: 8px;
 }
@@ -371,14 +361,28 @@
 }
 
 .saveStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1 1 200px;
   margin: 0;
   font-size: 14px;
-  color: var(--color-muted-gray);
+  color: var(--color-light-gray);
 }
 
-.saveStatusChanged {
-  color: var(--color-light-gray);
+.saveStatusIcon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.saveStatusSaved .saveStatusIcon {
+  color: var(--color-neon-pink);
+  filter: drop-shadow(0 0 4px rgba(var(--color-neon-pink-rgb), 0.6));
+}
+
+.saveStatusChanged .saveStatusIcon {
+  color: var(--color-buttery-yellow);
 }
 
 .saveStatusError {

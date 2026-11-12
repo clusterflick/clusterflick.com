@@ -1,4 +1,5 @@
-/* Green is the release-status colour: a fresh release, never decoration.
+/* Green is the live colour: a fresh release or a public profile, never
+   decoration.
    The global stylesheet stills the pulse for readers who prefer reduced
    motion. */
 .dot {
@@ -40,6 +41,16 @@
 .stale {
   background: none;
   border: 2px solid var(--color-buttery-yellow);
+
+  &::after {
+    display: none;
+  }
+}
+
+/* Off: still, and in the site's pink rather than an alarm red, since being
+   private is a choice rather than a fault. */
+.off {
+  background: var(--color-neon-pink);
 
   &::after {
     display: none;

@@ -147,11 +147,11 @@ const LINK_FIELDS: Record<
 
 const SECTION_DESCRIPTIONS: Record<ProfileSectionId, string> = {
   [ProfileSectionId.SeenStats]:
-    "How much you've seen, your longest, shortest, oldest and newest films, the directors, actors, genres, decades and languages you watch most, and how far you are through film lists.",
+    "Your film counts, records, and the directors and genres you watch most.",
   [ProfileSectionId.Watchlist]:
     "The films you want to see, and which of them are showing this week.",
   [ProfileSectionId.FavouriteVenues]:
-    "The venues in My Venues. Between them, they can hint at where you live or work.",
+    "The venues you've starred, and what's on at them.",
   [ProfileSectionId.Seen]: "Every film you've marked as seen.",
 };
 
@@ -292,8 +292,6 @@ function Editor({
 
         <PublishCard
           profile={profile}
-          draftSections={draft.sections}
-          hasFavourites={draft.favourites.length > 0}
           canPublish={canSave}
           publishBlocker={blocker}
           renameFrom={renaming ? profile?.handle : undefined}
@@ -321,7 +319,7 @@ function Editor({
 
         <SettingsCard
           title="About you"
-          intro="Optional. A name heads your profile in place of your handle, which stays beside it, and links lead to you elsewhere."
+          intro="Personalise your profile with your name at the top and links to your film socials."
         >
           <div className={styles.fields}>
             <div className={styles.field}>
@@ -396,7 +394,7 @@ function Editor({
 
         <SettingsCard
           title="Favourite films"
-          intro="Optional. Up to four films to head your profile, in your order. Pick from what you've seen, or search every film."
+          intro="Up to four films to head your profile, in your order. Pick from what you've seen, or search for any film."
         >
           <FavouritesPicker
             value={draft.favourites}
@@ -406,7 +404,7 @@ function Editor({
 
         <SettingsCard
           title="What it shows"
-          intro="Everything starts switched on. Turn off anything you'd rather keep to yourself."
+          intro="Turn off anything you'd rather keep to yourself."
         >
           <ul className={styles.sections}>
             {PROFILE_SECTION_IDS.map((id) => (
