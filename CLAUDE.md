@@ -2143,8 +2143,19 @@ displayName, links, favourites }`, readable by
 - **A profile is useful to a friend, not just a record.** On someone's
   profile the watchlist leads with how many of its films are showing this
   week, linking to the planner on just those (`getShowingThisWeek`), and its
-  buttons speak of them ("Plan from Siobhán's watchlist"). It sets up
-  holding two readers' watchlists against each other.
+  buttons speak of them ("Plan from Siobhán's watchlist").
+- **A signed-in visitor sees what they have in common with the owner**
+  (`ProfileComparison`, `compareProfileLists`), above the owner's lists:
+  films they both want to see, with "Plan together" opening the planner on
+  those with a showing to book; films they've both seen; and each one's
+  films the other has seen. Worked out in the visitor's browser from their
+  own lists, which every page already has, against what the profile sends,
+  so nothing new leaves anyone's account. **Only lists the owner shows are
+  compared**: the Seen list arrives for the stats while hidden, but "you've
+  both seen" would name films from it, so Seen is compared only when the
+  list itself is shown. Short groups share a row, each as wide as its
+  posters. Signed out, it's an invitation to start lists of one's own;
+  never for the owner, nor when the profile shows neither list.
 - **The settings are their own page, `/personalise/profile/`**, and one
   draft (`@/lib/user-profile/draft`): where the profile stands and the way
   to publish it, then the address, name and links, favourite films and

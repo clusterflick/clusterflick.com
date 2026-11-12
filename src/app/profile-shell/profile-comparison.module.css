@@ -1,0 +1,80 @@
+/* Groups share a row while they're short (one film in common beside two
+   more), each as wide as its own posters, and wrap when they aren't, as the
+   watchlist's Last chance and occasion groups do. On a phone, one each. */
+.groups {
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.group {
+  flex: 1 1 calc(var(--count) * 156px + 16px);
+  min-width: min(100%, 300px);
+}
+
+/* Fixed tracks, so a short group's posters are the size a long group's
+   are, rather than stretching to fill its share of the row. */
+@container (min-width: 600px) {
+  .tiles {
+    grid-template-columns: repeat(var(--count), minmax(0, 140px));
+  }
+}
+
+.groupHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.groupCount {
+  margin-left: 4px;
+  font-size: 0.8em;
+  color: var(--color-muted-gray);
+}
+
+.groupAction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.groupNote {
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
+.more,
+.nothing {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+/* Signed out: the comparison as a reason to keep lists, in the panel the
+   coming-soon and withdrawn notices use. */
+.invitation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  max-width: calc(var(--page-default) - 40px);
+  margin: 0 auto 40px;
+  padding: 16px 20px;
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 12px;
+}
+
+.invitationText {
+  flex: 1 1 320px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}

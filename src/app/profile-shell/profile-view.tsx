@@ -121,6 +121,7 @@ export function ProfileLinksRow({ links }: { links: ProfileLinks }) {
  * the preview beside the profile settings, so the preview is the page.
  */
 export default function ProfileView({
+  lead,
   ownerName,
   sections,
   lists,
@@ -129,6 +130,8 @@ export default function ProfileView({
   venueImagePaths,
   movieLists,
 }: {
+  /** Above the sections: what a visitor has in common with the owner. */
+  lead?: React.ReactNode;
   /** The name the profile goes by: its display name, or its handle. */
   ownerName: string;
   sections: ProfileSections;
@@ -141,6 +144,7 @@ export default function ProfileView({
   const shown = (id: ProfileSectionId) => sections[id];
   return (
     <div className={personaliseStyles.wide}>
+      {lead}
       {shown(ProfileSectionId.SeenStats) && (
         <SeenStats
           seen={lists[UserListId.Seen]}

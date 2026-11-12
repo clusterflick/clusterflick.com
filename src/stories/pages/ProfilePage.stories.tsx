@@ -219,9 +219,120 @@ export const Public: Story = {
       // Once the listings have loaded: it covers only venues still in them.
       await canvas.findByRole("link", { name: "What's on at these venues" }),
     ).toBeInTheDocument();
-    await expect(canvas.queryByText(/\byour?\b/i)).not.toBeInTheDocument();
+    // The owner's sections speak about them, not to the reader; only the
+    // invitation, which is for the visitor, says "you".
+    await expect(
+      canvas
+        .queryAllByText(/\byour?\b/i)
+        .filter((element) => !element.closest("aside")),
+    ).toEqual([]);
     await expect(canvas.queryByText("Remove")).not.toBeInTheDocument();
     await expect(canvas.queryByText("Edit profile")).not.toBeInTheDocument();
+    // Signed out, what they'd have in common is an invitation.
+    await expect(
+      canvas.getByRole("link", { name: "Start your lists" }),
+    ).toHaveAttribute("href", "/personalise/");
+  },
+};
+
+/**
+ * Someone else, signed in: what they have in common with the owner, above
+ * the owner's lists. Each kind of film in common is its own group.
+ */
+export const VisitorInCommon: Story = {
+  args: {
+    data: FOUND,
+    user: {
+      ...SIGNED_IN,
+      lists: {
+        [UserListId.Watchlist]: {
+          "496243": { title: "Parasite", year: "2019", addedAt: 1 },
+          "949": { title: "Heat", year: "1995", addedAt: 1 },
+        },
+        [UserListId.Seen]: {
+          "843": { title: "In the Mood for Love", year: "2000", addedAt: 1 },
+          "a-long-gone-film": {
+            title: "A Film Long Gone",
+            year: "1950",
+            addedAt: 1,
+          },
+        },
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "You and film-fan" }),
+    ).toBeInTheDocument();
+    for (const group of [
+      /^You both want to see/,
+      /^You've both seen/,
+      /^On your watchlist, seen by film-fan/,
+      /^Seen by you, on film-fan's watchlist/,
+    ]) {
+      await expect(
+        canvas.getByRole("heading", { name: group }),
+      ).toBeInTheDocument();
+    }
+    await expect(
+      canvas.queryByRole("link", { name: "Start your lists" }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * Someone else, signed in, with nothing in common: said plainly, with what
+ * would show here.
+ */
+export const VisitorNothingInCommon: Story = {
+  args: {
+    data: FOUND,
+    user: {
+      ...SIGNED_IN,
+      lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/No films in common yet/),
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * Both lists hidden: nothing to compare, so no comparison, even with the
+ * Seen list sent for the stats.
+ */
+export const VisitorListsHidden: Story = {
+  args: {
+    data: {
+      ...FOUND,
+      sections: {
+        ...ALL_PROFILE_SECTIONS,
+        [ProfileSectionId.Watchlist]: false,
+        [ProfileSectionId.Seen]: false,
+      },
+    },
+    user: {
+      ...SIGNED_IN,
+      lists: {
+        [UserListId.Watchlist]: {},
+        [UserListId.Seen]: {
+          "843": { title: "In the Mood for Love", year: "2000", addedAt: 1 },
+        },
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Film Stats" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: /^You and/ }),
+    ).not.toBeInTheDocument();
   },
 };
 
@@ -243,6 +354,9 @@ export const PublicOwner: Story = {
     await expect(
       canvas.getByRole("button", { name: "Copy link" }),
     ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: /^You and/ }),
+    ).not.toBeInTheDocument();
   },
 };
 

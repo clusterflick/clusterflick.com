@@ -18,6 +18,7 @@ import type { MovieListProgressItem } from "@/app/personalise/seen-stats";
 import { PROFILE_SETTINGS_PATH } from "@/app/personalise/profile/path";
 import ProfileView from "./profile-view";
 import ProfileHero from "./profile-hero";
+import ProfileComparison from "./profile-comparison";
 import CopyLinkButton from "./copy-link-button";
 import styles from "./page.module.css";
 
@@ -203,6 +204,14 @@ function FoundProfile({
       }
       afterContent={
         <ProfileView
+          lead={
+            <ProfileComparison
+              ownerName={displayName ?? handle}
+              lists={lists}
+              sections={sections}
+              isOwner={visitor === "owner" || visitor === "checking"}
+            />
+          }
           ownerName={displayName ?? handle}
           sections={sections}
           lists={lists}

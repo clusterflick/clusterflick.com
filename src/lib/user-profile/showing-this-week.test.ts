@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Movie } from "@/types";
-import { getShowingThisWeek } from "./showing-this-week";
+import { getBookable, getShowingThisWeek } from "./showing-this-week";
 
 const NOW = Date.UTC(2026, 10, 12, 12);
 const DAY = 24 * 60 * 60 * 1000;
@@ -28,5 +28,15 @@ describe("getShowingThisWeek", () => {
         NOW,
       ),
     ).toEqual(["mixed", "soon"]);
+  });
+});
+
+describe("getBookable", () => {
+  test("with no end, keeps any bookable showing ahead", () => {
+    const movies = {
+      later: movie({ time: NOW + 30 * DAY }),
+      past: movie({ time: NOW - DAY }),
+    };
+    expect(getBookable(movies, ["past", "later"], NOW)).toEqual(["later"]);
   });
 });
