@@ -174,8 +174,8 @@ export default function PrivacyPage() {
             <strong>Your public profile settings</strong>, if you set one up:
             the handle you chose and whether your profile is shown. Nothing on
             it is public until you switch it on. While it&apos;s on, anyone can
-            see your handle, how many films are on your watchlist and Seen list,
-            and the most recent of each, and search engines may list it. Never
+            see your handle, your watchlist, Seen list and favourite venues, and
+            the stats from your Seen list, and search engines may list it. Never
             your email address.
           </li>
           <li>

@@ -6,6 +6,8 @@ import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
 import { MockUserProvider, type UserContextType } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
+import { UserListId } from "@/lib/user-lists";
+import type { FilmDetails } from "@/lib/user-lists/film-details";
 import type { ProfilePageData } from "@/lib/user-profile/page-data";
 
 function ProfilePageWrapper({
@@ -20,7 +22,21 @@ function ProfilePageWrapper({
       <FilterConfigProvider>
         <GeolocationProvider>
           <MockUserProvider value={user}>
-            <ProfilePage data={data} />
+            <ProfilePage
+              data={data}
+              venueImagePaths={{
+                "riocinema.org.uk": "/images/venues/riocinema.org.uk.png",
+              }}
+              movieLists={[
+                {
+                  id: "hong-kong",
+                  name: "Hong Kong Classics",
+                  href: "/lists/hong-kong/",
+                  imagePath: null,
+                  tmdbIds: ["843", "11104", "e"],
+                },
+              ]}
+            />
           </MockUserProvider>
         </GeolocationProvider>
       </FilterConfigProvider>
@@ -47,28 +63,117 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** [id, title, year, details]: enough Seen films for the stats to show. */
+const SEEN_FILMS: [string, string, string, FilmDetails][] = [
+  [
+    "843",
+    "In the Mood for Love",
+    "2000",
+    {
+      genres: ["18", "10749"],
+      directors: ["wkw"],
+      cast: ["tony"],
+      runtime: 98,
+      language: "cn",
+    },
+  ],
+  [
+    "11104",
+    "Chungking Express",
+    "1994",
+    {
+      genres: ["18", "35"],
+      directors: ["wkw"],
+      cast: ["tony"],
+      runtime: 102,
+      language: "cn",
+    },
+  ],
+  [
+    "129",
+    "Spirited Away",
+    "2001",
+    {
+      genres: ["16"],
+      directors: ["miyazaki"],
+      cast: [],
+      runtime: 125,
+      language: "ja",
+    },
+  ],
+  [
+    "949",
+    "Heat",
+    "1995",
+    {
+      genres: ["80"],
+      directors: ["mann"],
+      cast: ["pacino"],
+      runtime: 170,
+      language: "en",
+    },
+  ],
+  [
+    "1018",
+    "Mulholland Drive",
+    "2001",
+    {
+      genres: ["53"],
+      directors: ["lynch"],
+      cast: [],
+      runtime: 147,
+      language: "en",
+    },
+  ],
+  [
+    "11216",
+    "Cinema Paradiso",
+    "1988",
+    {
+      genres: ["18"],
+      directors: ["tornatore"],
+      cast: [],
+      runtime: 155,
+      language: "it",
+    },
+  ],
+];
+
 const FOUND: ProfilePageData = {
   found: true,
   handle: "film-fan",
-  seen: {
-    count: 412,
-    films: [
-      {
-        id: "samurai",
-        title: "Le Samouraï",
-        year: "1967",
-        posterPath: "/2Ys8ScbQdkXGnZOFQmmzvT6vKLq.jpg",
+  lists: {
+    [UserListId.Seen]: Object.fromEntries(
+      SEEN_FILMS.map(([id, title, year], index) => [
+        id,
+        { title, year, addedAt: 1_757_000_000_000 + index },
+      ]),
+    ),
+    [UserListId.Watchlist]: {
+      "496243": { title: "Parasite", year: "2019", addedAt: 1_758_000_000_000 },
+      "a-long-gone-film": {
+        title: "A Film Long Gone",
+        year: "1950",
+        addedAt: 1_758_100_000_000,
       },
-      { id: "heat", title: "Heat", year: "1995" },
-      { id: "long-gone", title: "A Film Long Gone", year: "1950" },
-    ],
+    },
   },
-  watchlist: {
-    count: 2,
-    films: [
-      { id: "mood", title: "In the Mood for Love", year: "2000" },
-      { id: "chungking", title: "Chungking Express", year: "1994" },
-    ],
+  favouriteVenues: {
+    "riocinema.org.uk": { name: "Rio Cinema", addedAt: 1_758_000_000_000 },
+  },
+  filmDetails: {
+    films: Object.fromEntries(
+      SEEN_FILMS.map(([id, , , details]) => [id, details]),
+    ),
+    people: {
+      wkw: "Wong Kar-wai",
+      tony: "Tony Leung",
+      miyazaki: "Hayao Miyazaki",
+      mann: "Michael Mann",
+      pacino: "Al Pacino",
+      lynch: "David Lynch",
+      tornatore: "Giuseppe Tornatore",
+    },
   },
 };
 
@@ -90,9 +195,21 @@ export const Public: Story = {
       await canvas.findByRole("heading", { name: "film-fan" }),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByText("412 films seen, 2 films on the watchlist"),
+      canvas.getByText("6 films seen, 2 films on the watchlist"),
     ).toBeInTheDocument();
-    await expect(canvas.getByText("and 409 more films")).toBeInTheDocument();
+    // /personalise's sections, speaking about the reader, with no editing.
+    await expect(
+      await canvas.findByRole("heading", { name: "Film Stats" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("heading", { name: /Favourite Venues/ }),
+    ).toBeInTheDocument();
+    await expect(
+      // Once the listings have loaded: it covers only venues still in them.
+      await canvas.findByRole("link", { name: "What's on at these venues" }),
+    ).toBeInTheDocument();
+    await expect(canvas.queryByText(/\byour?\b/i)).not.toBeInTheDocument();
+    await expect(canvas.queryByText("Remove")).not.toBeInTheDocument();
     await expect(canvas.queryByText("Edit profile")).not.toBeInTheDocument();
   },
 };
@@ -120,10 +237,19 @@ export const PublicEmptyLists: Story = {
     data: {
       found: true,
       handle: "new-reader",
-      seen: { count: 0, films: [] },
-      watchlist: { count: 0, films: [] },
+      lists: { [UserListId.Seen]: {}, [UserListId.Watchlist]: {} },
+      favouriteVenues: {},
+      filmDetails: { films: {}, people: {} },
     },
     user: { status: "signed-out" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // No prompts to add films: they're for the owner, on /personalise.
+    await expect(await canvas.findAllByText("Nothing here yet.")).toHaveLength(
+      3,
+    );
+    await expect(canvas.queryByText(/Film Stats/)).not.toBeInTheDocument();
   },
 };
 

@@ -712,11 +712,17 @@ function AccountManagement() {
  */
 type Removal = { entry: UserListEntry; seen?: UserListEntry | null };
 
-function UserListSection({
+/**
+ * One of a reader's lists. Also a public profile's (`/profile-shell`), read
+ * only: `publicView` keeps the editing away and speaks about the reader
+ * rather than to them.
+ */
+export function UserListSection({
   listId,
   lists,
   showEditing,
   onOpenFilmSearch,
+  publicView = false,
 }: {
   listId: UserListId;
   lists: UserLists;
@@ -724,6 +730,8 @@ function UserListSection({
   showEditing: boolean;
   /** Takes the reader to the film search, from the empty watchlist. */
   onOpenFilmSearch?: () => void;
+  /** Someone else's list, on their public profile. */
+  publicView?: boolean;
 }) {
   const { addToList, removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
@@ -808,7 +816,9 @@ function UserListSection({
   if (entries.length === 0) {
     return (
       <ContentSection title={title}>
-        {listId === UserListId.Watchlist ? (
+        {publicView ? (
+          <p className={styles.publicEmpty}>Nothing here yet.</p>
+        ) : listId === UserListId.Watchlist ? (
           <EmptyList icon="/images/icons/neon-ticket.svg">
             <p className={styles.emptyLine}>
               Press{" "}
@@ -1125,14 +1135,20 @@ function UserListSection({
  * "My Venues": the venues behind the filter overlay's My Venues pill, as the
  * venue cards the cinema-group and borough pages use: logo, type and what's on.
  */
-function FavouriteVenuesSection({
+/**
+ * "My Venues". Also a public profile's, read only, as `UserListSection`.
+ */
+export function FavouriteVenuesSection({
   favouriteVenues,
   showEditing,
   venueImagePaths,
+  publicView = false,
 }: {
   favouriteVenues: FavouriteVenues;
   showEditing: boolean;
   venueImagePaths: Record<string, string>;
+  /** Someone else's venues, on their public profile. */
+  publicView?: boolean;
 }) {
   const { addFavouriteVenue, removeFavouriteVenue } = useUserContext();
   const { movies, metaData } = useCinemaData();
@@ -1210,9 +1226,16 @@ function FavouriteVenuesSection({
     );
   };
 
-  const title = "My Venues";
+  const title = publicView ? "Favourite Venues" : "My Venues";
 
   if (entries.length === 0) {
+    if (publicView) {
+      return (
+        <ContentSection title={title}>
+          <p className={styles.publicEmpty}>Nothing here yet.</p>
+        </ContentSection>
+      );
+    }
     return (
       <ContentSection title={title}>
         <EmptyList icon="/images/icons/neon-projector.svg">
@@ -1244,7 +1267,9 @@ function FavouriteVenuesSection({
               href={`/catalogue?venues=${knownIds.map(encodeURIComponent).join(",")}`}
               size="sm"
             >
-              What&apos;s on at my venues
+              {publicView
+                ? "What's on at these venues"
+                : "What's on at my venues"}
             </ButtonLink>
             <Button
               variant="secondary"
@@ -1311,7 +1336,7 @@ function FavouriteVenuesSection({
       </div>
       {isMapOpen && (
         <VenueMapDialog
-          title="My Venues"
+          title={title}
           summary={`${mapVenues.length} ${mapVenues.length === 1 ? "venue" : "venues"}`}
           venues={mapVenues}
           onClose={() => setIsMapOpen(false)}

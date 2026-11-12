@@ -2089,9 +2089,15 @@ profile.
 - **The page is `/profile-shell/`, filled in by the Worker.** The export has
   no page per reader, so the Worker owns `/u/*`: it reads the profile from
   Firestore as a service account (nothing there is public), fetches this
-  page, and puts the profile in a `<script id="profile-data">`
-  (`@/lib/user-profile/page-data`). The page reads it after hydration, and
-  links the films that are showing, as `/personalise` does. Unknown, private
+  page, and puts the profile in a `<script id="profile-data">`. To stay inside
+  Workers Free's 10ms of CPU it decodes only the small documents it checks:
+  the lists, favourite venues and film details arrive as Firestore's REST
+  answer, undecoded, and the page decodes them after hydration
+  (`@/lib/user-profile/page-data`, `firestore-rest`). The page is
+  `/personalise` read only: the same `SeenStats`, `UserListSection` and
+  `FavouriteVenuesSection`, with `publicView` (and `SeenStats`' `details`)
+  keeping the editing away and speaking about the reader rather than to them.
+  A change to those sections shows on profiles too. Unknown, private
   and revoked profiles are one not-found response, so they look alike to
   everyone but the owner, recognised by their own profile document (only
   they can read it), who is told theirs is private. The Worker's README has

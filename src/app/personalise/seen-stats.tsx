@@ -66,11 +66,19 @@ export type MovieListProgressItem = {
 export default function SeenStats({
   seen,
   movieLists = [],
+  details: givenDetails,
 }: {
   seen: Record<string, UserListEntry>;
   /** The film lists, from the build, for the reader's progress through them. */
   movieLists?: MovieListProgressItem[];
+  /**
+   * Someone else's film details, on their public profile. The stats then
+   * speak about the reader rather than to them. Without it, the signed-in
+   * reader's own are read.
+   */
+  details?: FilmDetailsData;
 }) {
+  const publicView = givenDetails !== undefined;
   const { readFilmDetails } = useUserContext();
   // Matches `.summary`'s breakpoint in seen-stats.module.css. Beside the
   // records the figures go two to a row; across the page, in a row of four.
@@ -81,7 +89,7 @@ export default function SeenStats({
   const seenKey = Object.keys(seen).sort().join(",");
 
   useEffect(() => {
-    if (!seenKey) return;
+    if (!seenKey || publicView) return;
     let cancelled = false;
     readFilmDetails().then(
       (loaded) => !cancelled && setDetails(loaded),
@@ -90,17 +98,19 @@ export default function SeenStats({
     return () => {
       cancelled = true;
     };
-  }, [seenKey, readFilmDetails]);
+  }, [seenKey, readFilmDetails, publicView]);
 
-  const stats = useMemo(
-    () => details && getSeenStats(seen, details, GENRE_NAMES),
-    [seen, details],
-  );
+  const stats = useMemo(() => {
+    const source = givenDetails ?? details;
+    return source && getSeenStats(seen, source, GENRE_NAMES);
+  }, [seen, givenDetails, details]);
 
   // An empty Seen list has its own empty state above.
   if (!stats || stats.films === 0) return null;
 
   if (stats.films < MIN_STATS_FILMS) {
+    // The countdown is a nudge for the owner.
+    if (publicView) return null;
     const toGo = MIN_STATS_FILMS - stats.films;
     return (
       <p className={styles.teaser}>
@@ -111,12 +121,12 @@ export default function SeenStats({
   }
 
   return (
-    <ContentSection title="Your Film Stats">
+    <ContentSection title={publicView ? "Film Stats" : "Your Film Stats"}>
       <div className={styles.stats}>
         <div className={styles.summary}>
           <StatsBand
             layout={besideRecords ? "grid" : "row"}
-            label="Your film stats"
+            label={publicView ? "Film stats" : "Your film stats"}
             items={[
               { id: "films", value: stats.films, label: "Films" },
               {
@@ -138,14 +148,19 @@ export default function SeenStats({
         {stats.films > stats.withDetails && (
           <p className={styles.footnote}>
             Counted from {plural(stats.withDetails, "film")}.{" "}
-            {plural(stats.films - stats.withDetails, "film")} on your list{" "}
+            {plural(stats.films - stats.withDetails, "film")} on{" "}
+            {publicView ? "the" : "your"} list{" "}
             {stats.films - stats.withDetails === 1 ? "has" : "have"} no details
             to count.
           </p>
         )}
-        <ListsProgress seen={seen} movieLists={movieLists} />
+        <ListsProgress
+          seen={seen}
+          movieLists={movieLists}
+          publicView={publicView}
+        />
         <ExpandableSection title="More Stats" scrollOnExpand={false}>
-          <MoreStats stats={stats} />
+          <MoreStats stats={stats} publicView={publicView} />
         </ExpandableSection>
       </div>
     </ContentSection>
@@ -160,9 +175,11 @@ export default function SeenStats({
 function ListsProgress({
   seen,
   movieLists,
+  publicView,
 }: {
   seen: Record<string, UserListEntry>;
   movieLists: MovieListProgressItem[];
+  publicView: boolean;
 }) {
   const ranked = movieLists
     .map((list) => ({ list, progress: getListProgress(list.tmdbIds, seen) }))
@@ -177,7 +194,9 @@ function ListsProgress({
 
   return (
     <div className={styles.block}>
-      <h3 className={styles.groupTitle}>Your progress through the lists</h3>
+      <h3 className={styles.groupTitle}>
+        {publicView ? "Progress" : "Your progress"} through the lists
+      </h3>
       <ul className={styles.listsProgress}>
         {ranked.map(({ list, progress }) => (
           <li key={list.id}>
@@ -260,16 +279,23 @@ function Records({ stats }: { stats: Stats }) {
   );
 }
 
-function MoreStats({ stats }: { stats: Stats }) {
+function MoreStats({
+  stats,
+  publicView,
+}: {
+  stats: Stats;
+  publicView: boolean;
+}) {
+  const watched = publicView ? "watched most" : "you watch most";
   const people = [
     {
-      caption: "Directors you watch most",
+      caption: `Directors ${watched}`,
       heading: "Director",
       ranked: stats.topDirectors,
       filterId: FilterId.Directors as const,
     },
     {
-      caption: "Actors you watch most",
+      caption: `Actors ${watched}`,
       heading: "Actor",
       ranked: stats.topCast,
       filterId: FilterId.Cast as const,
@@ -315,7 +341,8 @@ function MoreStats({ stats }: { stats: Stats }) {
         }))}
       />
       <p className={styles.footnote}>
-        A film can have several genres, so these add up to more than your films.
+        A film can have several genres, so these add up to more than{" "}
+        {publicView ? "the films seen" : "your films"}.
       </p>
     </div>
   );

@@ -1,4 +1,15 @@
 import { getHandleProblem } from ".";
+import {
+  type FavouriteVenues,
+  type UserListEntry,
+  type UserLists,
+  UserListId,
+} from "@/lib/user-lists";
+import type {
+  FilmDetails,
+  FilmDetailsData,
+} from "@/lib/user-lists/film-details";
+import { decodeBatchGet } from "./firestore-rest";
 
 /**
  * What the profiles Worker (clusterflick/api-profiles) puts in the
@@ -18,18 +29,19 @@ export const PROFILE_DATA_ELEMENT_ID = "profile-data";
 export const PROFILE_SHELL_TITLE = "Profile Not Found";
 export const PROFILE_SHELL_DESCRIPTION = "No public profile at this address.";
 
-export type ProfileFilm = {
-  id: string;
-  title: string;
-  year?: string;
-  posterPath?: string;
+/**
+ * A public profile: the reader's lists, favourite venues and film details, as
+ * `/personalise` has the owner's own.
+ */
+export type PublicProfile = {
+  handle: string;
+  lists: UserLists;
+  favouriteVenues: FavouriteVenues;
+  filmDetails: FilmDetailsData;
 };
 
-/** The list's size, and its most recently added films. */
-export type ProfileList = { count: number; films: ProfileFilm[] };
-
 export type ProfilePageData =
-  | { found: true; handle: string; seen: ProfileList; watchlist: ProfileList }
+  | ({ found: true } & PublicProfile)
   /** `handle` only when the address held a valid one. */
   | { found: false; handle?: string };
 
@@ -37,27 +49,81 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function parseList(value: unknown): ProfileList {
-  if (!isRecord(value)) return { count: 0, films: [] };
-  const films = (Array.isArray(value.films) ? value.films : []).flatMap(
-    (film: unknown): ProfileFilm[] =>
-      isRecord(film) &&
-      typeof film.id === "string" &&
-      typeof film.title === "string"
-        ? [
-            {
-              id: film.id,
-              title: film.title,
-              ...(typeof film.year === "string" && { year: film.year }),
-              ...(typeof film.posterPath === "string" && {
-                posterPath: film.posterPath,
-              }),
-            },
-          ]
-        : [],
+/** Each entry of a map that `parse` can read, by key; the rest are dropped. */
+function parseMap<T>(
+  value: unknown,
+  parse: (entry: Record<string, unknown>) => T | null,
+): Record<string, T> {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([key, entry]) => {
+      const parsed = isRecord(entry) ? parse(entry) : null;
+      return parsed === null ? [] : [[key, parsed]];
+    }),
   );
-  const count = typeof value.count === "number" ? value.count : films.length;
-  return { count: Math.max(count, films.length), films };
+}
+
+const optionalString = (key: string, value: unknown) =>
+  typeof value === "string" ? { [key]: value } : {};
+
+function parseListEntry(entry: Record<string, unknown>): UserListEntry | null {
+  if (typeof entry.title !== "string") return null;
+  return {
+    title: entry.title,
+    ...optionalString("year", entry.year),
+    ...optionalString("posterPath", entry.posterPath),
+    addedAt: typeof entry.addedAt === "number" ? entry.addedAt : 0,
+  };
+}
+
+const strings = (value: unknown) =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+
+function parseFilmDetails(entry: Record<string, unknown>): FilmDetails {
+  return {
+    genres: strings(entry.genres),
+    directors: strings(entry.directors),
+    cast: strings(entry.cast),
+    ...(typeof entry.runtime === "number" && { runtime: entry.runtime }),
+    ...optionalString("language", entry.language),
+  };
+}
+
+/**
+ * The Worker's `documents`: Firestore's own answer for `users/{uid}` and
+ * `users/{uid}/meta/films`, undecoded, with the uid in their names as `-`.
+ */
+function parseDocuments(documents: unknown) {
+  const decoded = decodeBatchGet(documents);
+  const user = decoded["users/-"] ?? {};
+  const films = decoded["meta/films"] ?? {};
+  return {
+    lists: {
+      [UserListId.Watchlist]: parseMap(user.watchlist, parseListEntry),
+      [UserListId.Seen]: parseMap(user.seen, parseListEntry),
+    },
+    favouriteVenues: parseMap(user.favouriteVenues, (entry) =>
+      typeof entry.name === "string"
+        ? {
+            name: entry.name,
+            addedAt: typeof entry.addedAt === "number" ? entry.addedAt : 0,
+          }
+        : null,
+    ),
+    filmDetails: {
+      films: parseMap(films.films, parseFilmDetails),
+      people: isRecord(films.people)
+        ? Object.fromEntries(
+            Object.entries(films.people).filter(
+              (entry): entry is [string, string] =>
+                typeof entry[1] === "string",
+            ),
+          )
+        : {},
+    },
+  };
 }
 
 /**
@@ -79,12 +145,7 @@ export function parseProfilePageData(
       ? value.handle
       : undefined;
   if (value.found === true && handle) {
-    return {
-      found: true,
-      handle,
-      seen: parseList(value.seen),
-      watchlist: parseList(value.watchlist),
-    };
+    return { found: true, handle, ...parseDocuments(value.documents) };
   }
   return handle ? { found: false, handle } : { found: false };
 }

@@ -483,6 +483,11 @@
   line-height: 1.6;
 }
 
+.publicEmpty {
+  margin: 0;
+  color: var(--color-muted-gray);
+}
+
 .emptyLead {
   margin: 20px 0 0;
   color: var(--color-light-gray);
