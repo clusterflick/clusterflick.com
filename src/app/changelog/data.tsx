@@ -74,6 +74,17 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-12",
     changes: [
       {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/stow-film-lounge">Stow Film Lounge</Link>, a
+            pop-up cinema screening in halls, breweries and churches around
+            Walthamstow.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
