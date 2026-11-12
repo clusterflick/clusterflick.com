@@ -89,6 +89,14 @@ async function read(docPath: string) {
 
 const GRANTED = { publicProfile: { grantedAt: 1 } };
 
+/** A choice of what the page shows, as the site saves one. */
+const SECTIONS = {
+  seenStats: true,
+  watchlist: false,
+  favouriteVenues: false,
+  seen: true,
+};
+
 beforeAll(async () => {
   // Every refusal a test expects would otherwise be logged as an error.
   setLogLevel("silent");
@@ -244,7 +252,7 @@ describe("renaming", () => {
       saveProfile(
         signedInAs("alice"),
         "alice",
-        { handle: "alice-b", public: true },
+        { handle: "alice-b", public: true, sections: SECTIONS },
         { handle: "alice", public: true },
       ),
     );
@@ -287,13 +295,17 @@ describe("renaming", () => {
 });
 
 describe("the public switch", () => {
-  test("can be turned on with the capability", async () => {
+  test("can be turned on with the capability, once sections are chosen", async () => {
     await seed({
       "users/alice/meta/capabilities": GRANTED,
-      "users/alice/meta/profile": { handle: "alice", public: false },
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: false,
+        sections: SECTIONS,
+      },
       "handles/alice": { uid: "alice" },
     });
-    const previous = { handle: "alice", public: false };
+    const previous = { handle: "alice", public: false, sections: SECTIONS };
     await assertSucceeds(
       saveProfile(
         signedInAs("alice"),
@@ -304,13 +316,50 @@ describe("the public switch", () => {
     );
   });
 
-  test("can't be turned on once the capability is revoked", async () => {
+  test("can't be turned on before sections are chosen", async () => {
     await seed({
-      "users/alice/meta/capabilities": {},
+      "users/alice/meta/capabilities": GRANTED,
       "users/alice/meta/profile": { handle: "alice", public: false },
       "handles/alice": { uid: "alice" },
     });
     const previous = { handle: "alice", public: false };
+    await assertFails(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, public: true },
+        previous,
+      ),
+    );
+  });
+
+  test("a profile can't be claimed public in one go without sections", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    const alice = signedInAs("alice");
+    await assertFails(
+      saveProfile(alice, "alice", { handle: "alice", public: true }, null),
+    );
+    await assertSucceeds(
+      saveProfile(
+        alice,
+        "alice",
+        { handle: "alice", public: true, sections: SECTIONS },
+        null,
+      ),
+    );
+  });
+
+  test("can't be turned on once the capability is revoked", async () => {
+    await seed({
+      "users/alice/meta/capabilities": {},
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: false,
+        sections: SECTIONS,
+      },
+      "handles/alice": { uid: "alice" },
+    });
+    const previous = { handle: "alice", public: false, sections: SECTIONS };
     await assertFails(
       saveProfile(
         signedInAs("alice"),
@@ -350,6 +399,282 @@ describe("the public switch", () => {
         public: "yes",
       }),
     );
+  });
+});
+
+describe("sections", () => {
+  const PRIVATE = {
+    "users/alice/meta/capabilities": GRANTED,
+    "users/alice/meta/profile": { handle: "alice", public: false },
+    "handles/alice": { uid: "alice" },
+  };
+  const profileDoc = (db: Firestore) =>
+    doc(db, "users", "alice", "meta", "profile");
+
+  test("can be chosen while the profile is private", async () => {
+    await seed(PRIVATE);
+    const previous = { handle: "alice", public: false };
+    await assertSucceeds(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, sections: SECTIONS },
+        previous,
+      ),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual({
+      ...previous,
+      sections: SECTIONS,
+    });
+  });
+
+  const withoutSeen = Object.fromEntries(
+    Object.entries(SECTIONS).filter(([id]) => id !== "seen"),
+  );
+  test.each<[string, unknown]>([
+    ["one missing", withoutSeen],
+    ["one extra", { ...SECTIONS, email: true }],
+    ["one that isn't a boolean", { ...SECTIONS, seen: "yes" }],
+    ["not a map", true],
+  ])("not with %s", async (_, sections) => {
+    await seed(PRIVATE);
+    const alice = signedInAs("alice");
+    await assertFails(
+      setDoc(profileDoc(alice), { handle: "alice", public: false, sections }),
+    );
+  });
+
+  test("can't be taken off a public profile", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: true,
+        sections: SECTIONS,
+      },
+    });
+    const alice = signedInAs("alice");
+    await assertFails(
+      setDoc(profileDoc(alice), { handle: "alice", public: true }),
+    );
+  });
+
+  test("a profile public from before them can be switched off as it is", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": { handle: "alice", public: true },
+    });
+    const previous = { handle: "alice", public: true };
+    await assertSucceeds(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { ...previous, public: false },
+        previous,
+      ),
+    );
+  });
+
+  test("a profile public from before them must choose them to change", async () => {
+    await seed({
+      ...PRIVATE,
+      "users/alice/meta/profile": { handle: "alice", public: true },
+    });
+    const previous = { handle: "alice", public: true };
+    await assertFails(
+      saveProfile(
+        signedInAs("alice"),
+        "alice",
+        { handle: "alice-b", public: true },
+        previous,
+      ),
+    );
+  });
+
+  test("can't be changed once the capability is revoked, even switching off", async () => {
+    await seed({
+      "users/alice/meta/profile": {
+        handle: "alice",
+        public: true,
+        sections: SECTIONS,
+      },
+      "handles/alice": { uid: "alice" },
+    });
+    const previous = { handle: "alice", public: true, sections: SECTIONS };
+    const alice = signedInAs("alice");
+    await assertFails(
+      saveProfile(
+        alice,
+        "alice",
+        { ...previous, public: false, sections: { ...SECTIONS, seen: false } },
+        previous,
+      ),
+    );
+    // Switching off alone still works.
+    await assertSucceeds(
+      saveProfile(alice, "alice", { ...previous, public: false }, previous),
+    );
+  });
+});
+
+describe("display name and links", () => {
+  const PROFILE = { handle: "alice", public: false, sections: SECTIONS };
+  const seeded = (capabilities: Record<string, unknown> = GRANTED) => ({
+    "users/alice/meta/capabilities": capabilities,
+    "users/alice/meta/profile": PROFILE,
+    "handles/alice": { uid: "alice" },
+  });
+  const write = (data: Record<string, unknown>) =>
+    setDoc(doc(signedInAs("alice"), "users", "alice", "meta", "profile"), {
+      ...PROFILE,
+      ...data,
+    });
+
+  test("are saved with the profile", async () => {
+    await seed(seeded());
+    const next = {
+      ...PROFILE,
+      displayName: "Siobhán O'Brien 🎬",
+      links: {
+        letterboxd: "film_fan_1",
+        imdb: "ur1234567",
+        website: "https://example.com/films?page=1",
+      },
+    };
+    await assertSucceeds(
+      saveProfile(signedInAs("alice"), "alice", next, PROFILE),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual(next);
+  });
+
+  test("a name may be exactly 50 characters, not 51", async () => {
+    await seed(seeded());
+    await assertSucceeds(write({ displayName: "é".repeat(50) }));
+    await assertFails(write({ displayName: "é".repeat(51) }));
+  });
+
+  test.each([
+    ["empty", ""],
+    ["a double quote", 'Say "hi"'],
+    ["an ampersand", "Tom & Jerry"],
+    ["a less-than", "<b>"],
+    ["a greater-than", "a > b"],
+    ["a backslash", "back\\slash"],
+    ["a newline", "two\nlines"],
+    ["a tab", "tab\tbed"],
+    ["a C1 control", "a\u0085b"],
+    ["a line separator", "a\u2028b"],
+    ["a right-to-left override", "a\u202Eb"],
+    ["a directional isolate", "a\u2066b"],
+    ["a leading space", " Alice"],
+    ["a trailing space", "Alice "],
+    ["a leading $", "$Alice"],
+    ["not a string", 42],
+  ])("a name refuses %s", async (_, displayName) => {
+    await seed(seeded());
+    await assertFails(write({ displayName }));
+  });
+
+  test.each([
+    ["an unknown link", { twitter: "alice" }],
+    [
+      "a Letterboxd address rather than a username",
+      {
+        letterboxd: "https://letterboxd.com/alice/",
+      },
+    ],
+    ["a Letterboxd username with a slash", { letterboxd: "alice/films" }],
+    ["a Letterboxd username with a hyphen", { letterboxd: "film-fan" }],
+    ["an IMDb id that isn't a user's", { imdb: "nm0000123" }],
+    ["an http website", { website: "http://example.com/" }],
+    ["a javascript: website", { website: "javascript:alert(1)" }],
+    ["a website with a quote", { website: 'https://example.com/"x' }],
+    ["a website with a space", { website: "https://example.com/a b" }],
+    [
+      "a website too long",
+      {
+        website: `https://example.com/${"a".repeat(181)}`,
+      },
+    ],
+    ["links that aren't a map", "alice"],
+  ])("links refuse %s", async (_, links) => {
+    await seed(seeded());
+    await assertFails(write({ links }));
+  });
+
+  test("can't be changed without the capability", async () => {
+    await seed(seeded({}));
+    await assertFails(write({ displayName: "Alice" }));
+  });
+});
+
+describe("favourite films", () => {
+  const PROFILE = { handle: "alice", public: false, sections: SECTIONS };
+  const film = (n: number) => ({
+    id: String(100 + n),
+    title: `Film ${n}`,
+    year: "2001",
+    posterPath: `/poster-${n}.jpg`,
+  });
+  const write = (favourites: unknown) =>
+    setDoc(doc(signedInAs("alice"), "users", "alice", "meta", "profile"), {
+      ...PROFILE,
+      favourites,
+    });
+
+  beforeEach(async () => {
+    await seed({
+      "users/alice/meta/capabilities": GRANTED,
+      "users/alice/meta/profile": PROFILE,
+      "handles/alice": { uid: "alice" },
+    });
+  });
+
+  test("up to four are saved with the profile, in order", async () => {
+    const next = {
+      ...PROFILE,
+      favourites: [
+        film(4),
+        film(1),
+        { id: "a1b2c3d4", title: "Untitled" },
+        film(2),
+      ],
+    };
+    await assertSucceeds(
+      saveProfile(signedInAs("alice"), "alice", next, PROFILE),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual(next);
+  });
+
+  test("not five", async () => {
+    await assertFails(write([1, 2, 3, 4, 5].map(film)));
+  });
+
+  test.each<[string, unknown]>([
+    ["no id", { title: "Film" }],
+    ["no title", { id: "101" }],
+    ["an empty title", { id: "101", title: "" }],
+    ["a title too long", { id: "101", title: "a".repeat(301) }],
+    ["an id with a slash", { id: "10/1", title: "Film" }],
+    ["a year that isn't one", { ...film(1), year: "01" }],
+    [
+      "a poster that isn't a path",
+      { ...film(1), posterPath: "https://x.y/z.jpg" },
+    ],
+    ["an extra field", { ...film(1), rating: 5 }],
+    ["not a map", "101"],
+  ])("a film refuses %s, wherever it sits", async (_, bad) => {
+    await assertFails(write([bad]));
+    await assertFails(write([film(1), film(2), film(3), bad]));
+  });
+
+  test("not a map in place of the list", async () => {
+    await assertFails(write({ 0: film(1) }));
+  });
+
+  test("can't be changed without the capability", async () => {
+    await seed({ "users/alice/meta/capabilities": {} });
+    await assertFails(write([film(1)]));
   });
 });
 

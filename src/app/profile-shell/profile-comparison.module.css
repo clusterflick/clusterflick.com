@@ -1,0 +1,86 @@
+/* The offer: one line and a button in the panel the coming-soon and
+   withdrawn notices use, small enough not to take over a page the visitor
+   came to for someone else. */
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: calc(var(--page-default) - 40px);
+  margin: 0 auto 40px;
+  padding: 12px 12px 12px 20px;
+  background: rgba(var(--color-neon-pink-rgb), 0.08);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.4);
+  border-radius: 12px;
+}
+
+.cardBody {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  min-width: 0;
+  padding: 4px 0;
+}
+
+.cardText {
+  flex: 1 1 280px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+}
+
+/* A handle breaks at its hyphens otherwise: "film-" on one line, "fan." on
+   the next. */
+.name {
+  white-space: nowrap;
+}
+
+.dismiss {
+  display: flex;
+  flex-shrink: 0;
+  padding: 6px;
+  color: var(--color-muted-gray);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dismiss:hover,
+.dismiss:focus-visible {
+  color: var(--color-white);
+}
+
+/* Groups share a row while they're short (one film in common beside two
+   more), each sized for its own posters, and wrap when they aren't. A long
+   group closes to a pile, which fills whatever row it's given. */
+.groups {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.group {
+  flex: 1 1 calc(var(--count) * 156px + 16px);
+  min-width: min(100%, 300px);
+}
+
+.groupCount {
+  margin-left: 4px;
+  font-size: 0.8em;
+  color: var(--color-muted-gray);
+}
+
+.plan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}

@@ -37,18 +37,36 @@ service cloud.firestore {
       allow delete: if isOwner(userId)
         && !existsAfter(handlePath(resource.data.handle));
       allow create, update: if isOwner(userId)
-        && request.resource.data.keys().hasOnly(['handle', 'public'])
+        && request.resource.data.keys()
+          .hasOnly(['handle', 'public', 'sections', 'displayName', 'links',
+            'favourites'])
         && request.resource.data.handle is string
         && request.resource.data.public is bool
+        && (!('sections' in request.resource.data)
+          || isProfileSections(request.resource.data.sections))
+        && (!('displayName' in request.resource.data)
+          || isDisplayName(request.resource.data.displayName))
+        && (!('links' in request.resource.data)
+          || isProfileLinks(request.resource.data.links))
+        && (!('favourites' in request.resource.data)
+          || isFavourites(request.resource.data.favourites))
+        // Public only once the reader has chosen what the page shows. A
+        // profile made public before there was a choice has no sections and
+        // shows everything; it can stay as it is, but no write makes a
+        // profile public without them again.
+        && (request.resource.data.public == false
+          || 'sections' in request.resource.data)
         && existsAfter(handlePath(request.resource.data.handle))
         && getAfter(handlePath(request.resource.data.handle)).data.uid == userId
-        // Publishing or taking a new handle needs the capability; switching
-        // the page off never does, so a reader whose capability was revoked
-        // can still take it down.
+        // Publishing, taking a new handle or changing what's shown needs the
+        // capability; switching the page off never does, so a reader whose
+        // capability was revoked can still take it down. Only that: nothing
+        // else in the profile may change without the capability.
         && (hasCapability(userId, 'publicProfile')
           || (resource != null
             && request.resource.data.public == false
-            && request.resource.data.handle == resource.data.handle));
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['public'])));
     }
 
     // One per claimed handle, holding its owner's uid: a document id exists
@@ -88,6 +106,73 @@ service cloud.firestore {
 
   function isOwner(userId) {
     return request.auth != null && request.auth.uid == userId;
+  }
+
+  // As ProfileSectionId in @/lib/user-profile: every section, each shown or
+  // hidden, and nothing else. A test holds this list to the enum.
+  function isProfileSections(sections) {
+    return sections is map
+      && sections.keys().hasOnly(['seenStats', 'watchlist', 'favouriteVenues', 'seen'])
+      && sections.keys().hasAll(['seenStats', 'watchlist', 'favouriteVenues', 'seen'])
+      && sections.seenStats is bool
+      && sections.watchlist is bool
+      && sections.favouriteVenues is bool
+      && sections.seen is bool;
+  }
+
+  // As sanitiseDisplayName in @/lib/user-profile: nothing from
+  // FORBIDDEN_NAME_RANGES, no leading or trailing space and no leading $, and
+  // 1 to 50 characters. A test holds the class to the module's ranges.
+  function isDisplayName(name) {
+    return name is string
+      && name.size() >= 1
+      && name.size() <= 50
+      && name.matches('[^\\x{0}-\\x{1F}\\x{22}\\x{26}\\x{3C}\\x{3E}\\x{5C}\\x{7F}-\\x{9F}\\x{2028}-\\x{2029}\\x{202A}-\\x{202E}\\x{2066}-\\x{2069}]+')
+      && !name.matches('[\\s$].*|.*\\s');
+  }
+
+  // As ProfileLinkId in @/lib/user-profile: identifiers, not addresses, apart
+  // from the website, which must be https. A test holds these patterns to the
+  // module's.
+  function isProfileLinks(links) {
+    return links is map
+      && links.keys().hasOnly(['letterboxd', 'imdb', 'website'])
+      && (!('letterboxd' in links)
+        || (links.letterboxd is string
+          && links.letterboxd.matches('[A-Za-z0-9_]{1,50}')))
+      && (!('imdb' in links)
+        || (links.imdb is string && links.imdb.matches('ur[0-9]{1,12}')))
+      && (!('website' in links)
+        || (links.website is string
+          && links.website.size() <= 200
+          && links.website.matches('https://[^\\s<>"\\\\]+')));
+  }
+
+  // As FavouriteFilm in @/lib/user-profile: up to four snapshots of a film.
+  // Rules have no loops, so each place is checked in turn. A test holds the
+  // count and the patterns to the module's.
+  function isFavourites(favourites) {
+    return favourites is list
+      && favourites.size() <= 4
+      && (favourites.size() < 1 || isFavouriteFilm(favourites[0]))
+      && (favourites.size() < 2 || isFavouriteFilm(favourites[1]))
+      && (favourites.size() < 3 || isFavouriteFilm(favourites[2]))
+      && (favourites.size() < 4 || isFavouriteFilm(favourites[3]));
+  }
+
+  function isFavouriteFilm(film) {
+    return film is map
+      && film.keys().hasOnly(['id', 'title', 'year', 'posterPath'])
+      && film.id is string
+      && film.id.matches('[A-Za-z0-9_-]{1,40}')
+      && film.title is string
+      && film.title.size() >= 1
+      && film.title.size() <= 300
+      && (!('year' in film)
+        || (film.year is string && film.year.matches('[0-9]{4}')))
+      && (!('posterPath' in film)
+        || (film.posterPath is string
+          && film.posterPath.matches('/[A-Za-z0-9._-]{1,100}')));
   }
 
   // As getHandleProblem in @/lib/user-profile. The reserved list is

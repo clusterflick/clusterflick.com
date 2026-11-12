@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { getVenueImagePaths } from "@/utils/get-venue-image";
-import { MOVIE_LISTS } from "@/data/movie-lists";
-import { getMovieListUrl } from "@/utils/get-movie-list-url";
-import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
-import { getMovieListImagePath } from "@/utils/get-movie-list-image";
+import { getMovieListProgressItems } from "@/utils/get-movie-list-progress-items";
 import PersonalisePageContent from "./page-content";
 
 export const metadata: Metadata = {
@@ -22,13 +19,7 @@ export default function PersonalisePage() {
   // path ships: a few KB, on a page nobody reaches by accident.
   // The film lists' ids, for the reader's progress through them in the Seen
   // stats: ~1,500 ids, rather than every list file in the page's bundle.
-  const movieLists = MOVIE_LISTS.map((list) => ({
-    id: list.id,
-    name: list.name,
-    href: getMovieListUrl(list),
-    imagePath: getMovieListImagePath(list.id),
-    tmdbIds: getMovieListTmdbIds(list),
-  })).filter(({ tmdbIds }) => tmdbIds.length > 0);
+  const movieLists = getMovieListProgressItems();
   return (
     <PersonalisePageContent
       venueImagePaths={getVenueImagePaths()}

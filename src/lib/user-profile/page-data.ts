@@ -1,4 +1,14 @@
-import { getHandleProblem } from ".";
+import {
+  ALL_PROFILE_SECTIONS,
+  getHandleProblem,
+  type ProfileLinks,
+  type ProfileSections,
+  PROFILE_SECTION_IDS,
+  readDisplayName,
+  readFavourites,
+  readProfileLinks,
+  type FavouriteFilm,
+} from ".";
 import {
   type FavouriteVenues,
   type UserListEntry,
@@ -31,10 +41,18 @@ export const PROFILE_SHELL_DESCRIPTION = "No public profile at this address.";
 
 /**
  * A public profile: the reader's lists, favourite venues and film details, as
- * `/personalise` has the owner's own.
+ * `/personalise` has the owner's own, and which of them the page shows. A
+ * hidden section's data is never sent, so its list arrives empty; `sections`
+ * is what tells it from a list that is empty.
  */
 export type PublicProfile = {
   handle: string;
+  sections: ProfileSections;
+  /** Read as the settings save it, stripped again: the Worker strips it too. */
+  displayName?: string;
+  links: ProfileLinks;
+  /** Up to four, in order, each its own snapshot. */
+  favourites: FavouriteFilm[];
   lists: UserLists;
   favouriteVenues: FavouriteVenues;
   filmDetails: FilmDetailsData;
@@ -127,6 +145,19 @@ function parseDocuments(documents: unknown) {
 }
 
 /**
+ * The sections the Worker says are shown. A Worker from before sections sends
+ * none, and sent everything, so none is everything. Anything else it sends is
+ * read strictly: only `true` shows a section.
+ */
+function parseSections(value: unknown): ProfileSections {
+  if (value === undefined) return ALL_PROFILE_SECTIONS;
+  const map = isRecord(value) ? value : {};
+  return Object.fromEntries(
+    PROFILE_SECTION_IDS.map((id) => [id, map[id] === true]),
+  ) as ProfileSections;
+}
+
+/**
  * The script tag's contents. No tag at all, as when `/profile-shell/` is
  * visited directly, or anything unreadable, is a profile not found.
  */
@@ -144,8 +175,17 @@ export function parseProfilePageData(
     typeof value.handle === "string" && getHandleProblem(value.handle) === null
       ? value.handle
       : undefined;
+  const displayName = readDisplayName(value.displayName);
   if (value.found === true && handle) {
-    return { found: true, handle, ...parseDocuments(value.documents) };
+    return {
+      found: true,
+      handle,
+      sections: parseSections(value.sections),
+      ...(displayName && { displayName }),
+      links: readProfileLinks(value.links),
+      favourites: readFavourites(value.favourites),
+      ...parseDocuments(value.documents),
+    };
   }
   return handle ? { found: false, handle } : { found: false };
 }

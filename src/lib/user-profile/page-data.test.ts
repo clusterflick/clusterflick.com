@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { parseProfilePageData } from "./page-data";
+import { ALL_PROFILE_SECTIONS } from ".";
 
 /** A value as Firestore's REST API sends it, as the SDK would have stored it. */
 function encode(value: unknown): Record<string, unknown> {
@@ -27,6 +28,7 @@ const ROOT = "projects/clusterflick-com/databases/(default)/documents";
 function found(
   user: Record<string, unknown> | null,
   films: Record<string, unknown> | null,
+  extra: Record<string, unknown> = {},
 ) {
   const document = (path: string, data: Record<string, unknown> | null) =>
     data
@@ -41,6 +43,7 @@ function found(
   return JSON.stringify({
     found: true,
     handle: "film-fan",
+    ...extra,
     // In no particular order.
     documents: [
       document("users/-/meta/films", films),
@@ -82,6 +85,9 @@ describe("parseProfilePageData", () => {
     expect(data).toEqual({
       found: true,
       handle: "film-fan",
+      sections: ALL_PROFILE_SECTIONS,
+      links: {},
+      favourites: [],
       lists: {
         seen: {
           "1": {
@@ -109,10 +115,71 @@ describe("parseProfilePageData", () => {
     });
   });
 
+  test("reads the sections shown, only true showing one", () => {
+    const data = parseProfilePageData(
+      found(null, null, {
+        sections: { seenStats: true, watchlist: false, seen: "yes" },
+      }),
+    );
+    expect(data.found && data.sections).toEqual({
+      seenStats: true,
+      watchlist: false,
+      favouriteVenues: false,
+      seen: false,
+    });
+  });
+
+  test("reads the name and links, stripping and dropping what can't show", () => {
+    const data = parseProfilePageData(
+      found(null, null, {
+        displayName: "<Siobhán> O'Brien",
+        links: {
+          letterboxd: "film_fan",
+          website: "javascript:alert(1)",
+          imdb: "ur123",
+        },
+      }),
+    );
+    expect(data.found && data.displayName).toBe("Siobhán O'Brien");
+    expect(data.found && data.links).toEqual({
+      letterboxd: "film_fan",
+      imdb: "ur123",
+    });
+  });
+
+  test("reads the favourites in order, dropping what can't be drawn", () => {
+    const data = parseProfilePageData(
+      found(null, null, {
+        favourites: [
+          { id: "949", title: "Heat", year: "1995", posterPath: "/h.jpg" },
+          { id: "../x", title: "Bad" },
+          { id: "843", title: "In the Mood for Love" },
+        ],
+      }),
+    );
+    expect(data.found && data.favourites).toEqual([
+      { id: "949", title: "Heat", year: "1995", posterPath: "/h.jpg" },
+      { id: "843", title: "In the Mood for Love" },
+    ]);
+  });
+
+  test("no name is the handle alone", () => {
+    const data = parseProfilePageData(found(null, null, { displayName: "  " }));
+    expect(data.found && data).not.toHaveProperty("displayName");
+  });
+
+  test("no sections, from a Worker before them, is every section", () => {
+    const data = parseProfilePageData(found(null, null));
+    expect(data.found && data.sections).toEqual(ALL_PROFILE_SECTIONS);
+  });
+
   test("missing documents and fields are empty", () => {
     expect(parseProfilePageData(found(null, null))).toEqual({
       found: true,
       handle: "film-fan",
+      sections: ALL_PROFILE_SECTIONS,
+      links: {},
+      favourites: [],
       lists: { seen: {}, watchlist: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

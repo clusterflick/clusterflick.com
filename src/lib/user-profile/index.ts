@@ -1,5 +1,16 @@
 import type { Firestore } from "firebase/firestore/lite";
 import reservedHandles from "./reserved-handles.json";
+import {
+  type ProfileLinks,
+  readDisplayName,
+  readProfileLinks,
+} from "./identity";
+import { type FavouriteFilm, readFavourites } from "./favourites";
+
+export * from "./identity";
+export * from "./favourites";
+export * from "./taste";
+export * from "./showing-this-week";
 
 /**
  * A reader's public profile settings: the handle their page lives at
@@ -13,7 +24,74 @@ import reservedHandles from "./reserved-handles.json";
 export type UserProfile = {
   handle: string;
   public: boolean;
+  /**
+   * What the page shows. Absent until the reader has chosen, and a profile
+   * can't be made public before they have (the rules refuse it). A profile
+   * made public before the choice existed has none and shows everything,
+   * as it did then.
+   */
+  sections?: ProfileSections;
+  /** Shown in place of the handle, with the handle beside it. */
+  displayName?: string;
+  /** Left out when there are none. */
+  links?: ProfileLinks;
+  /** Up to four, in order. Left out when there are none. */
+  favourites?: FavouriteFilm[];
 };
+
+/**
+ * The parts of a profile a reader can show or hide. Repeated in
+ * `firestore.rules` and in the profiles Worker, which leaves a hidden
+ * section's data out of the page rather than only not drawing it.
+ */
+export enum ProfileSectionId {
+  SeenStats = "seenStats",
+  Watchlist = "watchlist",
+  FavouriteVenues = "favouriteVenues",
+  Seen = "seen",
+}
+
+export type ProfileSections = Record<ProfileSectionId, boolean>;
+
+/** In the order the page shows them. */
+export const PROFILE_SECTION_IDS: readonly ProfileSectionId[] =
+  Object.values(ProfileSectionId);
+
+/**
+ * What a reader starts from: everything, as every profile showed before the
+ * choice. Starting from everything is fine because nothing goes public until
+ * they have saved a choice.
+ */
+export const ALL_PROFILE_SECTIONS: ProfileSections = {
+  [ProfileSectionId.SeenStats]: true,
+  [ProfileSectionId.Watchlist]: true,
+  [ProfileSectionId.FavouriteVenues]: true,
+  [ProfileSectionId.Seen]: true,
+};
+
+/**
+ * A saved `sections` map, or undefined if there isn't a whole one. Every key
+ * must be a boolean, as the rules require.
+ */
+export function parseProfileSections(
+  value: unknown,
+): ProfileSections | undefined {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+  const map = value as Record<string, unknown>;
+  if (PROFILE_SECTION_IDS.some((id) => typeof map[id] !== "boolean")) {
+    return undefined;
+  }
+  return Object.fromEntries(
+    PROFILE_SECTION_IDS.map((id) => [id, map[id]]),
+  ) as ProfileSections;
+}
+
+/** What a profile shows: a saved choice, or everything before there is one. */
+export function getShownSections(profile: UserProfile): ProfileSections {
+  return profile.sections ?? ALL_PROFILE_SECTIONS;
+}
 
 export const HANDLE_MIN_LENGTH = 3;
 export const HANDLE_MAX_LENGTH = 30;
@@ -65,7 +143,18 @@ export function parseProfile(
   data: Record<string, unknown> | undefined,
 ): UserProfile | null {
   if (!data || typeof data.handle !== "string") return null;
-  return { handle: data.handle, public: data.public === true };
+  const sections = parseProfileSections(data.sections);
+  const displayName = readDisplayName(data.displayName);
+  const links = readProfileLinks(data.links);
+  const favourites = readFavourites(data.favourites);
+  return {
+    handle: data.handle,
+    public: data.public === true,
+    ...(sections && { sections }),
+    ...(displayName && { displayName }),
+    ...(Object.keys(links).length > 0 && { links }),
+    ...(favourites.length > 0 && { favourites }),
+  };
 }
 
 /*
@@ -76,8 +165,9 @@ export function parseProfile(
  *   what makes a handle unique, and it is the Worker's lookup from address to
  *   reader. Any signed-in reader may get one (to be told it's taken), nobody
  *   may list them.
- * - `users/{uid}/meta/profile` holds `{ handle, public }`, the owner's own
- *   record, which only they can read.
+ * - `users/{uid}/meta/profile` holds `{ handle, public, sections,
+ *   displayName, links, favourites }`, the owner's own record, which only
+ *   they can read.
  *
  * So every change is one batch over both: claiming creates the handle and the
  * profile, renaming deletes the old handle and creates the new one, and
@@ -135,6 +225,12 @@ export async function saveProfile(
   batch.set(await getProfileDocRef(db, uid), {
     handle: next.handle,
     public: next.public,
+    ...(next.sections && { sections: next.sections }),
+    ...(next.displayName && { displayName: next.displayName }),
+    ...(next.links &&
+      Object.keys(next.links).length > 0 && { links: next.links }),
+    ...(next.favourites &&
+      next.favourites.length > 0 && { favourites: next.favourites }),
   });
   await batch.commit();
 }

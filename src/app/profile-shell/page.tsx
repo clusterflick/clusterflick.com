@@ -3,11 +3,8 @@ import {
   PROFILE_SHELL_DESCRIPTION,
   PROFILE_SHELL_TITLE,
 } from "@/lib/user-profile/page-data";
-import { MOVIE_LISTS } from "@/data/movie-lists";
-import { getMovieListImagePath } from "@/utils/get-movie-list-image";
-import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
-import { getMovieListUrl } from "@/utils/get-movie-list-url";
 import { getVenueImagePaths } from "@/utils/get-venue-image";
+import { getMovieListProgressItems } from "@/utils/get-movie-list-progress-items";
 import ProfileShellContent from "./page-content";
 
 /**
@@ -31,13 +28,7 @@ export const metadata: Metadata = {
 export default function ProfileShellPage() {
   // As /personalise builds them: every venue logo, since which are favourites
   // is known only in the browser, and the film lists' ids for the stats.
-  const movieLists = MOVIE_LISTS.map((list) => ({
-    id: list.id,
-    name: list.name,
-    href: getMovieListUrl(list),
-    imagePath: getMovieListImagePath(list.id),
-    tmdbIds: getMovieListTmdbIds(list),
-  })).filter(({ tmdbIds }) => tmdbIds.length > 0);
+  const movieLists = getMovieListProgressItems();
   return (
     <ProfileShellContent
       venueImagePaths={getVenueImagePaths()}

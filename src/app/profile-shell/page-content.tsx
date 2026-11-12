@@ -13,18 +13,14 @@ import {
   type PublicProfile,
 } from "@/lib/user-profile/page-data";
 import { useUserContext } from "@/state/user-context";
-import { UserListId } from "@/lib/user-lists";
-import {
-  FavouriteVenuesSection,
-  UserListSection,
-} from "@/app/personalise/page-content";
-import SeenStats, {
-  type MovieListProgressItem,
-} from "@/app/personalise/seen-stats";
-import personaliseStyles from "@/app/personalise/page.module.css";
+import { PROFILE_SECTION_IDS } from "@/lib/user-profile";
+import type { MovieListProgressItem } from "@/app/personalise/seen-stats";
+import { PROFILE_SETTINGS_PATH } from "@/app/personalise/profile/path";
+import ProfileView from "./profile-view";
+import ProfileHero from "./profile-hero";
+import ProfileComparison from "./profile-comparison";
+import CopyLinkButton from "./copy-link-button";
 import styles from "./page.module.css";
-
-const PERSONALISE_PATH = "/personalise/";
 
 let cached: { text: string | null; data: ProfilePageData } | undefined;
 
@@ -167,72 +163,71 @@ export function ProfilePage({
   );
 }
 
-function plural(count: number, one: string, many: string) {
-  return `${count.toLocaleString("en-GB")} ${count === 1 ? one : many}`;
-}
-
 /**
- * The profile as `/personalise` shows the owner their own, with its sections
- * read only: the Seen stats, the watchlist, the favourite venues and the Seen
- * list, in that order.
+ * The profile as `/personalise` shows the owner their own, read only, with
+ * the sections they chose to show, under a hero of their favourites.
  */
 function FoundProfile({
   profile,
   venueImagePaths,
   movieLists,
 }: { profile: PublicProfile } & ProfileBuildData) {
-  const { handle, lists, favouriteVenues, filmDetails } = profile;
+  const { handle, displayName, links, favourites, sections, lists } = profile;
+  const { favouriteVenues, filmDetails } = profile;
   const { visitor } = useVisitor(handle);
-  const seen = Object.keys(lists[UserListId.Seen]).length;
-  const watchlist = Object.keys(lists[UserListId.Watchlist]).length;
+  const nothingShown =
+    favourites.length === 0 && PROFILE_SECTION_IDS.every((id) => !sections[id]);
 
   // Full width, as /personalise is signed in: the page is mostly posters.
   return (
     <StandardPageLayout
-      title={handle}
-      subtitle={`${plural(seen, "film", "films")} seen, ${plural(
-        watchlist,
-        "film",
-        "films",
-      )} on the watchlist`}
-      heroExtra={
-        visitor === "owner" && (
-          <div className={styles.ownerActions}>
-            <ButtonLink href={PERSONALISE_PATH} size="sm">
-              Edit profile
-            </ButtonLink>
-          </div>
-        )
+      hero={
+        <ProfileHero
+          handle={handle}
+          displayName={displayName}
+          links={links}
+          favourites={favourites}
+          sections={sections}
+          lists={lists}
+          filmDetails={filmDetails}
+          actions={
+            visitor === "owner" && (
+              <>
+                <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
+                  Edit profile
+                </ButtonLink>
+                <CopyLinkButton handle={handle} />
+              </>
+            )
+          }
+        />
       }
       afterContent={
-        <div className={personaliseStyles.wide}>
-          <SeenStats
-            seen={lists[UserListId.Seen]}
-            movieLists={movieLists}
-            details={filmDetails}
-          />
-          <UserListSection
-            listId={UserListId.Watchlist}
-            lists={lists}
-            showEditing={false}
-            publicView
-          />
-          <FavouriteVenuesSection
-            favouriteVenues={favouriteVenues}
-            showEditing={false}
-            venueImagePaths={venueImagePaths}
-            publicView
-          />
-          <UserListSection
-            listId={UserListId.Seen}
-            lists={lists}
-            showEditing={false}
-            publicView
-          />
-        </div>
+        <ProfileView
+          lead={
+            <ProfileComparison
+              handle={handle}
+              ownerName={displayName ?? handle}
+              lists={lists}
+              sections={sections}
+              isOwner={visitor === "owner" || visitor === "checking"}
+            />
+          }
+          ownerName={displayName ?? handle}
+          sections={sections}
+          lists={lists}
+          favouriteVenues={favouriteVenues}
+          filmDetails={filmDetails}
+          venueImagePaths={venueImagePaths}
+          movieLists={movieLists}
+        />
       }
     >
-      {null}
+      {nothingShown ? (
+        <p className={styles.nothingShown}>
+          {displayName ?? handle} isn&apos;t sharing any lists yet.
+        </p>
+      ) : null}
     </StandardPageLayout>
   );
 }
@@ -262,9 +257,9 @@ function ProfileNotFound({ handle }: { handle?: string }) {
         iconSrc={NOT_FOUND_ICON}
         backLink={BACK_LINK}
         title="Your Profile Is Private"
-        message="This is your profile. Only you can see this page: make it public in Personalise and anyone with the link can see your lists."
+        message="This is your profile. Only you can see this page: make it public in your profile settings and anyone with the link can see what you choose to show."
         actions={
-          <ButtonLink href={PERSONALISE_PATH}>Go to Personalise</ButtonLink>
+          <ButtonLink href={PROFILE_SETTINGS_PATH}>Profile settings</ButtonLink>
         }
       />
     );
@@ -278,7 +273,9 @@ function ProfileNotFound({ handle }: { handle?: string }) {
         title="Profile Not Found"
         message="There's no public profile at this address. Want one of your own? Set up your profile in Personalise."
         actions={
-          <ButtonLink href={PERSONALISE_PATH}>Go to Personalise</ButtonLink>
+          <ButtonLink href={PROFILE_SETTINGS_PATH}>
+            Set up your profile
+          </ButtonLink>
         }
       />
     );

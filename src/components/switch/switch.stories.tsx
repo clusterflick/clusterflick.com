@@ -53,6 +53,20 @@ export const On: Story = {
   },
 };
 
+/**
+ * Disabled, until something else is done first. Say why beside it and pass
+ * that text's id as `describedBy`.
+ */
+export const Disabled: Story = {
+  args: {
+    label: "Public",
+    id: "public",
+    checked: false,
+    disabled: true,
+    onChange: () => {},
+  },
+};
+
 /** Interactive switch with real toggle behaviour. */
 export const Interactive: Story = {
   args: {

@@ -2050,14 +2050,15 @@ profile never publishes anything by itself.
   the panel gives way to the feature's own settings, as Public profile's has.
 
 **Public profiles** (`@/lib/user-profile`) are a page at `/u/<handle>/`
-showing a reader's Seen list and watchlist, for readers granted
+showing what a reader chooses of their lists, venues and stats, for readers granted
 `publicProfile` who switch it on. The site holds the handle, the switch and a
 shell page; a Cloudflare Worker, `clusterflick/api-profiles`, serves the
 profile.
 
 - **Two documents name each other.** `handles/{handle}` holds `{ uid }`: a
   document id exists once, which makes handles unique, and it is the Worker's
-  lookup. `users/{uid}/meta/profile` holds `{ handle, public }`, readable by
+  lookup. `users/{uid}/meta/profile` holds `{ handle, public, sections,
+displayName, links, favourites }`, readable by
   its owner only. Every change is one batch over both (`saveProfile`,
   `deleteProfile`), and the rules accept a write only if, after the batch,
   each still names the other: a claim creates both, a rename deletes the old
@@ -2072,20 +2073,130 @@ profile.
   `reserved-handles.json`. The list is short and curated, not a published
   blocklist: handles sit under `/u/`, so they can't collide with a page, and
   what's left is impersonating the site.
-- **Claiming, renaming and `public: true` need the capability;
-  `public: false` never does**, so a reader whose capability was revoked can
-  still take their profile down. Revoking deletes nothing: the page stops
+- **Claiming, renaming, choosing sections and `public: true` need the
+  capability; `public: false` never does**, and without the capability it is
+  the only change allowed (`affectedKeys().hasOnly(['public'])`), so a reader
+  whose capability was revoked can still take their profile down and nothing
+  else. Revoking deletes nothing: the page stops
   being served, the handle stays theirs, and a new grant restores it.
   `/personalise` then shows a notice offering to switch it off, in place of
   the panel.
-- **The settings are a "Public profile" panel in the account bar**
-  (`public-profile.tsx`), shown only with the capability: the handle, saved
-  after checking it's free, with a warning before a rename frees the old
-  address, the switch, disabled until a handle is saved, and a link to the
-  page, which works while private too. A refused batch
-  is reported as "taken", since another reader claiming the handle between
-  the check and the save is the likely cause, and logged in case it isn't.
-  `readProfile` reads it once a session, as `readCapabilities` does.
+- **The reader chooses what the page shows** (`sections`: Seen stats,
+  watchlist, favourite venues, Seen list, `ProfileSectionId`, repeated in the
+  rules and the Worker). Every section starts on, but **a profile can't go
+  public until a choice has been saved**: the rules refuse `public: true`
+  without `sections`, so publishing is never a step that skips seeing what's
+  on the page. A profile made public before sections existed has none and
+  shows everything, as it did; it can be switched off as it is, but changing
+  anything else means saving a choice first, and the settings say so.
+- **A hidden section is never sent, not just not drawn.** The Worker builds
+  its field mask from `sections`, so a hidden list never leaves Firestore,
+  and sends the page `sections` to tell a hidden list from an empty one
+  (`getShownSections`; none from an older Worker means everything). The
+  stats are the exception the settings explain: they are worked out in the
+  visitor's browser from the Seen list, so showing them sends the list even
+  while it is hidden, and their records name a few films. **Deploy the Worker
+  before the rules and the site**: the other way round, a reader could hide a
+  section that the old Worker still sends.
+- **A name and links are optional** (`@/lib/user-profile/identity`): a
+  display name heads the page in place of the handle, which leads the line
+  under it and the Worker's title ("Siobhán O'Brien (@film-fan)"), so the
+  address is never hidden behind a name anyone could choose. Links are film
+  ones only: Letterboxd, IMDb and a website. They are stored as identifiers
+  (a Letterboxd username, an IMDb `ur…` id) and the page builds the
+  addresses, so only the website is an address a reader typed, and it must be
+  https. All open in a new tab with `rel="me ugc nofollow"`.
+- **A name is stripped, not escaped.** It is written into the page's
+  `<head>` and into Next's inline payload, as a JSON string inside a
+  JavaScript string, so `FORBIDDEN_NAME_RANGES` (`"` `&` `<` `>` `\`,
+  control characters, the line and paragraph separators, and the
+  bidirectional overrides and isolates) are dropped as it's typed, refused by
+  the rules, and stripped again wherever it's read: by the Worker, and by the
+  page. A leading `$` goes too, since the payload reads a string starting
+  with `$` as a reference. An apostrophe stays (O'Brien): nothing it's
+  written into is quoted with one. The lists and patterns are repeated in
+  `firestore.rules` (held to the module by `rules-copy.test.ts`) and in the
+  Worker: change all three together. Letterboxd usernames are letters,
+  numbers and underscores (no hyphens); their length limit isn't published,
+  so 50 is a generous cap rather than Letterboxd's own.
+- **Up to four favourite films head the page** (`@/lib/user-profile/favourites`),
+  in the reader's order, as Letterboxd's Four Favourites do. Each is its
+  own snapshot (id, title, year, poster) in the profile document, **not a
+  reference into the Seen list**: tidying Seen shouldn't undo a statement
+  made once, a hidden Seen list stays wholly hidden rather than hidden but
+  for four films pulled out of it, and a reader with no Seen list can still
+  pick. They're picked from the Seen list as the reader types, then from
+  TheMovieDB on "Search all films", the film search's two steps
+  (`favourites-picker.tsx`), into four places that can be dragged into
+  order, or moved with their arrows from the keyboard; an empty place opens
+  the search. There's no section switch: picking none hides them. The count
+  and patterns are repeated in the rules (held to the module by a test) and
+  the Worker.
+- **A link to a profile previews with its first favourite's poster**, set
+  by the Worker in place of the site's image (a `summary` card, the poster
+  beside the text). Only ever TMDB's image, so nothing a reader uploads is
+  shown under the site's name; a card drawn in the browser and stored per
+  reader was considered and left for later for that reason.
+- **The hero is the favourites** (`ProfileHero`, shared by the page and the
+  preview): fanned like a hand of cards over a blurred wash of their
+  posters, as the home page's carousel washes its poster, so each profile
+  looks like its owner. A favourite that's showing links to its page. Under
+  the name, a line of the reader's taste (`getTasteLine`: "Mostly drama ·
+  Big on the 2000s · 2 Wong Kar-wai films"), from the stats the page already
+  shows and only with them, each part only where it's true enough to say.
+  The owner gets Edit profile and Copy link beneath.
+- **A profile is useful to a friend, not just a record.** On someone's
+  profile the watchlist leads with how many of its films are showing this
+  week, linking to the planner on just those (`getShowingThisWeek`), and its
+  buttons speak of them ("Plan from Siobhán's watchlist").
+- **A visitor is offered what they have in common with the owner**
+  (`ProfileComparison`, `compareProfileLists`), not shown it: they came to
+  see the owner, so the top of the page is a small card, not the overlap.
+  Signed in, it says how many films they share and offers Compare, which
+  swaps it for the films in groups (both want to see, with "Plan together"
+  opening the planner on those with a showing to book; both seen; each
+  one's films the other has seen), each a `PosterStack` as the watchlist's
+  groups are, sharing a row while short; Hide brings the card back. Signed
+  out, the card invites them to start lists of their own. Either can be
+  dismissed for the rest of the day, so it's out of the way for the visit
+  without being gone for good: the sign-up card for every profile, the
+  compare card for that profile only (`comparison-dismissals.ts`). Dismissals live in
+  `localStorage`, being a preference about the page rather than anything
+  about the reader's lists, so the account-only rule doesn't apply. It's
+  worked out in the visitor's browser from their own lists against what
+  the profile sends, so nothing new leaves anyone's account, and **only
+  lists the owner shows are compared**: the Seen list arrives for the stats
+  while hidden, but "you've both seen" would name films from it, so Seen is
+  compared only when the list itself is shown. Never for the owner, nor
+  when the profile shows neither list.
+- **The settings are their own page, `/personalise/profile/`**, and one
+  draft (`@/lib/user-profile/draft`): where the profile stands and the way
+  to publish it, then the address, name and links, favourite films and
+  what it shows, unnumbered, since a reader coming back is editing rather
+  than setting up. Everything is saved with **one Save in a bar stuck to the
+  bottom of the screen**, a new handle included, so nothing has to be saved
+  before anything else; it says what stops a save, asks before a rename
+  frees the old address, and leaving with changes unsaved asks first. The
+  handle is checked as it's typed (`useHandleAvailability`), and again on
+  saving, since another reader can claim it in between.
+- **The preview sits beside the settings** from 1100px, sticky and
+  scrolling on its own, and on a narrower screen is a full-screen dialog
+  opened from the save bar (and isn't drawn until then). It draws from the
+  draft, saved or not, through the profile page's own `ProfileHero` and
+  `ProfileView`, so the two can't differ.
+- **Publishing is a moment, not a switch.** "Publish profile" first lists
+  what goes public and what stays hidden, which is where the reader
+  considers it (the rules make the same point by refusing `public: true`
+  without `sections`), then saves the draft and `public: true` in one
+  write, so what goes public is what the preview showed. The card then
+  flickers on like a neon sign, once, with the address, Copy link and the
+  phone's share sheet where there is one. Making it private never waits for
+  anything. The account bar's "Public profile" panel (`public-profile.tsx`)
+  only says where the profile stands and links here. A refused batch is
+  reported as "taken" when the handle changed, since another reader
+  claiming it between the check and the save is the likely cause, and
+  logged in case it isn't. `readProfile` reads it once a session, as
+  `readCapabilities` does.
 - **The page is `/profile-shell/`, filled in by the Worker.** The export has
   no page per reader, so the Worker owns `/u/*`: it reads the profile from
   Firestore as a service account (nothing there is public), fetches this
@@ -2094,7 +2205,8 @@ profile.
   the lists, favourite venues and film details arrive as Firestore's REST
   answer, undecoded, and the page decodes them after hydration
   (`@/lib/user-profile/page-data`, `firestore-rest`). The page is
-  `/personalise` read only: the same `SeenStats`, `UserListSection` and
+  `/personalise` read only, with only the sections shown (`ProfileView`):
+  the same `SeenStats`, `UserListSection` and
   `FavouriteVenuesSection`, with `publicView` (and `SeenStats`' `details`)
   keeping the editing away and speaking about the reader rather than to them.
   A change to those sections shows on profiles too. Unknown, private

@@ -2,6 +2,9 @@
 .title {
   font-size: clamp(2rem, 5vw, 3.5rem);
   margin-bottom: 12px;
+  /* Only breaks a word that can't fit the line on its own: a reader's
+     display name on their profile can be one long word. */
+  overflow-wrap: break-word;
 }
 
 /* Optional subtitle paragraph rendered below the heading */
