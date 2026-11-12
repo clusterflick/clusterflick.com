@@ -86,6 +86,7 @@ describe("parseProfilePageData", () => {
       found: true,
       handle: "film-fan",
       sections: ALL_PROFILE_SECTIONS,
+      links: {},
       lists: {
         seen: {
           "1": {
@@ -127,6 +128,29 @@ describe("parseProfilePageData", () => {
     });
   });
 
+  test("reads the name and links, stripping and dropping what can't show", () => {
+    const data = parseProfilePageData(
+      found(null, null, {
+        displayName: "<Siobhán> O'Brien",
+        links: {
+          letterboxd: "film_fan",
+          website: "javascript:alert(1)",
+          imdb: "ur123",
+        },
+      }),
+    );
+    expect(data.found && data.displayName).toBe("Siobhán O'Brien");
+    expect(data.found && data.links).toEqual({
+      letterboxd: "film_fan",
+      imdb: "ur123",
+    });
+  });
+
+  test("no name is the handle alone", () => {
+    const data = parseProfilePageData(found(null, null, { displayName: "  " }));
+    expect(data.found && data).not.toHaveProperty("displayName");
+  });
+
   test("no sections, from a Worker before them, is every section", () => {
     const data = parseProfilePageData(found(null, null));
     expect(data.found && data.sections).toEqual(ALL_PROFILE_SECTIONS);
@@ -137,6 +161,7 @@ describe("parseProfilePageData", () => {
       found: true,
       handle: "film-fan",
       sections: ALL_PROFILE_SECTIONS,
+      links: {},
       lists: { seen: {}, watchlist: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

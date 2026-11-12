@@ -144,6 +144,7 @@ const FOUND = {
   found: true,
   handle: "film-fan",
   sections: ALL_PROFILE_SECTIONS,
+  links: {},
   lists: {
     [UserListId.Seen]: Object.fromEntries(
       SEEN_FILMS.map(([id, title, year], index) => [
@@ -235,6 +236,50 @@ export const PublicOwner: Story = {
 };
 
 /**
+ * A name and links: the name heads the page, the handle leads the line under
+ * it, and the links open the reader's profiles elsewhere.
+ */
+export const WithNameAndLinks: Story = {
+  args: {
+    data: {
+      ...FOUND,
+      displayName: "Siobhán O'Brien",
+      links: {
+        letterboxd: "film_fan",
+        imdb: "ur1234567",
+        website: "https://www.example.com/films",
+      },
+    },
+    user: { status: "signed-out" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Siobhán O'Brien" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText("@film-fan · 6 films seen, 2 films on the watchlist"),
+    ).toBeInTheDocument();
+    const letterboxd = canvas.getByRole("link", { name: "Letterboxd" });
+    await expect(letterboxd).toHaveAttribute(
+      "href",
+      "https://letterboxd.com/film_fan/",
+    );
+    await expect(letterboxd).toHaveAttribute(
+      "rel",
+      "me ugc nofollow noopener noreferrer",
+    );
+    await expect(canvas.getByRole("link", { name: "IMDb" })).toHaveAttribute(
+      "href",
+      "https://www.imdb.com/user/ur1234567/",
+    );
+    await expect(
+      canvas.getByRole("link", { name: "example.com" }),
+    ).toHaveAttribute("href", "https://www.example.com/films");
+  },
+};
+
+/**
  * The stats without the Seen list, and no watchlist or venues: only what was
  * chosen, and the subtitle counts only what's shown.
  */
@@ -279,6 +324,7 @@ export const NothingShown: Story = {
     data: {
       found: true,
       handle: "quiet-reader",
+      links: {},
       sections: {
         [ProfileSectionId.SeenStats]: false,
         [ProfileSectionId.Watchlist]: false,
@@ -306,6 +352,7 @@ export const PublicEmptyLists: Story = {
       found: true,
       handle: "new-reader",
       sections: ALL_PROFILE_SECTIONS,
+      links: {},
       lists: { [UserListId.Seen]: {}, [UserListId.Watchlist]: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

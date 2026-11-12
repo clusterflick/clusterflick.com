@@ -517,6 +517,96 @@ describe("sections", () => {
   });
 });
 
+describe("display name and links", () => {
+  const PROFILE = { handle: "alice", public: false, sections: SECTIONS };
+  const seeded = (capabilities: Record<string, unknown> = GRANTED) => ({
+    "users/alice/meta/capabilities": capabilities,
+    "users/alice/meta/profile": PROFILE,
+    "handles/alice": { uid: "alice" },
+  });
+  const write = (data: Record<string, unknown>) =>
+    setDoc(doc(signedInAs("alice"), "users", "alice", "meta", "profile"), {
+      ...PROFILE,
+      ...data,
+    });
+
+  test("are saved with the profile", async () => {
+    await seed(seeded());
+    const next = {
+      ...PROFILE,
+      displayName: "Siobhán O'Brien 🎬",
+      links: {
+        letterboxd: "film_fan-1",
+        imdb: "ur1234567",
+        website: "https://example.com/films?page=1",
+      },
+    };
+    await assertSucceeds(
+      saveProfile(signedInAs("alice"), "alice", next, PROFILE),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual(next);
+  });
+
+  test("a name may be exactly 50 characters, not 51", async () => {
+    await seed(seeded());
+    await assertSucceeds(write({ displayName: "é".repeat(50) }));
+    await assertFails(write({ displayName: "é".repeat(51) }));
+  });
+
+  test.each([
+    ["empty", ""],
+    ["a double quote", 'Say "hi"'],
+    ["an ampersand", "Tom & Jerry"],
+    ["a less-than", "<b>"],
+    ["a greater-than", "a > b"],
+    ["a backslash", "back\\slash"],
+    ["a newline", "two\nlines"],
+    ["a tab", "tab\tbed"],
+    ["a C1 control", "a\u0085b"],
+    ["a line separator", "a\u2028b"],
+    ["a right-to-left override", "a\u202Eb"],
+    ["a directional isolate", "a\u2066b"],
+    ["a leading space", " Alice"],
+    ["a trailing space", "Alice "],
+    ["a leading $", "$Alice"],
+    ["not a string", 42],
+  ])("a name refuses %s", async (_, displayName) => {
+    await seed(seeded());
+    await assertFails(write({ displayName }));
+  });
+
+  test.each([
+    ["an unknown link", { twitter: "alice" }],
+    [
+      "a Letterboxd address rather than a username",
+      {
+        letterboxd: "https://letterboxd.com/alice/",
+      },
+    ],
+    ["a Letterboxd username with a slash", { letterboxd: "alice/films" }],
+    ["an IMDb id that isn't a user's", { imdb: "nm0000123" }],
+    ["an http website", { website: "http://example.com/" }],
+    ["a javascript: website", { website: "javascript:alert(1)" }],
+    ["a website with a quote", { website: 'https://example.com/"x' }],
+    ["a website with a space", { website: "https://example.com/a b" }],
+    [
+      "a website too long",
+      {
+        website: `https://example.com/${"a".repeat(181)}`,
+      },
+    ],
+    ["links that aren't a map", "alice"],
+  ])("links refuse %s", async (_, links) => {
+    await seed(seeded());
+    await assertFails(write({ links }));
+  });
+
+  test("can't be changed without the capability", async () => {
+    await seed(seeded({}));
+    await assertFails(write({ displayName: "Alice" }));
+  });
+});
+
 describe("reading", () => {
   const SEEDED = {
     "users/alice/meta/profile": { handle: "alice", public: true },

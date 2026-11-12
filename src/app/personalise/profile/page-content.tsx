@@ -16,9 +16,18 @@ import {
   getProfilePath,
   HANDLE_MAX_LENGTH,
   HANDLE_PROBLEM_MESSAGES,
+  DISPLAY_NAME_MAX_LENGTH,
+  getNameLength,
+  parseLinkInput,
+  PROFILE_LINK_IDS,
   PROFILE_SECTION_IDS,
+  ProfileLinkId,
   ProfileSectionId,
+  sanitiseDisplayName,
+  stripDisplayNameInput,
+  type ProfileLinks,
   type ProfileSections,
+  type UserProfile,
 } from "@/lib/user-profile";
 import {
   MIN_STATS_FILMS,
@@ -32,7 +41,8 @@ import {
   type PublicProfileState,
 } from "@/app/personalise/public-profile";
 import ProfileView, {
-  getProfileSubtitle,
+  getProfileHeading,
+  ProfileLinksRow,
 } from "@/app/profile-shell/profile-view";
 import personaliseStyles from "@/app/personalise/page.module.css";
 import styles from "./page.module.css";
@@ -46,8 +56,8 @@ type BuildData = {
 
 /**
  * Where a reader with the `publicProfile` capability sets up their profile, in
- * the order it has to be done: a handle, then what the page shows, then
- * whether anyone can see it. Going public waits until what's shown has been
+ * the order it has to be done: a handle, then a name and links if they want
+ * them, then what the page shows, then whether anyone can see it. Going public waits until what's shown has been
  * saved once, so nobody publishes before seeing the choice; the rules enforce
  * the same. A preview below draws the page as visitors will see it, from the
  * choice as it stands, saved or not.
@@ -62,13 +72,27 @@ export default function ProfileSettingsPageContent(build: BuildData) {
   const [draft, setDraft] = useState<ProfileSections | null>(null);
   const savedSections = state?.profile?.sections;
   const sections = draft ?? savedSections ?? ALL_PROFILE_SECTIONS;
+  // The name and links as typed, the parts that would save, for the preview.
+  const [identity, setIdentity] = useState<Identity | null>(null);
+  const profile = state?.profile;
+  const shownIdentity = identity ?? {
+    displayName: profile?.displayName,
+    links: profile?.links ?? {},
+  };
 
   return (
     <StandardPageLayout
       title="Your Public Profile"
       subtitle="Share your lists at an address of your own, showing as much or as little as you like."
       afterContent={
-        ready ? <Preview sections={sections} {...build} /> : undefined
+        ready ? (
+          <Preview
+            handle={profile?.handle}
+            identity={shownIdentity}
+            sections={sections}
+            {...build}
+          />
+        ) : undefined
       }
     >
       {status === "unavailable" ? (
@@ -98,7 +122,12 @@ export default function ProfileSettingsPageContent(build: BuildData) {
         <NotGranted state={state} />
       ) : (
         state && (
-          <Settings state={state} draft={sections} onDraftChange={setDraft} />
+          <Settings
+            state={state}
+            draft={sections}
+            onDraftChange={setDraft}
+            onIdentityChange={setIdentity}
+          />
         )
       )}
     </StandardPageLayout>
@@ -135,10 +164,12 @@ function Settings({
   state,
   draft,
   onDraftChange,
+  onIdentityChange,
 }: {
   state: PublicProfileState;
   draft: ProfileSections;
   onDraftChange: (sections: ProfileSections) => void;
+  onIdentityChange: (identity: Identity) => void;
 }) {
   const { profile, onSaved } = state;
   return (
@@ -153,6 +184,11 @@ function Settings({
         </aside>
       )}
       <HandleStep profile={profile} onSaved={onSaved} />
+      <IdentityStep
+        profile={profile}
+        onSaved={onSaved}
+        onIdentityChange={onIdentityChange}
+      />
       <SectionsStep
         profile={profile}
         onSaved={onSaved}
@@ -308,6 +344,196 @@ function HandleStep({ profile, onSaved }: StepProps) {
   );
 }
 
+/** A name and links as they'd be saved: what the preview shows. */
+type Identity = { displayName?: string; links: ProfileLinks };
+
+const LINK_FIELDS: Record<
+  ProfileLinkId,
+  { label: string; placeholder: string; help: string }
+> = {
+  [ProfileLinkId.Letterboxd]: {
+    label: "Letterboxd",
+    placeholder: "letterboxd.com/your-name",
+    help: "Your username, or the address of your profile.",
+  },
+  [ProfileLinkId.Imdb]: {
+    label: "IMDb",
+    placeholder: "imdb.com/user/ur1234567",
+    help: "The address of your profile, from IMDb's Your profile page.",
+  },
+  [ProfileLinkId.Website]: {
+    label: "Website",
+    placeholder: "example.com",
+    help: "A site of your own: a blog, a newsletter. https only.",
+  },
+};
+
+/** What each link's field holds to start: the saved value, as stored. */
+function getLinkInputs(links: ProfileLinks = {}) {
+  return Object.fromEntries(
+    PROFILE_LINK_IDS.map((id) => [id, links[id] ?? ""]),
+  ) as Record<ProfileLinkId, string>;
+}
+
+const sameLinks = (a: ProfileLinks, b: ProfileLinks = {}) =>
+  PROFILE_LINK_IDS.every((id) => (a[id] ?? "") === (b[id] ?? ""));
+
+/**
+ * A name to show in place of the handle, and links to the reader's profiles
+ * elsewhere, all optional and saved together. What a name can't hold is
+ * dropped as it's typed rather than refused on saving: nobody needs telling
+ * off for a quotation mark. A link is read from a username or a pasted
+ * address, and one that can't be read says why under its field.
+ */
+function IdentityStep({
+  profile,
+  onSaved,
+  onIdentityChange,
+}: StepProps & { onIdentityChange: (identity: Identity) => void }) {
+  const { save, saving, error } = useProfileSave(profile, onSaved);
+  const [name, setName] = useState(profile?.displayName ?? "");
+  const [linkInputs, setLinkInputs] = useState(() =>
+    getLinkInputs(profile?.links),
+  );
+
+  const displayName = sanitiseDisplayName(name);
+  const nameTooLong = getNameLength(displayName) > DISPLAY_NAME_MAX_LENGTH;
+  const parsed = PROFILE_LINK_IDS.map(
+    (id) => [id, parseLinkInput(id, linkInputs[id])] as const,
+  );
+  const links = Object.fromEntries(
+    parsed.flatMap(([id, result]) =>
+      "value" in result && result.value ? [[id, result.value]] : [],
+    ),
+  ) as ProfileLinks;
+  const problems = parsed.some(([, result]) => "problem" in result);
+  const changed =
+    displayName !== (profile?.displayName ?? "") ||
+    !sameLinks(links, profile?.links);
+  const blockedBySections = Boolean(profile?.public && !profile.sections);
+
+  useEffect(() => {
+    onIdentityChange({ displayName: displayName || undefined, links });
+    // `links` is rebuilt every render; its contents are what matter.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayName, JSON.stringify(links), onIdentityChange]);
+
+  const onSubmit = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    if (!profile || !changed || problems || nameTooLong || blockedBySections)
+      return;
+    const next: UserProfile = { ...profile, links };
+    if (displayName) next.displayName = displayName;
+    else delete next.displayName;
+    save(next).then((saved) => saved && setName(displayName));
+  };
+
+  return (
+    <Step number={2} title="About you">
+      <p className={personaliseStyles.managementText}>
+        Optional. A name heads your profile in place of your handle, which stays
+        beside it, and links lead to you elsewhere.
+      </p>
+      <form className={styles.fields} onSubmit={onSubmit}>
+        <div className={styles.field}>
+          <label htmlFor="profile-name" className={styles.fieldLabel}>
+            Name
+          </label>
+          <input
+            id="profile-name"
+            className={personaliseStyles.input}
+            type="text"
+            autoComplete="name"
+            maxLength={DISPLAY_NAME_MAX_LENGTH * 2}
+            aria-describedby="profile-name-help"
+            aria-invalid={nameTooLong ? true : undefined}
+            value={name}
+            onChange={(event) =>
+              setName(stripDisplayNameInput(event.target.value))
+            }
+            placeholder={profile?.handle ?? "Your name"}
+          />
+          <span id="profile-name-help" className={styles.fieldHelp}>
+            {nameTooLong
+              ? `At most ${DISPLAY_NAME_MAX_LENGTH} characters`
+              : `Up to ${DISPLAY_NAME_MAX_LENGTH} characters. Quotation marks, <, >, & and \\ can't be used.`}
+          </span>
+        </div>
+        {parsed.map(([id, result]) => (
+          <div key={id} className={styles.field}>
+            <label htmlFor={`profile-link-${id}`} className={styles.fieldLabel}>
+              {LINK_FIELDS[id].label}
+            </label>
+            <input
+              id={`profile-link-${id}`}
+              className={personaliseStyles.input}
+              type={id === ProfileLinkId.Website ? "url" : "text"}
+              inputMode={id === ProfileLinkId.Website ? "url" : undefined}
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              aria-describedby={`profile-link-${id}-help`}
+              aria-invalid={"problem" in result ? true : undefined}
+              value={linkInputs[id]}
+              onChange={(event) =>
+                setLinkInputs((current) => ({
+                  ...current,
+                  [id]: event.target.value,
+                }))
+              }
+              placeholder={LINK_FIELDS[id].placeholder}
+            />
+            <span
+              id={`profile-link-${id}-help`}
+              className={clsx(
+                styles.fieldHelp,
+                "problem" in result && styles.fieldProblem,
+              )}
+            >
+              {"problem" in result ? result.problem : LINK_FIELDS[id].help}
+            </span>
+          </div>
+        ))}
+        <div className={personaliseStyles.managementActions}>
+          <Button
+            type="submit"
+            size="sm"
+            disabled={
+              !profile ||
+              saving ||
+              !changed ||
+              problems ||
+              nameTooLong ||
+              blockedBySections
+            }
+          >
+            Save
+          </Button>
+          {!profile ? (
+            <span className={personaliseStyles.confirmText}>
+              Save a handle first.
+            </span>
+          ) : blockedBySections ? (
+            <span className={personaliseStyles.confirmText}>
+              Choose what your profile shows first, below.
+            </span>
+          ) : (
+            !changed &&
+            (profile.displayName || profile.links) && (
+              <span className={personaliseStyles.confirmText}>Saved</span>
+            )
+          )}
+        </div>
+      </form>
+      {error && (
+        <p className={personaliseStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </Step>
+  );
+}
+
 /** What each switch is called, and what turning it on puts on the page. */
 const SECTION_COPY: Record<
   ProfileSectionId,
@@ -357,7 +583,7 @@ function SectionsStep({
     draft[ProfileSectionId.SeenStats] && !draft[ProfileSectionId.Seen];
 
   return (
-    <Step number={2} title="What it shows">
+    <Step number={3} title="What it shows">
       <p className={personaliseStyles.managementText}>
         Everything starts switched on. Turn off anything you&apos;d rather keep
         to yourself; the preview below shows the page as visitors will see it.
@@ -439,7 +665,7 @@ function VisibilityStep({
         : null;
 
   return (
-    <Step number={3} title="Who can see it">
+    <Step number={4} title="Who can see it">
       <Switch
         id="profile-public"
         label="Public"
@@ -482,10 +708,17 @@ function VisibilityStep({
  * read once, as the stats on /personalise read them.
  */
 function Preview({
+  handle,
+  identity,
   sections,
   venueImagePaths,
   movieLists,
-}: { sections: ProfileSections } & BuildData) {
+}: {
+  /** Undefined before one is saved. */
+  handle?: string;
+  identity: Identity;
+  sections: ProfileSections;
+} & BuildData) {
   const { lists, favouriteVenues, readFilmDetails } = useUserContext();
   const [filmDetails, setFilmDetails] = useState<FilmDetailsData | null>(null);
 
@@ -516,21 +749,29 @@ function Preview({
     sections[ProfileSectionId.SeenStats] &&
     !sections[ProfileSectionId.Seen] &&
     Object.keys(lists[UserListId.Seen]).length >= MIN_STATS_FILMS;
-  const summary = nothingShown
-    ? "With everything switched off, your profile shows only your handle."
-    : `${getProfileSubtitle(sections, lists) ?? "No film counts are shown"}.`;
+  const { title, subtitle } = getProfileHeading({
+    handle: handle ?? "your-handle",
+    displayName: identity.displayName,
+    sections,
+    lists,
+  });
 
   return (
     <section className={styles.preview} aria-labelledby="profile-preview">
       <div className={styles.previewHeader}>
-        <h2 id="profile-preview" className={styles.previewTitle}>
+        <p id="profile-preview" className={styles.previewLabel}>
           Preview
-        </h2>
-        <p className={styles.previewText}>
-          {summary}
-          {statsNameFilms &&
-            " The Seen list is hidden, but the stats still name a few films."}
         </p>
+        <h2 className={styles.previewTitle}>{title}</h2>
+        {subtitle && <p className={styles.previewText}>{subtitle}</p>}
+        <ProfileLinksRow links={identity.links} />
+        {(nothingShown || statsNameFilms) && (
+          <p className={styles.previewNote}>
+            {nothingShown
+              ? "With every section switched off, your profile shows only this."
+              : "The Seen list is hidden, but the stats still name a few films."}
+          </p>
+        )}
       </div>
       {!nothingShown && (
         <ProfileView

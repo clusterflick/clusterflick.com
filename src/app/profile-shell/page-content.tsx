@@ -16,7 +16,10 @@ import { useUserContext } from "@/state/user-context";
 import { PROFILE_SECTION_IDS } from "@/lib/user-profile";
 import type { MovieListProgressItem } from "@/app/personalise/seen-stats";
 import { PROFILE_SETTINGS_PATH } from "@/app/personalise/profile/path";
-import ProfileView, { getProfileSubtitle } from "./profile-view";
+import ProfileView, {
+  getProfileHeading,
+  ProfileLinksRow,
+} from "./profile-view";
 import styles from "./page.module.css";
 
 let cached: { text: string | null; data: ProfilePageData } | undefined;
@@ -169,23 +172,33 @@ function FoundProfile({
   venueImagePaths,
   movieLists,
 }: { profile: PublicProfile } & ProfileBuildData) {
-  const { handle, sections, lists, favouriteVenues, filmDetails } = profile;
+  const { handle, displayName, links, sections, lists } = profile;
+  const { favouriteVenues, filmDetails } = profile;
   const { visitor } = useVisitor(handle);
   const nothingShown = PROFILE_SECTION_IDS.every((id) => !sections[id]);
+  const { title, subtitle } = getProfileHeading({
+    handle,
+    displayName,
+    sections,
+    lists,
+  });
 
   // Full width, as /personalise is signed in: the page is mostly posters.
   return (
     <StandardPageLayout
-      title={handle}
-      subtitle={getProfileSubtitle(sections, lists)}
+      title={title}
+      subtitle={subtitle}
       heroExtra={
-        visitor === "owner" && (
-          <div className={styles.ownerActions}>
-            <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
-              Edit profile
-            </ButtonLink>
-          </div>
-        )
+        <>
+          <ProfileLinksRow links={links} />
+          {visitor === "owner" && (
+            <div className={styles.ownerActions}>
+              <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
+                Edit profile
+              </ButtonLink>
+            </div>
+          )}
+        </>
       }
       afterContent={
         <ProfileView
@@ -200,7 +213,7 @@ function FoundProfile({
     >
       {nothingShown ? (
         <p className={styles.nothingShown}>
-          {handle} isn&apos;t sharing any lists yet.
+          {displayName ?? handle} isn&apos;t sharing any lists yet.
         </p>
       ) : null}
     </StandardPageLayout>

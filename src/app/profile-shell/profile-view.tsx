@@ -6,7 +6,16 @@ import {
   type UserLists,
 } from "@/lib/user-lists";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
-import { ProfileSectionId, type ProfileSections } from "@/lib/user-profile";
+import { ButtonAnchor } from "@/components/button";
+import {
+  getProfileLinkLabel,
+  getProfileLinkUrl,
+  PROFILE_LINK_IDS,
+  ProfileSectionId,
+  type ProfileLinks,
+  type ProfileSections,
+} from "@/lib/user-profile";
+import styles from "./page.module.css";
 import {
   FavouriteVenuesSection,
   UserListSection,
@@ -50,6 +59,59 @@ export function getProfileSubtitle(
       : []),
   ];
   return parts.length > 0 ? parts.join(", ") : undefined;
+}
+
+/**
+ * What heads the profile: the name the reader chose, or their handle. With a
+ * name, the handle goes first in the line under it, so the address is never
+ * hidden behind a name anyone could choose.
+ */
+export function getProfileHeading({
+  handle,
+  displayName,
+  sections,
+  lists,
+}: {
+  handle: string;
+  displayName?: string;
+  sections: ProfileSections;
+  lists: UserLists;
+}): { title: string; subtitle?: string } {
+  const counts = getProfileSubtitle(sections, lists);
+  if (!displayName) return { title: handle, subtitle: counts };
+  return {
+    title: displayName,
+    subtitle: [`@${handle}`, counts].filter(Boolean).join(" · "),
+  };
+}
+
+/**
+ * The reader's links elsewhere, in a new tab. `me` lets those sites confirm
+ * the link back; `ugc` and `nofollow` say the reader chose it, not us.
+ */
+export function ProfileLinksRow({ links }: { links: ProfileLinks }) {
+  const shown = PROFILE_LINK_IDS.flatMap((id) => {
+    const value = links[id];
+    return value ? [{ id, value }] : [];
+  });
+  if (shown.length === 0) return null;
+  return (
+    <ul className={styles.links} aria-label="Elsewhere">
+      {shown.map(({ id, value }) => (
+        <li key={id}>
+          <ButtonAnchor
+            href={getProfileLinkUrl(id, value)}
+            variant="secondary"
+            size="sm"
+            target="_blank"
+            rel="me ugc nofollow noopener noreferrer"
+          >
+            {getProfileLinkLabel(id, value)}
+          </ButtonAnchor>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 /**

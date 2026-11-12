@@ -1,5 +1,12 @@
 import type { Firestore } from "firebase/firestore/lite";
 import reservedHandles from "./reserved-handles.json";
+import {
+  type ProfileLinks,
+  readDisplayName,
+  readProfileLinks,
+} from "./identity";
+
+export * from "./identity";
 
 /**
  * A reader's public profile settings: the handle their page lives at
@@ -20,6 +27,10 @@ export type UserProfile = {
    * as it did then.
    */
   sections?: ProfileSections;
+  /** Shown in place of the handle, with the handle beside it. */
+  displayName?: string;
+  /** Left out when there are none. */
+  links?: ProfileLinks;
 };
 
 /**
@@ -127,10 +138,14 @@ export function parseProfile(
 ): UserProfile | null {
   if (!data || typeof data.handle !== "string") return null;
   const sections = parseProfileSections(data.sections);
+  const displayName = readDisplayName(data.displayName);
+  const links = readProfileLinks(data.links);
   return {
     handle: data.handle,
     public: data.public === true,
     ...(sections && { sections }),
+    ...(displayName && { displayName }),
+    ...(Object.keys(links).length > 0 && { links }),
   };
 }
 
@@ -142,8 +157,8 @@ export function parseProfile(
  *   what makes a handle unique, and it is the Worker's lookup from address to
  *   reader. Any signed-in reader may get one (to be told it's taken), nobody
  *   may list them.
- * - `users/{uid}/meta/profile` holds `{ handle, public, sections }`, the
- *   owner's own record, which only they can read.
+ * - `users/{uid}/meta/profile` holds `{ handle, public, sections,
+ *   displayName, links }`, the owner's own record, which only they can read.
  *
  * So every change is one batch over both: claiming creates the handle and the
  * profile, renaming deletes the old handle and creates the new one, and
@@ -202,6 +217,9 @@ export async function saveProfile(
     handle: next.handle,
     public: next.public,
     ...(next.sections && { sections: next.sections }),
+    ...(next.displayName && { displayName: next.displayName }),
+    ...(next.links &&
+      Object.keys(next.links).length > 0 && { links: next.links }),
   });
   await batch.commit();
 }

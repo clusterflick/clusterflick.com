@@ -2097,9 +2097,30 @@ profile.
   while it is hidden, and their records name a few films. **Deploy the Worker
   before the rules and the site**: the other way round, a reader could hide a
   section that the old Worker still sends.
+- **A name and links are optional** (`@/lib/user-profile/identity`): a
+  display name heads the page in place of the handle, which leads the line
+  under it and the Worker's title ("Siobhán O'Brien (@film-fan)"), so the
+  address is never hidden behind a name anyone could choose. Links are film
+  ones only: Letterboxd, IMDb and a website. They are stored as identifiers
+  (a Letterboxd username, an IMDb `ur…` id) and the page builds the
+  addresses, so only the website is an address a reader typed, and it must be
+  https. All open in a new tab with `rel="me ugc nofollow"`.
+- **A name is stripped, not escaped.** It is written into the page's
+  `<head>` and into Next's inline payload, as a JSON string inside a
+  JavaScript string, so `FORBIDDEN_NAME_RANGES` (`"` `&` `<` `>` `\`,
+  control characters, the line and paragraph separators, and the
+  bidirectional overrides and isolates) are dropped as it's typed, refused by
+  the rules, and stripped again wherever it's read: by the Worker, and by the
+  page. A leading `$` goes too, since the payload reads a string starting
+  with `$` as a reference. An apostrophe stays (O'Brien): nothing it's
+  written into is quoted with one. The lists and patterns are repeated in
+  `firestore.rules` (held to the module by `rules-copy.test.ts`) and in the
+  Worker: change all three together. Letterboxd publishes no rules for
+  usernames, so its pattern is the address's safe characters, not a claim
+  about what Letterboxd allows.
 - **The settings are their own page, `/personalise/profile/`**, in the order
   they must be done: the handle (checked free, with a warning before a rename
-  frees the old address), what's shown (switches saved together), then the
+  frees the old address), the name and links, what's shown (switches saved together), then the
   public switch, disabled until both are saved and while the choice has
   unsaved changes, since going public publishes what's saved. Below them a
   preview draws the page as visitors will see it from the choice as it

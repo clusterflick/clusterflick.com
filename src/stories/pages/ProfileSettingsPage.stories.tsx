@@ -243,9 +243,66 @@ export const PublicBeforeSections: Story = {
     await expect(
       canvas.getByRole("button", { name: "Change handle" }),
     ).toBeDisabled();
+    // Under the handle, and under the name and links, which wait too.
     await expect(
-      canvas.getByText("Choose what your profile shows first, below."),
+      canvas.getAllByText("Choose what your profile shows first, below."),
+    ).toHaveLength(2);
+  },
+};
+
+/**
+ * A name and links: what a name can't hold drops out as it's typed, a pasted
+ * profile address is read for its username, and a link that can't be read
+ * says why and holds the save. The preview shows them as they're typed.
+ */
+export const NameAndLinks: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({
+        handle: "film-fan",
+        public: false,
+        sections: ALL_PROFILE_SECTIONS,
+      }),
+      saveProfile: fn(async () => {}),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const name = await canvas.findByRole("textbox", { name: "Name" });
+    await userEvent.type(name, 'Siobhán "Shiv" O\'Brien');
+    await expect(name).toHaveValue("Siobhán Shiv O'Brien");
+    await expect(
+      canvas.getByRole("heading", { name: "Siobhán Shiv O'Brien" }),
     ).toBeInTheDocument();
+
+    await userEvent.type(
+      canvas.getByRole("textbox", { name: "Letterboxd" }),
+      "https://letterboxd.com/film_fan/",
+    );
+    const imdb = canvas.getByRole("textbox", { name: "IMDb" });
+    await userEvent.type(imdb, "nm0000123");
+    await expect(
+      canvas.getByText(/The address of your IMDb profile/),
+    ).toBeInTheDocument();
+    const save = canvas.getByRole("button", { name: "Save" });
+    await expect(save).toBeDisabled();
+
+    await userEvent.clear(imdb);
+    await userEvent.type(imdb, "imdb.com/user/ur1234567/");
+    await expect(
+      canvas.getByRole("link", { name: "Letterboxd" }),
+    ).toHaveAttribute("href", "https://letterboxd.com/film_fan/");
+    await userEvent.click(save);
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        handle: "film-fan",
+        public: false,
+        sections: ALL_PROFILE_SECTIONS,
+        displayName: "Siobhán Shiv O'Brien",
+        links: { letterboxd: "film_fan", imdb: "ur1234567" },
+      } satisfies UserProfile),
+    );
   },
 };
 

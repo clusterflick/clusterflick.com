@@ -77,13 +77,67 @@
   text-align: center;
 }
 
+.previewLabel {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted-gray);
+}
+
 .previewTitle {
   margin: 0 0 8px;
-  font-size: 24px;
+  font-size: 32px;
+  overflow-wrap: anywhere;
   color: var(--color-white);
+}
+
+.previewNote {
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--color-light-gray);
 }
 
 .previewText {
   margin: 0;
   color: var(--color-muted-gray);
+}
+
+.fields {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .fields {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+  }
+
+  .fields > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-light-gray);
+}
+
+.fieldHelp {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
+.fieldProblem {
+  color: var(--color-neon-pink);
 }

@@ -1,8 +1,11 @@
 import {
   ALL_PROFILE_SECTIONS,
   getHandleProblem,
+  type ProfileLinks,
   type ProfileSections,
   PROFILE_SECTION_IDS,
+  readDisplayName,
+  readProfileLinks,
 } from ".";
 import {
   type FavouriteVenues,
@@ -43,6 +46,9 @@ export const PROFILE_SHELL_DESCRIPTION = "No public profile at this address.";
 export type PublicProfile = {
   handle: string;
   sections: ProfileSections;
+  /** Read as the settings save it, stripped again: the Worker strips it too. */
+  displayName?: string;
+  links: ProfileLinks;
   lists: UserLists;
   favouriteVenues: FavouriteVenues;
   filmDetails: FilmDetailsData;
@@ -165,11 +171,14 @@ export function parseProfilePageData(
     typeof value.handle === "string" && getHandleProblem(value.handle) === null
       ? value.handle
       : undefined;
+  const displayName = readDisplayName(value.displayName);
   if (value.found === true && handle) {
     return {
       found: true,
       handle,
       sections: parseSections(value.sections),
+      ...(displayName && { displayName }),
+      links: readProfileLinks(value.links),
       ...parseDocuments(value.documents),
     };
   }
