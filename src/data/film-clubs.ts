@@ -737,4 +737,19 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Cine Brazil" },
     ],
   },
+  {
+    id: "stow-film-lounge",
+    name: "Stow Film Lounge",
+    kind: "community",
+    url: "https://www.stowfilmlounge.com",
+    aliases: [],
+    matchers: [
+      // Its screenings come from its own site, where every one books through
+      // a /buytickets/ page on its domain or, when free, links to /wescreen.
+      // The titles are the film's alone.
+      { [FilterId.ShowingUrlSearch]: "stowfilmlounge.com" },
+      { [FilterId.ShowingTitleSearch]: "Stow Film Lounge" },
+      { [FilterId.PerformanceNotesSearch]: "Stow Film Lounge" },
+    ],
+  },
 ];
