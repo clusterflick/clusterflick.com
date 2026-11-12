@@ -536,7 +536,7 @@ describe("display name and links", () => {
       ...PROFILE,
       displayName: "Siobhán O'Brien 🎬",
       links: {
-        letterboxd: "film_fan-1",
+        letterboxd: "film_fan_1",
         imdb: "ur1234567",
         website: "https://example.com/films?page=1",
       },
@@ -584,6 +584,7 @@ describe("display name and links", () => {
       },
     ],
     ["a Letterboxd username with a slash", { letterboxd: "alice/films" }],
+    ["a Letterboxd username with a hyphen", { letterboxd: "film-fan" }],
     ["an IMDb id that isn't a user's", { imdb: "nm0000123" }],
     ["an http website", { website: "http://example.com/" }],
     ["a javascript: website", { website: "javascript:alert(1)" }],

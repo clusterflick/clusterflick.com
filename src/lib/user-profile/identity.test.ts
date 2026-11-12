@@ -70,6 +70,7 @@ describe("parseLinkInput", () => {
 
   test.each<[ProfileLinkId, string]>([
     [ProfileLinkId.Letterboxd, "https://letterboxd.com/film/heat/x/"],
+    [ProfileLinkId.Letterboxd, "film-fan"],
     [ProfileLinkId.Letterboxd, "film fan"],
     [ProfileLinkId.Imdb, "nm0000123"],
     [ProfileLinkId.Imdb, "https://www.imdb.com/title/tt0113277/"],

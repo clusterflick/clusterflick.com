@@ -2116,9 +2116,9 @@ displayName, links, favourites }`, readable by
   with `$` as a reference. An apostrophe stays (O'Brien): nothing it's
   written into is quoted with one. The lists and patterns are repeated in
   `firestore.rules` (held to the module by `rules-copy.test.ts`) and in the
-  Worker: change all three together. Letterboxd publishes no rules for
-  usernames, so its pattern is the address's safe characters, not a claim
-  about what Letterboxd allows.
+  Worker: change all three together. Letterboxd usernames are letters,
+  numbers and underscores (no hyphens); their length limit isn't published,
+  so 50 is a generous cap rather than Letterboxd's own.
 - **Up to four favourite films head the page** (`@/lib/user-profile/favourites`),
   in the reader's order, as Letterboxd's Four Favourites do. Each is its
   own snapshot (id, title, year, poster) in the profile document, **not a
