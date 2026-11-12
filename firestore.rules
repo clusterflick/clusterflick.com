@@ -38,7 +38,8 @@ service cloud.firestore {
         && !existsAfter(handlePath(resource.data.handle));
       allow create, update: if isOwner(userId)
         && request.resource.data.keys()
-          .hasOnly(['handle', 'public', 'sections', 'displayName', 'links'])
+          .hasOnly(['handle', 'public', 'sections', 'displayName', 'links',
+            'favourites'])
         && request.resource.data.handle is string
         && request.resource.data.public is bool
         && (!('sections' in request.resource.data)
@@ -47,6 +48,8 @@ service cloud.firestore {
           || isDisplayName(request.resource.data.displayName))
         && (!('links' in request.resource.data)
           || isProfileLinks(request.resource.data.links))
+        && (!('favourites' in request.resource.data)
+          || isFavourites(request.resource.data.favourites))
         // Public only once the reader has chosen what the page shows. A
         // profile made public before there was a choice has no sections and
         // shows everything; it can stay as it is, but no write makes a
@@ -143,6 +146,33 @@ service cloud.firestore {
         || (links.website is string
           && links.website.size() <= 200
           && links.website.matches('https://[^\\s<>"\\\\]+')));
+  }
+
+  // As FavouriteFilm in @/lib/user-profile: up to four snapshots of a film.
+  // Rules have no loops, so each place is checked in turn. A test holds the
+  // count and the patterns to the module's.
+  function isFavourites(favourites) {
+    return favourites is list
+      && favourites.size() <= 4
+      && (favourites.size() < 1 || isFavouriteFilm(favourites[0]))
+      && (favourites.size() < 2 || isFavouriteFilm(favourites[1]))
+      && (favourites.size() < 3 || isFavouriteFilm(favourites[2]))
+      && (favourites.size() < 4 || isFavouriteFilm(favourites[3]));
+  }
+
+  function isFavouriteFilm(film) {
+    return film is map
+      && film.keys().hasOnly(['id', 'title', 'year', 'posterPath'])
+      && film.id is string
+      && film.id.matches('[A-Za-z0-9_-]{1,40}')
+      && film.title is string
+      && film.title.size() >= 1
+      && film.title.size() <= 300
+      && (!('year' in film)
+        || (film.year is string && film.year.matches('[0-9]{4}')))
+      && (!('posterPath' in film)
+        || (film.posterPath is string
+          && film.posterPath.matches('/[A-Za-z0-9._-]{1,100}')));
   }
 
   // As getHandleProblem in @/lib/user-profile. The reserved list is

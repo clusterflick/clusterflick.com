@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { http, HttpResponse } from "msw";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import ProfileSettingsPageContent from "@/app/personalise/profile/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
@@ -243,10 +244,11 @@ export const PublicBeforeSections: Story = {
     await expect(
       canvas.getByRole("button", { name: "Change handle" }),
     ).toBeDisabled();
-    // Under the handle, and under the name and links, which wait too.
+    // Under the handle, the name and links, and the favourites, which wait
+    // too.
     await expect(
       canvas.getAllByText("Choose what your profile shows first, below."),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
   },
 };
 
@@ -301,6 +303,82 @@ export const NameAndLinks: Story = {
         sections: ALL_PROFILE_SECTIONS,
         displayName: "Siobhán Shiv O'Brien",
         links: { letterboxd: "film_fan", imdb: "ur1234567" },
+      } satisfies UserProfile),
+    );
+  },
+};
+
+/**
+ * Favourites: the Seen list is searched as it's typed, TheMovieDB only when
+ * asked, and picks fill the four places in order, saved together.
+ */
+export const PickingFavourites: Story = {
+  args: {
+    user: {
+      ...READER,
+      getIdToken: async () => "token",
+      readProfile: async () => ({
+        handle: "film-fan",
+        public: false,
+        sections: ALL_PROFILE_SECTIONS,
+      }),
+      saveProfile: fn(async () => {}),
+    },
+  },
+  parameters: {
+    msw: {
+      handlers: [
+        http.get("/api/tmdb/search", () =>
+          HttpResponse.json({
+            page: 1,
+            totalPages: 1,
+            totalResults: 1,
+            results: [{ id: "949", title: "Heat", year: "1995" }],
+          }),
+        ),
+      ],
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const search = await canvas.findByRole("textbox", {
+      name: "Search for a favourite film",
+    });
+    await userEvent.type(search, "mood");
+    await expect(
+      await canvas.findByRole("heading", { name: "From your Seen list" }),
+    ).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Add" }));
+    await expect(
+      canvas.getByRole("button", { name: "Remove In the Mood for Love" }),
+    ).toBeInTheDocument();
+
+    await userEvent.clear(search);
+    await userEvent.type(search, "heat");
+    await expect(
+      await canvas.findByText(/Nothing on your Seen list matches/),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Search all films" }),
+    );
+    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
+    // Heat goes second; moved first, it leads.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Move Heat earlier" }),
+    );
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Save favourites" }),
+    );
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        handle: "film-fan",
+        public: false,
+        sections: ALL_PROFILE_SECTIONS,
+        favourites: [
+          { id: "949", title: "Heat", year: "1995" },
+          { id: "843", title: "In the Mood for Love", year: "2000" },
+        ],
       } satisfies UserProfile),
     );
   },

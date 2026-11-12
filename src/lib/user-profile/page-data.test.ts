@@ -87,6 +87,7 @@ describe("parseProfilePageData", () => {
       handle: "film-fan",
       sections: ALL_PROFILE_SECTIONS,
       links: {},
+      favourites: [],
       lists: {
         seen: {
           "1": {
@@ -146,6 +147,22 @@ describe("parseProfilePageData", () => {
     });
   });
 
+  test("reads the favourites in order, dropping what can't be drawn", () => {
+    const data = parseProfilePageData(
+      found(null, null, {
+        favourites: [
+          { id: "949", title: "Heat", year: "1995", posterPath: "/h.jpg" },
+          { id: "../x", title: "Bad" },
+          { id: "843", title: "In the Mood for Love" },
+        ],
+      }),
+    );
+    expect(data.found && data.favourites).toEqual([
+      { id: "949", title: "Heat", year: "1995", posterPath: "/h.jpg" },
+      { id: "843", title: "In the Mood for Love" },
+    ]);
+  });
+
   test("no name is the handle alone", () => {
     const data = parseProfilePageData(found(null, null, { displayName: "  " }));
     expect(data.found && data).not.toHaveProperty("displayName");
@@ -162,6 +179,7 @@ describe("parseProfilePageData", () => {
       handle: "film-fan",
       sections: ALL_PROFILE_SECTIONS,
       links: {},
+      favourites: [],
       lists: { seen: {}, watchlist: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

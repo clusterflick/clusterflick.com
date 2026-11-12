@@ -5,8 +5,10 @@ import {
   readDisplayName,
   readProfileLinks,
 } from "./identity";
+import { type FavouriteFilm, readFavourites } from "./favourites";
 
 export * from "./identity";
+export * from "./favourites";
 
 /**
  * A reader's public profile settings: the handle their page lives at
@@ -31,6 +33,8 @@ export type UserProfile = {
   displayName?: string;
   /** Left out when there are none. */
   links?: ProfileLinks;
+  /** Up to four, in order. Left out when there are none. */
+  favourites?: FavouriteFilm[];
 };
 
 /**
@@ -140,12 +144,14 @@ export function parseProfile(
   const sections = parseProfileSections(data.sections);
   const displayName = readDisplayName(data.displayName);
   const links = readProfileLinks(data.links);
+  const favourites = readFavourites(data.favourites);
   return {
     handle: data.handle,
     public: data.public === true,
     ...(sections && { sections }),
     ...(displayName && { displayName }),
     ...(Object.keys(links).length > 0 && { links }),
+    ...(favourites.length > 0 && { favourites }),
   };
 }
 
@@ -158,7 +164,8 @@ export function parseProfile(
  *   reader. Any signed-in reader may get one (to be told it's taken), nobody
  *   may list them.
  * - `users/{uid}/meta/profile` holds `{ handle, public, sections,
- *   displayName, links }`, the owner's own record, which only they can read.
+ *   displayName, links, favourites }`, the owner's own record, which only
+ *   they can read.
  *
  * So every change is one batch over both: claiming creates the handle and the
  * profile, renaming deletes the old handle and creates the new one, and
@@ -220,6 +227,8 @@ export async function saveProfile(
     ...(next.displayName && { displayName: next.displayName }),
     ...(next.links &&
       Object.keys(next.links).length > 0 && { links: next.links }),
+    ...(next.favourites &&
+      next.favourites.length > 0 && { favourites: next.favourites }),
   });
   await batch.commit();
 }

@@ -607,6 +607,76 @@ describe("display name and links", () => {
   });
 });
 
+describe("favourite films", () => {
+  const PROFILE = { handle: "alice", public: false, sections: SECTIONS };
+  const film = (n: number) => ({
+    id: String(100 + n),
+    title: `Film ${n}`,
+    year: "2001",
+    posterPath: `/poster-${n}.jpg`,
+  });
+  const write = (favourites: unknown) =>
+    setDoc(doc(signedInAs("alice"), "users", "alice", "meta", "profile"), {
+      ...PROFILE,
+      favourites,
+    });
+
+  beforeEach(async () => {
+    await seed({
+      "users/alice/meta/capabilities": GRANTED,
+      "users/alice/meta/profile": PROFILE,
+      "handles/alice": { uid: "alice" },
+    });
+  });
+
+  test("up to four are saved with the profile, in order", async () => {
+    const next = {
+      ...PROFILE,
+      favourites: [
+        film(4),
+        film(1),
+        { id: "a1b2c3d4", title: "Untitled" },
+        film(2),
+      ],
+    };
+    await assertSucceeds(
+      saveProfile(signedInAs("alice"), "alice", next, PROFILE),
+    );
+    expect(await read("users/alice/meta/profile")).toEqual(next);
+  });
+
+  test("not five", async () => {
+    await assertFails(write([1, 2, 3, 4, 5].map(film)));
+  });
+
+  test.each<[string, unknown]>([
+    ["no id", { title: "Film" }],
+    ["no title", { id: "101" }],
+    ["an empty title", { id: "101", title: "" }],
+    ["a title too long", { id: "101", title: "a".repeat(301) }],
+    ["an id with a slash", { id: "10/1", title: "Film" }],
+    ["a year that isn't one", { ...film(1), year: "01" }],
+    [
+      "a poster that isn't a path",
+      { ...film(1), posterPath: "https://x.y/z.jpg" },
+    ],
+    ["an extra field", { ...film(1), rating: 5 }],
+    ["not a map", "101"],
+  ])("a film refuses %s, wherever it sits", async (_, bad) => {
+    await assertFails(write([bad]));
+    await assertFails(write([film(1), film(2), film(3), bad]));
+  });
+
+  test("not a map in place of the list", async () => {
+    await assertFails(write({ 0: film(1) }));
+  });
+
+  test("can't be changed without the capability", async () => {
+    await seed({ "users/alice/meta/capabilities": {} });
+    await assertFails(write([film(1)]));
+  });
+});
+
 describe("reading", () => {
   const SEEDED = {
     "users/alice/meta/profile": { handle: "alice", public: true },

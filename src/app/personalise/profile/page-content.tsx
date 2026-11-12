@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
 import EmptyState from "@/components/empty-state";
@@ -26,6 +26,7 @@ import {
   sanitiseDisplayName,
   stripDisplayNameInput,
   type ProfileLinks,
+  type FavouriteFilm,
   type ProfileSections,
   type UserProfile,
 } from "@/lib/user-profile";
@@ -46,6 +47,8 @@ import ProfileView, {
 } from "@/app/profile-shell/profile-view";
 import personaliseStyles from "@/app/personalise/page.module.css";
 import styles from "./page.module.css";
+import Step, { type StepProps } from "./step";
+import FavouritesStep from "./favourites-step";
 
 const PERSONALISE_PATH = "/personalise/";
 
@@ -56,8 +59,9 @@ type BuildData = {
 
 /**
  * Where a reader with the `publicProfile` capability sets up their profile, in
- * the order it has to be done: a handle, then a name and links if they want
- * them, then what the page shows, then whether anyone can see it. Going public waits until what's shown has been
+ * the order it has to be done: a handle, then a name, links and favourite
+ * films if they want them, then what the page shows, then whether anyone can
+ * see it. Going public waits until what's shown has been
  * saved once, so nobody publishes before seeing the choice; the rules enforce
  * the same. A preview below draws the page as visitors will see it, from the
  * choice as it stands, saved or not.
@@ -79,6 +83,9 @@ export default function ProfileSettingsPageContent(build: BuildData) {
     displayName: profile?.displayName,
     links: profile?.links ?? {},
   };
+  // The favourites as picked, saved or not, for the preview.
+  const [favourites, setFavourites] = useState<FavouriteFilm[] | null>(null);
+  const shownFavourites = favourites ?? profile?.favourites ?? [];
 
   return (
     <StandardPageLayout
@@ -89,6 +96,7 @@ export default function ProfileSettingsPageContent(build: BuildData) {
           <Preview
             handle={profile?.handle}
             identity={shownIdentity}
+            favourites={shownFavourites}
             sections={sections}
             {...build}
           />
@@ -127,6 +135,7 @@ export default function ProfileSettingsPageContent(build: BuildData) {
             draft={sections}
             onDraftChange={setDraft}
             onIdentityChange={setIdentity}
+            onFavouritesChange={setFavourites}
           />
         )
       )}
@@ -165,11 +174,13 @@ function Settings({
   draft,
   onDraftChange,
   onIdentityChange,
+  onFavouritesChange,
 }: {
   state: PublicProfileState;
   draft: ProfileSections;
   onDraftChange: (sections: ProfileSections) => void;
   onIdentityChange: (identity: Identity) => void;
+  onFavouritesChange: (favourites: FavouriteFilm[]) => void;
 }) {
   const { profile, onSaved } = state;
   return (
@@ -189,6 +200,12 @@ function Settings({
         onSaved={onSaved}
         onIdentityChange={onIdentityChange}
       />
+      <FavouritesStep
+        number={3}
+        profile={profile}
+        onSaved={onSaved}
+        onFavouritesChange={onFavouritesChange}
+      />
       <SectionsStep
         profile={profile}
         onSaved={onSaved}
@@ -199,30 +216,6 @@ function Settings({
     </div>
   );
 }
-
-function Step({
-  number,
-  title,
-  children,
-}: {
-  number: number;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className={clsx(personaliseStyles.card, styles.step)}>
-      <h2 className={styles.stepTitle}>
-        <span className={styles.stepNumber} aria-hidden="true">
-          {number}
-        </span>
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
-type StepProps = Pick<PublicProfileState, "profile" | "onSaved">;
 
 /**
  * The handle: saved after checking it's free, with a warning before a rename
@@ -583,7 +576,7 @@ function SectionsStep({
     draft[ProfileSectionId.SeenStats] && !draft[ProfileSectionId.Seen];
 
   return (
-    <Step number={3} title="What it shows">
+    <Step number={4} title="What it shows">
       <p className={personaliseStyles.managementText}>
         Everything starts switched on. Turn off anything you&apos;d rather keep
         to yourself; the preview below shows the page as visitors will see it.
@@ -665,7 +658,7 @@ function VisibilityStep({
         : null;
 
   return (
-    <Step number={4} title="Who can see it">
+    <Step number={5} title="Who can see it">
       <Switch
         id="profile-public"
         label="Public"
@@ -710,6 +703,7 @@ function VisibilityStep({
 function Preview({
   handle,
   identity,
+  favourites,
   sections,
   venueImagePaths,
   movieLists,
@@ -717,6 +711,7 @@ function Preview({
   /** Undefined before one is saved. */
   handle?: string;
   identity: Identity;
+  favourites: FavouriteFilm[];
   sections: ProfileSections;
 } & BuildData) {
   const { lists, favouriteVenues, readFilmDetails } = useUserContext();
@@ -742,7 +737,8 @@ function Preview({
     return <LoadingIndicator message="Loading the preview…" />;
   }
 
-  const nothingShown = PROFILE_SECTION_IDS.every((id) => !sections[id]);
+  const nothingShown =
+    favourites.length === 0 && PROFILE_SECTION_IDS.every((id) => !sections[id]);
   // The stats' records name films, so with the list hidden they still give a
   // few away: said only when there are enough films for the stats to show.
   const statsNameFilms =
@@ -768,13 +764,14 @@ function Preview({
         {(nothingShown || statsNameFilms) && (
           <p className={styles.previewNote}>
             {nothingShown
-              ? "With every section switched off, your profile shows only this."
+              ? "With every section switched off and no favourites, your profile shows only this."
               : "The Seen list is hidden, but the stats still name a few films."}
           </p>
         )}
       </div>
       {!nothingShown && (
         <ProfileView
+          favourites={favourites}
           sections={sections}
           lists={lists}
           favouriteVenues={favouriteVenues ?? {}}

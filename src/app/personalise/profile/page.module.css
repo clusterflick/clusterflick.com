@@ -141,3 +141,59 @@
 .fieldProblem {
   color: var(--color-neon-pink);
 }
+
+/* The four places, filled in order: four across, or two by two on a phone,
+   as the profile draws them. An empty place keeps a poster's footprint. */
+.favouritePicks {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 680px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 600px) {
+  .favouritePicks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.favouriteEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 2 / 3;
+  padding: 12px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-muted-gray);
+  border: 1px dashed rgba(var(--color-white-rgb), 0.2);
+  border-radius: 8px;
+}
+
+.favouriteActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.favouriteSearch {
+  margin-bottom: 16px;
+}
+
+.favouriteResults {
+  margin-bottom: 20px;
+}
+
+.favouriteResultsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.favouriteSearchAll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

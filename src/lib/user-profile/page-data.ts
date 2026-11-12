@@ -5,7 +5,9 @@ import {
   type ProfileSections,
   PROFILE_SECTION_IDS,
   readDisplayName,
+  readFavourites,
   readProfileLinks,
+  type FavouriteFilm,
 } from ".";
 import {
   type FavouriteVenues,
@@ -49,6 +51,8 @@ export type PublicProfile = {
   /** Read as the settings save it, stripped again: the Worker strips it too. */
   displayName?: string;
   links: ProfileLinks;
+  /** Up to four, in order, each its own snapshot. */
+  favourites: FavouriteFilm[];
   lists: UserLists;
   favouriteVenues: FavouriteVenues;
   filmDetails: FilmDetailsData;
@@ -179,6 +183,7 @@ export function parseProfilePageData(
       sections: parseSections(value.sections),
       ...(displayName && { displayName }),
       links: readProfileLinks(value.links),
+      favourites: readFavourites(value.favourites),
       ...parseDocuments(value.documents),
     };
   }

@@ -19,3 +19,23 @@
   padding: 0;
   list-style: none;
 }
+
+/* Four across or two by two, never three and one, as the stats' records
+   are: the tile list's own columns fit as many as the width allows. Capped,
+   so four posters don't grow to fill a wide page. */
+.favourites {
+  container-type: inline-size;
+}
+
+.favourites .favouriteList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+@container (min-width: 520px) {
+  .favourites .favouriteList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

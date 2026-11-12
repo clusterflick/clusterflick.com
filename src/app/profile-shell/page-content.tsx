@@ -172,10 +172,11 @@ function FoundProfile({
   venueImagePaths,
   movieLists,
 }: { profile: PublicProfile } & ProfileBuildData) {
-  const { handle, displayName, links, sections, lists } = profile;
+  const { handle, displayName, links, favourites, sections, lists } = profile;
   const { favouriteVenues, filmDetails } = profile;
   const { visitor } = useVisitor(handle);
-  const nothingShown = PROFILE_SECTION_IDS.every((id) => !sections[id]);
+  const nothingShown =
+    favourites.length === 0 && PROFILE_SECTION_IDS.every((id) => !sections[id]);
   const { title, subtitle } = getProfileHeading({
     handle,
     displayName,
@@ -202,6 +203,7 @@ function FoundProfile({
       }
       afterContent={
         <ProfileView
+          favourites={favourites}
           sections={sections}
           lists={lists}
           favouriteVenues={favouriteVenues}

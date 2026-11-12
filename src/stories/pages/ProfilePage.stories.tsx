@@ -145,6 +145,7 @@ const FOUND = {
   handle: "film-fan",
   sections: ALL_PROFILE_SECTIONS,
   links: {},
+  favourites: [],
   lists: {
     [UserListId.Seen]: Object.fromEntries(
       SEEN_FILMS.map(([id, title, year], index) => [
@@ -232,6 +233,37 @@ export const PublicOwner: Story = {
     await expect(
       await canvas.findByRole("link", { name: "Edit profile" }),
     ).toHaveAttribute("href", "/personalise/profile/");
+  },
+};
+
+/**
+ * Favourite films lead the page, in the reader's order: one that's showing
+ * links to its page, one that isn't is drawn from its snapshot, unlinked.
+ */
+export const WithFavourites: Story = {
+  args: {
+    data: {
+      ...FOUND,
+      favourites: [
+        { id: "949", title: "Heat", year: "1995" },
+        { id: "a-long-gone-film", title: "A Film Long Gone", year: "1950" },
+        { id: "843", title: "In the Mood for Love", year: "2000" },
+      ],
+    },
+    user: { status: "signed-out" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = await canvas.findByRole("heading", {
+      name: "Favourite Films",
+    });
+    const section = heading.closest("section") as HTMLElement;
+    const tiles = within(section).getAllByRole("listitem");
+    await expect(tiles).toHaveLength(3);
+    // In the reader's order.
+    await expect(tiles[0]).toHaveTextContent("Heat");
+    await expect(tiles[1]).toHaveTextContent("A Film Long Gone");
+    await expect(tiles[2]).toHaveTextContent("In the Mood for Love");
   },
 };
 
@@ -325,6 +357,7 @@ export const NothingShown: Story = {
       found: true,
       handle: "quiet-reader",
       links: {},
+      favourites: [],
       sections: {
         [ProfileSectionId.SeenStats]: false,
         [ProfileSectionId.Watchlist]: false,
@@ -353,6 +386,7 @@ export const PublicEmptyLists: Story = {
       handle: "new-reader",
       sections: ALL_PROFILE_SECTIONS,
       links: {},
+      favourites: [],
       lists: { [UserListId.Seen]: {}, [UserListId.Watchlist]: {} },
       favouriteVenues: {},
       filmDetails: { films: {}, people: {} },

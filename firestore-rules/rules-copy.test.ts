@@ -3,6 +3,9 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
   DISPLAY_NAME_MAX_LENGTH,
+  FAVOURITE_PATTERN_SOURCES,
+  FAVOURITE_TITLE_MAX_LENGTH,
+  FAVOURITES_MAX,
   getForbiddenNameClassForRules,
   LINK_PATTERN_SOURCES,
   PROFILE_LINK_IDS,
@@ -104,6 +107,38 @@ describe("the rules' copy of the display name and link checks", () => {
   test("has the same website length", () => {
     expect(linksBody).toContain(
       `links.website.size() <= ${WEBSITE_MAX_LENGTH}`,
+    );
+  });
+});
+
+describe("the rules' copy of the favourite film checks", () => {
+  const rules = readFileSync(
+    path.join(import.meta.dirname, "..", "firestore.rules"),
+    "utf8",
+  );
+  const listBody = rules.match(/function isFavourites\b[\s\S]*?\n {2}\}/)?.[0];
+  const filmBody = rules.match(/function isFavouriteFilm[\s\S]*?\n {2}\}/)?.[0];
+
+  test("allows the same number, and checks every place", () => {
+    expect(listBody).toContain(`favourites.size() <= ${FAVOURITES_MAX}`);
+    for (let index = 0; index < FAVOURITES_MAX; index++) {
+      expect(listBody).toContain(`isFavouriteFilm(favourites[${index}])`);
+    }
+  });
+
+  const asRules = (source: string) =>
+    source.replace(/^\^|\$$/g, "").replace(/\\\//g, "/");
+
+  test.each(Object.entries(FAVOURITE_PATTERN_SOURCES))(
+    "has the same pattern for %s",
+    (field, source) => {
+      expect(filmBody).toContain(`film.${field}.matches('${asRules(source)}')`);
+    },
+  );
+
+  test("has the same title length", () => {
+    expect(filmBody).toContain(
+      `film.title.size() <= ${FAVOURITE_TITLE_MAX_LENGTH}`,
     );
   });
 });

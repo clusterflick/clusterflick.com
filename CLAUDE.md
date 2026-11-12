@@ -2057,7 +2057,8 @@ profile.
 
 - **Two documents name each other.** `handles/{handle}` holds `{ uid }`: a
   document id exists once, which makes handles unique, and it is the Worker's
-  lookup. `users/{uid}/meta/profile` holds `{ handle, public, sections }`, readable by
+  lookup. `users/{uid}/meta/profile` holds `{ handle, public, sections,
+displayName, links, favourites }`, readable by
   its owner only. Every change is one batch over both (`saveProfile`,
   `deleteProfile`), and the rules accept a write only if, after the batch,
   each still names the other: a claim creates both, a rename deletes the old
@@ -2118,9 +2119,22 @@ profile.
   Worker: change all three together. Letterboxd publishes no rules for
   usernames, so its pattern is the address's safe characters, not a claim
   about what Letterboxd allows.
+- **Up to four favourite films head the page** (`@/lib/user-profile/favourites`),
+  in the reader's order, as Letterboxd's Four Favourites do: four across or
+  two by two, never three and one, as the stats' records are. Each is its
+  own snapshot (id, title, year, poster) in the profile document, **not a
+  reference into the Seen list**: tidying Seen shouldn't undo a statement
+  made once, a hidden Seen list stays wholly hidden rather than hidden but
+  for four films pulled out of it, and a reader with no Seen list can still
+  pick. They're picked from the Seen list as the reader types, then from
+  TheMovieDB on "Search all films", the film search's two steps
+  (`favourites-step.tsx`). There's no section switch: picking none hides
+  them. A favourite that's showing links to its page; one that isn't is its
+  snapshot, unlinked. The count and patterns are repeated in the rules (held
+  to the module by a test) and the Worker.
 - **The settings are their own page, `/personalise/profile/`**, in the order
   they must be done: the handle (checked free, with a warning before a rename
-  frees the old address), the name and links, what's shown (switches saved together), then the
+  frees the old address), the name and links, favourite films, what's shown (switches saved together), then the
   public switch, disabled until both are saved and while the choice has
   unsaved changes, since going public publishes what's saved. Below them a
   preview draws the page as visitors will see it from the choice as it

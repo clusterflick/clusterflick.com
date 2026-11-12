@@ -7,11 +7,16 @@ import {
 } from "@/lib/user-lists";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
 import { ButtonAnchor } from "@/components/button";
+import ContentSection from "@/components/content-section";
+import PosterTile, { PosterTileList } from "@/components/poster-tile";
+import { useCinemaData } from "@/state/cinema-data-context";
+import { getMovieUrl } from "@/utils/get-movie-url";
 import {
   getProfileLinkLabel,
   getProfileLinkUrl,
   PROFILE_LINK_IDS,
   ProfileSectionId,
+  type FavouriteFilm,
   type ProfileLinks,
   type ProfileSections,
 } from "@/lib/user-profile";
@@ -115,12 +120,50 @@ export function ProfileLinksRow({ links }: { links: ProfileLinks }) {
 }
 
 /**
+ * The reader's favourite films, in their order: four across, or two by two,
+ * never three and one, as the stats' records are. A film that's showing links
+ * to its page and takes the dataset's poster, which may be newer than the
+ * snapshot's; one that isn't is drawn from its snapshot, unlinked, since
+ * whether its departed page still exists is only known at build time.
+ */
+export function FavouriteFilmsSection({
+  favourites,
+}: {
+  favourites: FavouriteFilm[];
+}) {
+  const { movies } = useCinemaData();
+  if (favourites.length === 0) return null;
+  return (
+    <ContentSection title="Favourite Films">
+      <div className={styles.favourites}>
+        <PosterTileList className={styles.favouriteList}>
+          {favourites.map((film) => {
+            const showing = movies[film.id];
+            return (
+              <PosterTile
+                key={film.id}
+                title={film.title}
+                posterPath={showing?.posterPath ?? film.posterPath}
+                includedMovies={showing?.includedMovies}
+                href={showing ? getMovieUrl(showing) : undefined}
+                details={film.year ? [film.year] : undefined}
+              />
+            );
+          })}
+        </PosterTileList>
+      </div>
+    </ContentSection>
+  );
+}
+
+/**
  * A public profile's sections, read only, as `/personalise` shows the owner
  * their own: the Seen stats, the watchlist, the favourite venues and the Seen
  * list, in that order, each only if shown. Drawn by the profile page and by
  * the preview beside the profile settings, so the preview is the page.
  */
 export default function ProfileView({
+  favourites,
   sections,
   lists,
   favouriteVenues,
@@ -128,6 +171,7 @@ export default function ProfileView({
   venueImagePaths,
   movieLists,
 }: {
+  favourites: FavouriteFilm[];
   sections: ProfileSections;
   lists: UserLists;
   favouriteVenues: FavouriteVenues;
@@ -138,6 +182,8 @@ export default function ProfileView({
   const shown = (id: ProfileSectionId) => sections[id];
   return (
     <div className={personaliseStyles.wide}>
+      {/* First: the films the reader chose to be known by. */}
+      <FavouriteFilmsSection favourites={favourites} />
       {shown(ProfileSectionId.SeenStats) && (
         <SeenStats
           seen={lists[UserListId.Seen]}
