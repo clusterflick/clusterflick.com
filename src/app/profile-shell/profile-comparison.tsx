@@ -43,10 +43,10 @@ const GROUP_WIDTH_LIMIT = 8;
  *   with the planner on those showing; both seen; and each one's films the
  *   other has seen). Hiding them brings the card back.
  *
- * Either card can be dismissed: the sign-up one for every profile, the
- * compare one for this profile only, since another reader's overlap may be
- * wanted. Remembered in this browser, as a preference about the page rather
- * than anything about the reader's lists. Never drawn for the owner, nor
+ * Either card can be dismissed for the rest of the day: the sign-up one for
+ * every profile, the compare one for this profile only, since another
+ * reader's overlap may be wanted. Remembered in this browser, as a
+ * preference about the page rather than anything about the reader's lists. Never drawn for the owner, nor
  * when the profile shows neither list; see `compareProfileLists` for why
  * only lists shown are compared.
  */

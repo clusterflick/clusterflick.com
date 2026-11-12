@@ -2153,8 +2153,9 @@ displayName, links, favourites }`, readable by
   one's films the other has seen), each a `PosterStack` as the watchlist's
   groups are, sharing a row while short; Hide brings the card back. Signed
   out, the card invites them to start lists of their own. Either can be
-  dismissed: the sign-up card for every profile, the compare card for that
-  profile only (`comparison-dismissals.ts`). Dismissals live in
+  dismissed for the rest of the day, so it's out of the way for the visit
+  without being gone for good: the sign-up card for every profile, the
+  compare card for that profile only (`comparison-dismissals.ts`). Dismissals live in
   `localStorage`, being a preference about the page rather than anything
   about the reader's lists, so the account-only rule doesn't apply. It's
   worked out in the visitor's browser from their own lists against what

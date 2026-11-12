@@ -235,7 +235,7 @@ export const Public: Story = {
     await expect(canvas.queryByText("Remove")).not.toBeInTheDocument();
     await expect(canvas.queryByText("Edit profile")).not.toBeInTheDocument();
     // Signed out, what they'd have in common is an invitation, which can
-    // be dismissed for good.
+    // be dismissed for the day.
     await expect(
       canvas.getByRole("link", { name: "Start your lists" }),
     ).toHaveAttribute("href", "/personalise/");
@@ -245,7 +245,7 @@ export const Public: Story = {
     ).not.toBeInTheDocument();
     await expect(
       localStorage.getItem("clusterflick-profile-sign-up-dismissed"),
-    ).toBe("1");
+    ).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   },
 };
 
@@ -307,7 +307,7 @@ export const VisitorComparing: Story = {
   },
 };
 
-/** Dismissed, the compare card stays gone for this profile. */
+/** Dismissed, the compare card stays gone for this profile, for the day. */
 export const VisitorDismissing: Story = {
   args: { data: FOUND, user: VISITOR },
   play: async ({ canvasElement }) => {
@@ -319,8 +319,10 @@ export const VisitorDismissing: Story = {
       canvas.queryByRole("button", { name: "Compare" }),
     ).not.toBeInTheDocument();
     await expect(
-      localStorage.getItem("clusterflick-profile-compare-dismissed"),
-    ).toBe('["film-fan"]');
+      JSON.parse(
+        localStorage.getItem("clusterflick-profile-compare-dismissed") ?? "",
+      ).handles,
+    ).toEqual(["film-fan"]);
   },
 };
 
