@@ -50,6 +50,8 @@ const OTHER_NOTES: [note: string, festivalId: string][] = [
   ],
   ["Part of Native Spirit Festival", "native-spirit-festival"],
   ["Part of Armenian Film Festival 2026", "armenian-film-festival"],
+  // OutSavvy's organiser note
+  ["Presented by The Marginal Film Festival", "marginal-film-festival"],
 ];
 
 const matchesNote = (festivalId: string, note: string): boolean => {
