@@ -12,13 +12,14 @@ export default function SettingsCard({
   intro,
   children,
 }: {
-  title: string;
+  /** Left out where the field's own label says it all (the handle). */
+  title?: string;
   intro?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <section className={clsx(personaliseStyles.card, styles.card)}>
-      <h2 className={styles.cardTitle}>{title}</h2>
+      {title && <h2 className={styles.cardTitle}>{title}</h2>}
       {intro && <p className={personaliseStyles.managementText}>{intro}</p>}
       {children}
     </section>

@@ -37,13 +37,15 @@ export const SECTION_NAMES: Record<ProfileSectionId, string> = {
  * is one press too. It saves the draft with it, in one write, so what goes
  * public is what the preview shows; only a new address with it asks first,
  * since freeing the old one can't be undone. Then the card lights up, with
- * the address to copy or share. A green dot says it's public, a pink one
+ * the address to copy or share. With unsaved changes the button reads "Save
+ * and publish", since it saves them too. A green dot says it's public, a pink one
  * that it's private.
  */
 export default function PublishCard({
   profile,
   canPublish,
   publishBlocker,
+  changed,
   renameFrom,
   saving,
   error,
@@ -54,6 +56,11 @@ export default function PublishCard({
   canPublish: boolean;
   /** Why publishing can't happen yet, when it can't. */
   publishBlocker?: string;
+  /**
+   * The draft has unsaved changes. Publishing saves them with it, so the
+   * button says so.
+   */
+  changed: boolean;
   /** The saved handle a publish would rename away from, if any. */
   renameFrom?: string;
   saving: boolean;
@@ -164,29 +171,27 @@ export default function PublishCard({
           <p className={personaliseStyles.managementText}>
             {profile
               ? "Nobody else can see it until you publish it. The preview shows how it will look."
-              : "Choose an address and what your profile shows. Nobody else can see it until you publish it."}
+              : "Choose your handle and what your profile shows. Nobody else can see it until you publish it."}
           </p>
-          <div className={personaliseStyles.managementActions}>
-            <Button
-              size="sm"
-              onClick={() =>
-                renameFrom ? setConfirmingRename(true) : publish()
-              }
-              disabled={!canPublish || saving}
-              aria-describedby={
-                publishBlocker ? "profile-publish-blocker" : undefined
-              }
-            >
-              {saving ? "Publishing…" : "Publish profile"}
-            </Button>
-          </div>
-          {publishBlocker && (
-            <p
-              id="profile-publish-blocker"
-              className={personaliseStyles.managementStatus}
-            >
-              {publishBlocker}
-            </p>
+          {/* What stops it, in place of a button that can't be pressed. */}
+          {publishBlocker ? (
+            <p className={styles.publishBlocker}>{publishBlocker}</p>
+          ) : (
+            <div className={personaliseStyles.managementActions}>
+              <Button
+                size="sm"
+                onClick={() =>
+                  renameFrom ? setConfirmingRename(true) : publish()
+                }
+                disabled={!canPublish || saving}
+              >
+                {saving
+                  ? "Publishing…"
+                  : changed
+                    ? "Save and publish"
+                    : "Publish profile"}
+              </Button>
+            </div>
           )}
         </>
       ) : (

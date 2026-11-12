@@ -2209,8 +2209,10 @@ displayName, links, favourites }`, readable by
   private again is one press too, so a confirmation step listing the
   sections was taken out. "Publish profile" saves the draft and
   `public: true` in one write, so what goes public is what the preview
-  showed; only a new address in the draft asks first, since freeing the old
-  one can't be undone. The card then flickers on like a neon sign, once,
+  showed, and with unsaved changes it reads "Save and publish" to say so.
+  Only a new address in the draft asks first, since freeing the old one
+  can't be undone. While something stops it (no handle yet, one that's
+  taken), that reason stands where the button would be. The card then flickers on like a neon sign, once,
   with the address, Copy link and the phone's share sheet where there is
   one. A `ReleaseDot` says where it stands, here and in the account bar's
   panel: green and pulsing while public, still pink while private. A

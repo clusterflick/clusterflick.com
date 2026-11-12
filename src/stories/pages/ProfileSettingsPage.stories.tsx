@@ -98,12 +98,16 @@ export const NewProfile: Story = {
     const canvas = within(canvasElement);
     const save = await canvas.findByRole("button", { name: "Save" });
     await expect(save).toBeDisabled();
+    // What stops publishing stands in place of the button.
     await expect(
-      canvas.getByRole("button", { name: "Publish profile" }),
-    ).toBeDisabled();
+      canvas.queryByRole("button", { name: /publish/i }),
+    ).not.toBeInTheDocument();
     await expect(
-      canvas.getAllByText("Choose an address to save").length,
-    ).toBeGreaterThan(0);
+      canvas.getByText("Choose your handle to publish"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Choose your handle to save"),
+    ).toBeInTheDocument();
 
     await userEvent.type(
       canvas.getByRole("textbox", { name: "Handle" }),
@@ -264,8 +268,9 @@ export const PublishingWithRename: Story = {
     await userEvent.clear(handle);
     await userEvent.type(handle, "film-buff");
     await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
+    // Publishing saves the changes too, and says so.
     await userEvent.click(
-      canvas.getByRole("button", { name: "Publish profile" }),
+      canvas.getByRole("button", { name: "Save and publish" }),
     );
     await expect(
       canvas.getByText(/clusterflick\.com\/u\/film-fan will stop working/),

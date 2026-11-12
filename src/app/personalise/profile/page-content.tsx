@@ -194,13 +194,15 @@ function Editor({
   const handleTaken = availability === "taken";
   const canSave = read.valid && !handleTaken;
   const renaming = Boolean(profile && value.handle !== profile.handle);
-  const blocker = problems.handle
-    ? "Choose an address to save"
-    : handleTaken
-      ? "That address is taken"
-      : !read.valid
-        ? "Some fields need another look"
-        : undefined;
+  // What stops a save or a publish, said in the words of each.
+  const getBlocker = (action: "save" | "publish") =>
+    problems.handle
+      ? `Choose your handle to ${action}`
+      : handleTaken
+        ? "That handle is taken"
+        : !read.valid
+          ? "Some fields need another look"
+          : undefined;
 
   const update = (change: Partial<ProfileDraft>) => {
     setDraft((current) => ({ ...current, ...change }));
@@ -293,7 +295,8 @@ function Editor({
         <PublishCard
           profile={profile}
           canPublish={canSave}
-          publishBlocker={blocker}
+          publishBlocker={getBlocker("publish")}
+          changed={changed}
           renameFrom={renaming ? profile?.handle : undefined}
           saving={saving}
           error={lastAction === "publish" ? error : null}
@@ -307,7 +310,7 @@ function Editor({
           }}
         />
 
-        <SettingsCard title="Address">
+        <SettingsCard>
           <HandleField
             value={draft.handle}
             onChange={(handle) => update({ handle })}
@@ -442,7 +445,7 @@ function Editor({
         <SaveBar
           changed={changed}
           canSave={canSave}
-          blocker={blocker}
+          blocker={getBlocker("save")}
           saving={saving}
           error={lastAction === "save" ? error : null}
           confirmingRename={confirmingRename}

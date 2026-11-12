@@ -7,6 +7,7 @@ import {
 } from "@/lib/user-profile";
 import personaliseStyles from "@/app/personalise/page.module.css";
 import type { HandleAvailability } from "./use-handle-availability";
+import StatusIcon from "./status-icon";
 import styles from "./page.module.css";
 
 /**
@@ -76,7 +77,11 @@ export default function HandleField({
       >
         {status && (
           <>
-            <span className={styles.address}>{address}</span> {status.text}
+            <span className={styles.address}>{address}</span>{" "}
+            {status.tone === "good" && (
+              <StatusIcon kind="done" className={styles.fieldTick} />
+            )}
+            {status.text}
           </>
         )}
       </p>
