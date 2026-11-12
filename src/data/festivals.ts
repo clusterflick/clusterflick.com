@@ -1087,4 +1087,27 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "marginal-film-festival",
+    name: "The Marginal Film Festival",
+    url: "https://www.instagram.com/marginal_film_festival/",
+    aliases: ["mostra-do-filme-marginal"],
+    matchers: [
+      {
+        // Matches "The Marginal Film Festival – Opening Night: …" at the Cinema
+        // Museum and "The Marginal Film Festival Session IV – …"
+        [FilterId.ShowingTitleSearch]: "Marginal Film Festival",
+      },
+      {
+        // Matches "Marginal Film Session II: …" and "Marginal Film Session III:
+        // …", the festival's own OutSavvy listings at LARC and Farr's Dalston
+        [FilterId.ShowingTitleSearch]: "Marginal Film Session",
+      },
+      {
+        // OutSavvy notes each of the festival's events "Presented by The
+        // Marginal Film Festival"
+        [FilterId.PerformanceNotesSearch]: "Marginal Film Festival",
+      },
+    ],
+  },
 ];

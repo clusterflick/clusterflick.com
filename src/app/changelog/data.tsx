@@ -95,6 +95,21 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="The Marginal Film Festival"
+              url="https://www.instagram.com/marginal_film_festival/"
+            />
+            , the London edition of Brazil&apos;s Mostra do Filme Marginal: free
+            evenings of independent Brazilian and Lusophone cinema on land,
+            extraction and resistance, from 1 to 5 December.
+          </>
+        ),
+      },
     ],
   },
   {
