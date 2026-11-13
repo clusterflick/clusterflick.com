@@ -24,9 +24,12 @@
   list-style: none;
 }
 
-@media (min-width: 700px) {
+/* Three across once they fit, and one above another until then: two
+   across left the third on a row of its own. */
+@media (min-width: 900px) {
   .features {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
 }
 
