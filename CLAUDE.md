@@ -2112,8 +2112,8 @@ displayName, links, favourites }`, readable by
   page builds the addresses, so only the website is an address a reader
   typed, and it must be https. All open in a new tab with
   `rel="me ugc nofollow"`, each button carrying its mark: the Letterboxd
-  dots, a globe for the website, and for IMDb its badge (in the button's blue), which is
-  its name and so the whole label.
+  dots and a globe for the website; IMDb's mark is its name in a badge, so
+  its button is its name alone.
 - **A name is stripped, not escaped.** It is written into the page's
   `<head>` and into Next's inline payload, as a JSON string inside a
   JavaScript string, so `FORBIDDEN_NAME_RANGES` (`"` `&` `<` `>` `\`,

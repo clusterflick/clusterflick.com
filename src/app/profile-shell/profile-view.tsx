@@ -93,12 +93,11 @@ export function getProfileHeading({
  */
 /**
  * What each link's button shows: its mark and its name. IMDb's mark is its
- * name, a badge, so the badge is the whole label.
+ * name in a badge, which read as a second label beside the first, so IMDb's
+ * button is its name alone.
  */
 function LinkLabel({ id, value }: { id: ProfileLinkId; value: string }) {
-  if (id === ProfileLinkId.Imdb) {
-    return <span className={styles.imdbBadge}>IMDb</span>;
-  }
+  if (id === ProfileLinkId.Imdb) return getProfileLinkLabel(id, value);
   return (
     <span className={styles.linkLabel}>
       {id === ProfileLinkId.Letterboxd ? (
