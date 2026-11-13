@@ -51,7 +51,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
     "@firebase/rules-unit-testing": "^5.0.2",
-    "@playwright/test": "^1.58.1",
+    "@playwright/test": "^1.65.0",
     "@storybook/addon-a11y": "^10.2.6",
     "@storybook/addon-docs": "^10.2.6",
     "@storybook/addon-onboarding": "^10.2.6",
@@ -75,7 +75,7 @@
     "lighthouse": "^13.0.3",
     "msw": "^2.12.8",
     "msw-storybook-addon": "^2.0.6",
-    "playwright": "^1.58.1",
+    "playwright": "^1.65.0",
     "prettier": "^3.7.3",
     "scripts": "github:clusterflick/scripts",
     "sharp": "^0.34.5",

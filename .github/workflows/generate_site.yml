@@ -195,9 +195,7 @@ jobs:
 
   smoke-tests:
     name: Run smoke tests
-    # Pinned: ubuntu-latest moved to 26.04, which Playwright only supports
-    # from 1.62. Return to ubuntu-latest once Playwright is upgraded.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     needs: verify-hash
