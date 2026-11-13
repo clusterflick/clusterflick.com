@@ -10,6 +10,7 @@ import {
   CrossIcon,
   EmailIcon,
   LetterboxdIcon,
+  GlobeIcon,
   InstagramIcon,
   RedditIcon,
   ThreadsIcon,
@@ -36,7 +37,7 @@ import {
  * `CalendarIcon`, `FileCodeIcon`, `TickIcon`, `CrossIcon`, `BookmarkIcon`, `EyeIcon`
  *
  * **Social icons** (venue/festival profile links):
- * `LetterboxdIcon`, `InstagramIcon`, `XIcon`, `BlueskyIcon`, `ThreadsIcon`,
+ * `LetterboxdIcon`, `GlobeIcon`, `InstagramIcon`, `XIcon`, `BlueskyIcon`, `ThreadsIcon`,
  * `RedditIcon`, `EmailIcon`
  *
  * **Calendar export icons**:
@@ -113,6 +114,7 @@ export const SocialIcons: Story = {
     <div style={galleryStyle}>
       {[
         { label: "Letterboxd", icon: <LetterboxdIcon size={32} /> },
+        { label: "Website", icon: <GlobeIcon size={32} /> },
         { label: "Instagram", icon: <InstagramIcon size={32} /> },
         { label: "X", icon: <XIcon size={32} /> },
         { label: "Bluesky", icon: <BlueskyIcon size={32} /> },

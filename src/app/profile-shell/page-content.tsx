@@ -20,7 +20,7 @@ import ProfileView from "./profile-view";
 import ProfileHero from "./profile-hero";
 import ProfileComparison from "./profile-comparison";
 import CopyLinkButton from "./copy-link-button";
-import styles from "./page.module.css";
+import NothingShared from "./nothing-shared";
 
 let cached: { text: string | null; data: ProfilePageData } | undefined;
 
@@ -175,8 +175,9 @@ function FoundProfile({
   const { handle, displayName, links, favourites, sections, lists } = profile;
   const { favouriteVenues, filmDetails } = profile;
   const { visitor } = useVisitor(handle);
-  const nothingShown =
-    favourites.length === 0 && PROFILE_SECTION_IDS.every((id) => !sections[id]);
+  // Every section off. Favourites may still head the page, but there are
+  // no lists under them.
+  const nothingShown = PROFILE_SECTION_IDS.every((id) => !sections[id]);
 
   // Full width, as /personalise is signed in: the page is mostly posters.
   return (
@@ -224,9 +225,7 @@ function FoundProfile({
       }
     >
       {nothingShown ? (
-        <p className={styles.nothingShown}>
-          {displayName ?? handle} isn&apos;t sharing any lists yet.
-        </p>
+        <NothingShared ownerName={displayName ?? handle} />
       ) : null}
     </StandardPageLayout>
   );

@@ -175,6 +175,15 @@ export default function FavouritesPicker({
     const film = toFavouriteFilm(candidate.id, candidate);
     if (!film || full || pickedIds.has(film.id)) return;
     onChange([...picks, film]);
+    // The search has done its job: cleared, ready for the next pick, with
+    // focus back in the box rather than lost with the tile that was pressed.
+    // Once that was the fourth, the box gives way to the notice instead.
+    inFlight.current?.abort();
+    setQuery("");
+    setTmdb({ step: "idle" });
+    if (picks.length + 1 < FAVOURITES_MAX) {
+      searchRef.current?.focus({ preventScroll: true });
+    }
   };
   const remove = (id: string) =>
     onChange(picks.filter((film) => film.id !== id));

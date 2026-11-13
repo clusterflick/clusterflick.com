@@ -2089,9 +2089,10 @@ displayName, links, favourites }`, readable by
   on the page. A profile made public before sections existed has none and
   shows everything, as it did; it can be switched off as it is, but changing
   anything else means saving a choice first, and the settings say so.
-- **With every section switched off, the settings show the popcorn
-  knocked over** (`PopcornLogo`'s `spilled`) and say the profile now shows
-  only the name, links and favourites.
+- **With every section switched off, the profile shows the popcorn
+  knocked over** (`NothingShared`, `PopcornLogo`'s `spilled`) over "… isn't
+  sharing any lists yet", favourites or not, and so does the preview as the
+  last switch goes off.
 - **A hidden section is never sent, not just not drawn.** The Worker builds
   its field mask from `sections`, so a hidden list never leaves Firestore,
   and sends the page `sections` to tell a hidden list from an empty one
@@ -2106,9 +2107,13 @@ displayName, links, favourites }`, readable by
   under it and the Worker's title ("Siobhán O'Brien (@film-fan)"), so the
   address is never hidden behind a name anyone could choose. Links are film
   ones only: Letterboxd, IMDb and a website. They are stored as identifiers
-  (a Letterboxd username, an IMDb `ur…` id) and the page builds the
-  addresses, so only the website is an address a reader typed, and it must be
-  https. All open in a new tab with `rel="me ugc nofollow"`.
+  (a Letterboxd username, an IMDb user id: `ur` and digits for older
+  accounts, `p.` and lowercase letters and digits for newer ones) and the
+  page builds the addresses, so only the website is an address a reader
+  typed, and it must be https. All open in a new tab with
+  `rel="me ugc nofollow"`, each button carrying its mark: the Letterboxd
+  dots, a globe for the website, and for IMDb its yellow badge, which is
+  its name and so the whole label.
 - **A name is stripped, not escaped.** It is written into the page's
   `<head>` and into Next's inline payload, as a JSON string inside a
   JavaScript string, so `FORBIDDEN_NAME_RANGES` (`"` `&` `<` `>` `\`,
@@ -2133,7 +2138,8 @@ displayName, links, favourites }`, readable by
   (`favourites-picker.tsx`), into four places that can be dragged into
   order, or moved with their arrows from the keyboard; an empty place opens
   the search. A result is picked by pressing its whole tile (`PosterTile`'s
-  `onClick`, with an "Add" `cue` over the poster on hover).
+  `onClick`, with an "Add" `cue` over the poster on hover), which clears the
+  search and puts focus back in it for the next.
   There's no section switch: picking none hides them. The count
   and patterns are repeated in the rules (held to the module by a test) and
   the Worker.

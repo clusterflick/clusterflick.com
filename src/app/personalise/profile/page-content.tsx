@@ -7,7 +7,6 @@ import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import StandardPageLayout from "@/components/standard-page-layout";
 import Switch from "@/components/switch";
-import PopcornLogo from "@/components/popcorn-logo";
 import { useUserContext } from "@/state/user-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
@@ -138,7 +137,7 @@ const LINK_FIELDS: Record<
   },
   [ProfileLinkId.Imdb]: {
     label: "IMDb",
-    placeholder: "imdb.com/user/ur1234567",
+    placeholder: "imdb.com/user/p.abc123",
   },
   [ProfileLinkId.Website]: {
     label: "Website",
@@ -446,15 +445,6 @@ function Editor({
                 but anyone reading the page&apos;s source could find it.
               </p>
             )}
-          {PROFILE_SECTION_IDS.every((id) => !draft.sections[id]) && (
-            <div className={styles.allOff}>
-              <PopcornLogo spilled size={200} />
-              <p className={styles.allOffText}>
-                That&apos;s everything switched off. Your profile shows just
-                your name, links and favourite films.
-              </p>
-            </div>
-          )}
         </SettingsCard>
 
         <SaveBar

@@ -7,10 +7,12 @@ import {
 } from "@/lib/user-lists";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
 import { ButtonAnchor } from "@/components/button";
+import { GlobeIcon, LetterboxdIcon } from "@/components/icons";
 import {
   getProfileLinkLabel,
   getProfileLinkUrl,
   PROFILE_LINK_IDS,
+  ProfileLinkId,
   ProfileSectionId,
   type ProfileLinks,
   type ProfileSections,
@@ -89,6 +91,26 @@ export function getProfileHeading({
  * The reader's links elsewhere, in a new tab. `me` lets those sites confirm
  * the link back; `ugc` and `nofollow` say the reader chose it, not us.
  */
+/**
+ * What each link's button shows: its mark and its name. IMDb's mark is its
+ * name, a badge, so the badge is the whole label.
+ */
+function LinkLabel({ id, value }: { id: ProfileLinkId; value: string }) {
+  if (id === ProfileLinkId.Imdb) {
+    return <span className={styles.imdbBadge}>IMDb</span>;
+  }
+  return (
+    <span className={styles.linkLabel}>
+      {id === ProfileLinkId.Letterboxd ? (
+        <LetterboxdIcon size={16} />
+      ) : (
+        <GlobeIcon size={14} />
+      )}
+      {getProfileLinkLabel(id, value)}
+    </span>
+  );
+}
+
 export function ProfileLinksRow({ links }: { links: ProfileLinks }) {
   const shown = PROFILE_LINK_IDS.flatMap((id) => {
     const value = links[id];
@@ -106,7 +128,7 @@ export function ProfileLinksRow({ links }: { links: ProfileLinks }) {
             target="_blank"
             rel="me ugc nofollow noopener noreferrer"
           >
-            {getProfileLinkLabel(id, value)}
+            <LinkLabel id={id} value={value} />
           </ButtonAnchor>
         </li>
       ))}

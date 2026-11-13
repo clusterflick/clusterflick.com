@@ -1,3 +1,17 @@
+/* Every section switched off: the popcorn, knocked over, over its line. */
+.nothingShared {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.nothingShared svg {
+  max-width: 100%;
+  height: auto;
+}
+
 .nothingShown {
   margin: 0;
   text-align: center;
@@ -12,4 +26,23 @@
   margin: 16px 0 0;
   padding: 0;
   list-style: none;
+}
+
+/* A link's mark beside its name, as one line inside the button. */
+.linkLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* IMDb's badge: its name, bold, dark on yellow, as IMDb draws it. */
+.imdbBadge {
+  display: inline-block;
+  padding: 0 5px;
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  color: var(--color-black);
+  background: var(--color-buttery-yellow);
+  border-radius: 3px;
 }

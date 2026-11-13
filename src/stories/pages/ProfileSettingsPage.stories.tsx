@@ -319,23 +319,6 @@ export const StatsWithoutSeenList: Story = {
   },
 };
 
-/** Every section switched off: the popcorn, knocked over. */
-export const EverythingSwitchedOff: Story = {
-  args: { user: { ...READER, readProfile: async () => SAVED } },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const name of ["Seen stats", "Favourite venues", "Seen list"]) {
-      await userEvent.click(await canvas.findByRole("checkbox", { name }));
-    }
-    await expect(
-      canvas.getByRole("img", { name: "The Clusterflick popcorn, spilled" }),
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByText(/everything switched off/),
-    ).toBeInTheDocument();
-  },
-};
-
 /**
  * Favourites: an empty place opens the search, the Seen list is searched as
  * it's typed, TheMovieDB only when asked, and picks are put in order.
@@ -382,8 +365,10 @@ export const PickingFavourites: Story = {
     await expect(
       canvas.getByRole("button", { name: "Remove In the Mood for Love" }),
     ).toBeInTheDocument();
+    // Picked, the search is cleared and ready for the next.
+    await expect(search).toHaveValue("");
+    await expect(search).toHaveFocus();
 
-    await userEvent.clear(search);
     await userEvent.type(search, "heat");
     await userEvent.click(
       await canvas.findByRole("button", { name: "Search all films" }),
@@ -391,9 +376,7 @@ export const PickingFavourites: Story = {
     await userEvent.click(
       await canvas.findByRole("button", { name: /^Add: Heat/ }),
     );
-    await expect(
-      canvas.getByRole("button", { name: /^Added: Heat/ }),
-    ).toBeDisabled();
+    await expect(search).toHaveValue("");
     await userEvent.click(
       canvas.getByRole("button", { name: "Move Heat earlier" }),
     );

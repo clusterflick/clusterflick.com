@@ -537,7 +537,7 @@ describe("display name and links", () => {
       displayName: "Siobhán O'Brien 🎬",
       links: {
         letterboxd: "film_fan_1",
-        imdb: "ur1234567",
+        imdb: "p.mbd2yexnoms6latfrdkzba2zxy",
         website: "https://example.com/films?page=1",
       },
     };

@@ -199,24 +199,6 @@
   border-radius: 8px;
 }
 
-/* Every section switched off: the popcorn, knocked over. */
-.allOff {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-top: 24px;
-  text-align: center;
-}
-
-.allOffText {
-  margin: 0;
-  max-width: 36ch;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-muted-gray);
-}
-
 /* ---- Favourites ---- */
 
 /* The four places, filled in order, four across as the profile shows them. */
