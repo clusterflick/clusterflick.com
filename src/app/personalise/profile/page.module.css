@@ -120,7 +120,10 @@
   min-width: 0;
 }
 
+/* Further from its input than the input is from the line under it, which
+   belongs to the input. */
 .fieldLabel {
+  margin-bottom: 4px;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-light-gray);
