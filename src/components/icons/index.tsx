@@ -499,6 +499,27 @@ export function StarIcon({
   );
 }
 
+/** A bar chart: figures about the reader, as the Seen list's stats. */
+export function ChartIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M4 20h16M7 16v-5M12 16V6M17 16v-8" />
+    </svg>
+  );
+}
+
 export function MenuIcon({ size = 24, ...props }: IconProps) {
   return (
     <svg

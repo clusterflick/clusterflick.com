@@ -36,6 +36,7 @@ import {
   ChevronDownIcon,
   CloseIcon,
   EyeIcon,
+  ChartIcon,
   MapPinIcon,
   StarIcon,
 } from "@/components/icons";
@@ -352,6 +353,15 @@ function SignedOut() {
           </h2>
           <p className={styles.featureText}>
             Mark films as seen, and they come off your watchlist.
+          </p>
+        </li>
+        <li className={styles.feature}>
+          <ChartIcon size={28} className={styles.featureIcon} />
+          <h2 className={styles.featureTitle}>See your film stats</h2>
+          <p className={styles.featureText}>
+            The hours you&apos;ve spent watching, the directors and genres you
+            keep coming back to, and how far you are through lists like the IMDb
+            Top 250.
           </p>
         </li>
       </ul>
