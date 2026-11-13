@@ -348,9 +348,7 @@ function SignedOut() {
         </li>
         <li className={styles.feature}>
           <EyeIcon size={28} className={styles.featureIcon} />
-          <h2 className={styles.featureTitle}>
-            Remember what you&apos;ve seen
-          </h2>
+          <h2 className={styles.featureTitle}>Log what you&apos;ve seen</h2>
           <p className={styles.featureText}>
             Mark films as seen, and they come off your watchlist.
           </p>
@@ -359,9 +357,8 @@ function SignedOut() {
           <ChartIcon size={28} className={styles.featureIcon} />
           <h2 className={styles.featureTitle}>See your film stats</h2>
           <p className={styles.featureText}>
-            The hours you&apos;ve spent watching, the directors and genres you
-            keep coming back to, and how far you are through lists like the IMDb
-            Top 250.
+            Your hours watched, top directors and genres, and progress through
+            film lists.
           </p>
         </li>
       </ul>
