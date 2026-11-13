@@ -32,9 +32,17 @@
   list-style: none;
 }
 
-/* A link's mark beside its name, as one line inside the button. */
+/* A link's mark beside its name, as one line inside the button. Aligned to
+   the top rather than the text's baseline, which left a descender's room
+   below it, and the marks overhang the line rather than set its height, so
+   these buttons are exactly as tall as one with only a name (IMDb's). */
 .linkLabel {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  vertical-align: top;
+}
+
+.linkLabel svg {
+  margin-block: -4px;
 }
