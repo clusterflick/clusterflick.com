@@ -1937,6 +1937,17 @@ Editing takes a row of its own first, and import and export pair up below it:
   1 MiB or 40,000-index-entry limits; excluding the list fields from indexing
   is the fix if anyone does.
 
+- **Import from IMDb.** The same buttons take IMDb's list exports (the
+  watchlist to the Watchlist, ratings to Seen), told apart by their `Const`
+  column and parsed in `@/lib/user-lists/imdb-csv`. `Const` is the IMDb id, so
+  a film that's showing matches exactly; the rest go to TheMovieDB by title and
+  year, as Letterboxd rows do, since the search Worker can't look up an IMDb id
+  yet. A row is dated by `Date Rated`, else `Date Added` or `Created`, the
+  first it fills. Series, episodes, games and podcasts (`Title Type`) are left
+  out and named in the review. The headers were written from third-party
+  descriptions of the export, not from a file IMDb exported, and are found by
+  name so the older lower-case exports read too.
+- **Nothing is exported to IMDb**, which has no way to import a list.
 - **Export** writes each list in Letterboxd's _import_ format rather than its
   export format: the `tmdbID` column makes it an exact match both in Letterboxd
   and back in here. A pipeline-generated id isn't TheMovieDB's, so it's left

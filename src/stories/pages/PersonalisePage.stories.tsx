@@ -816,7 +816,30 @@ const tmdbMatches: Record<string, object> = {
   "Paris, Texas": { id: "655", title: "Paris, Texas", year: "1984" },
 };
 
-async function importWatchlist(canvasElement: HTMLElement) {
+/**
+ * The same watchlist as IMDb exports it, with a series IMDb lists beside the
+ * films, which the import leaves out.
+ */
+const imdbWatchlist = new File(
+  [
+    [
+      "Position,Const,Created,Modified,Description,Title,Original Title,URL,Title Type,IMDb Rating,Runtime (mins),Year,Genres,Num Votes,Release Date,Directors,Your Rating,Date Rated",
+      "1,tt0071129,2024-01-01,2024-01-01,,We All Loved Each Other So Much,C'eravamo tanto amati,,Movie,8.1,124,1974,Comedy,10000,1974-12-21,Ettore Scola,,",
+      "2,tt0095765,2024-01-02,2024-01-02,,Cinema Paradiso,Nuovo Cinema Paradiso,,Movie,8.5,155,1988,Drama,300000,1988-11-17,Giuseppe Tornatore,,",
+      "3,tt0272338,2024-01-03,2024-01-03,,Punch-Drunk Love,Punch-Drunk Love,,Movie,7.3,95,2002,Comedy,200000,2002-10-11,Paul Thomas Anderson,,",
+      '4,tt0087884,2024-01-04,2024-01-04,,"Paris, Texas","Paris, Texas",,Movie,8.1,145,1984,Drama,100000,1984-05-19,Wim Wenders,,',
+      "5,tt9999999,2024-01-05,2024-01-05,,A Film Nobody Made,A Film Nobody Made,,Movie,,,1999,,,,,,",
+      "6,tt0903747,2024-01-06,2024-01-06,,Breaking Bad,Breaking Bad,,TV Series,9.5,49,2008,Drama,2000000,2008-01-20,,,",
+    ].join("\n"),
+  ],
+  "imdb-watchlist.csv",
+  { type: "text/csv" },
+);
+
+async function importWatchlist(
+  canvasElement: HTMLElement,
+  file: File = letterboxdWatchlist,
+) {
   const canvas = within(canvasElement);
   await userEvent.click(await findManageListsToggle(canvas));
   // The data has to load before an import can start.
@@ -826,7 +849,7 @@ async function importWatchlist(canvasElement: HTMLElement) {
   await waitFor(() => expect(button).toBeEnabled(), { timeout: 10000 });
   const input =
     canvasElement.querySelector<HTMLInputElement>('input[type="file"]')!;
-  await userEvent.upload(input, letterboxdWatchlist);
+  await userEvent.upload(input, file);
   return canvas;
 }
 
@@ -850,6 +873,17 @@ export const SignedInImportReview: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await importWatchlist(canvasElement);
     await canvas.findByText(/lists 5 films/);
+  },
+};
+
+/** An IMDb export: the same films, and a series left out. */
+export const SignedInImportReviewImdb: Story = {
+  args: SignedInWithLists.args,
+  parameters: SignedInImportReview.parameters,
+  play: async ({ canvasElement }) => {
+    const canvas = await importWatchlist(canvasElement, imdbWatchlist);
+    await canvas.findByText(/lists 5 films/);
+    await canvas.findByText(/1 TV series or episode left out/);
   },
 };
 

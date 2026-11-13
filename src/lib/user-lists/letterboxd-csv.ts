@@ -14,9 +14,11 @@ import { toUserListEntry, type UserListEntry } from "./index";
  *   wrote comes back as exact matches, and Letterboxd matches it exactly too.
  */
 
-/** One film read from a file. */
+/** One film read from a file — Letterboxd's, or IMDb's (`imdb-csv`). */
 export type LetterboxdRow = {
   title: string;
+  /** Another title the film goes by, such as IMDb's `Original Title`. */
+  altTitles?: string[];
   year?: number;
   tmdbId?: string;
   imdbId?: string;
@@ -73,12 +75,12 @@ export function parseCsv(text: string): string[][] {
 }
 
 /** Header names folded so "Watched Date", "WatchedDate" and "watched_date" agree. */
-function foldHeader(header: string) {
+export function foldHeader(header: string) {
   return header.toLowerCase().replace(/[^a-z]/g, "");
 }
 
 /** The first of `names` present among the headers, as a column index. */
-function findColumn(headers: string[], names: string[]) {
+export function findColumn(headers: string[], names: string[]) {
   for (const name of names) {
     const index = headers.indexOf(name);
     if (index !== -1) return index;
@@ -86,8 +88,8 @@ function findColumn(headers: string[], names: string[]) {
   return -1;
 }
 
-/** `YYYY-MM-DD`, as both formats write dates, at midnight UTC. */
-function parseDate(value: string): number | undefined {
+/** `YYYY-MM-DD`, as both Letterboxd formats write dates, at midnight UTC. */
+export function parseDate(value: string): number | undefined {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
   if (!match) return undefined;
   const time = Date.UTC(+match[1], +match[2] - 1, +match[3]);
