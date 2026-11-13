@@ -116,6 +116,11 @@ export function createBatchRunner({
  * looked up at all — after waiting out a rate limit, and a couple of retries
  * for anything else — throws, rather than counting its films as missing: the
  * reader would lose them from the import without knowing.
+ *
+ * A row with an IMDb id is found by the id, exactly. The Worker doesn't fall
+ * back to the title for an id TMDB doesn't know (it can't afford a second call
+ * per film), so those rows are asked about again, by title and year, once the
+ * first pass is done. `onProgress` counts rows settled either way.
  */
 export async function lookUpRowsOnTmdb(
   rows: LetterboxdRow[],
@@ -123,21 +128,39 @@ export async function lookUpRowsOnTmdb(
 ): Promise<TmdbLookup> {
   const lookup: TmdbLookup = { found: [], missing: [] };
   const runBatch = createBatchRunner({ signal, sleep, now });
+  let settled = 0;
 
-  for (let start = 0; start < rows.length; start += MATCH_BATCH_SIZE) {
-    const batch = rows.slice(start, start + MATCH_BATCH_SIZE);
-    const films = batch.map(({ title, year }) => ({
-      title,
-      ...(year !== undefined && { year }),
-    }));
+  const pass = async (
+    queue: LetterboxdRow[],
+    byImdbId: boolean,
+  ): Promise<LetterboxdRow[]> => {
+    const retry: LetterboxdRow[] = [];
+    for (let start = 0; start < queue.length; start += MATCH_BATCH_SIZE) {
+      const batch = queue.slice(start, start + MATCH_BATCH_SIZE);
+      const films = batch.map(({ title, year, imdbId }) => ({
+        title,
+        ...(year !== undefined && { year }),
+        ...(byImdbId && imdbId && { imdbId }),
+      }));
 
-    const results = await runBatch(() => matchTmdb(films, getIdToken, signal));
-    results.forEach((film, index) => {
-      if (film) lookup.found.push({ row: batch[index], film });
-      else lookup.missing.push(batch[index]);
-    });
-    onProgress?.(Math.min(start + MATCH_BATCH_SIZE, rows.length));
-  }
+      const results = await runBatch(() =>
+        matchTmdb(films, getIdToken, signal),
+      );
+      results.forEach((film, index) => {
+        const row = batch[index];
+        if (film) lookup.found.push({ row, film });
+        else if (byImdbId && row.imdbId) retry.push(row);
+        else lookup.missing.push(row);
+        // A row left for the second pass is settled when that reaches it.
+        if (film || !byImdbId || !row.imdbId) settled++;
+      });
+      onProgress?.(settled);
+    }
+    return retry;
+  };
+
+  const retry = await pass(rows, true);
+  if (retry.length > 0) await pass(retry, false);
   return lookup;
 }
 

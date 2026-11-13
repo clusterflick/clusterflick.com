@@ -1940,9 +1940,12 @@ Editing takes a row of its own first, and import and export pair up below it:
 - **Import from IMDb.** The same buttons take IMDb's list exports (the
   watchlist to the Watchlist, ratings to Seen), told apart by their `Const`
   column and parsed in `@/lib/user-lists/imdb-csv`. `Const` is the IMDb id, so
-  a film that's showing matches exactly; the rest go to TheMovieDB by title and
-  year, as Letterboxd rows do, since the search Worker can't look up an IMDb id
-  yet. A row is dated by `Date Rated`, else `Date Added` or `Created`, the
+  a film that's showing matches exactly, and so does one that isn't: the match
+  endpoint takes an `imdbId` and asks TMDB's find endpoint instead of searching.
+  It can't afford a title search as well within a batch's subrequests, so the
+  ids it misses are asked about again by title and year in a second pass
+  (`lookUpRowsOnTmdb`). An older Worker ignores `imdbId` and searches the
+  title, so the Worker and the site can deploy in either order. A row is dated by `Date Rated`, else `Date Added` or `Created`, the
   first it fills. Series, episodes, games and podcasts (`Title Type`) are left
   out and named in the review. The headers were written from third-party
   descriptions of the export, not from a file IMDb exported, and are found by
