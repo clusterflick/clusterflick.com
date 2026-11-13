@@ -124,8 +124,12 @@ export const PROFILE_LINK_IDS: readonly ProfileLinkId[] =
  */
 const LETTERBOXD_PATTERN = /^[A-Za-z0-9_]{1,50}$/;
 
-/** IMDb's user ids: `ur` and digits, as in `imdb.com/user/ur1000000/`. */
-const IMDB_PATTERN = /^ur[0-9]{1,12}$/;
+/**
+ * IMDb's user ids, as they appear in `imdb.com/user/<id>/`: `ur` and digits
+ * for older accounts, and `p.` and lowercase letters and digits for newer
+ * ones (`p.mbd2yexnoms6latfrdkzba2zxy`).
+ */
+const IMDB_PATTERN = /^(?:ur[0-9]{1,12}|p\.[a-z0-9]{1,40})$/;
 
 export const WEBSITE_MAX_LENGTH = 200;
 
@@ -236,14 +240,14 @@ export function parseLinkInput(id: ProfileLinkId, input: string): LinkInput {
     }
     case ProfileLinkId.Imdb: {
       const fromUrl = text.match(
-        /^(?:https?:\/\/)?(?:(?:www|m)\.)?imdb\.com\/user\/(ur[0-9]+)\/?(?:[?#].*)?$/i,
+        /^(?:https?:\/\/)?(?:(?:www|m)\.)?imdb\.com\/user\/([^/?#]+)\/?(?:[?#].*)?$/i,
       )?.[1];
       const userId = fromUrl ?? text;
       return IMDB_PATTERN.test(userId)
         ? { value: userId }
         : {
             problem:
-              "The address of your IMDb profile, like imdb.com/user/ur1234567",
+              "The address of your IMDb profile, like imdb.com/user/p.abc123",
           };
     }
     case ProfileLinkId.Website: {

@@ -36,6 +36,10 @@ const posterUrl = (path: string) => `https://image.tmdb.org/t/p/w342${path}`;
  * like its owner, which a heading alone can't. Without favourites it's the
  * name over the site's usual backdrop.
  *
+ * Nothing in it waits on anything: the posters are the snapshots', the wash
+ * is a fixed height rather than the hero's, and the owner's buttons sit
+ * outside the flow, so the top of the page doesn't move as the rest loads.
+ *
  * Drawn by the profile page and by the preview beside the settings, so the
  * two can't differ.
  */
@@ -48,6 +52,7 @@ export default function ProfileHero({
   lists,
   filmDetails,
   actions,
+  inPreview = false,
 }: {
   handle: string;
   displayName?: string;
@@ -56,8 +61,17 @@ export default function ProfileHero({
   sections: ProfileSections;
   lists: UserLists;
   filmDetails: FilmDetailsData;
-  /** The owner's own buttons, under everything else. */
+  /**
+   * The owner's own buttons, in the hero's top corner: they're not part of
+   * the profile, and they arrive once the owner is recognised, so they sit
+   * where arriving moves nothing.
+   */
   actions?: ReactNode;
+  /**
+   * Drawn in the settings' preview, where there's no site header above it
+   * to clear and no owner's buttons to make room for.
+   */
+  inPreview?: boolean;
 }) {
   const { movies } = useCinemaData();
   const { title, subtitle } = getProfileHeading({
@@ -76,18 +90,25 @@ export default function ProfileHero({
     return getTasteLine(getSeenStats(seen, filmDetails, GENRE_NAMES));
   }, [sections, seen, filmDetails]);
 
-  // A film that's showing may have a newer poster than its snapshot.
+  // The snapshot's poster, so nothing changes as the listings arrive; the
+  // dataset's only for a snapshot that has none.
   const posters = favourites.map((film) => ({
     film,
     showing: movies[film.id],
-    posterPath: movies[film.id]?.posterPath ?? film.posterPath,
+    posterPath: film.posterPath ?? movies[film.id]?.posterPath,
   }));
   const washed = posters.flatMap(({ posterPath }) =>
     posterPath ? [posterPath] : [],
   );
 
   return (
-    <header className={clsx(styles.hero, posters.length > 0 && styles.withFan)}>
+    <header
+      className={clsx(
+        styles.hero,
+        posters.length > 0 && styles.withFan,
+        inPreview && styles.inPreview,
+      )}
+    >
       <div className={styles.wash} aria-hidden="true">
         {washed.length > 0 ? (
           washed.map((path, index) => (
@@ -159,8 +180,9 @@ export default function ProfileHero({
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         {taste && <p className={styles.taste}>{taste}</p>}
         <ProfileLinksRow links={links} />
-        {actions && <div className={styles.actions}>{actions}</div>}
       </div>
+
+      {actions && <div className={styles.actions}>{actions}</div>}
     </header>
   );
 }

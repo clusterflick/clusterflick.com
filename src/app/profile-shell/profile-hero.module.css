@@ -1,4 +1,5 @@
 .hero {
+  --poster: clamp(96px, 22vw, 168px);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -6,16 +7,42 @@
   text-align: center;
 }
 
+/* Until the fan has room beside it (four 168px posters, ~590px, centred,
+   and ~230px of buttons), the owner's buttons get a strip of their own
+   above it, kept for everyone so it's there before they arrive. */
+@media (max-width: 1099px) {
+  .hero {
+    padding-top: 120px;
+  }
+}
+
 /* The favourites' posters, side by side and blurred into a wash of their
    colours, as the home page's carousel does with its one. Masked out at the
    bottom rather than faded to a colour, since the page's background is a
    gradient and any flat colour draws a hard edge. */
+/* In the settings' preview: nothing above it to clear. */
+.hero.inPreview {
+  padding-top: 40px;
+}
+
 .wash {
   position: absolute;
   inset: 0;
   z-index: -1;
+  pointer-events: none;
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+/* With favourites, each poster's layer is a fixed height from the top
+   rather than the hero's: sized to the hero, it rescaled every blurred
+   poster whenever a line arrived. Only the mask, which fades the wash out at
+   the hero's foot, follows the hero. The wash stays inside the hero: let it
+   run on past the foot and it painted over the heading below. */
+.withFan .washLayer {
+  top: -60px;
+  bottom: auto;
+  height: calc(var(--poster) * 1.5 + 420px);
 }
 
 .washLayer {
@@ -60,7 +87,6 @@
    the middle and overlapping its neighbour, straightening and rising when
    pointed at. Large, since they are what the profile says first. */
 .fan {
-  --poster: clamp(96px, 22vw, 168px);
   display: flex;
   justify-content: center;
   margin: 0 0 32px;
@@ -147,10 +173,21 @@
   color: var(--color-light-gray);
 }
 
+/* Under the site header (63px), in the top right corner. */
 .actions {
+  position: absolute;
+  top: 79px;
+  right: 20px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
-  margin-top: 20px;
+}
+
+@media (max-width: 1099px) {
+  .actions {
+    top: 75px;
+    right: 16px;
+    left: 16px;
+  }
 }

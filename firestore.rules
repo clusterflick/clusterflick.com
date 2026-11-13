@@ -141,7 +141,7 @@ service cloud.firestore {
         || (links.letterboxd is string
           && links.letterboxd.matches('[A-Za-z0-9_]{1,50}')))
       && (!('imdb' in links)
-        || (links.imdb is string && links.imdb.matches('ur[0-9]{1,12}')))
+        || (links.imdb is string && links.imdb.matches('(?:ur[0-9]{1,12}|p\\.[a-z0-9]{1,40})')))
       && (!('website' in links)
         || (links.website is string
           && links.website.size() <= 200

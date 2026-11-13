@@ -98,12 +98,16 @@ export const NewProfile: Story = {
     const canvas = within(canvasElement);
     const save = await canvas.findByRole("button", { name: "Save" });
     await expect(save).toBeDisabled();
+    // What stops publishing stands in place of the button.
     await expect(
-      canvas.getByRole("button", { name: "Publish profile" }),
-    ).toBeDisabled();
+      canvas.queryByRole("button", { name: /publish/i }),
+    ).not.toBeInTheDocument();
     await expect(
-      canvas.getAllByText("Choose an address to save").length,
-    ).toBeGreaterThan(0);
+      canvas.getByText("Choose your handle to publish"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Choose your handle to save"),
+    ).toBeInTheDocument();
 
     await userEvent.type(
       canvas.getByRole("textbox", { name: "Handle" }),
@@ -147,8 +151,8 @@ export const HandleTaken: Story = {
 };
 
 /**
- * Publishing: it first says what goes public and what stays hidden, then
- * goes live, with the address to copy or share.
+ * Publishing: one press saves the draft and makes it public, and the card
+ * lights up with the address to copy or share.
  */
 export const Publishing: Story = {
   args: {
@@ -160,21 +164,12 @@ export const Publishing: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("heading", { name: "Your profile is private" }),
+    ).toBeInTheDocument();
     await userEvent.click(
-      await canvas.findByRole("button", { name: "Publish profile" }),
+      canvas.getByRole("button", { name: "Publish profile" }),
     );
-    await expect(canvas.getByText(/Before it goes public/)).toBeInTheDocument();
-    await expect(
-      canvas.getByText("Seen stats, Favourite venues and Seen list"),
-    ).toBeInTheDocument();
-    await expect(
-      canvas.getByText(
-        (_, element) =>
-          element?.tagName === "LI" &&
-          element.textContent === "Hidden: Watchlist",
-      ),
-    ).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole("button", { name: "Publish" }));
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
         ...SAVED,
@@ -185,7 +180,7 @@ export const Publishing: Story = {
       await canvas.findByRole("heading", { name: "You're live" }),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByText("clusterflick.com/u/film-fan/"),
+      canvas.getByText("clusterflick.com/u/film-fan"),
     ).toBeInTheDocument();
     await expect(
       canvas.getByRole("button", { name: "Copy link" }),
@@ -239,10 +234,51 @@ export const Renaming: Story = {
     await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await expect(
-      canvas.getByText(/\/u\/film-fan\/ will stop working straight away/),
+      canvas.getByText(
+        /clusterflick\.com\/u\/film-fan will stop working straight away/,
+      ),
     ).toBeInTheDocument();
     await expect(args.user.saveProfile).not.toHaveBeenCalled();
     await userEvent.click(canvas.getByRole("button", { name: "Change it" }));
+    await waitFor(() =>
+      expect(args.user.saveProfile).toHaveBeenCalledWith({
+        ...SAVED,
+        handle: "film-buff",
+        public: true,
+      }),
+    );
+  },
+};
+
+/**
+ * Publishing with a new address saves it too, so it asks first: the old
+ * address is freed, which can't be undone.
+ */
+export const PublishingWithRename: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => SAVED,
+      saveProfile: fn(async () => {}),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const handle = await canvas.findByRole("textbox", { name: "Handle" });
+    await userEvent.clear(handle);
+    await userEvent.type(handle, "film-buff");
+    await expect(await canvas.findByText("It's free.")).toBeInTheDocument();
+    // Publishing saves the changes too, and says so.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Save and publish" }),
+    );
+    await expect(
+      canvas.getByText(/clusterflick\.com\/u\/film-fan will stop working/),
+    ).toBeInTheDocument();
+    await expect(args.user.saveProfile).not.toHaveBeenCalled();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Change it and publish" }),
+    );
     await waitFor(() =>
       expect(args.user.saveProfile).toHaveBeenCalledWith({
         ...SAVED,
@@ -278,7 +314,7 @@ export const StatsWithoutSeenList: Story = {
       await canvas.findByRole("checkbox", { name: "Seen list" }),
     );
     await expect(
-      canvas.getByText(/your Seen list is still sent with the page/),
+      canvas.getByText(/your Seen list is\s+still sent with it/),
     ).toBeInTheDocument();
   },
 };
@@ -312,25 +348,35 @@ export const PickingFavourites: Story = {
   },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      await canvas.findByRole("button", { name: /Add a film/ }),
-    );
+    // Every empty place opens the search.
+    const [firstPlace] = await canvas.findAllByRole("button", {
+      name: /Add a film/,
+    });
+    await userEvent.click(firstPlace);
     const search = canvas.getByRole("textbox", {
       name: "Search for a favourite film",
     });
     await expect(search).toHaveFocus();
     await userEvent.type(search, "mood");
-    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
+    // The whole tile is the button.
+    await userEvent.click(
+      await canvas.findByRole("button", { name: /^Add: In the Mood for Love/ }),
+    );
     await expect(
       canvas.getByRole("button", { name: "Remove In the Mood for Love" }),
     ).toBeInTheDocument();
+    // Picked, the search is cleared and ready for the next.
+    await expect(search).toHaveValue("");
+    await expect(search).toHaveFocus();
 
-    await userEvent.clear(search);
     await userEvent.type(search, "heat");
     await userEvent.click(
       await canvas.findByRole("button", { name: "Search all films" }),
     );
-    await userEvent.click(await canvas.findByRole("button", { name: "Add" }));
+    await userEvent.click(
+      await canvas.findByRole("button", { name: /^Add: Heat/ }),
+    );
+    await expect(search).toHaveValue("");
     await userEvent.click(
       canvas.getByRole("button", { name: "Move Heat earlier" }),
     );
@@ -344,6 +390,37 @@ export const PickingFavourites: Story = {
         ],
       }),
     );
+  },
+};
+
+/** Four favourites: the search gives way to saying they're full. */
+export const FavouritesFull: Story = {
+  args: {
+    user: {
+      ...READER,
+      readProfile: async () => ({
+        ...SAVED,
+        favourites: [
+          { id: "949", title: "Heat", year: "1995" },
+          { id: "843", title: "In the Mood for Love", year: "2000" },
+          { id: "11216", title: "Cinema Paradiso", year: "1988" },
+          { id: "1018", title: "Mulholland Drive", year: "2001" },
+        ],
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/You've filled your favourites!/),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("textbox", { name: "Search for a favourite film" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Remove Heat" }));
+    await expect(
+      canvas.getByRole("textbox", { name: "Search for a favourite film" }),
+    ).toBeInTheDocument();
   },
 };
 

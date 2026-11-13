@@ -2089,6 +2089,10 @@ displayName, links, favourites }`, readable by
   on the page. A profile made public before sections existed has none and
   shows everything, as it did; it can be switched off as it is, but changing
   anything else means saving a choice first, and the settings say so.
+- **With every section switched off, the profile shows the popcorn
+  knocked over** (`NothingShared`, `PopcornLogo`'s `spilled`) over "… isn't
+  sharing any lists yet", favourites or not, and so does the preview as the
+  last switch goes off.
 - **A hidden section is never sent, not just not drawn.** The Worker builds
   its field mask from `sections`, so a hidden list never leaves Firestore,
   and sends the page `sections` to tell a hidden list from an empty one
@@ -2103,9 +2107,13 @@ displayName, links, favourites }`, readable by
   under it and the Worker's title ("Siobhán O'Brien (@film-fan)"), so the
   address is never hidden behind a name anyone could choose. Links are film
   ones only: Letterboxd, IMDb and a website. They are stored as identifiers
-  (a Letterboxd username, an IMDb `ur…` id) and the page builds the
-  addresses, so only the website is an address a reader typed, and it must be
-  https. All open in a new tab with `rel="me ugc nofollow"`.
+  (a Letterboxd username, an IMDb user id: `ur` and digits for older
+  accounts, `p.` and lowercase letters and digits for newer ones) and the
+  page builds the addresses, so only the website is an address a reader
+  typed, and it must be https. All open in a new tab with
+  `rel="me ugc nofollow"`, each button carrying its mark: the Letterboxd
+  dots and a globe for the website; IMDb's mark is its name in a badge, so
+  its button is its name alone.
 - **A name is stripped, not escaped.** It is written into the page's
   `<head>` and into Next's inline payload, as a JSON string inside a
   JavaScript string, so `FORBIDDEN_NAME_RANGES` (`"` `&` `<` `>` `\`,
@@ -2129,7 +2137,10 @@ displayName, links, favourites }`, readable by
   TheMovieDB on "Search all films", the film search's two steps
   (`favourites-picker.tsx`), into four places that can be dragged into
   order, or moved with their arrows from the keyboard; an empty place opens
-  the search. There's no section switch: picking none hides them. The count
+  the search. A result is picked by pressing its whole tile (`PosterTile`'s
+  `onClick`, with an "Add" `cue` over the poster on hover), which clears the
+  search and puts focus back in it for the next.
+  There's no section switch: picking none hides them. The count
   and patterns are repeated in the rules (held to the module by a test) and
   the Worker.
 - **A link to a profile previews with its first favourite's poster**, set
@@ -2144,7 +2155,15 @@ displayName, links, favourites }`, readable by
   the name, a line of the reader's taste (`getTasteLine`: "Mostly drama ·
   Big on the 2000s · 2 Wong Kar-wai films"), from the stats the page already
   shows and only with them, each part only where it's true enough to say.
-  The owner gets Edit profile and Copy link beneath.
+  The owner gets Edit profile and Copy link in the top right corner, out of
+  the flow, since they arrive once the owner is recognised and aren't part
+  of the profile; below 1100px the hero keeps a strip above the fan for
+  them, for everyone, so nothing moves when they appear. **Nothing in the
+  hero waits on anything**: the posters are the favourites' snapshots (the
+  dataset's only where a snapshot has none), and each blurred poster's layer
+  is a fixed height from the hero's top rather than the hero's height, which
+  rescaled them as the hero's lines arrived. The wash stays clipped to the
+  hero: run on past its foot, it painted over the heading below.
 - **A profile is useful to a friend, not just a record.** On someone's
   profile the watchlist leads with how many of its films are showing this
   week, linking to the planner on just those (`getShowingThisWeek`), and its
@@ -2183,15 +2202,32 @@ displayName, links, favourites }`, readable by
   scrolling on its own, and on a narrower screen is a full-screen dialog
   opened from the save bar (and isn't drawn until then). It draws from the
   draft, saved or not, through the profile page's own `ProfileHero` and
-  `ProfileView`, so the two can't differ.
-- **Publishing is a moment, not a switch.** "Publish profile" first lists
-  what goes public and what stays hidden, which is where the reader
-  considers it (the rules make the same point by refusing `public: true`
-  without `sections`), then saves the draft and `public: true` in one
-  write, so what goes public is what the preview showed. The card then
-  flickers on like a neon sign, once, with the address, Copy link and the
-  phone's share sheet where there is one. Making it private never waits for
-  anything. The account bar's "Public profile" panel (`public-profile.tsx`)
+  `ProfileView`, so the two can't differ. **Beside the settings it's an
+  iframe** (`PreviewFrame`): about 750px of a wide screen, drawn in the page
+  it took the profile's desktop layout and was cramped. The frame is still
+  this page's React tree, through a portal, so it keeps the reader's lists
+  and the listings; the page's stylesheets are copied in and kept in step,
+  with `<html>`'s and `<body>`'s classes and style, which carry the fonts.
+  Script that asks a window a question goes through `ViewWindowProvider`:
+  `useMediaQuery` asks the frame's, and `useElementWidth` and `PosterStack`
+  use their element's own window.
+- **Addresses are written without the trailing slash**
+  (`getProfileDisplayAddress`: `clusterflick.com/u/film-fan`); links and
+  copied addresses keep it, being where the page lives.
+- **Publishing is one press, and a moment.** The switches and the preview
+  beside them are where the reader considers what's shared, and making it
+  private again is one press too, so a confirmation step listing the
+  sections was taken out. "Publish profile" saves the draft and
+  `public: true` in one write, so what goes public is what the preview
+  showed, and with unsaved changes it reads "Save and publish" to say so.
+  Only a new address in the draft asks first, since freeing the old one
+  can't be undone. While something stops it (no handle yet, one that's
+  taken), that reason stands where the button would be. The card then flickers on like a neon sign, once,
+  with the address, Copy link and the phone's share sheet where there is
+  one. A `ReleaseDot` says where it stands, here and in the account bar's
+  panel: green and pulsing while public, still pink while private. A
+  private profile offers no link to itself, since the owner would find only
+  a page saying it's private; the preview is how it looks. The account bar's "Public profile" panel (`public-profile.tsx`)
   only says where the profile stands and links here. A refused batch is
   reported as "taken" when the handle changed, since another reader
   claiming it between the check and the save is the likely cause, and

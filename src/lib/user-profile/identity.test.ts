@@ -57,6 +57,16 @@ describe("parseLinkInput", () => {
     [ProfileLinkId.Imdb, "ur1234567", "ur1234567"],
     [ProfileLinkId.Imdb, "https://www.imdb.com/user/ur1234567/", "ur1234567"],
     [ProfileLinkId.Imdb, "m.imdb.com/user/ur1234567", "ur1234567"],
+    [
+      ProfileLinkId.Imdb,
+      "https://www.imdb.com/user/p.mbd2yexnoms6latfrdkzba2zxy",
+      "p.mbd2yexnoms6latfrdkzba2zxy",
+    ],
+    [
+      ProfileLinkId.Imdb,
+      "p.mbd2yexnoms6latfrdkzba2zxy",
+      "p.mbd2yexnoms6latfrdkzba2zxy",
+    ],
     [ProfileLinkId.Website, "example.com", "https://example.com/"],
     [
       ProfileLinkId.Website,
@@ -73,6 +83,7 @@ describe("parseLinkInput", () => {
     [ProfileLinkId.Letterboxd, "film-fan"],
     [ProfileLinkId.Letterboxd, "film fan"],
     [ProfileLinkId.Imdb, "nm0000123"],
+    [ProfileLinkId.Imdb, "https://www.imdb.com/user/p.has-a-hyphen/"],
     [ProfileLinkId.Imdb, "https://www.imdb.com/title/tt0113277/"],
     [ProfileLinkId.Website, "http://example.com"],
     [ProfileLinkId.Website, "javascript:alert(1)"],

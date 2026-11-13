@@ -276,7 +276,10 @@ export default function PosterStack({
       .slice(0, drawnCount)
       .map((tile) => getTileArt(tile).getBoundingClientRect());
     const toggle = toggleRef.current?.getBoundingClientRect();
-    const scrollBefore = window.scrollY;
+    // The window the stack is drawn in, which in the profile preview is an
+    // iframe's rather than the page's.
+    const view = rootRef.current?.ownerDocument.defaultView ?? window;
+    const scrollBefore = view.scrollY;
     flushSync(() => setExpanded(false));
 
     // Closing a long list from the button under it can leave the stack above
@@ -286,7 +289,7 @@ export default function PosterStack({
     if (root && root.getBoundingClientRect().top < 0) {
       root.scrollIntoView({ block: "start" });
     }
-    const scrolled = window.scrollY - scrollBefore;
+    const scrolled = view.scrollY - scrollBefore;
 
     if (!prefersReducedMotion()) {
       const posters = postersRef.current

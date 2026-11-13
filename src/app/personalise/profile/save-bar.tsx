@@ -2,7 +2,8 @@
 
 import clsx from "clsx";
 import Button from "@/components/button";
-import { getProfilePath } from "@/lib/user-profile";
+import { getProfileDisplayAddress } from "@/lib/user-profile";
+import StatusIcon from "./status-icon";
 import styles from "./page.module.css";
 
 /**
@@ -41,10 +42,11 @@ export default function SaveBar({
   /** Absent where the preview is already beside the settings. */
   onPreview?: () => void;
 }) {
+  const state = error ? "error" : changed ? "changed" : "saved";
   const status = error
     ? error
     : confirmingRename && renameFrom
-      ? `clusterflick.com${getProfilePath(renameFrom)} will stop working straight away, and anyone can claim it.`
+      ? `${getProfileDisplayAddress(renameFrom)} will stop working straight away, and anyone can claim it.`
       : !changed
         ? "All changes saved"
         : blocker
@@ -56,11 +58,18 @@ export default function SaveBar({
       <p
         className={clsx(
           styles.saveStatus,
-          changed && !error && styles.saveStatusChanged,
-          error && styles.saveStatusError,
+          state === "saved" && styles.saveStatusSaved,
+          state === "changed" && styles.saveStatusChanged,
+          state === "error" && styles.saveStatusError,
         )}
         aria-live="polite"
       >
+        {state !== "error" && (
+          <StatusIcon
+            kind={state === "saved" ? "done" : "pending"}
+            className={styles.saveStatusIcon}
+          />
+        )}
         {status}
       </p>
       <div className={styles.saveActions}>
@@ -74,7 +83,12 @@ export default function SaveBar({
             <Button variant="link" onClick={onCancelRename}>
               Cancel
             </Button>
-            <Button size="sm" onClick={onSave} disabled={saving}>
+            <Button
+              size="sm"
+              className={styles.saveButton}
+              onClick={onSave}
+              disabled={saving}
+            >
               Change it
             </Button>
           </>
@@ -87,6 +101,7 @@ export default function SaveBar({
             )}
             <Button
               size="sm"
+              className={styles.saveButton}
               onClick={onSave}
               disabled={!changed || !canSave || saving}
             >

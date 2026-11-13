@@ -2,9 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
+import ReleaseDot from "@/components/release-dot";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
-import { getProfilePath, type UserProfile } from "@/lib/user-profile";
+import {
+  getProfileDisplayAddress,
+  getProfilePath,
+  type UserProfile,
+} from "@/lib/user-profile";
 import { PROFILE_SETTINGS_PATH } from "./profile/path";
 import styles from "./page.module.css";
 
@@ -23,13 +28,17 @@ export type PublicProfileState = {
  * coming-soon panel, a setting nobody can reach is better than a broken page.
  */
 export function usePublicProfile(): PublicProfileState | null {
-  const { readCapabilities, readProfile } = useUserContext();
+  const { status, readCapabilities, readProfile } = useUserContext();
+  const signedIn = status === "signed-in";
   const [state, setState] = useState<{
     granted: boolean;
     profile: UserProfile | null;
   } | null>(null);
 
+  // Only once signed in: the settings page asks before Firebase has said who
+  // is, and reading then fails.
   useEffect(() => {
+    if (!signedIn) return;
     let cancelled = false;
     Promise.all([readCapabilities(), readProfile()]).then(
       ([capabilities, profile]) => {
@@ -44,7 +53,7 @@ export function usePublicProfile(): PublicProfileState | null {
     return () => {
       cancelled = true;
     };
-  }, [readCapabilities, readProfile]);
+  }, [signedIn, readCapabilities, readProfile]);
 
   const onSaved = useCallback(
     (profile: UserProfile) =>
@@ -118,11 +127,12 @@ export function PublicProfileSummary({
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Your profile</h3>
         <p className={styles.managementText}>
+          {profile && <ReleaseDot off={!profile.public} />}
           {!profile
-            ? "Choose an address and what your profile shows. It stays private until you make it public."
+            ? "Choose an address and what your profile shows. Nobody else can see it until you publish it."
             : profile.public
-              ? `Public at clusterflick.com${getProfilePath(profile.handle)}.`
-              : `Private. Only you can open clusterflick.com${getProfilePath(profile.handle)}.`}
+              ? `Public at ${getProfileDisplayAddress(profile.handle)}.`
+              : "Private: nobody else can see it until you publish it."}
           {profile?.public && !profile.sections && (
             <>
               {" "}
@@ -135,7 +145,9 @@ export function PublicProfileSummary({
           <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
             {profile ? "Edit profile" : "Set up your profile"}
           </ButtonLink>
-          {profile && (
+          {/* Only once public: a private profile shows its owner nothing but
+              that it's private. */}
+          {profile?.public && (
             // An anchor, not a client-side link: the page is the profiles
             // Worker's, and isn't in the static export.
             <ButtonAnchor

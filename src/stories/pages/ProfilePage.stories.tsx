@@ -549,6 +549,9 @@ export const NothingShown: Story = {
       await canvas.findByText("quiet-reader isn't sharing any lists yet."),
     ).toBeInTheDocument();
     await expect(canvas.queryByText(/films seen/)).not.toBeInTheDocument();
+    await expect(
+      canvas.getByRole("img", { name: "The Clusterflick popcorn, spilled" }),
+    ).toBeInTheDocument();
   },
 };
 

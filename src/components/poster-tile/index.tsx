@@ -48,6 +48,18 @@ export interface PosterTileProps {
   /** Where the tile leads. Without one, the tile is drawn unlinked. */
   href?: string;
   /**
+   * Makes the whole tile a button, as `href` makes it a link: for picking a
+   * film rather than going to it. Not with `href`.
+   */
+  onClick?: () => void;
+  /** With `onClick`: drawn, but not pressable (already picked, say). */
+  disabled?: boolean;
+  /**
+   * With `onClick`: what pressing it does ("Add"), over the poster while it's
+   * pointed at or focused, and there all the time once `disabled` ("Added").
+   */
+  cue?: string;
+  /**
    * Short lines under the title — a venue, a count, a year. The first reads
    * more strongly than the rest.
    */
@@ -80,45 +92,71 @@ export default function PosterTile({
   posterPath,
   includedMovies,
   href,
+  onClick,
+  disabled,
+  cue,
   details = [],
   action,
   note,
   movieId,
 }: PosterTileProps) {
+  const poster = (
+    <EventPoster
+      title={title}
+      posterPath={posterPath}
+      includedMovies={includedMovies}
+      size="xsmall"
+      interactive={!!href || (!!onClick && !disabled)}
+    />
+  );
+  // A button may only hold phrasing content, so as one the tile's text is
+  // spans rather than a heading and paragraphs.
+  const Title = onClick ? "span" : "h4";
+  const Detail = onClick ? "span" : "p";
   const body = (
     <>
       {/* First, so it is the direct child of whatever the tile's target is:
           hovering that is what fans a stack of markers out */}
       {movieId && <PosterStatusMarkers movieId={movieId} />}
-      <EventPoster
-        title={title}
-        posterPath={posterPath}
-        includedMovies={includedMovies}
-        size="xsmall"
-        interactive={!!href}
-      />
-      <h4 className={styles.title}>{title}</h4>
+      {cue ? (
+        <span className={styles.posterWithCue}>
+          {poster}
+          <span className={styles.cue} aria-hidden="true">
+            {cue}
+          </span>
+        </span>
+      ) : (
+        poster
+      )}
+      <Title className={styles.title}>{title}</Title>
       {details.map((detail, index) => (
-        <p key={index} className={styles.detail}>
+        <Detail key={index} className={styles.detail}>
           {detail}
-        </p>
+        </Detail>
       ))}
     </>
   );
 
+  const label = details.length > 0 ? `${title} — ${details.join(", ")}` : title;
+
   return (
     <li className={styles.tile}>
-      {href ? (
+      {onClick ? (
+        // One target, as the link below is, named for what pressing it does.
+        <button
+          type="button"
+          className={clsx(styles.link, styles.button)}
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={cue ? `${cue}: ${label}` : label}
+        >
+          {body}
+        </button>
+      ) : href ? (
         // The poster and text are one target rather than separate links. The
         // label replaces the accessible name so a screen reader reads it once,
         // instead of the poster's alt text and the title in turn.
-        <Link
-          href={href}
-          className={styles.link}
-          aria-label={
-            details.length > 0 ? `${title} — ${details.join(", ")}` : title
-          }
-        >
+        <Link href={href} className={styles.link} aria-label={label}>
           {body}
         </Link>
       ) : (

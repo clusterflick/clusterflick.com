@@ -14,6 +14,7 @@ import {
 import type { MovieListProgressItem } from "@/app/personalise/seen-stats";
 import ProfileHero from "@/app/profile-shell/profile-hero";
 import ProfileView from "@/app/profile-shell/profile-view";
+import NothingShared from "@/app/profile-shell/nothing-shared";
 import styles from "./page.module.css";
 
 export type PreviewProfile = {
@@ -63,9 +64,7 @@ export function ProfilePreview({
   }
 
   const ownerName = profile.displayName ?? profile.handle;
-  const nothingShown =
-    profile.favourites.length === 0 &&
-    PROFILE_SECTION_IDS.every((id) => !profile.sections[id]);
+  const nothingShown = PROFILE_SECTION_IDS.every((id) => !profile.sections[id]);
 
   return (
     <>
@@ -77,11 +76,12 @@ export function ProfilePreview({
         sections={profile.sections}
         lists={lists}
         filmDetails={filmDetails}
+        inPreview
       />
       {nothingShown ? (
-        <p className={styles.previewEmpty}>
-          {ownerName} isn&apos;t sharing any lists yet.
-        </p>
+        <div className={styles.previewEmpty}>
+          <NothingShared ownerName={ownerName} />
+        </div>
       ) : (
         <ProfileView
           ownerName={ownerName}

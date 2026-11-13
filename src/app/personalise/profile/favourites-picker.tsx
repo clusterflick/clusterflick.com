@@ -175,6 +175,15 @@ export default function FavouritesPicker({
     const film = toFavouriteFilm(candidate.id, candidate);
     if (!film || full || pickedIds.has(film.id)) return;
     onChange([...picks, film]);
+    // The search has done its job: cleared, ready for the next pick, with
+    // focus back in the box rather than lost with the tile that was pressed.
+    // Once that was the fourth, the box gives way to the notice instead.
+    inFlight.current?.abort();
+    setQuery("");
+    setTmdb({ step: "idle" });
+    if (picks.length + 1 < FAVOURITES_MAX) {
+      searchRef.current?.focus({ preventScroll: true });
+    }
   };
   const remove = (id: string) =>
     onChange(picks.filter((film) => film.id !== id));
@@ -230,7 +239,7 @@ export default function FavouritesPicker({
                   <span className={styles.slotPlus} aria-hidden="true">
                     +
                   </span>
-                  {index === picks.length ? "Add a film" : "Empty"}
+                  Add a film
                 </button>
               </li>
             );
@@ -301,32 +310,38 @@ export default function FavouritesPicker({
         })}
       </ol>
 
-      <form
-        role="search"
-        className={styles.favouriteSearch}
-        onSubmit={onSubmit}
-      >
-        <SearchInput
-          id="profile-favourite-search"
-          inputRef={searchRef}
-          value={query}
-          onChange={(value) => {
-            setQuery(value);
-            if (!value) {
-              inFlight.current?.abort();
-              setTmdb({ step: "idle" });
-            }
-          }}
-          placeholder={
-            full
-              ? "Remove one to add another"
-              : "Search your Seen list to add a film"
-          }
-          ariaLabel="Search for a favourite film"
-        />
-      </form>
+      {/* Full, there's nothing a search could add, so it gives way to
+          saying so. */}
+      {full ? (
+        <p className={styles.favouritesFull} role="status">
+          You&apos;ve filled your favourites!
+          <br />
+          Remove one to change it for something else.
+        </p>
+      ) : (
+        <form
+          role="search"
+          className={styles.favouriteSearch}
+          onSubmit={onSubmit}
+        >
+          <SearchInput
+            id="profile-favourite-search"
+            inputRef={searchRef}
+            value={query}
+            onChange={(value) => {
+              setQuery(value);
+              if (!value) {
+                inFlight.current?.abort();
+                setTmdb({ step: "idle" });
+              }
+            }}
+            placeholder="Search your Seen list to add a film"
+            ariaLabel="Search for a favourite film"
+          />
+        </form>
+      )}
 
-      {(searchable || tmdbCurrent) && (
+      {!full && (searchable || tmdbCurrent) && (
         <div aria-live="polite" className={styles.favouriteResults}>
           <div className={styles.favouriteResultsHeader}>
             <h3 className={personaliseStyles.groupTitle}>
@@ -360,19 +375,9 @@ export default function FavouritesPicker({
                     ...(film.year ? [film.year] : []),
                     ...(allFilms && film.onSeen ? ["Seen"] : []),
                   ]}
-                  action={
-                    <Button
-                      size="sm"
-                      onClick={() => add(film)}
-                      disabled={full || pickedIds.has(film.id)}
-                    >
-                      {pickedIds.has(film.id)
-                        ? "Added"
-                        : full
-                          ? `${FAVOURITES_MAX} picked`
-                          : "Add"}
-                    </Button>
-                  }
+                  onClick={() => add(film)}
+                  disabled={pickedIds.has(film.id)}
+                  cue={pickedIds.has(film.id) ? "Added" : "Add"}
                 />
               ))}
             </PosterTileList>

@@ -4,13 +4,17 @@ import styles from "./release-dot.module.css";
 export interface ReleaseDotProps {
   /** The release is older than `STALE_AFTER_HOURS`: a hollow yellow ring */
   stale?: boolean;
+  /** Not live (a private profile): a still pink dot */
+  off?: boolean;
   className?: string;
 }
 
 /**
- * The release-status dot: filled green and gently pulsing while the data is
- * fresh, a hollow yellow ring once it is stale, so the two read apart without
- * colour as well. Sized in `em`, so it scales with the text it sits in.
+ * The status dot: filled green and gently pulsing while something is live
+ * (the data is fresh, a profile is public), a hollow yellow ring once data is
+ * stale, and a still pink dot for something that is off (a private profile),
+ * so they read apart without colour as well. Sized in `em`, so it scales with
+ * the text it sits in.
  *
  * It is an inline element centred on the x-height, so it goes first in the
  * same line box as its text and travels with the first line however that line
@@ -19,11 +23,17 @@ export interface ReleaseDotProps {
  */
 export default function ReleaseDot({
   stale = false,
+  off = false,
   className,
 }: ReleaseDotProps) {
   return (
     <span
-      className={clsx(styles.dot, stale && styles.stale, className)}
+      className={clsx(
+        styles.dot,
+        stale && styles.stale,
+        off && styles.off,
+        className,
+      )}
       aria-hidden="true"
     />
   );

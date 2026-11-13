@@ -1,14 +1,19 @@
 "use client";
 
 import clsx from "clsx";
-import { HANDLE_MAX_LENGTH } from "@/lib/user-profile";
+import {
+  getProfileDisplayAddress,
+  HANDLE_MAX_LENGTH,
+} from "@/lib/user-profile";
 import personaliseStyles from "@/app/personalise/page.module.css";
 import type { HandleAvailability } from "./use-handle-availability";
+import StatusIcon from "./status-icon";
 import styles from "./page.module.css";
 
 /**
  * The handle, with its address and whether it's free beside it as it's
- * typed. Lowercased as it's typed, as handles are everywhere.
+ * typed. Lowercased as it's typed, as handles are everywhere. Nothing is said
+ * under the saved handle: the card above already gives its address.
  */
 export default function HandleField({
   value,
@@ -24,15 +29,15 @@ export default function HandleField({
   problem?: string;
   availability: HandleAvailability;
 }) {
-  const address = `clusterflick.com/u/${handle || "your-handle"}`;
-  const status: { text: string; tone?: "good" | "bad" } = problem
+  const address = getProfileDisplayAddress(handle || "your-handle");
+  const status: { text: string; tone?: "good" | "bad" } | null = problem
     ? value.trim()
       ? { text: problem, tone: "bad" }
       : {
           text: `Letters, numbers, - and _, from 3 to ${HANDLE_MAX_LENGTH} characters.`,
         }
     : availability === "yours"
-      ? { text: "Your address." }
+      ? null
       : availability === "free"
         ? { text: "It's free.", tone: "good" }
         : availability === "taken"
@@ -54,8 +59,8 @@ export default function HandleField({
         autoCapitalize="none"
         spellCheck={false}
         maxLength={HANDLE_MAX_LENGTH}
-        aria-describedby="profile-handle-status"
-        aria-invalid={status.tone === "bad" ? true : undefined}
+        aria-describedby={status ? "profile-handle-status" : undefined}
+        aria-invalid={status?.tone === "bad" ? true : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value.toLowerCase())}
         placeholder="your-name"
@@ -64,12 +69,21 @@ export default function HandleField({
         id="profile-handle-status"
         className={clsx(
           styles.fieldHelp,
-          status.tone === "good" && styles.fieldGood,
-          status.tone === "bad" && styles.fieldProblem,
+          status?.tone === "good" && styles.fieldGood,
+          status?.tone === "bad" && styles.fieldProblem,
         )}
         aria-live="polite"
+        hidden={!status}
       >
-        <span className={styles.address}>{address}</span> {status.text}
+        {status && (
+          <>
+            <span className={styles.address}>{address}</span>{" "}
+            {status.tone === "good" && (
+              <StatusIcon kind="done" className={styles.fieldTick} />
+            )}
+            {status.text}
+          </>
+        )}
       </p>
     </div>
   );

@@ -39,6 +39,17 @@
   position: relative;
 }
 
+/* What stops publishing, where the button would be: a line the button's
+   height, so the card doesn't change size as it comes and goes. */
+.publishBlocker {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-light-gray);
+}
+
 /* Live: the card takes the site's neon, as a lit sign. */
 .live {
   border-color: rgba(var(--color-neon-pink-rgb), 0.6);
@@ -89,28 +100,6 @@
   }
 }
 
-.confirm {
-  margin-top: 4px;
-}
-
-.confirmLead {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: var(--color-light-gray);
-}
-
-.confirmList {
-  margin: 0 0 16px;
-  padding-left: 20px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-muted-gray);
-}
-
-.confirmList strong {
-  color: var(--color-light-gray);
-}
-
 /* ---- Fields ---- */
 
 .fields {
@@ -131,7 +120,10 @@
   min-width: 0;
 }
 
+/* Further from its input than the input is from the line under it, which
+   belongs to the input. */
 .fieldLabel {
+  margin-bottom: 4px;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-light-gray);
@@ -150,6 +142,17 @@
 
 .fieldGood {
   color: var(--color-light-gray);
+}
+
+/* The save bar's pink tick, inline before "It's free." */
+.fieldTick {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  margin-right: 0.3em;
+  vertical-align: -0.25em;
+  color: var(--color-neon-pink);
+  filter: drop-shadow(0 0 4px rgba(var(--color-neon-pink-rgb), 0.6));
 }
 
 .address {
@@ -185,10 +188,18 @@
   color: var(--color-muted-gray);
 }
 
-/* What the stats send though the list is hidden: not a warning in pink, but
-   brighter than the help around it, so it isn't skimmed past. */
+/* What the stats send though the list is hidden, in a box of its own at the
+   foot of the card: not a warning in pink, but set apart from the sections'
+   help so it isn't skimmed past. */
 .sectionCaveat {
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--color-light-gray);
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.12);
+  border-radius: 8px;
 }
 
 /* ---- Favourites ---- */
@@ -314,6 +325,19 @@
   margin-bottom: 16px;
 }
 
+/* In place of the search once all four places are filled: blue, as news
+   rather than a problem. */
+.favouritesFull {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-light-gray);
+  background: rgba(var(--color-electric-blue-rgb), 0.08);
+  border: 1px solid rgba(var(--color-electric-blue-rgb), 0.45);
+  border-radius: 8px;
+}
+
 .favouriteResults {
   margin-bottom: 8px;
 }
@@ -363,14 +387,28 @@
 }
 
 .saveStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1 1 200px;
   margin: 0;
   font-size: 14px;
-  color: var(--color-muted-gray);
+  color: var(--color-light-gray);
 }
 
-.saveStatusChanged {
-  color: var(--color-light-gray);
+.saveStatusIcon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.saveStatusSaved .saveStatusIcon {
+  color: var(--color-neon-pink);
+  filter: drop-shadow(0 0 4px rgba(var(--color-neon-pink-rgb), 0.6));
+}
+
+.saveStatusChanged .saveStatusIcon {
+  color: var(--color-buttery-yellow);
 }
 
 .saveStatusError {
@@ -382,6 +420,22 @@
   align-items: center;
   gap: 8px;
   margin-left: auto;
+}
+
+/* Wide, so it reads as the page's one button rather than one of several
+   small ones. On a phone the actions take their own row and Save fills it. */
+.saveButton {
+  min-width: 160px;
+}
+
+@media (max-width: 599px) {
+  .saveActions {
+    flex: 1 1 100%;
+  }
+
+  .saveButton {
+    flex: 1;
+  }
 }
 
 /* ---- Preview ---- */
@@ -403,10 +457,12 @@
   color: var(--color-muted-gray);
 }
 
+/* An iframe (PreviewFrame), so the profile inside is laid out at this width
+   rather than the screen's, and scrolls on its own. */
 .previewFrame {
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  display: block;
+  width: 100%;
+  height: calc(100vh - 120px);
   background: var(--color-midnight-navy);
   border: 1px solid rgba(var(--color-white-rgb), 0.12);
   border-radius: 12px;
