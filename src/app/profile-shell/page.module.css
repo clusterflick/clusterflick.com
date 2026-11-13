@@ -1,10 +1,14 @@
 /* Every section switched off: the popcorn, knocked over, over its line. */
+/* The room above is for the kernels, which start where they sit in the
+   upright logo, up to ~70px above the drawing, before they fall: without it
+   they passed over the buttons above. */
 .nothingShared {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   max-width: 100%;
+  padding-top: 72px;
 }
 
 .nothingShared svg {
@@ -35,14 +39,21 @@
   gap: 6px;
 }
 
-/* IMDb's badge: its name, bold, dark on yellow, as IMDb draws it. */
+/* IMDb's badge: its name, bold, in a filled box as IMDb draws it, but in
+   the button's blue rather than IMDb's yellow, so it matches its
+   neighbours. When the button fills blue on hover, the two swap. */
 .imdbBadge {
   display: inline-block;
   padding: 0 5px;
   font-weight: 900;
   line-height: 1.4;
   letter-spacing: -0.02em;
-  color: var(--color-black);
-  background: var(--color-buttery-yellow);
+  color: var(--color-midnight-navy);
+  background: var(--color-electric-blue);
   border-radius: 3px;
+}
+
+:hover > .imdbBadge {
+  color: var(--color-electric-blue);
+  background: var(--color-dark-navy);
 }
