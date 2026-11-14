@@ -19,6 +19,7 @@ import {
   parseLetterboxdCsv,
   type LetterboxdRow,
 } from "@/lib/user-lists/letterboxd-csv";
+import { parseImdbCsv, type ImdbCsv } from "@/lib/user-lists/imdb-csv";
 import {
   estimateLookupMinutes,
   lookUpDetailsOnTmdb,
@@ -42,12 +43,22 @@ const LETTERBOXD_FILES: Record<UserListId, string> = {
   [UserListId.Seen]: "watched.csv",
 };
 
+/** Where an imported file came from, as the review names it. */
+type ImportSource = "Letterboxd" | "IMDb";
+
+/** The IMDb page whose export holds each list. */
+const IMDB_EXPORTS: Record<UserListId, string> = {
+  [UserListId.Watchlist]: "your watchlist",
+  [UserListId.Seen]: "your ratings",
+};
+
 /** Titles listed in an import's review before the rest become "and N more". */
 const REVIEW_TITLE_LIMIT = 12;
 
 type ImportReviewState = {
   listId: UserListId;
   fileName: string;
+  source: ImportSource;
   /** Films the file names. */
   total: number;
   /** Films not already on the list, whether showing or not. */
@@ -58,6 +69,8 @@ type ImportReviewState = {
   alreadyListed: number;
   /** Films TheMovieDB has no match for. */
   missing: LetterboxdRow[];
+  /** Rows that aren't films (IMDb lists hold series and episodes too). */
+  skipped: ImdbCsv["skipped"];
   /** Every film in `entries`' details, saved with them. */
   details: FilmDetailsData;
 };
@@ -81,8 +94,8 @@ type ImportState =
   | { step: "done"; listId: UserListId; count: number }
   | { step: "error"; message: string };
 
-function plural(count: number, noun: string) {
-  return `${count.toLocaleString("en-GB")} ${noun}${count === 1 ? "" : "s"}`;
+function plural(count: number, noun: string, nouns = `${noun}s`) {
+  return `${count.toLocaleString("en-GB")} ${count === 1 ? noun : nouns}`;
 }
 
 /**
@@ -130,8 +143,8 @@ function downloadCsv(fileName: string, csv: string) {
 
 /**
  * Whether the lists show their editing buttons (Remove, and Seen it on the
- * watchlist), and importing from and exporting to Letterboxd. Tucked under the
- * account bar: all of it is occasional. Adding a film is not, so its search
+ * watchlist), importing from Letterboxd or IMDb, and exporting to Letterboxd.
+ * Tucked under the account bar: all of it is occasional. Adding a film is not, so its search
  * sits in the open below the bar (`FilmSearch`).
  */
 export default function ListManagement({
@@ -184,15 +197,28 @@ function ImportSection() {
     const listId = targetRef.current;
     const listed = lists[listId];
 
+    // An IMDb export is told apart by its `Const` column; anything else is
+    // read as Letterboxd's.
     let rows: LetterboxdRow[];
+    let source: ImportSource;
+    let skipped: ImdbCsv["skipped"] = [];
     try {
-      rows = parseLetterboxdCsv(await file.text());
+      const text = await file.text();
+      const imdb = parseImdbCsv(text);
+      if (imdb) {
+        source = "IMDb";
+        rows = imdb.rows;
+        skipped = imdb.skipped;
+      } else {
+        source = "Letterboxd";
+        rows = parseLetterboxdCsv(text);
+      }
     } catch (caught) {
       setState({
         step: "error",
         message:
           caught instanceof LetterboxdCsvError
-            ? `${file.name} doesn't look like a Letterboxd export — it has no Name or Title column.`
+            ? `${file.name} doesn't look like a Letterboxd or IMDb export — it has no Name or Title column.`
             : `We couldn't read ${file.name}.`,
       });
       return;
@@ -307,12 +333,14 @@ function ImportSection() {
       step: "review",
       listId,
       fileName: file.name,
+      source,
       total: rows.length,
       entries,
       showing: Object.keys(entries).filter((id) => movies[id]).length,
       alreadyListed:
         alreadyListedIds.size + (unmatched.length - toLookUp.length),
       missing,
+      skipped,
       details,
     });
   };
@@ -349,7 +377,9 @@ function ImportSection() {
   return (
     <>
       <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>Import from Letterboxd</h3>
+        <h3 className={styles.managementTitle}>
+          Import from Letterboxd or IMDb
+        </h3>
         <p className={styles.managementText}>
           In Letterboxd, export your data from{" "}
           <a
@@ -362,8 +392,16 @@ function ImportSection() {
           and unzip it. Add{" "}
           <code>{LETTERBOXD_FILES[UserListId.Watchlist]}</code> to your
           Watchlist and <code>{LETTERBOXD_FILES[UserListId.Seen]}</code> to
-          Seen. Films that aren&apos;t showing are looked up on TheMovieDB,
-          which takes about a minute for every 200.
+          Seen.
+        </p>
+        <p className={styles.managementText}>
+          In IMDb, export {IMDB_EXPORTS[UserListId.Watchlist]} to add to your
+          Watchlist and {IMDB_EXPORTS[UserListId.Seen]} to add to Seen. TV
+          series and episodes are left out.
+        </p>
+        <p className={styles.managementText}>
+          Films that aren&apos;t showing are looked up on TheMovieDB, which
+          takes about a minute for every 200.
         </p>
         <input
           ref={inputRef}
@@ -487,16 +525,20 @@ function ImportReview({
       : count === 1
         ? ", and it's showing now"
         : `, ${state.showing.toLocaleString("en-GB")} of them showing now`;
-  const summary = [
-    `${state.fileName} lists ${plural(state.total, "film")}${already > 0 ? `, ${already.toLocaleString("en-GB")} of them already on your ${listName}` : ""}.`,
-    count > 0
-      ? `${plural(count, "film")} ${count === 1 ? "isn't" : "aren't"} on ${already > 0 ? "it" : `your ${listName}`} yet${showingNote}:`
-      : already === 0
-        ? "We couldn't find any of them."
-        : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  // An IMDb list of nothing but series has no films to speak of.
+  const summary =
+    state.total === 0
+      ? `${state.fileName} has no films in it.`
+      : [
+          `${state.fileName} lists ${plural(state.total, "film")}${already > 0 ? `, ${already.toLocaleString("en-GB")} of them already on your ${listName}` : ""}.`,
+          count > 0
+            ? `${plural(count, "film")} ${count === 1 ? "isn't" : "aren't"} on ${already > 0 ? "it" : `your ${listName}`} yet${showingNote}:`
+            : already === 0
+              ? "We couldn't find any of them."
+              : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
 
   return (
     <div className={styles.importReview}>
@@ -515,7 +557,22 @@ function ImportReview({
           </p>
           <p className={styles.managementText}>
             Try searching for {state.missing.length === 1 ? "it" : "them"} under
-            Add a film: the title may differ from Letterboxd&apos;s.
+            Add a film: the title may differ from {state.source}&apos;s.
+          </p>
+        </details>
+      )}
+      {state.skipped.length > 0 && (
+        <details className={styles.importMissing}>
+          <summary>
+            {plural(
+              state.skipped.length,
+              "TV series or episode",
+              "TV series or episodes",
+            )}{" "}
+            left out
+          </summary>
+          <p className={styles.importTitles}>
+            {state.skipped.map(({ title }) => title).join(", ")}
           </p>
         </details>
       )}
@@ -584,7 +641,8 @@ function ExportSection() {
         >
           Letterboxd imports
         </a>
-        , which can come back in here too.
+        , which can come back in here too. IMDb has no way to import a list, so
+        there is nothing to export to it.
       </p>
       <div className={styles.managementActions}>
         {[UserListId.Watchlist, UserListId.Seen].map((listId) => {

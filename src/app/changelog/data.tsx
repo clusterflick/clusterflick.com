@@ -71,6 +71,24 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-14",
+    changes: [
+      {
+        tag: "New feature",
+        body: () => (
+          <>
+            You can now import your lists from IMDb as well as Letterboxd:
+            export your IMDb watchlist to bring in your Watchlist, and your
+            ratings to bring in the films you&rsquo;ve seen. Films are found by
+            their IMDb id rather than by title, and TV series and episodes are
+            left out. Find it under Manage lists on{" "}
+            <Link href="/personalise">Personalise</Link>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-12",
     changes: [
       {

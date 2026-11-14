@@ -91,8 +91,11 @@ export async function searchTmdb(
  */
 export const MATCH_BATCH_SIZE = 15;
 
-/** A film as an import names it. */
-export type TmdbMatchQuery = { title: string; year?: number };
+/**
+ * A film as an import names it. With an IMDb id the Worker finds it by that
+ * alone, and reports a miss rather than searching the title as well.
+ */
+export type TmdbMatchQuery = { title: string; year?: number; imdbId?: string };
 
 /**
  * Finds each film on TheMovieDB, strictly — a title that matches, or the only

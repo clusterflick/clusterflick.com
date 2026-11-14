@@ -83,6 +83,37 @@ describe("lookUpRowsOnTmdb", () => {
     ]);
   });
 
+  it("finds rows by IMDb id, then asks by title for the ids it missed", async () => {
+    const heat = { id: "949", title: "Heat", year: "1995" };
+    const amelie = { id: "194", title: "Amélie", year: "2001" };
+    matchTmdb
+      .mockResolvedValueOnce([heat, null, null])
+      .mockResolvedValueOnce([amelie]);
+    const progress: number[] = [];
+
+    const lookup = await lookUpRowsOnTmdb(
+      [
+        { title: "Heat", year: 1995, imdbId: "tt0113277" },
+        { title: "Amélie", year: 2001, imdbId: "tt0211915" },
+        { title: "Nowhere", year: 2001 },
+      ],
+      { getIdToken, ...fakeTime(), onProgress: (done) => progress.push(done) },
+    );
+
+    expect(matchTmdb.mock.calls.map(([films]) => films)).toEqual([
+      [
+        { title: "Heat", year: 1995, imdbId: "tt0113277" },
+        { title: "Amélie", year: 2001, imdbId: "tt0211915" },
+        { title: "Nowhere", year: 2001 },
+      ],
+      // The second ask leaves the id out, so the Worker searches the title.
+      [{ title: "Amélie", year: 2001 }],
+    ]);
+    expect(lookup.found.map(({ film }) => film.id)).toEqual(["949", "194"]);
+    expect(lookup.missing.map(({ title }) => title)).toEqual(["Nowhere"]);
+    expect(progress).toEqual([2, 3]);
+  });
+
   it("waits out a rate limit and tries the batch again", async () => {
     matchTmdb
       .mockRejectedValueOnce(new TmdbSearchError("rate-limited", "slow down"))
