@@ -18,41 +18,70 @@
 
 .features {
   display: grid;
-  gap: 16px;
-  margin: 0 0 32px;
+  gap: 12px;
+  margin: 0 0 24px;
   padding: 0;
   list-style: none;
 }
 
-/* Three across once they fit, and one above another until then: two
-   across left the third on a row of its own. */
-@media (min-width: 900px) {
-  .features {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-}
-
+/* Stacked, the icon took a line of its own above each title and pushed the
+   sign-in form most of a phone screen down, so until the three sit side by
+   side the icon leads the title's line. */
 .feature {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
   padding: 4px 0;
 }
 
 .featureIcon {
+  width: 22px;
+  height: 22px;
   color: var(--color-neon-pink);
-  margin-bottom: 8px;
 }
 
 /* Explicit, since the global h2 is display-sized. */
 .featureTitle {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 20px;
   color: var(--color-white);
 }
 
 .featureText {
-  margin: 0;
+  grid-column: 1 / -1;
+  margin: 6px 0 0;
   color: var(--color-muted-gray);
   line-height: 1.5;
+}
+
+/* Three across once they fit, and one above another until then: two
+   across left the third on a row of its own. Side by side there's height
+   to spare, and the icon goes back above its title. */
+@media (min-width: 900px) {
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .feature {
+    display: block;
+  }
+
+  .featureIcon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 8px;
+  }
+
+  .featureTitle {
+    margin-bottom: 6px;
+  }
+
+  .featureText {
+    margin-top: 0;
+  }
 }
 
 .signInIntro {
