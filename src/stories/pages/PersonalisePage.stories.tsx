@@ -867,6 +867,19 @@ export const SignedInImportReview: Story = {
             results: films.map(({ title }) => tmdbMatches[title] ?? null),
           });
         }),
+        // Every film the import adds that isn't showing is saved with its
+        // details, so the review waits on these too.
+        http.post("/api/tmdb/details", async ({ request }) => {
+          const { ids } = (await request.json()) as { ids: string[] };
+          return HttpResponse.json({
+            results: ids.map((id) => ({
+              id,
+              genres: ["18"],
+              directors: [],
+              cast: [],
+            })),
+          });
+        }),
       ],
     },
   },
