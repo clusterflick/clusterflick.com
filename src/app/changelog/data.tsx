@@ -86,6 +86,22 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://www.cinematik.app">Cinematik</Ext>, which runs
+            film programmes including Escapes, elevenfiftyfive and MASSIVE. Some
+            of its screenings are on a screen it hires at a venue, like{" "}
+            <Venue
+              name="Genesis Cinema"
+              url="https://www.genesiscinema.co.uk"
+            />
+            , and don&rsquo;t show up in the venue&rsquo;s own listings.
+          </>
+        ),
+      },
     ],
   },
   {
