@@ -16,10 +16,12 @@ import {
  * showing is looked up on TheMovieDB by title and year, as a Letterboxd row
  * is, since the search Worker only searches by title.
  *
- * The headers have changed over the years — `Created` and `Date Added` on
- * lists, `Date Rated` on ratings, `Original Title` added later, and the older
- * exports in lower case (`const`, `created`, `title type`) — so columns are
- * found by folded name rather than position, and none but `Const` and
+ * The watchlist and ratings exports were checked against files exported in
+ * November 2026: a list has `Created` (and an empty `Date Rated` for films not
+ * rated), ratings have `Date Rated`, and both have `Original Title` and
+ * `Title Type`. The columns sit in different places in the two, and older
+ * exports were in lower case (`const`, `created`, `title type`), so columns
+ * are found by folded name rather than position, and none but `Const` and
  * `Title` is required.
  */
 

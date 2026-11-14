@@ -1947,9 +1947,10 @@ Editing takes a row of its own first, and import and export pair up below it:
   (`lookUpRowsOnTmdb`). An older Worker ignores `imdbId` and searches the
   title, so the Worker and the site can deploy in either order. A row is dated by `Date Rated`, else `Date Added` or `Created`, the
   first it fills. Series, episodes, games and podcasts (`Title Type`) are left
-  out and named in the review. The headers were written from third-party
-  descriptions of the export, not from a file IMDb exported, and are found by
-  name so the older lower-case exports read too.
+  out and named in the review. IMDb has no seen list apart from ratings, so a
+  film seen but not rated there can't come in. The headers were checked against
+  a watchlist and a ratings export from November 2026, and are found by name,
+  since the two order them differently and older exports were lower case.
 - **Nothing is exported to IMDb**, which has no way to import a list.
 - **Export** writes each list in Letterboxd's _import_ format rather than its
   export format: the `tmdbID` column makes it an exact match both in Letterboxd

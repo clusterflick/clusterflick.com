@@ -3,19 +3,20 @@ import type { Movie } from "@/types";
 import { isImdbHeader, parseImdbCsv } from "./imdb-csv";
 import { matchLetterboxdRows } from "./letterboxd-csv";
 
-// The headers below follow third-party descriptions of IMDb's exports, not a
-// file exported from IMDb itself: check them against a real export.
+// Both headers are copied from files exported from IMDb in November 2026, and
+// so are the rows, with their dates changed, apart from Life Is Beautiful. The
+// older lower-case export further down follows third-party descriptions of it.
 const WATCHLIST = [
   "Position,Const,Created,Modified,Description,Title,Original Title,URL,Title Type,IMDb Rating,Runtime (mins),Year,Genres,Num Votes,Release Date,Directors,Your Rating,Date Rated",
-  '1,tt0133093,2024-03-01,2024-03-01,,The Matrix,The Matrix,https://www.imdb.com/title/tt0133093/,Movie,8.7,136,1999,"Action, Sci-Fi",2000000,1999-03-24,"Lana Wachowski, Lilly Wachowski",,',
-  "2,tt0903747,2024-03-02,2024-03-02,,Breaking Bad,Breaking Bad,https://www.imdb.com/title/tt0903747/,TV Series,9.5,49,2008,Drama,2000000,2008-01-20,,,",
+  '2,tt0088763,2024-03-01,2024-03-01,,"Back to the Future","Back to the Future",https://www.imdb.com/title/tt0088763/,Movie,8.5,116,1985,"Adventure, Comedy, Sci-Fi",1487593,1985-12-04,"Robert Zemeckis",,',
+  '1,tt7631058,2024-03-02,2024-03-02,,"The Lord of the Rings: The Rings of Power","The Lord of the Rings: The Rings of Power",https://www.imdb.com/title/tt7631058/,TV Series,6.8,60,2022,"Action, Adventure, Drama, Fantasy",449329,2022-09-02,,,',
   '3,tt0118799,2024-03-03,2024-03-03,,Life Is Beautiful,"La vita è bella",https://www.imdb.com/title/tt0118799/,Movie,8.6,116,1997,Comedy,700000,1997-12-20,Roberto Benigni,,',
-].join("\r\n");
+].join("\n");
 
 const RATINGS = [
-  "Const,Your Rating,Date Rated,Title,URL,Title Type,IMDb Rating,Runtime (mins),Year,Genres,Num Votes,Release Date,Directors",
-  "tt0078748,9,2023-10-31,Alien,https://www.imdb.com/title/tt0078748/,Movie,8.5,117,1979,Horror,900000,1979-05-25,Ridley Scott",
-  "tt0959621,10,2023-11-01,Pilot,https://www.imdb.com/title/tt0959621/,TV Episode,8.2,58,2008,Drama,40000,2008-01-20,Vince Gilligan",
+  "Const,Your Rating,Date Rated,Title,Original Title,URL,Title Type,IMDb Rating,Runtime (mins),Year,Genres,Num Votes,Release Date,Directors",
+  'tt0076759,10,2023-10-31,"Star Wars: Episode IV - A New Hope","Star Wars",https://www.imdb.com/title/tt0076759,Movie,8.6,121,1977,"Action, Sci-Fi, Adventure, Fantasy",1598054,"1978-01-29","George Lucas"',
+  'tt9253284,10,2023-11-01,"Andor","Andor",https://www.imdb.com/title/tt9253284,TV Series,8.6,60,2022,"Sci-Fi, Thriller, Adventure, Fantasy, Drama",290632,"2022-09-21",',
 ].join("\n");
 
 describe("isImdbHeader", () => {
@@ -33,9 +34,9 @@ describe("parseImdbCsv", () => {
     expect(parseImdbCsv(WATCHLIST)).toEqual({
       rows: [
         {
-          title: "The Matrix",
-          year: 1999,
-          imdbId: "tt0133093",
+          title: "Back to the Future",
+          year: 1985,
+          imdbId: "tt0088763",
           date: Date.UTC(2024, 2, 1),
         },
         {
@@ -46,7 +47,12 @@ describe("parseImdbCsv", () => {
           date: Date.UTC(2024, 2, 3),
         },
       ],
-      skipped: [{ title: "Breaking Bad", type: "TV Series" }],
+      skipped: [
+        {
+          title: "The Lord of the Rings: The Rings of Power",
+          type: "TV Series",
+        },
+      ],
     });
   });
 
@@ -54,13 +60,14 @@ describe("parseImdbCsv", () => {
     expect(parseImdbCsv(RATINGS)).toEqual({
       rows: [
         {
-          title: "Alien",
-          year: 1979,
-          imdbId: "tt0078748",
+          title: "Star Wars: Episode IV - A New Hope",
+          altTitles: ["Star Wars"],
+          year: 1977,
+          imdbId: "tt0076759",
           date: Date.UTC(2023, 9, 31),
         },
       ],
-      skipped: [{ title: "Pilot", type: "TV Episode" }],
+      skipped: [{ title: "Andor", type: "TV Series" }],
     });
   });
 
@@ -93,17 +100,17 @@ describe("parseImdbCsv", () => {
 describe("matching IMDb rows", () => {
   it("finds a showing film by its IMDb id, whatever its title", () => {
     const movie = {
-      id: "348",
-      title: "Alien (Director's Cut)",
-      year: "2003",
-      imdbId: "tt0078748",
-      posterPath: "/348.jpg",
+      id: "11",
+      title: "Star Wars (Special Edition)",
+      year: "1997",
+      imdbId: "tt0076759",
+      posterPath: "/11.jpg",
       showings: {},
       performances: [],
     } as unknown as Movie;
     const { rows } = parseImdbCsv(RATINGS)!;
     const { matched, unmatched } = matchLetterboxdRows(rows, [movie]);
-    expect(Object.keys(matched)).toEqual(["348"]);
+    expect(Object.keys(matched)).toEqual(["11"]);
     expect(unmatched).toEqual([]);
   });
 });
