@@ -752,4 +752,18 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Stow Film Lounge" },
     ],
   },
+  {
+    id: "twickenham-cinema-club",
+    name: "Twickenham Cinema Club",
+    kind: "community",
+    url: "https://twickenhamcinemaclub.co.uk",
+    aliases: [],
+    matchers: [
+      // Its screenings come from Billetto, whose titles are the film's alone
+      // and which names the club as the organiser: "Hosted by twickenham
+      // cinema club".
+      { [FilterId.ShowingTitleSearch]: "Twickenham Cinema Club" },
+      { [FilterId.PerformanceNotesSearch]: "Twickenham Cinema Club" },
+    ],
+  },
 ];

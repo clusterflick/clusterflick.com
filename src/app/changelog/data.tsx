@@ -71,6 +71,69 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-15",
+    changes: [
+      {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings from{" "}
+            <Ext href="https://billetto.co.uk">Billetto</Ext>, a ticketing
+            platform that film clubs and community groups use for their nights,
+            like the Black History screenings at{" "}
+            <Venue name="Goldsmiths" url="https://www.gold.ac.uk" />.
+          </>
+        ),
+      },
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "The Cabbage Patch",
+                  url: "https://www.cabbagepatch.co.uk",
+                },
+                {
+                  name: "St John's Waterloo",
+                  url: "https://stjohnswaterloo.org",
+                },
+              ]}
+            />
+            : a Twickenham rugby pub whose upstairs events space hosts
+            Twickenham Cinema Club, and a restored Grade II* church and arts
+            venue by Waterloo station.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/twickenham-cinema-club">
+              Twickenham Cinema Club
+            </Link>
+            , a volunteer-run community cinema club showing art house,
+            award-winning and missed films once a month.
+          </>
+        ),
+      },
+      {
+        tag: "Under the hood",
+        body: () => (
+          <>
+            Importing your lists from Letterboxd or IMDb is a lot quicker: a
+            2,000-film diary now comes in in under two minutes, rather than
+            about ten.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-14",
     changes: [
       {
