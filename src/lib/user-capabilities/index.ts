@@ -1,4 +1,4 @@
-import { CapabilityId } from "@clusterflick/accounts/capability-ids.mjs";
+import { CapabilityId as AccountsCapabilityId } from "@clusterflick/accounts/capability-ids.mjs";
 import type { Firestore } from "firebase/firestore/lite";
 import {
   commitUserWrite,
@@ -20,9 +20,11 @@ import {
  * runs the feature are what enforce it.
  *
  * The ids are `@clusterflick/accounts`', which the Workers and the grant
- * script read too.
+ * script read too. Declared as a const here rather than re-exported: SWC
+ * drops `export { CapabilityId }` beside a type of the same name, taking it
+ * for the type, and the build then finds no value to import.
  */
-export { CapabilityId };
+export const CapabilityId = AccountsCapabilityId;
 export type CapabilityId = (typeof CapabilityId)[keyof typeof CapabilityId];
 
 export type CapabilityGrant = {
