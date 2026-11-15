@@ -1,4 +1,8 @@
 import type { Firestore } from "firebase/firestore/lite";
+import {
+  commitUserWrite,
+  type UserWriteResult,
+} from "@/lib/firebase/commit-user-write";
 import reservedHandles from "./reserved-handles.json";
 import {
   type ProfileLinks,
@@ -218,39 +222,51 @@ export async function isHandleTaken(
  * the same batch. `previous` is the profile as last read; if it is out of
  * date the rules refuse the batch, as they do when another reader has claimed
  * the handle in between.
+ *
+ * Both handles' cached copies are purged: the one given up, and the one taken,
+ * which a visitor may have found empty.
  */
 export async function saveProfile(
   db: Firestore,
   uid: string,
   next: UserProfile,
   previous: UserProfile | null,
-): Promise<void> {
-  const { writeBatch } = await import("firebase/firestore/lite");
-  const batch = writeBatch(db);
-  if (previous?.handle !== next.handle) {
-    if (previous) batch.delete(await getHandleDocRef(db, previous.handle));
-    batch.set(await getHandleDocRef(db, next.handle), { uid });
-  }
-  batch.set(await getProfileDocRef(db, uid), {
-    handle: next.handle,
-    public: next.public,
-    ...(next.sections && { sections: next.sections }),
-    ...(next.displayName && { displayName: next.displayName }),
-    ...(next.links &&
-      Object.keys(next.links).length > 0 && { links: next.links }),
-    ...(next.favourites &&
-      next.favourites.length > 0 && { favourites: next.favourites }),
-  });
-  await batch.commit();
+): Promise<UserWriteResult> {
+  return commitUserWrite(
+    db,
+    async (batch) => {
+      if (previous?.handle !== next.handle) {
+        if (previous) batch.delete(await getHandleDocRef(db, previous.handle));
+        batch.set(await getHandleDocRef(db, next.handle), { uid });
+      }
+      batch.set(await getProfileDocRef(db, uid), {
+        handle: next.handle,
+        public: next.public,
+        ...(next.sections && { sections: next.sections }),
+        ...(next.displayName && { displayName: next.displayName }),
+        ...(next.links &&
+          Object.keys(next.links).length > 0 && { links: next.links }),
+        ...(next.favourites &&
+          next.favourites.length > 0 && { favourites: next.favourites }),
+      });
+    },
+    { purgeHandles: [...(previous ? [previous.handle] : []), next.handle] },
+  );
 }
 
 /** For account deletion: the profile and its handle, together. */
-export async function deleteProfile(db: Firestore, uid: string): Promise<void> {
-  const { writeBatch } = await import("firebase/firestore/lite");
+export async function deleteProfile(
+  db: Firestore,
+  uid: string,
+): Promise<UserWriteResult | null> {
   const profile = await fetchProfile(db, uid);
-  if (!profile) return;
-  const batch = writeBatch(db);
-  batch.delete(await getHandleDocRef(db, profile.handle));
-  batch.delete(await getProfileDocRef(db, uid));
-  await batch.commit();
+  if (!profile) return null;
+  return commitUserWrite(
+    db,
+    async (batch) => {
+      batch.delete(await getHandleDocRef(db, profile.handle));
+      batch.delete(await getProfileDocRef(db, uid));
+    },
+    { purgeHandles: [profile.handle] },
+  );
 }

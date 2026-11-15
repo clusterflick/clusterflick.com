@@ -1,4 +1,8 @@
 import type { Firestore } from "firebase/firestore/lite";
+import {
+  commitUserWrite,
+  type UserWriteResult,
+} from "@/lib/firebase/commit-user-write";
 
 /**
  * Features granted to a reader one account at a time, rather than switched on
@@ -105,7 +109,8 @@ export async function fetchCapabilities(
 export async function deleteCapabilities(
   db: Firestore,
   uid: string,
-): Promise<void> {
-  const { deleteDoc } = await import("firebase/firestore/lite");
-  await deleteDoc(await getCapabilitiesDocRef(db, uid));
+): Promise<UserWriteResult> {
+  return commitUserWrite(db, async (batch) => {
+    batch.delete(await getCapabilitiesDocRef(db, uid));
+  });
 }

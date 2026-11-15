@@ -74,6 +74,13 @@ function isPermissionDenied(error: unknown) {
   );
 }
 
+/**
+ * After switching to private, when the cached copy of the profile couldn't be
+ * purged. Five minutes is the cache's `FRESH_MS` (clusterflick/api-profiles).
+ */
+export const PRIVATE_NOT_PURGED =
+  "Your profile is private now, but for up to 5 minutes it may still be shown to anyone who had it open or follows a link to it.";
+
 export const SAVE_FAILED =
   "Something went wrong saving that. Please try again.";
 
@@ -95,8 +102,13 @@ export function useProfileSave(
     setSaving(true);
     setError(null);
     try {
-      await saveProfile(next);
+      const { purged } = await saveProfile(next);
       onSaved(next);
+      // Saved, but the profile's cached copy couldn't be dropped, so it can
+      // still be shown until it expires.
+      if (profile?.public && !next.public && !purged) {
+        setError(PRIVATE_NOT_PURGED);
+      }
       return true;
     } catch (saveError) {
       console.error("Failed to save profile", saveError);

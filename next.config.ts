@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
         source: "/api/tmdb/:path*",
         destination: "http://localhost:8787/api/tmdb/:path*",
       },
+      {
+        source: "/api/profiles/:path*",
+        destination: "http://localhost:8788/api/profiles/:path*",
+      },
       { source: "/u", destination: "http://localhost:8788/u" },
       { source: "/u/:path*", destination: "http://localhost:8788/u/:path*" },
     ],

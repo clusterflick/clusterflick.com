@@ -1,6 +1,10 @@
 import type { Movie, Venue } from "@/types";
 import type { Firestore, WriteBatch } from "firebase/firestore/lite";
 import type { FilmDetailsData } from "./film-details";
+import {
+  commitUserWrite,
+  type UserWriteResult,
+} from "@/lib/firebase/commit-user-write";
 
 /**
  * Set on sign-in, cleared on sign-out. Carries no personal data: it exists so
@@ -118,22 +122,22 @@ export async function addToUserList(
   details: FilmDetailsData,
   /** Lists the film leaves in the same write, so the two can't disagree. */
   removeFrom: UserListId[] = [],
-): Promise<void> {
-  const { writeBatch, deleteField } = await import("firebase/firestore/lite");
-  const batch = writeBatch(db);
-  // Merge rather than update: the document doesn't exist until the first add.
-  batch.set(
-    await getUserDocRef(db, uid),
-    {
-      [listId]: { [movieId]: entry },
-      ...Object.fromEntries(
-        removeFrom.map((otherId) => [otherId, { [movieId]: deleteField() }]),
-      ),
-    },
-    { merge: true },
-  );
-  await addDetailsToBatch(batch, db, uid, details);
-  await batch.commit();
+): Promise<UserWriteResult> {
+  const { deleteField } = await import("firebase/firestore/lite");
+  return commitUserWrite(db, async (batch) => {
+    // Merge rather than update: the document doesn't exist until the first add.
+    batch.set(
+      await getUserDocRef(db, uid),
+      {
+        [listId]: { [movieId]: entry },
+        ...Object.fromEntries(
+          removeFrom.map((otherId) => [otherId, { [movieId]: deleteField() }]),
+        ),
+      },
+      { merge: true },
+    );
+    await addDetailsToBatch(batch, db, uid, details);
+  });
 }
 
 /**
@@ -147,25 +151,25 @@ export async function addManyToUserList(
   entries: Record<Movie["id"], UserListEntry>,
   details: FilmDetailsData,
   removeFrom: UserListId[] = [],
-): Promise<void> {
-  const { writeBatch, deleteField } = await import("firebase/firestore/lite");
+): Promise<UserWriteResult> {
+  const { deleteField } = await import("firebase/firestore/lite");
   const ids = Object.keys(entries);
-  const batch = writeBatch(db);
-  batch.set(
-    await getUserDocRef(db, uid),
-    {
-      [listId]: entries,
-      ...Object.fromEntries(
-        removeFrom.map((otherId) => [
-          otherId,
-          Object.fromEntries(ids.map((id) => [id, deleteField()])),
-        ]),
-      ),
-    },
-    { merge: true },
-  );
-  await addDetailsToBatch(batch, db, uid, details);
-  await batch.commit();
+  return commitUserWrite(db, async (batch) => {
+    batch.set(
+      await getUserDocRef(db, uid),
+      {
+        [listId]: entries,
+        ...Object.fromEntries(
+          removeFrom.map((otherId) => [
+            otherId,
+            Object.fromEntries(ids.map((id) => [id, deleteField()])),
+          ]),
+        ),
+      },
+      { merge: true },
+    );
+    await addDetailsToBatch(batch, db, uid, details);
+  });
 }
 
 /**
@@ -177,18 +181,20 @@ export async function restoreUserListEntries(
   uid: string,
   movieId: Movie["id"],
   entries: Partial<Record<UserListId, UserListEntry | null>>,
-): Promise<void> {
-  const { setDoc, deleteField } = await import("firebase/firestore/lite");
-  await setDoc(
-    await getUserDocRef(db, uid),
-    Object.fromEntries(
-      Object.entries(entries).map(([listId, entry]) => [
-        listId,
-        { [movieId]: entry ?? deleteField() },
-      ]),
-    ),
-    { merge: true },
-  );
+): Promise<UserWriteResult> {
+  const { deleteField } = await import("firebase/firestore/lite");
+  return commitUserWrite(db, async (batch) => {
+    batch.set(
+      await getUserDocRef(db, uid),
+      Object.fromEntries(
+        Object.entries(entries).map(([listId, entry]) => [
+          listId,
+          { [movieId]: entry ?? deleteField() },
+        ]),
+      ),
+      { merge: true },
+    );
+  });
 }
 
 export async function removeFromUserList(
@@ -196,16 +202,17 @@ export async function removeFromUserList(
   uid: string,
   listId: UserListId,
   movieId: Movie["id"],
-): Promise<void> {
-  const { updateDoc, deleteField, FieldPath } =
-    await import("firebase/firestore/lite");
-  // FieldPath rather than a dotted string, so an id can never be misread as a
-  // nested path.
-  await updateDoc(
-    await getUserDocRef(db, uid),
-    new FieldPath(listId, movieId),
-    deleteField(),
-  );
+): Promise<UserWriteResult> {
+  const { deleteField, FieldPath } = await import("firebase/firestore/lite");
+  return commitUserWrite(db, async (batch) => {
+    // FieldPath rather than a dotted string, so an id can never be misread as
+    // a nested path.
+    batch.update(
+      await getUserDocRef(db, uid),
+      new FieldPath(listId, movieId),
+      deleteField(),
+    );
+  });
 }
 
 export async function addFavouriteVenue(
@@ -213,28 +220,30 @@ export async function addFavouriteVenue(
   uid: string,
   venueId: Venue["id"],
   entry: FavouriteVenueEntry,
-): Promise<void> {
-  const { setDoc } = await import("firebase/firestore/lite");
-  // Merge rather than update: the document doesn't exist until the first add.
-  await setDoc(
-    await getUserDocRef(db, uid),
-    { [FAVOURITE_VENUES_FIELD]: { [venueId]: entry } },
-    { merge: true },
-  );
+): Promise<UserWriteResult> {
+  return commitUserWrite(db, async (batch) => {
+    // Merge rather than update: the document doesn't exist until the first add.
+    batch.set(
+      await getUserDocRef(db, uid),
+      { [FAVOURITE_VENUES_FIELD]: { [venueId]: entry } },
+      { merge: true },
+    );
+  });
 }
 
 export async function removeFavouriteVenue(
   db: Firestore,
   uid: string,
   venueId: Venue["id"],
-): Promise<void> {
-  const { updateDoc, deleteField, FieldPath } =
-    await import("firebase/firestore/lite");
-  await updateDoc(
-    await getUserDocRef(db, uid),
-    new FieldPath(FAVOURITE_VENUES_FIELD, venueId),
-    deleteField(),
-  );
+): Promise<UserWriteResult> {
+  const { deleteField, FieldPath } = await import("firebase/firestore/lite");
+  return commitUserWrite(db, async (batch) => {
+    batch.update(
+      await getUserDocRef(db, uid),
+      new FieldPath(FAVOURITE_VENUES_FIELD, venueId),
+      deleteField(),
+    );
+  });
 }
 
 async function getFilmDetailsDocRef(db: Firestore, uid: string) {
@@ -266,10 +275,11 @@ async function addDetailsToBatch(
 export async function deleteUserLists(
   db: Firestore,
   uid: string,
-): Promise<void> {
-  const { deleteDoc } = await import("firebase/firestore/lite");
-  // Firestore never deletes a subcollection with its parent, so the details go
-  // explicitly.
-  await deleteDoc(await getFilmDetailsDocRef(db, uid));
-  await deleteDoc(await getUserDocRef(db, uid));
+): Promise<UserWriteResult> {
+  return commitUserWrite(db, async (batch) => {
+    // Firestore never deletes a subcollection with its parent, so the details
+    // go explicitly.
+    batch.delete(await getFilmDetailsDocRef(db, uid));
+    batch.delete(await getUserDocRef(db, uid));
+  });
 }

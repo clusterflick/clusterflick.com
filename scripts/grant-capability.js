@@ -12,6 +12,8 @@
  *                                   (Firebase console → Project settings →
  *                                   Service accounts → Generate new private key)
  *   NEXT_PUBLIC_FIREBASE_PROJECT_ID the project, as for the site
+ *   PROFILES_PURGE_SECRET           for publicProfile with --write: see
+ *                                   scripts/lib/purge-profile.js
  *
  * The key can read and write every reader's data: keep it out of the
  * repository.
@@ -20,8 +22,13 @@
  * and never write. The reader sees it on their next visit to /personalise
  * (it's read once a session). A reader who hasn't signed up has no account to
  * grant to, and the script says so rather than creating one.
+ *
+ * Granting or revoking publicProfile changes whether the reader's profile is
+ * shown, so the profile's cached copy is purged after the write; a purge that
+ * fails is an error, saying the write itself went through.
  */
 const { parseArgs, planChange } = require("./lib/capabilities");
+const { getPurgeConfig, purgeProfile } = require("./lib/purge-profile");
 
 function loadEnv() {
   try {
@@ -42,6 +49,12 @@ async function main() {
   loadEnv();
   requireEnv("GOOGLE_APPLICATION_CREDENTIALS");
   const projectId = requireEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  // Before anything is written, so a missing secret can't leave a profile
+  // cached as it was.
+  const purge =
+    args.write && args.capability === "publicProfile"
+      ? getPurgeConfig()
+      : undefined;
 
   const { initializeApp, applicationDefault } = require("firebase-admin/app");
   const { getAuth } = require("firebase-admin/auth");
@@ -83,6 +96,16 @@ async function main() {
     );
   } else if (args.write) {
     console.log(`Done: ${verb}ed ${args.capability} for ${who}.`);
+    if (purge) {
+      try {
+        await purgeProfile(user.uid, purge);
+      } catch (error) {
+        throw new Error(
+          `${error.message}. The ${verb} is saved; their profile may show as it was for up to 5 minutes.`,
+        );
+      }
+      console.log("Purged their cached profile.");
+    }
   } else {
     console.log(
       `Dry run: would ${verb} ${args.capability} for ${who}. Run with --write to apply.`,

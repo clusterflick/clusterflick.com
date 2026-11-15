@@ -93,7 +93,9 @@ const SAVED: UserProfile = {
  * typed, and one Save claims it with the rest.
  */
 export const NewProfile: Story = {
-  args: { user: { ...READER, saveProfile: fn(async () => {}) } },
+  args: {
+    user: { ...READER, saveProfile: fn(async () => ({ purged: true })) },
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const save = await canvas.findByRole("button", { name: "Save" });
@@ -159,7 +161,7 @@ export const Publishing: Story = {
     user: {
       ...READER,
       readProfile: async () => SAVED,
-      saveProfile: fn(async () => {}),
+      saveProfile: fn(async () => ({ purged: true })),
     },
   },
   play: async ({ canvasElement, args }) => {
@@ -194,7 +196,7 @@ export const Public: Story = {
     user: {
       ...READER,
       readProfile: async () => ({ ...SAVED, public: true }),
-      saveProfile: fn(async () => {}),
+      saveProfile: fn(async () => ({ purged: true })),
     },
   },
   play: async ({ canvasElement, args }) => {
@@ -223,7 +225,7 @@ export const Renaming: Story = {
     user: {
       ...READER,
       readProfile: async () => ({ ...SAVED, public: true }),
-      saveProfile: fn(async () => {}),
+      saveProfile: fn(async () => ({ purged: true })),
     },
   },
   play: async ({ canvasElement, args }) => {
@@ -259,7 +261,7 @@ export const PublishingWithRename: Story = {
     user: {
       ...READER,
       readProfile: async () => SAVED,
-      saveProfile: fn(async () => {}),
+      saveProfile: fn(async () => ({ purged: true })),
     },
   },
   play: async ({ canvasElement, args }) => {
@@ -329,7 +331,7 @@ export const PickingFavourites: Story = {
       ...READER,
       getIdToken: async () => "token",
       readProfile: async () => SAVED,
-      saveProfile: fn(async () => {}),
+      saveProfile: fn(async () => ({ purged: true })),
     },
   },
   parameters: {

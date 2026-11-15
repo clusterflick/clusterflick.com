@@ -1,5 +1,6 @@
 "use client";
 
+import type { UserWriteResult } from "@/lib/firebase/commit-user-write";
 import {
   createContext,
   useContext,
@@ -147,7 +148,8 @@ export type UserContextType = {
    * Saves the profile, claiming its handle (and releasing the old one) in
    * the same write. Rejects if the handle was claimed by someone else first.
    */
-  saveProfile: (profile: UserProfile) => Promise<void>;
+  /** Says whether the profile's cached copies were purged; see `commitUserWrite`. */
+  saveProfile: (profile: UserProfile) => Promise<UserWriteResult>;
   /** Whether someone else holds the (normalised) handle. */
   isHandleTaken: (handle: string) => Promise<boolean>;
 };
@@ -585,8 +587,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
       const previous = await readProfile();
+      let result: UserWriteResult;
       try {
-        await saveProfileToDocs(db, user.uid, next, previous);
+        result = await saveProfileToDocs(db, user.uid, next, previous);
       } catch (error) {
         // The cached profile may be what made the batch fail (changed in
         // another tab), so the next read goes back to Firestore.
@@ -594,6 +597,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       profileRef.current = { uid: user.uid, profile: Promise.resolve(next) };
+      return result;
     },
     [getServices, user, readProfile],
   );
@@ -690,7 +694,7 @@ export function MockUserProvider({
     readFilmDetails: async () => ({ films: {}, people: {} }),
     readCapabilities: async () => ({}),
     readProfile: async () => null,
-    saveProfile: noop,
+    saveProfile: async () => ({ purged: true }),
     isHandleTaken: async () => false,
     ...value,
   };

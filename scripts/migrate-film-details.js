@@ -14,6 +14,9 @@
  *                                   Service accounts → Generate new private key)
  *   TMDB_TOKEN                      a TMDB API read access token
  *   NEXT_PUBLIC_FIREBASE_PROJECT_ID the project, as for the site
+ *   PROFILES_PURGE_SECRET           with --write: each user written has their
+ *                                   cached public profile purged, as their
+ *                                   stats change (scripts/lib/purge-profile.js)
  *
  * The key can read and write every reader's data: keep it out of the
  * repository, and delete it in the console once the migration is done.
@@ -47,6 +50,7 @@ const {
   isSameDocument,
 } = require("./lib/film-details-migration");
 const { checkTmdbToken, fetchTmdbJson, forEachLimited } = require("./lib/tmdb");
+const { getPurgeConfig, purgeProfile } = require("./lib/purge-profile");
 
 /** Lookups in flight at once: TMDB allows around 40 requests a second. */
 const CONCURRENCY = 8;
@@ -118,6 +122,9 @@ async function main() {
   const token = requireEnv("TMDB_TOKEN");
   requireEnv("GOOGLE_APPLICATION_CREDENTIALS");
   const projectId = requireEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  // Before anything is written, so a missing secret stops the run.
+  const purge = write ? getPurgeConfig() : undefined;
+  const unpurged = [];
   await checkTmdbToken(token);
 
   const { initializeApp, applicationDefault } = require("firebase-admin/app");
@@ -182,6 +189,13 @@ async function main() {
       console.warn(`  ${uid}'s details are nearing Firestore's 1 MiB limit`);
     }
     if (!result.unchanged) changed++;
+    if (purge && !result.unchanged) {
+      try {
+        await purgeProfile(uid, purge);
+      } catch (error) {
+        unpurged.push({ uid, error: error.message });
+      }
+    }
   }
 
   console.log(
@@ -189,6 +203,14 @@ async function main() {
       ? `Done: ${changed} of ${users.length} users written.`
       : `Dry run: ${changed} of ${users.length} users would be written. Run with --write to apply.`,
   );
+  // Reported after the run rather than stopping it: each write is done, and
+  // a copy left cached expires within five minutes.
+  if (unpurged.length > 0) {
+    for (const { uid, error } of unpurged) console.error(`  ${uid}: ${error}`);
+    throw new Error(
+      `${unpurged.length} written users' cached profiles couldn't be purged; they may show as they were for up to 5 minutes.`,
+    );
+  }
 }
 
 main().catch((error) => {

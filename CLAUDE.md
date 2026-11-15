@@ -1623,6 +1623,24 @@ one static import puts the SDK in every page's bundle. Firestore is
 caching. Auth is `initializeAuth` rather than `getAuth`, which would bundle the
 popup/redirect resolvers email links never use.
 
+**Every write goes through `commitUserWrite`** (`@/lib/firebase/commit-user-write`).
+It takes a function that adds writes to a batch, commits it, and then purges
+the reader's cached public profile (`POST /api/profiles/purge` on the profiles
+Worker, with their ID token), so a profile shows a change on its next view
+rather than up to five minutes later. Lint refuses `writeBatch`, `setDoc`,
+`updateDoc`, `deleteDoc`, `addDoc` and `runTransaction` anywhere else, in any
+form of import (`eslint.config.mjs`), because a write that skipped the purge
+would leave a profile showing what it no longer holds. A failed commit
+throws, as before. A failed purge, retried twice, doesn't: the write
+happened, and the copy expires on its own. The result's `purged` says which,
+and the settings page tells a reader who has just gone private that their
+profile may still show for up to five minutes. A profile save names its old
+and new handles (`purgeHandles`), as the Worker finds a reader's copies by uid
+and can't know a handle just taken. The scripts that write as the service
+account (`grant-capability` for `publicProfile`, `migrate-film-details`) purge
+with the Worker's secret, `PROFILES_PURGE_SECRET`
+(`scripts/lib/purge-profile.js`), checked before they write.
+
 **Storage is one document per user at `users/{uid}`**, every list a map of
 movie id → `UserListEntry`. One read per session. The entry snapshots title,
 year and poster because a listed film outlives its run — once it leaves the
@@ -2266,8 +2284,10 @@ displayName, links, favourites }`, readable by
   A change to those sections shows on profiles too. Unknown, private
   and revoked profiles are one not-found response, so they look alike to
   everyone but the owner, recognised by their own profile document (only
-  they can read it), who is told theirs is private. The Worker's README has
-  the routes and what it sends.
+  they can read it), who is told theirs is private. Each profile is cached
+  in a Durable Object for five minutes and purged by every write
+  (`commitUserWrite`, above), so a change shows on the next view. The
+  Worker's README has the routes, what it sends and how the cache works.
 - **The shell's `<head>` is the Worker's to set.** Next renders the `<head>`
   again in the browser from the page's inline RSC payload, so whatever the
   shell's metadata says comes back after hydration. So it has no `robots` or
