@@ -102,3 +102,20 @@ export async function disconnectAssistant(
     throw new Error(`Disconnecting failed: ${response.status}`);
   }
 }
+
+/**
+ * Disconnects every assistant the reader has connected, which deleting their
+ * account does first: the Worker keeps each connection under the reader's
+ * id, and once the account is gone there's no ID token left to remove them
+ * with. Throws if the Worker refuses, so the deletion stops with nothing yet
+ * deleted rather than leaving connections behind.
+ */
+export async function disconnectAllAssistants(idToken: string): Promise<void> {
+  const response = await fetch(CONNECTIONS_URL, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Disconnecting all failed: ${response.status}`);
+  }
+}

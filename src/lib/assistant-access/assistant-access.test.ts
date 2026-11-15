@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   describeScopes,
+  disconnectAllAssistants,
   disconnectAssistant,
   getConnectCallbackUrl,
   listConnections,
@@ -70,6 +71,17 @@ describe("connected assistants", () => {
     );
   });
 
+  it("are disconnected all at once, as deleting the account does", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    await disconnectAllAssistants("id-token");
+    expect(fetch).toHaveBeenCalledWith(
+      "https://mcp.clusterflick.com/connections",
+      { method: "DELETE", headers: { Authorization: "Bearer id-token" } },
+    );
+  });
+
   it("fail loudly when the Worker refuses", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 503 }),
@@ -78,6 +90,7 @@ describe("connected assistants", () => {
     await expect(disconnectAssistant("id-token", "grant1")).rejects.toThrow(
       "503",
     );
+    await expect(disconnectAllAssistants("id-token")).rejects.toThrow("503");
   });
 });
 

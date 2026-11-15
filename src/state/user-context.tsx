@@ -39,6 +39,7 @@ import {
   pickFilmDetails,
   type FilmDetailsData,
 } from "@/lib/user-lists/film-details";
+import { disconnectAllAssistants } from "@/lib/assistant-access";
 import {
   deleteCapabilities,
   fetchCapabilities,
@@ -95,7 +96,10 @@ export type UserContextType = {
    * rejected it.
    */
   getIdToken: (forceRefresh?: boolean) => Promise<string>;
-  /** Deletes the user's lists and profile, and then their account. */
+  /**
+   * Disconnects their AI assistants, deletes their lists and profile, and
+   * then their account.
+   */
   deleteAccount: () => Promise<void>;
   /**
    * Adds a film with its details, saved together or not at all — see
@@ -353,7 +357,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const { auth, db } = await getServices();
     const current = auth.currentUser;
     if (!current) return;
-    // Data first: once the account is gone, the rules no longer let anyone
+    // Their AI assistants first, for any reader, since a capability can be
+    // revoked with connections left: it takes an ID token, which goes with
+    // the account, and a failure here stops the deletion with nothing gone.
+    await disconnectAllAssistants(await current.getIdToken());
+    // Data next: once the account is gone, the rules no longer let anyone
     // delete its document. If the account deletion then needs a fresh sign-in,
     // the lists are already gone and the caller asks for one.
     // The profile before the capabilities, though its deletion needs none:
