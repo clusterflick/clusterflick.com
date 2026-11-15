@@ -242,14 +242,20 @@ function getFullWidthTileWidth(width: number) {
 
 const STORE_NOTE = (
   <>
-    Your email address, so we can send you sign-in links, the films and venues
-    you add to your lists, any features we&apos;ve switched on for your account,
-    and your public profile&apos;s handle if you set one up. Nothing else. We
-    never sell your data. We never share your data beyond the services the site
-    runs on. You can delete your account, and everything in it, from this page
-    at any time. <Link href="/privacy">How we handle your data</Link>
+    Your email address, so we can send you sign-in links; the films and venues
+    you add to your lists, with details of those films (such as genres,
+    directors and runtime) for your Seen stats; any features we&apos;ve switched
+    on for your account; your public profile if you set one up (its handle,
+    name, links, favourite films and which sections it shows); and the AI
+    assistants you connect, with what each can see. Nothing else. We never sell
+    your data. We never share your data beyond the services the site runs on.
+    You can delete your account, and everything in it, from this page at any
+    time.
   </>
 );
+
+/** On a line of its own under the note, where it's found at a glance. */
+const STORE_NOTE_LINK = <Link href="/privacy">How we handle your data</Link>;
 
 export default function PersonalisePageContent({
   venueImagePaths = {},
@@ -519,12 +525,14 @@ function AccountManagement() {
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>What we store</h3>
         <p className={styles.managementText}>{STORE_NOTE}</p>
+        <p className={styles.managementText}>{STORE_NOTE_LINK}</p>
       </section>
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Delete account</h3>
         <p className={styles.managementText}>
-          Deletes your account, every list in it and your public profile. This
-          can&apos;t be undone.
+          Deletes your account, every list in it and your public profile, and
+          disconnects any AI assistants you&apos;ve connected. This can&apos;t
+          be undone.
         </p>
         <div className={styles.managementActions}>
           {confirmingDelete ? (
@@ -1239,6 +1247,7 @@ function WhatWeStore() {
     <aside className={styles.storeNote}>
       <h2 className={styles.storeNoteTitle}>What we store</h2>
       <p>{STORE_NOTE}</p>
+      <p>{STORE_NOTE_LINK}</p>
     </aside>
   );
 }

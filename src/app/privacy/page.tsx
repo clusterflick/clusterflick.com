@@ -73,9 +73,10 @@ const PROCESSORS: Entry[] = [
       <>
         Serves the film posters and images, so your browser fetches them from
         TheMovieDB directly. When you search for a film that isn&apos;t showing,
-        or import from Letterboxd, the titles and years you&apos;re looking for
-        are also sent to TheMovieDB through our search service. Your email
-        address and lists are not.
+        or import from Letterboxd or IMDb, the titles and years you&apos;re
+        looking for (and, from IMDb, each film&apos;s IMDb id) are also sent to
+        TheMovieDB through our search service. Your email address and lists are
+        not.
       </>
     ),
   },
@@ -171,12 +172,16 @@ export default function PrivacyPage() {
             given you early access to any, with when each was switched on.
           </li>
           <li>
-            <strong>Your public profile settings</strong>, if you set one up:
-            the handle you chose and whether your profile is shown. Nothing on
-            it is public until you switch it on. While it&apos;s on, anyone can
-            see your handle, your watchlist, Seen list and favourite venues, and
-            the stats from your Seen list, and search engines may list it. Never
-            your email address.
+            <strong>Your public profile</strong>, if you set one up: the handle
+            you chose, whether your profile is shown, and what you add to it: a
+            display name, links to your Letterboxd, IMDb and website, up to four
+            favourite films, and which of your watchlist, Seen list, favourite
+            venues and Seen stats it shows. Nothing on it is public until you
+            switch it on. While it&apos;s on, anyone can see your handle, name,
+            links and favourites, and the sections you chose to show, and search
+            engines may list it. Showing your Seen stats sends your Seen list to
+            the visitor&apos;s browser to work them out, even with the list
+            itself hidden. Never your email address.
           </li>
           <li>
             <strong>AI assistants you connect</strong>, if we have given you
@@ -195,9 +200,9 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p className={styles.body}>
-          A Letterboxd file you import is read in your browser. Only the films
-          you choose to add are saved, and the file itself never leaves your
-          device.
+          A Letterboxd or IMDb file you import is read in your browser. Only the
+          films you choose to add are saved, and the file itself never leaves
+          your device.
         </p>
         <p className={styles.body}>
           Without an account, we hold nothing about you. The services below see
@@ -263,12 +268,13 @@ export default function PrivacyPage() {
           Deleting your account from{" "}
           <Link href="/personalise">Personalise</Link> deletes your lists, the
           film details that go with them, any features switched on for you, your
-          public profile and its handle, and the account itself, straight away.
-          A handle you change or delete is free for someone else to use at once.
-          Removing a single film from a list removes it from that list. Metadata
-          about the film (duration, director, etc.) remains until the account is
-          deleted. The hosts above keep their own request logs for as long as
-          their own terms say.
+          public profile and its handle, your connected AI assistants (which are
+          disconnected), and the account itself, straight away. A handle you
+          change or delete is free for someone else to use at once. Removing a
+          single film from a list removes it from that list. Metadata about the
+          film (duration, director, etc.) remains until the account is deleted.
+          The hosts above keep their own request logs for as long as their own
+          terms say.
         </p>
       </ContentSection>
 
