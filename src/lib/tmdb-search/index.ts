@@ -86,10 +86,10 @@ export async function searchTmdb(
 }
 
 /**
- * The most films one match call takes: what the Worker can look up within a
- * Workers Free request's 50 subrequests. The Worker rejects a bigger batch.
+ * The most films one match call takes. The Worker rejects a bigger batch, so
+ * it must be deployed with a limit at least this big before the site is.
  */
-export const MATCH_BATCH_SIZE = 15;
+export const MATCH_BATCH_SIZE = 100;
 
 /**
  * A film as an import names it. With an IMDb id the Worker finds it by that
@@ -130,11 +130,8 @@ export async function matchTmdb(
   return (await response.json()).results;
 }
 
-/**
- * The most films one details call takes, as for a match: what the Worker can
- * look up within a Workers Free request's 50 subrequests.
- */
-export const DETAILS_BATCH_SIZE = 15;
+/** The most films one details call takes, as for a match. */
+export const DETAILS_BATCH_SIZE = 100;
 
 export type TmdbPerson = { id: string; name: string };
 

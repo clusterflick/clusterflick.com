@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TmdbSearchError } from "@/lib/tmdb-search";
 import {
-  BATCH_INTERVAL_MS,
   estimateLookupMinutes,
+  LOOKUP_INTERVAL_MS,
   lookUpDetailsOnTmdb,
   lookUpRowsOnTmdb,
 } from "./tmdb-lookup";
@@ -40,25 +40,28 @@ beforeEach(() => {
 });
 
 describe("lookUpRowsOnTmdb", () => {
-  it("sends batches of 15, paced to the Worker's limit", async () => {
+  it("sends batches of 100, paced per film to the Worker's limit", async () => {
     matchTmdb.mockImplementation(async (films: unknown[]) =>
       films.map(() => null),
     );
     const time = fakeTime();
     const progress: number[] = [];
 
-    await lookUpRowsOnTmdb(rows(40), {
+    await lookUpRowsOnTmdb(rows(240), {
       getIdToken,
       ...time,
       onProgress: (done) => progress.push(done),
     });
 
     expect(matchTmdb.mock.calls.map(([films]) => films.length)).toEqual([
-      15, 15, 10,
+      100, 100, 40,
     ]);
-    // The first goes straight away; each after waits its turn.
-    expect(time.waits).toEqual([BATCH_INTERVAL_MS, BATCH_INTERVAL_MS]);
-    expect(progress).toEqual([15, 30, 40]);
+    // The first goes straight away; each after waits for the one before.
+    expect(time.waits).toEqual([
+      100 * LOOKUP_INTERVAL_MS,
+      100 * LOOKUP_INTERVAL_MS,
+    ]);
+    expect(progress).toEqual([100, 200, 240]);
   });
 
   it("splits rows into found and missing", async () => {
@@ -89,6 +92,7 @@ describe("lookUpRowsOnTmdb", () => {
     matchTmdb
       .mockResolvedValueOnce([heat, null, null])
       .mockResolvedValueOnce([amelie]);
+    const time = fakeTime();
     const progress: number[] = [];
 
     const lookup = await lookUpRowsOnTmdb(
@@ -97,7 +101,7 @@ describe("lookUpRowsOnTmdb", () => {
         { title: "Amélie", year: 2001, imdbId: "tt0211915" },
         { title: "Nowhere", year: 2001 },
       ],
-      { getIdToken, ...fakeTime(), onProgress: (done) => progress.push(done) },
+      { getIdToken, ...time, onProgress: (done) => progress.push(done) },
     );
 
     expect(matchTmdb.mock.calls.map(([films]) => films)).toEqual([
@@ -112,6 +116,8 @@ describe("lookUpRowsOnTmdb", () => {
     expect(lookup.found.map(({ film }) => film.id)).toEqual(["949", "194"]);
     expect(lookup.missing.map(({ title }) => title)).toEqual(["Nowhere"]);
     expect(progress).toEqual([2, 3]);
+    // The second pass waits only for the three films the first looked up.
+    expect(time.waits).toEqual([3 * LOOKUP_INTERVAL_MS]);
   });
 
   it("waits out a rate limit and tries the batch again", async () => {
@@ -143,7 +149,7 @@ describe("lookUpRowsOnTmdb", () => {
     });
     const time = fakeTime();
     await expect(
-      lookUpRowsOnTmdb(rows(30), {
+      lookUpRowsOnTmdb(rows(150), {
         getIdToken,
         signal: controller.signal,
         now: time.now,
@@ -154,10 +160,10 @@ describe("lookUpRowsOnTmdb", () => {
 });
 
 describe("estimateLookupMinutes", () => {
-  it("is about a minute per 195 films, never under one", () => {
+  it("is about a minute per 1,200 films, never under one", () => {
     expect(estimateLookupMinutes(1)).toBe(1);
-    expect(estimateLookupMinutes(195)).toBe(1);
-    expect(estimateLookupMinutes(2000)).toBe(11);
+    expect(estimateLookupMinutes(1300)).toBe(1);
+    expect(estimateLookupMinutes(2000)).toBe(2);
   });
 });
 
@@ -172,25 +178,25 @@ describe("lookUpDetailsOnTmdb", () => {
   const ids = (count: number) =>
     Array.from({ length: count }, (_, i) => String(1000 + i));
 
-  it("fetches batches of 15, paced as the lookup is, into one set", async () => {
+  it("fetches batches of 100, paced as the lookup is, into one set", async () => {
     fetchTmdbDetails.mockImplementation(async (batch: string[]) =>
       batch.map(tmdbFilm),
     );
     const time = fakeTime();
     const progress: number[] = [];
 
-    const details = await lookUpDetailsOnTmdb(ids(20), {
+    const details = await lookUpDetailsOnTmdb(ids(120), {
       getIdToken,
       ...time,
       onProgress: (done) => progress.push(done),
     });
 
     expect(fetchTmdbDetails.mock.calls.map(([batch]) => batch.length)).toEqual([
-      15, 5,
+      100, 20,
     ]);
-    expect(time.waits).toEqual([BATCH_INTERVAL_MS]);
-    expect(progress).toEqual([15, 20]);
-    expect(Object.keys(details.films)).toHaveLength(20);
+    expect(time.waits).toEqual([100 * LOOKUP_INTERVAL_MS]);
+    expect(progress).toEqual([100, 120]);
+    expect(Object.keys(details.films)).toHaveLength(120);
     expect(details.people.d1000).toBe("Director 1000");
   });
 

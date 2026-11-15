@@ -1917,9 +1917,11 @@ Editing takes a row of its own first, and import and export pair up below it:
      (`lookUpRowsOnTmdb`, `@/lib/user-lists/tmdb-lookup`). Rows are grouped by
      folded title and year first, so a diary's rewatches are one lookup, and a
      row already on the list by title and year isn't looked up just to be
-     skipped. Batches of 15 (what the Worker fits in Workers Free's 50
-     subrequests) go one every 60s / 13, the Worker's per-reader limit, so a
-     2,000-film diary takes about 10 minutes; the page shows progress and can
+     skipped. Batches of 100 are paced per film to the Worker's per-reader
+     limit of 1,200 lookups a minute (after a batch of n, the next waits
+     n x 50ms), so a 2,000-film diary takes under 2 minutes. The Worker must
+     be deployed with a batch limit at least `MATCH_BATCH_SIZE` before the
+     site, or every batch is a 400; the page shows progress and can
      cancel. Matching is strict — a title that matches, or the only result for
      that year — and a film it can't find is listed in the review for the
      reader to search for, never guessed. A 429 is waited out; any other
@@ -1942,8 +1944,8 @@ Editing takes a row of its own first, and import and export pair up below it:
   column and parsed in `@/lib/user-lists/imdb-csv`. `Const` is the IMDb id, so
   a film that's showing matches exactly, and so does one that isn't: the match
   endpoint takes an `imdbId` and asks TMDB's find endpoint instead of searching.
-  It can't afford a title search as well within a batch's subrequests, so the
-  ids it misses are asked about again by title and year in a second pass
+  A title search as well would be a second TMDB call for a film the Worker
+  charges one lookup, so the ids it misses are asked about again by title and year in a second pass
   (`lookUpRowsOnTmdb`). An older Worker ignores `imdbId` and searches the
   title, so the Worker and the site can deploy in either order. A row is dated by `Date Rated`, else `Date Added` or `Created`, the
   first it fills. Series, episodes, games and podcasts (`Title Type`) are left

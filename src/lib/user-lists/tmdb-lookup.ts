@@ -13,12 +13,12 @@ import {
 import type { LetterboxdRow } from "./letterboxd-csv";
 
 /**
- * The Worker's per-reader limit on match batches, and separately on details
- * batches. Starting one every 60s / 13 keeps an import, or a backfill, just
- * inside it.
+ * The Worker's per-reader limit on match lookups, and separately on details
+ * lookups, counted per film. Each batch is followed by a wait of this long
+ * per film in it, which keeps an import, or a backfill, just inside it.
  */
-const BATCHES_PER_MINUTE = 13;
-export const BATCH_INTERVAL_MS = Math.ceil(60_000 / BATCHES_PER_MINUTE);
+const LOOKUPS_PER_MINUTE = 1200;
+export const LOOKUP_INTERVAL_MS = 60_000 / LOOKUPS_PER_MINUTE;
 
 /** The limit counts a minute; hitting it anyway means waiting that out. */
 const RATE_LIMITED_WAIT_MS = 60_000;
@@ -60,9 +60,10 @@ function sleep(ms: number, signal?: AbortSignal) {
 
 /** Roughly how long looking up `count` rows takes, in whole minutes. */
 export function estimateLookupMinutes(count: number) {
-  // The first batch starts straight away; each after waits its turn.
-  const waits = Math.ceil(count / MATCH_BATCH_SIZE) - 1;
-  return Math.max(1, Math.ceil((waits * BATCH_INTERVAL_MS) / 60_000));
+  // The first batch starts straight away; each after waits for the one
+  // before it, so every film but the last batch's is waited for.
+  const waited = Math.max(0, count - MATCH_BATCH_SIZE);
+  return Math.max(1, Math.ceil((waited * LOOKUP_INTERVAL_MS) / 60_000));
 }
 
 export type BatchRunnerOptions = {
@@ -74,7 +75,8 @@ export type BatchRunnerOptions = {
 
 /**
  * Runs calls to the Worker's batch endpoints one at a time, paced to its
- * per-reader limit. A rate limit is waited out, and anything else retried a
+ * per-reader limit: each call says how many films it looks up, and the next
+ * starts once that many lookups' worth of time has passed. A rate limit is waited out, and anything else retried a
  * couple of times before the error is thrown: the caller decides what a batch
  * that couldn't be looked up means, which is never that its films are missing.
  */
@@ -84,12 +86,17 @@ export function createBatchRunner({
   now = Date.now,
 }: BatchRunnerOptions = {}) {
   let lastStart = -Infinity;
-  return async function runBatch<T>(call: () => Promise<T>): Promise<T> {
+  let lastLookups = 0;
+  return async function runBatch<T>(
+    lookups: number,
+    call: () => Promise<T>,
+  ): Promise<T> {
     let retries = 0;
     for (;;) {
-      const due = lastStart + BATCH_INTERVAL_MS - now();
+      const due = lastStart + lastLookups * LOOKUP_INTERVAL_MS - now();
       if (due > 0) await wait(due, signal);
       lastStart = now();
+      lastLookups = lookups;
       try {
         return await call();
       } catch (error) {
@@ -118,8 +125,8 @@ export function createBatchRunner({
  * reader would lose them from the import without knowing.
  *
  * A row with an IMDb id is found by the id, exactly. The Worker doesn't fall
- * back to the title for an id TMDB doesn't know (it can't afford a second call
- * per film), so those rows are asked about again, by title and year, once the
+ * back to the title for an id TMDB doesn't know (that would be a second TMDB
+ * call for a film charged one lookup), so those rows are asked about again, by title and year, once the
  * first pass is done. `onProgress` counts rows settled either way.
  */
 export async function lookUpRowsOnTmdb(
@@ -143,7 +150,7 @@ export async function lookUpRowsOnTmdb(
         ...(byImdbId && imdbId && { imdbId }),
       }));
 
-      const results = await runBatch(() =>
+      const results = await runBatch(films.length, () =>
         matchTmdb(films, getIdToken, signal),
       );
       results.forEach((film, index) => {
@@ -178,7 +185,7 @@ export async function lookUpDetailsOnTmdb(
   const runBatch = createBatchRunner({ signal, sleep, now });
   for (let start = 0; start < ids.length; start += DETAILS_BATCH_SIZE) {
     const batch = ids.slice(start, start + DETAILS_BATCH_SIZE);
-    const found = await runBatch(() =>
+    const found = await runBatch(batch.length, () =>
       fetchFilmDetailsFromTmdb(batch, getIdToken, signal),
     );
     Object.assign(details.films, found.films);
