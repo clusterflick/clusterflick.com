@@ -48,9 +48,9 @@ jobs:
           node-version-file: .node-version
       - run: npm ci
       - run: npm run lint
-      # The site builds the package from its source; this runs its tests and
-      # builds what npm would publish, and imports every module of it in Node.
-      - run: npm test -w @clusterflick/catalogue
+      # The site builds the package from its source; this builds what npm
+      # would publish and imports every module of it in Node. Its tests run
+      # with the site's, below.
       - run: npm run check -w @clusterflick/catalogue
       - name: Download combined data
         uses: ./.github/actions/download-release
@@ -85,6 +85,9 @@ jobs:
       # template, which still validates the script and is stable for Chromatic.
       # The real AI summary is generated in generate_site.yml at deploy time.
       - run: npm run generate-summary
+      # The unit tests, the package's included. After the data steps, since
+      # Vitest's config loads Storybook's, which reads public/data.
+      - run: npm test
       - run: npm run build-storybook
       - name: Publish to Chromatic
         if: github.actor != 'dependabot[bot]'
