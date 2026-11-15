@@ -61,8 +61,12 @@ A release is a version bump in `package.json`, pushed to `main` (semver: a
 change to the data model or to a function's signature is a major version while
 the Workers depend on it). `.github/workflows/publish-catalogue.yml` runs on
 every push that touches the package and publishes only a version npm doesn't
-have yet, after the site's tests and `check`; a push without a bump finds its
-version already published and stops.
+have yet, after the package's tests and `check`; a push without a bump finds its
+version already published and stops. npm scans a new version for malware before
+it can be installed, typically for about five minutes, so the workflow then
+waits until the version is available, and fails if it isn't within 30 minutes
+(npm may have held it for review or blocked it). A push during that wait queues
+behind it.
 
 It publishes with npm's trusted publishing: the workflow proves who it is with
 an OIDC token, so no npm token is stored anywhere, and each release carries

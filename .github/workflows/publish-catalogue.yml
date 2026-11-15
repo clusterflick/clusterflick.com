@@ -56,6 +56,7 @@ jobs:
             echo "$version is new"
             echo "new=true" >> "$GITHUB_OUTPUT"
           fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - if: steps.version.outputs.new == 'true'
         run: npm ci
       # The package's own tests: the site's `npm test` also loads Storybook,
@@ -66,3 +67,30 @@ jobs:
         run: npm run check -w @clusterflick/catalogue
       - if: steps.version.outputs.new == 'true'
         run: npm publish -w @clusterflick/catalogue --access public
+      # npm scans a new version for malware before anyone can install it,
+      # typically for five minutes and sometimes 15 or more, and may hold it for
+      # review or block it. So a publish that succeeded isn't yet a release:
+      # this waits until the version is installable, and fails if it never is.
+      # A push in the meantime queues behind this run (the concurrency group),
+      # then finds the version published and stops, rather than publishing it
+      # again into npm's 409 for a version still being scanned.
+      - if: steps.version.outputs.new == 'true'
+        name: Wait for npm to make it available
+        timeout-minutes: 30
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for attempt in $(seq 1 60); do
+            versions=$(npm view @clusterflick/catalogue versions --json --prefer-online)
+            if VERSIONS="$versions" node -e '
+              const versions = [JSON.parse(process.env.VERSIONS)].flat();
+              process.exit(versions.includes(process.env.VERSION) ? 0 : 1);
+            '; then
+              echo "$VERSION is available"
+              exit 0
+            fi
+            echo "$VERSION isn't available yet ($attempt of 60)"
+            sleep 30
+          done
+          echo "::error::$VERSION wasn't available 30 minutes after publishing. Check the package on npmjs.com: npm may have held it for review or blocked it."
+          exit 1
