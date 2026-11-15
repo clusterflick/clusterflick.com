@@ -630,15 +630,69 @@
   gap: 8px;
 }
 
-/* The film search, in the open between the account bar and the watchlist. */
+/* The film search, a card at the head of the lists it fills: the stats end
+   at the divider above it, and the watchlist follows. Takes .card's look and
+   scroll margin. */
 .filmSearchSection {
-  /* Clear of the fixed header when the empty watchlist scrolls to it. */
-  scroll-margin-top: 80px;
-  margin-bottom: 40px;
+  padding: 24px;
+  margin-bottom: 60px;
 }
 
+.filmSearchTitle {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-light-gray);
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.filmSearchHint {
+  margin: 0 0 16px;
+  color: var(--color-muted-gray);
+}
+
+/* Larger than the catalogue's pill: it's the page's one way to add a film. */
 .filmSearchInput {
   flex: 1;
+}
+
+/* One right padding whether the "/" or the clear button is at the end, so
+   the circle sits as far in from the curve as the icon does at the start,
+   and nothing moves as the reader starts typing. Through .row to outrank
+   SearchInput's own padding. */
+.row > .filmSearchInput {
+  padding-right: 12px;
+}
+
+.filmSearchInput input {
+  padding: 16px 0;
+  font-size: 18px;
+}
+
+/* "/" focuses the search. Only worth saying with a keyboard, and not once
+   the reader is in the box. */
+.slashHint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+  border: 1px solid rgba(var(--color-white-rgb), 0.2);
+  border-radius: 6px;
+}
+
+.filmSearchInput:focus-within .slashHint {
+  display: none;
+}
+
+@media (hover: none) {
+  .slashHint {
+    display: none;
+  }
 }
 
 .filmSearchResults {

@@ -51,6 +51,7 @@ import {
   formatShowingTime,
 } from "@clusterflick/catalogue/utils/format-date";
 import ListManagement from "./list-management";
+import Divider from "@/components/divider";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
@@ -385,8 +386,12 @@ function SignedIn({
       {/* At the top: they're what a reader with a long Seen list comes back
           for, and the lists below are long. */}
       {lists && (
-        <SeenStats seen={lists[UserListId.Seen]} movieLists={movieLists} />
+        <>
+          <SeenStats seen={lists[UserListId.Seen]} movieLists={movieLists} />
+          <Divider />
+        </>
       )}
+      {/* The head of the lists, the tool that fills them. */}
       <FilmSearch ref={filmSearchRef} />
       {lists ? (
         <>

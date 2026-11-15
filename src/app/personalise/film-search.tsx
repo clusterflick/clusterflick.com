@@ -2,6 +2,7 @@
 
 import {
   useDeferredValue,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -52,6 +53,7 @@ const SearchIcon = () => (
 
 /** For the empty watchlist, which sends the reader here. */
 export const FILM_SEARCH_INPUT_ID = "personalise-film-search";
+const FILM_SEARCH_HEADING_ID = "personalise-film-search-heading";
 
 /**
  * How many showing films are drawn as the reader types. Two rows across the
@@ -95,6 +97,27 @@ export default function FilmSearch({
   const [query, setQuery] = useState("");
   const [tmdb, setTmdb] = useState<TmdbState>({ step: "idle" });
   const inFlight = useRef<AbortController | null>(null);
+
+  // "/" jumps to the search from anywhere on the page, as it does on many
+  // sites, unless the reader is already typing somewhere.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey)
+        return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.isContentEditable ||
+        target?.closest("input, textarea, select")
+      )
+        return;
+      const input = document.getElementById(FILM_SEARCH_INPUT_ID);
+      if (!input) return;
+      event.preventDefault();
+      input.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   // A film that's showing has its details in the dataset, which only the
   // results drawn from it reach, so it's read when the film is added.
@@ -179,15 +202,32 @@ export default function FilmSearch({
   const hasResults = shown.length > 0 || tmdbResults.length > 0;
 
   return (
-    <section ref={ref} className={styles.filmSearchSection}>
+    <section
+      ref={ref}
+      aria-labelledby={FILM_SEARCH_HEADING_ID}
+      className={clsx(styles.card, styles.filmSearchSection)}
+    >
+      <h2 id={FILM_SEARCH_HEADING_ID} className={styles.filmSearchTitle}>
+        Add films to your lists
+      </h2>
+      <p className={styles.filmSearchHint}>
+        Search what&apos;s showing now, or every film.
+      </p>
       <form role="search" className={styles.row} onSubmit={onSubmit}>
         <SearchInput
           id={FILM_SEARCH_INPUT_ID}
           value={query}
           onChange={onChange}
-          placeholder="Find a film to add to your lists"
+          placeholder="Film title"
           ariaLabel="Film title"
           className={styles.filmSearchInput}
+          trailing={
+            query ? undefined : (
+              <kbd className={styles.slashHint} aria-hidden="true">
+                /
+              </kbd>
+            )
+          }
         />
       </form>
 
