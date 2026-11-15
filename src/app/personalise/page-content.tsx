@@ -54,7 +54,7 @@ import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
-import AssistantAccess from "./assistant-access";
+import { AssistantAccessSummary, useAssistantAccess } from "./assistant-access";
 import SignInForm, { describeError, getErrorCode } from "./sign-in-form";
 import {
   ProfileWithdrawnNotice,
@@ -343,6 +343,7 @@ function SignedIn({
   const [panel, setPanel] = useState<AccountPanel | null>(null);
   const filmSearchRef = useRef<HTMLElement>(null);
   const publicProfile = usePublicProfile();
+  const assistantAccess = useAssistantAccess();
 
   // The empty watchlist's "search for a film" takes the reader to the search
   // above it.
@@ -364,9 +365,9 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
         publicProfile={publicProfile?.granted ? publicProfile : null}
+        assistantAccess={assistantAccess}
       />
       <ComingSoon />
-      <AssistantAccess />
       {publicProfile &&
         !publicProfile.granted &&
         publicProfile.profile?.public && (
@@ -409,7 +410,7 @@ function SignedIn({
   );
 }
 
-type AccountPanel = "lists" | "profile" | "account";
+type AccountPanel = "lists" | "profile" | "assistant" | "account";
 
 function AccountBar({
   panel,
@@ -417,6 +418,7 @@ function AccountBar({
   showEditing,
   onShowEditingChange,
   publicProfile,
+  assistantAccess,
 }: {
   panel: AccountPanel | null;
   onPanelChange: (panel: AccountPanel | null) => void;
@@ -424,6 +426,8 @@ function AccountBar({
   onShowEditingChange: (show: boolean) => void;
   /** Only for a reader with the capability: everyone else sees no panel. */
   publicProfile: PublicProfileState | null;
+  /** Whether the reader has `assistantAccess`: nobody else sees its panel. */
+  assistantAccess: boolean;
 }) {
   const { email, signOut } = useUserContext();
 
@@ -452,6 +456,7 @@ function AccountBar({
         <div className={styles.toolbarGroup}>
           {panelToggle("lists", "Manage lists")}
           {publicProfile && panelToggle("profile", "Public profile")}
+          {assistantAccess && panelToggle("assistant", "AI assistant")}
           {panelToggle("account", "Manage account")}
         </div>
         <div className={clsx(styles.toolbarGroup, styles.toolbarAccount)}>
@@ -476,6 +481,11 @@ function AccountBar({
           {panel === "profile" && (
             <PublicProfileSummary profile={publicProfile.profile} />
           )}
+        </div>
+      )}
+      {assistantAccess && (
+        <div id="personalise-assistant" hidden={panel !== "assistant"}>
+          {panel === "assistant" && <AssistantAccessSummary />}
         </div>
       )}
       <div id="personalise-account" hidden={panel !== "account"}>
