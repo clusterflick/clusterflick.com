@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  describeScopes,
   disconnectAssistant,
   getConnectCallbackUrl,
   listConnections,
@@ -44,6 +45,7 @@ describe("connected assistants", () => {
     name: "Claude",
     domain: "claude.ai",
     connectedAt: 1_794_700_000_000,
+    scopes: ["listings", "lists"],
   };
 
   it("are listed from the Worker, with the reader's sign-in", async () => {
@@ -76,5 +78,21 @@ describe("connected assistants", () => {
     await expect(disconnectAssistant("id-token", "grant1")).rejects.toThrow(
       "503",
     );
+  });
+});
+
+describe("describeScopes", () => {
+  it("says what a connection can do, and what it can't", () => {
+    expect(describeScopes(["listings", "lists", "offline_access"])).toEqual({
+      can: [
+        "Searches the listings",
+        "Sees your watchlist, Seen list and venues",
+      ],
+      cannot: [],
+    });
+    expect(describeScopes(["listings"])).toEqual({
+      can: ["Searches the listings"],
+      cannot: ["Can't see your watchlist, Seen list or venues"],
+    });
   });
 });

@@ -38,7 +38,39 @@ export type Connection = {
   domain?: string;
   /** Epoch milliseconds. */
   connectedAt: number;
+  /** What the reader allowed it, as OAuth scopes. */
+  scopes: string[];
 };
+
+/**
+ * What each of api-mcp's scopes lets an assistant do, as the panel says it,
+ * in order (api-mcp's `src/scopes.ts`). A connection keeps the scopes it was
+ * given, so one made before a scope was added, or with it unticked, lacks it
+ * until it's connected again; the panel says which.
+ */
+export const ASSISTANT_SCOPES = [
+  {
+    scope: "listings",
+    can: "Searches the listings",
+    cannot: "Can't search the listings",
+  },
+  {
+    scope: "lists",
+    can: "Sees your watchlist, Seen list and venues",
+    cannot: "Can't see your watchlist, Seen list or venues",
+  },
+] as const;
+
+/** What a connection can do, and what it can't, by `ASSISTANT_SCOPES`. */
+export function describeScopes(scopes: string[]) {
+  const granted = new Set(scopes);
+  return {
+    can: ASSISTANT_SCOPES.filter((s) => granted.has(s.scope)).map((s) => s.can),
+    cannot: ASSISTANT_SCOPES.filter((s) => !granted.has(s.scope)).map(
+      (s) => s.cannot,
+    ),
+  };
+}
 
 const CONNECTIONS_URL = `${MCP_ORIGIN}/connections`;
 

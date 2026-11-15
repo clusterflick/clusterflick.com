@@ -848,6 +848,12 @@
   gap: 8px 16px;
 }
 
+.assistantDetails {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
 .assistantItem .managementText {
   margin: 0;
 }

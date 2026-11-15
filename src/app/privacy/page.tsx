@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 // Change this whenever the page's substance changes, so a reader coming back
 // can tell whether anything has moved since they last read it.
-const LAST_UPDATED = "11 November 2026";
+const LAST_UPDATED = "15 November 2026";
 
 const ICO_COMPLAIN = "https://ico.org.uk/make-a-complaint/";
 
@@ -50,7 +50,7 @@ const PROCESSORS: Entry[] = [
   {
     name: "Cloudflare",
     value:
-      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below), and the one that reads a public profile from Firebase to show it.",
+      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below), the one that reads a public profile from Firebase to show it, and the one AI assistants you connect search through.",
   },
   {
     name: "GitHub Pages",
@@ -177,6 +177,17 @@ export default function PrivacyPage() {
             see your handle, your watchlist, Seen list and favourite venues, and
             the stats from your Seen list, and search engines may list it. Never
             your email address.
+          </li>
+          <li>
+            <strong>AI assistants you connect</strong>, if we have given you
+            access: which assistant, when you connected it, and whether you let
+            it see your lists. It searches the listings as you, and if you let
+            it, it reads your watchlist, Seen list and venues to leave out what
+            you&apos;ve seen or keep to your watchlist. What it finds goes to
+            the assistant, so its provider (Anthropic, for Claude) handles it
+            under their own terms. We log that it searched, never what for or
+            what&apos;s on your lists. You can disconnect it from your account
+            page at any time.
           </li>
           <li>
             <strong>Account records Firebase keeps itself</strong>, such as when

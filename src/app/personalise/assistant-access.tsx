@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import Button from "@/components/button";
 import {
+  describeScopes,
   disconnectAssistant,
   listConnections,
   MCP_URL,
@@ -89,8 +90,10 @@ export function AssistantAccessSummary() {
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>What it can see</h3>
         <p className={styles.managementText}>
-          It searches London&apos;s screenings, films and venues as you. It
-          can&apos;t see your lists or change anything on your account.
+          It searches London&apos;s screenings, films and venues as you. When
+          you connect it, you can also let it see your watchlist, Seen list and
+          venues, so it can leave out what you&apos;ve seen and find what&apos;s
+          on from your watchlist. It can&apos;t change anything on your account.
         </p>
       </section>
       <ConnectedAssistants />
@@ -171,25 +174,39 @@ function ConnectedAssistants() {
         </p>
       ) : (
         <ul className={styles.assistantList}>
-          {state.connections.map((connection) => (
-            <li key={connection.id} className={styles.assistantItem}>
-              <span className={styles.managementText}>
-                <strong>{connection.name}</strong>
-                {connection.domain && connection.domain !== connection.name
-                  ? ` (${connection.domain})`
-                  : ""}
-                , connected {formatDateLong(connection.connectedAt)}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={removing !== null}
-                onClick={() => disconnect(connection.id)}
-              >
-                {removing === connection.id ? "Disconnecting…" : "Disconnect"}
-              </Button>
-            </li>
-          ))}
+          {state.connections.map((connection) => {
+            const { can, cannot } = describeScopes(connection.scopes);
+            return (
+              <li key={connection.id} className={styles.assistantItem}>
+                <div className={styles.assistantDetails}>
+                  <span className={styles.managementText}>
+                    <strong>{connection.name}</strong>
+                    {connection.domain && connection.domain !== connection.name
+                      ? ` (${connection.domain})`
+                      : ""}
+                    , connected {formatDateLong(connection.connectedAt)}
+                  </span>
+                  <span className={styles.managementText}>
+                    {can.join(" · ")}
+                  </span>
+                  {cannot.length > 0 && (
+                    <span className={styles.managementText}>
+                      {cannot.join(" · ")}. To allow it, disconnect it and
+                      connect it again.
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={removing !== null}
+                  onClick={() => disconnect(connection.id)}
+                >
+                  {removing === connection.id ? "Disconnecting…" : "Disconnect"}
+                </Button>
+              </li>
+            );
+          })}
         </ul>
       )}
       {error && (

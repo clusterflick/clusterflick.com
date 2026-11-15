@@ -2109,7 +2109,10 @@ the listings through api-mcp, a Worker at `mcp.clusterflick.com`
 reader with the capability sees its "AI assistant" panel in /personalise's
 account bar, beside the public profile's, with the address to add, how, and
 what it can see, and the assistants they've connected, each to disconnect
-(api-mcp's `/connections`, called with their ID token). The assistant's OAuth sign-in runs on the Worker, which asks the reader to
+(api-mcp's `/connections`, called with their ID token). Each says what it
+can and can't do, from the OAuth scopes it was given (`ASSISTANT_SCOPES`,
+which follows api-mcp's `src/scopes.ts`): one connected before a scope was
+added, or with the lists unticked, says what it lacks and to reconnect it. The assistant's OAuth sign-in runs on the Worker, which asks the reader to
 approve the assistant, then sends them to `/connect/` here to sign in, since
 Firebase's sign-in lives on the site. That page posts their ID token to the
 Worker's `/callback`, an address fixed at build time and never taken from the
