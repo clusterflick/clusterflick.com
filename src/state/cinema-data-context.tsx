@@ -10,8 +10,13 @@ import {
   useRef,
 } from "react";
 import { CinemaData, MetaData } from "@clusterflick/catalogue/types";
-import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
-import { pruneByPerformances } from "@clusterflick/catalogue/utils/prune-movies";
+import {
+  assignUncategorisedGenre,
+  ensureUncategorisedGenre,
+  expandMetaData,
+  expandMovies,
+  stripPastPerformances,
+} from "@clusterflick/catalogue/utils/read-listings";
 import { fetchWithRetry, FetchRetryError } from "@/utils/fetch-with-retry";
 
 /**
@@ -55,82 +60,6 @@ type ContextType = {
 };
 
 /**
- * Adds the `id` property to each item based on its key.
- * Note: Intentionally mutates the input for performance - this is only called
- * on freshly fetched data before it enters React state.
- */
-function expandData<T extends Record<string, { id: string }>>(data: T): T {
-  Object.keys(data).forEach((id: string) => {
-    data[id].id = id;
-  });
-  return data;
-}
-
-const UNCATEGORISED_GENRE_ID = "uncategorised";
-
-/**
- * Find or create the "Uncategorised" genre in the genres metadata.
- * Note: Intentionally mutates the input for performance - this is only called
- * on freshly fetched data before it enters React state.
- */
-function ensureUncategorisedGenre(
-  genres: Record<string, { id: string; name: string }>,
-): string {
-  // First, check if it already exists
-  for (const genre of Object.values(genres)) {
-    if (genre.name === "Uncategorised") {
-      return genre.id;
-    }
-  }
-
-  // If not found, create it
-  genres[UNCATEGORISED_GENRE_ID] = {
-    id: UNCATEGORISED_GENRE_ID,
-    name: "Uncategorised",
-  };
-  return UNCATEGORISED_GENRE_ID;
-}
-
-/**
- * Assign "Uncategorised" genre to movies that have no genres,
- * or whose genres don't exist in the metadata.
- * Note: Intentionally mutates the input for performance - this is only called
- * on freshly fetched data before it enters React state.
- */
-function assignUncategorisedGenre(
-  movies: CinemaData["movies"],
-  uncategorisedGenreId: string,
-  validGenreIds: Set<string>,
-): CinemaData["movies"] {
-  for (const movie of Object.values(movies)) {
-    if (!movie.genres || movie.genres.length === 0) {
-      // No genres at all
-      movie.genres = [uncategorisedGenreId];
-    } else {
-      // Check if any of the movie's genres are valid (exist in metadata)
-      const hasValidGenre = movie.genres.some((id) => validGenreIds.has(id));
-      if (!hasValidGenre) {
-        // All genre IDs are invalid/orphaned, add uncategorised
-        movie.genres = [...movie.genres, uncategorisedGenreId];
-      }
-    }
-  }
-  return movies;
-}
-
-/**
- * Remove performances before today, then prune any showings and movies
- * that have no remaining performances. This ensures stale data never
- * enters React state regardless of which filters are active.
- */
-function stripPastPerformances(
-  movies: CinemaData["movies"],
-): CinemaData["movies"] {
-  const todayMidnight = getLondonMidnightTimestamp();
-  return pruneByPerformances(movies, (perf) => perf.time >= todayMidnight);
-}
-
-/**
  * Turn a fetch that failed every retry into the error the pages show. A status
  * means the server answered and refused; no status means the request never got
  * an answer (offline, dropped, timed out) or the body could not be parsed.
@@ -170,13 +99,7 @@ export async function getMetaData(): Promise<MetaData> {
     throw toDataFetchError(err, "metadata");
   }
 
-  return {
-    ...metaData,
-    genres: expandData<CinemaData["genres"]>(metaData.genres),
-    people: expandData<CinemaData["people"]>(metaData.people),
-    venues: expandData<CinemaData["venues"]>(metaData.venues),
-    collections: expandData<CinemaData["collections"]>(metaData.collections),
-  };
+  return expandMetaData(metaData);
 }
 
 export async function getMovieData(
@@ -191,7 +114,7 @@ export async function getMovieData(
     throw toDataFetchError(err, `movie data from ${filename}`);
   }
 
-  return expandData<CinemaData["movies"]>(movies);
+  return expandMovies(movies);
 }
 
 const Context = createContext<ContextType | undefined>(undefined);

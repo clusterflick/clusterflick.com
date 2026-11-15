@@ -1,48 +1,24 @@
 import type {
   CinemaData,
-  Movie,
-  Venue,
-  Person,
-  Genre,
-  CollectionSummary,
   MetaData,
+  Movie,
 } from "@clusterflick/catalogue/types";
+import {
+  expandMetaData,
+  expandMovies,
+} from "@clusterflick/catalogue/utils/read-listings";
 
+/**
+ * Every film the build has, past performances included: the build renders
+ * pages for them. A reader's listings drop those (`readListings`).
+ */
 function expandAndCombine(
   metaData: MetaData,
-  chunkFiles: Record<string, unknown>[],
-) {
-  const movies = chunkFiles.reduce(
-    (combined, data) => ({ ...combined, ...data }),
-    {},
-  );
-  const combinedData = { ...metaData, movies } as CinemaData;
-  const keysWithIds = [
-    "collections",
-    "genres",
-    "movies",
-    "people",
-    "venues",
-  ] as Partial<keyof CinemaData>[];
-  keysWithIds.forEach((key) => {
-    Object.keys(combinedData[key]).forEach((id: string) => {
-      const entry = combinedData[key] as
-        | Record<string, Movie>
-        | Record<string, Venue>
-        | Record<string, Person>
-        | Record<string, Genre>
-        | Record<string, CollectionSummary>;
-      entry[id].id = id;
-    });
-  });
-
-  Object.values(combinedData.movies).forEach(({ showings }) => {
-    Object.keys(showings).forEach((id: string) => {
-      showings[id].id = id;
-    });
-  });
-
-  return combinedData;
+  chunkFiles: Record<string, Movie>[],
+): CinemaData {
+  const movies: Record<string, Movie> = {};
+  for (const chunk of chunkFiles) Object.assign(movies, expandMovies(chunk));
+  return { ...expandMetaData(metaData), movies };
 }
 
 export default expandAndCombine;

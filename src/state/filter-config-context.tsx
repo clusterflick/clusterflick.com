@@ -1,5 +1,6 @@
 "use client";
 
+import { EVENT_CATEGORIES } from "@clusterflick/catalogue/filters/event-categories";
 import {
   createContext,
   useContext,
@@ -66,18 +67,7 @@ function readStoredVenueOrigin(): VenueOrigin | null {
 }
 
 // Event categories that can be filtered
-export const EVENT_CATEGORIES: { value: Category; label: string }[] = [
-  { value: Category.Movie, label: "Films" },
-  { value: Category.MultipleMovies, label: "Multiple Films" },
-  { value: Category.Shorts, label: "Short Films" },
-  { value: Category.Tv, label: "TV" },
-  { value: Category.Quiz, label: "Quizzes" },
-  { value: Category.Comedy, label: "Comedy" },
-  { value: Category.Music, label: "Music" },
-  { value: Category.Talk, label: "Talks" },
-  { value: Category.Workshop, label: "Workshops" },
-  { value: Category.Event, label: "Other Events" },
-];
+export { EVENT_CATEGORIES };
 
 // Venue quick-select options
 export const VENUE_OPTIONS = [

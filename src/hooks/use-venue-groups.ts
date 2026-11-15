@@ -6,7 +6,7 @@ import { getNearbyVenueIds } from "@clusterflick/catalogue/utils/geo-distance";
 import {
   getCinemaVenueIds,
   getSmallScreeningVenueIds,
-} from "@/utils/get-cinema-venue-ids";
+} from "@clusterflick/catalogue/utils/get-cinema-venue-ids";
 import { getVenueIdsWithShowings } from "@clusterflick/catalogue/utils/get-venues-with-showings";
 
 export type VenueGroup = {

@@ -1,4 +1,4 @@
-import { Venue } from "@clusterflick/catalogue/types";
+import type { Venue } from "../types";
 
 /**
  * Filters venues to return only cinema venue IDs.

@@ -424,8 +424,6 @@ export type MetaData = Omit<CinemaData, "movies"> & {
   /** `DATA_FORMAT_VERSION` (`data-format.mjs`) when it was published. */
   formatVersion: number;
   mapping: Record<string, string[]>;
-  /** The movie chunks, by file name in the same directory. */
-  filenames: string[];
 };
 
 /**

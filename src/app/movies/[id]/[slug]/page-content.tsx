@@ -32,7 +32,7 @@ import {
   suggestShowingRelaxations,
   type FilterSuggestion,
 } from "@clusterflick/catalogue/filters";
-import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
+import { getCinemaVenueIds } from "@clusterflick/catalogue/utils/get-cinema-venue-ids";
 import { getPlaceVenues } from "@clusterflick/catalogue/places";
 import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import {
