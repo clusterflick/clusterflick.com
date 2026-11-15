@@ -476,6 +476,27 @@ test.describe("Published Data", () => {
       );
     }
   });
+
+  // The one file in `data/` with a fixed name, which names the release for
+  // the Workers (`CURRENT_DATA_FILE`). The zone's JSON rule would hold it for a
+  // year, and every reader of it would stay on the release it named then.
+  test("data/current.json names this deploy's data and is cached briefly", async ({
+    request,
+  }) => {
+    const response = await request.get("/data/current.json");
+    expect(response.status()).toBe(200);
+    const { meta } = await response.json();
+    expect((await request.get(`/data/${meta}`)).status()).toBe(200);
+
+    test.skip(
+      new URL(SITE_URL).hostname !== "clusterflick.com",
+      "Cache headers are set by Cloudflare in front of the live site",
+    );
+    const maxAge = Number(
+      /max-age=(\d+)/.exec(response.headers()["cache-control"] ?? "")?.[1],
+    );
+    expect(maxAge, "data/current.json cache-control").toBeLessThanOrEqual(3600);
+  });
 });
 
 let londonCinemasPage: LondonCinemasPage;

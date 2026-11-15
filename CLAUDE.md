@@ -687,8 +687,10 @@ in the browser, which is GitHub Pages' own `max-age=600`. It sits after the "Cac
 rule, which gives every `.json` a year, because a later Cache Rule overrides an earlier one.
 Respecting the origin rather than setting a TTL is deliberate: on our plan an override can't go
 below two hours, and ten minutes keeps a reader, and the site's own calendar page, within one
-cache period of a deploy. The smoke tests check those headers, since a rule that stops matching
-would quietly serve year-old data.
+cache period of a deploy. The same rule matches `/data/current.json`, the one fixed name under
+`data/` (see the catalogue package), which the JSON rule would otherwise hold for a year, leaving
+the Workers that read it on the release it named then. The smoke tests check those headers, since a
+rule that stops matching would quietly serve year-old data.
 
 **The calendars are served uncompressed**, and that is accepted rather than an oversight. GitHub
 Pages gzips the `.json` files but not `text/calendar`, and Cloudflare only compresses the content
