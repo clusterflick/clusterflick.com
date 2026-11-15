@@ -28,6 +28,9 @@ type ReportVenue = {
 };
 type RankedVenue = ReportVenue & { value: number };
 
+const SCRIPTS_GIST =
+  "https://gist.github.com/alistairjcbrown/2bc167084a5067aed16d1cb1b7315f99";
+
 const fmt = (n: number) => n.toLocaleString("en-GB");
 const percent = (n: number) => `${Math.round(n)}%`;
 const period = `${formatReportDate(DATA.from)} to ${formatReportDate(DATA.to)}`;
@@ -557,7 +560,7 @@ export default function LondonCinemas2026Report() {
             <ReportHighlight
               title="Most international programme"
               stat={percent(mostInternational.value)}
-              statLabel={`of screenings were of films not in English, mostly in ${formatLanguages(mostInternational.id)}`}
+              statLabel={`of screenings were of films not in English, ${fmt(DATA.nonEnglishScreenings[mostInternational.id])} in all, mostly in ${formatLanguages(mostInternational.id)}`}
               venue={cardVenue(mostInternational)}
             />
             <ReportHighlight
@@ -676,6 +679,14 @@ export default function LondonCinemas2026Report() {
             <li>
               <strong>A film&apos;s age</strong> is from its original release
               year, so a re-release or restoration counts as the original.
+            </li>
+            <li>
+              <strong>The working.</strong> The scripts that produced these
+              numbers, and how to run them, are{" "}
+              <a href={SCRIPTS_GIST} target="_blank" rel="noopener noreferrer">
+                on GitHub
+              </a>
+              .
             </li>
             <li>
               <strong>Using these numbers.</strong> They&apos;re free to use

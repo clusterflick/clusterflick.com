@@ -375,6 +375,14 @@ export const LONDON_CINEMAS_2026 = {
       value: 51.7,
     },
   ],
+  nonEnglishScreenings: {
+    "institut-francais.org.uk": 1411,
+    "closeupfilmcentre.com": 321,
+    "metrocinema.co.uk": 1728,
+    "cineworld.co.uk-ilford": 7945,
+    "ica.art": 1152,
+    "cineworld.co.uk-hounslow": 6139,
+  },
   languageMix: {
     "institut-francais.org.uk": [
       {
