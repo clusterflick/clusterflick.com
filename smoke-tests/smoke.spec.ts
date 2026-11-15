@@ -309,7 +309,11 @@ test.describe("Venue Calendar Page", () => {
     await calendarPage.waitForCalendar();
     await calendarPage.waitForEvents();
 
+    // The agenda is this Monday-to-Sunday week, and the feed holds only
+    // upcoming showings, so late on a Sunday it is rightly empty. Next week
+    // always has something on.
     await calendarPage.switchToAgenda();
+    await calendarPage.goToNextPeriod();
     await calendarPage.waitForEvents();
 
     expect(await calendarPage.countEvents()).toBeGreaterThan(0);
