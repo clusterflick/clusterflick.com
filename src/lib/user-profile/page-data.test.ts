@@ -2,61 +2,24 @@ import { describe, expect, test } from "vitest";
 import { parseProfilePageData } from "./page-data";
 import { ALL_PROFILE_SECTIONS } from ".";
 
-/** A value as Firestore's REST API sends it, as the SDK would have stored it. */
-function encode(value: unknown): Record<string, unknown> {
-  if (typeof value === "string") return { stringValue: value };
-  if (typeof value === "boolean") return { booleanValue: value };
-  if (typeof value === "number") {
-    return Number.isInteger(value)
-      ? { integerValue: String(value) }
-      : { doubleValue: value };
-  }
-  if (Array.isArray(value))
-    return { arrayValue: { values: value.map(encode) } };
-  return {
-    mapValue: {
-      fields: Object.fromEntries(
-        Object.entries(value as object).map(([k, v]) => [k, encode(v)]),
-      ),
-    },
-  };
-}
-
-const ROOT = "projects/clusterflick-com/databases/(default)/documents";
-
-/** The Worker's script tag for a found profile, its documents as Firestore sent them. */
+/** The Worker's script tag for a found profile, with what it decoded. */
 function found(
-  user: Record<string, unknown> | null,
-  films: Record<string, unknown> | null,
+  content: Record<string, unknown> | null,
   extra: Record<string, unknown> = {},
 ) {
-  const document = (path: string, data: Record<string, unknown> | null) =>
-    data
-      ? {
-          found: {
-            name: `${ROOT}/${path}`,
-            fields: (encode(data).mapValue as { fields: unknown }).fields,
-          },
-          readTime: "2026-11-12T00:00:00Z",
-        }
-      : { missing: `${ROOT}/${path}`, readTime: "2026-11-12T00:00:00Z" };
   return JSON.stringify({
     found: true,
     handle: "film-fan",
     ...extra,
-    // In no particular order.
-    documents: [
-      document("users/-/meta/films", films),
-      document("users/-", user),
-    ],
+    ...content,
   });
 }
 
 describe("parseProfilePageData", () => {
-  test("decodes the lists, venues and film details as the Worker sends them", () => {
+  test("reads the lists, venues and film details as the Worker sends them", () => {
     const data = parseProfilePageData(
-      found(
-        {
+      found({
+        lists: {
           seen: {
             "1": {
               title: "Dune",
@@ -66,9 +29,9 @@ describe("parseProfilePageData", () => {
             },
           },
           watchlist: { "2": { title: "Heat", addedAt: 7 } },
-          favouriteVenues: { rio: { name: "The Rio", addedAt: 3 } },
         },
-        {
+        favouriteVenues: { rio: { name: "The Rio", addedAt: 3 } },
+        filmDetails: {
           films: {
             "1": {
               genres: ["878"],
@@ -80,7 +43,7 @@ describe("parseProfilePageData", () => {
           },
           people: { "137427": "Denis Villeneuve" },
         },
-      ),
+      }),
     );
     expect(data).toEqual({
       found: true,
@@ -117,7 +80,7 @@ describe("parseProfilePageData", () => {
 
   test("reads the sections shown, only true showing one", () => {
     const data = parseProfilePageData(
-      found(null, null, {
+      found(null, {
         sections: { seenStats: true, watchlist: false, seen: "yes" },
       }),
     );
@@ -131,7 +94,7 @@ describe("parseProfilePageData", () => {
 
   test("reads the name and links, stripping and dropping what can't show", () => {
     const data = parseProfilePageData(
-      found(null, null, {
+      found(null, {
         displayName: "<Siobhán> O'Brien",
         links: {
           letterboxd: "film_fan",
@@ -149,7 +112,7 @@ describe("parseProfilePageData", () => {
 
   test("reads the favourites in order, dropping what can't be drawn", () => {
     const data = parseProfilePageData(
-      found(null, null, {
+      found(null, {
         favourites: [
           { id: "949", title: "Heat", year: "1995", posterPath: "/h.jpg" },
           { id: "../x", title: "Bad" },
@@ -164,17 +127,17 @@ describe("parseProfilePageData", () => {
   });
 
   test("no name is the handle alone", () => {
-    const data = parseProfilePageData(found(null, null, { displayName: "  " }));
+    const data = parseProfilePageData(found(null, { displayName: "  " }));
     expect(data.found && data).not.toHaveProperty("displayName");
   });
 
   test("no sections, from a Worker before them, is every section", () => {
-    const data = parseProfilePageData(found(null, null));
+    const data = parseProfilePageData(found(null));
     expect(data.found && data.sections).toEqual(ALL_PROFILE_SECTIONS);
   });
 
-  test("missing documents and fields are empty", () => {
-    expect(parseProfilePageData(found(null, null))).toEqual({
+  test("missing lists, venues and details are empty", () => {
+    expect(parseProfilePageData(found(null))).toEqual({
       found: true,
       handle: "film-fan",
       sections: ALL_PROFILE_SECTIONS,
@@ -188,13 +151,11 @@ describe("parseProfilePageData", () => {
 
   test("drops entries it can't draw", () => {
     const data = parseProfilePageData(
-      found(
-        {
-          seen: { "1": { year: "2001" }, "2": { title: "Heat" } },
-          favouriteVenues: { rio: { addedAt: 1 } },
-        },
-        null,
-      ),
+      found({
+        lists: { seen: { "1": { year: "2001" }, "2": { title: "Heat" } } },
+        favouriteVenues: { rio: { addedAt: 1 } },
+        filmDetails: "not details",
+      }),
     );
     expect(data.found && data.lists.seen).toEqual({
       "2": { title: "Heat", addedAt: 0 },

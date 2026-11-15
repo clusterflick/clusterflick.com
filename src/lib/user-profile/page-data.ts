@@ -19,13 +19,14 @@ import type {
   FilmDetails,
   FilmDetailsData,
 } from "@/lib/user-lists/film-details";
-import { decodeBatchGet } from "./firestore-rest";
 
 /**
  * What the profiles Worker (clusterflick/api-profiles) puts in the
  * `/profile-shell/` page it serves at `/u/<handle>/`, as JSON in a script tag
- * with this id. Its own copy of these types is the one that matters; this
- * reads what arrives defensively, so a Worker change can't break the page.
+ * with this id. Its own copy of these types is the one that matters, and it
+ * reads Firestore with the same rules as this (`src/lists.ts` there): change
+ * them together. This reads what arrives defensively, so a Worker change
+ * can't break the page.
  */
 export const PROFILE_DATA_ELEMENT_ID = "profile-data";
 
@@ -110,19 +111,21 @@ function parseFilmDetails(entry: Record<string, unknown>): FilmDetails {
 }
 
 /**
- * The Worker's `documents`: Firestore's own answer for `users/{uid}` and
- * `users/{uid}/meta/films`, undecoded, with the uid in their names as `-`.
+ * The lists, venues and film details, which the Worker decodes from
+ * Firestore for the sections shown. A hidden section's arrive empty.
  */
-function parseDocuments(documents: unknown) {
-  const decoded = decodeBatchGet(documents);
-  const user = decoded["users/-"] ?? {};
-  const films = decoded["meta/films"] ?? {};
+function parseProfileContent(value: Record<string, unknown>) {
+  const lists = isRecord(value.lists) ? value.lists : {};
+  const films = isRecord(value.filmDetails) ? value.filmDetails : {};
   return {
     lists: {
-      [UserListId.Watchlist]: parseMap(user.watchlist, parseListEntry),
-      [UserListId.Seen]: parseMap(user.seen, parseListEntry),
+      [UserListId.Watchlist]: parseMap(
+        lists[UserListId.Watchlist],
+        parseListEntry,
+      ),
+      [UserListId.Seen]: parseMap(lists[UserListId.Seen], parseListEntry),
     },
-    favouriteVenues: parseMap(user.favouriteVenues, (entry) =>
+    favouriteVenues: parseMap(value.favouriteVenues, (entry) =>
       typeof entry.name === "string"
         ? {
             name: entry.name,
@@ -184,7 +187,7 @@ export function parseProfilePageData(
       ...(displayName && { displayName }),
       links: readProfileLinks(value.links),
       favourites: readFavourites(value.favourites),
-      ...parseDocuments(value.documents),
+      ...parseProfileContent(value),
     };
   }
   return handle ? { found: false, handle } : { found: false };

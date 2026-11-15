@@ -2253,11 +2253,12 @@ displayName, links, favourites }`, readable by
 - **The page is `/profile-shell/`, filled in by the Worker.** The export has
   no page per reader, so the Worker owns `/u/*`: it reads the profile from
   Firestore as a service account (nothing there is public), fetches this
-  page, and puts the profile in a `<script id="profile-data">`. To stay inside
-  Workers Free's 10ms of CPU it decodes only the small documents it checks:
-  the lists, favourite venues and film details arrive as Firestore's REST
-  answer, undecoded, and the page decodes them after hydration
-  (`@/lib/user-profile/page-data`, `firestore-rest`). The page is
+  page, and puts the profile in a `<script id="profile-data">`. It decodes
+  the lists, favourite venues and film details into the site's own shapes
+  (`UserLists`, `FavouriteVenues`, `FilmDetailsData`), keeping only the films'
+  details the Seen stats read, and the page checks them again with the same
+  rules (`@/lib/user-profile/page-data`, mirrored by the Worker's
+  `src/lists.ts`: change them together). The page is
   `/personalise` read only, with only the sections shown (`ProfileView`):
   the same `SeenStats`, `UserListSection` and
   `FavouriteVenuesSection`, with `publicView` (and `SeenStats`' `details`)
