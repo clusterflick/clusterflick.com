@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import Button from "@/components/button";
+import ReleaseDot from "@/components/release-dot";
 import {
   describeScopes,
   disconnectAssistant,
@@ -45,9 +46,11 @@ export function useAssistantAccess(): boolean {
 }
 
 /**
- * Opened from the account bar: the address to add to an AI assistant, which
- * signs the reader in through /connect/ the first time, and the assistants
- * they've connected, to disconnect.
+ * Opened from the account bar: on the left, the address to add to an AI
+ * assistant and how, which signs the reader in through /connect/ the first
+ * time; on the right, the assistants they've connected, each saying what it
+ * can see, to disconnect. What one can see is the connection's, chosen when
+ * it was connected, so the panel doesn't describe it for them all.
  */
 export function AssistantAccessSummary() {
   const [copied, setCopied] = useState(false);
@@ -60,41 +63,48 @@ export function AssistantAccessSummary() {
   };
 
   return (
-    <div className={styles.management}>
+    <div className={`${styles.management} ${styles.assistantManagement}`}>
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Connect your assistant</h3>
         <p className={styles.managementText}>
           Your AI assistant can search Clusterflick&apos;s listings for you: ask
           it what&apos;s on near you tonight, or when a film is showing. Add
-          this address to it, and sign in here when it asks.
+          this address to it, and sign in here when it asks. You choose what
+          each assistant can see when you connect it.
         </p>
-        <p className={styles.assistantAddress}>
-          <code>{MCP_URL}</code>
-        </p>
-        <div className={styles.managementActions}>
+        <div className={styles.assistantAddressRow}>
+          <input
+            className={`${styles.input} ${styles.assistantAddress}`}
+            type="text"
+            readOnly
+            value={MCP_URL}
+            aria-label="The address to add to your assistant"
+            onFocus={(event) => event.currentTarget.select()}
+            onClick={(event) => event.currentTarget.select()}
+          />
           <Button size="sm" onClick={copy}>
             {copied ? "Copied" : "Copy address"}
           </Button>
         </div>
-      </section>
-      <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>Adding it</h3>
-        <p className={styles.managementText}>
-          In Claude, add it as a custom connector. Other assistants call it an
-          MCP server. In Claude Code, run:
-        </p>
-        <p className={styles.assistantAddress}>
-          <code>claude mcp add --transport http clusterflick {MCP_URL}</code>
-        </p>
-      </section>
-      <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>What it can see</h3>
-        <p className={styles.managementText}>
-          It searches London&apos;s screenings, films and venues as you. When
-          you connect it, you can also let it see your watchlist, Seen list and
-          venues, so it can leave out what you&apos;ve seen and find what&apos;s
-          on from your watchlist. It can&apos;t change anything on your account.
-        </p>
+        <h3 className={`${styles.managementTitle} ${styles.assistantSubtitle}`}>
+          Adding it
+        </h3>
+        <ul className={styles.assistantSteps}>
+          <li className={styles.managementText}>
+            <strong>Claude</strong>, on the web or in the desktop app: Customize
+            → Connectors → Add custom connector, then paste the address. On a
+            Team or Enterprise plan, an owner adds it under Organization
+            settings → Connectors.
+          </li>
+          <li className={styles.managementText}>
+            <strong>Claude Code</strong>: run{" "}
+            <code>claude mcp add --transport http clusterflick {MCP_URL}</code>
+          </li>
+          <li className={styles.managementText}>
+            <strong>Any other assistant</strong> that supports remote MCP
+            servers with sign-in: add the address as an MCP server.
+          </li>
+        </ul>
       </section>
       <ConnectedAssistants />
     </div>
@@ -157,9 +167,7 @@ function ConnectedAssistants() {
   };
 
   return (
-    <section
-      className={`${styles.managementSection} ${styles.assistantConnections}`}
-    >
+    <section className={styles.managementSection}>
       <h3 className={styles.managementTitle}>Connected assistants</h3>
       {state.step === "loading" ? (
         <p className={styles.managementText}>Checking…</p>
@@ -180,7 +188,7 @@ function ConnectedAssistants() {
               <li key={connection.id} className={styles.assistantItem}>
                 <div className={styles.assistantDetails}>
                   <span className={styles.managementText}>
-                    <strong>{connection.name}</strong>
+                    <ReleaseDot /> <strong>{connection.name}</strong>
                     {connection.domain && connection.domain !== connection.name
                       ? ` (${connection.domain})`
                       : ""}

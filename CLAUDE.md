@@ -2107,8 +2107,8 @@ will show, so its server component passes every logo path in
 the listings through api-mcp, a Worker at `mcp.clusterflick.com`
 (`@/lib/assistant-access`). It's invitation-only and never advertised: only a
 reader with the capability sees its "AI assistant" panel in /personalise's
-account bar, beside the public profile's, with the address to add, how, and
-what it can see, and the assistants they've connected, each to disconnect
+account bar, beside the public profile's: the address to add and how, beside
+the assistants they've connected, each to disconnect
 (api-mcp's `/connections`, called with their ID token). Each says what it
 can and can't do, from the OAuth scopes it was given (`ASSISTANT_SCOPES`,
 which follows api-mcp's `src/scopes.ts`): one connected before a scope was

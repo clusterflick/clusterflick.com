@@ -256,10 +256,10 @@
     order: 1;
   }
 
-  /* The assistant panel's connections take the full width below its two
-     short sections. */
-  .assistantConnections {
-    grid-column: 1 / -1;
+  /* The assistant panel: connecting on the left, what's connected on the
+     right, from the top. */
+  .assistantManagement .managementSection:first-child {
+    grid-column: auto;
   }
 
   /* The account panel has two short sections, side by side. */
@@ -823,13 +823,37 @@
   margin-top: 12px;
 }
 
-.assistantAddress {
-  margin: 0 0 12px;
-  overflow-wrap: anywhere;
+.assistantAddressRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
 }
 
-.assistantAddress code {
-  color: var(--color-white);
+.assistantAddress {
+  flex: 1 1 240px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.assistantSubtitle {
+  margin-top: 24px;
+}
+
+.assistantSteps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.assistantSteps .managementText {
+  margin: 0;
+}
+
+.assistantSteps code {
+  overflow-wrap: anywhere;
 }
 
 .assistantList {
