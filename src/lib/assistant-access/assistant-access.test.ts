@@ -82,17 +82,22 @@ describe("connected assistants", () => {
 });
 
 describe("describeScopes", () => {
-  it("says what a connection can do, and what it can't", () => {
-    expect(describeScopes(["listings", "lists", "offline_access"])).toEqual({
-      can: [
-        "Searches the listings",
-        "Sees your watchlist, Seen list and venues",
-      ],
-      cannot: [],
-    });
-    expect(describeScopes(["listings"])).toEqual({
-      can: ["Searches the listings"],
-      cannot: ["Can't see your watchlist, Seen list or venues"],
-    });
+  it("says what a connection can do, and what it can't, in order", () => {
+    expect(describeScopes(["listings", "lists", "offline_access"])).toEqual([
+      { scope: "listings", on: true, label: "Searches the listings" },
+      {
+        scope: "lists",
+        on: true,
+        label: "Sees your watchlist, Seen list and venues",
+      },
+    ]);
+    expect(describeScopes(["lists"])).toEqual([
+      { scope: "listings", on: false, label: "Can't search the listings" },
+      {
+        scope: "lists",
+        on: true,
+        label: "Sees your watchlist, Seen list and venues",
+      },
+    ]);
   });
 });

@@ -1,16 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import clsx from "clsx";
 import Button, { ButtonAnchor, ButtonLink } from "@/components/button";
 import ReleaseDot from "@/components/release-dot";
+import MoviePoster from "@/components/movie-poster";
 import { useUserContext } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
 import {
-  getProfileDisplayAddress,
   getProfilePath,
+  getShownSections,
+  PROFILE_SECTION_IDS,
   type UserProfile,
 } from "@/lib/user-profile";
+import CopyLinkButton, {
+  getProfileUrl,
+} from "@/app/profile-shell/copy-link-button";
 import { PROFILE_SETTINGS_PATH } from "./profile/path";
+import { SECTION_NAMES } from "./profile/publish-card";
+import OnOffItem from "./on-off-item";
 import styles from "./page.module.css";
 
 export type PublicProfileState = {
@@ -128,14 +136,16 @@ export function useProfileSave(
 
 /**
  * Opened from the account bar for a reader with the capability: where their
- * profile stands, and the way to its settings page, which has the room to
- * preview what each choice shows.
+ * profile stands, its address to copy once it's public, and the way to its
+ * settings page, which has the room to preview what each choice shows. Beside
+ * it, what the profile shows: the favourites that head it, and each section
+ * on or off, so the panel says what's shared without a visit to the settings.
  */
 export function PublicProfileSummary({
   profile,
 }: Pick<PublicProfileState, "profile">) {
   return (
-    <div className={styles.management}>
+    <div className={clsx(styles.management, styles.profileManagement)}>
       <section className={styles.managementSection}>
         <h3 className={styles.managementTitle}>Your profile</h3>
         <p className={styles.managementText}>
@@ -143,7 +153,7 @@ export function PublicProfileSummary({
           {!profile
             ? "Choose an address and what your profile shows. Nobody else can see it until you publish it."
             : profile.public
-              ? `Public at ${getProfileDisplayAddress(profile.handle)}.`
+              ? "Public: anyone with the address can see it."
               : "Private: nobody else can see it until you publish it."}
           {profile?.public && !profile.sections && (
             <>
@@ -153,12 +163,35 @@ export function PublicProfileSummary({
             </>
           )}
         </p>
-        <div className={styles.managementActions}>
-          <ButtonLink href={PROFILE_SETTINGS_PATH} size="sm">
+        {/* Only once public: a private profile shows its owner nothing but
+            that it's private. */}
+        {profile?.public && (
+          <div className={styles.assistantAddressRow}>
+            <input
+              className={clsx(styles.input, styles.assistantAddress)}
+              type="text"
+              readOnly
+              value={getProfileUrl(profile.handle)}
+              aria-label="Your profile's address"
+              onFocus={(event) => event.currentTarget.select()}
+              onClick={(event) => event.currentTarget.select()}
+            />
+            <CopyLinkButton handle={profile.handle} variant="primary" />
+          </div>
+        )}
+        <div
+          className={clsx(
+            styles.managementActions,
+            profile?.public && styles.profileActions,
+          )}
+        >
+          <ButtonLink
+            href={PROFILE_SETTINGS_PATH}
+            size="sm"
+            variant={profile?.public ? "secondary" : "primary"}
+          >
             {profile ? "Edit profile" : "Set up your profile"}
           </ButtonLink>
-          {/* Only once public: a private profile shows its owner nothing but
-              that it's private. */}
           {profile?.public && (
             // An anchor, not a client-side link: the page is the profiles
             // Worker's, and isn't in the static export.
@@ -172,7 +205,46 @@ export function PublicProfileSummary({
           )}
         </div>
       </section>
+      {profile && <ProfileContents profile={profile} />}
     </div>
+  );
+}
+
+/** The favourites and sections a profile shows, or would once public. */
+function ProfileContents({ profile }: { profile: UserProfile }) {
+  const sections = getShownSections(profile);
+  const favourites = profile.favourites ?? [];
+  return (
+    <section className={styles.managementSection}>
+      <h3 className={styles.managementTitle}>
+        {profile.public ? "What it shows" : "What it will show"}
+      </h3>
+      {favourites.length > 0 && (
+        <ol className={styles.profileFavourites} aria-label="Favourite films">
+          {favourites.map((film) => (
+            <li
+              key={film.id}
+              className={styles.profileFavourite}
+              title={film.year ? `${film.title} (${film.year})` : film.title}
+            >
+              <MoviePoster
+                title={film.title}
+                posterPath={film.posterPath}
+                showOverlay={!film.posterPath}
+                interactive={false}
+                fluid
+                headingLevel="h3"
+              />
+            </li>
+          ))}
+        </ol>
+      )}
+      <ul className={styles.onOffList} aria-label="Sections">
+        {PROFILE_SECTION_IDS.map((id) => (
+          <OnOffItem key={id} on={sections[id]} label={SECTION_NAMES[id]} />
+        ))}
+      </ul>
+    </section>
   );
 }
 

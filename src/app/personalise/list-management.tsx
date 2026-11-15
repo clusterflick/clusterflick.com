@@ -163,7 +163,7 @@ export default function ListManagement({
           label="Show editing buttons on your lists"
           checked={showEditing}
           onChange={onShowEditingChange}
-          className={styles.managementSwitch}
+          className={styles.editingSwitch}
         />
       </section>
       <ImportSection />

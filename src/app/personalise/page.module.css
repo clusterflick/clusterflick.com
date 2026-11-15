@@ -262,6 +262,12 @@
     grid-column: auto;
   }
 
+  /* The profile panel: where it stands on the left, what it shows on the
+     right. Before there's a profile, the one section takes the row. */
+  .profileManagement .managementSection:first-child:not(:only-child) {
+    grid-column: auto;
+  }
+
   /* The account panel has two short sections, side by side. */
   .accountManagement .managementSection:first-child {
     grid-column: auto;
@@ -307,6 +313,16 @@
 /* The switch stretches to its container; kept beside its label here. */
 .managementSwitch {
   justify-content: flex-start;
+}
+
+/* The editing switch heads a full-width row, so the track leads, left of its
+   label, and the switch is only as wide as the two: stretched, the track sat
+   at the far end of the panel. The section's class outweighs the Switch's own
+   space-between, whichever stylesheet loads last. */
+.managementSection .editingSwitch {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  width: fit-content;
 }
 
 .importReview {
@@ -596,6 +612,10 @@
   margin: 0;
 }
 
+.storeNote p + p {
+  margin-top: 8px;
+}
+
 .storeNoteTitle {
   margin: 0 0 6px;
   font-size: 14px;
@@ -830,8 +850,10 @@
   gap: 8px 12px;
 }
 
+/* About as wide as the address itself, rather than the whole column. */
 .assistantAddress {
-  flex: 1 1 240px;
+  flex: 0 1 320px;
+  min-width: 0;
   padding: 8px 16px;
   font-size: 14px;
   font-family: var(--font-mono, ui-monospace, monospace);
@@ -880,4 +902,81 @@
 
 .assistantItem .managementText {
   margin: 0;
+}
+
+/* The assistant's own name leads its entry, brighter than the date after. */
+.assistantName {
+  color: var(--color-light-gray);
+}
+
+/* What a connection or a profile shares: a tick in green for what's on, a
+   cross in pink for what's off, with the off lines dimmed so the two sets
+   read apart at a glance. */
+.onOffList {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.onOffItemOn,
+.onOffItemOff {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.onOffItemOn {
+  color: var(--color-light-gray);
+}
+
+.onOffItemOff {
+  color: var(--color-muted-gray);
+}
+
+.onOffIcon {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.onOffItemOn .onOffIcon {
+  color: var(--color-release-green);
+}
+
+.onOffItemOff .onOffIcon {
+  color: var(--color-neon-pink);
+}
+
+/* Under the address row, spaced as the steps are under the assistant's. */
+.profileActions {
+  margin-top: 12px;
+}
+
+/* The favourites that head the profile, small, in their order. */
+.profileFavourites {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.profileFavourite {
+  width: 64px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* An on/off line's state for a screen reader, which the icon is hidden from. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

@@ -61,15 +61,16 @@ export const ASSISTANT_SCOPES = [
   },
 ] as const;
 
-/** What a connection can do, and what it can't, by `ASSISTANT_SCOPES`. */
+/**
+ * What a connection can do and what it can't, one line per scope in
+ * `ASSISTANT_SCOPES`' order, each marked on or off for the panel to draw.
+ */
 export function describeScopes(scopes: string[]) {
   const granted = new Set(scopes);
-  return {
-    can: ASSISTANT_SCOPES.filter((s) => granted.has(s.scope)).map((s) => s.can),
-    cannot: ASSISTANT_SCOPES.filter((s) => !granted.has(s.scope)).map(
-      (s) => s.cannot,
-    ),
-  };
+  return ASSISTANT_SCOPES.map(({ scope, can, cannot }) => {
+    const on = granted.has(scope);
+    return { scope, on, label: on ? can : cannot };
+  });
 }
 
 const CONNECTIONS_URL = `${MCP_ORIGIN}/connections`;

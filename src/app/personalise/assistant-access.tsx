@@ -13,6 +13,7 @@ import {
 } from "@/lib/assistant-access";
 import { CapabilityId } from "@/lib/user-capabilities";
 import { useUserContext } from "@/state/user-context";
+import OnOffItem from "./on-off-item";
 import styles from "./page.module.css";
 
 /**
@@ -91,8 +92,8 @@ export function AssistantAccessSummary() {
         </h3>
         <ul className={styles.assistantSteps}>
           <li className={styles.managementText}>
-            <strong>Claude</strong>, on the web or in the desktop app: Customize
-            → Connectors → Add custom connector, then paste the address. On a
+            <strong>Claude</strong>, on the web or in the desktop app: Plugins →
+            Add (top right) → Add custom connector, then paste the address. On a
             Team or Enterprise plan, an owner adds it under Organization
             settings → Connectors.
           </li>
@@ -183,24 +184,28 @@ function ConnectedAssistants() {
       ) : (
         <ul className={styles.assistantList}>
           {state.connections.map((connection) => {
-            const { can, cannot } = describeScopes(connection.scopes);
+            const scopes = describeScopes(connection.scopes);
             return (
               <li key={connection.id} className={styles.assistantItem}>
                 <div className={styles.assistantDetails}>
                   <span className={styles.managementText}>
-                    <ReleaseDot /> <strong>{connection.name}</strong>
+                    <ReleaseDot />{" "}
+                    <strong className={styles.assistantName}>
+                      {connection.name}
+                    </strong>
                     {connection.domain && connection.domain !== connection.name
                       ? ` (${connection.domain})`
                       : ""}
                     , connected {formatDateLong(connection.connectedAt)}
                   </span>
-                  <span className={styles.managementText}>
-                    {can.join(" · ")}
-                  </span>
-                  {cannot.length > 0 && (
+                  <ul className={styles.onOffList} aria-label="What it can see">
+                    {scopes.map(({ scope, on, label }) => (
+                      <OnOffItem key={scope} on={on} label={label} />
+                    ))}
+                  </ul>
+                  {scopes.some(({ on }) => !on) && (
                     <span className={styles.managementText}>
-                      {cannot.join(" · ")}. To allow it, disconnect it and
-                      connect it again.
+                      To allow more, disconnect it and connect it again.
                     </span>
                   )}
                 </div>

@@ -693,7 +693,10 @@ displayName, links, favourites }`, readable by
   panel: green and pulsing while public, still pink while private. A
   private profile offers no link to itself, since the owner would find only
   a page saying it's private; the preview is how it looks. The account bar's "Public profile" panel (`public-profile.tsx`)
-  only says where the profile stands and links here. A refused batch is
+  says where the profile stands, gives a public one's address to copy, and
+  shows what it shows (the favourites, and each section ticked or crossed,
+  as the AI assistant panel marks each connection's scopes: `OnOffItem`),
+  then links here. A refused batch is
   reported as "taken" when the handle changed, since another reader
   claiming it between the check and the save is the likely cause, and
   logged in case it isn't. `readProfile` reads it once a session, as
