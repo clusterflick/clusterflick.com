@@ -1,0 +1,24 @@
+{
+  // The declarations for the published build. The web standards a browser,
+  // Node and a Worker share (`URLSearchParams`, `Intl`, `console`), from the
+  // WebWorker library, but no DOM and no Node types: code that reaches for
+  // `window`, `document` or `process` fails here rather than in a Worker.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "WebWorker", "WebWorker.Iterable"],
+    "types": [],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -1,12 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { CAPABILITY_IDS, parseArgs, planChange } from "./capabilities";
-import { CAPABILITIES, CapabilityId } from "@/lib/user-capabilities";
+import { CAPABILITIES } from "@/lib/user-capabilities";
 
 describe("CAPABILITY_IDS", () => {
-  it("is the site's registry", () => {
-    expect([...CAPABILITY_IDS].sort()).toEqual(
-      Object.values(CapabilityId).sort(),
-    );
+  it("is every capability the site describes", () => {
     expect(Object.keys(CAPABILITIES).sort()).toEqual(
       [...CAPABILITY_IDS].sort(),
     );

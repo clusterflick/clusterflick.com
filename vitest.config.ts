@@ -17,12 +17,16 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: "@", replacement: path.join(dirname, "src") },
-      // The site builds the package from its source, as tsconfig.json's
+      // The site builds the packages from their source, as tsconfig.json's
       // `paths` does for Next and Storybook; only the Workers use the
       // published build.
       {
         find: /^@clusterflick\/catalogue\/(.*)$/,
         replacement: path.join(dirname, "packages/catalogue/src/$1"),
+      },
+      {
+        find: /^@clusterflick\/accounts\/(.*)$/,
+        replacement: path.join(dirname, "packages/accounts/src/$1"),
       },
     ],
   },

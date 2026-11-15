@@ -48,10 +48,11 @@ jobs:
           node-version-file: .node-version
       - run: npm ci
       - run: npm run lint
-      # The site builds the package from its source; this builds what npm
-      # would publish and imports every module of it in Node. Its tests run
-      # with the site's, below.
+      # The site builds the packages from their source; this builds what npm
+      # would publish and imports every module of each in Node. Their tests
+      # run with the site's, below.
       - run: npm run check -w @clusterflick/catalogue
+      - run: npm run check -w @clusterflick/accounts
       - name: Download combined data
         uses: ./.github/actions/download-release
         with:

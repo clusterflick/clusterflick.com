@@ -24,8 +24,8 @@ import type {
  * What the profiles Worker (clusterflick/api-profiles) puts in the
  * `/profile-shell/` page it serves at `/u/<handle>/`, as JSON in a script tag
  * with this id. Its own copy of these types is the one that matters, and it
- * reads Firestore with the same rules as this (`src/lists.ts` there): change
- * them together. This reads what arrives defensively, so a Worker change
+ * reads Firestore with the same rules as this (`@clusterflick/accounts/lists`,
+ * in `packages/accounts`): change them together. This reads what arrives defensively, so a Worker change
  * can't break the page.
  */
 export const PROFILE_DATA_ELEMENT_ID = "profile-data";

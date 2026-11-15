@@ -1,3 +1,4 @@
+import { CapabilityId } from "@clusterflick/accounts/capability-ids.mjs";
 import type { Firestore } from "firebase/firestore/lite";
 import {
   commitUserWrite,
@@ -17,13 +18,12 @@ import {
  * them read their capabilities and nothing more. Hiding a page here is a
  * convenience, not a guard — the site is static, so the rules and whatever
  * runs the feature are what enforce it.
+ *
+ * The ids are `@clusterflick/accounts`', which the Workers and the grant
+ * script read too.
  */
-export enum CapabilityId {
-  EmailAlerts = "emailAlerts",
-  PublicProfile = "publicProfile",
-  /** Searching the listings from the reader's own AI assistant (api-mcp). */
-  AssistantAccess = "assistantAccess",
-}
+export { CapabilityId };
+export type CapabilityId = (typeof CapabilityId)[keyof typeof CapabilityId];
 
 export type CapabilityGrant = {
   /** Epoch milliseconds. */
@@ -43,8 +43,7 @@ export type CapabilityDefinition = {
 
 /**
  * Every capability and how /personalise describes it. A `Record`, so a new
- * capability won't compile until it has its copy. The grant script keeps its
- * own list of ids (it can't load TypeScript), held to this one by a test.
+ * capability won't compile until it has its copy.
  */
 export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
   [CapabilityId.EmailAlerts]: {

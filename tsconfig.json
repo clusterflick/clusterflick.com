@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@clusterflick/catalogue/*": ["./packages/catalogue/src/*"]
+      "@clusterflick/catalogue/*": ["./packages/catalogue/src/*"],
+      "@clusterflick/accounts/*": ["./packages/accounts/src/*"]
     }
   },
   "include": [

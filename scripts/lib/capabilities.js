@@ -2,12 +2,14 @@
  * The decisions behind scripts/grant-capability.js, kept free of Firestore so
  * they can be tested.
  *
- * The ids repeat `CapabilityId` in `@/lib/user-capabilities`, since a plain
- * Node script can't load the site's TypeScript; a test holds the two to each
- * other.
+ * The ids are `@clusterflick/accounts`', as the site's and the Workers' are:
+ * plain ESM, so this loads them from source under raw Node.
  */
 
-const CAPABILITY_IDS = ["emailAlerts", "publicProfile", "assistantAccess"];
+const {
+  CAPABILITY_IDS,
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- run by raw Node
+} = require("../../packages/accounts/src/capability-ids.mjs");
 
 const USAGE = [
   "Usage: npm run grant-capability -- <email> <capability> [--revoke] [--write]",

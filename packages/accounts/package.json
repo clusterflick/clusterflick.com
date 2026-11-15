@@ -1,0 +1,41 @@
+{
+  "name": "@clusterflick/accounts",
+  "version": "0.1.0",
+  "description": "A Clusterflick reader's account as a Worker reads it: Firebase ID tokens, Firestore over REST with a service account, the reader's lists and capabilities.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clusterflick/clusterflick.com.git",
+    "directory": "packages/accounts"
+  },
+  "homepage": "https://clusterflick.com",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./capability-ids.mjs": {
+      "types": "./dist/capability-ids.d.mts",
+      "default": "./dist/capability-ids.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "npm run build && node check.mjs",
+    "test": "vitest run",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "jose": "^6.2.17"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.2",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

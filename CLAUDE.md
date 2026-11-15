@@ -53,8 +53,8 @@ and film-club registries, the stations, and the London-time date helpers.
 
 **What goes in:** code about the listings that something outside the site needs.
 Anything only the site uses stays in `src/`, even when it's about the listings
-(`@/lib/occasions`' rarity finding, the page helpers). A reader's lists are a
-different concern and would be a package of their own.
+(`@/lib/occasions`' rarity finding, the page helpers). A reader's account is a
+different concern: `@clusterflick/accounts`, below.
 
 **The site uses the source.** `@clusterflick/catalogue/*` resolves to
 `packages/catalogue/src/*` through `tsconfig.json`'s `paths` (Next, Storybook,
@@ -88,6 +88,24 @@ the current meta file for a reader that can't list the directory. Raise it,
 with a major version of the package, when a change would break a reader built
 against the old shape (a field removed, renamed or changed in meaning); a new
 optional field doesn't. A Worker refuses a version it wasn't built for.
+
+## The Accounts Package
+
+`packages/accounts` is `@clusterflick/accounts`, a second workspace built and
+published as the catalogue is (`publish-accounts.yml`): a reader's account as
+a Worker reads it. Firebase ID token checks, a service account's access token,
+Firestore over REST, the lists decoded, and capabilities. The Workers that act
+for a reader install it from npm (`api-profiles`, `api-tmdb-search`,
+`api-mcp`, the alerts next).
+
+Its `lists` module decodes the same documents as
+`src/lib/user-profile/page-data.ts`, with the same rules: change the two
+together. Its `capability-ids.mjs` is the one list of capability ids: the
+site's `CapabilityId` re-exports it, and `scripts/lib/capabilities.js`
+requires it from source, so a new capability is added there and nowhere else
+(the site then needs its copy in `CAPABILITIES`). Writes, queries and the
+list invariants aren't in it yet: they come with the first Worker that needs
+them. See `packages/accounts/README.md`.
 
 ## Project Structure
 
