@@ -7,6 +7,10 @@ const {
 } = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const {
+  CURRENT_DATA_FILE,
+  DATA_FORMAT_VERSION,
+} = require("../packages/catalogue/src/data-format.mjs");
 const data = require("../combined-data/combined-data.json");
 // Optional review sources: default to {} when the data file isn't present yet
 // so the site can still be built and deployed without them.
@@ -282,6 +286,7 @@ try {
   );
 
   const meta = {
+    formatVersion: DATA_FORMAT_VERSION,
     generatedAt,
     genres,
     people,
@@ -293,6 +298,19 @@ try {
   const metaSerialised = JSON.stringify(meta);
   const outputFilename = `data.meta.${getHash(metaSerialised)}.json`;
   writeFileSync(path.join(outputPath, outputFilename), metaSerialised);
+
+  // The site finds the meta file by listing this directory at build time; a
+  // Worker can't, so this names it at an address that never changes. Not
+  // carried forward between deploys (carry-forward-static.js carries only
+  // hashed files): it always names this build's data.
+  writeFileSync(
+    path.join(outputPath, CURRENT_DATA_FILE),
+    JSON.stringify({
+      formatVersion: DATA_FORMAT_VERSION,
+      meta: outputFilename,
+      generatedAt,
+    }),
+  );
 } catch (e) {
   throw e;
 }

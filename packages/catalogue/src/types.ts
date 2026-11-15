@@ -421,7 +421,22 @@ export type CinemaData = {
 };
 
 export type MetaData = Omit<CinemaData, "movies"> & {
+  /** `DATA_FORMAT_VERSION` (`data-format.mjs`) when it was published. */
+  formatVersion: number;
   mapping: Record<string, string[]>;
+  /** The movie chunks, by file name in the same directory. */
+  filenames: string[];
+};
+
+/**
+ * `data/current.json`: where a reader that can't list the site's `data/`
+ * directory finds the listings. Never cached, and replaced on every deploy.
+ */
+export type CurrentData = {
+  formatVersion: number;
+  /** The current meta file's name, in the same directory. */
+  meta: string;
+  generatedAt: string;
 };
 
 /**

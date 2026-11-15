@@ -78,6 +78,17 @@ needed for the site. A release is a version bump in its `package.json`:
 npm's trusted publishing, and skips every other push. See
 `packages/catalogue/README.md`.
 
+**The listings' shape is a contract with the Workers.** They read the
+published `data/` (the MCP server does), from a deploy of their own, so a
+change to `MetaData` or `Movie` reaches them only when they move to a new
+version of the package. `DATA_FORMAT_VERSION` in
+`packages/catalogue/src/data-format.mjs` is written into the meta file and
+into `data/current.json`, the one file there with a fixed name, which names
+the current meta file for a reader that can't list the directory. Raise it,
+with a major version of the package, when a change would break a reader built
+against the old shape (a field removed, renamed or changed in meaning); a new
+optional field doesn't. A Worker refuses a version it wasn't built for.
+
 ## Project Structure
 
 ```
@@ -691,8 +702,9 @@ apps a few times a day and served from Cloudflare's cache, so the cost is the do
 origin. If feed size ever matters, the lasting fix is a smaller feed from `data-calendar`.
 
 **Not under `data/`.** That directory is the site's own: content-hashed listing chunks, cached
-forever and carried forward between deploys by `carry-forward-static`, with no promise about
-their shape. These are the opposite on every count, so they get a directory of their own — one
+forever and carried forward between deploys by `carry-forward-static`, read only by the site and
+its own Workers, in a shape the catalogue package defines (below). These are the opposite on
+every count, so they get a directory of their own — one
 cache rule covers it, nothing carries it forward (each deploy is exactly one release, and the
 GitHub releases remain the archive of earlier ones), and `fetch-published-data` owns all of it.
 

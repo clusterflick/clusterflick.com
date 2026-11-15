@@ -24,6 +24,25 @@ The filters run on the listings in the shape the site publishes them, not on
 the pipeline's combined data: the site's build joins in the ratings, each
 venue's last performance and more (`scripts/process-combined-data.js`).
 
+## Reading the listings
+
+The site publishes them under `https://clusterflick.com/data/`, every file
+named by its content's hash except one: `current.json` (`CURRENT_DATA_FILE`), a
+`CurrentData`, names the current meta file, a `MetaData`, whose `filenames` are
+the movie chunks. Each is a `Record<string, Movie>`.
+
+```ts
+import {
+  CURRENT_DATA_FILE,
+  DATA_FORMAT_VERSION,
+} from "@clusterflick/catalogue/data-format.mjs";
+```
+
+`DATA_FORMAT_VERSION` is the shape this version of the package reads. Both
+`current.json` and the meta file carry the version they were published in;
+read neither when it differs. It's raised, with a major version of this
+package, when a change would break a reader built against the old shape.
+
 It's plain ESM with type declarations and no dependencies, and runs in a
 browser, in Node and in a Worker. It has no React, and never reads `window`,
 `document` or `process`.

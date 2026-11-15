@@ -3,7 +3,7 @@
  * what a Worker's bundler will see. Fails on a subpath the exports map can't
  * reach, or a module that needs the browser to load.
  */
-import { globSync, readFileSync } from "node:fs";
+import { existsSync, globSync, readFileSync } from "node:fs";
 
 const { name, exports } = JSON.parse(readFileSync("package.json", "utf8"));
 const subpaths = new Set(
@@ -13,9 +13,9 @@ for (const file of globSync("dist/**/*.js")) {
   if (file.startsWith("dist/chunks/")) continue;
   const subpath = `./${file.slice("dist/".length, -".js".length)}`;
   if (subpath.endsWith("/index")) continue; // reached by its directory
-  subpaths.add(
-    subpath === "./utils/movie-ratings" ? `${subpath}.mjs` : subpath,
-  );
+  // An .mjs source is exported under its own extension.
+  const mjs = existsSync(`dist/${subpath.slice(2)}.d.mts`);
+  subpaths.add(mjs ? `${subpath}.mjs` : subpath);
 }
 
 for (const subpath of [...subpaths].sort()) {

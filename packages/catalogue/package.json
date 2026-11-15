@@ -1,6 +1,6 @@
 {
   "name": "@clusterflick/catalogue",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Clusterflick's listings: the data model, filters, places and occasions, shared by the site and its Workers.",
   "license": "MIT",
   "repository": {
@@ -26,6 +26,10 @@
     "./places": {
       "types": "./dist/places/index.d.ts",
       "default": "./dist/places/index.js"
+    },
+    "./data-format.mjs": {
+      "types": "./dist/data-format.d.mts",
+      "default": "./dist/data-format.js"
     },
     "./utils/movie-ratings.mjs": {
       "types": "./dist/utils/movie-ratings.d.mts",
