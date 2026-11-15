@@ -1,0 +1,10 @@
+/* One column for now; the email's preview goes beside it once there is one. */
+.editor {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.stopNote {
+  margin: 12px 0 0;
+}

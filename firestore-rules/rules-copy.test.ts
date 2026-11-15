@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
+import { ALERT_TRIGGERS, MAX_ALERTS } from "@clusterflick/accounts/alerts";
 import {
   DISPLAY_NAME_MAX_LENGTH,
   FAVOURITE_PATTERN_SOURCES,
@@ -140,5 +141,32 @@ describe("the rules' copy of the favourite film checks", () => {
     expect(filmBody).toContain(
       `film.title.size() <= ${FAVOURITE_TITLE_MAX_LENGTH}`,
     );
+  });
+});
+
+describe("the rules' copy of the alert checks", () => {
+  const rules = readFileSync(
+    path.join(import.meta.dirname, "..", "firestore.rules"),
+    "utf8",
+  );
+  const alerts = rules.match(/function isAlerts[\s\S]*?\n {2}\}/)?.[0];
+  const watchlist = rules.match(
+    /function isWatchlistAlert[\s\S]*?\n {2}\}/,
+  )?.[0];
+
+  test("allows the same number of alerts, and checks every place", () => {
+    expect(alerts).toContain(`alerts.size() <= ${MAX_ALERTS}`);
+    for (let place = 0; place < MAX_ALERTS; place++) {
+      expect(alerts).toContain(`isWatchlistAlert(alerts[${place}])`);
+    }
+  });
+
+  test("allows exactly the module's triggers", () => {
+    const listed = [
+      ...(watchlist?.match(/notify\.hasOnly\(\[(.*?)\]/)?.[1] ?? "").matchAll(
+        /'([^']+)'/g,
+      ),
+    ].map(([, trigger]) => trigger);
+    expect(listed.sort()).toEqual([...ALERT_TRIGGERS].sort());
   });
 });

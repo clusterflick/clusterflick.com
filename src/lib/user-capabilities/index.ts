@@ -50,8 +50,7 @@ export type CapabilityDefinition = {
 export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
   [CapabilityId.EmailAlerts]: {
     title: "Email alerts",
-    comingSoon:
-      "Soon you'll be able to get an email when a film on your watchlist gets new showings, or is about to finish its run.",
+    comingSoon: null,
   },
   [CapabilityId.PublicProfile]: {
     title: "Public profile",

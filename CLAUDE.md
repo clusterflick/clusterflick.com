@@ -103,9 +103,12 @@ Its `lists` module decodes the same documents as
 together. Its `capability-ids.mjs` is the one list of capability ids: the
 site's `CapabilityId` re-exports it, and `scripts/lib/capabilities.js`
 requires it from source, so a new capability is added there and nowhere else
-(the site then needs its copy in `CAPABILITIES`). Writes, queries and the
-list invariants aren't in it yet: they come with the first Worker that needs
-them. See `packages/accounts/README.md`.
+(the site then needs its copy in `CAPABILITIES`). Its `alerts` module is the shape of a
+reader's email alerts and of the alerts Worker's ledger, which the site and
+the Worker both parse; `firestore.rules` repeats the settings' shape, held to
+it by `firestore-rules/rules-copy.test.ts`. Writes, queries and the list
+invariants aren't in it yet: they come with the first Worker that needs them.
+See `packages/accounts/README.md`.
 
 ## Project Structure
 
@@ -1003,7 +1006,7 @@ files load when you work in their directory; read the relevant one before
 changing a feature from outside it (a site component using a filter, say).
 
 - **Personalisation** (accounts, lists, film details, capabilities, public
-  profiles, AI assistant access, Firestore rules) — `docs/personalisation.md`.
+  profiles, email alerts, AI assistant access, Firestore rules) — `docs/personalisation.md`.
   Read it before touching `src/lib/user-*`, `src/lib/firebase`, `src/app/personalise`,
   `src/app/profile-shell`, `src/app/connect`, `firestore.rules` or anything signed-in.
 - **Filters** (cast & crew, films, hide seen, clubs & festivals, occasions,

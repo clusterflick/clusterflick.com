@@ -52,6 +52,13 @@ if (await hasCapability(db, uid, "emailAlerts")) {
   `CapabilityId` and `CAPABILITY_IDS` are the one list of capabilities: the
   site and its grant script read them from `capability-ids.mjs`.
 
+- **`alerts`**: a reader's email alert settings (`users/{uid}/meta/alerts`,
+  which they write) and the ledger the alerts Worker keeps of each night's run
+  (`users/{uid}/meta/alert-ledger`, which only the Worker writes), parsed from
+  plain values: the site passes a snapshot's data, a Worker `decodeFields` of
+  what Firestore sent. `firestore.rules` repeats the settings' shape, held to
+  this module by a test.
+
 Anything Firestore can't answer throws `UpstreamError`, rather than being read
 as "no". It's plain ESM with type declarations; its one dependency is `jose`.
 It uses only `fetch` and Web Crypto, so it runs in a Worker and in Node.

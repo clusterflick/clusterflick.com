@@ -56,6 +56,11 @@ import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
 import { AssistantAccessSummary, useAssistantAccess } from "./assistant-access";
+import {
+  EmailAlertsSummary,
+  useEmailAlerts,
+  type EmailAlertsState,
+} from "./email-alerts";
 import SignInForm, { describeError, getErrorCode } from "./sign-in-form";
 import {
   ProfileWithdrawnNotice,
@@ -247,11 +252,12 @@ const STORE_NOTE = (
     you add to your lists, with details of those films (such as genres,
     directors and runtime) for your Seen stats; any features we&apos;ve switched
     on for your account; your public profile if you set one up (its handle,
-    name, links, favourite films and which sections it shows); and the AI
-    assistants you connect, with what each can see. Nothing else. We never sell
-    your data. We never share your data beyond the services the site runs on.
-    You can delete your account, and everything in it, from this page at any
-    time.
+    name, links, favourite films and which sections it shows); your email alerts
+    if you switch them on (what they&apos;re for, when each was checked and what
+    was sent); and the AI assistants you connect, with what each can see.
+    Nothing else. We never sell your data. We never share your data beyond the
+    services the site runs on. You can delete your account, and everything in
+    it, from this page at any time.
   </>
 );
 
@@ -351,6 +357,7 @@ function SignedIn({
   const filmSearchRef = useRef<HTMLElement>(null);
   const publicProfile = usePublicProfile();
   const assistantAccess = useAssistantAccess();
+  const emailAlerts = useEmailAlerts();
 
   // The empty watchlist's "search for a film" takes the reader to the search
   // above it.
@@ -372,6 +379,7 @@ function SignedIn({
         showEditing={showEditing}
         onShowEditingChange={setShowEditing}
         publicProfile={publicProfile?.granted ? publicProfile : null}
+        emailAlerts={emailAlerts?.granted ? emailAlerts : null}
         assistantAccess={assistantAccess}
       />
       <ComingSoon />
@@ -421,7 +429,7 @@ function SignedIn({
   );
 }
 
-type AccountPanel = "lists" | "profile" | "assistant" | "account";
+type AccountPanel = "lists" | "profile" | "alerts" | "assistant" | "account";
 
 function AccountBar({
   panel,
@@ -429,6 +437,7 @@ function AccountBar({
   showEditing,
   onShowEditingChange,
   publicProfile,
+  emailAlerts,
   assistantAccess,
 }: {
   panel: AccountPanel | null;
@@ -437,6 +446,8 @@ function AccountBar({
   onShowEditingChange: (show: boolean) => void;
   /** Only for a reader with the capability: everyone else sees no panel. */
   publicProfile: PublicProfileState | null;
+  /** Only for a reader with `emailAlerts`: everyone else sees no panel. */
+  emailAlerts: EmailAlertsState | null;
   /** Whether the reader has `assistantAccess`: nobody else sees its panel. */
   assistantAccess: boolean;
 }) {
@@ -467,6 +478,7 @@ function AccountBar({
         <div className={styles.toolbarGroup}>
           {panelToggle("lists", "Manage lists")}
           {publicProfile && panelToggle("profile", "Public profile")}
+          {emailAlerts && panelToggle("alerts", "Email alerts")}
           {assistantAccess && panelToggle("assistant", "AI assistant")}
           {panelToggle("account", "Manage account")}
         </div>
@@ -491,6 +503,17 @@ function AccountBar({
         <div id="personalise-profile" hidden={panel !== "profile"}>
           {panel === "profile" && (
             <PublicProfileSummary profile={publicProfile.profile} />
+          )}
+        </div>
+      )}
+      {emailAlerts && (
+        <div id="personalise-alerts" hidden={panel !== "alerts"}>
+          {panel === "alerts" && (
+            <EmailAlertsSummary
+              settings={emailAlerts.settings}
+              saved={emailAlerts.saved}
+              ledger={emailAlerts.ledger}
+            />
           )}
         </div>
       )}

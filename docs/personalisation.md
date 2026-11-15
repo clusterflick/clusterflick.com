@@ -481,6 +481,21 @@ hands out. A sign-in link sent from `/connect/` returns there
 (`withoutSignInLink` removes only Firebase's parameters). The Worker checks the
 capability again on its calls, so revoking it switches the assistant off.
 
+**Email alerts** (`emailAlerts`, `@/lib/user-alerts`) are a daily email about the films on a reader's watchlist. A reader switches them on and chooses
+what counts as news at `/personalise/alerts/` (`src/app/personalise/alerts/`),
+and the account bar's "Email alerts" panel (`email-alerts.tsx`) shows whether
+they're on, what they're for, and the newest run from the ledger. The settings
+are theirs (`users/{uid}/meta/alerts`): the rules refuse switching them on
+without the capability, and let anyone switch them off. The ledger
+(`users/{uid}/meta/alert-ledger`) is written only by the alerts Worker
+(`clusterflick/api-alerts`), which runs daily at 8pm, sends from
+`alert@alerts.clusterflick.com`, and also writes the settings to switch them
+off on an unsubscribe, a bounce or a complaint, saying why in the ledger.
+Deleting an account deletes both. Their shapes are `@clusterflick/accounts/alerts`', which the Worker reads
+too; `firestore.rules` repeats the settings', held to it by
+`firestore-rules/rules-copy.test.ts`. Deploy the rules before the site:
+without them, saving alerts and deleting an account both fail.
+
 **Capabilities are features granted one account at a time**
 (`@/lib/user-capabilities`): `emailAlerts`, `publicProfile` and `assistantAccess` so far, each
 in `CAPABILITIES` with its copy, a `Record` so a new one won't compile
@@ -742,8 +757,8 @@ displayName, links, favourites }`, readable by
 **Personalisation is account-only**, lists and venues alike, so that it syncs
 across devices. Don't add a signed-out, browser-held copy of any of it.
 
-**Deleting an account deletes the lists first**, film details, profile and
-capabilities included (a subcollection isn't deleted with its parent): once the account is gone, the
+**Deleting an account deletes the lists first**, film details, profile, email
+alerts and capabilities included (a subcollection isn't deleted with its parent): once the account is gone, the
 rules let nobody delete its documents. Firebase may refuse the account deletion
 without a recent sign-in; the lists are gone by then and the page says how to
 finish.

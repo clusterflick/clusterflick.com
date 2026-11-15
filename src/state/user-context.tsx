@@ -41,6 +41,14 @@ import {
 } from "@/lib/user-lists/film-details";
 import { disconnectAllAssistants } from "@/lib/assistant-access";
 import {
+  deleteAlerts,
+  fetchAlertLedger,
+  fetchAlertSettings,
+  saveAlertSettings as saveAlertSettingsToDocs,
+  type AlertLedger,
+  type AlertSettings,
+} from "@/lib/user-alerts";
+import {
   deleteCapabilities,
   fetchCapabilities,
   type UserCapabilities,
@@ -161,6 +169,16 @@ export type UserContextType = {
   saveProfile: (profile: UserProfile) => Promise<UserWriteResult>;
   /** Whether someone else holds the (normalised) handle. */
   isHandleTaken: (handle: string) => Promise<boolean>;
+  /**
+   * The reader's email alert settings, or null before they've saved any —
+   * see `@/lib/user-alerts`. Read afresh each time: the alerts Worker also
+   * writes them, to switch alerts off when the reader unsubscribes.
+   */
+  readAlertSettings: () => Promise<AlertSettings | null>;
+  /** Rejects if the rules refuse it: switching on without the capability. */
+  saveAlertSettings: (settings: AlertSettings) => Promise<void>;
+  /** The alerts Worker's record of the reader's runs, read afresh. */
+  readAlertLedger: () => Promise<AlertLedger>;
 };
 
 /**
@@ -368,6 +386,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // the handle goes with it, freeing it for someone else.
     await deleteProfile(db, current.uid);
     profileRef.current = null;
+    // The alert settings and the Worker's ledger of them, both at once.
+    await deleteAlerts(db, current.uid);
     await deleteCapabilities(db, current.uid);
     capabilitiesRef.current = null;
     await deleteUserLists(db, current.uid);
@@ -629,6 +649,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [getServices, user],
   );
 
+  const readAlertSettings = useCallback<
+    UserContextType["readAlertSettings"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    return fetchAlertSettings(db, user.uid);
+  }, [getServices, user]);
+
+  const saveAlertSettings = useCallback<
+    UserContextType["saveAlertSettings"]
+  >(
+    async (settings) => {
+      const { db } = await getServices();
+      if (!user) throw new Error("Not signed in");
+      await saveAlertSettingsToDocs(db, user.uid, settings);
+    },
+    [getServices, user],
+  );
+
+  const readAlertLedger = useCallback<
+    UserContextType["readAlertLedger"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    return fetchAlertLedger(db, user.uid);
+  }, [getServices, user]);
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -652,6 +699,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readProfile,
       saveProfile,
       isHandleTaken: checkHandleTaken,
+      readAlertSettings,
+      saveAlertSettings,
+      readAlertLedger,
     }),
     [
       status,
@@ -674,6 +724,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readProfile,
       saveProfile,
       checkHandleTaken,
+      readAlertSettings,
+      saveAlertSettings,
+      readAlertLedger,
     ],
   );
 
@@ -714,6 +767,9 @@ export function MockUserProvider({
     readProfile: async () => null,
     saveProfile: async () => ({ purged: true }),
     isHandleTaken: async () => false,
+    readAlertSettings: async () => null,
+    saveAlertSettings: noop,
+    readAlertLedger: async () => ({ runs: [] }),
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

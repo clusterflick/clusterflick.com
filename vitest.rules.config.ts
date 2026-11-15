@@ -14,9 +14,18 @@ const dirname =
 // which needs the processed data the rules job doesn't download.
 export default defineConfig({
   resolve: {
-    alias: {
-      "@": path.join(dirname, "src"),
-    },
+    alias: [
+      { find: "@", replacement: path.join(dirname, "src") },
+      // As vitest.config.ts: the packages from their source, never a build.
+      {
+        find: /^@clusterflick\/accounts\/(.*)$/,
+        replacement: path.join(dirname, "packages/accounts/src/$1"),
+      },
+      {
+        find: /^@clusterflick\/catalogue\/(.*)$/,
+        replacement: path.join(dirname, "packages/catalogue/src/$1"),
+      },
+    ],
   },
   test: {
     environment: "node",

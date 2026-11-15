@@ -103,11 +103,11 @@ export const SignedInEmpty: Story = {
 };
 
 /**
- * A reader granted capabilities: the banner under the account bar names the
- * ones still being built. Public profile has shipped, so it gets its own
- * panel in the account bar instead.
+ * A reader granted capabilities: each shipped feature gets its own panel in
+ * the account bar. None is still being built, so there's no coming-soon
+ * banner under it.
  */
-export const SignedInComingSoon: Story = {
+export const SignedInGranted: Story = {
   args: {
     user: {
       status: "signed-in",
@@ -123,14 +123,106 @@ export const SignedInComingSoon: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
-      await canvas.findByRole("heading", {
-        name: "Coming soon to your account",
-      }),
+      await canvas.findByRole("button", { name: "Email alerts" }),
     ).toBeInTheDocument();
-    await expect(canvas.getByText("Email alerts.")).toBeInTheDocument();
-    await expect(canvas.queryByText("Public profile.")).not.toBeInTheDocument();
     await expect(
       canvas.getByRole("button", { name: "Public profile" }),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.queryByRole("heading", { name: "Coming soon to your account" }),
+    ).not.toBeInTheDocument();
+  },
+};
+
+const ALERTS_READER = {
+  status: "signed-in",
+  email: "reader@example.com",
+  lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+  favouriteVenues: {},
+  readCapabilities: async () => ({
+    [CapabilityId.EmailAlerts]: { grantedAt: 0 },
+  }),
+} satisfies Partial<UserContextType>;
+
+async function openEmailAlerts(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "Email alerts" }),
+  );
+  return canvas;
+}
+
+/** 20:00 on 16 November 2026, London time. */
+const RAN_AT = Date.UTC(2026, 10, 16, 20, 0);
+
+/** Granted alerts, never set up: the panel offers them, and leads in. */
+export const SignedInAlertsNotSetUp: Story = {
+  args: { user: ALERTS_READER },
+  play: async ({ canvasElement }) => {
+    const canvas = await openEmailAlerts(canvasElement);
+    await expect(
+      canvas.getByText(/Nothing is sent until you switch it on/),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "Set up alerts" }),
+    ).toHaveAttribute("href", "/personalise/alerts/");
+  },
+};
+
+/** On, and checked last night: a quiet day still says the job ran. */
+export const SignedInAlertsOn: Story = {
+  args: {
+    user: {
+      ...ALERTS_READER,
+      readAlertSettings: async () => ({
+        enabled: true,
+        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      }),
+      readAlertLedger: async () => ({
+        runs: [{ on: "2026-11-16", at: RAN_AT, outcome: "nothingNew" }],
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openEmailAlerts(canvasElement);
+    await expect(canvas.getByText(/^On: a daily email/)).toBeInTheDocument();
+    await expect(
+      canvas.getByText(
+        "Last checked Monday, 16 November 2026 at 20:00: nothing new, so no email.",
+      ),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "Edit alerts" }),
+    ).toBeInTheDocument();
+  },
+};
+
+/** Switched off from an email's unsubscribe link: the panel says when. */
+export const SignedInAlertsUnsubscribed: Story = {
+  args: {
+    user: {
+      ...ALERTS_READER,
+      readAlertSettings: async () => ({
+        enabled: false,
+        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      }),
+      readAlertLedger: async () => ({
+        runs: [{ on: "2026-11-16", at: RAN_AT, outcome: "sent", films: 2 }],
+        stopped: {
+          reason: "unsubscribed",
+          at: RAN_AT + 14 * 60 * 60 * 1000,
+          emailOn: "2026-11-16",
+        },
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openEmailAlerts(canvasElement);
+    await expect(canvas.getByText(/^Off: nothing is sent/)).toBeInTheDocument();
+    await expect(
+      canvas.getByText(
+        "You unsubscribed on Tuesday, 17 November 2026, from the email sent on Monday, 16 November 2026.",
+      ),
     ).toBeInTheDocument();
   },
 };
