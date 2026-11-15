@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import Button from "@/components/button";
-import { MCP_URL } from "@/lib/assistant-access";
+import {
+  disconnectAssistant,
+  listConnections,
+  MCP_URL,
+  type Connection,
+} from "@/lib/assistant-access";
 import { CapabilityId } from "@/lib/user-capabilities";
 import { useUserContext } from "@/state/user-context";
 import styles from "./page.module.css";
@@ -39,8 +45,8 @@ export function useAssistantAccess(): boolean {
 
 /**
  * Opened from the account bar: the address to add to an AI assistant, which
- * signs the reader in through /connect/ the first time. Where the assistants
- * they've connected will be listed, to disconnect, when that's built.
+ * signs the reader in through /connect/ the first time, and the assistants
+ * they've connected, to disconnect.
  */
 export function AssistantAccessSummary() {
   const [copied, setCopied] = useState(false);
@@ -87,6 +93,110 @@ export function AssistantAccessSummary() {
           can&apos;t see your lists or change anything on your account.
         </p>
       </section>
+      <ConnectedAssistants />
     </div>
+  );
+}
+
+type ConnectionsState =
+  | { step: "loading" }
+  | { step: "failed" }
+  | { step: "loaded"; connections: Connection[] };
+
+/**
+ * The assistants the reader has connected, each to disconnect: its access
+ * ends at once, and it would have to be signed in again. When one was last
+ * used isn't kept, so it isn't shown.
+ */
+function ConnectedAssistants() {
+  const { getIdToken } = useUserContext();
+  const [state, setState] = useState<ConnectionsState>({ step: "loading" });
+  const [removing, setRemoving] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getIdToken()
+      .then(listConnections)
+      .then(
+        (connections) => {
+          if (!cancelled) setState({ step: "loaded", connections });
+        },
+        (failure) => {
+          console.error("Failed to load connected assistants", failure);
+          if (!cancelled) setState({ step: "failed" });
+        },
+      );
+    return () => {
+      cancelled = true;
+    };
+  }, [getIdToken]);
+
+  const disconnect = async (id: string) => {
+    setRemoving(id);
+    setError(null);
+    try {
+      await disconnectAssistant(await getIdToken(), id);
+      setState((current) =>
+        current.step === "loaded"
+          ? {
+              step: "loaded",
+              connections: current.connections.filter((c) => c.id !== id),
+            }
+          : current,
+      );
+    } catch (failure) {
+      console.error("Failed to disconnect an assistant", failure);
+      setError("We couldn't disconnect it. Please try again.");
+    } finally {
+      setRemoving(null);
+    }
+  };
+
+  return (
+    <section
+      className={`${styles.managementSection} ${styles.assistantConnections}`}
+    >
+      <h3 className={styles.managementTitle}>Connected assistants</h3>
+      {state.step === "loading" ? (
+        <p className={styles.managementText}>Checking…</p>
+      ) : state.step === "failed" ? (
+        <p className={styles.managementText}>
+          We couldn&apos;t load your connected assistants just now.
+        </p>
+      ) : state.connections.length === 0 ? (
+        <p className={styles.managementText}>
+          None yet. Once you&apos;ve added the address and signed in, your
+          assistant shows here.
+        </p>
+      ) : (
+        <ul className={styles.assistantList}>
+          {state.connections.map((connection) => (
+            <li key={connection.id} className={styles.assistantItem}>
+              <span className={styles.managementText}>
+                <strong>{connection.name}</strong>
+                {connection.domain && connection.domain !== connection.name
+                  ? ` (${connection.domain})`
+                  : ""}
+                , connected {formatDateLong(connection.connectedAt)}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={removing !== null}
+                onClick={() => disconnect(connection.id)}
+              >
+                {removing === connection.id ? "Disconnecting…" : "Disconnect"}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </section>
   );
 }

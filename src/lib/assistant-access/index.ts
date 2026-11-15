@@ -28,3 +28,44 @@ export function parseConnectState(search: string): string | null {
 export function getConnectCallbackUrl(state: string): string {
   return `${MCP_ORIGIN}/callback?state=${encodeURIComponent(state)}`;
 }
+
+/** An assistant the reader has connected, as api-mcp describes it. */
+export type Connection = {
+  id: string;
+  /** What the assistant calls itself. */
+  name: string;
+  /** For one that publishes its details: the domain it publishes them on. */
+  domain?: string;
+  /** Epoch milliseconds. */
+  connectedAt: number;
+};
+
+const CONNECTIONS_URL = `${MCP_ORIGIN}/connections`;
+
+/** The reader's connected assistants, newest first. */
+export async function listConnections(idToken: string): Promise<Connection[]> {
+  const response = await fetch(CONNECTIONS_URL, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Listing connections failed: ${response.status}`);
+  }
+  return ((await response.json()) as { connections: Connection[] }).connections;
+}
+
+/**
+ * Disconnects one assistant: its access ends at once, and it would have to
+ * be signed in again.
+ */
+export async function disconnectAssistant(
+  idToken: string,
+  id: string,
+): Promise<void> {
+  const response = await fetch(`${CONNECTIONS_URL}/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Disconnecting failed: ${response.status}`);
+  }
+}

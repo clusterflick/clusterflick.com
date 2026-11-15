@@ -1,5 +1,15 @@
-import { describe, expect, it } from "vitest";
-import { getConnectCallbackUrl, MCP_URL, parseConnectState } from ".";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  disconnectAssistant,
+  getConnectCallbackUrl,
+  listConnections,
+  MCP_URL,
+  parseConnectState,
+} from ".";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const STATE = "a".repeat(40) + "-_9";
 
@@ -24,6 +34,47 @@ describe("the Worker's addresses", () => {
     expect(MCP_URL).toBe("https://mcp.clusterflick.com/mcp");
     expect(getConnectCallbackUrl(STATE)).toBe(
       `https://mcp.clusterflick.com/callback?state=${STATE}`,
+    );
+  });
+});
+
+describe("connected assistants", () => {
+  const connection = {
+    id: "grant1",
+    name: "Claude",
+    domain: "claude.ai",
+    connectedAt: 1_794_700_000_000,
+  };
+
+  it("are listed from the Worker, with the reader's sign-in", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({ connections: [connection] }));
+    expect(await listConnections("id-token")).toEqual([connection]);
+    expect(fetch).toHaveBeenCalledWith(
+      "https://mcp.clusterflick.com/connections",
+      { headers: { Authorization: "Bearer id-token" } },
+    );
+  });
+
+  it("are disconnected one at a time", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    await disconnectAssistant("id-token", "grant1");
+    expect(fetch).toHaveBeenCalledWith(
+      "https://mcp.clusterflick.com/connections/grant1",
+      { method: "DELETE", headers: { Authorization: "Bearer id-token" } },
+    );
+  });
+
+  it("fail loudly when the Worker refuses", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(null, { status: 503 }),
+    );
+    await expect(listConnections("id-token")).rejects.toThrow("503");
+    await expect(disconnectAssistant("id-token", "grant1")).rejects.toThrow(
+      "503",
     );
   });
 });

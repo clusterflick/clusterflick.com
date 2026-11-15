@@ -256,6 +256,12 @@
     order: 1;
   }
 
+  /* The assistant panel's connections take the full width below its two
+     short sections. */
+  .assistantConnections {
+    grid-column: 1 / -1;
+  }
+
   /* The account panel has two short sections, side by side. */
   .accountManagement .managementSection:first-child {
     grid-column: auto;
@@ -824,4 +830,24 @@
 
 .assistantAddress code {
   color: var(--color-white);
+}
+
+.assistantList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assistantItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.assistantItem .managementText {
+  margin: 0;
 }

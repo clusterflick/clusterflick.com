@@ -2108,7 +2108,8 @@ the listings through api-mcp, a Worker at `mcp.clusterflick.com`
 (`@/lib/assistant-access`). It's invitation-only and never advertised: only a
 reader with the capability sees its "AI assistant" panel in /personalise's
 account bar, beside the public profile's, with the address to add, how, and
-what it can see; the assistants they've connected will be listed there too. The assistant's OAuth sign-in runs on the Worker, which asks the reader to
+what it can see, and the assistants they've connected, each to disconnect
+(api-mcp's `/connections`, called with their ID token). The assistant's OAuth sign-in runs on the Worker, which asks the reader to
 approve the assistant, then sends them to `/connect/` here to sign in, since
 Firebase's sign-in lives on the site. That page posts their ID token to the
 Worker's `/callback`, an address fixed at build time and never taken from the
