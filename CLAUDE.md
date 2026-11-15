@@ -2103,8 +2103,22 @@ before `applyUrlParams`, which replaces the whole address, hash included. The pa
 will show, so its server component passes every logo path in
 (`getVenueImagePaths`), as `/near-me` passes its venues.
 
+**AI assistant access** (`assistantAccess`) lets a reader's own assistant search
+the listings through api-mcp, a Worker at `mcp.clusterflick.com`
+(`@/lib/assistant-access`). It's invitation-only and never advertised: only a
+reader with the capability sees its panel on /personalise, with the address to
+add. The assistant's OAuth sign-in runs on the Worker, which asks the reader to
+approve the assistant, then sends them to `/connect/` here to sign in, since
+Firebase's sign-in lives on the site. That page posts their ID token to the
+Worker's `/callback`, an address fixed at build time and never taken from the
+link, with the `state` the Worker sent, checked to be exactly what the Worker
+hands out. A sign-in link sent from `/connect/` returns there
+(`sendSignInLink`'s `returnTo`), and its `state` survives the sign-in
+(`withoutSignInLink` removes only Firebase's parameters). The Worker checks the
+capability again on its calls, so revoking it switches the assistant off.
+
 **Capabilities are features granted one account at a time**
-(`@/lib/user-capabilities`): `emailAlerts` and `publicProfile` so far, each
+(`@/lib/user-capabilities`): `emailAlerts`, `publicProfile` and `assistantAccess` so far, each
 in `CAPABILITIES` with its copy, a `Record` so a new one won't compile
 without. A capability says a reader _may_ use a feature, and whether they do
 is their own setting, so everything acting on one checks both: the alerts job

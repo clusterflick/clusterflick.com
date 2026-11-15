@@ -816,3 +816,16 @@
 .renameConfirm {
   margin-top: 12px;
 }
+
+.assistantText {
+  margin: 0 0 8px;
+}
+
+.assistantAddress {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.assistantAddress code {
+  color: var(--color-white);
+}

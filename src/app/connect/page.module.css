@@ -1,0 +1,21 @@
+.intro {
+  margin: 0 0 16px;
+  color: var(--color-light-gray);
+}
+
+.connect {
+  padding: 20px 0;
+  margin-bottom: 40px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.error {
+  margin: 12px 0 0;
+  color: var(--color-neon-pink);
+}

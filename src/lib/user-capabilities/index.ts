@@ -21,6 +21,8 @@ import {
 export enum CapabilityId {
   EmailAlerts = "emailAlerts",
   PublicProfile = "publicProfile",
+  /** Searching the listings from the reader's own AI assistant (api-mcp). */
+  AssistantAccess = "assistantAccess",
 }
 
 export type CapabilityGrant = {
@@ -52,6 +54,10 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
   },
   [CapabilityId.PublicProfile]: {
     title: "Public profile",
+    comingSoon: null,
+  },
+  [CapabilityId.AssistantAccess]: {
+    title: "AI assistant access",
     comingSoon: null,
   },
 };

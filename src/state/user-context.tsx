@@ -70,8 +70,13 @@ export type UserContextType = {
   lists: UserLists | null;
   /** "My Venues". Null exactly when `lists` is. */
   favouriteVenues: FavouriteVenues | null;
-  /** Emails a sign-in link. Signing up and signing in are the same action. */
-  sendSignInLink: (email: string) => Promise<void>;
+  /**
+   * Emails a sign-in link. Signing up and signing in are the same action. The
+   * link opens `returnTo`, a path on this site, which must finish the sign-in
+   * (`completeSignIn`): /personalise/ unless the page asking needs the reader
+   * back where they were, as /connect/ does.
+   */
+  sendSignInLink: (email: string, returnTo?: string) => Promise<void>;
   /**
    * Completes sign-in from a link in the current URL. Resolves `needs-email`
    * when the link was opened somewhere the address wasn't remembered — another
@@ -208,8 +213,13 @@ function readPendingEmail(): string | null {
   return null;
 }
 
-function getSignInReturnUrl() {
-  return `${window.location.origin}/personalise/`;
+function getSignInReturnUrl(returnTo = "/personalise/") {
+  // A path on this site, never an address from elsewhere: the link signs the
+  // reader in wherever it lands.
+  if (!returnTo.startsWith("/") || returnTo.startsWith("//")) {
+    throw new Error(`Not a path on this site: ${returnTo}`);
+  }
+  return `${window.location.origin}${returnTo}`;
 }
 
 const Context = createContext<UserContextType | undefined>(undefined);
@@ -297,11 +307,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const sendSignInLink = useCallback(
-    async (email: string) => {
+    async (email: string, returnTo?: string) => {
       const { auth } = await getServices();
       const { sendSignInLinkToEmail } = await import("firebase/auth");
       await sendSignInLinkToEmail(auth, email, {
-        url: getSignInReturnUrl(),
+        url: getSignInReturnUrl(returnTo),
         handleCodeInApp: true,
       });
       storageSet(

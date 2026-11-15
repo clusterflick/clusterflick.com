@@ -7,7 +7,7 @@
  * other.
  */
 
-const CAPABILITY_IDS = ["emailAlerts", "publicProfile"];
+const CAPABILITY_IDS = ["emailAlerts", "publicProfile", "assistantAccess"];
 
 const USAGE = [
   "Usage: npm run grant-capability -- <email> <capability> [--revoke] [--write]",

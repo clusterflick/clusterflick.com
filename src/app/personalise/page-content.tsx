@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type FormEvent,
-  type ReactNode,
-} from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getShowingThisWeek } from "@/lib/user-profile/showing-this-week";
@@ -61,6 +54,8 @@ import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
+import AssistantAccess from "./assistant-access";
+import SignInForm, { describeError, getErrorCode } from "./sign-in-form";
 import {
   ProfileWithdrawnNotice,
   PublicProfileSummary,
@@ -245,13 +240,6 @@ function getFullWidthTileWidth(width: number) {
   return (width - (columns - 1) * TILE_GAP) / columns;
 }
 
-/** The parameters Firebase appends to the return URL of a sign-in link. */
-function isSignInLink(url: URL) {
-  return (
-    url.searchParams.get("mode") === "signIn" && url.searchParams.has("oobCode")
-  );
-}
-
 const STORE_NOTE = (
   <>
     Your email address, so we can send you sign-in links, the films and venues
@@ -262,38 +250,6 @@ const STORE_NOTE = (
     at any time. <Link href="/privacy">How we handle your data</Link>
   </>
 );
-
-function getErrorCode(error: unknown): string | undefined {
-  return typeof error === "object" && error && "code" in error
-    ? String(error.code)
-    : undefined;
-}
-
-function describeError(error: unknown): string {
-  switch (getErrorCode(error)) {
-    case "auth/invalid-email":
-    case "auth/missing-email":
-      return "That doesn't look like an email address.";
-    case "auth/invalid-action-code":
-    case "auth/expired-action-code":
-      return "That link has expired or has already been used. Send yourself a new one.";
-    case "auth/quota-exceeded":
-    case "auth/too-many-requests":
-      return "We can't send any more links right now. Please try again later.";
-    case "auth/network-request-failed":
-      return "We couldn't reach the server. Check your connection and try again.";
-    default:
-      return "Something went wrong. Please try again.";
-  }
-}
-
-type LinkState =
-  | { step: "idle" }
-  | { step: "sending" }
-  | { step: "sent"; email: string }
-  | { step: "completing" }
-  | { step: "needs-email" }
-  | { step: "error"; message: string };
 
 export default function PersonalisePageContent({
   venueImagePaths = {},
@@ -371,132 +327,6 @@ function SignedOut() {
   );
 }
 
-function SignInForm() {
-  const { sendSignInLink, completeSignIn, getPendingEmail } = useUserContext();
-  // Prefilled while an address is still held from a link sent within the
-  // hour, so a failed or expired link is one click from a fresh one.
-  const [email, setEmail] = useState(() => getPendingEmail() ?? "");
-  // Only ever mounted client-side, once the status is known, so reading the
-  // URL here can't mismatch the server render.
-  const [state, setState] = useState<LinkState>(() =>
-    isSignInLink(new URL(window.location.href))
-      ? { step: "completing" }
-      : { step: "idle" },
-  );
-  const attempted = useRef(false);
-
-  // A sign-in link lands back here. Redeem it once — a second attempt (Strict
-  // Mode's double effect) would find the code already spent.
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (attempted.current || !isSignInLink(url)) return;
-    attempted.current = true;
-    completeSignIn().then(
-      (result) => {
-        if (result === "needs-email") {
-          setState({ step: "needs-email" });
-        } else {
-          window.history.replaceState(null, "", url.pathname);
-        }
-      },
-      (error) => {
-        window.history.replaceState(null, "", url.pathname);
-        setState({ step: "error", message: describeError(error) });
-      },
-    );
-  }, [completeSignIn]);
-
-  const onSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    const address = email.trim();
-    if (state.step === "needs-email") {
-      setState({ step: "completing" });
-      try {
-        await completeSignIn(address);
-        window.history.replaceState(null, "", window.location.pathname);
-      } catch (error) {
-        setState({ step: "error", message: describeError(error) });
-      }
-      return;
-    }
-    setState({ step: "sending" });
-    try {
-      await sendSignInLink(address);
-      setState({ step: "sent", email: address });
-    } catch (error) {
-      setState({ step: "error", message: describeError(error) });
-    }
-  };
-
-  if (state.step === "completing") {
-    return <LoadingIndicator message="Signing you in…" />;
-  }
-
-  if (state.step === "sent") {
-    return (
-      <EmptyState
-        icon={{
-          src: "/images/icons/neon-ticket.svg",
-          width: 120,
-          height: 120,
-        }}
-        title="Check your inbox"
-        message={
-          <>
-            We&apos;ve sent a sign-in link to <strong>{state.email}</strong>.
-          </>
-        }
-        hint="It can take a minute to arrive — have a look in your spam folder if it doesn't."
-        actions={
-          <Button
-            variant="secondary"
-            onClick={() => setState({ step: "idle" })}
-          >
-            Use a different email
-          </Button>
-        }
-      />
-    );
-  }
-
-  const confirming = state.step === "needs-email";
-
-  return (
-    <form className={styles.signIn} onSubmit={onSubmit}>
-      <p id="personalise-email-intro" className={styles.signInIntro}>
-        {confirming
-          ? "This link was opened in a different browser from the one it was sent from. Enter your email to finish signing in."
-          : "Enter your email to sign in, or to create an account if you're new."}
-      </p>
-      <div className={styles.row}>
-        <input
-          className={styles.input}
-          type="email"
-          autoComplete="email"
-          required
-          aria-label="Email address"
-          aria-describedby="personalise-email-intro"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
-        />
-        <Button type="submit" disabled={state.step === "sending"}>
-          {confirming
-            ? "Sign in"
-            : state.step === "sending"
-              ? "Sending…"
-              : "Email me a link"}
-        </Button>
-      </div>
-      {state.step === "error" && (
-        <p className={styles.error} role="alert">
-          {state.message}
-        </p>
-      )}
-    </form>
-  );
-}
-
 function SignedIn({
   venueImagePaths,
   movieLists,
@@ -536,6 +366,7 @@ function SignedIn({
         publicProfile={publicProfile?.granted ? publicProfile : null}
       />
       <ComingSoon />
+      <AssistantAccess />
       {publicProfile &&
         !publicProfile.granted &&
         publicProfile.profile?.public && (
