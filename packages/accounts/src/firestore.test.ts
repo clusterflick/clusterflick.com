@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { decodeFields, decodeValue, Firestore, isUid } from "./firestore";
+import {
+  decodeFields,
+  decodeValue,
+  encodeFields,
+  encodeValue,
+  Firestore,
+  isUid,
+  PreconditionError,
+} from "./firestore";
 import { UpstreamError } from "./google-auth";
 
 const ROOT = "projects/p/databases/(default)/documents";
@@ -118,4 +126,165 @@ describe("isUid", () => {
       expect(isUid(value)).toBe(false);
     },
   );
+});
+
+describe("encodeValue", () => {
+  it("writes what decodeValue reads", () => {
+    const data = {
+      title: "Halloween",
+      seen: true,
+      at: 1_794_700_000_000,
+      rating: 4.5,
+      none: null,
+      runs: [{ on: "2026-11-16", films: 2 }],
+      empty: {},
+    };
+    expect(decodeFields(encodeFields(data))).toEqual(data);
+    expect(encodeValue(3)).toEqual({ integerValue: "3" });
+  });
+
+  it.each([undefined, NaN, () => {}])("refuses %o", (value) => {
+    expect(() => encodeValue(value)).toThrow(TypeError);
+  });
+});
+
+/** The body a call to Firestore was sent. */
+const sent = (fetch: { mock: { calls: unknown[][] } }, call = 0) =>
+  JSON.parse(String((fetch.mock.calls[call][1] as RequestInit).body));
+
+describe("Firestore writes", () => {
+  it("reads a document with the time it was written", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({
+        name: `${ROOT}/users/u1/meta/alert-ledger`,
+        fields: { runs: { arrayValue: {} } },
+        updateTime: "2026-11-16T20:00:00.123456Z",
+      }),
+    );
+    expect(await db.getVersioned("users/u1/meta/alert-ledger")).toEqual({
+      data: { runs: [] },
+      updateTime: "2026-11-16T20:00:00.123456Z",
+    });
+  });
+
+  it("commits sets, updates and deletes together, with preconditions", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({ writeResults: [] }));
+    await db.commit([
+      {
+        set: "users/u1/meta/alert-ledger",
+        data: { sending: "2026-11-16" },
+        precondition: { updateTime: "t1" },
+      },
+      {
+        update: "users/u1/meta/alerts",
+        data: { enabled: false },
+        fields: ["enabled", "gone"],
+        precondition: { exists: true },
+      },
+      { delete: "users/u2/meta/alerts" },
+    ]);
+    expect(fetch.mock.calls[0][0]).toBe(
+      `https://firestore.googleapis.com/v1/${ROOT}:commit`,
+    );
+    expect(sent(fetch)).toEqual({
+      writes: [
+        {
+          update: {
+            name: `${ROOT}/users/u1/meta/alert-ledger`,
+            fields: { sending: { stringValue: "2026-11-16" } },
+          },
+          currentDocument: { updateTime: "t1" },
+        },
+        {
+          update: {
+            name: `${ROOT}/users/u1/meta/alerts`,
+            fields: { enabled: { booleanValue: false } },
+          },
+          updateMask: { fieldPaths: ["enabled", "gone"] },
+          currentDocument: { exists: true },
+        },
+        { delete: `${ROOT}/users/u2/meta/alerts` },
+      ],
+    });
+  });
+
+  it("says when a precondition failed, so the caller can read again", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json(
+        { error: { code: 400, status: "FAILED_PRECONDITION" } },
+        { status: 400 },
+      ),
+    );
+    await expect(
+      db.commit([{ delete: "users/u1/meta/alerts" }]),
+    ).rejects.toThrow(PreconditionError);
+  });
+
+  it("fails loudly on anything else", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json(
+        { error: { code: 403, status: "PERMISSION_DENIED" } },
+        { status: 403 },
+      ),
+    );
+    const failure = db.commit([{ delete: "users/u1/meta/alerts" }]);
+    await expect(failure).rejects.toThrow(UpstreamError);
+    await expect(failure).rejects.not.toThrow(PreconditionError);
+  });
+
+  it("backquotes a field name that isn't plain", async () => {
+    const fetch = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({}));
+    await db.commit([
+      { update: "x/y", data: {}, fields: ["alert-ledger", "a`b"] },
+    ]);
+    expect(sent(fetch).writes[0].updateMask.fieldPaths).toEqual([
+      "`alert-ledger`",
+      "`a\\`b`",
+    ]);
+  });
+});
+
+describe("Firestore collection-group queries", () => {
+  it("finds the documents a field matches, at any depth, with their paths", async () => {
+    const fetch = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json([
+        {
+          document: {
+            name: `${ROOT}/users/u1/meta/alerts`,
+            fields: { enabled: { booleanValue: true } },
+          },
+          readTime: "t",
+        },
+      ]),
+    );
+    expect(await db.findInCollectionGroup("meta", "enabled", true)).toEqual([
+      { path: "users/u1/meta/alerts", data: { enabled: true } },
+    ]);
+    expect(fetch.mock.calls[0][0]).toBe(
+      `https://firestore.googleapis.com/v1/${ROOT}:runQuery`,
+    );
+    expect(sent(fetch)).toEqual({
+      structuredQuery: {
+        from: [{ collectionId: "meta", allDescendants: true }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: "enabled" },
+            op: "EQUAL",
+            value: { booleanValue: true },
+          },
+        },
+      },
+    });
+  });
+
+  it("finds none when Firestore sends only a read time", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json([{ readTime: "t" }]),
+    );
+    expect(await db.findInCollectionGroup("meta", "enabled", true)).toEqual([]);
+  });
 });

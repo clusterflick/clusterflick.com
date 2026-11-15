@@ -10,6 +10,20 @@
       "collectionGroup": "meta",
       "fieldPath": "people",
       "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "enabled",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
     }
   ]
 }

@@ -43,7 +43,14 @@ if (await hasCapability(db, uid, "emailAlerts")) {
   token endpoint. The token is kept in the isolate until five minutes before it
   expires, and requests that arrive together share one exchange.
 - **`firestore`**: `get` and `batchGet` with a field mask, and `decodeValue` for
-  REST's typed values. `isUid` says whether a value is safe to put in a path:
+  REST's typed values. `getVersioned` reads a document with the time it was
+  last written, and `commit` writes several documents at once, each with an
+  optional precondition (unchanged since that time, or there or not), throwing
+  `PreconditionError` when one fails so the caller can read again: that's how
+  the alerts Worker claims a reader's digest before sending it.
+  `findInCollectionGroup` finds the documents of a collection id at any depth
+  whose field equals a value, which needs a collection-group index on that
+  field (`firestore.indexes.json`). `isUid` says whether a value is safe to put in a path:
   a service account skips the security rules, so nothing else is.
 - **`lists`**: the watchlist, Seen list, favourite venues and film details,
   decoded with the same rules as the site's `parseProfilePageData`.

@@ -106,8 +106,11 @@ requires it from source, so a new capability is added there and nowhere else
 (the site then needs its copy in `CAPABILITIES`). Its `alerts` module is the shape of a
 reader's email alerts and of the alerts Worker's ledger, which the site and
 the Worker both parse; `firestore.rules` repeats the settings' shape, held to
-it by `firestore-rules/rules-copy.test.ts`. Writes, queries and the list
-invariants aren't in it yet: they come with the first Worker that needs them.
+it by `firestore-rules/rules-copy.test.ts`. It writes (`commit`, with
+preconditions) and finds documents by a field across a collection group, for
+the alerts Worker; a field queried that way needs a `COLLECTION_GROUP` index in
+`firestore.indexes.json`. The list invariants aren't in it yet: they come with
+the first Worker that writes lists.
 See `packages/accounts/README.md`.
 
 ## Project Structure
