@@ -50,6 +50,9 @@ From the repo root:
   no Node types.
 - `npm run check -w @clusterflick/catalogue` builds it and imports every subpath
   from `dist/` in Node, as a Worker's bundler would find them. CI runs it.
+- `npm test -w @clusterflick/catalogue` runs only the package's tests, with its
+  own `vitest.config.ts`: the site's also loads Storybook, which needs the
+  site's data downloaded. CI and the publish workflow run it.
 
 ## Publishing
 

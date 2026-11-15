@@ -39,10 +39,12 @@
   "scripts": {
     "build": "node build.mjs",
     "check": "npm run build && node check.mjs",
+    "test": "vitest run",
     "prepack": "npm run build"
   },
   "devDependencies": {
     "esbuild": "0.27.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

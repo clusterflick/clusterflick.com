@@ -58,8 +58,10 @@ jobs:
           fi
       - if: steps.version.outputs.new == 'true'
         run: npm ci
+      # The package's own tests: the site's `npm test` also loads Storybook,
+      # which needs the site's data, and none of it is downloaded here.
       - if: steps.version.outputs.new == 'true'
-        run: npm test
+        run: npm test -w @clusterflick/catalogue
       - if: steps.version.outputs.new == 'true'
         run: npm run check -w @clusterflick/catalogue
       - if: steps.version.outputs.new == 'true'
