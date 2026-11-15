@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Category, type Venue } from "@/types";
+import { Category, type Venue } from "@clusterflick/catalogue/types";
 import PlannerLane, { PlannerLaneCard } from ".";
 
 /**

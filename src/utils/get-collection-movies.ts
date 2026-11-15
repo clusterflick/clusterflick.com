@@ -1,4 +1,8 @@
-import type { Collection, CollectionPart, Movie } from "@/types";
+import type {
+  Collection,
+  CollectionPart,
+  Movie,
+} from "@clusterflick/catalogue/types";
 
 /**
  * One film in a collection. `movie` is set when the film is in the dataset with

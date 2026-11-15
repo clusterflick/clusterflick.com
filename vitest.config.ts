@@ -15,9 +15,16 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   resolve: {
-    alias: {
-      "@": path.join(dirname, "src"),
-    },
+    alias: [
+      { find: "@", replacement: path.join(dirname, "src") },
+      // The site builds the package from its source, as tsconfig.json's
+      // `paths` does for Next and Storybook; only the Workers use the
+      // published build.
+      {
+        find: /^@clusterflick\/catalogue\/(.*)$/,
+        replacement: path.join(dirname, "packages/catalogue/src/$1"),
+      },
+    ],
   },
   test: {
     projects: [
@@ -30,7 +37,11 @@ export default defineConfig({
           // Set from the processed data at build time (get-venue-count-floor);
           // unit tests run without it, so they get a fixed figure.
           env: { NEXT_PUBLIC_VENUE_COUNT_FLOOR: "500" },
-          include: ["src/**/*.test.ts", "scripts/**/*.test.js"],
+          include: [
+            "src/**/*.test.ts",
+            "packages/*/src/**/*.test.ts",
+            "scripts/**/*.test.js",
+          ],
         },
       },
       {

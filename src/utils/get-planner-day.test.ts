@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Movie } from "@/types";
-import { dateStringToLondonTimestamp } from "@/utils/format-date";
+import type { Movie } from "@clusterflick/catalogue/types";
+import { dateStringToLondonTimestamp } from "@clusterflick/catalogue/utils/format-date";
 import {
   clampToRange,
   findNearestShowingDay,

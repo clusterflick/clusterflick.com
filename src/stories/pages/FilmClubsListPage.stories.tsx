@@ -4,7 +4,7 @@ import {
   getFilmClubsIndex,
   type FilmClubListItem,
 } from "@/utils/get-film-clubs-index";
-import { FILM_CLUBS } from "@/data/film-clubs";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
 import type { PosterRowItem } from "@/components/poster-row";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";

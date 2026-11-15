@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Person } from "@/types";
-import { FilterId, PeopleFilterId } from "@/lib/filters";
+import { Person } from "@clusterflick/catalogue/types";
+import { FilterId, PeopleFilterId } from "@clusterflick/catalogue/filters";
 import { getPersonFilterUrl } from "@/utils/get-person-filter-url";
 import PillList from "@/components/pill-list";
 import styles from "./cast-crew-section.module.css";

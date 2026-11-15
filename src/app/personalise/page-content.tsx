@@ -50,10 +50,13 @@ import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
 // Direct from the module: the filters barrel would bundle the whole engine.
-import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
+import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import { OPEN_FILTERS_HASH } from "@/hooks/use-open-filters-hash";
 import { getWatchlistHighlights } from "@/utils/get-watchlist-highlights";
-import { formatRelativeDay, formatShowingTime } from "@/utils/format-date";
+import {
+  formatRelativeDay,
+  formatShowingTime,
+} from "@clusterflick/catalogue/utils/format-date";
 import ListManagement from "./list-management";
 import FilmSearch, { FILM_SEARCH_INPUT_ID } from "./film-search";
 import SeenStats, { type MovieListProgressItem } from "./seen-stats";
@@ -64,7 +67,7 @@ import {
   usePublicProfile,
   type PublicProfileState,
 } from "./public-profile";
-import type { MoviePerformance } from "@/types";
+import type { MoviePerformance } from "@clusterflick/catalogue/types";
 import {
   UserListId,
   type FavouriteVenueEntry,

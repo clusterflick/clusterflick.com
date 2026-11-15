@@ -3,7 +3,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
-import { formatDateLong } from "@/utils/format-date";
+import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import { getBoroughWeek } from "./get-borough-week";
 import LondonCinemasPageContent from "./page-content";
 

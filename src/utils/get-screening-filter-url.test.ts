@@ -3,8 +3,8 @@ import { getScreeningFilterUrl } from "./get-screening-filter-url";
 import {
   getDefaultState,
   resolveFilterStateFromUrl,
-} from "@/lib/filters/manager";
-import { FilterId } from "@/lib/filters/types";
+} from "@clusterflick/catalogue/filters/manager";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
 
 describe("getScreeningFilterUrl", () => {
   it("selects the venue and the screening's London day", () => {

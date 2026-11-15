@@ -1,7 +1,7 @@
 import PosterRow from "@/components/poster-row";
 import CollectionRow from "@/components/collection-row";
 import OccasionRow from "@/components/occasion-row";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import {
   getMarathonsUrl,
@@ -10,7 +10,7 @@ import {
   type DiscoveryRows,
 } from "@/utils/get-discovery-movies";
 import { getOccasionRowItems } from "@/utils/get-occasion-row-items";
-import { getHighlyRatedUrl } from "@/lib/filters/modules/ratings";
+import { getHighlyRatedUrl } from "@clusterflick/catalogue/filters/modules/ratings";
 import styles from "./page.module.css";
 
 /**

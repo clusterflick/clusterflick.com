@@ -18,7 +18,7 @@ import {
   FormatDimension,
   FormatSourceDefault,
   FormatDimensionDefault,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import { getFormatLabels } from "@/utils/format-labels";
 
 /** Which `performance.format` field a format value lives on. */

@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { filterManager, type FilterState } from "@/lib/filters";
+import {
+  filterManager,
+  type FilterState,
+} from "@clusterflick/catalogue/filters";
 import {
   resolveUrlFilterState,
   useFilterConfig,

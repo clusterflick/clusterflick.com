@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { searchShowingFilms } from "./search-showing-films";
 
 function movie(id: string, title: string, extra: Partial<Movie> = {}): Movie {

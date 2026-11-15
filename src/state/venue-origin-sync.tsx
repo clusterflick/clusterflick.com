@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { getPlaceVenues, reresolveAutoVenueOrigin } from "@/lib/places";
+import {
+  getPlaceVenues,
+  reresolveAutoVenueOrigin,
+} from "@clusterflick/catalogue/places";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 

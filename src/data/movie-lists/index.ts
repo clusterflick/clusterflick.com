@@ -1,4 +1,4 @@
-import { RT_MIN_REVIEWS } from "@/utils/movie-ratings.mjs";
+import { RT_MIN_REVIEWS } from "@clusterflick/catalogue/utils/movie-ratings.mjs";
 import { MovieListSource, type MovieList } from "./types";
 import { RT_BEST_OF_ALL_TIME } from "./rt-best-of-all-time";
 import { IMDB_TOP_250 } from "./imdb-top-250";

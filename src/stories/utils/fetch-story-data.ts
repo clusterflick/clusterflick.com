@@ -1,4 +1,4 @@
-import type { MetaData, CinemaData } from "@/types";
+import type { MetaData, CinemaData } from "@clusterflick/catalogue/types";
 
 /**
  * Fetch the metadata file from public/data.

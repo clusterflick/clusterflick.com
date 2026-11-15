@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { getBookable, getShowingThisWeek } from "./showing-this-week";
 
 const NOW = Date.UTC(2026, 10, 12, 12);

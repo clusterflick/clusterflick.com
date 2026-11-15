@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, ReactNode } from "react";
-import { Genre, Showing } from "@/types";
+import { Genre, Showing } from "@clusterflick/catalogue/types";
 import { formatCategory } from "@/app/utils";
 import { GENRES } from "@/data/genres";
 import { getGenreUrl } from "@/utils/get-genre-url";

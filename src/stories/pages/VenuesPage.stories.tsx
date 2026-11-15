@@ -4,7 +4,7 @@ import type { VenueMapVenue } from "@/components/venue-map";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import type { VenueGroupData } from "@/app/venues/page";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import { handlers, loadingHandlers } from "../../../.storybook/msw/handlers";

@@ -11,7 +11,7 @@ import {
 } from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { Category } from "@/types";
+import { Category } from "@clusterflick/catalogue/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import {
   filterManager,
@@ -26,7 +26,7 @@ import {
   FilterChip,
   FilterSearchEntry,
   FilterState,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import {
   useFilterConfig,
   QuickFilter,
@@ -34,8 +34,8 @@ import {
 } from "@/state/filter-config-context";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useVenueGroups } from "@/hooks/use-venue-groups";
-import { getNearbyVenueIds } from "@/utils/geo-distance";
-import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
+import { getNearbyVenueIds } from "@clusterflick/catalogue/utils/geo-distance";
+import { getVenueIdsWithShowings } from "@clusterflick/catalogue/utils/get-venues-with-showings";
 import { trackEvent } from "@/utils/track-event";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
@@ -422,7 +422,10 @@ export default function FilterOverlay({
 
   const handleShareFilters = useCallback(async () => {
     trackEvent("filter-share");
-    const url = buildFilterUrl(filterState);
+    const url = buildFilterUrl(
+      filterState,
+      `${window.location.origin}${window.location.pathname}`,
+    );
     try {
       await navigator.clipboard.writeText(url);
       setShare({ status: "copied", url });

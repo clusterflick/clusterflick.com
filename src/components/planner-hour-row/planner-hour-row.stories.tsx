@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Category, type MoviePerformance, type Venue } from "@/types";
+import {
+  Category,
+  type MoviePerformance,
+  type Venue,
+} from "@clusterflick/catalogue/types";
 import PlannerHourRow, { PlannerHourGap } from ".";
 
 /**

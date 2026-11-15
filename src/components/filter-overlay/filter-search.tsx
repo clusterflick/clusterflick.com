@@ -9,7 +9,7 @@ import {
   isFilterSearchEntrySelected,
   prepareFilterSearch,
   searchFilterGroups,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import SearchInput from "@/components/search-input";
 import styles from "./filter-overlay.module.css";
 

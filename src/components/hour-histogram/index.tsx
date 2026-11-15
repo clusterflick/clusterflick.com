@@ -1,4 +1,4 @@
-import { minutesToTimeString } from "@/utils/format-date";
+import { minutesToTimeString } from "@clusterflick/catalogue/utils/format-date";
 import styles from "./hour-histogram.module.css";
 
 interface HourHistogramProps {

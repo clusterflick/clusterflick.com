@@ -7,11 +7,17 @@ import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
-import { FILM_CLUBS, type FilmClub } from "@/data/film-clubs";
-import { AccessibilityFeature, type Movie } from "@/types";
+import {
+  FILM_CLUBS,
+  type FilmClub,
+} from "@clusterflick/catalogue/data/film-clubs";
+import {
+  AccessibilityFeature,
+  type Movie,
+} from "@clusterflick/catalogue/types";
 import EventDetailPageContent from "@/components/event-detail-page-content";
-import { FilterId } from "@/lib/filters/types";
-import { getProgrammeFilterUrl } from "@/lib/filters/modules/programmes";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
+import { getProgrammeFilterUrl } from "@clusterflick/catalogue/filters/modules/programmes";
 
 export const dynamicParams = false;
 

@@ -1,5 +1,5 @@
-import { getSearchVariants } from "@/lib/filters/normalize";
-import type { Movie } from "@/types";
+import { getSearchVariants } from "@clusterflick/catalogue/filters/normalize";
+import type { Movie } from "@clusterflick/catalogue/types";
 
 /**
  * What identifies a film from outside the dataset — a row of a Letterboxd

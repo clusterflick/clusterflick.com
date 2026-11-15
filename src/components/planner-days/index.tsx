@@ -2,7 +2,7 @@ import clsx from "clsx";
 import {
   dateStringToLondonTimestamp,
   formatDateLong,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import type { DateString } from "@/utils/get-planner-day";
 import styles from "./planner-days.module.css";
 

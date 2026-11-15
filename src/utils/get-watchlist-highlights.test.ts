@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie, type MoviePerformanceOccasions } from "@/types";
+import {
+  Category,
+  type Movie,
+  type MoviePerformanceOccasions,
+} from "@clusterflick/catalogue/types";
 import { getWatchlistHighlights } from "./get-watchlist-highlights";
 
 const DAY = 86_400_000;

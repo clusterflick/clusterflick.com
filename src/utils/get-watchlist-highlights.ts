@@ -1,11 +1,11 @@
-import type { Movie, MoviePerformance } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import { findOccasions, type Occasion } from "@/lib/occasions";
 import {
   getFinalShowing,
   LAST_CHANCE_DAYS,
 } from "@/utils/get-discovery-movies";
-import { MS_PER_DAY } from "@/utils/format-date";
+import { MS_PER_DAY } from "@clusterflick/catalogue/utils/format-date";
 
 /** What's worth telling a reader about a film on their watchlist. */
 export interface WatchlistHighlight {

@@ -1,4 +1,7 @@
-import type { Collection, CollectionSummary } from "@/types";
+import type {
+  Collection,
+  CollectionSummary,
+} from "@clusterflick/catalogue/types";
 
 /** Canonical path for a collection landing page. */
 export function getCollectionUrl(

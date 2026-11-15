@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { BookmarkIcon, EyeIcon } from "@/components/icons";
 import { useUserContext, type UserContextType } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";

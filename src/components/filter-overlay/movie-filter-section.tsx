@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MovieOption } from "@/lib/filters";
+import { MovieOption } from "@clusterflick/catalogue/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import EntityQuickAdd from "@/components/entity-quick-add";

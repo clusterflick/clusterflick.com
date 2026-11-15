@@ -5,7 +5,7 @@ import {
   type CinemaData,
   type Movie,
   type MoviePerformance,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import { getListingsStats } from "./get-listings-stats";
 
 const DAY = 86_400_000;

@@ -8,7 +8,7 @@ import { getGenreMovies } from "@/utils/get-genre-movies";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { AccessibilityFeature } from "@/types";
+import { AccessibilityFeature } from "@clusterflick/catalogue/types";
 import EventDetailPageContent from "@/components/event-detail-page-content";
 import styles from "./page.module.css";
 

@@ -1,4 +1,4 @@
-import type { MoviePerformance } from "@/types";
+import type { MoviePerformance } from "@clusterflick/catalogue/types";
 import {
   FORMATS,
   type FormatDefinition,

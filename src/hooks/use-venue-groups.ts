@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { CinemaData, MetaData, Position } from "@/types";
-import { getNearbyVenueIds } from "@/utils/geo-distance";
+import { CinemaData, MetaData, Position } from "@clusterflick/catalogue/types";
+import { getNearbyVenueIds } from "@clusterflick/catalogue/utils/geo-distance";
 import {
   getCinemaVenueIds,
   getSmallScreeningVenueIds,
 } from "@/utils/get-cinema-venue-ids";
-import { getVenueIdsWithShowings } from "@/utils/get-venues-with-showings";
+import { getVenueIdsWithShowings } from "@clusterflick/catalogue/utils/get-venues-with-showings";
 
 export type VenueGroup = {
   id: string;

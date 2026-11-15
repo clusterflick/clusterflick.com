@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { UserListEntry } from "./index";
 import type { FilmDetailsData } from "./film-details";
 

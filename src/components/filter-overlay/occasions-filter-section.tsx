@@ -6,9 +6,9 @@ import {
   OccasionFilterValue,
   OccasionType,
   OCCASION_NONE,
-} from "@/types";
-import { OCCASION_LABELS } from "@/utils/occasion-labels";
-import { OCCASION_ORDER } from "@/lib/occasions/rules";
+} from "@clusterflick/catalogue/types";
+import { OCCASION_LABELS } from "@clusterflick/catalogue/utils/occasion-labels";
+import { OCCASION_ORDER } from "@clusterflick/catalogue/occasions/rules";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import styles from "./filter-overlay.module.css";

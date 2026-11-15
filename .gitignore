@@ -69,3 +69,4 @@ storybook-static
 # Firestore emulator
 firestore-debug.log
 firebase-debug.log
+/packages/*/dist

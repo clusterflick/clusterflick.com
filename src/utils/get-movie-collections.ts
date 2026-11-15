@@ -1,4 +1,4 @@
-import type { CollectionSummary, Movie } from "@/types";
+import type { CollectionSummary, Movie } from "@clusterflick/catalogue/types";
 
 /**
  * The collections to credit on a film's page.

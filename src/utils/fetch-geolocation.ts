@@ -1,4 +1,4 @@
-import { Position } from "@/types";
+import { Position } from "@clusterflick/catalogue/types";
 
 export type GeolocationResult =
   | { success: true; position: Position }

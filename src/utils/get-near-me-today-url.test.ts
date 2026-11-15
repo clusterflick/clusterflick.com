@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { filterManager } from "@/lib/filters/manager";
-import { FilterId } from "@/lib/filters/types";
-import { getLondonMidnightTimestamp } from "@/utils/format-date";
+import { filterManager } from "@clusterflick/catalogue/filters/manager";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
+import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
 import { getNearMeTodayUrl } from "./get-near-me-today-url";
 
 describe("getNearMeTodayUrl", () => {

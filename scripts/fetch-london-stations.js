@@ -1,6 +1,6 @@
 /* eslint-disable */
 /**
- * Builds src/data/london-stations.json from TfL's open data: one entry per
+ * Builds packages/catalogue/src/data/london-stations.json from TfL's open data: one entry per
  * station on the Underground, Overground, Elizabeth line and DLR, which is how
  * Londoners and visitors alike say where they'll be ("near King's Cross").
  *
@@ -34,6 +34,8 @@ const BOUNDS = { minLat: 51.25, maxLat: 51.72, minLon: -0.56, maxLon: 0.34 };
 const SAME_NAME_KM = 0.5;
 const OUT_FILE = path.join(
   process.cwd(),
+  "packages",
+  "catalogue",
   "src",
   "data",
   "london-stations.json",

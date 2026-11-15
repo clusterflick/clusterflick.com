@@ -1,0 +1,1113 @@
+import { FilterId } from "../filters/types";
+import type { FilterState } from "../filters/types";
+
+export type Festival = {
+  id: string;
+  name: string;
+  url: string;
+  aliases: string[];
+  matchers: Partial<FilterState>[];
+};
+
+// Fringe! titles its screenings several ways — "… - FRINGE!" (Genesis),
+// "FRINGE! PRESENTS …" (The Nickel), "Fringe! and Pink Palace: …" (Rio) and
+// "Fringe x <collaborator> presents: …". Search normalisation strips
+// punctuation, so the bang cannot anchor a matcher and a bare "Fringe" would
+// also catch any film with the word in its title. The bare match is therefore
+// scoped to the venues the festival currently uses, with the full name and the
+// "presents" form left unscoped so a new venue is still picked up.
+const fringeVenues = [
+  "genesiscinema.co.uk",
+  "riocinema.org.uk",
+  "thenickel.co.uk",
+  "thegardencinema.co.uk",
+];
+
+// The BFI runs LFF from the South Bank: the galas are at the Southbank
+// Centre's Royal Festival Hall but ticketed by the BFI, so they arrive under
+// BFI Southbank alongside the competition programme, the Screen Talks and the
+// LFF for Free events. The rest of the 70th edition is split between BFI IMAX
+// and four West End partner cinemas.
+const londonFilmFestivalVenues = [
+  "bfi.org.uk-southbank",
+  "bfi.org.uk-imax",
+  "curzon.com-soho",
+  "ica.art",
+  "princecharlescinema.com",
+  "myvue.com-leicester-square",
+  "southbankcentre.co.uk",
+];
+
+export const FESTIVALS: Festival[] = [
+  {
+    id: "bfi-flare",
+    name: "BFI Flare: London LGBTQIA+ Film Festival ",
+    url: "https://whatson.bfi.org.uk/flare/Online/default.asp",
+    aliases: ["flare"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Part of the BFI Flare festival",
+      },
+    ],
+  },
+  {
+    id: "festival-of-creativity-gothic-film-festival",
+    name: "Festival of Creativity: Gothic Film Festival",
+    url: "https://www.stmarys.ac.uk/academic-areas/structure/fablet/school-of-theology-and-the-arts/festival-of-creativity",
+    aliases: ["gothic-film-festival"],
+    matchers: [
+      {
+        // Matches showings titled "Festival of Creativity: Gothic Film Festival"
+        // at St Mary's University, The 1850 venue, running March 16–25 2026
+        [FilterId.ShowingTitleSearch]: "Gothic Film Festival",
+        [FilterId.Venues]: ["stmarys.ac.uk-the-1850"],
+      },
+    ],
+  },
+  {
+    id: "london-soundtrack-festival",
+    name: "London Soundtrack Festival",
+    url: "https://londonsoundtrack.com/whats-on/",
+    aliases: ["soundtrack-festival"],
+    matchers: [
+      {
+        // Matches "London Soundtrack Festival: ..." and
+        // "FFC x London Soundtrack Festival: ..." at the Barbican, April 9–11 2026
+        [FilterId.ShowingTitleSearch]: "Soundtrack Festival",
+        [FilterId.Venues]: ["barbican.org.uk"],
+      },
+    ],
+  },
+  {
+    id: "judgement-hall-festival",
+    name: "The Judgement Hall Festival",
+    url: "https://www.thejudgementhall.com/programming",
+    aliases: [],
+    matchers: [
+      {
+        // Matches "The Judgement Hall Festival: ..." at Rio Cinema, April 12 2026
+        [FilterId.ShowingTitleSearch]: "Judgement Hall Festival",
+        [FilterId.Venues]: ["riocinema.org.uk"],
+      },
+    ],
+  },
+  {
+    id: "london-fetish-film-festival",
+    name: "London Fetish Film Festival",
+    url: "https://filmfreeway.com/LondonFetishFilmFestival",
+    aliases: ["lfff"],
+    matchers: [
+      {
+        // Matches "LFFF: ..." showings at The Arzner
+        [FilterId.ShowingTitleSearch]: "LFFF",
+        [FilterId.Venues]: ["thearzner.com"],
+      },
+    ],
+  },
+  {
+    id: "open-city-documentary-festival",
+    name: "Open City Documentary Festival",
+    url: "https://opencitylondon.com/",
+    aliases: ["Open City Doc Fest", "Open City London"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "OCDF:",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "OCDF x ",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Open City Documentary Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Open City Doc Fest",
+      },
+    ],
+  },
+  {
+    id: "kinoteka",
+    name: "Kinoteka",
+    url: "https://kinoteka.org.uk",
+    aliases: ["Polish Film Festival"],
+    matchers: [
+      {
+        // "Kinoteka" is a distinctive proper noun, so it matches unscoped —
+        // the festival takes a different set of venues each year. The 2026
+        // edition also ran a block of films at BFI Southbank, and two one-offs
+        // at The Garden Cinema, listed under their own titles alone with
+        // nothing marking them as festival screenings; titles like
+        // "Possession" or "Brother" can only be enumerated per edition and
+        // clamped to that edition's run, or they sweep in later revivals.
+        [FilterId.ShowingTitleSearch]: "Kinoteka",
+      },
+    ],
+  },
+  {
+    id: "docn-roll-film-festival",
+    name: "Doc'n Roll Film Festival",
+    url: "https://www.docnrollfestival.com/",
+    aliases: ["Doc'n Roll"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Doc'n Roll",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Doc'n Roll",
+      },
+    ],
+  },
+  {
+    id: "picture-east-film-festival",
+    name: "PictureEast Film Festival",
+    url: "https://www.tnbfc.co.uk/peff26",
+    aliases: ["PEFF"],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "PictureEast" },
+      { [FilterId.ShowingTitleSearch]: "Picture East" },
+    ],
+  },
+  {
+    id: "women-without-borders-film-festival",
+    name: "Women Without Borders Film Festival",
+    url: "https://wwbfilm.com",
+    aliases: ["WWBFF"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Women Without Borders",
+      },
+    ],
+  },
+  {
+    id: "women-and-the-world-film-festival",
+    name: "Women and the World International Film Festival",
+    url: "https://www.iffww.com/",
+    aliases: ["wwiff", "iffww"],
+    matchers: [
+      // Eventbrite listings at the Rio are titled "WWIFF: …"
+      { [FilterId.ShowingTitleSearch]: "WWIFF" },
+      // DocHouse titles its strand "DocHouse: Women and the World Festival: …"
+      // at Curzon Bloomsbury
+      { [FilterId.ShowingTitleSearch]: "Women and the World" },
+    ],
+  },
+  {
+    id: "london-indian-film-festival",
+    name: "London Indian Film Festival",
+    url: "https://londonindianfilmfestival.co.uk/",
+    aliases: ["liff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "London Indian Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Indian Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LIFF Opening",
+      },
+    ],
+  },
+  {
+    id: "london-australian-film-festival",
+    name: "London Australian Film Festival",
+    url: "https://www.londonaustfilm.com/festival",
+    aliases: ["laff"],
+    matchers: [
+      {
+        // Matches "LAFF 2026: ..." showings (and the short film showcase
+        // movie title) at Picturehouse Finsbury Park, running July 16–19 2026
+        [FilterId.ShowingTitleSearch]: "LAFF 2026",
+        [FilterId.Venues]: ["picturehouses.com-finsbury-park"],
+      },
+    ],
+  },
+  {
+    id: "the-final-film-festival",
+    name: "The Final Film Festival",
+    url: "https://www.tfffestival.co.uk/",
+    aliases: ["tfff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Final Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Final Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "TFFF:",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "- TFFF",
+      },
+    ],
+  },
+  {
+    id: "london-colombian-film-festival",
+    name: "London Colombian Film Festival",
+    url: "https://www.thelondoncolombianfilmfestival.com",
+    aliases: ["lcff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "LCFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LCFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Colombian Film Festival",
+      },
+    ],
+  },
+  {
+    id: "london-latino-film-festival",
+    name: "London Latino Film Festival",
+    url: "https://londonlatinofilmfestival.org.uk/",
+    aliases: ["lolaff"],
+    matchers: [
+      {
+        // Matches "London Latino Film Festival presents: ..." showings, which is
+        // how the festival's screenings are titled across its venues (Barbican,
+        // ICA, Ciné Lumière, BFI Stephen Street, The Garden Cinema), October 2–6 2026
+        [FilterId.ShowingTitleSearch]: "London Latino Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Latino Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LoLaFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LoLaFF",
+      },
+    ],
+  },
+  {
+    id: "the-shortest-nights-film-festival",
+    name: "The Shortest Nights Film Festival",
+    url: "https://www.shortsightedcinema.com/theshortestnightsfestival2026",
+    aliases: ["the-shortest-nights", "shortest-nights"],
+    matchers: [
+      {
+        // Matches "The Shortest Nights Film Festival: ..." programme blocks at
+        // The Castle Sidcup, running September 5–6 2026
+        [FilterId.ShowingTitleSearch]: "Shortest Nights",
+        [FilterId.Venues]: ["castlesidcup.com"],
+      },
+    ],
+  },
+  // The Free Film Festivals network tags every performance it publishes with
+  // "Part of the <neighbourhood> Free Film Festival", which is the only thing
+  // distinguishing one festival from another — the screenings share a source,
+  // and each one is at a different hall, pub or park rather than a fixed venue.
+  {
+    id: "peckham-nunhead-free-film-festival",
+    name: "Peckham & Nunhead Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/peckham-nunhead/",
+    aliases: ["pnfff", "peckham-nunhead"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]:
+          "Peckham & Nunhead Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "streatham-free-film-festival",
+    name: "Streatham Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/streatham/",
+    aliases: ["streatham"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Streatham Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "raynes-park-free-film-festival",
+    name: "Raynes Park Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/raynes-park/",
+    aliases: ["raynes-park"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "Raynes Park Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "west-norwood-free-film-festival",
+    name: "West Norwood Free Film Festival",
+    url: "https://freefilmfestivals.org/filmfestival/west-norwood/",
+    aliases: ["wnfff", "west-norwood"],
+    matchers: [
+      {
+        [FilterId.PerformanceNotesSearch]: "West Norwood Free Film Festival",
+      },
+    ],
+  },
+  {
+    id: "animation-in-love",
+    name: "Animation in Love",
+    url: "https://www.barbican.org.uk/whats-on/2026/series/animation-in-love",
+    aliases: [],
+    matchers: [
+      {
+        // Matches "Animation In Love: ..." / "Animation in Love: ..."
+        // at the Barbican, running June–October 2026
+        [FilterId.ShowingTitleSearch]: "Animation in Love",
+        [FilterId.Venues]: ["barbican.org.uk"],
+      },
+    ],
+  },
+  {
+    id: "hong-kong-film-festival-uk",
+    name: "Hong Kong Film Festival UK",
+    url: "https://www.hkff.uk",
+    aliases: ["hkff", "hong-kong-film-festival"],
+    matchers: [
+      {
+        // Venues title these "Hong Kong Film Festival UK: ..." (Rio) or
+        // "Hong Kong Film Festival 2026-27 - ..." (Theatreship). The fourth
+        // edition runs 25 September – 4 October 2026 across 11 London venues.
+        [FilterId.ShowingTitleSearch]: "Hong Kong Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Hong Kong Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "HKFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "HKFF",
+      },
+    ],
+  },
+  {
+    id: "kino-london-short-film-festival",
+    name: "Kino London Short Film Festival",
+    url: "https://www.kinoshortfilm.com",
+    aliases: ["klsff", "kino-london"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Kino London Short Film Festival",
+      },
+      {
+        // Catches the industry sessions and open-screen nights, which are
+        // titled "Kino Industry Session: …" and "Short Film Open Screen".
+        [FilterId.PerformanceNotesSearch]: "Kino Short Film",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Kino London Short Film Festival",
+      },
+    ],
+  },
+  {
+    id: "ukrainian-film-festival",
+    name: "Ukrainian Film Festival",
+    url: "https://uil.org.uk/ukrainian-film-festival/",
+    aliases: ["ukrainian-film-fest"],
+    matchers: [
+      // Curzon titles these "Ukrainian Film Fest: …"; the festival's own name
+      // is "Ukrainian Film Festival", and the shorter string matches both.
+      { [FilterId.ShowingTitleSearch]: "Ukrainian Film Fest" },
+      { [FilterId.PerformanceNotesSearch]: "Ukrainian Film Fest" },
+    ],
+  },
+  {
+    id: "wine-dark-short-film-festival",
+    name: "Wine Dark Short Film Festival",
+    url: "https://www.winedark.co.uk/wine-dark-short-film-festival",
+    aliases: ["wdsff", "wine-dark"],
+    matchers: [
+      // Picturehouse titles each strand "<Strand> - Wine Dark Short Film
+      // Festival".
+      { [FilterId.ShowingTitleSearch]: "Wine Dark Short Film Festival" },
+      { [FilterId.PerformanceNotesSearch]: "Wine Dark Short Film Festival" },
+    ],
+  },
+  {
+    id: "fringe-queer-film-arts-fest",
+    name: "Fringe! Queer Film & Arts Fest",
+    url: "https://www.fringefilmfest.com",
+    aliases: ["fringe", "fringe-queer-film-festival"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Fringe",
+        [FilterId.Venues]: fringeVenues,
+      },
+      { [FilterId.ShowingTitleSearch]: "Fringe Queer Film Festival" },
+      { [FilterId.ShowingTitleSearch]: "Fringe Presents" },
+      { [FilterId.PerformanceNotesSearch]: "Fringe Queer Film Festival" },
+    ],
+  },
+  {
+    id: "queerhub",
+    name: "QUEERHUB Film Festival",
+    url: "https://queerhub.uk/festival",
+    aliases: ["queerhub-film-festival"],
+    matchers: [
+      // Ticket Tailor listings at the London Film School, one per evening:
+      // "QUEERHUB Film Festival: Friday", "… Saturday", October 23–24 2026
+      { [FilterId.ShowingTitleSearch]: "QUEERHUB" },
+    ],
+  },
+  {
+    id: "siffa",
+    name: "SIFFA: Independent International Film Festival & Awards",
+    url: "https://siffafestival.co.uk/",
+    aliases: ["siffa-festival"],
+    matchers: [
+      {
+        // Matches the Vue Piccadilly listings, "SIFFA 2026 Opening Gala:
+        // Nicholas and Alexandra" and "SIFFA 2026: Gipsy Kings + Q&A | In
+        // Competition". Search normalisation strips spacing, so "SIFFA" alone
+        // would claim any title running "…s iffa…" together; the edition's
+        // year anchors it without tying it to one edition.
+        [FilterId.ShowingTitleSearch]: "SIFFA 20",
+      },
+    ],
+  },
+  {
+    id: "fighting-spirit-film-festival",
+    name: "The Fighting Spirit Film Festival",
+    url: "https://www.fightingspiritfilmfestival.com",
+    aliases: ["fsff", "fighting-spirit"],
+    matchers: [
+      {
+        // The Rio titles each screening "Fighting Spirit: …". Scoped to the
+        // venue because "Fighting Spirit" is also a film title in its own
+        // right; the full festival name is matched unscoped below.
+        [FilterId.ShowingTitleSearch]: "Fighting Spirit",
+        [FilterId.Venues]: ["riocinema.org.uk"],
+      },
+      { [FilterId.ShowingTitleSearch]: "Fighting Spirit Film Festival" },
+    ],
+  },
+  {
+    id: "south-london-film-festival",
+    name: "The South London Film Festival",
+    url: "https://www.southlondonfilmfest.co.uk/",
+    aliases: ["slff", "south-london-film-fest"],
+    matchers: [
+      {
+        // The Ritzy titles these "The South London Film Festival Presents: …"
+        // and "The South London Film Festival Official Awards Showcase 2026";
+        // the 2026 edition runs 12–27 September, all at the Ritzy.
+        [FilterId.ShowingTitleSearch]: "South London Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "South London Film Festival",
+      },
+    ],
+  },
+  {
+    id: "tibet-film-festival",
+    name: "Tibet Film Festival London",
+    url: "https://www.tibetfilmfestival.org/london",
+    aliases: ["tff-london", "tibet-film-festival-london"],
+    matchers: [
+      {
+        // Venues title these "Tibet Film Festival: ..." / "Tibet Film Festival
+        // London presents: ..."; the 2026 London edition runs 25-27 September
+        // across east and central London (past editions: Genesis, Rio, The
+        // Garden Cinema, Regent Street Cinema). Left unscoped because the
+        // festival moves venues each year and the full name is distinctive
+        // enough on its own - a bare "Tibet" would catch films with the word in
+        // their title.
+        [FilterId.ShowingTitleSearch]: "Tibet Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Tibet Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "TFF London",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "TFF London",
+      },
+    ],
+  },
+  {
+    id: "frightfest",
+    name: "FrightFest",
+    url: "https://www.frightfest.co.uk",
+    aliases: ["fright-fest", "tubi-frightfest"],
+    matchers: [
+      {
+        // The ODEON Luxe Leicester Square and West End screens tag every
+        // performance "Part of FrightFest <year>". Search normalisation strips
+        // spaces, so this single string also covers venues that write it
+        // "Fright Fest".
+        [FilterId.PerformanceNotesSearch]: "FrightFest",
+      },
+      {
+        // Some venues instead title the screening "FrightFest presents: ..." /
+        // "FrightFest Halloween All-Dayer: ...". Left unscoped because the
+        // festival moves house (Prince Charles, Empire, Cineworld, now the two
+        // ODEON Luxes) and the name is distinctive enough on its own.
+        [FilterId.ShowingTitleSearch]: "FrightFest",
+      },
+    ],
+  },
+  {
+    id: "unrestricted-view-horror-film-festival",
+    name: "Unrestricted View Horror Film Festival",
+    url: "https://uvff.co.uk/uvhff-2026",
+    aliases: ["uvhff"],
+    matchers: [
+      {
+        // Matches the Everyman Screen on the Green opening night, "Unrestricted
+        // View Horror Film Festival 2026: Opening Night", and the programme's
+        // own billing for the Hen & Chickens screenings ("UNRESTRICTED VIEW
+        // HORROR FILM FESTIVAL 2026 X BIFA: SAINT MAUD"). Keeping "Horror" in
+        // the name leaves out the spring Unrestricted View Film Festival, a
+        // separate festival from the same team.
+        [FilterId.ShowingTitleSearch]: "Unrestricted View Horror",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Unrestricted View Horror",
+      },
+      {
+        // The festival's own abbreviation, as in "UVHFF x About Bloody Time"
+        [FilterId.ShowingTitleSearch]: "UVHFF",
+      },
+    ],
+  },
+  {
+    id: "bfi-london-film-festival",
+    name: "BFI London Film Festival",
+    url: "https://www.bfi.org.uk/london-film-festival",
+    aliases: ["lff", "london-film-festival"],
+    matchers: [
+      {
+        // The full name is the only form safe to match unscoped: search
+        // normalisation strips spacing, so a bare "London Film Festival" is a
+        // substring of "The South London Film Festival" and would swallow the
+        // Ritzy's programme whole. Keeping the BFI prefix also picks up the
+        // year-round member events ("BFI London Film Festival Member Quiz").
+        [FilterId.ShowingTitleSearch]: "BFI London Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "BFI London Film Festival",
+      },
+      {
+        // Partner cinemas drop the BFI prefix and shorten the name, titling
+        // screenings "London Film Festival: ..." or "LFF: ...". Both short
+        // forms are scoped to the festival's venues — "lff" survives
+        // normalisation as a bare three-letter run that could fall inside an
+        // ordinary title.
+        [FilterId.ShowingTitleSearch]: "London Film Festival",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Film Festival",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "LFF",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LFF",
+        [FilterId.Venues]: londonFilmFestivalVenues,
+      },
+    ],
+  },
+  {
+    id: "london-independent-film-festival",
+    name: "London Independent Film Festival",
+    url: "https://liff.org",
+    // The festival's own acronym is LIFF, but that slug belongs to the London
+    // Indian Film Festival, which registered it first — aliases become static
+    // routes, so a second claim on it would resolve to the other festival.
+    aliases: ["london-indie-film-festival", "london-independent-film-fest"],
+    matchers: [
+      {
+        // The Genesis titles every screening and industry session "<Name> -
+        // LIFF", which is the only marker the listings carry — the films
+        // themselves are premieres with no other tell. Search normalisation
+        // strips punctuation and spacing, so the suffix cannot be anchored and
+        // a bare "LIFF" is a three-letter run that falls inside ordinary words
+        // ("Cliffhanger"). It is therefore scoped to the Genesis, which has
+        // hosted every edition since the festival started and is the only
+        // venue it uses.
+        [FilterId.ShowingTitleSearch]: "LIFF",
+        [FilterId.Venues]: ["genesiscinema.co.uk"],
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LIFF",
+        [FilterId.Venues]: ["genesiscinema.co.uk"],
+      },
+      {
+        // The full name is distinctive enough to match unscoped, so a venue the
+        // festival spills into is still picked up.
+        [FilterId.ShowingTitleSearch]: "London Independent Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Independent Film Festival",
+      },
+    ],
+  },
+  {
+    id: "london-breeze-film-festival",
+    name: "London Breeze Film Festival",
+    url: "https://londonbreezefilmfestival.com",
+    aliases: ["london-breeze", "barnes-film-festival"],
+    matchers: [
+      {
+        // Every venue leads with the festival's name, in one form or another:
+        // "London Breeze Film Festival Opening Gala Film: ..." (Regent Street
+        // Cinema), "London Breeze Film Festival presents ..." (The Garden
+        // Cinema), "London Breeze Industry Networker". "London Breeze" is the
+        // shortest form all of them share, and is distinctive enough to match
+        // unscoped — which matters here, because the festival takes a
+        // different set of venues each year.
+        [FilterId.ShowingTitleSearch]: "London Breeze",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Breeze",
+      },
+      {
+        // The one listing in the programme carrying no marker of its own: The
+        // Garden Cinema files its 25th-anniversary screening of Silent Grace
+        // under the festival on its own site, but neither the showing title nor
+        // the performance notes we receive say so. Pinned to the venue and to
+        // the run of the 11th edition (21–25 October 2026) so a later
+        // revival of the film is not swept in with it.
+        [FilterId.ShowingTitleSearch]: "Silent Grace + Panel",
+        [FilterId.Venues]: ["thegardencinema.co.uk"],
+        [FilterId.DateRange]: { start: 1792537200000, end: 1792972800000 },
+      },
+    ],
+  },
+  {
+    id: "film-africa",
+    name: "Film Africa",
+    url: "https://www.filmafrica.org/",
+    aliases: ["film-africa-festival"],
+    matchers: [
+      {
+        // Partner venues title their screenings with the festival's name -
+        // "Film Africa: Tutu" (Rio), "Congo Boy (Film Africa)" (Riverside),
+        // "Film Africa: O Profeta" (Bernie Grant). Left unscoped, as the
+        // festival takes a different set of partner venues each year. "African
+        // Odysseys" is not matched: it is BFI Southbank's year-round strand.
+        [FilterId.ShowingTitleSearch]: "Film Africa",
+      },
+      {
+        // BFI Southbank notes each screening "Part of Film Africa 2026", and
+        // Ciné Lumière "Part of Film Africa 2026" from its season tag.
+        [FilterId.PerformanceNotesSearch]: "Film Africa",
+      },
+    ],
+  },
+  {
+    id: "erotic-film-festival-london",
+    name: "Erotic Film Festival London",
+    url: "https://eroticfilmfestivallondon.com",
+    aliases: ["eff-london", "erotic-film-festival"],
+    matchers: [
+      {
+        // Coldharbour Blue billed the 2025 edition as plain "Erotic Film
+        // Festival London", and the festival's own Eventbrite as "Erotic Film
+        // Festival London Presents...". The full name is distinctive enough to
+        // match unscoped, which matters here: the festival takes a different
+        // pair of venues each year — Coldharbour Blue and The Bath House on
+        // Eastway for the 1–2 October 2026 edition.
+        [FilterId.ShowingTitleSearch]: "Erotic Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Erotic Film Festival",
+      },
+      {
+        // The festival brands itself "EFF London". The bare acronym is far too
+        // short to match on — search normalisation strips spacing, so "EFF"
+        // would fall inside ordinary words — but "EFF London" survives as a
+        // distinctive run.
+        [FilterId.ShowingTitleSearch]: "EFF London",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "EFF London",
+      },
+    ],
+  },
+  {
+    id: "ealing-film-festival",
+    name: "Ealing Film Festival",
+    url: "https://ealingfilmfestival.com",
+    // "EFF" is not claimed here: the Erotic Film Festival already brands
+    // itself EFF London, and a bare three-letter slug is ambiguous between
+    // them.
+    aliases: ["ealing-film-fest", "ealing"],
+    matchers: [
+      {
+        // ActOne titles the programme blocks "Ealing Film Festival: Homegrown
+        // 1"; "Ealing Film Fest" is the shorter form, and a substring of the
+        // full name once search normalisation strips spacing, so it covers
+        // both. Left unscoped: the festival takes whichever rooms in the
+        // borough it can get — ActOne, Ealing Picturehouse and Pitzhanger
+        // Manor — and a bare "Ealing" would catch the Ealing Studios
+        // comedies, which play all over London.
+        [FilterId.ShowingTitleSearch]: "Ealing Film Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Ealing Film Fest",
+      },
+    ],
+  },
+  {
+    id: "windrush-international-caribbean-film-festival",
+    name: "Windrush International Caribbean Film Festival",
+    url: "https://www.instagram.com/windrush_fest",
+    // "windrush" alone is safe as a slug — the festivals namespace has nothing
+    // else with the name — but deliberately not as a matcher: films about the
+    // Windrush generation carry it in their own titles, and the Ritzy sits on
+    // Windrush Square.
+    aliases: ["wicff", "wcff", "windrush-caribbean-film-festival", "windrush"],
+    matchers: [
+      {
+        // The festival has billed itself both ways — "Windrush Caribbean Film
+        // Festival" for the UK editions and "Windrush International Caribbean
+        // Film Festival" for the 2026 one — so the matcher takes the part they
+        // share rather than either full name. Left unscoped: the London
+        // programme is co-presented with Black History Walks and African
+        // Odysseys and takes whichever rooms it can get. "African Odysseys" is
+        // not matched: it is a year-round BFI Southbank strand, and claiming it
+        // would file every one of its screenings under this festival.
+        [FilterId.ShowingTitleSearch]: "Caribbean Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Caribbean Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "WICFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "WICFF",
+      },
+    ],
+  },
+  {
+    id: "uk-jewish-film-festival",
+    name: "UK Jewish Film Festival",
+    url: "https://ukjewishfilm.org/",
+    aliases: ["ukjff", "jewish-film-festival"],
+    matchers: [
+      {
+        // Curzon titles its screenings "UKJFF: …" and Picturehouse
+        // "UKJFF 2026: …". The abbreviation is distinctive enough to match
+        // unscoped: the festival spreads across a dozen London venues and
+        // changes them from year to year.
+        [FilterId.ShowingTitleSearch]: "UKJFF",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "UK Jewish Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "UK Jewish Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "UKJFF",
+      },
+    ],
+  },
+  {
+    id: "london-korean-film-festival",
+    name: "London Korean Film Festival",
+    url: "https://www.koreanfilm.co.uk/",
+    aliases: ["lkff", "korean-film-festival"],
+    matchers: [
+      {
+        // BFI Southbank and the ICA note each screening "Part of London Korean
+        // Film Festival 2026", and Ciné Lumière "Part of London Korean Film
+        // Festival" from its season tag. The titles themselves carry no
+        // marker, and the films go on general release - Possible Love played
+        // the ICA and a dozen other cinemas the fortnight before the festival
+        // - so the notes are what tells a festival screening from a regular
+        // one.
+        [FilterId.PerformanceNotesSearch]: "London Korean Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "London Korean Film Festival",
+      },
+      {
+        // The festival brands itself LKFF ("LKFF 2026 Opening Gala"). Left
+        // unscoped, as UKJFF and LPFF are: the abbreviation is distinctive and
+        // the festival's venues change from year to year.
+        [FilterId.ShowingTitleSearch]: "LKFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LKFF",
+      },
+    ],
+  },
+  {
+    id: "mubi-fest-london",
+    name: "MUBI FEST London",
+    url: "https://mubifest.com/en/london",
+    aliases: ["mubi-fest", "mubifest"],
+    matchers: [
+      {
+        // Hackney Picturehouse titles every screening "MUBI FEST: …". Bare
+        // "MUBI" is not matched: MUBI distributes films that play all over
+        // London, and the festival's own screenings are noted "Presented by
+        // MUBI" or "In partnership with …", neither of which names it.
+        [FilterId.ShowingTitleSearch]: "MUBI Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "MUBI Fest",
+      },
+    ],
+  },
+  {
+    id: "french-film-festival-london",
+    name: "French Film Festival London",
+    url: "https://www.institut-francais.org.uk/festivals-and-series/french-film-festival-london/",
+    // "french-film-festival" is not claimed here: it is ambiguous between this
+    // and French Film Festival UK, a separate touring festival.
+    aliases: ["fffl"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of French Film Festival
+        // London" from its season tag. The full name rather than "French Film
+        // Fest", which would also claim the touring French Film Festival UK -
+        // a separate festival, which titles its London screenings "French Film
+        // Fest UK: …".
+        [FilterId.PerformanceNotesSearch]: "French Film Festival London",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival London",
+      },
+    ],
+  },
+  {
+    id: "french-film-festival-uk",
+    name: "French Film Festival UK",
+    url: "https://frenchfilmfestival.org.uk/",
+    aliases: ["ffuk", "french-film-festival-uk-and-ireland"],
+    matchers: [
+      {
+        // The Gate titles its screening "French Film Fest UK: The Money Maker
+        // + Q&A". Both that and the full name are matched: search
+        // normalisation runs the words together, so "French Film Fest UK" is
+        // not a substring of "French Film Festival UK". Neither claims the
+        // French Film Festival London, which ends "London", not "UK".
+        [FilterId.ShowingTitleSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Fest UK",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "French Film Festival UK",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "French Film Festival UK",
+      },
+    ],
+  },
+  {
+    id: "fashion-in-film-festival",
+    name: "Fashion in Film Festival",
+    url: "https://www.fashioninfilm.com/",
+    aliases: ["fiff", "fashion-in-film"],
+    matchers: [
+      {
+        // Ciné Lumière notes each screening "Part of Fashion in Film Festival"
+        // from its season tag. Its own "Fashion & Cinema" series is a
+        // different programme and does not match.
+        [FilterId.PerformanceNotesSearch]: "Fashion in Film Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Fashion in Film Festival",
+      },
+    ],
+  },
+  {
+    id: "london-palestine-film-festival",
+    name: "London Palestine Film Festival",
+    url: "https://www.palestinefilm.org.uk/",
+    aliases: ["lpff", "palestine-film-festival"],
+    matchers: [
+      {
+        // The festival brands itself LPFF (#LPFF2026), so venues tend to
+        // title screenings "LPFF: …" or "LPFF 2026: …". Left unscoped, as the
+        // abbreviation is distinctive and the festival's venues change from
+        // year to year.
+        [FilterId.ShowingTitleSearch]: "LPFF",
+      },
+      {
+        // The full name rather than "Palestine Film Festival" alone, which
+        // other cities' festivals share and which could arrive as a touring
+        // programme at a London venue.
+        [FilterId.ShowingTitleSearch]: "London Palestine Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Palestine Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "LPFF",
+      },
+    ],
+  },
+  {
+    id: "phoenix-rising-international-film-festival",
+    name: "Phoenix Rising International Film Festival",
+    url: "https://www.priff.co.uk/",
+    aliases: ["priff", "phoenix-rising"],
+    matchers: [
+      {
+        // The full name rather than "Phoenix Rising" alone, which is also the
+        // title of films that could screen anywhere in London.
+        [FilterId.ShowingTitleSearch]: "Phoenix Rising International",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Phoenix Rising International",
+      },
+      {
+        // The festival brands itself PRIFF. Left unscoped, as the
+        // abbreviation is distinctive and the festival spreads its programme
+        // across more than one venue.
+        [FilterId.ShowingTitleSearch]: "PRIFF",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "PRIFF",
+      },
+    ],
+  },
+  {
+    id: "turn-up-film-festival",
+    name: "Turn Up Film Festival",
+    url: "https://turnupfilmfestival.com/",
+    aliases: ["tuff"],
+    matchers: [
+      {
+        // Matches the screenings, "Turn Up Film Festival - Short Film
+        // Competition Part 1 + Q&A"
+        [FilterId.ShowingTitleSearch]: "Turn Up Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Turn Up Film Festival",
+      },
+      {
+        // Matches the industry programme, "Line producing with Ioanna
+        // Karavela - Masterclass - TUFF 2027 (Room UG05)". Search
+        // normalisation strips spacing, so "TUFF" alone would also claim
+        // "We Are Made of Star Stuff" or "Funky Stuff"; the edition's year
+        // anchors it without tying it to one edition, and the venue scope
+        // keeps any "… Stuff 20…" title elsewhere out.
+        [FilterId.ShowingTitleSearch]: "TUFF 20",
+        [FilterId.Venues]: ["regentstreetcinema.com"],
+      },
+    ],
+  },
+  {
+    id: "london-international-animation-festival",
+    name: "London International Animation Festival",
+    url: "https://liaf.org.uk/",
+    aliases: ["liaf"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]:
+          "London International Animation Festival",
+      },
+      {
+        // The Garden Cinema notes each screening "Part of London
+        // International Animation Festival 2026"
+        [FilterId.PerformanceNotesSearch]:
+          "London International Animation Festival",
+      },
+      {
+        // Matches "LIAF 2026: International Competition Programme 1- Abstract
+        // Showcase". Search normalisation strips spacing, so "LIAF" alone
+        // would claim any title running "…li af…" together; the edition's
+        // year anchors it without tying it to one edition.
+        [FilterId.ShowingTitleSearch]: "LIAF 20",
+      },
+    ],
+  },
+  {
+    id: "romanian-film-festival",
+    name: "Romanian Film Festival UK",
+    url: "https://www.rofilmfest.co.uk/",
+    aliases: ["rff", "rofilmfest", "romanian-film-festival-uk"],
+    matchers: [
+      {
+        // Search normalisation runs the words together, so "Romanian Film
+        // Fest" also covers the full "Romanian Film Festival" and the
+        // festival's own "Romanian Film Fest UK"
+        [FilterId.ShowingTitleSearch]: "Romanian Film Fest",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Romanian Film Fest",
+      },
+      {
+        // Matches "RFF 2026: 3 Days in September" at Curzon Mayfair and Soho.
+        // "RFF" is a common acronym - an unrelated "RFF: GIRLFRIENDS + CLAUDIA
+        // WEILL" has turned up elsewhere - so the edition's year anchors it
+        // and it is scoped to the Curzon screens the festival uses in London.
+        [FilterId.ShowingTitleSearch]: "RFF 20",
+        [FilterId.Venues]: ["curzon.com-soho", "curzon.com-mayfair"],
+      },
+    ],
+  },
+  {
+    id: "native-spirit-festival",
+    name: "Native Spirit Festival",
+    url: "https://nativespiritfoundation.org/",
+    aliases: ["native-spirit", "native-spirit-film-festival", "nsff"],
+    matchers: [
+      {
+        [FilterId.ShowingTitleSearch]: "Native Spirit Festival",
+      },
+      {
+        [FilterId.ShowingTitleSearch]: "Native Spirit Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Native Spirit Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "Native Spirit Film Festival",
+      },
+    ],
+  },
+  {
+    id: "armenian-film-festival",
+    name: "Armenian Film Festival London",
+    url: "https://armenianartsandfilm.com/film/",
+    aliases: ["affl", "armenian-film-festival-london"],
+    matchers: [
+      {
+        // The ICA, the festival's home, notes each screening "Part of
+        // Armenian Film Festival 2026"
+        [FilterId.PerformanceNotesSearch]: "Armenian Film Festival",
+      },
+      {
+        // Matches "Armenian Film Festival Masterclass: …", and the festival's
+        // full name should a venue put it in the title instead
+        [FilterId.ShowingTitleSearch]: "Armenian Film Festival",
+      },
+    ],
+  },
+  {
+    id: "marginal-film-festival",
+    name: "The Marginal Film Festival",
+    url: "https://www.instagram.com/marginal_film_festival/",
+    aliases: ["mostra-do-filme-marginal"],
+    matchers: [
+      {
+        // Matches "The Marginal Film Festival – Opening Night: …" at the Cinema
+        // Museum and "The Marginal Film Festival Session IV – …"
+        [FilterId.ShowingTitleSearch]: "Marginal Film Festival",
+      },
+      {
+        // Matches "Marginal Film Session II: …" and "Marginal Film Session III:
+        // …", the festival's own OutSavvy listings at LARC and Farr's Dalston
+        [FilterId.ShowingTitleSearch]: "Marginal Film Session",
+      },
+      {
+        // OutSavvy notes each of the festival's events "Presented by The
+        // Marginal Film Festival"
+        [FilterId.PerformanceNotesSearch]: "Marginal Film Festival",
+      },
+    ],
+  },
+];

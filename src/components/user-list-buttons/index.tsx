@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { BookmarkIcon, EyeIcon } from "@/components/icons";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";

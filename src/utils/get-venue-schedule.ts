@@ -1,6 +1,9 @@
-import type { Movie, MoviePerformance } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
-import { addLondonDays, getLondonMidnightTimestamp } from "@/utils/format-date";
+import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import {
+  addLondonDays,
+  getLondonMidnightTimestamp,
+} from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A single performance in the venue schedule board, kept alongside its movie so

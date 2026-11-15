@@ -7,7 +7,7 @@ import ListProgress from "@/components/list-progress";
 import EmptyState from "@/components/empty-state";
 import CanonicalRedirect from "@/components/canonical-redirect";
 import FilmPosterGrid from "@/components/film-poster-grid";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { MovieList } from "@/data/movie-lists";
 import styles from "./page.module.css";
 

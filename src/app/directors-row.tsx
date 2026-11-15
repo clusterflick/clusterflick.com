@@ -7,7 +7,7 @@ import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { UserListId } from "@/lib/user-lists";
-import { FilterId } from "@/lib/filters/types";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
 import {
   getFavouriteDirectors,

@@ -4,16 +4,16 @@ import {
   FormatSourceDefault,
   FormatDimensionDefault,
   type MoviePerformance,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import type { VenueScheduleDay } from "@/utils/get-venue-schedule";
 import {
   formatShowingTime,
   formatDateShort,
   timestampToLondonDateString,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import { FORMAT_LABELS } from "@/utils/format-labels";
-import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+import { ACCESSIBILITY_LABELS } from "@clusterflick/catalogue/utils/accessibility-labels";
 import styles from "./venue-schedule-board.module.css";
 
 export type { VenueScheduleDay } from "@/utils/get-venue-schedule";

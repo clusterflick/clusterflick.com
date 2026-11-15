@@ -7,8 +7,8 @@ import {
   type MoviePerformance,
   type MoviePerformanceFormat,
   type Venue,
-} from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+} from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import {
   getFormatsIndex,
   getFilmSourcesUrl,

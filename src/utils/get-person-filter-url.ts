@@ -3,7 +3,7 @@
 import {
   PEOPLE_GROUPS,
   type PeopleFilterId,
-} from "@/lib/filters/modules/people";
+} from "@clusterflick/catalogue/filters/modules/people";
 
 /**
  * The films grid, filtered to one person's credits — what a director or cast

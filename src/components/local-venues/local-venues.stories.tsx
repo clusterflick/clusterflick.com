@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { NearMeVenue, NearMeFilmClub } from "@/utils/get-near-me-data";
 import type { LocalVenuesItem } from ".";
 import LocalVenues from ".";

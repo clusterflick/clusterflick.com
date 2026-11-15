@@ -6,7 +6,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import OutlineHeading from "@/components/outline-heading";
 import Tag from "@/components/tag";
 import { getStaticData } from "@/utils/get-static-data";
-import { FESTIVALS } from "@/data/festivals";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import { CHANGELOG, tagColor, type ChangeHelpers, type Ref } from "./data";
 import styles from "./page.module.css";

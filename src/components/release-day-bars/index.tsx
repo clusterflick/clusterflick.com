@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { formatDateLong } from "@/utils/format-date";
+import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import styles from "./release-day-bars.module.css";
 
 export interface ReleaseDayBarsItem {

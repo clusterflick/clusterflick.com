@@ -5,7 +5,7 @@ import EventPoster, {
   type EventPosterIncludedMovie,
 } from "@/components/event-poster";
 import Tag from "@/components/tag";
-import { formatDuration } from "@/utils/format-date";
+import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { setUseBrowserBack } from "@/utils/nav-links";
 import styles from "./movie-summary.module.css";
 

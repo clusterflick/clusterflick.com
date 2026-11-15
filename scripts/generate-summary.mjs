@@ -25,7 +25,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   getRating,
   EVERGREEN_MAX_FUTURE,
-} from "../src/utils/movie-ratings.mjs";
+} from "../packages/catalogue/src/utils/movie-ratings.mjs";
 import {
   getAllowedFilmTitles,
   findUnknownFilms,
@@ -63,7 +63,7 @@ const GLOBAL_MAX_PER_VENUE = 3;
 const CINEMA_TYPES = new Set(["Cinema", "Community Cinema", "Screening Room"]);
 
 // getRating + the review-count floors and EVERGREEN_MAX_FUTURE are shared with
-// the discovery helpers — see ../src/utils/movie-ratings.mjs.
+// the discovery helpers — see ../packages/catalogue/src/utils/movie-ratings.mjs.
 
 // A film counts as an "acclaimed gem" if well-reviewed but showing at few venues.
 const GEM_RATING_MIN = 0.76; // ~3.8/5 Letterboxd, 76% RT, 7.6 IMDb

@@ -1,14 +1,17 @@
 "use client";
 
 import { useMemo } from "react";
-import { CinemaData } from "@/types";
+import { CinemaData } from "@clusterflick/catalogue/types";
 import {
   DateOption,
   DATE_OPTIONS,
   TimeOption,
   TIME_OPTIONS,
 } from "@/state/filter-config-context";
-import { DAY_START_MINUTES, DAY_END_MINUTES } from "@/lib/filters/modules";
+import {
+  DAY_START_MINUTES,
+  DAY_END_MINUTES,
+} from "@clusterflick/catalogue/filters/modules";
 import {
   getLondonMidnightTimestamp,
   getLondonDayOfWeek,
@@ -17,7 +20,7 @@ import {
   minutesToTimeString,
   timeStringToMinutes,
   addLondonDays,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import Chip from "@/components/chip";
 import ExpandableSection from "@/components/expandable-section";
 import styles from "./filter-overlay.module.css";

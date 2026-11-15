@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import PageContent from "@/app/movies/[id]/[slug]/page-content";
 import type { VenuePlayCount } from "@/app/movies/[id]/[slug]/components/playing-at-section";
-import { Category } from "@/types";
+import { Category } from "@clusterflick/catalogue/types";
 import type {
   Movie,
   Genre,
@@ -9,7 +9,7 @@ import type {
   Venue,
   MetaData,
   CinemaData,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import type { FormatDefinition } from "@/data/formats";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";

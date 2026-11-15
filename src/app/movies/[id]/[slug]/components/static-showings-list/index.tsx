@@ -1,9 +1,13 @@
-import type { MoviePerformance, Showing, Venue } from "@/types";
+import type {
+  MoviePerformance,
+  Showing,
+  Venue,
+} from "@clusterflick/catalogue/types";
 import {
   formatDateLong,
   getDaysFromNow,
   formatDaysFromNow,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import { titlesDiffer } from "@/utils/title-differs";
 import PerformanceCard from "@/components/performance-card";
 import styles from "../showings-section/showings-section.module.css";

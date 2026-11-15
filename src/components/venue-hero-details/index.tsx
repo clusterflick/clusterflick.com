@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { SocialHandles } from "@/utils/build-social-links";
+import type { SocialHandles } from "@clusterflick/catalogue/types";
 import Tag from "@/components/tag";
 import SocialLinks from "@/components/social-links";
 import { DetailPageStatusCard } from "@/components/detail-page-hero";

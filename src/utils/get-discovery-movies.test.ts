@@ -5,8 +5,8 @@ import {
   type MoviePerformance,
   type MoviePerformanceOccasions,
   type IncludedMovie,
-} from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+} from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import {
   getPopularMovies,
   getNewAdditions,

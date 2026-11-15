@@ -1,15 +1,19 @@
-import type { Movie, MoviePerformance, Position } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type {
+  Movie,
+  MoviePerformance,
+  Position,
+} from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import type { NearMeFilmClub, NearMeVenue } from "@/utils/get-near-me-data";
 import {
   DEFAULT_CATEGORIES,
   getPrimaryCategory,
-} from "@/lib/filters/modules/categories";
+} from "@clusterflick/catalogue/filters/modules/categories";
 import {
   getDistanceInMiles,
   NEARBY_MAX_RADIUS_MILES,
-} from "@/utils/geo-distance";
-import { MS_PER_DAY } from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/geo-distance";
+import { MS_PER_DAY } from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A venue has to have *more* than this many screenings in the next

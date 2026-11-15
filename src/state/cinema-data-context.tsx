@@ -9,9 +9,9 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { CinemaData, MetaData } from "@/types";
-import { getLondonMidnightTimestamp } from "@/utils/format-date";
-import { pruneByPerformances } from "@/utils/prune-movies";
+import { CinemaData, MetaData } from "@clusterflick/catalogue/types";
+import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
+import { pruneByPerformances } from "@clusterflick/catalogue/utils/prune-movies";
 import { fetchWithRetry, FetchRetryError } from "@/utils/fetch-with-retry";
 
 /**

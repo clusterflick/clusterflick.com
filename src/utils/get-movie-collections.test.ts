@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { CollectionSummary } from "@/types";
+import type { CollectionSummary } from "@clusterflick/catalogue/types";
 import { getMovieCollections } from "./get-movie-collections";
 
 const collections: Record<string, CollectionSummary> = {

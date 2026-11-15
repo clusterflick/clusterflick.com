@@ -1,0 +1,495 @@
+import { FilterId, FilterState, MoviesRecord, AnyFilterModule } from "./types";
+import {
+  searchFilter,
+  showingTitleSearchFilter,
+  showingUrlSearchFilter,
+  performanceNotesSearchFilter,
+  categoriesFilter,
+  venuesFilter,
+  dateRangeFilter,
+  timeRangeFilter,
+  genresFilter,
+  letterboxdRatingFilter,
+  imdbRatingFilter,
+  rottenTomatoesRatingFilter,
+  directorsFilter,
+  castFilter,
+  moviesFilter,
+  accessibilityFilter,
+  occasionsFilter,
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
+  hideFinishedFilter,
+  hideSoldOutFilter,
+  hideSeenFilter,
+  buildProgrammeFilter,
+  PROGRAMME_GROUPS,
+} from "./modules";
+import { createMatchAny } from "./match-any";
+
+/**
+ * Runs a set of OR'd matchers (a film club's or festival's) over a set of
+ * movies: each matcher is this pipeline over a fully permissive state, so only
+ * the matcher itself constrains what it finds. See `createMatchAny`.
+ */
+export const matchAny = createMatchAny((movies, matcher) =>
+  apply(movies, { ...getPermissiveState(), ...matcher }),
+);
+
+// Built here rather than in ./modules because a programme is a set of matchers
+// run through this pipeline, which is what `matchAny` hands them.
+const [filmClubsFilter, festivalsFilter] = PROGRAMME_GROUPS.map((group) =>
+  buildProgrammeFilter(group, matchAny),
+);
+
+/**
+ * All registered filter modules.
+ * Order matters: filters are applied in this order.
+ */
+const modules: AnyFilterModule[] = [
+  // First, so they always see the record handed to the pipeline — on the grid,
+  // the dataset itself — which is what their matcher caches are keyed on. They
+  // are also the narrowest filters when set, leaving little for the rest.
+  filmClubsFilter,
+  festivalsFilter,
+  searchFilter,
+  showingTitleSearchFilter,
+  showingUrlSearchFilter,
+  performanceNotesSearchFilter,
+  categoriesFilter,
+  venuesFilter,
+  dateRangeFilter,
+  timeRangeFilter,
+  hideFinishedFilter,
+  hideSoldOutFilter,
+  genresFilter,
+  letterboxdRatingFilter,
+  imdbRatingFilter,
+  rottenTomatoesRatingFilter,
+  directorsFilter,
+  castFilter,
+  moviesFilter,
+  hideSeenFilter,
+  accessibilityFilter,
+  occasionsFilter,
+  formatSourceFilter,
+  formatPresentationFilter,
+  formatDimensionFilter,
+];
+
+/**
+ * Finds a module by its id.
+ */
+function getModule<K extends FilterId>(id: K): AnyFilterModule {
+  const filterModule = modules.find((m) => m.id === id);
+  if (!filterModule) {
+    throw new Error(`Filter module not found: ${id}`);
+  }
+  return filterModule;
+}
+
+/**
+ * Creates the default filter state with no filters applied.
+ */
+export function getDefaultState(): FilterState {
+  const state = {} as FilterState;
+  for (const filterModule of modules) {
+    (state as Record<string, unknown>)[filterModule.id] =
+      filterModule.getDefault();
+  }
+  return state;
+}
+
+/**
+ * Creates a fully permissive ("all") filter state where every filter is a no-op.
+ *
+ * Unlike getDefaultState(), which reflects the `/catalogue` browsing defaults
+ * (Films/Multiple/Shorts categories, a today→+7d window, finished showings
+ * hidden), this overrides the three restrictive modules with their true
+ * no-filter sentinels. Used as the base for club/festival matchers, where only
+ * the matcher itself should constrain results.
+ */
+export function getPermissiveState(): FilterState {
+  return {
+    ...getDefaultState(),
+    [FilterId.Categories]: null, // all categories, including Events
+    [FilterId.DateRange]: { start: null, end: null }, // all dates
+    [FilterId.HideFinished]: false, // finished showings too
+  };
+}
+
+/**
+ * The starting state for `base=all` links ("explore everything at X"): every
+ * category and every date, otherwise the browsing defaults.
+ *
+ * Deliberately not getPermissiveState(). That is the widest a search can be
+ * taken, so it shows finished showings too; a link a reader follows to browse
+ * should hide them as every other browsing view does.
+ */
+export function getBrowseAllState(): FilterState {
+  return {
+    ...getDefaultState(),
+    [FilterId.Categories]: null, // all categories, including Events
+    [FilterId.DateRange]: { start: null, end: null }, // all dates
+  };
+}
+
+/**
+ * `next` with every personal filter (see {@link FilterModule.personal}) taken
+ * from `current`. For whole-state replacements that stand for a search rather
+ * than a reset — a shared link, a quick filter — which would otherwise switch
+ * off a reader's own setting on their behalf.
+ */
+export function keepPersonalFilters(
+  next: FilterState,
+  current: FilterState,
+): FilterState {
+  const state = { ...next };
+  for (const filterModule of modules) {
+    if (filterModule.personal) {
+      (state as Record<string, unknown>)[filterModule.id] =
+        filterModule.get(current);
+    }
+  }
+  return state;
+}
+
+/**
+ * Sanitises an unknown object into a valid FilterState.
+ * Any missing or corrupt keys are replaced with their module defaults.
+ * This protects against stale session storage, malformed URL params,
+ * or future schema changes.
+ */
+export function sanitizeFilterState(raw: Record<string, unknown>): FilterState {
+  const defaults = getDefaultState();
+  const state = { ...defaults };
+
+  for (const filterModule of modules) {
+    const key = filterModule.id;
+    if (key in raw && raw[key] !== undefined) {
+      (state as Record<string, unknown>)[key] = raw[key];
+    }
+    // Otherwise the default from getDefaultState() is already in place
+  }
+
+  return state;
+}
+
+/**
+ * Gets a filter value from the state.
+ *
+ * Note: The `as FilterState[K]` cast is needed because getModule returns
+ * AnyFilterModule (a union type), and TypeScript can't narrow the return
+ * type based on the generic K. Type safety is enforced at call sites via
+ * the generic constraint.
+ */
+export function get<K extends FilterId>(
+  state: FilterState,
+  id: K,
+): FilterState[K] {
+  return getModule(id).get(state) as FilterState[K];
+}
+
+/**
+ * Sets a filter value, returning a new state.
+ *
+ * Note: The `as never` cast is needed because getModule returns AnyFilterModule
+ * (a union type), and TypeScript can't verify that `value` matches the specific
+ * module's expected type. Type safety is enforced at call sites - the generic K
+ * ensures callers pass the correct value type for the given filter id.
+ */
+export function set<K extends FilterId>(
+  state: FilterState,
+  id: K,
+  value: FilterState[K],
+): FilterState {
+  return getModule(id).set(state, value as never);
+}
+
+/**
+ * Checks if any filter is actively filtering.
+ */
+export function hasActiveFilters(state: FilterState): boolean {
+  return modules.some((module) => module.hasActiveFilter(state));
+}
+
+/**
+ * Structural equality for two filter values. Handles the shapes filter modules
+ * store: primitives, `T[] | null` (compared order-independently, since a set of
+ * selected categories/venues is the same filter regardless of toggle order),
+ * and `{ start, end }` range objects.
+ */
+function valuesEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    const seen = new Set(a);
+    return b.every((value) => seen.has(value));
+  }
+  if (
+    a !== null &&
+    b !== null &&
+    typeof a === "object" &&
+    typeof b === "object"
+  ) {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    return [...keys].every((key) =>
+      valuesEqual(
+        (a as Record<string, unknown>)[key],
+        (b as Record<string, unknown>)[key],
+      ),
+    );
+  }
+  return false;
+}
+
+/**
+ * Whether two filter states are equivalent — i.e. would produce the same
+ * results. Compares every registered module's value, so it stays correct as
+ * filters are added without any per-key maintenance.
+ */
+export function statesEqual(a: FilterState, b: FilterState): boolean {
+  return modules.every((module) => valuesEqual(module.get(a), module.get(b)));
+}
+
+/**
+ * The filters whose values differ between two states, in pipeline order. Used
+ * to record which filters a visit to the overlay actually changed.
+ */
+export function getChangedFilterIds(
+  a: FilterState,
+  b: FilterState,
+): FilterId[] {
+  return modules
+    .filter((module) => !valuesEqual(module.get(a), module.get(b)))
+    .map((module) => module.id);
+}
+
+/**
+ * Whether every one of `ids` holds its `/catalogue` default value — i.e. the
+ * reader didn't set it, the defaults did.
+ */
+export function filtersAtDefault(state: FilterState, ids: FilterId[]): boolean {
+  const defaults = getDefaultState();
+  return ids.every((id) =>
+    valuesEqual(getModule(id).get(state), getModule(id).get(defaults)),
+  );
+}
+
+/**
+ * `state` with each of `ids` taken back to its fully permissive value — the
+ * same widening the zero-result suggestions apply, so a removed filter stops
+ * narrowing at all rather than falling back to a restrictive default.
+ */
+export function widenFilters(state: FilterState, ids: FilterId[]): FilterState {
+  const permissive = getPermissiveState();
+  let next = state;
+  for (const id of ids) {
+    next = set(next, id, get(permissive, id));
+  }
+  return next;
+}
+
+/**
+ * Gets the IDs of all active filters.
+ */
+export function getActiveFilterIds(state: FilterState): FilterId[] {
+  return modules
+    .filter((module) => module.hasActiveFilter(state))
+    .map((module) => module.id);
+}
+
+/**
+ * The IDs of every filter currently narrower than fully permissive — i.e. every
+ * filter that could be cutting results.
+ *
+ * Deliberately not {@link getActiveFilterIds}: two modules have *restrictive*
+ * defaults (categories → Films/Multiple/Shorts, date range → today→+7d), so
+ * they report themselves inactive while still removing results. Someone who has
+ * touched no filter at all and sees an empty grid is usually looking at exactly
+ * one of those two, and an "active filters" view is blind to both.
+ */
+export function getRestrictiveFilterIds(state: FilterState): FilterId[] {
+  const permissive = getPermissiveState();
+  return modules
+    .filter((module) => !valuesEqual(module.get(state), module.get(permissive)))
+    .map((module) => module.id);
+}
+
+/**
+ * Applies all filters to the movies data.
+ * Filters are applied in order, each receiving the output of the previous.
+ * Returns a new movies record with filtering applied.
+ */
+export function apply(movies: MoviesRecord, state: FilterState): MoviesRecord {
+  let result = movies;
+
+  for (const filterModule of modules) {
+    result = filterModule.apply(result, state);
+  }
+
+  return result;
+}
+
+/**
+ * The starting point a URL's filter params are applied on top of, chosen by the
+ * `base` query param:
+ * - `default` (or absent) — the `/catalogue` browsing defaults (Films/Multiple/
+ *   Shorts, today→+7d). A deep link is self-contained: dimensions it doesn't
+ *   mention fall back to these defaults, never to whatever was in session.
+ * - `all` — all categories and all dates, otherwise the defaults (so past
+ *   showings stay hidden); see getBrowseAllState. Use for "explore everything
+ *   at X" links.
+ * - `patch` — the caller's current state; unmentioned dimensions are preserved.
+ *   The one opt-in that amends session state instead of replacing it.
+ */
+export type FilterBase = "default" | "all" | "patch";
+
+function isFilterBase(value: string | null): value is FilterBase {
+  return value === "default" || value === "all" || value === "patch";
+}
+
+function getBaseState(
+  base: FilterBase,
+  currentState: FilterState,
+): FilterState {
+  switch (base) {
+    case "all":
+      return getBrowseAllState();
+    case "patch":
+      return currentState;
+    default:
+      return getDefaultState();
+  }
+}
+
+/**
+ * Whether the URL carries anything that should drive filter state — a valid
+ * `base` or any recognised filter param.
+ */
+export function hasUrlFilterParams(search: string): boolean {
+  const params = new URLSearchParams(search);
+  if (isFilterBase(params.get("base"))) return true;
+  return modules.some((m) => m.fromUrlParams(params) !== undefined);
+}
+
+/**
+ * Resolve a URL's search params into a full FilterState.
+ *
+ * The `base` param selects the starting state (see {@link FilterBase}); each
+ * recognised filter param then overrides its own dimension on top. Because the
+ * base sets *every* dimension to a known value, dimensions the URL doesn't
+ * mention are reset to the base rather than inherited from session storage.
+ *
+ * Returns null when the URL carries nothing filter-related, so callers can leave
+ * the existing (session) state untouched.
+ */
+export function resolveFilterStateFromUrl(
+  search: string,
+  currentState: FilterState,
+): FilterState | null {
+  const params = new URLSearchParams(search);
+  const baseParam = params.get("base");
+  const hasBase = isFilterBase(baseParam);
+
+  const overrides: Partial<FilterState> = {};
+  let hasOverride = false;
+  for (const filterModule of modules) {
+    const value = filterModule.fromUrlParams(params);
+    if (value !== undefined) {
+      (overrides as Record<string, unknown>)[filterModule.id] = value;
+      hasOverride = true;
+    }
+  }
+
+  if (!hasBase && !hasOverride) {
+    return null;
+  }
+
+  const base = hasBase ? baseParam : "default";
+  return keepPersonalFilters(
+    { ...getBaseState(base, currentState), ...overrides },
+    currentState,
+  );
+}
+
+/**
+ * The query params that encode a filter state: only what differs from the
+ * defaults, and no `base`, since resolving them over the default base gives the
+ * same state back. Personal filters are never written.
+ */
+export function buildFilterParams(state: FilterState): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const filterModule of modules) {
+    if (filterModule.hasActiveFilter(state)) {
+      filterModule.toUrlParams(state, params);
+    }
+  }
+  return params;
+}
+
+/**
+ * Whether a query param is one the filters read — `base`, or a param some
+ * module recognises on its own. Lets the filter params be rewritten without
+ * touching params a page keeps for itself (the planner's `day` and `view`).
+ */
+function isFilterUrlParam(key: string, value: string): boolean {
+  if (key === "base") return true;
+  const single = new URLSearchParams([[key, value]]);
+  return modules.some((m) => m.fromUrlParams(single) !== undefined);
+}
+
+/**
+ * `search` with its filter params replaced by those encoding `state`, every
+ * other param kept as it was. Returns the query without a leading "?", empty
+ * when nothing is left.
+ */
+export function replaceFilterParams(
+  search: string,
+  state: FilterState,
+): string {
+  const params = buildFilterParams(state);
+  for (const [key, value] of new URLSearchParams(search)) {
+    if (!isFilterUrlParam(key, value)) params.append(key, value);
+  }
+  return params.toString();
+}
+
+/**
+ * Build a shareable URL with the current filter state encoded as query params.
+ * Only includes params that differ from the defaults.
+ *
+ * `base` is the page the link should open: the overlay passes the page it was
+ * shared from, since filters are only useful against the grid that renders
+ * them, and dropping the path would send recipients to the homepage with a
+ * query string nothing there acts on. Passed in rather than read from
+ * `window`, which a Worker doesn't have.
+ */
+export function buildFilterUrl(state: FilterState, base = ""): string {
+  const query = buildFilterParams(state).toString();
+  return query ? `${base}?${query}` : base;
+}
+
+/**
+ * The filter manager object - a convenient namespace for all filter operations.
+ */
+export const filterManager = {
+  getDefaultState,
+  getPermissiveState,
+  sanitizeFilterState,
+  keepPersonalFilters,
+  get,
+  set,
+  hasActiveFilters,
+  statesEqual,
+  getChangedFilterIds,
+  filtersAtDefault,
+  widenFilters,
+  apply,
+  resolveFilterStateFromUrl,
+  hasUrlFilterParams,
+  buildFilterParams,
+  replaceFilterParams,
+  buildFilterUrl,
+};

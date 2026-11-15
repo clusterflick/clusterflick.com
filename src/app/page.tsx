@@ -19,7 +19,7 @@ import { FORMATS } from "@/data/formats";
 import StatsBand, { type StatsBandItem } from "@/components/stats-band";
 import { getFeaturedScreenings } from "@/utils/get-featured-screenings";
 import { getListingsStats } from "@/utils/get-listings-stats";
-import { FormatSource } from "@/types";
+import { FormatSource } from "@clusterflick/catalogue/types";
 import DiscoverySections from "./discovery-sections";
 import { FeaturedHero, FeaturedPicks } from "./featured-screenings";
 import DiscoveryRowsView from "./discovery-rows-view";

@@ -8,7 +8,7 @@ import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 // From its module rather than the filters barrel, which would bundle the whole
 // filter engine into this page
-import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
+import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import type { DayFilm } from "@/utils/get-updates";
 import styles from "./updates.module.css";
 

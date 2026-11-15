@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie, type MoviePerformance } from "@/types";
+import {
+  Category,
+  type Movie,
+  type MoviePerformance,
+} from "@clusterflick/catalogue/types";
 import type { NearMeFilmClub, NearMeVenue } from "@/utils/get-near-me-data";
 import { getLocalVenues, LOCAL_NEXT_SCREENINGS } from "./get-local-venues";
 

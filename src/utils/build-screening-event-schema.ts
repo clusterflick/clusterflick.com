@@ -1,4 +1,4 @@
-import type { MoviePerformance, Venue } from "@/types";
+import type { MoviePerformance, Venue } from "@clusterflick/catalogue/types";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 
 export function buildScreeningEventSchema(

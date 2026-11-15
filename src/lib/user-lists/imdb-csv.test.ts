@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { isImdbHeader, parseImdbCsv } from "./imdb-csv";
 import { matchLetterboxdRows } from "./letterboxd-csv";
 

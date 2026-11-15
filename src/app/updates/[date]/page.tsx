@@ -15,7 +15,7 @@ import type { UpdateDay } from "@/utils/get-updates";
 import {
   dateStringToLondonTimestamp,
   formatDateLong,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import ReleaseSection from "../release-section";
 import WatchlistHighlights from "../watchlist-highlights";
 import DayStats from "../day-stats";

@@ -4,7 +4,7 @@ import {
   addLondonDays,
   formatDateShort,
   getLondonDaysBetween,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import styles from "./festival-timeline.module.css";
 
 export interface FestivalTimelineItem {

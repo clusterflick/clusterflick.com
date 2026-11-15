@@ -4,7 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
-import { formatDatePart, formatTimePart } from "@/utils/format-date";
+import {
+  formatDatePart,
+  formatTimePart,
+} from "@clusterflick/catalogue/utils/format-date";
 import {
   formatHours,
   getHoursSince,

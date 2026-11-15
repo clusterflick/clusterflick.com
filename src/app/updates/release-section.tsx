@@ -2,7 +2,7 @@ import Link from "next/link";
 import PosterTile from "@/components/poster-tile";
 import { pluralise, summariseRelease } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
-import { formatShowingTime } from "@/utils/format-date";
+import { formatShowingTime } from "@clusterflick/catalogue/utils/format-date";
 import VenueList from "./venue-list";
 import CappedList from "./capped-list";
 import WatchlistTag from "./watchlist-tag";

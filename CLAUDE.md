@@ -22,7 +22,7 @@ Pages at clusterflick.com.
 - `npm run migrate-film-details` — One-off: give every listed film its details in Firestore (see Personalisation); a dry run unless given `-- --write`
 - `npm run grant-capability -- <email> <capability>` — Grant a reader a capability (see Capabilities); `--revoke` takes it away, and it's a dry run unless given `--write`
 - `npm run test:rules` — Test `firestore.rules` against the Firestore emulator (see Public Profiles); needs Java (a JDK 21, e.g. `brew install openjdk@21` on its `PATH`)
-- `npm run fetch-london-stations` — Regenerate `src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
+- `npm run fetch-london-stations` — Regenerate `packages/catalogue/src/data/london-stations.json` from TfL's open data (see Nearby Venues); commit the result
 - `npm run smoke-test` — Run Playwright smoke tests against deployed site (clusterflick.com by default); override with `SITE_URL=http://localhost:3000 npm run smoke-test` after `npm run build && npm start`
 
 ## Architecture
@@ -43,6 +43,38 @@ Pages at clusterflick.com.
   Lists on why server-rendered grids must not virtualise), data chunking,
   critical CSS extraction
 
+## The Catalogue Package
+
+`packages/catalogue` is `@clusterflick/catalogue`, an npm workspace in this
+repo: what the listings are and how they're searched, shared with the Workers
+that need them (the MCP server, and saved-search alerts after it). It holds the
+data model (`types.ts`), the filters, places, the occasion rules, the festival
+and film-club registries, the stations, and the London-time date helpers.
+
+**What goes in:** code about the listings that something outside the site needs.
+Anything only the site uses stays in `src/`, even when it's about the listings
+(`@/lib/occasions`' rarity finding, the page helpers). A reader's lists are a
+different concern and would be a package of their own.
+
+**The site uses the source.** `@clusterflick/catalogue/*` resolves to
+`packages/catalogue/src/*` through `tsconfig.json`'s `paths` (Next, Storybook,
+`tsc`) and an alias in `vitest.config.ts`, so a change to the package shows on
+the site straight away and is tested by `npm test` like any other file; there's
+nothing to build or publish first. The package's tests sit beside its code as
+before. Import it by its subpaths, as the site always imported the files:
+`@clusterflick/catalogue/filters`, `…/types`, `…/utils/format-date`.
+
+**The package can't import the site.** Inside it, imports are relative. It
+has no React and no `window`: its published declarations are built against
+the web standards a browser, Node and a Worker share, so `window`, `document`
+or `process` fails `npm run check -w @clusterflick/catalogue`, which CI runs.
+That's why `buildFilterUrl` takes the page's address rather than reading it.
+
+**Publishing** is for the Workers, which install it from npm. `npm run build -w
+@clusterflick/catalogue` writes `dist/` (a module per source file, with type
+declarations) and `check` imports every subpath of it in Node; neither is
+needed for the site. See `packages/catalogue/README.md`.
+
 ## Project Structure
 
 ```
@@ -51,11 +83,14 @@ src/
   components/    — Reusable UI components (one per directory: index.tsx + .module.css)
   state/         — React Context providers (cinema-data, filter-config, geolocation)
   hooks/         — Custom React hooks
-  data/          — Static data files (festivals registry, London boroughs)
-  lib/           — Domain logic (filters/)
-  utils/         — Utility functions (date formatting, data loading, geo distance)
+  data/          — Static data files (London boroughs, movie lists)
+  lib/           — Site-only domain logic (occasion finding, Firebase, lists)
+  utils/         — Utility functions (data loading, page helpers)
   stories/       — Page-level Storybook stories
-  types.ts       — Shared TypeScript types and enums
+packages/
+  catalogue/     — @clusterflick/catalogue: the data model (types.ts), filters,
+                   places, occasion rules, festivals and film clubs, London
+                   dates — see The Catalogue Package
 scripts/         — Node.js build-time data processing scripts
 smoke-tests/     — Playwright E2E smoke tests
 .storybook/      — Storybook configuration and MSW mocks
@@ -177,7 +212,7 @@ width: it is sized for its two filter columns.
 
 ## Film Clubs
 
-Film clubs are defined in `src/data/film-clubs.ts`. Each club has a `matchers` array of
+Film clubs are defined in `packages/catalogue/src/data/film-clubs.ts`. Each club has a `matchers` array of
 `Partial<FilterState>` objects used to identify its showings in the combined dataset.
 
 **Matcher semantics:**
@@ -186,7 +221,7 @@ Film clubs are defined in `src/data/film-clubs.ts`. Each club has a `matchers` a
 - Filter keys within a single matcher are **AND'd** — all keys must match simultaneously
 - The OR is taken over **showings and performances, not movie ids** — see below
 
-**Available matcher filter IDs** (use `FilterId.*` from `@/lib/filters/types`):
+**Available matcher filter IDs** (use `FilterId.*` from `@clusterflick/catalogue/filters/types`):
 
 - `ShowingTitleSearch` — substring match on `showing.title` (falls back to `movie.title` when absent)
 - `ShowingUrlSearch` — substring match on `showing.url`; internal-only (no UI, no URL params)
@@ -200,14 +235,14 @@ and regular cinemas simultaneously.
 
 Because each matcher returns the movie pruned to _its own_ matches, a film matching two matchers
 arrives once per matcher, each copy carrying a different slice of the same film.
-`unionMatches` (`@/lib/filters/match-any`, shared with festivals and the programme filters) therefore
+`unionMatches` (`@clusterflick/catalogue/filters/match-any`, shared with festivals and the programme filters) therefore
 unions those slices per movie; keeping the last copy silently drops the venues the earlier matchers found. The
 Japanese Film Club is the case to keep in mind: the Phoenix lists "Shall We Dance?" under the club's
 name and hands booking to the club, so its own listing is what we hold (the club's copy is
 deduplicated away upstream) and only the _title_ matcher finds it — while the note matcher finds the
 club-sourced showings at other venues.
 
-`applyMatchers` (`@/lib/filters/apply-matchers`) is the page-side entry point: `matchAny` from the
+`applyMatchers` (`@clusterflick/catalogue/filters/apply-matchers`) is the page-side entry point: `matchAny` from the
 manager, then finished performances pruned.
 
 Each club also has a blurb component at `src/components/film-clubs/<id>.tsx` (default export +
@@ -250,7 +285,7 @@ carries the variety.
   `performance.occasions` (`intro`, `qAndA`, `liveScore`, `premiere`, …, each
   `true` or carrying `guests`, `performers` or a `region`). The description is
   why it lives there - the ICA's "The Eel" says nothing in its title, while its
-  page names who introduces it. `matchOccasions` (`@/lib/occasions/rules`)
+  page names who introduces it. `matchOccasions` (`@clusterflick/catalogue/occasions/rules`)
   only turns that into this site's kinds and labels; how rare an occasion is,
   which decides the row, is scored here in `findOccasions`, because only the
   whole city shows what is house style at a venue.
@@ -450,7 +485,7 @@ but its boundary (a perfect score) is inherent rather than chosen.
 - **Curated** — reproduces someone else's published selection. Store only what identifies each
   film, in a `MovieListEntry[]` file, and always link back to the source.
 - **Computed** — derived from rating data already in the dataset via a `score()` function, so it
-  re-evaluates every build. Review-count floors come from `@/utils/movie-ratings.mjs`, shared with
+  re-evaluates every build. Review-count floors come from `@clusterflick/catalogue/utils/movie-ratings.mjs`, shared with
   the Critics' Picks row.
 
 **Every curated entry carries its TMDB id** (`tmdbId`), the id the dataset and a reader's
@@ -750,10 +785,10 @@ why, and focuses the station search. The picker owns locating
 (`VenuePlacePicker`'s `locate` handle), so the pill and Use my location can't
 handle "nothing near you" differently.
 
-**Places** (`@/lib/places`) are `here`, a `station:<slug>` or a `venue:<id>`.
+**Places** (`@clusterflick/catalogue/places`) are `here`, a `station:<slug>` or a `venue:<id>`.
 Stations are the Underground, Overground, Elizabeth line and DLR, generated
 from TfL's open data by `npm run fetch-london-stations` into
-`src/data/london-stations.json` and committed, since a build shouldn't depend on
+`packages/catalogue/src/data/london-stations.json` and committed, since a build shouldn't depend on
 TfL's API. TfL's terms want their credit on the About page. The list is
 imported dynamically, when the picker first shows. Boroughs are not places: a
 borough is an area whose venues are decided by boundary, not a point, and its
@@ -871,7 +906,7 @@ a row and its chip can't describe a filter differently. Showings is worded on
 its own, since its default has no chip.
 
 **The search box also finds filters** (`FilterSearch`, matching in
-`@/lib/filters/filter-search`). Typing still searches titles live; a menu
+`@clusterflick/catalogue/filters/filter-search`). Typing still searches titles live; a menu
 under it offers the filter values the query names — event types, genres,
 formats, accessibility (with the suggestion engine's aliases, so "subs" finds
 Subtitles), directors, cast, clubs, festivals and venues — plus the two other
@@ -922,7 +957,7 @@ overlay's 700px breakpoint.
 "Show everything" is the third preset, but as the way out of every filter it
 sits beside Reset as a link.
 
-**The active-filters strip** (`describeFilterChips` in `@/lib/filters/describe`)
+**The active-filters strip** (`describeFilterChips` in `@clusterflick/catalogue/filters/describe`)
 lists every filter narrowing the results as a chip, driven by
 `getRestrictiveFilterIds` so the restrictive defaults (date window, event
 types) appear too, marked Default. Removing a chip widens its filters to
@@ -976,7 +1011,7 @@ returns to the grid as it was, not to the cast filter the link set.
 ## Cast & Crew Filters
 
 Directors and cast are **filters on the films grid, not pages of their own**
-(`src/lib/filters/modules/people.ts`, surfaced in the filter overlay's
+(`packages/catalogue/src/filters/modules/people.ts`, surfaced in the filter overlay's
 `PeopleFilterSection`).
 
 **Why no `/directors/<id>` pages.** Measured against a live release: 1,288
@@ -1077,7 +1112,7 @@ A double bill, marathon or shorts programme usually matches no single film, so
 its own `genres`, `directors` and `actors` are empty (genres hold only the
 "Uncategorised" placeholder) while each film in `includedMovies` carries its
 own. The genre and people filters, the genre pages and the overlay's counts
-read an event through `getMovieAndIncluded` (`@/utils/get-movie-and-included`):
+read an event through `getMovieAndIncluded` (`@clusterflick/catalogue/utils/get-movie-and-included`):
 the event plus the films it screens, any one matching, as every multi-select
 filter reads "or". An unmatched event whose films supply genres stops being
 Uncategorised. A shorts programme whose venue listed no films still has
@@ -1085,7 +1120,7 @@ nothing to read, and stays Uncategorised.
 
 ## Films Filter
 
-`FilterId.Movies` (`src/lib/filters/modules/movies.ts`) restricts the grid to a
+`FilterId.Movies` (`packages/catalogue/src/filters/modules/movies.ts`) restricts the grid to a
 chosen set of films by id. It is the people filters over again, keyed on the
 film rather than a credit: `string[] | null`, "or" across the selection, empty
 meaning no filter, a `?movies=` param, and an `EntityQuickAdd` in the "Films" Refine row (`MovieFilterSection`). Its main job is the watchlist
@@ -1122,7 +1157,7 @@ another page is exactly the invisible blocker the empty state exists to name.
 
 ## Hide Seen Films
 
-`FilterId.HideSeen` (`src/lib/filters/modules/hide-seen.ts`) takes the films on
+`FilterId.HideSeen` (`packages/catalogue/src/filters/modules/hide-seen.ts`) takes the films on
 the reader's Seen list off the grid. It is a "Hide films I've seen" switch at
 the top of the filter overlay's core column, above Dates, shown only once a
 signed-in reader's lists have loaded. It used to sit under the event types,
@@ -1151,7 +1186,7 @@ accessibility — it is a standing preference, not part of the search.
 
 ## Film Club & Festival Filters
 
-`FilterId.FilmClubs` and `FilterId.Festivals` (`src/lib/filters/modules/programmes.ts`) restrict
+`FilterId.FilmClubs` and `FilterId.Festivals` (`packages/catalogue/src/filters/modules/programmes.ts`) restrict
 the grid to the showings of chosen clubs or festivals. They are how a club's programme reaches the
 catalogue and planner, which otherwise had no way to express a set of OR'd matchers.
 
@@ -1238,7 +1273,7 @@ The rest need filters that don't exist yet (last chance, just added) or a sort (
 London). Lists and collections need no link: their pages already show every member that is
 showing.
 
-**The rating filters** (`src/lib/filters/modules/ratings.ts`) are three, one per source, built from
+**The rating filters** (`packages/catalogue/src/filters/modules/ratings.ts`) are three, one per source, built from
 one factory as the people and format filters are: Letterboxd (`?letterboxd=`, out of 5), IMDb
 (`?imdb=`, out of 10) and Rotten Tomatoes (`?rottenTomatoes=`, 0–100). Each is a minimum on a
 `Slider` in the overlay's "Ratings" Refine row. They are not
@@ -1246,7 +1281,7 @@ one blended score, because the sources don't measure the same thing: Letterboxd 
 average, Rotten Tomatoes the share of critics who liked a film, and of 193 films carrying both a
 Letterboxd average and a Tomatometer score, 73 fell on opposite sides of an 80% line.
 
-- **Review floors are the site's existing ones** (`@/utils/movie-ratings.mjs`: 2,000 Letterboxd
+- **Review floors are the site's existing ones** (`@clusterflick/catalogue/utils/movie-ratings.mjs`: 2,000 Letterboxd
   reviews, 10,000 IMDb votes, 40 critic reviews), read by `getLetterboxdRating`, `getImdbRating` and
   `getRottenTomatoesScore`. A film under the floor has no score, so any minimum excludes it, and a
   one-line note under each slider ("Only films with 2,000+ reviews are counted") says so, so an
@@ -1283,13 +1318,13 @@ when nothing from the list is on, when it's the most useful thing on the page. E
 
 ## Occasions Filter
 
-`FilterId.Occasions` (`src/lib/filters/modules/occasions.ts`) is the accessibility filter over
+`FilterId.Occasions` (`packages/catalogue/src/filters/modules/occasions.ts`) is the accessibility filter over
 `performance.occasions`: one pill per kind the pipeline publishes (`OccasionType`) plus None for
 ordinary screenings, nine in all, in the "Occasions" Refine row after Format. `null` is no filter,
 `[]` matches nothing, a `?occasions=` param. **The kinds aren't grouped**: in conversation, panel
 and guest appearance stay three pills, so a reader is told how many of each there are rather than
 a total of things we decided were alike. `OccasionType` and `MoviePerformanceOccasions` are held to
-the same keys by a type in `src/types.ts`, so a kind added to one won't compile without the other.
+the same keys by a type in `packages/catalogue/src/types.ts`, so a kind added to one won't compile without the other.
 
 **It widens like a format, not like accessibility.** An occasion is a preference about the night,
 as 35mm is, so the suggestion engine widens it beside the formats and may pair it; accessibility is
@@ -1303,7 +1338,7 @@ showing. Rarity belongs to the home row (`findOccasions`).
 ## Thin-Result Notice
 
 When a filtered grid returns a handful of films and widening the dates would
-return meaningfully more, `getHiddenByDate` (`src/lib/filters/hidden-by-date.ts`)
+return meaningfully more, `getHiddenByDate` (`packages/catalogue/src/filters/hidden-by-date.ts`)
 says so in a quiet line under the grid, rendered by `HiddenResultsNotice`.
 
 **Separate from the suggestion engine on purpose.** That exists to rescue a
@@ -1347,7 +1382,7 @@ that has already moved on would be wrong rather than merely late.
 
 ## Zero-Result Suggestions
 
-When a filtered grid comes up empty, `src/lib/filters/suggest.ts` finds the cheapest
+When a filtered grid comes up empty, `packages/catalogue/src/filters/suggest.ts` finds the cheapest
 changes that would return something, each with a real result count, rendered by
 `FilterSuggestions` inside the `EmptyState`.
 

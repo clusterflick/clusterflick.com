@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import VenueDetailPageContent from "@/app/venues/[slug]/page-content";
 import type { VenueDetailPageContentProps } from "@/app/venues/[slug]/page-content";
 import VenueBlurb from "@/components/venues/princecharlescinema.com";
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";

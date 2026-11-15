@@ -6,7 +6,7 @@ import type {
   Genre,
   CollectionSummary,
   MetaData,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 
 function expandAndCombine(
   metaData: MetaData,

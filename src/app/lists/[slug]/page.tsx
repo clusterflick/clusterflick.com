@@ -11,12 +11,12 @@ import {
   type MovieList,
 } from "@/data/movie-lists";
 import { MovieListSource } from "@/data/movie-lists/types";
-import { FilterId } from "@/lib/filters/types";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
 import {
   getHighlyRatedUrl,
   getRatingGroup,
   type RatingFilterId,
-} from "@/lib/filters/modules/ratings";
+} from "@clusterflick/catalogue/filters/modules/ratings";
 import ListDetailPageContent, { type RatingLink } from "./page-content";
 import { getMovieListTmdbIds } from "@/utils/get-movie-list-tmdb-ids";
 

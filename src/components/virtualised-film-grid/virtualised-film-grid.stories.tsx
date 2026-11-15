@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import type { Movie } from "@/types";
-import { Category } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
+import { Category } from "@clusterflick/catalogue/types";
 import VirtualisedFilmGrid from "@/components/virtualised-film-grid";
 
 const POSTERS = [

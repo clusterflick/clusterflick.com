@@ -9,7 +9,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import VenueHeroDetails from "@/components/venue-hero-details";
 import EmptyState from "@/components/empty-state";
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import VenueCalendar from "./venue-calendar";
 import styles from "./calendar.module.css";
 

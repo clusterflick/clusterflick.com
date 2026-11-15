@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import { Category, type Movie } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import {
   buildMovieListIndex,
   getMovieListsForMovie,

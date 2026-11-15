@@ -1,8 +1,6 @@
 import clsx from "clsx";
-import {
-  buildSocialLinks,
-  type SocialHandles,
-} from "@/utils/build-social-links";
+import type { SocialHandles } from "@clusterflick/catalogue/types";
+import { buildSocialLinks } from "@/utils/build-social-links";
 import styles from "./social-links.module.css";
 
 interface SocialLinksProps {

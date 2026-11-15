@@ -1,9 +1,9 @@
-import { FESTIVALS } from "@/data/festivals";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import {
   getFestivalMovies,
   getFestivalDateRange,
 } from "@/utils/get-festival-movies";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 
 export type MovieFestival = {
   id: string;

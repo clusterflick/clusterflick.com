@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { Category, type CinemaData, type Movie, type Venue } from "@/types";
+import {
+  Category,
+  type CinemaData,
+  type Movie,
+  type Venue,
+} from "@clusterflick/catalogue/types";
 import { getCinemaGroupsIndex } from "./get-cinema-groups-index";
 
 const DAY = 86_400_000;

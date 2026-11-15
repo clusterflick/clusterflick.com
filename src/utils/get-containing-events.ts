@@ -1,4 +1,4 @@
-import { Movie } from "@/types";
+import { Movie } from "@clusterflick/catalogue/types";
 
 /**
  * Find multi-movie events that include the given movie.

@@ -1,5 +1,9 @@
 import clsx from "clsx";
-import type { MoviePerformance, Showing, Venue } from "@/types";
+import type {
+  MoviePerformance,
+  Showing,
+  Venue,
+} from "@clusterflick/catalogue/types";
 import MovieSummary from "@/components/movie-summary";
 import type { EventPosterIncludedMovie } from "@/components/event-poster";
 import PlannerLane, { PlannerLaneCard } from "@/components/planner-lane";

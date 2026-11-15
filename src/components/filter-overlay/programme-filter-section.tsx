@@ -8,7 +8,7 @@ import {
   MoviesRecord,
   ProgrammeFilterId,
   ProgrammeGroupConfig,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import EntityQuickAdd, {

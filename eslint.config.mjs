@@ -46,6 +46,8 @@ const eslintConfig = defineConfig([
     "storybook-static/**",
     // Mock Service Worker:
     ".storybook/static/mockServiceWorker.js",
+    // The packages' published builds:
+    "packages/*/dist/**",
   ]),
 ]);
 

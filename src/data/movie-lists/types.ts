@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 
 /**
  * Where a list comes from. Drives attribution wording on the list page and the

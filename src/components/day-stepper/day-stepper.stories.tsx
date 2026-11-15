@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { getLondonMidnightTimestamp, MS_PER_DAY } from "@/utils/format-date";
+import {
+  getLondonMidnightTimestamp,
+  MS_PER_DAY,
+} from "@clusterflick/catalogue/utils/format-date";
 import DayStepper from ".";
 
 /**

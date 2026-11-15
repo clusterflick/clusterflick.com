@@ -1,5 +1,9 @@
-import type { AccessibilityFeature, Movie, MoviePerformance } from "@/types";
-import { pruneByPerformances } from "@/utils/prune-movies";
+import type {
+  AccessibilityFeature,
+  Movie,
+  MoviePerformance,
+} from "@clusterflick/catalogue/types";
+import { pruneByPerformances } from "@clusterflick/catalogue/utils/prune-movies";
 
 export type AccessibilityMovie = { movie: Movie; performanceCount: number };
 

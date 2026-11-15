@@ -1,7 +1,7 @@
-import type { Movie, Venue } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import { FORMATS, FORMAT_SECTIONS, type FormatKind } from "@/data/formats";
-import { FormatSource } from "@/types";
+import { FormatSource } from "@clusterflick/catalogue/types";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { getFormatMovies } from "@/utils/get-format-movies";
 import {
@@ -9,7 +9,7 @@ import {
   pickPosters,
   type ProgrammePoster,
 } from "@/utils/get-programme-summary";
-import { formatDayAndDate } from "@/utils/format-date";
+import { formatDayAndDate } from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * Below this many showings a format is rare enough that its next screening is

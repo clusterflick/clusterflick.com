@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Movie } from "@/types";
+import { Movie } from "@clusterflick/catalogue/types";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import StackedPoster from "@/components/stacked-poster";
 import styles from "./part-of-section.module.css";

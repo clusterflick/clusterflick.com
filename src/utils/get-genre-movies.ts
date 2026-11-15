@@ -1,5 +1,5 @@
-import type { Movie } from "@/types";
-import { getMovieAndIncluded } from "./get-movie-and-included";
+import type { Movie } from "@clusterflick/catalogue/types";
+import { getMovieAndIncluded } from "@clusterflick/catalogue/utils/get-movie-and-included";
 
 export type GenreMovie = { movie: Movie; performanceCount: number };
 

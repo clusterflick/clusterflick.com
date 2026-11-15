@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Category, CinemaData } from "@/types";
+import { Category, CinemaData } from "@clusterflick/catalogue/types";
 import { EVENT_CATEGORIES } from "@/state/filter-config-context";
 import Button from "@/components/button";
 import Chip from "@/components/chip";

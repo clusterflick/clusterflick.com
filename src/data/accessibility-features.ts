@@ -10,7 +10,7 @@
  * The descriptions are shared by `/accessibility`, where each feature has a
  * section (and an FAQ answer), and by the feature's own page.
  */
-import { AccessibilityFeature } from "@/types";
+import { AccessibilityFeature } from "@clusterflick/catalogue/types";
 
 export type AccessibilityFeatureDefinition = {
   id: AccessibilityFeature;

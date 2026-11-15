@@ -5,10 +5,10 @@ import {
   getBoroughWeek,
   type BoroughWeek,
 } from "@/app/london-cinemas/get-borough-week";
-import { formatDateLong } from "@/utils/format-date";
+import { formatDateLong } from "@clusterflick/catalogue/utils/format-date";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { getBoroughUrl } from "@/utils/get-borough-url";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import { groupVenuesByBoroughSimple } from "../utils/group-venues-by-borough-simple";
 import StoryDataLoader from "../utils/story-data-loader";

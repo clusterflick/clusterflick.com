@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import clsx from "clsx";
-import type { Position, Venue } from "@/types";
+import type { Position, Venue } from "@clusterflick/catalogue/types";
 import {
   DEFAULT_RADIUS,
   RADIUS_OPTIONS,
@@ -25,8 +25,8 @@ import {
   type PlaceRef,
   type Station,
   type VenueOrigin,
-} from "@/lib/places";
-import { NEARBY_MAX_RADIUS_MILES } from "@/utils/geo-distance";
+} from "@clusterflick/catalogue/places";
+import { NEARBY_MAX_RADIUS_MILES } from "@clusterflick/catalogue/utils/geo-distance";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import EntityQuickAdd, {

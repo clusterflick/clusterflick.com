@@ -6,7 +6,10 @@ import ContentSection from "@/components/content-section";
 import ReleaseDayBars from "@/components/release-day-bars";
 import ReleaseFreshness from "@/components/release-freshness";
 import HourHistogram from "@/components/hour-histogram";
-import { formatDateLong, minutesToTimeString } from "@/utils/format-date";
+import {
+  formatDateLong,
+  minutesToTimeString,
+} from "@clusterflick/catalogue/utils/format-date";
 import {
   getDailyRange,
   getLondonDay,

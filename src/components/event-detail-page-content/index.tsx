@@ -1,10 +1,10 @@
 import { type ComponentType, type ReactNode } from "react";
 import Link from "next/link";
-import type { AccessibilityFeature } from "@/types";
+import type { AccessibilityFeature } from "@clusterflick/catalogue/types";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
-} from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/utils/accessibility-labels";
 import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";

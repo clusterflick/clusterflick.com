@@ -7,8 +7,11 @@ import { getMovieUrl } from "@/utils/get-movie-url";
 import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES,
-} from "@/lib/filters/modules/categories";
-import { addLondonDays, getLondonMidnightTimestamp } from "@/utils/format-date";
+} from "@clusterflick/catalogue/filters/modules/categories";
+import {
+  addLondonDays,
+  getLondonMidnightTimestamp,
+} from "@clusterflick/catalogue/utils/format-date";
 import PageContent from "./page-content";
 import SSROnly from "../ssr-only";
 import styles from "./page.module.css";

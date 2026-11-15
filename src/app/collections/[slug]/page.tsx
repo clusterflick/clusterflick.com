@@ -13,7 +13,7 @@ import {
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import type { Collection, Movie } from "@/types";
+import type { Collection, Movie } from "@clusterflick/catalogue/types";
 import type { FilmPosterGridMovie } from "@/components/film-poster-grid";
 import CollectionDetailPageContent from "./page-content";
 

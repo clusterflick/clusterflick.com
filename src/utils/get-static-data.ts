@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import { CinemaData } from "@/types";
+import { CinemaData } from "@clusterflick/catalogue/types";
 import expandAndCombine from "./expand-and-combine";
 
 let cached: { metaFilename: string; data: CinemaData } | undefined;

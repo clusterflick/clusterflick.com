@@ -6,7 +6,7 @@ import {
   formatDaysFromNow,
   getDaysFromNow,
   RELATIVE_DAY_LIMIT,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import styles from "./hidden-results-notice.module.css";
 
 interface HiddenResultsNoticeProps {

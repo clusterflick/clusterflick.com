@@ -1,16 +1,16 @@
-import type { CinemaData, Movie, Venue } from "@/types";
+import type { CinemaData, Movie, Venue } from "@clusterflick/catalogue/types";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import {
   DEFAULT_CATEGORIES,
   getPrimaryCategory,
-} from "@/lib/filters/modules/categories";
+} from "@clusterflick/catalogue/filters/modules/categories";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import {
   pickPosters,
   type ProgrammePoster,
 } from "@/utils/get-programme-summary";
 import { LISTINGS_STATS_DAYS } from "@/utils/get-listings-stats";
-import { MS_PER_DAY } from "@/utils/format-date";
+import { MS_PER_DAY } from "@clusterflick/catalogue/utils/format-date";
 
 export type CinemaGroupListItem = {
   slug: string;

@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import type { Collection } from "@/types";
+import type { Collection } from "@clusterflick/catalogue/types";
 
 /**
  * The full collection records, including each one's membership.

@@ -1,9 +1,9 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import {
   getSearchVariants,
   normalizeForSearch,
   normalizeToWords,
-} from "@/lib/filters/normalize";
+} from "@clusterflick/catalogue/filters/normalize";
 
 /** How closely a title answers a query: lower is better. */
 enum Closeness {

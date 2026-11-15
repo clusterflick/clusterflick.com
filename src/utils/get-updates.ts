@@ -6,12 +6,12 @@ import type {
   DiffModifiedShowing,
   DiffShowing,
   Movie,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import { getMovieUrl, SHOW_ALL_HASH } from "./get-movie-url";
 import { getVenueUrl } from "./get-venue-url";
 import { getVenueGroupUrl } from "./get-venue-group-url";
 import { VENUE_GROUPS } from "@/data/venue-groups";
-import { timestampToLondonDateString } from "./format-date";
+import { timestampToLondonDateString } from "@clusterflick/catalogue/utils/format-date";
 
 /** The cinema chain a venue belongs to, when the chain has a page here. */
 export type UpdateVenueGroup = {

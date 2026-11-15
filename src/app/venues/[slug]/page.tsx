@@ -5,7 +5,7 @@ import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueImagePath, getVenueMapPath } from "@/utils/get-venue-image";
 import { getVenueUrl } from "@/utils/get-venue-url";
-import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import {
@@ -14,17 +14,21 @@ import {
 } from "@/utils/get-venue-group-url";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
-import { FESTIVALS } from "@/data/festivals";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
 import { summariseFestival } from "@/utils/get-movie-festivals";
-import { FILM_CLUBS } from "@/data/film-clubs";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { summariseFilmClub } from "@/utils/get-movie-film-clubs";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
-import { AccessibilityFeature, type Movie, type Venue } from "@/types";
+import {
+  AccessibilityFeature,
+  type Movie,
+  type Venue,
+} from "@clusterflick/catalogue/types";
 import VenueDetailPageContent from "./page-content";
 
 export const dynamicParams = false;

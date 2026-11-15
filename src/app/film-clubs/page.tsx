@@ -5,7 +5,7 @@ import {
   getFilmClubsIndex,
   type FilmClubListItem,
 } from "@/utils/get-film-clubs-index";
-import { FILM_CLUBS } from "@/data/film-clubs";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
 import FilmClubsPageContent from "./page-content";
 
 export type { FilmClubListItem };

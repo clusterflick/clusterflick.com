@@ -8,7 +8,10 @@ import FestivalTimeline from "@/components/festival-timeline";
 import Tag from "@/components/tag";
 import { ButtonLink } from "@/components/button";
 import { CalendarIcon } from "@/components/icons";
-import { formatDateShort, formatDayAndDate } from "@/utils/format-date";
+import {
+  formatDateShort,
+  formatDayAndDate,
+} from "@clusterflick/catalogue/utils/format-date";
 import type {
   FestivalListItem,
   FeaturedFestival,

@@ -1,4 +1,4 @@
-import type { AccessibilityFeature } from "@/types";
+import type { AccessibilityFeature } from "@clusterflick/catalogue/types";
 import { getAccessibilityFeature } from "@/data/accessibility-features";
 
 /** Canonical path for an accessibility feature's landing page. */

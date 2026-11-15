@@ -10,7 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import SearchInput from "@/components/search-input";
 import Button from "@/components/button";
 import PosterTile, { PosterTileList } from "@/components/poster-tile";
@@ -19,7 +19,7 @@ import UserListButtons from "@/components/user-list-buttons";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { getMovieUrl } from "@/utils/get-movie-url";
-import { normalizeForSearch } from "@/lib/filters/normalize";
+import { normalizeForSearch } from "@clusterflick/catalogue/filters/normalize";
 import { searchShowingFilms } from "@/lib/user-lists/search-showing-films";
 import {
   collectFilmDetails,

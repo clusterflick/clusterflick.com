@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { DepartedMovie } from "@/utils/get-departed-data";
 
 /** The fields of a movie the Movie schema is built from. */

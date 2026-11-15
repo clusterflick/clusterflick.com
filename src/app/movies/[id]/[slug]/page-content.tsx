@@ -15,7 +15,7 @@ import {
   Person,
   Venue,
   CollectionSummary,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
 import type { MovieFilmClub } from "@/utils/get-movie-film-clubs";
 import type { MovieListMembership } from "@/utils/get-movie-list-movies";
@@ -31,11 +31,14 @@ import {
   describeFilters,
   suggestShowingRelaxations,
   type FilterSuggestion,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
-import { getPlaceVenues } from "@/lib/places";
+import { getPlaceVenues } from "@clusterflick/catalogue/places";
 import { SHOW_ALL_HASH } from "@/utils/get-movie-url";
-import { formatDuration, formatDateLong } from "@/utils/format-date";
+import {
+  formatDuration,
+  formatDateLong,
+} from "@clusterflick/catalogue/utils/format-date";
 import { formatLanguage } from "@/utils/format-language";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";

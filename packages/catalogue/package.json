@@ -1,0 +1,48 @@
+{
+  "name": "@clusterflick/catalogue",
+  "version": "0.1.0",
+  "description": "Clusterflick's listings: the data model, filters, places and occasions, shared by the site and its Workers.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clusterflick/clusterflick.com.git",
+    "directory": "packages/catalogue"
+  },
+  "homepage": "https://clusterflick.com",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./filters": {
+      "types": "./dist/filters/index.d.ts",
+      "default": "./dist/filters/index.js"
+    },
+    "./filters/modules": {
+      "types": "./dist/filters/modules/index.d.ts",
+      "default": "./dist/filters/modules/index.js"
+    },
+    "./places": {
+      "types": "./dist/places/index.d.ts",
+      "default": "./dist/places/index.js"
+    },
+    "./utils/movie-ratings.mjs": {
+      "types": "./dist/utils/movie-ratings.d.mts",
+      "default": "./dist/utils/movie-ratings.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "npm run build && node check.mjs",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.2",
+    "typescript": "5.9.3"
+  }
+}

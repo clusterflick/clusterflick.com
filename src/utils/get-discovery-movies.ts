@@ -1,23 +1,30 @@
-import type { Movie, MoviePerformance, CollectionSummary } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
-import { Category } from "@/types";
+import type {
+  Movie,
+  MoviePerformance,
+  CollectionSummary,
+} from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import { Category } from "@clusterflick/catalogue/types";
 import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
-} from "@/lib/filters/modules/categories";
+} from "@clusterflick/catalogue/filters/modules/categories";
 import {
   addLondonDays,
   formatDayAndDate,
   getLondonMidnightTimestamp,
   MS_PER_DAY,
-} from "@/utils/format-date";
-import { getRating } from "@/utils/movie-ratings.mjs";
-import { getRatingGroup, meetsRating } from "@/lib/filters/modules/ratings";
-import { FilterId } from "@/lib/filters/types";
+} from "@clusterflick/catalogue/utils/format-date";
+import { getRating } from "@clusterflick/catalogue/utils/movie-ratings.mjs";
+import {
+  getRatingGroup,
+  meetsRating,
+} from "@clusterflick/catalogue/filters/modules/ratings";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
 import { findBestOccasionPerMovie, type Occasion } from "@/lib/occasions";
-import { OCCASION_ORDER } from "@/lib/occasions/rules";
-import { pruneByShowings } from "@/utils/prune-movies";
-import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
+import { OCCASION_ORDER } from "@clusterflick/catalogue/occasions/rules";
+import { pruneByShowings } from "@clusterflick/catalogue/utils/prune-movies";
+import { getMovieAndIncluded } from "@clusterflick/catalogue/utils/get-movie-and-included";
 
 export { getRating };
 

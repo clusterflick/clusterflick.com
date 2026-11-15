@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import { createMovieMatcher } from "@/utils/match-movie";
 import { toUserListEntry, type UserListEntry } from "./index";
 

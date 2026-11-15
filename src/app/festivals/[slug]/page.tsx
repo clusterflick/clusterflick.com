@@ -10,11 +10,14 @@ import {
 } from "@/utils/get-festival-movies";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
-import { FESTIVALS, type Festival } from "@/data/festivals";
-import type { Movie } from "@/types";
+import {
+  FESTIVALS,
+  type Festival,
+} from "@clusterflick/catalogue/data/festivals";
+import type { Movie } from "@clusterflick/catalogue/types";
 import EventDetailPageContent from "@/components/event-detail-page-content";
-import { FilterId } from "@/lib/filters/types";
-import { getProgrammeFilterUrl } from "@/lib/filters/modules/programmes";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
+import { getProgrammeFilterUrl } from "@clusterflick/catalogue/filters/modules/programmes";
 
 export const dynamicParams = false;
 

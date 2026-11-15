@@ -4,7 +4,7 @@ import {
   FormatDimension,
   FormatSourceDefault,
   FormatDimensionDefault,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 
 /**
  * Human-readable labels for format features.

@@ -1,9 +1,12 @@
-import { normalizeForSearch, normalizeToWords } from "@/lib/filters/normalize";
+import {
+  normalizeForSearch,
+  normalizeToWords,
+} from "@clusterflick/catalogue/filters/normalize";
 import {
   bestWordRunDistance,
   editBudgetFor,
   MIN_FUZZY_LENGTH,
-} from "@/lib/filters/word-distance";
+} from "@clusterflick/catalogue/filters/word-distance";
 
 /** The fields matching reads; `EntityQuickAddItem` satisfies it. */
 export interface MatchableItem {

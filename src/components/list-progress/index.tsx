@@ -4,7 +4,7 @@ import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
 import clsx from "clsx";
 import Link from "next/link";
-import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
+import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import { getListProgress } from "@/lib/user-lists/list-progress";
 import styles from "./list-progress.module.css";
 

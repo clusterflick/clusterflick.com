@@ -1,6 +1,9 @@
-import type { Genre, Person } from "@/types";
+import type { Genre, Person } from "@clusterflick/catalogue/types";
 import type { DepartedMovie } from "@/utils/get-departed-data";
-import { formatDuration, formatDateLong } from "@/utils/format-date";
+import {
+  formatDuration,
+  formatDateLong,
+} from "@clusterflick/catalogue/utils/format-date";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";

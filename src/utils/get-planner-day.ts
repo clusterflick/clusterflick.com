@@ -1,10 +1,10 @@
-import type { Movie, MoviePerformance } from "@/types";
+import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
 import {
   dateStringToLondonTimestamp,
   getLondonMinutesOfDay,
   MS_PER_DAY,
   timestampToLondonDateString,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 
 /** A London calendar date, "YYYY-MM-DD". */
 export type DateString = string;

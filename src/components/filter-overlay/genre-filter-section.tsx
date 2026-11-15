@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { CinemaData, Genre } from "@/types";
+import { CinemaData, Genre } from "@clusterflick/catalogue/types";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
-import { getMovieAndIncluded } from "@/utils/get-movie-and-included";
+import { getMovieAndIncluded } from "@clusterflick/catalogue/utils/get-movie-and-included";
 import styles from "./filter-overlay.module.css";
 
 interface GenreFilterSectionProps {

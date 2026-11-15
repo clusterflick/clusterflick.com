@@ -7,8 +7,8 @@ import {
   AccessibilityFilterValue,
   ACCESSIBILITY_NONE,
   CinemaData,
-} from "@/types";
-import { ACCESSIBILITY_LABELS } from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/types";
+import { ACCESSIBILITY_LABELS } from "@clusterflick/catalogue/utils/accessibility-labels";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import styles from "./filter-overlay.module.css";

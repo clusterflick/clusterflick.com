@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AccessibilityFeature, FormatSource, type Movie } from "@/types";
+import {
+  AccessibilityFeature,
+  FormatSource,
+  type Movie,
+} from "@clusterflick/catalogue/types";
 import type { VenueScheduleDay } from "@/utils/get-venue-schedule";
 import VenueScheduleBoard from ".";
 import CollapsibleBoard from "./collapsible-board";

@@ -1,6 +1,6 @@
-import type { MoviesRecord } from "@/lib/filters/types";
-import { applyMatchers } from "@/lib/filters/apply-matchers";
-import type { Festival } from "@/data/festivals";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import { applyMatchers } from "@clusterflick/catalogue/filters/apply-matchers";
+import type { Festival } from "@clusterflick/catalogue/data/festivals";
 
 /**
  * Returns the festival's currently-showing movies — those matching its matchers

@@ -1,4 +1,4 @@
-import type { Collection, Movie } from "@/types";
+import type { Collection, Movie } from "@clusterflick/catalogue/types";
 import type { FilmPosterGridMovie } from "@/components/film-poster-grid";
 import EventDetailPageContent, {
   type EventVenueItem,

@@ -2,10 +2,13 @@ import {
   FilterId,
   type FilterState,
   type MoviesRecord,
-} from "@/lib/filters/types";
-import { apply, getPermissiveState } from "@/lib/filters/manager";
+} from "@clusterflick/catalogue/filters/types";
+import {
+  apply,
+  getPermissiveState,
+} from "@clusterflick/catalogue/filters/manager";
 import { MOVIE_LISTS, type MovieList } from "@/data/movie-lists";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 
 /** A film on a list, alongside what it scored and how often it's showing. */
 export type MovieListFilm = {

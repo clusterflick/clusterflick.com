@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Venue } from "@/types";
+import { Venue } from "@clusterflick/catalogue/types";
 import { useGeolocationContext } from "@/state/geolocation-context";
-import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import PillList from "@/components/pill-list";
 import Button from "@/components/button";

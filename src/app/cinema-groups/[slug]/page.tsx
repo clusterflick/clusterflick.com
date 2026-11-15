@@ -12,7 +12,7 @@ import { groupVenuesByGroup } from "@/utils/get-venue-group-venues";
 import { getGroupCorporateSocials } from "@/utils/get-group-socials";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { VENUE_GROUPS } from "@/data/venue-groups";
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import GroupPageContent from "./page-content";
 
 export const dynamicParams = false;

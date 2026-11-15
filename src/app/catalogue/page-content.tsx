@@ -15,8 +15,8 @@ import {
   getPeopleVocabulary,
   buildPeopleIndex,
   type FilterSuggestion,
-} from "@/lib/filters";
-import { getPlaceVenues } from "@/lib/places";
+} from "@clusterflick/catalogue/filters";
+import { getPlaceVenues } from "@clusterflick/catalogue/places";
 import Button from "@/components/button";
 import SearchInput from "@/components/search-input";
 import StickyBar from "@/components/sticky-bar";

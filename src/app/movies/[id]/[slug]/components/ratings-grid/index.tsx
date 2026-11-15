@@ -1,4 +1,4 @@
-import { Movie } from "@/types";
+import { Movie } from "@clusterflick/catalogue/types";
 import LinkCard, {
   CardLabel,
   CardValue,

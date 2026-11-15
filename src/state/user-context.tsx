@@ -12,7 +12,7 @@ import {
   ReactNode,
 } from "react";
 import type { User } from "firebase/auth";
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import {
   isFirebaseConfigured,
   loadFirebase,

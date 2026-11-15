@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { FilterId } from "@/lib/filters";
+import { FilterId } from "@clusterflick/catalogue/filters";
 import { UserListId } from "@/lib/user-lists";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { useUserContext } from "@/state/user-context";

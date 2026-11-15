@@ -5,7 +5,7 @@ import {
   type FestivalListItem,
   type FeaturedFestival,
 } from "@/utils/get-festivals-index";
-import { getLondonMidnightTimestamp } from "@/utils/format-date";
+import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";
 import {

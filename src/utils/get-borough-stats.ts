@@ -1,4 +1,4 @@
-import type { CinemaData, Venue } from "@/types";
+import type { CinemaData, Venue } from "@clusterflick/catalogue/types";
 import { LONDON_BOROUGHS, type LondonBorough } from "@/data/london-boroughs";
 import { getListingsStats, type ListingsStats } from "./get-listings-stats";
 

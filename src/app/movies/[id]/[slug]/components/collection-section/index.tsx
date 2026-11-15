@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { CollectionSummary } from "@/types";
+import type { CollectionSummary } from "@clusterflick/catalogue/types";
 import { getCollectionUrl } from "@/utils/get-collection-url";
 import PillList from "@/components/pill-list";
 import styles from "./collection-section.module.css";

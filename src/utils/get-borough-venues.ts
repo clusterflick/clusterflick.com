@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { point, polygon } from "@turf/helpers";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { LONDON_BOROUGHS, type LondonBorough } from "@/data/london-boroughs";
 
 type BoroughBoundary = {

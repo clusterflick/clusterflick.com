@@ -1,4 +1,4 @@
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import type { Firestore, WriteBatch } from "firebase/firestore/lite";
 import type { FilmDetailsData } from "./film-details";
 import {

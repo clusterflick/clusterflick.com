@@ -1,7 +1,10 @@
 "use client";
 
 import clsx from "clsx";
-import type { FilterSuggestion, SuggestionKind } from "@/lib/filters";
+import type {
+  FilterSuggestion,
+  SuggestionKind,
+} from "@clusterflick/catalogue/filters";
 import styles from "./filter-suggestions.module.css";
 
 /**

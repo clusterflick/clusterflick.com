@@ -1,9 +1,9 @@
-import type { Movie } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
-import { matchAny } from "@/lib/filters/manager";
-import { FilterId } from "@/lib/filters/types";
-import { getProgrammeFilterUrl } from "@/lib/filters/modules/programmes";
-import { FESTIVALS } from "@/data/festivals";
+import type { Movie } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import { matchAny } from "@clusterflick/catalogue/filters/manager";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
+import { getProgrammeFilterUrl } from "@clusterflick/catalogue/filters/modules/programmes";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import {
   getFestivalMovies,
@@ -14,7 +14,10 @@ import {
   getProgrammeRow,
   type ProgrammePoster,
 } from "@/utils/get-programme-summary";
-import { formatDayAndDate, MS_PER_DAY } from "@/utils/format-date";
+import {
+  formatDayAndDate,
+  MS_PER_DAY,
+} from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A festival screening inside this window is "this week"; the rest are

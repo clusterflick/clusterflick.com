@@ -1,11 +1,15 @@
 import { Fragment, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AccessibilityFeature, type Movie, type Venue } from "@/types";
+import {
+  AccessibilityFeature,
+  type Movie,
+  type Venue,
+} from "@clusterflick/catalogue/types";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
-} from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/utils/accessibility-labels";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";
 import ColumnsLayout from "@/components/columns-layout";

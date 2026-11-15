@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CollectionSummary } from "@/types";
+import type { CollectionSummary } from "@clusterflick/catalogue/types";
 import { getCollectionUrl } from "@/utils/get-collection-url";
 import MoviePoster from "@/components/movie-poster";
 import PosterScroller from "@/components/poster-row/scroller";

@@ -1,5 +1,5 @@
 import VenueCard from "@/components/venue-card";
-import { formatDateShort } from "@/utils/format-date";
+import { formatDateShort } from "@clusterflick/catalogue/utils/format-date";
 import { getFestivalUrl } from "@/utils/get-festival-url";
 import type { MovieFestival } from "@/utils/get-movie-festivals";
 

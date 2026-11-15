@@ -1,4 +1,8 @@
-import { FilterChip, FilterId, FilterState } from "@/lib/filters";
+import {
+  FilterChip,
+  FilterId,
+  FilterState,
+} from "@clusterflick/catalogue/filters";
 
 /** The Refine rows, in display order. */
 export const REFINE_ROWS = [

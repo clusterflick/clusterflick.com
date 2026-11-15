@@ -1,11 +1,11 @@
-import type { CinemaData } from "@/types";
+import type { CinemaData } from "@clusterflick/catalogue/types";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
-import { FILM_CLUBS } from "@/data/film-clubs";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
 
 /**
  * Build-time precompute for the `/near-me` page: everything it needs to sort

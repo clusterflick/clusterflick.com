@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchGeolocationIfPermissionGranted } from "@/utils/fetch-geolocation";
-import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 
 interface VenueDistanceProps {
   venueLat: number;

@@ -9,7 +9,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { Position } from "@/types";
+import { Position } from "@clusterflick/catalogue/types";
 import {
   fetchGeolocation,
   fetchGeolocationIfPermissionGranted,

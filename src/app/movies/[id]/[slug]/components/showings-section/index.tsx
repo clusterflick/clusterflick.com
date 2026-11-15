@@ -10,15 +10,22 @@ import {
 } from "react";
 import clsx from "clsx";
 import { GroupedVirtuoso } from "react-virtuoso";
-import { MoviePerformance, Showing, Venue } from "@/types";
+import {
+  MoviePerformance,
+  Showing,
+  Venue,
+} from "@clusterflick/catalogue/types";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { titlesDiffer } from "@/utils/title-differs";
-import type { FilterDescription, FilterSuggestion } from "@/lib/filters";
+import type {
+  FilterDescription,
+  FilterSuggestion,
+} from "@clusterflick/catalogue/filters";
 import {
   getDaysFromNow,
   formatDaysFromNow,
   isInPast,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import Button from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";
 import ContentSection from "@/components/content-section";

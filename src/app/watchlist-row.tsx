@@ -6,7 +6,7 @@ import PosterRow from "@/components/poster-row";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
 import { UserListId } from "@/lib/user-lists";
-import { getMoviesFilterUrl } from "@/lib/filters/modules/movies";
+import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import { getWatchlistRow } from "@/utils/get-discovery-movies";
 import {
   storeRowHeight,

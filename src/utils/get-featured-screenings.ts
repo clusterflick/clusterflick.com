@@ -1,16 +1,16 @@
-import type { CinemaData, Movie } from "@/types";
+import type { CinemaData, Movie } from "@clusterflick/catalogue/types";
 import type {
   EditorialHighlightKind,
   EditorialSummary,
 } from "@/utils/get-editorial-summary";
 import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
 import { getVenueUrl } from "@/utils/get-venue-url";
-import { getRating } from "@/utils/movie-ratings.mjs";
+import { getRating } from "@clusterflick/catalogue/utils/movie-ratings.mjs";
 import {
   formatRelativeDay,
   formatShowingTime,
   MS_PER_DAY,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import { findSummaryMentions } from "@/utils/summary-mentions";
 
 /** The home page's picks: at most this many, in the order the summary names them. */

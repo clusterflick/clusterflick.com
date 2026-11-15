@@ -1,6 +1,6 @@
-import { FILM_CLUBS } from "@/data/film-clubs";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 
 export type MovieFilmClub = {
   id: string;

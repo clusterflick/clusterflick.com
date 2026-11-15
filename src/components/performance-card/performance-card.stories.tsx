@@ -4,7 +4,7 @@ import {
   FormatDimension,
   FormatPresentation,
   FormatSource,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import PerformanceCard, { PerformanceCardActions } from ".";
 
 /**

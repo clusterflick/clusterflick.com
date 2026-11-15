@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import FilterSuggestions from "@/components/filter-suggestions";
-import { filterManager, type FilterSuggestion } from "@/lib/filters";
+import {
+  filterManager,
+  type FilterSuggestion,
+} from "@clusterflick/catalogue/filters";
 
 const state = filterManager.getDefaultState();
 

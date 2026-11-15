@@ -1,7 +1,10 @@
 import type { OccasionRowItem } from "@/components/occasion-row";
-import type { Movie, Venue } from "@/types";
+import type { Movie, Venue } from "@clusterflick/catalogue/types";
 import type { ScoredMovie } from "@/utils/get-discovery-movies";
-import { formatDayAndDate, formatShowingTime } from "@/utils/format-date";
+import {
+  formatDayAndDate,
+  formatShowingTime,
+} from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A row of occasions as `OccasionRow` cards, which lead with the occasion

@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import DepartedContent from "@/app/movies/[id]/[slug]/departed-content";
-import type { Genre, Movie, Person, MetaData } from "@/types";
+import type {
+  Genre,
+  Movie,
+  Person,
+  MetaData,
+} from "@clusterflick/catalogue/types";
 import type { DepartedMovie } from "@/utils/get-departed-data";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import StoryDataLoader from "../utils/story-data-loader";

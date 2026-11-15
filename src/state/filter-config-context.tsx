@@ -18,7 +18,7 @@ import {
   OccasionType,
   OCCASION_NONE,
   Category,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import {
   FilterState,
   FilterId,
@@ -27,14 +27,20 @@ import {
   ProgrammeFilterId,
   RatingFilterId,
   filterManager,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import {
   getLondonMidnightTimestamp,
   getLondonDayOfWeek,
   addLondonDays,
-} from "@/utils/format-date";
-import { DAY_START_MINUTES, DAY_END_MINUTES } from "@/lib/filters/modules";
-import { isVenueOriginCurrent, type VenueOrigin } from "@/lib/places";
+} from "@clusterflick/catalogue/utils/format-date";
+import {
+  DAY_START_MINUTES,
+  DAY_END_MINUTES,
+} from "@clusterflick/catalogue/filters/modules";
+import {
+  isVenueOriginCurrent,
+  type VenueOrigin,
+} from "@clusterflick/catalogue/places";
 
 const SESSION_STORAGE_KEY = "clusterflick-filters";
 // The place a venue selection was picked from. Per tab, like the filters, and

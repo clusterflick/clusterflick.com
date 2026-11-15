@@ -1,6 +1,6 @@
-import type { Movie, MoviePerformance } from "@/types";
+import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
 import type { FormatDefinition } from "@/data/formats";
-import { pruneByPerformances } from "@/utils/prune-movies";
+import { pruneByPerformances } from "@clusterflick/catalogue/utils/prune-movies";
 
 export type FormatMovie = { movie: Movie; performanceCount: number };
 

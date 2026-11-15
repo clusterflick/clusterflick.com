@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { UserListEntry } from "./index";
 
 export type ListProgress = { seen: number; total: number };

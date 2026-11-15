@@ -13,7 +13,7 @@ import type { VenueGroupData } from "./page";
 import {
   matchesSearchQuery,
   normalizeForSearch,
-} from "@/lib/filters/normalize";
+} from "@clusterflick/catalogue/filters/normalize";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import LinkGrid from "@/components/link-grid";

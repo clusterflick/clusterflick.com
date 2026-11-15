@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import type { ScoredMovie } from "./get-discovery-movies";
 import { getOccasionRowItems } from "./get-occasion-row-items";
 

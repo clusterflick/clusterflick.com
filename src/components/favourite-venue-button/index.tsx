@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { StarIcon } from "@/components/icons";
 import { useUserContext } from "@/state/user-context";
 import styles from "./favourite-venue-button.module.css";

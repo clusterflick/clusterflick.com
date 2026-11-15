@@ -3,7 +3,10 @@ import Image from "next/image";
 import clsx from "clsx";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
-import { formatDateShort, isInPast } from "@/utils/format-date";
+import {
+  formatDateShort,
+  isInPast,
+} from "@clusterflick/catalogue/utils/format-date";
 import styles from "./detail-page-hero.module.css";
 
 interface DetailPageHeroProps {

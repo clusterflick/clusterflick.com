@@ -4,7 +4,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
-import { getDistanceInMiles } from "@/utils/geo-distance";
+import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
@@ -14,12 +14,15 @@ import {
   getFestivalDateRange,
 } from "@/utils/get-festival-movies";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
-import { FILM_CLUBS } from "@/data/film-clubs";
-import { FESTIVALS } from "@/data/festivals";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { getBoroughMapPath } from "@/utils/get-borough-image";
-import { AccessibilityFeature, type Venue } from "@/types";
+import {
+  AccessibilityFeature,
+  type Venue,
+} from "@clusterflick/catalogue/types";
 import BoroughPageContent from "./page-content";
 
 export const dynamicParams = false;

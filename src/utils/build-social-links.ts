@@ -1,11 +1,6 @@
 import type { ComponentType } from "react";
 import { LetterboxdIcon, InstagramIcon, XIcon } from "@/components/icons";
-
-export type SocialHandles = {
-  letterboxd: string | null;
-  twitter: string | null;
-  instagram: string | null;
-} | null;
+import type { SocialHandles } from "@clusterflick/catalogue/types";
 
 export type SocialLink = {
   Icon: ComponentType<{ size?: number }>;

@@ -5,7 +5,7 @@ import {
   LONDON_TIMEZONE,
   formatDaysFromNow,
   getDaysFromNow,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import styles from "./day-stepper.module.css";
 
 const dayFormatter = new Intl.DateTimeFormat("en-GB", {

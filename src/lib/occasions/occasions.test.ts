@@ -1,12 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie, type MoviePerformanceOccasions } from "@/types";
+import {
+  Category,
+  type Movie,
+  type MoviePerformanceOccasions,
+} from "@clusterflick/catalogue/types";
 import {
   getOccasionDetails,
   getOccasionTags,
   isNoteCoveredByOccasions,
   matchOccasions,
   OccasionKind,
-} from "./rules";
+} from "@clusterflick/catalogue/occasions/rules";
 import { findOccasions, findBestOccasionPerMovie } from "./index";
 
 const DAY = 86_400_000;

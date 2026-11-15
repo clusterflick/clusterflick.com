@@ -1,4 +1,4 @@
-import type { Position } from "@/types";
+import type { Position } from "@clusterflick/catalogue/types";
 
 export type LondonBorough = {
   name: string;

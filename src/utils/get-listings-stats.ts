@@ -1,9 +1,9 @@
-import { FormatSource, type CinemaData } from "@/types";
+import { FormatSource, type CinemaData } from "@clusterflick/catalogue/types";
 import {
   DEFAULT_CATEGORIES,
   getPrimaryCategory,
-} from "@/lib/filters/modules/categories";
-import { MS_PER_DAY } from "@/utils/format-date";
+} from "@clusterflick/catalogue/filters/modules/categories";
+import { MS_PER_DAY } from "@clusterflick/catalogue/utils/format-date";
 
 /** The window the home page's counts cover. */
 export const LISTINGS_STATS_DAYS = 7;

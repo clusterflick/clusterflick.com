@@ -1,4 +1,4 @@
-import { timestampToLondonDateString } from "@/utils/format-date";
+import { timestampToLondonDateString } from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A film page's address, filtered to one screening's venue and day — where a

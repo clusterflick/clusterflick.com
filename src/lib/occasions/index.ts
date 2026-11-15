@@ -1,14 +1,17 @@
-import type { Movie, MoviePerformance } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES as DEFAULT_CATEGORY_LIST,
-} from "@/lib/filters/modules/categories";
-import { getRating } from "@/utils/movie-ratings.mjs";
-import { matchOccasions, OccasionKind } from "./rules";
+} from "@clusterflick/catalogue/filters/modules/categories";
+import { getRating } from "@clusterflick/catalogue/utils/movie-ratings.mjs";
+import {
+  matchOccasions,
+  OccasionKind,
+} from "@clusterflick/catalogue/occasions/rules";
 
-export { OccasionKind } from "./rules";
-export type { OccasionMatch } from "./rules";
+export { OccasionKind } from "@clusterflick/catalogue/occasions/rules";
+export type { OccasionMatch } from "@clusterflick/catalogue/occasions/rules";
 
 /**
  * A performance that is more than a screening, with the evidence for saying so.

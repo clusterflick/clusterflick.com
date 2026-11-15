@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { FilterChip } from "@/lib/filters";
+import { FilterChip } from "@clusterflick/catalogue/filters";
 import styles from "./filter-overlay.module.css";
 
 interface ActiveFiltersSectionProps {

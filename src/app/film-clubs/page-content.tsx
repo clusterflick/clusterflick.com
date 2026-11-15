@@ -2,7 +2,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import ProgrammeCard from "@/components/programme-card";
 import PosterRow, { type PosterRowItem } from "@/components/poster-row";
 import LinkGrid from "@/components/link-grid";
-import { FILM_CLUB_KINDS } from "@/data/film-clubs";
+import { FILM_CLUB_KINDS } from "@clusterflick/catalogue/data/film-clubs";
 import type { FilmClubListItem } from "@/utils/get-film-clubs-index";
 import styles from "./page.module.css";
 

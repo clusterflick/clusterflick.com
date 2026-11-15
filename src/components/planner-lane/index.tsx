@@ -1,13 +1,17 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import type { MoviePerformance, Showing, Venue } from "@/types";
+import type {
+  MoviePerformance,
+  Showing,
+  Venue,
+} from "@clusterflick/catalogue/types";
 import PosterScroller from "@/components/poster-row/scroller";
 import PerformanceCard, {
   PerformanceCardActions,
   type PerformanceCardFilm,
   type PerformanceCardStatus,
 } from "@/components/performance-card";
-import { isInPast } from "@/utils/format-date";
+import { isInPast } from "@clusterflick/catalogue/utils/format-date";
 import { setUseBrowserBack } from "@/utils/nav-links";
 import { titlesDiffer } from "@/utils/title-differs";
 import styles from "./planner-lane.module.css";

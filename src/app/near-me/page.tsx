@@ -14,8 +14,8 @@ import {
 } from "@/utils/get-festival-movies";
 import { groupVenuesByBorough } from "@/utils/get-borough-venues";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
-import { FESTIVALS } from "@/data/festivals";
-import { AccessibilityFeature } from "@/types";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
+import { AccessibilityFeature } from "@clusterflick/catalogue/types";
 import NearMePageContent from "./page-content";
 
 export const metadata: Metadata = {

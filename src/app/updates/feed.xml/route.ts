@@ -7,7 +7,10 @@ import {
   summariseRelease,
 } from "@/utils/get-updates";
 import type { UpdateFilm, UpdateRelease } from "@/utils/get-updates";
-import { formatDateLong, formatShowingTime } from "@/utils/format-date";
+import {
+  formatDateLong,
+  formatShowingTime,
+} from "@clusterflick/catalogue/utils/format-date";
 
 export const dynamic = "force-static";
 

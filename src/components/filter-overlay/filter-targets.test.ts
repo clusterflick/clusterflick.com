@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Category } from "@/types";
+import { Category } from "@clusterflick/catalogue/types";
 import {
   FilterId,
   describeFilterChips,
@@ -7,7 +7,7 @@ import {
   getPermissiveState,
   set,
   FilterState,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import { getRowStatuses } from "./filter-targets";
 
 const statuses = (state: FilterState) =>

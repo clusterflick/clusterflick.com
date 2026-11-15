@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import type { CinemaData, Movie, Venue } from "@/types";
+import type { CinemaData, Movie, Venue } from "@clusterflick/catalogue/types";
 
 vi.mock("@/utils/get-static-data", () => ({
   getStaticData: async (): Promise<CinemaData> => ({

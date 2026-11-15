@@ -3,11 +3,14 @@
 import { useEffect, useMemo } from "react";
 import { useGeolocationContext } from "@/state/geolocation-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { getDistanceInMiles, getNearbyVenueIds } from "@/utils/geo-distance";
+import {
+  getDistanceInMiles,
+  getNearbyVenueIds,
+} from "@clusterflick/catalogue/utils/geo-distance";
 import { getLocalVenues, type LocalVenue } from "@/utils/get-local-venues";
 import { getNearMeTodayUrl } from "@/utils/get-near-me-today-url";
 import type { NearMeFilmClub, NearMeVenue } from "@/utils/get-near-me-data";
-import type { Position } from "@/types";
+import type { Position } from "@clusterflick/catalogue/types";
 
 export type NearbyVenue = NearMeVenue & { distance: number };
 

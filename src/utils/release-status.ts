@@ -11,7 +11,7 @@
 import {
   getLondonMinutesOfDay,
   timestampToLondonDateString,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 
 export type DatasetKey = "data" | "calendar";
 

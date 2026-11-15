@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Collection, type Movie } from "@/types";
+import {
+  Category,
+  type Collection,
+  type Movie,
+} from "@clusterflick/catalogue/types";
 import {
   getCollectionScreenings,
   getCollectionEvents,

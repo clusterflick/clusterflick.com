@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { CinemaData } from "@/types";
+import { CinemaData } from "@clusterflick/catalogue/types";
 import {
   FORMAT_GROUPS,
   FormatFilterId,
   getEffectiveFormatValue,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import styles from "./filter-overlay.module.css";

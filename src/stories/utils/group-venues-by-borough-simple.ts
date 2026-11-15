@@ -1,6 +1,6 @@
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
-import { getDistanceInMiles } from "@/utils/geo-distance";
-import type { Venue } from "@/types";
+import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
+import type { Venue } from "@clusterflick/catalogue/types";
 
 /**
  * Simple center+radius venue grouping for browser/Storybook use.

@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { Category, type Movie, type MoviePerformance } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
+import {
+  Category,
+  type Movie,
+  type MoviePerformance,
+} from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
 import { getVenueSchedule } from "./get-venue-schedule";
 
 const DAY = 86_400_000;

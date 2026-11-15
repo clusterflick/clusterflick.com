@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+import { Category } from "@clusterflick/catalogue/types";
 
 export const formatCategory = (category: Category): string => {
   const labels: Record<Category, string> = {

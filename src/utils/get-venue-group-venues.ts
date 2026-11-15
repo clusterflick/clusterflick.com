@@ -1,4 +1,4 @@
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 
 /**

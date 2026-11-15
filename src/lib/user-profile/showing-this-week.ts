@@ -1,4 +1,4 @@
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 

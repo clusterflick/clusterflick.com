@@ -3,7 +3,10 @@
 import clsx from "clsx";
 import ReleaseDot from "@/components/release-dot";
 import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
-import { formatDayAndDate, formatShowingTime } from "@/utils/format-date";
+import {
+  formatDayAndDate,
+  formatShowingTime,
+} from "@clusterflick/catalogue/utils/format-date";
 import {
   formatHours,
   getHoursSince,

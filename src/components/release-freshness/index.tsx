@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useIsOnReaderClock, useNow } from "@/hooks/use-now";
-import { formatShowingTime, formatDateLong } from "@/utils/format-date";
+import {
+  formatShowingTime,
+  formatDateLong,
+} from "@clusterflick/catalogue/utils/format-date";
 import {
   formatHours,
   getHoursSince,

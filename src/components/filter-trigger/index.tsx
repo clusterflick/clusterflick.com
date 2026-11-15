@@ -8,7 +8,7 @@ import {
   EVENT_CATEGORIES,
 } from "@/state/filter-config-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { describeFilters } from "@/lib/filters";
+import { describeFilters } from "@clusterflick/catalogue/filters";
 import { getCinemaVenueIds } from "@/utils/get-cinema-venue-ids";
 import styles from "./filter-trigger.module.css";
 

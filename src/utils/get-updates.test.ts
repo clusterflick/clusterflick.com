@@ -9,7 +9,7 @@ import {
   type DiffModifiedShowing,
   type DiffShowing,
   type Movie,
-} from "@/types";
+} from "@clusterflick/catalogue/types";
 import {
   buildUpdates,
   getUpdateReleasePath,

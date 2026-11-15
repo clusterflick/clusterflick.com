@@ -1,6 +1,9 @@
-import type { Movie } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
-import { FILM_CLUBS, type FilmClubKind } from "@/data/film-clubs";
+import type { Movie } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import {
+  FILM_CLUBS,
+  type FilmClubKind,
+} from "@clusterflick/catalogue/data/film-clubs";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
 import {
@@ -8,7 +11,7 @@ import {
   getNextUpRow,
   type ProgrammePoster,
 } from "@/utils/get-programme-summary";
-import { formatDayAndDate } from "@/utils/format-date";
+import { formatDayAndDate } from "@clusterflick/catalogue/utils/format-date";
 
 export type FilmClubListItem = {
   id: string;

@@ -9,13 +9,17 @@ import Divider from "@/components/divider";
 import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
-import { AccessibilityFeature, type Movie, type CinemaData } from "@/types";
+import {
+  AccessibilityFeature,
+  type Movie,
+  type CinemaData,
+} from "@clusterflick/catalogue/types";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueUrl } from "@/utils/get-venue-url";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
-} from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/utils/accessibility-labels";
 import styles from "./page.module.css";
 import { VENUE_COUNT } from "@/utils/venue-count";
 import { getAccessibilityFeature } from "@/data/accessibility-features";

@@ -1,5 +1,5 @@
-import type { CinemaData } from "@/types";
-import { pruneByPerformances } from "@/utils/prune-movies";
+import type { CinemaData } from "@clusterflick/catalogue/types";
+import { pruneByPerformances } from "@clusterflick/catalogue/utils/prune-movies";
 
 export interface StatusStats {
   /** When the release these figures come from was generated. */

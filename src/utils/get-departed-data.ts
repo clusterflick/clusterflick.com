@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import type { Genre, Movie, Person } from "@/types";
+import type { Genre, Movie, Person } from "@clusterflick/catalogue/types";
 
 /**
  * A film that has stopped screening. Everything a movie carries about itself

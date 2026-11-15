@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import PosterRow from "@/components/poster-row";
 
 /**

@@ -7,8 +7,8 @@ import {
   getFestivalsIndex,
   type FestivalListItem,
 } from "@/utils/get-festivals-index";
-import { getLondonMidnightTimestamp } from "@/utils/format-date";
-import { FESTIVALS } from "@/data/festivals";
+import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 import FestivalsPageContent from "./page-content";
 
 export type { FestivalListItem };

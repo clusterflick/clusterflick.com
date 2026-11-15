@@ -1,4 +1,4 @@
-import type { SocialHandles } from "./build-social-links";
+import type { SocialHandles } from "@clusterflick/catalogue/types";
 
 type Platform = "letterboxd" | "twitter" | "instagram";
 const PLATFORMS: Platform[] = ["letterboxd", "twitter", "instagram"];

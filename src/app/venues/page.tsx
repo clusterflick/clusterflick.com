@@ -5,7 +5,7 @@ import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { getNearMeVenues } from "@/utils/get-near-me-data";
 import { getLondonBoundary } from "@/utils/get-london-boundary";
-import type { Venue } from "@/types";
+import type { Venue } from "@clusterflick/catalogue/types";
 import VenuesPageContent from "./page-content";
 
 export const metadata: Metadata = {

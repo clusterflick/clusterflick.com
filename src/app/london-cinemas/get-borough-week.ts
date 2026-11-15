@@ -1,4 +1,4 @@
-import type { CinemaData, Venue } from "@/types";
+import type { CinemaData, Venue } from "@clusterflick/catalogue/types";
 import type { BoroughMapItem } from "@/components/borough-map";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";

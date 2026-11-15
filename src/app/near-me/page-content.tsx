@@ -9,16 +9,19 @@ import {
   getDistanceInMiles,
   formatShortDistance,
   NEARBY_MAX_RADIUS_MILES,
-} from "@/utils/geo-distance";
+} from "@clusterflick/catalogue/utils/geo-distance";
 import { LOCAL_MIN_SCREENINGS } from "@/utils/get-local-venues";
 import { computeNearMeRows } from "@/utils/get-discovery-movies";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,
-} from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/utils/accessibility-labels";
 import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-url";
-import { formatDateShort } from "@/utils/format-date";
-import type { Position, AccessibilityFeature } from "@/types";
+import { formatDateShort } from "@clusterflick/catalogue/utils/format-date";
+import type {
+  Position,
+  AccessibilityFeature,
+} from "@clusterflick/catalogue/types";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ContentSection from "@/components/content-section";
 import ColumnsLayout from "@/components/columns-layout";

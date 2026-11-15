@@ -5,7 +5,7 @@ import {
   FilterState,
   RatingFilterId,
   RatingGroupConfig,
-} from "@/lib/filters";
+} from "@clusterflick/catalogue/filters";
 import Button from "@/components/button";
 import Slider from "@/components/slider";
 import styles from "./filter-overlay.module.css";

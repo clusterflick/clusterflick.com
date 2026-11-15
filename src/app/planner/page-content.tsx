@@ -18,7 +18,7 @@ import {
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useFilterConfig } from "@/state/filter-config-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { filterManager } from "@/lib/filters";
+import { filterManager } from "@clusterflick/catalogue/filters";
 import Button from "@/components/button";
 import Chip from "@/components/chip";
 import DayStepper from "@/components/day-stepper";
@@ -34,7 +34,7 @@ import {
   formatDateLong,
   getLondonMidnightTimestamp,
   timestampToLondonDateString,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import {
   clampToRange,

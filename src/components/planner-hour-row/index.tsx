@@ -2,14 +2,14 @@
 
 import { Fragment, useState } from "react";
 import clsx from "clsx";
-import type { MoviePerformance, Venue } from "@/types";
+import type { MoviePerformance, Venue } from "@clusterflick/catalogue/types";
 import PlannerLane, {
   PlannerLaneCard,
   type PlannerLaneMovie,
 } from "@/components/planner-lane";
 import type { PerformanceCardFilm } from "@/components/performance-card";
 import Button from "@/components/button";
-import { formatShowingTime } from "@/utils/format-date";
+import { formatShowingTime } from "@clusterflick/catalogue/utils/format-date";
 import { groupBySameStart } from "@/utils/get-planner-day";
 import styles from "./planner-hour-row.module.css";
 

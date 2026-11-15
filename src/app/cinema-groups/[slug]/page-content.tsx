@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getVenueGroupTitle } from "@/utils/get-venue-group-url";
-import type { SocialHandles } from "@/utils/build-social-links";
-import type { Movie } from "@/types";
+import type { SocialHandles } from "@clusterflick/catalogue/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import StandardPageLayout from "@/components/standard-page-layout";
 import ColumnsLayout from "@/components/columns-layout";
 import ContentSection from "@/components/content-section";

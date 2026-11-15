@@ -12,7 +12,12 @@ import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { getMovieCollections } from "@/utils/get-movie-collections";
-import type { Genre, Person, Venue, Movie } from "@/types";
+import type {
+  Genre,
+  Person,
+  Venue,
+  Movie,
+} from "@clusterflick/catalogue/types";
 import { buildScreeningEventSchema } from "@/utils/build-screening-event-schema";
 import {
   buildMovieJsonLd,

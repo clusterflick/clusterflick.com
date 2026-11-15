@@ -1,4 +1,4 @@
-import type { Movie, Person } from "@/types";
+import type { Movie, Person } from "@clusterflick/catalogue/types";
 import { fetchTmdbDetails, type TmdbFilmDetails } from "@/lib/tmdb-search";
 
 /**

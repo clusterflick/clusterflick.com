@@ -2,13 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import FilmClubCard from "@/components/film-club-card";
 import type { LocalVenue } from "@/utils/get-local-venues";
-import { formatShortDistance } from "@/utils/geo-distance";
+import { formatShortDistance } from "@clusterflick/catalogue/utils/geo-distance";
 import { getMovieUrl } from "@/utils/get-movie-url";
 import {
   formatRelativeDay,
   formatShowingTime,
   timestampToLondonDateString,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 import styles from "./local-venues.module.css";
 
 export type LocalVenuesItem = LocalVenue;

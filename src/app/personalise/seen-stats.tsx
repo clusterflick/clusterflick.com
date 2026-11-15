@@ -15,7 +15,7 @@ import { ProgressRing } from "@/components/list-progress";
 import VenueCard from "@/components/venue-card";
 import { getListProgress } from "@/lib/user-lists/list-progress";
 import { GENRES } from "@/data/genres";
-import { FilterId } from "@/lib/filters/types";
+import { FilterId } from "@clusterflick/catalogue/filters/types";
 import type { UserListEntry } from "@/lib/user-lists";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";
 import {
@@ -23,7 +23,7 @@ import {
   type SeenRecord,
   type SeenStats as Stats,
 } from "@/lib/user-lists/seen-stats";
-import { formatDuration } from "@/utils/format-date";
+import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { formatLanguage } from "@/utils/format-language";
 import { getGenreUrl } from "@/utils/get-genre-url";
 import { getMovieUrl } from "@/utils/get-movie-url";

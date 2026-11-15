@@ -1,6 +1,6 @@
-import type { MoviesRecord } from "@/lib/filters/types";
-import { applyMatchers } from "@/lib/filters/apply-matchers";
-import type { FilmClub } from "@/data/film-clubs";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import { applyMatchers } from "@clusterflick/catalogue/filters/apply-matchers";
+import type { FilmClub } from "@clusterflick/catalogue/data/film-clubs";
 
 /**
  * Returns the film club's currently-showing movies — those with at least one

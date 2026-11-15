@@ -16,7 +16,7 @@ import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import SearchInput from "@/components/search-input";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
-import { normalizeForSearch } from "@/lib/filters/normalize";
+import { normalizeForSearch } from "@clusterflick/catalogue/filters/normalize";
 import { UserListId } from "@/lib/user-lists";
 import {
   searchTmdb,

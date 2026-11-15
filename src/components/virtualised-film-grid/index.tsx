@@ -3,7 +3,7 @@
 import { forwardRef, useSyncExternalStore, type ComponentProps } from "react";
 import clsx from "clsx";
 import { VirtuosoGrid } from "react-virtuoso";
-import type { Movie } from "@/types";
+import type { Movie } from "@clusterflick/catalogue/types";
 import MovieCell from "@/components/movie-cell";
 import styles from "./virtualised-film-grid.module.css";
 

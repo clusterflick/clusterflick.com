@@ -12,8 +12,8 @@ import VenueQuickAdd, {
 import VenueMapPicker, {
   VenueMapPickerItem,
 } from "@/components/venue-map-picker";
-import type { Position } from "@/types";
-import type { VenueOrigin } from "@/lib/places";
+import type { Position } from "@clusterflick/catalogue/types";
+import type { VenueOrigin } from "@clusterflick/catalogue/places";
 import VenuePlacePicker, {
   type VenuePlacePickerHandle,
 } from "./venue-place-picker";

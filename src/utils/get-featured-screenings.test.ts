@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Category, type CinemaData, type Movie } from "@/types";
+import {
+  Category,
+  type CinemaData,
+  type Movie,
+} from "@clusterflick/catalogue/types";
 import type { EditorialSummary } from "./get-editorial-summary";
 import {
   formatFeaturedWhen,

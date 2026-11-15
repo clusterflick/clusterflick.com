@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getSourceNames } from "@/utils/get-source-names";
-import { getLondonMidnightTimestamp } from "@/utils/format-date";
+import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format-date";
 import { getStatusStats } from "./components/status-section/get-status-stats";
 import AboutPageContent from "./about-page-content";
 import { VENUE_COUNT } from "@/utils/venue-count";

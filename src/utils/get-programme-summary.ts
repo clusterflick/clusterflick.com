@@ -1,6 +1,6 @@
-import type { Movie } from "@/types";
-import type { MoviesRecord } from "@/lib/filters/types";
-import { formatDayAndDate } from "@/utils/format-date";
+import type { Movie } from "@clusterflick/catalogue/types";
+import type { MoviesRecord } from "@clusterflick/catalogue/filters/types";
+import { formatDayAndDate } from "@clusterflick/catalogue/utils/format-date";
 
 export interface ProgrammePoster {
   title: string;

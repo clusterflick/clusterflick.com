@@ -5,15 +5,15 @@ import {
   FormatDimension,
   FormatSourceDefault,
   type MoviePerformance,
-} from "@/types";
-import { getAccessibilityLabel } from "@/utils/accessibility-labels";
+} from "@clusterflick/catalogue/types";
+import { getAccessibilityLabel } from "@clusterflick/catalogue/utils/accessibility-labels";
 import { getFormatLabels } from "@/utils/format-labels";
-import { formatShowingTime } from "@/utils/format-date";
+import { formatShowingTime } from "@clusterflick/catalogue/utils/format-date";
 import {
   getOccasionDetails,
   getOccasionTags,
   isNoteCoveredByOccasions,
-} from "@/lib/occasions/rules";
+} from "@clusterflick/catalogue/occasions/rules";
 import Tag from "@/components/tag";
 import { ButtonAnchor } from "@/components/button";
 import EventPoster, {

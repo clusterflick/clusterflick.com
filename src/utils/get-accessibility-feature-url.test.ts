@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { AccessibilityFeature } from "@/types";
+import { AccessibilityFeature } from "@clusterflick/catalogue/types";
 import {
   ACCESSIBILITY_FEATURES,
   getRelatedAccessibilityFeatures,

@@ -4,7 +4,7 @@ import type { UpdateDay } from "@/utils/get-updates";
 import {
   dateStringToLondonTimestamp,
   formatDateLong,
-} from "@/utils/format-date";
+} from "@clusterflick/catalogue/utils/format-date";
 
 /**
  * A day's scale at a glance, above its runs: the figures a reader would
