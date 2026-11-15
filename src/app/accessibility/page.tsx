@@ -15,7 +15,7 @@ import {
   type CinemaData,
 } from "@clusterflick/catalogue/types";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import {
   ACCESSIBILITY_LABELS,
   ACCESSIBILITY_EMOJIS,

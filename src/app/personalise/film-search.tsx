@@ -18,7 +18,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import UserListButtons from "@/components/user-list-buttons";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { normalizeForSearch } from "@clusterflick/catalogue/filters/normalize";
 import { searchShowingFilms } from "@/lib/user-lists/search-showing-films";
 import {

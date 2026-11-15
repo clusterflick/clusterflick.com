@@ -22,6 +22,9 @@ await build({
   entryNames: "[dir]/[name]",
   chunkNames: "chunks/[name]-[hash]",
   bundle: true,
+  // Its dependencies are installed beside it, as any package's are, rather
+  // than copied into it.
+  packages: "external",
   splitting: true,
   format: "esm",
   platform: "neutral",

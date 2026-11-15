@@ -26,7 +26,7 @@ import {
 import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { formatLanguage } from "@/utils/format-language";
 import { getGenreUrl } from "@/utils/get-genre-url";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { getPersonFilterUrl } from "@/utils/get-person-filter-url";
 import styles from "./seen-stats.module.css";
 

@@ -8,7 +8,7 @@ import {
   getFestivalMovies,
   getFestivalDateRange,
 } from "@/utils/get-festival-movies";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import {
   FESTIVALS,

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { trackEvent } from "@/utils/track-event";
 import { ButtonLink } from "@/components/button";
 import LoadingIndicator from "@/components/loading-indicator";

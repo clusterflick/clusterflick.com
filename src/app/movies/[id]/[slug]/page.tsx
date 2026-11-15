@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
 import { getDepartedData } from "@/utils/get-departed-data";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { getContainingEvents } from "@/utils/get-containing-events";
 import { getMovieFestivals } from "@/utils/get-movie-festivals";
 import { getFestivalImagePath } from "@/utils/get-festival-image";

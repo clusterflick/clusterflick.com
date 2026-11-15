@@ -6,7 +6,7 @@ import clsx from "clsx";
 import MoviePoster from "@/components/movie-poster";
 import OutlineHeading from "@/components/outline-heading";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { GENRES } from "@/data/genres";
 import { UserListId, type UserLists } from "@/lib/user-lists";
 import type { FilmDetailsData } from "@/lib/user-lists/film-details";

@@ -2,7 +2,10 @@ import PosterRow from "@/components/poster-row";
 import CollectionRow from "@/components/collection-row";
 import OccasionRow from "@/components/occasion-row";
 import type { Venue } from "@clusterflick/catalogue/types";
-import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
+import {
+  getMovieUrl,
+  SHOW_ALL_HASH,
+} from "@clusterflick/catalogue/utils/get-movie-url";
 import {
   getMarathonsUrl,
   getOccasionsUrl,

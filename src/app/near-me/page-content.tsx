@@ -29,7 +29,7 @@ import VenueMap from "@/components/venue-map";
 import LocalVenues from "@/components/local-venues";
 import PosterRow from "@/components/poster-row";
 import OccasionRow from "@/components/occasion-row";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { getOccasionRowItems } from "@/utils/get-occasion-row-items";
 import LinkedList from "@/components/linked-list";
 import Button, { ButtonLink } from "@/components/button";

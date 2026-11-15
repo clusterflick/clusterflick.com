@@ -13,9 +13,9 @@ import {
   getAccessibilityFilterUrl,
 } from "@/utils/get-accessibility-feature-url";
 import { getAccessibilityMovies } from "@/utils/get-accessibility-movies";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import EventDetailPageContent from "@/components/event-detail-page-content";
 import styles from "./page.module.css";
 

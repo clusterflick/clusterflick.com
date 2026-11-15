@@ -10,7 +10,7 @@ import type {
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";
 import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getBoroughUrl } from "@/utils/get-borough-url";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import type { Venue } from "@clusterflick/catalogue/types";
 import { fetchMetaData, fetchAllMovies } from "../utils/fetch-story-data";
 import { groupVenuesByBoroughSimple } from "../utils/group-venues-by-borough-simple";

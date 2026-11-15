@@ -4,7 +4,10 @@ import type { Movie } from "@clusterflick/catalogue/types";
 import Link from "next/link";
 import { formatCategory } from "@/app/utils";
 import { getPrimaryCategory } from "@clusterflick/catalogue/filters";
-import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
+import {
+  getMovieUrl,
+  SHOW_ALL_HASH,
+} from "@clusterflick/catalogue/utils/get-movie-url";
 import EventPoster from "@/components/event-poster";
 import PosterStatusMarkers from "@/components/poster-status-markers";
 import styles from "./movie-cell.module.css";

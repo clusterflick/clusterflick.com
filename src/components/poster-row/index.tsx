@@ -1,7 +1,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 import type { Movie } from "@clusterflick/catalogue/types";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import MoviePoster from "@/components/movie-poster";
 import StackedPoster from "@/components/stacked-poster";
 import PosterStatusMarkers from "@/components/poster-status-markers";

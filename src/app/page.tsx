@@ -12,8 +12,11 @@ import {
   linkifySummary,
   type SummaryLinkTarget,
 } from "@/utils/linkify-summary";
-import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import {
+  getMovieUrl,
+  SHOW_ALL_HASH,
+} from "@clusterflick/catalogue/utils/get-movie-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getFormatUrl } from "@/utils/get-format-url";
 import { FORMATS } from "@/data/formats";
 import StatsBand, { type StatsBandItem } from "@/components/stats-band";

@@ -18,7 +18,7 @@ import Divider from "@/components/divider";
 import VenueHeroDetails from "@/components/venue-hero-details";
 import FavouriteVenueButton from "@/components/favourite-venue-button";
 import { ButtonLink } from "@/components/button";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import LinkedList from "@/components/linked-list";
 import FestivalCard from "@/components/festival-card";
 import type { MovieFestival } from "@/utils/get-movie-festivals";

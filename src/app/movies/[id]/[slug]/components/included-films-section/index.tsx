@@ -1,5 +1,5 @@
 import { IncludedMovie, Movie } from "@clusterflick/catalogue/types";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";

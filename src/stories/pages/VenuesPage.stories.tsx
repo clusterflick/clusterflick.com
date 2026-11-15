@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import VenuesPageContent from "@/app/venues/page-content";
 import type { VenueMapVenue } from "@/components/venue-map";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import type { VenueGroupData } from "@/app/venues/page";
 import type { Venue } from "@clusterflick/catalogue/types";

@@ -47,8 +47,8 @@ import {
   EMPTY_FILM_DETAILS,
 } from "@/lib/user-lists/film-details";
 import { useElementWidth } from "@/hooks/use-element-width";
-import { getMovieUrl } from "@/utils/get-movie-url";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 // Direct from the module: the filters barrel would bundle the whole engine.
 import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import { OPEN_FILTERS_HASH } from "@/hooks/use-open-filters-hash";

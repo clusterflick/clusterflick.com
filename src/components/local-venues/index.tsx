@@ -3,7 +3,7 @@ import Link from "next/link";
 import FilmClubCard from "@/components/film-club-card";
 import type { LocalVenue } from "@/utils/get-local-venues";
 import { formatShortDistance } from "@clusterflick/catalogue/utils/geo-distance";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import {
   formatRelativeDay,
   formatShowingTime,

@@ -35,7 +35,7 @@ import {
   getLondonMidnightTimestamp,
   timestampToLondonDateString,
 } from "@clusterflick/catalogue/utils/format-date";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import {
   clampToRange,
   findNearestShowingDay,

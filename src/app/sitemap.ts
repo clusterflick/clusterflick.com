@@ -1,7 +1,7 @@
 import { type MetadataRoute } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { getMovieUrl } from "@/utils/get-movie-url";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { Movie, Venue } from "@clusterflick/catalogue/types";
 import { LONDON_BOROUGHS } from "@/data/london-boroughs";

@@ -5,7 +5,7 @@ import { getStaticData } from "@/utils/get-static-data";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getFilmClubMovies } from "@/utils/get-film-club-movies";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import {
   FILM_CLUBS,

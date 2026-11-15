@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
 import { getFestivalImagePath } from "@/utils/get-festival-image";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getFestivalMovies } from "@/utils/get-festival-movies";
 import {
   getFestivalsIndex,

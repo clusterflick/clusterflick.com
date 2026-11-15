@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueImagePath, getVenueMapPath } from "@/utils/get-venue-image";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";

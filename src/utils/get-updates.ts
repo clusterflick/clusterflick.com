@@ -7,8 +7,11 @@ import type {
   DiffShowing,
   Movie,
 } from "@clusterflick/catalogue/types";
-import { getMovieUrl, SHOW_ALL_HASH } from "./get-movie-url";
-import { getVenueUrl } from "./get-venue-url";
+import {
+  getMovieUrl,
+  SHOW_ALL_HASH,
+} from "@clusterflick/catalogue/utils/get-movie-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueGroupUrl } from "./get-venue-group-url";
 import { VENUE_GROUPS } from "@/data/venue-groups";
 import { timestampToLondonDateString } from "@clusterflick/catalogue/utils/format-date";

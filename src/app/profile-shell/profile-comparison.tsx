@@ -8,7 +8,7 @@ import PosterTile, { PosterTileList } from "@/components/poster-tile";
 import { CloseIcon } from "@/components/icons";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useUserContext } from "@/state/user-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { getMoviesFilterUrl } from "@clusterflick/catalogue/filters/modules/movies";
 import type { UserLists } from "@/lib/user-lists";
 import { ProfileSectionId, type ProfileSections } from "@/lib/user-profile";

@@ -1,5 +1,5 @@
 import type { CinemaData } from "@clusterflick/catalogue/types";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getFilmClubUrl } from "@/utils/get-film-club-url";
 import { getFilmClubImagePath } from "@/utils/get-film-club-image";

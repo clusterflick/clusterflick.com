@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PageWrapper from "@/components/page-wrapper";
 import { getStaticData } from "@/utils/get-static-data";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import {
   getPrimaryCategory,
   DEFAULT_CATEGORIES,

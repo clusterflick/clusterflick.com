@@ -11,7 +11,7 @@ import {
   formatDateShort,
   timestampToLondonDateString,
 } from "@clusterflick/catalogue/utils/format-date";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { FORMAT_LABELS } from "@/utils/format-labels";
 import { ACCESSIBILITY_LABELS } from "@clusterflick/catalogue/utils/accessibility-labels";
 import styles from "./venue-schedule-board.module.css";

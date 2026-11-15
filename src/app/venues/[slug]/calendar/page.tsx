@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import slugify from "@sindresorhus/slugify";
 import { getStaticData } from "@/utils/get-static-data";
 import { getVenueImagePath } from "@/utils/get-venue-image";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueCalendarPath } from "@/utils/get-venue-calendar";
 import StandardPageLayout from "@/components/standard-page-layout";
 import DetailPageHero from "@/components/detail-page-hero";

@@ -13,7 +13,7 @@ import { VENUE_GROUPS } from "@/data/venue-groups";
 import { LEWISHAM_2026 as DATA } from "@/data/reports/lewisham-2026";
 import { getBoroughUrl } from "@/utils/get-borough-url";
 import { getBoroughMapShapes } from "@/utils/get-borough-map-shapes";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getVenueGroupUrl } from "@/utils/get-venue-group-url";
 import { formatReportDate } from "../format-report-date";

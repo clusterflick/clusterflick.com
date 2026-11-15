@@ -5,7 +5,7 @@ import Button from "@/components/button";
 import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import {
   toUserListEntry,
   UserListId,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";

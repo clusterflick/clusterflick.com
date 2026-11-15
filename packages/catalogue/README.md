@@ -43,8 +43,10 @@ import {
 read neither when it differs. It's raised, with a major version of this
 package, when a change would break a reader built against the old shape.
 
-It's plain ESM with type declarations and no dependencies, and runs in a
-browser, in Node and in a Worker. It has no React, and never reads `window`,
+It's plain ESM with type declarations, and runs in a browser, in Node and in a
+Worker. Its one dependency is `@sindresorhus/slugify`, which makes the film and
+venue pages' addresses (`utils/get-movie-url`, `utils/get-venue-url`), so a
+link from anywhere is the page the site built. It has no React, and never reads `window`,
 `document` or `process`.
 
 ## What goes in

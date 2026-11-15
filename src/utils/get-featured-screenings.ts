@@ -3,8 +3,11 @@ import type {
   EditorialHighlightKind,
   EditorialSummary,
 } from "@/utils/get-editorial-summary";
-import { getMovieUrl, SHOW_ALL_HASH } from "@/utils/get-movie-url";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import {
+  getMovieUrl,
+  SHOW_ALL_HASH,
+} from "@clusterflick/catalogue/utils/get-movie-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getRating } from "@clusterflick/catalogue/utils/movie-ratings.mjs";
 import {
   formatRelativeDay,

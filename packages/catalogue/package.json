@@ -46,6 +46,9 @@
     "test": "vitest run",
     "prepack": "npm run build"
   },
+  "dependencies": {
+    "@sindresorhus/slugify": "^3.0.0"
+  },
   "devDependencies": {
     "esbuild": "0.27.2",
     "typescript": "5.9.3",

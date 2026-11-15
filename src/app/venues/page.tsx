@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getStaticData } from "@/utils/get-static-data";
-import { getVenueUrl } from "@/utils/get-venue-url";
+import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueDisplayName } from "@/utils/get-venue-display-name";
 import { buildVenueSchema } from "@/utils/build-venue-schema";
 import { getNearMeVenues } from "@/utils/get-near-me-data";

@@ -4,7 +4,7 @@ import {
   formatDuration,
   formatDateLong,
 } from "@clusterflick/catalogue/utils/format-date";
-import { getMovieUrl } from "@/utils/get-movie-url";
+import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
