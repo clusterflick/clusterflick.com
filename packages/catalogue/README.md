@@ -53,18 +53,19 @@ From the repo root:
 
 ## Publishing
 
-Bump `version` in `package.json` (semver: a change to the data model or to a
-function's signature is a major version while the Workers depend on it), then
-publish. The first release is published by hand, since npm's trusted publishing
-is set up in a package's settings once it exists:
+A release is a version bump in `package.json`, pushed to `main` (semver: a
+change to the data model or to a function's signature is a major version while
+the Workers depend on it). `.github/workflows/publish-catalogue.yml` runs on
+every push that touches the package and publishes only a version npm doesn't
+have yet, after the site's tests and `check`; a push without a bump finds its
+version already published and stops.
 
-```sh
-npm login
-npm publish -w @clusterflick/catalogue --access public
-```
-
-`prepack` builds `dist/` first. Later releases are to be published from GitHub
-Actions with trusted publishing, which needs no npm token.
+It publishes with npm's trusted publishing: the workflow proves who it is with
+an OIDC token, so no npm token is stored anywhere, and each release carries
+provenance linking it to the commit and run that built it. The trusted
+publisher is configured in the package's settings on npmjs.com and names that
+workflow file, so renaming the file means updating it there. 0.1.0 was
+published by hand, before the package existed to configure.
 
 ## Licence
 

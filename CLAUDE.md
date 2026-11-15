@@ -73,7 +73,10 @@ That's why `buildFilterUrl` takes the page's address rather than reading it.
 **Publishing** is for the Workers, which install it from npm. `npm run build -w
 @clusterflick/catalogue` writes `dist/` (a module per source file, with type
 declarations) and `check` imports every subpath of it in Node; neither is
-needed for the site. See `packages/catalogue/README.md`.
+needed for the site. A release is a version bump in its `package.json`:
+`publish-catalogue.yml` publishes any version npm doesn't have yet, with
+npm's trusted publishing, and skips every other push. See
+`packages/catalogue/README.md`.
 
 ## Project Structure
 

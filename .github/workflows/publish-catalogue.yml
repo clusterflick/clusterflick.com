@@ -1,0 +1,66 @@
+name: Publish @clusterflick/catalogue
+
+# Publishes the package when its version is one npm doesn't have yet. Most
+# pushes that touch it are the site's own changes (a festival, a filter), which
+# the site picks up from source; those find the version already published and
+# stop. A release is a version bump in packages/catalogue/package.json.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/catalogue/**"
+  workflow_dispatch:
+
+concurrency:
+  group: publish-catalogue
+  cancel-in-progress: false
+
+# Deny all by default; the job grants only what it needs.
+permissions: {}
+
+jobs:
+  publish:
+    name: Publish if the version is new
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # npm's trusted publishing: the workflow proves who it is to npm with an
+      # OIDC token, so there's no npm token stored anywhere. Configured on the
+      # package's settings on npmjs.com, which name this file.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+          # As npm advises for release builds.
+          package-manager-cache: false
+      - name: Is this version on npm yet?
+        id: version
+        # Every published version, rather than asking for this one: npm answers
+        # a version it doesn't have with an error, which can't be told from a
+        # failed lookup. A failed lookup fails the job, never publishes blind.
+        run: |
+          version=$(node -p 'require("./packages/catalogue/package.json").version')
+          versions=$(npm view @clusterflick/catalogue versions --json)
+          if VERSIONS="$versions" VERSION="$version" node -e '
+            const versions = [JSON.parse(process.env.VERSIONS)].flat();
+            process.exit(versions.includes(process.env.VERSION) ? 0 : 1);
+          '; then
+            echo "$version is already published"
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$version is new"
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.new == 'true'
+        run: npm ci
+      - if: steps.version.outputs.new == 'true'
+        run: npm test
+      - if: steps.version.outputs.new == 'true'
+        run: npm run check -w @clusterflick/catalogue
+      - if: steps.version.outputs.new == 'true'
+        run: npm publish -w @clusterflick/catalogue --access public

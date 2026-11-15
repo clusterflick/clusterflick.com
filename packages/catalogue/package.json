@@ -1,6 +1,6 @@
 {
   "name": "@clusterflick/catalogue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Clusterflick's listings: the data model, filters, places and occasions, shared by the site and its Workers.",
   "license": "MIT",
   "repository": {
