@@ -1,5 +1,5 @@
 import type { Firestore, WriteBatch } from "firebase/firestore/lite";
-import { loadFirebase } from ".";
+import { isFirebaseConfigured, loadFirebase } from ".";
 
 /**
  * The profiles Worker's purge (clusterflick/api-profiles): it drops the cached
@@ -33,15 +33,22 @@ export type UserWriteOptions = {
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+/**
+ * Never throws: by the time it runs the write has happened, and a copy left
+ * cached expires on its own.
+ */
 async function purgeProfile(
   handles: string[],
   sleep: (ms: number) => Promise<void>,
 ): Promise<boolean> {
-  const { auth } = await loadFirebase();
-  const user = auth.currentUser;
-  if (!user) return false;
+  // Without a project (local builds, Storybook, the rules tests against the
+  // emulator) there's no profiles Worker, so nothing cached to purge.
+  if (!isFirebaseConfigured) return false;
   for (let attempt = 0; ; attempt++) {
     try {
+      const { auth } = await loadFirebase();
+      const user = auth.currentUser;
+      if (!user) return false;
       const response = await fetch(PROFILE_PURGE_PATH, {
         method: "POST",
         headers: {

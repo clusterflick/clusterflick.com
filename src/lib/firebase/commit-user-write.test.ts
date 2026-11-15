@@ -21,8 +21,15 @@ const currentUser = vi.hoisted(() => ({
     getIdToken: () => Promise<string>;
   } | null,
 }));
+const firebase = vi.hoisted(() => ({ configured: true, loadFails: false }));
 vi.mock(".", () => ({
-  loadFirebase: async () => ({ auth: { currentUser: currentUser.value } }),
+  get isFirebaseConfigured() {
+    return firebase.configured;
+  },
+  loadFirebase: async () => {
+    if (firebase.loadFails) throw new Error("Failed to load the SDK");
+    return { auth: { currentUser: currentUser.value } };
+  },
 }));
 
 const db = {} as Firestore;
@@ -33,6 +40,8 @@ beforeEach(() => {
   batch.set.mockReset();
   batch.commit.mockReset().mockResolvedValue(undefined);
   currentUser.value = { getIdToken: async () => "id-token" };
+  firebase.configured = true;
+  firebase.loadFails = false;
   fetchSpy = vi
     .spyOn(globalThis, "fetch")
     .mockResolvedValue(new Response(null, { status: 204 }));
@@ -100,6 +109,32 @@ describe("commitUserWrite", () => {
       .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const result = await commitUserWrite(db, () => {}, { sleep: noWait });
     expect(result).toEqual({ purged: true });
+  });
+
+  test("without a Firebase project, commits and purges nothing, quietly", async () => {
+    firebase.configured = false;
+    const result = await commitUserWrite(db, () => {});
+    expect(batch.commit).toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+    expect(result).toEqual({ purged: false });
+  });
+
+  test("never throws once the write is committed", async () => {
+    firebase.loadFails = true;
+    await expect(
+      commitUserWrite(db, () => {}, { sleep: noWait }),
+    ).resolves.toEqual({ purged: false });
+
+    firebase.loadFails = false;
+    currentUser.value = {
+      getIdToken: async () => {
+        throw new Error("auth/network-request-failed");
+      },
+    };
+    await expect(
+      commitUserWrite(db, () => {}, { sleep: noWait }),
+    ).resolves.toEqual({ purged: false });
   });
 
   test("with nobody signed in there's nothing to purge", async () => {
