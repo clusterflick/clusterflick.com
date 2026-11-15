@@ -86,6 +86,18 @@ export const CHANGELOG: ChangelogDay[] = [
         ),
       },
       {
+        tag: "New source",
+        body: ({ Venue }) => (
+          <>
+            Started pulling in screenings straight from{" "}
+            <Link href="/film-clubs/rebel-reel">Rebel Reel Cine Club</Link>
+            &rsquo;s own booking page, for its nights at venues like{" "}
+            <Venue name="Rio Cinema" url="https://riocinema.org.uk" /> and{" "}
+            <Venue name="The Mildmay Club" url="https://mildmay.club" />.
+          </>
+        ),
+      },
+      {
         tag: "New venue",
         body: ({ VenueList }) => (
           <>
@@ -100,11 +112,16 @@ export const CHANGELOG: ChangelogDay[] = [
                   name: "St John's Waterloo",
                   url: "https://stjohnswaterloo.org",
                 },
+                {
+                  name: "Brixton Jamm",
+                  url: "https://brixtonjamm.org",
+                },
               ]}
             />
             : a Twickenham rugby pub whose upstairs events space hosts
-            Twickenham Cinema Club, and a restored Grade II* church and arts
-            venue by Waterloo station.
+            Twickenham Cinema Club, a restored Grade II* church and arts venue
+            by Waterloo station, and a Brixton party venue whose first screening
+            is an erotic film shown in a dungeon during a social night.
           </>
         ),
       },
