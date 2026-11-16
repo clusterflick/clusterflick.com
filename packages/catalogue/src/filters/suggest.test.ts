@@ -53,6 +53,8 @@ interface MovieSpec {
   subtitled?: boolean;
   dogFriendly?: boolean;
   occasions?: MoviePerformanceOccasions;
+  /** Titles of the films a multi-film event screens. */
+  includedTitles?: string[];
 }
 
 function makeMovie(id: string, spec: MovieSpec): Movie {
@@ -81,6 +83,15 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     ...(spec.genres ? { genres: spec.genres } : {}),
     ...(spec.directors ? { directors: spec.directors } : {}),
     ...(spec.actors ? { actors: spec.actors } : {}),
+    ...(spec.includedTitles
+      ? {
+          includedMovies: spec.includedTitles.map((title, index) => ({
+            id: `${id}-i${index}`,
+            title,
+            normalizedTitle: title.toLowerCase(),
+          })),
+        }
+      : {}),
     showings: {
       [showingId]: {
         id: showingId,
@@ -1123,6 +1134,31 @@ describe("suggestFilterRelaxations", () => {
       expect(suggestions.map((s) => s.kind)).not.toContain("correct");
       expect(suggestions.map((s) => s.headline)).toEqual([
         "Show “The Godfather Part II”",
+      ]);
+    });
+
+    it("does not second-guess a query naming a film an event screens", () => {
+      // Nothing is listed as "Talking About Trees", but the all-dayer screens
+      // it, so the title is spelled right; only the date is wrong.
+      const movies = makeMovies({
+        "1": {
+          title: "Programmers of Tomorrow: Film Festival All-Dayer",
+          includedTitles: ["Talking About Trees", "Speed Racer"],
+          category: Category.MultipleMovies,
+          time: BEYOND_WINDOW,
+        },
+        "2": { title: "Talking About Tress" },
+      });
+      const state = set(
+        getDefaultState(),
+        FilterId.Search,
+        "Talking About Trees",
+      );
+
+      const suggestions = suggestFilterRelaxations({ movies, state });
+      expect(suggestions.map((s) => s.kind)).not.toContain("correct");
+      expect(suggestions.map((s) => s.headline)).toEqual([
+        "Show “Programmers of Tomorrow: Film Festival All-Dayer”",
       ]);
     });
 

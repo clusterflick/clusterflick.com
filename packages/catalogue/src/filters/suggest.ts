@@ -22,6 +22,7 @@ import {
   resolvePeopleQuery,
   type PeopleIndex,
 } from "./modules";
+import { findIncludedTitleMatch } from "./modules/search";
 import {
   matchesSearchQuery,
   normalizeForSearch,
@@ -765,8 +766,15 @@ function findNearMissTitles(
   // scan is itself the bulk of the cost on a correctly spelled query, being the
   // same work the search filter has already done — but no result should depend
   // on where in the catalogue the matching title happens to sit.
+  // A film an event screens counts: the search finds the event by it, so its
+  // title is spelled right even when nothing is listed under that name.
   for (const movie of catalogue) {
-    if (matchesSearchQuery(movie.title, needle)) return [];
+    if (
+      matchesSearchQuery(movie.title, needle) ||
+      findIncludedTitleMatch(movie, needle) !== undefined
+    ) {
+      return [];
+    }
   }
 
   // Widenings a correction can be paired with. Accessibility never pairs, so

@@ -875,6 +875,14 @@ filter reads "or". An unmatched event whose films supply genres stops being
 Uncategorised. A shorts programme whose venue listed no films still has
 nothing to read, and stays Uncategorised.
 
+The title search reads them the same way: an event is found by the title of
+any film it screens as well as by its own (`matchesTitleSearch` in
+`packages/catalogue/src/filters/modules/search.ts`). An all-dayer's name rarely
+says what it shows, and a reader searching "Talking About Trees" wants to know
+they can see it, not that nothing is listed under that name. The near-miss
+correction counts those titles as spelled right too, so it never rewrites a
+query that names a film an event screens.
+
 ## Home Row "See All" Links
 
 A home row is a slice: a rule, cut to its top dozen or so for a horizontal row. Where the rule can be
