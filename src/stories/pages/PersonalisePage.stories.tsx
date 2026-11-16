@@ -310,8 +310,13 @@ export const SignedInPublicProfileBeforeSections: Story = {
   play: async ({ canvasElement }) => {
     const canvas = await openPublicProfile(canvasElement);
     await expect(
-      canvas.getByText(/Public at clusterflick\.com\/u\/film-fan\./),
+      canvas.getByText(/Public: anyone with the address can see it\./),
     ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole<HTMLInputElement>("textbox", {
+        name: "Your profile's address",
+      }).value,
+    ).toMatch(/\/u\/film-fan\/$/);
     await expect(
       canvas.getByText(/before you could choose what it shows/),
     ).toBeInTheDocument();
