@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-16",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Ridley Road Social Club"
+              url="https://www.instagram.com/ridleyroadsocialclub"
+            />
+            , a café, vinyl shop and studios above Ridley Road Market in
+            Dalston.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-15",
     changes: [
       {
