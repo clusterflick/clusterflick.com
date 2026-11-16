@@ -87,6 +87,46 @@ export const CHANGELOG: ChangelogDay[] = [
           </>
         ),
       },
+      {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="Pedaller's Corner"
+              url="https://pedallerscorner.co.uk"
+            />
+            , a café and community hub in the corner of a Stoke Newington bike
+            shop.
+          </>
+        ),
+      },
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added the{" "}
+            <Festival
+              name="London Baltic Film Festival"
+              url="https://www.londonbalticff.com/"
+            />
+            , the latest feature films from Estonia, Latvia and Lithuania,
+            mostly UK premieres, at Regent Street Cinema and The Garden Cinema
+            from 13 to 21 November.
+          </>
+        ),
+      },
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added{" "}
+            <Link href="/film-clubs/goodfilmhunting">GoodFilmHunting</Link>, a
+            film club started by three friends, screening 90-minute films you
+            might not have caught before around Hackney.
+          </>
+        ),
+      },
     ],
   },
   {

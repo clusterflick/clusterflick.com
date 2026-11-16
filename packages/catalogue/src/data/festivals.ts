@@ -1110,4 +1110,21 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-baltic-film-festival",
+    name: "London Baltic Film Festival",
+    url: "https://www.londonbalticff.com/",
+    aliases: ["lbff"],
+    matchers: [
+      {
+        // Matches "London Baltic Film Festival: Kingpins + Q&A (UK premiere)"
+        // at Regent Street Cinema and "London Baltic Film Festival presents
+        // ..." at The Garden Cinema
+        [FilterId.ShowingTitleSearch]: "London Baltic Film Festival",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Baltic Film Festival",
+      },
+    ],
+  },
 ];

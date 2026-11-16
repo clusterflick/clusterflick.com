@@ -766,4 +766,17 @@ export const FILM_CLUBS: FilmClub[] = [
       { [FilterId.PerformanceNotesSearch]: "Twickenham Cinema Club" },
     ],
   },
+  {
+    id: "goodfilmhunting",
+    name: "GoodFilmHunting",
+    kind: "community",
+    url: "https://clyx.com/community/goodfilmhunting",
+    aliases: [],
+    matchers: [
+      // Its screenings come from Clyx, titled by number ("GoodFilmHunting
+      // #7") and noted "Presented by GoodFilmHunting".
+      { [FilterId.ShowingTitleSearch]: "GoodFilmHunting" },
+      { [FilterId.PerformanceNotesSearch]: "GoodFilmHunting" },
+    ],
+  },
 ];
