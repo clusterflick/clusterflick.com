@@ -43,15 +43,20 @@ export async function fetchAlertSettings(
   return parseAlertSettings(snapshot.data());
 }
 
+/**
+ * `email` is the address the reader is signed in with: the rules refuse any
+ * other, and the Worker sends to it.
+ */
 export async function saveAlertSettings(
   db: Firestore,
   uid: string,
   settings: AlertSettings,
+  email: string,
 ): Promise<void> {
   await commitUserWrite(db, async (batch) => {
     batch.set(
       await getSettingsDocRef(db, uid),
-      toAlertSettingsDocument(settings),
+      toAlertSettingsDocument(settings, email),
     );
   });
 }

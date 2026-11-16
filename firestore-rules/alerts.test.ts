@@ -43,16 +43,26 @@ const [HOST, PORT] = (
 let env: RulesTestEnvironment;
 const apps: FirebaseApp[] = [];
 
-/** Firestore Lite signed in as `uid`, as the site uses it. */
-function signedInAs(uid: string): Firestore {
+/**
+ * Firestore Lite signed in as `uid`, as the site uses it: by email link, so
+ * with a verified address unless told otherwise.
+ */
+function signedInAs(uid: string, { verified = true } = {}): Firestore {
   const app = initializeApp({ projectId: PROJECT_ID }, `${uid}-${apps.length}`);
   apps.push(app);
   const db = getFirestore(app);
   connectFirestoreEmulator(db, HOST, Number(PORT), {
-    mockUserToken: { sub: uid, user_id: uid },
+    mockUserToken: {
+      sub: uid,
+      user_id: uid,
+      email: address(uid),
+      email_verified: verified,
+    },
   });
   return db;
 }
+
+const address = (uid: string) => `${uid}@example.com`;
 
 /** Writes as the Admin SDK would, as the alerts Worker does: no rules. */
 async function seed(documents: Record<string, Record<string, unknown>>) {
@@ -95,30 +105,66 @@ describe("alert settings", () => {
   test("a reader with the capability can switch them on", async () => {
     await seed({ "users/alice/meta/capabilities": GRANTED });
     const alice = signedInAs("alice");
-    await assertSucceeds(saveAlertSettings(alice, "alice", ON));
+    await assertSucceeds(
+      saveAlertSettings(alice, "alice", ON, address("alice")),
+    );
     expect(await fetchAlertSettings(alice, "alice")).toEqual(ON);
   });
 
   test("not without the capability", async () => {
-    await assertFails(saveAlertSettings(signedInAs("alice"), "alice", ON));
+    await assertFails(
+      saveAlertSettings(signedInAs("alice"), "alice", ON, address("alice")),
+    );
   });
 
   test("but anyone can save them switched off, to stop them", async () => {
     await seed({ "users/alice/meta/alerts": { ...ON } });
     await assertSucceeds(
-      saveAlertSettings(signedInAs("alice"), "alice", DEFAULT_ALERT_SETTINGS),
+      saveAlertSettings(
+        signedInAs("alice"),
+        "alice",
+        DEFAULT_ALERT_SETTINGS,
+        address("alice"),
+      ),
+    );
+  });
+
+  test("only to the address they're signed in with", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    await assertFails(
+      saveAlertSettings(
+        signedInAs("alice"),
+        "alice",
+        ON,
+        "someone-else@example.com",
+      ),
+    );
+  });
+
+  test("and only once it's verified", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    await assertFails(
+      saveAlertSettings(
+        signedInAs("alice", { verified: false }),
+        "alice",
+        ON,
+        address("alice"),
+      ),
     );
   });
 
   test("only their own", async () => {
     await seed({ "users/alice/meta/capabilities": GRANTED });
-    await assertFails(saveAlertSettings(signedInAs("bob"), "alice", ON));
+    await assertFails(
+      saveAlertSettings(signedInAs("bob"), "alice", ON, address("bob")),
+    );
     await assertFails(fetchAlertSettings(signedInAs("bob"), "alice"));
   });
 
   test.each([
     ["an unknown field", { enabled: false, alerts: [], extra: 1 }],
     ["no alerts list", { enabled: false }],
+    ["no address", { enabled: false, alerts: [] }],
     ["enabled that isn't a boolean", { enabled: "yes", alerts: [] }],
     [
       "two alerts",
@@ -142,9 +188,12 @@ describe("alert settings", () => {
       "no trigger",
       { enabled: false, alerts: [{ type: "watchlist", notify: [] }] },
     ],
-  ])("refuse %s", async (_, data) => {
+  ])("refuse %s", async (name, data) => {
     const db = signedInAs("alice");
-    await assertFails(setDoc(doc(db, "users/alice/meta/alerts"), data));
+    // Each with the right address, so it's refused for its own reason.
+    const withAddress =
+      name === "no address" ? data : { ...data, email: address("alice") };
+    await assertFails(setDoc(doc(db, "users/alice/meta/alerts"), withAddress));
   });
 });
 

@@ -3,6 +3,7 @@ import {
   DEFAULT_ALERT_SETTINGS,
   parseAlertLedger,
   parseAlertSettings,
+  readAlertEmail,
   toAlertSettingsDocument,
 } from "./alerts";
 
@@ -48,27 +49,38 @@ describe("parseAlertSettings", () => {
 });
 
 describe("toAlertSettingsDocument", () => {
-  it("writes the triggers once each, in order", () => {
+  it("writes the triggers once each, in order, with the address", () => {
     expect(
-      toAlertSettingsDocument({
-        enabled: true,
-        alerts: [
-          {
-            type: "watchlist",
-            notify: ["newVenue", "firstListing", "newVenue"],
-          },
-        ],
-      }),
+      toAlertSettingsDocument(
+        {
+          enabled: true,
+          alerts: [
+            {
+              type: "watchlist",
+              notify: ["newVenue", "firstListing", "newVenue"],
+            },
+          ],
+        },
+        "reader@example.com",
+      ),
     ).toEqual({
       enabled: true,
+      email: "reader@example.com",
       alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
     });
   });
 
-  it("round-trips the defaults", () => {
-    expect(
-      parseAlertSettings(toAlertSettingsDocument(DEFAULT_ALERT_SETTINGS)),
-    ).toEqual(DEFAULT_ALERT_SETTINGS);
+  it("round-trips the defaults and the address", () => {
+    const document = toAlertSettingsDocument(
+      DEFAULT_ALERT_SETTINGS,
+      "reader@example.com",
+    );
+    expect(parseAlertSettings(document)).toEqual(DEFAULT_ALERT_SETTINGS);
+    expect(readAlertEmail(document)).toBe("reader@example.com");
+  });
+
+  it("has no address for settings saved without one", () => {
+    expect(readAlertEmail({ enabled: true, alerts: [] })).toBeNull();
   });
 });
 

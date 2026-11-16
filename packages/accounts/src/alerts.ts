@@ -5,8 +5,9 @@
  * from plain values: the site passes a snapshot's data, a Worker passes
  * `decodeFields` of what Firestore sent.
  *
- * - `users/{uid}/meta/alerts` is the reader's: whether alerts are on, and
- *   what each alert is for. `firestore.rules` repeats its shape, held to this
+ * - `users/{uid}/meta/alerts` is the reader's: whether alerts are on, what
+ *   each alert is for, and the address they go to, which the rules hold to
+ *   the verified address the reader is signed in with. `firestore.rules` repeats its shape, held to this
  *   module by a test. The Worker also writes it, only to switch alerts off
  *   when the reader unsubscribes or their address bounces.
  * - `users/{uid}/meta/alert-ledger` is the Worker's: the reader may read and
@@ -91,10 +92,17 @@ export function parseAlertSettings(data: unknown): AlertSettings | null {
   return { enabled: data.enabled === true, alerts };
 }
 
-/** The document as the rules accept it: the triggers deduplicated, in order. */
-export function toAlertSettingsDocument(settings: AlertSettings) {
+/**
+ * The document as the rules accept it: the triggers deduplicated, in order,
+ * and the address the reader is signed in with, which the Worker sends to.
+ */
+export function toAlertSettingsDocument(
+  settings: AlertSettings,
+  email: string,
+) {
   return {
     enabled: settings.enabled,
+    email,
     alerts: settings.alerts.slice(0, MAX_ALERTS).map((alert) => ({
       type: alert.type,
       notify: ALERT_TRIGGERS.filter((trigger) =>
@@ -102,6 +110,16 @@ export function toAlertSettingsDocument(settings: AlertSettings) {
       ),
     })),
   };
+}
+
+/**
+ * The address alerts go to, or null if there's none: settings saved before
+ * the address was, which the Worker doesn't guess at.
+ */
+export function readAlertEmail(data: unknown): string | null {
+  return isRecord(data) && typeof data.email === "string" && data.email
+    ? data.email
+    : null;
 }
 
 /** What one night's run did for a reader. */

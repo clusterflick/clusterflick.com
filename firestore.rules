@@ -71,15 +71,19 @@ service cloud.firestore {
     }
 
     // A reader's email alerts (see @clusterflick/accounts/alerts): whether
-    // they're on, and what each alert is for. Switching them on needs the
+    // they're on, what each alert is for, and the address they go to. Switching them on needs the
     // capability; switching them off, or changing them while off, never does,
     // so a reader whose capability was revoked can still stop them.
     match /users/{userId}/meta/alerts {
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId)
-        && request.resource.data.keys().hasOnly(['enabled', 'alerts'])
-        && request.resource.data.keys().hasAll(['enabled', 'alerts'])
+        && request.resource.data.keys().hasOnly(['enabled', 'alerts', 'email'])
+        && request.resource.data.keys().hasAll(['enabled', 'alerts', 'email'])
         && request.resource.data.enabled is bool
+        // The address alerts go to: only ever the verified one the reader
+        // is signed in with, so nobody can send them to someone else.
+        && request.auth.token.email_verified == true
+        && request.resource.data.email == request.auth.token.email
         && isAlerts(request.resource.data.alerts)
         && (request.resource.data.enabled == false
           || hasCapability(userId, 'emailAlerts'));

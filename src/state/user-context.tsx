@@ -657,13 +657,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return fetchAlertSettings(db, user.uid);
   }, [getServices, user]);
 
-  const saveAlertSettings = useCallback<
-    UserContextType["saveAlertSettings"]
-  >(
+  const saveAlertSettings = useCallback<UserContextType["saveAlertSettings"]>(
     async (settings) => {
       const { db } = await getServices();
       if (!user) throw new Error("Not signed in");
-      await saveAlertSettingsToDocs(db, user.uid, settings);
+      if (!user.email) throw new Error("Signed in with no address");
+      await saveAlertSettingsToDocs(db, user.uid, settings, user.email);
     },
     [getServices, user],
   );
