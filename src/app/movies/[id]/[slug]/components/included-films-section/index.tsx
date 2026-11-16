@@ -1,4 +1,5 @@
-import { IncludedMovie, Movie } from "@clusterflick/catalogue/types";
+import { Movie } from "@clusterflick/catalogue/types";
+import { getIncludedListings } from "@clusterflick/catalogue/utils/get-included-listings";
 import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { ButtonLink } from "@/components/button";
@@ -7,19 +8,21 @@ import ContentSection from "@/components/content-section";
 import styles from "./included-films-section.module.css";
 
 interface IncludedFilmsSectionProps {
-  includedMovies: IncludedMovie[];
-  /** All movies in the database, to check for standalone entries */
+  /** The event whose films these are */
+  event: Pick<Movie, "id" | "includedMovies">;
+  /** All movies in the database, to find each film's own listing */
   allMovies: Record<string, Movie>;
   /** If true, renders inline without the Section wrapper (for hero placement) */
   inline?: boolean;
 }
 
 export default function IncludedFilmsSection({
-  includedMovies,
+  event,
   allMovies,
   inline = false,
 }: IncludedFilmsSectionProps) {
-  if (!includedMovies || includedMovies.length === 0) {
+  const includedListings = getIncludedListings(event, allMovies);
+  if (includedListings.length === 0) {
     return null;
   }
 
@@ -29,13 +32,7 @@ export default function IncludedFilmsSection({
 
   const filmsGrid = (
     <div className={gridClassName}>
-      {includedMovies.map((movie) => {
-        // Check if this movie exists as a standalone entry
-        const standaloneMovie = Object.values(allMovies).find(
-          (m) => m.imdbId === movie.imdbId && m.imdbId,
-        );
-        const hasStandalonePage = !!standaloneMovie;
-
+      {includedListings.map(({ film: movie, listing: standaloneMovie }) => {
         return (
           <div key={movie.id} className={styles.filmCardWrapper}>
             <div className={styles.filmCard}>
@@ -46,7 +43,7 @@ export default function IncludedFilmsSection({
                   size="small"
                   interactive={false}
                 />
-                {hasStandalonePage && standaloneMovie && (
+                {standaloneMovie && (
                   <ButtonLink
                     href={getMovieUrl(standaloneMovie)}
                     size="sm"

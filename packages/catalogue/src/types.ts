@@ -115,6 +115,8 @@ export type IncludedMovie = {
   imdbId?: string;
   overview?: string;
   normalizedTitle?: string;
+  /** As on `Movie`: other English release titles, for search only. */
+  alternativeTitles?: string[];
   releaseDate?: string;
   collectionId?: Collection["id"];
 };
@@ -384,6 +386,12 @@ export type Movie = {
   originalTitle?: string;
   /** ISO 639-1 code of the film's original language, when that isn't English. */
   originalLanguage?: string;
+  /**
+   * Other English titles the film was released under, in the UK or US, spelled
+   * differently from `title` ("Zootropolis" for "Zootopia"). For search only:
+   * `title` is what's displayed.
+   */
+  alternativeTitles?: string[];
   isUnmatched?: boolean;
   classification?: Classification;
   overview?: string;

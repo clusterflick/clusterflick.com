@@ -417,11 +417,7 @@ export default function PageContent({
           )}
 
           {includedMovies && includedMovies.length > 0 && (
-            <IncludedFilmsSection
-              includedMovies={includedMovies}
-              allMovies={movies}
-              inline
-            />
+            <IncludedFilmsSection event={movie} allMovies={movies} inline />
           )}
 
           <RatingsGrid

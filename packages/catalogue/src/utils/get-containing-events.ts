@@ -8,7 +8,8 @@ import type { Movie } from "../types";
  * nothing on the film's own record says it is screening there too. The film
  * page's "Part of" section and the MCP server's `get_film` both read it from
  * here, so a film answers for every way it can be seen. Matched by id, which
- * is the film's TMDB id on both sides.
+ * is the film's TMDB id on both sides. `getIncludedListings` is the reverse,
+ * from an event to its films' own listings.
  */
 export function getContainingEvents(
   movieId: string,
