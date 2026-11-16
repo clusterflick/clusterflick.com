@@ -38,9 +38,13 @@ const meta = {
     layout: "fullscreen",
     nextjs: { appDirectory: true },
     backgrounds: { default: "dark" },
-    // The alerts Worker's preview, as it answers before any run.
+    // The alerts Worker: its preview, as it answers before any run, and
+    // remembering the watchlist when alerts are switched on.
     msw: {
       handlers: [
+        http.post(`${ALERTS_ORIGIN}/remember`, () =>
+          HttpResponse.json({ films: 1 }),
+        ),
         http.post(`${ALERTS_ORIGIN}/preview`, () =>
           HttpResponse.json({
             mode: "sinceLastRun",
@@ -91,6 +95,43 @@ export const NotSetUp: Story = {
         alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
       }),
     );
+  },
+};
+
+/**
+ * Switched on, but the Worker couldn't remember the watchlist: the alerts
+ * are on, and the page says the first email may come a day later.
+ */
+export const SwitchedOnNotRemembered: Story = {
+  args: { user: { ...READER, saveAlertSettings: fn(async () => {}) } },
+  parameters: {
+    msw: {
+      handlers: [
+        http.post(
+          `${ALERTS_ORIGIN}/remember`,
+          () => new HttpResponse(null, { status: 503 }),
+        ),
+        http.post(`${ALERTS_ORIGIN}/preview`, () =>
+          HttpResponse.json({
+            mode: "sinceLastRun",
+            baseline: true,
+            lastRun: null,
+            digest: null,
+          }),
+        ),
+      ],
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("checkbox", { name: "Send me alerts" }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await expect(
+      await canvas.findByText(/your first email may come a day later/),
+    ).toBeInTheDocument();
+    await expect(args.user.saveAlertSettings).toHaveBeenCalled();
   },
 };
 

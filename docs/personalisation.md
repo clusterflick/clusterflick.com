@@ -498,7 +498,11 @@ without them, saving alerts and deleting an account both fail. Beside the
 settings, the page previews the email they would send (`alerts-preview.tsx`),
 asked of the Worker's `POST /preview` with the reader's ID token and the
 switches as they stand: tonight's so far, against the Worker's last run, or
-one with everything on the watchlist that's showing. `NEXT_PUBLIC_ALERTS_ORIGIN`
+one with everything on the watchlist that's showing. Saving alerts switched on also asks the Worker's `POST /remember` to remember
+the watchlist as it stands, so that night's email has what's new since the
+switch-on rather than the first night only remembering; if that fails, the
+alerts are still on and the page says the first email may come a day later.
+`NEXT_PUBLIC_ALERTS_ORIGIN`
 points it at a local `wrangler dev`.
 
 **Capabilities are features granted one account at a time**

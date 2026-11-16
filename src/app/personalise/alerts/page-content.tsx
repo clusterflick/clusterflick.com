@@ -8,6 +8,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import Switch from "@/components/switch";
 import { useUserContext } from "@/state/user-context";
 import {
+  rememberWatchlist,
   ALERT_TRIGGERS,
   AlertTrigger,
   type AlertSettings,
@@ -30,6 +31,9 @@ import styles from "./page.module.css";
 const PERSONALISE_PATH = "/personalise/";
 
 const SAVE_FAILED = "Something went wrong saving that. Please try again.";
+
+const REMEMBER_FAILED =
+  "Alerts are on. We couldn't note your watchlist just now, so tonight's check will only do that, and your first email may come a day later.";
 
 /**
  * Where a reader with the `emailAlerts` capability switches their alerts on
@@ -114,11 +118,12 @@ function Editor({
   /** Without the capability: only switching off is allowed. */
   offOnly?: boolean;
 }) {
-  const { email, saveAlertSettings } = useUserContext();
+  const { email, saveAlertSettings, getIdToken } = useUserContext();
   const { settings, saved, ledger, onSaved } = state;
   const [draft, setDraft] = useState<AlertSettings>(settings);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const watchlist: WatchlistAlert = draft.alerts.find(
     (alert) => alert.type === "watchlist",
@@ -161,12 +166,25 @@ function Editor({
       ...draft,
       alerts: watchlist.notify.length > 0 ? [watchlist] : [],
     };
+    // Switched on by this save, so news starts from now.
+    const switchingOn = next.enabled && !(saved && settings.enabled);
     setSaving(true);
     setError(null);
+    setNotice(null);
     try {
       await saveAlertSettings(next);
       onSaved(next);
       setDraft(next);
+      if (switchingOn) {
+        // The alerts are on whatever happens here: without it, tonight's
+        // check only remembers the watchlist, and news starts tomorrow.
+        try {
+          await rememberWatchlist(await getIdToken());
+        } catch (rememberError) {
+          console.error("Failed to remember the watchlist", rememberError);
+          setNotice(REMEMBER_FAILED);
+        }
+      }
     } catch (saveError) {
       console.error("Failed to save email alerts", saveError);
       setError(SAVE_FAILED);
@@ -196,6 +214,14 @@ function Editor({
             disabled={offOnly && !draft.enabled}
             className={personaliseStyles.managementSwitch}
           />
+          {notice && (
+            <p
+              className={`${personaliseStyles.managementText} ${styles.stopNote}`}
+              role="status"
+            >
+              {notice}
+            </p>
+          )}
           {!settings.enabled && ledger.stopped && (
             <p
               className={`${personaliseStyles.managementText} ${styles.stopNote}`}

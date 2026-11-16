@@ -105,6 +105,20 @@ export type AlertPreview = {
 };
 
 /**
+ * Asks the alerts Worker to remember the reader's watchlist as it stands,
+ * when they switch alerts on, so that night's email has what's new since
+ * then; without it, the first night only remembers. Throws on any refusal:
+ * the alerts are on either way.
+ */
+export async function rememberWatchlist(idToken: string): Promise<void> {
+  const response = await fetch(`${ALERTS_ORIGIN}/remember`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!response.ok) throw new Error(`Remembering failed: ${response.status}`);
+}
+
+/**
  * The email the reader's alerts would send, with the triggers being edited,
  * worked out by the Worker now and never sent. Throws on any refusal.
  */
