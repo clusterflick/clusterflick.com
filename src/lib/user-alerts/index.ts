@@ -6,6 +6,7 @@ import {
   toAlertSettingsDocument,
   type AlertLedger,
   type AlertSettings,
+  type AlertTrigger,
 } from "@clusterflick/accounts/alerts";
 
 export * from "@clusterflick/accounts/alerts";
@@ -77,4 +78,51 @@ export async function deleteAlerts(db: Firestore, uid: string): Promise<void> {
     batch.delete(await getSettingsDocRef(db, uid));
     batch.delete(await getLedgerDocRef(db, uid));
   });
+}
+
+/**
+ * The alerts Worker (clusterflick/api-alerts), on the host the emails come
+ * from. `NEXT_PUBLIC_ALERTS_ORIGIN` points a local build at `wrangler dev`.
+ */
+export const ALERTS_ORIGIN =
+  process.env.NEXT_PUBLIC_ALERTS_ORIGIN || "https://alerts.clusterflick.com";
+
+/**
+ * What a preview shows: tonight's email so far, against the Worker's last
+ * run, or one with every watchlist film that's showing, to see the email
+ * with real listings before any run.
+ */
+export type PreviewMode = "sinceLastRun" | "everythingShowing";
+
+export type AlertPreview = {
+  mode: PreviewMode;
+  /** No run has remembered the watchlist yet, so there's nothing to compare. */
+  baseline: boolean;
+  /** The date of the Worker's last run for the reader, `YYYY-MM-DD`. */
+  lastRun: string | null;
+  /** Null when there'd be no email. */
+  digest: { subject: string; html: string; text: string; films: number } | null;
+};
+
+/**
+ * The email the reader's alerts would send, with the triggers being edited,
+ * worked out by the Worker now and never sent. Throws on any refusal.
+ */
+export async function previewAlerts(
+  idToken: string,
+  mode: PreviewMode,
+  notify: AlertTrigger[],
+  signal?: AbortSignal,
+): Promise<AlertPreview> {
+  const response = await fetch(`${ALERTS_ORIGIN}/preview`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ mode, notify }),
+    signal,
+  });
+  if (!response.ok) throw new Error(`Preview failed: ${response.status}`);
+  return (await response.json()) as AlertPreview;
 }

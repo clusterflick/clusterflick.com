@@ -24,6 +24,7 @@ import personaliseStyles from "@/app/personalise/page.module.css";
 import SettingsCard from "@/app/personalise/profile/settings-card";
 import SaveBar from "@/app/personalise/profile/save-bar";
 import profileStyles from "@/app/personalise/profile/page.module.css";
+import AlertsPreview from "./alerts-preview";
 import styles from "./page.module.css";
 
 const PERSONALISE_PATH = "/personalise/";
@@ -33,7 +34,8 @@ const SAVE_FAILED = "Something went wrong saving that. Please try again.";
 /**
  * Where a reader with the `emailAlerts` capability switches their alerts on
  * or off and chooses what counts as news, saved with one button, as the
- * profile's settings are.
+ * profile's settings are; beside them, where there's room, a preview of the
+ * email those choices would send.
  */
 export default function AlertsSettingsPageContent() {
   const { status } = useUserContext();
@@ -172,78 +174,81 @@ function Editor({
   };
 
   return (
-    <div className={styles.editor}>
-      <SettingsCard
-        title="Email alerts"
-        intro={
-          <>
-            One email a day, at 8pm, to <strong>{email}</strong>, when
-            there&apos;s something new about a film on your watchlist. Nothing
-            is sent on a day with nothing new.
-          </>
-        }
-      >
-        <Switch
-          id="alerts-enabled"
-          label="Send me alerts"
-          checked={draft.enabled}
-          onChange={(enabled) => update({ ...draft, enabled })}
-          disabled={offOnly && !draft.enabled}
-          className={personaliseStyles.managementSwitch}
+    <div className={profileStyles.editor}>
+      <div className={profileStyles.settings}>
+        <SettingsCard
+          title="Email alerts"
+          intro={
+            <>
+              One email a day, at 8pm, to <strong>{email}</strong>, when
+              there&apos;s something new about a film on your watchlist. Nothing
+              is sent on a day with nothing new.
+            </>
+          }
+        >
+          <Switch
+            id="alerts-enabled"
+            label="Send me alerts"
+            checked={draft.enabled}
+            onChange={(enabled) => update({ ...draft, enabled })}
+            disabled={offOnly && !draft.enabled}
+            className={personaliseStyles.managementSwitch}
+          />
+          {!settings.enabled && ledger.stopped && (
+            <p
+              className={`${personaliseStyles.managementText} ${styles.stopNote}`}
+            >
+              {describeStop(ledger.stopped)}
+            </p>
+          )}
+        </SettingsCard>
+
+        <SettingsCard
+          title="Your watchlist"
+          intro="Tell me when a film on my watchlist:"
+        >
+          <ul className={profileStyles.sections}>
+            {ALERT_TRIGGERS.map((trigger) => (
+              <li key={trigger} className={profileStyles.section}>
+                <Switch
+                  id={`alerts-trigger-${trigger}`}
+                  label={TRIGGER_NAMES[trigger]}
+                  checked={watchlist.notify.includes(trigger)}
+                  onChange={(on) => setTrigger(trigger, on)}
+                  describedBy={`alerts-trigger-${trigger}-help`}
+                  className={personaliseStyles.managementSwitch}
+                />
+                <p
+                  id={`alerts-trigger-${trigger}-help`}
+                  className={profileStyles.sectionHelp}
+                >
+                  {TRIGGER_DESCRIPTIONS[trigger]}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </SettingsCard>
+
+        <SaveBar
+          changed={changed}
+          canSave={!blocker}
+          blocker={blocker}
+          saving={saving}
+          error={error}
+          confirmingRename={false}
+          onSave={onSave}
+          onDiscard={
+            saved
+              ? () => {
+                  setDraft(settings);
+                  setError(null);
+                }
+              : undefined
+          }
+          onCancelRename={() => {}}
         />
-        {!settings.enabled && ledger.stopped && (
-          <p
-            className={`${personaliseStyles.managementText} ${styles.stopNote}`}
-          >
-            {describeStop(ledger.stopped)}
-          </p>
-        )}
-      </SettingsCard>
-
-      <SettingsCard
-        title="Your watchlist"
-        intro="Tell me when a film on my watchlist:"
-      >
-        <ul className={profileStyles.sections}>
-          {ALERT_TRIGGERS.map((trigger) => (
-            <li key={trigger} className={profileStyles.section}>
-              <Switch
-                id={`alerts-trigger-${trigger}`}
-                label={TRIGGER_NAMES[trigger]}
-                checked={watchlist.notify.includes(trigger)}
-                onChange={(on) => setTrigger(trigger, on)}
-                describedBy={`alerts-trigger-${trigger}-help`}
-                className={personaliseStyles.managementSwitch}
-              />
-              <p
-                id={`alerts-trigger-${trigger}-help`}
-                className={profileStyles.sectionHelp}
-              >
-                {TRIGGER_DESCRIPTIONS[trigger]}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </SettingsCard>
-
-      <SaveBar
-        changed={changed}
-        canSave={!blocker}
-        blocker={blocker}
-        saving={saving}
-        error={error}
-        confirmingRename={false}
-        onSave={onSave}
-        onDiscard={
-          saved
-            ? () => {
-                setDraft(settings);
-                setError(null);
-              }
-            : undefined
-        }
-        onCancelRename={() => {}}
-      />
+      </div>
+      {!offOnly && <AlertsPreview notify={watchlist.notify} />}
     </div>
   );
 }

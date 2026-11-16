@@ -494,7 +494,12 @@ off on an unsubscribe, a bounce or a complaint, saying why in the ledger.
 Deleting an account deletes both. Their shapes are `@clusterflick/accounts/alerts`', which the Worker reads
 too; `firestore.rules` repeats the settings', held to it by
 `firestore-rules/rules-copy.test.ts`. Deploy the rules before the site:
-without them, saving alerts and deleting an account both fail.
+without them, saving alerts and deleting an account both fail. Beside the
+settings, the page previews the email they would send (`alerts-preview.tsx`),
+asked of the Worker's `POST /preview` with the reader's ID token and the
+switches as they stand: tonight's so far, against the Worker's last run, or
+one with everything on the watchlist that's showing. `NEXT_PUBLIC_ALERTS_ORIGIN`
+points it at a local `wrangler dev`.
 
 **Capabilities are features granted one account at a time**
 (`@/lib/user-capabilities`): `emailAlerts`, `publicProfile` and `assistantAccess` so far, each

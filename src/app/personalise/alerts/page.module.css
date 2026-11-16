@@ -1,10 +1,37 @@
-/* One column for now; the email's preview goes beside it once there is one. */
-.editor {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
 .stopNote {
   margin: 12px 0 0;
+}
+
+.previewModes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.previewNote {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
+.previewSubject {
+  margin: 0 0 8px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.previewSubjectLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-gray);
+}
+
+/* Below the settings on a narrow screen, beside them on a wide one. */
+.previewFrame {
+  min-height: 420px;
+  height: calc(100vh - 200px);
 }

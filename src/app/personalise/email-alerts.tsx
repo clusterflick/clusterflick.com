@@ -116,6 +116,12 @@ export function describeRun(run: AlertRun): string {
       return `Last checked ${when}, but it went wrong${
         run.reason ? `: ${run.reason}` : ""
       }. We'll try again tomorrow.`;
+    case AlertRunOutcome.Previewed:
+      return `Last checked ${when}: ${
+        run.films
+          ? `an email with ${run.films} film${run.films === 1 ? "" : "s"} would have gone`
+          : "nothing new"
+      }, but alerts are being tried out, so nothing was sent.`;
     case AlertRunOutcome.NotResent:
       return `Last checked ${when}, but we can't tell whether that day's email went, so it wasn't sent again.`;
   }

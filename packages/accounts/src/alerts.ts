@@ -137,6 +137,11 @@ export const AlertRunOutcome = Object.freeze({
    * may or may not have gone.
    */
   NotResent: "notResent",
+  /**
+   * While alerts are being tried out: worked out like a send, naming
+   * `films` films, and not sent.
+   */
+  Previewed: "previewed",
 });
 export type AlertRunOutcome =
   (typeof AlertRunOutcome)[keyof typeof AlertRunOutcome];
@@ -147,7 +152,7 @@ export type AlertRun = {
   /** When it ran, epoch milliseconds. */
   at: number;
   outcome: AlertRunOutcome;
-  /** For `sent`. */
+  /** For `sent` and `previewed`. */
   films?: number;
   /** For `failed`, `skipped` and `notResent`, as the reader is shown it. */
   reason?: string;

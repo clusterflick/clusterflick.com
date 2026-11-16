@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { http, HttpResponse } from "msw";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import AlertsSettingsPageContent from "@/app/personalise/alerts/page-content";
 import { CinemaDataProvider } from "@/state/cinema-data-context";
@@ -6,6 +7,7 @@ import { FilterConfigProvider } from "@/state/filter-config-context";
 import { GeolocationProvider } from "@/state/geolocation-context";
 import { MockUserProvider, type UserContextType } from "@/state/user-context";
 import { CapabilityId } from "@/lib/user-capabilities";
+import { ALERTS_ORIGIN } from "@/lib/user-alerts";
 
 function AlertsSettingsPageWrapper({
   user,
@@ -36,6 +38,19 @@ const meta = {
     layout: "fullscreen",
     nextjs: { appDirectory: true },
     backgrounds: { default: "dark" },
+    // The alerts Worker's preview, as it answers before any run.
+    msw: {
+      handlers: [
+        http.post(`${ALERTS_ORIGIN}/preview`, () =>
+          HttpResponse.json({
+            mode: "sinceLastRun",
+            baseline: true,
+            lastRun: null,
+            digest: null,
+          }),
+        ),
+      ],
+    },
   },
 } satisfies Meta<typeof AlertsSettingsPageWrapper>;
 
@@ -111,6 +126,65 @@ export const NotGranted: Story = {
     const canvas = within(canvasElement);
     await expect(
       await canvas.findByText("Not switched on for you yet"),
+    ).toBeInTheDocument();
+  },
+};
+
+const EMAIL = `<!doctype html><html><body style="background:#111;color:#eee;font-family:sans-serif;padding:24px">
+<h2><a href="#" style="color:#e4a11b">Halloween</a></h2><p>Now showing</p>
+<ul><li>Tomorrow 19:30 · Rio Cinema</li><li>Wed 20:00 · Prince Charles Cinema</li></ul>
+</body></html>`;
+
+/**
+ * Beside the settings, the email they would send: here with everything on
+ * the watchlist that's showing.
+ */
+export const WithPreview: Story = {
+  args: {
+    user: {
+      ...READER,
+      readAlertSettings: async () => ({
+        enabled: true,
+        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      }),
+    },
+  },
+  parameters: {
+    msw: {
+      handlers: [
+        http.post(`${ALERTS_ORIGIN}/preview`, async ({ request }) => {
+          const { mode } = (await request.json()) as { mode: string };
+          return HttpResponse.json({
+            mode,
+            baseline: false,
+            lastRun: "2026-11-16",
+            digest:
+              mode === "everythingShowing"
+                ? {
+                    subject: "Halloween: Now showing",
+                    html: EMAIL,
+                    text: "Halloween",
+                    films: 1,
+                  }
+                : null,
+          });
+        }),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/Nothing new since the last check/),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Everything showing" }),
+    );
+    await expect(
+      await canvas.findByText("Halloween: Now showing"),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByTitle("The email, as it would arrive"),
     ).toBeInTheDocument();
   },
 };
