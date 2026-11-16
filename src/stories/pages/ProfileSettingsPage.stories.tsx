@@ -388,7 +388,13 @@ export const PickingFavourites: Story = {
         ...SAVED,
         favourites: [
           { id: "949", title: "Heat", year: "1995" },
-          { id: "843", title: "In the Mood for Love", year: "2000" },
+          // Storybook serves the real listings, so whether this film is
+          // showing (and lends its poster) depends on the week's data.
+          expect.objectContaining({
+            id: "843",
+            title: "In the Mood for Love",
+            year: "2000",
+          }),
         ],
       }),
     );
