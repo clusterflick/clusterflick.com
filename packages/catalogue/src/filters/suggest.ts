@@ -22,12 +22,8 @@ import {
   resolvePeopleQuery,
   type PeopleIndex,
 } from "./modules";
-import { findIncludedTitleMatch } from "./modules/search";
-import {
-  matchesSearchQuery,
-  normalizeForSearch,
-  normalizeToWords,
-} from "./normalize";
+import { matchesTitleSearch } from "./modules/search";
+import { normalizeForSearch, normalizeToWords } from "./normalize";
 import {
   bestWordRunDistance,
   editBudgetFor,
@@ -741,7 +737,7 @@ const MAX_CORRECTIONS = 2;
  * Returns nothing the moment any title matches the query outright — a query
  * that finds films is not a typo, and offering to rewrite it would be putting
  * words in the mouth of someone who spelled it correctly. The exact-match test
- * goes through `matchesSearchQuery` rather than the distance, so a query that
+ * goes through `matchesTitleSearch` rather than the distance, so a query that
  * only lands via a spelling variant ("godfather part 2") is recognised as
  * correct too.
  *
@@ -766,15 +762,11 @@ function findNearMissTitles(
   // scan is itself the bulk of the cost on a correctly spelled query, being the
   // same work the search filter has already done — but no result should depend
   // on where in the catalogue the matching title happens to sit.
-  // A film an event screens counts: the search finds the event by it, so its
-  // title is spelled right even when nothing is listed under that name.
+  // Whatever the search finds a film by is spelled right: its original and
+  // other English titles, and the title of a film an event screens, even when
+  // nothing is listed under that name.
   for (const movie of catalogue) {
-    if (
-      matchesSearchQuery(movie.title, needle) ||
-      findIncludedTitleMatch(movie, needle) !== undefined
-    ) {
-      return [];
-    }
+    if (matchesTitleSearch(movie, needle)) return [];
   }
 
   // Widenings a correction can be paired with. Accessibility never pairs, so

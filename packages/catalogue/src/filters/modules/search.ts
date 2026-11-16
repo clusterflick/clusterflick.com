@@ -3,18 +3,37 @@ import { FilterId, FilterModule, FilterState, MoviesRecord } from "../types";
 import { matchesSearchQuery, normalizeForSearch } from "../normalize";
 
 /**
+ * Whether any of a film's other English release titles match an
+ * already-normalized query: the UK title of a film displayed under its US one
+ * (searching "Zootropolis" finds Zootopia).
+ */
+function matchesAlternativeTitle(
+  movie: Pick<Movie, "alternativeTitles">,
+  query: string,
+): boolean {
+  return (movie.alternativeTitles ?? []).some((title) =>
+    matchesSearchQuery(title, query),
+  );
+}
+
+/**
  * Whether a film's own titles match an already-normalized query: alternative
- * spellings of both titles, plus the original-language title for
- * foreign-language films (e.g. searching "Fabuleux" finds Amélie).
+ * spellings of both titles, the original-language title for foreign-language
+ * films (e.g. searching "Fabuleux" finds Amélie), and the other English titles
+ * it was released under.
  */
 function matchesOwnTitle(
-  movie: Pick<Movie, "title" | "normalizedTitle" | "originalTitle">,
+  movie: Pick<
+    Movie,
+    "title" | "normalizedTitle" | "originalTitle" | "alternativeTitles"
+  >,
   query: string,
 ): boolean {
   return (
     matchesSearchQuery(movie.normalizedTitle || "", query) ||
     matchesSearchQuery(movie.title, query) ||
-    (!!movie.originalTitle && matchesSearchQuery(movie.originalTitle, query))
+    (!!movie.originalTitle && matchesSearchQuery(movie.originalTitle, query)) ||
+    matchesAlternativeTitle(movie, query)
   );
 }
 
@@ -35,7 +54,8 @@ export function findIncludedTitleMatch(
   for (const film of movie.includedMovies ?? []) {
     if (
       matchesSearchQuery(film.normalizedTitle || "", query) ||
-      matchesSearchQuery(film.title, query)
+      matchesSearchQuery(film.title, query) ||
+      matchesAlternativeTitle(film, query)
     ) {
       return film.title;
     }
@@ -50,7 +70,11 @@ export function findIncludedTitleMatch(
 export function matchesTitleSearch(
   movie: Pick<
     Movie,
-    "title" | "normalizedTitle" | "originalTitle" | "includedMovies"
+    | "title"
+    | "normalizedTitle"
+    | "originalTitle"
+    | "alternativeTitles"
+    | "includedMovies"
   >,
   query: string,
 ): boolean {

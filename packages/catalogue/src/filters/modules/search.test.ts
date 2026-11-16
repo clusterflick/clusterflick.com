@@ -41,6 +41,15 @@ const MOVIES: MoviesRecord = {
     originalTitle: "Le Fabuleux Destin d'Amélie Poulain",
   }),
   "4": makeMovie("4", "Heat"),
+  "5": makeMovie("5", "Zootopia", { alternativeTitles: ["Zootropolis"] }),
+  "6": makeMovie("6", "Pixar Double Bill", {
+    includedMovies: [
+      {
+        ...included("61", "Inside Out"),
+        alternativeTitles: ["Del revés"],
+      },
+    ],
+  }),
 };
 
 function search(query: string): string[] {
@@ -55,6 +64,14 @@ describe("searchFilter", () => {
 
   it("finds a film by its original-language title", () => {
     expect(search("fabuleux")).toEqual(["3"]);
+  });
+
+  it("finds a film by another English title it was released under", () => {
+    expect(search("zootropolis")).toEqual(["5"]);
+  });
+
+  it("finds an event by another title of a film it screens", () => {
+    expect(search("del reves")).toEqual(["6"]);
   });
 
   it("finds an event by the title of a film it screens", () => {

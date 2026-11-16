@@ -23,6 +23,7 @@ const movies = Object.fromEntries(
       originalTitle: "Le Fabuleux Destin d'Amélie Poulain",
     }),
     movie("6", "The Godfather Part II"),
+    movie("7", "Zootopia", { alternativeTitles: ["Zootropolis"] }),
   ].map((film) => [film.id, film]),
 );
 
@@ -45,9 +46,10 @@ describe("searchShowingFilms", () => {
     ]);
   });
 
-  it("matches the way the catalogue does: accents, original titles, numerals", () => {
+  it("matches the way the catalogue does: accents, original and other titles, numerals", () => {
     expect(titles("amelie")).toEqual(["Amélie"]);
     expect(titles("fabuleux")).toEqual(["Amélie"]);
+    expect(titles("zootropolis")).toEqual(["Zootopia"]);
     expect(titles("godfather part 2")).toEqual(["The Godfather Part II"]);
   });
 

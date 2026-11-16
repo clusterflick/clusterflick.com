@@ -883,6 +883,20 @@ they can see it, not that nothing is listed under that name. The near-miss
 correction counts those titles as spelled right too, so it never rewrites a
 query that names a film an event screens.
 
+A film is also found by its other English titles (`alternativeTitles`, from
+the pipeline: the UK and US release titles that differ from `title`). The
+displayed title is TheMovieDB's US one, so "Zootropolis", the name every
+London venue uses, found nothing until these were searched. They are never
+displayed. What the venue itself calls a showing (`showing.title`) is
+deliberately not searched by the title search, since it carries event branding
+("Kids Movie Club: …") that would match far more than the film.
+
+The reverse of "Part of" is `getIncludedListings`
+(`@clusterflick/catalogue/utils/get-included-listings`): an event's films, each
+with its own listing when it is also showing on its own, matched by TMDB id as
+`getContainingEvents` is. The film page's "Single Showing" buttons and the MCP
+server's `get_film` read it.
+
 ## Home Row "See All" Links
 
 A home row is a slice: a rule, cut to its top dozen or so for a horizontal row. Where the rule can be

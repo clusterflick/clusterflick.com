@@ -55,6 +55,7 @@ interface MovieSpec {
   occasions?: MoviePerformanceOccasions;
   /** Titles of the films a multi-film event screens. */
   includedTitles?: string[];
+  alternativeTitles?: string[];
 }
 
 function makeMovie(id: string, spec: MovieSpec): Movie {
@@ -83,6 +84,9 @@ function makeMovie(id: string, spec: MovieSpec): Movie {
     ...(spec.genres ? { genres: spec.genres } : {}),
     ...(spec.directors ? { directors: spec.directors } : {}),
     ...(spec.actors ? { actors: spec.actors } : {}),
+    ...(spec.alternativeTitles
+      ? { alternativeTitles: spec.alternativeTitles }
+      : {}),
     ...(spec.includedTitles
       ? {
           includedMovies: spec.includedTitles.map((title, index) => ({
@@ -1160,6 +1164,23 @@ describe("suggestFilterRelaxations", () => {
       expect(suggestions.map((s) => s.headline)).toEqual([
         "Show “Programmers of Tomorrow: Film Festival All-Dayer”",
       ]);
+    });
+
+    it("does not second-guess a query naming a film by another of its titles", () => {
+      // "Zootropolis" is the UK title of the film listed as "Zootopia", so the
+      // query is spelled right even though it's two edits from "Zoo Tropolis".
+      const movies = makeMovies({
+        "1": {
+          title: "Zootopia",
+          alternativeTitles: ["Zootropolis"],
+          time: BEYOND_WINDOW,
+        },
+        "2": { title: "Zoo Tropolis" },
+      });
+      const state = set(getDefaultState(), FilterId.Search, "Zootropolis");
+
+      const suggestions = suggestFilterRelaxations({ movies, state });
+      expect(suggestions.map((s) => s.kind)).not.toContain("correct");
     });
 
     it("ignores queries too short to correct", () => {

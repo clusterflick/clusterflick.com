@@ -50,7 +50,12 @@ export function searchShowingFilms(
 
   const found: { movie: Movie; closeness: Closeness }[] = [];
   for (const movie of Object.values(movies)) {
-    const closeness = [movie.title, movie.normalizedTitle, movie.originalTitle]
+    const closeness = [
+      movie.title,
+      movie.normalizedTitle,
+      movie.originalTitle,
+      ...(movie.alternativeTitles ?? []),
+    ]
       .filter((title): title is string => !!title)
       .map((title) => getCloseness(title, normalizedQuery))
       .filter((value): value is Closeness => value !== null);
