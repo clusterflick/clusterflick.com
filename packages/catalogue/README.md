@@ -43,6 +43,14 @@ import {
 read neither when it differs. It's raised, with a major version of this
 package, when a change would break a reader built against the old shape.
 
+`utils/fetch-listings` does all of that for you: `fetchCurrentRelease(origin)`
+names the current meta file (one small fetch, never from a cache), and
+`fetchRelease(origin, metaFile)` reads that release as the site does. Any
+failure, a data format this version doesn't read included, is a
+`ListingsUnavailableError`. How long to hold them, and what to do when they
+can't be read, is the caller's: the MCP server keeps the last good copy, the
+alerts Worker fails the night's run.
+
 It's plain ESM with type declarations, and runs in a browser, in Node and in a
 Worker. Its one dependency is `@sindresorhus/slugify`, which makes the film and
 venue pages' addresses (`utils/get-movie-url`, `utils/get-venue-url`), so a
