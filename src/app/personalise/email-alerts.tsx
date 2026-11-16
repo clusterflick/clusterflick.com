@@ -107,7 +107,10 @@ export function describeRun(run: AlertRun): string {
         run.films ? `, with ${run.films} film${run.films === 1 ? "" : "s"}` : ""
       }.`;
     case AlertRunOutcome.NothingNew:
-      return `Last checked ${when}: nothing new, so no email.`;
+      // A reason says why there was nothing to compare: the first check.
+      return run.reason
+        ? `Last checked ${when}: ${run.reason}.`
+        : `Last checked ${when}: nothing new, so no email.`;
     case AlertRunOutcome.Skipped:
       return `Last checked ${when}, but skipped${
         run.reason ? `: ${run.reason}` : ""

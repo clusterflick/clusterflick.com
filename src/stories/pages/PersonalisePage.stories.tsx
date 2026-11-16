@@ -197,6 +197,38 @@ export const SignedInAlertsOn: Story = {
   },
 };
 
+/** The first check, which only noted the watchlist: said so, not "nothing new". */
+export const SignedInAlertsFirstCheck: Story = {
+  args: {
+    user: {
+      ...ALERTS_READER,
+      readAlertSettings: async () => ({
+        enabled: true,
+        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      }),
+      readAlertLedger: async () => ({
+        runs: [
+          {
+            on: "2026-11-16",
+            at: RAN_AT,
+            outcome: "nothingNew",
+            reason:
+              "the first check, which noted your watchlist as it stands; news starts from the next",
+          },
+        ],
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openEmailAlerts(canvasElement);
+    await expect(
+      canvas.getByText(
+        "Last checked Monday, 16 November 2026 at 20:00: the first check, which noted your watchlist as it stands; news starts from the next.",
+      ),
+    ).toBeInTheDocument();
+  },
+};
+
 /** Switched off from an email's unsubscribe link: the panel says when. */
 export const SignedInAlertsUnsubscribed: Story = {
   args: {
