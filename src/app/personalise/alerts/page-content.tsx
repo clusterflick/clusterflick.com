@@ -123,7 +123,9 @@ function Editor({
   const watchlist: WatchlistAlert = draft.alerts.find(
     (alert) => alert.type === "watchlist",
   ) ?? { type: "watchlist", notify: [] };
-  const changed = !saved || !isSame(draft, settings);
+  // Against what the page opened with, saved or the defaults: opening it
+  // changes nothing.
+  const changed = !isSame(draft, settings);
   // Off with no triggers is fine to save; on needs at least one.
   const blocker =
     draft.enabled && watchlist.notify.length === 0
@@ -134,7 +136,7 @@ function Editor({
 
   // Leaving with changes unsaved asks first; the browser words it.
   useEffect(() => {
-    if (!changed || !saved) return;
+    if (!changed) return;
     const onBeforeUnload = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
@@ -237,14 +239,11 @@ function Editor({
           error={error}
           confirmingRename={false}
           onSave={onSave}
-          onDiscard={
-            saved
-              ? () => {
-                  setDraft(settings);
-                  setError(null);
-                }
-              : undefined
-          }
+          onDiscard={() => {
+            setDraft(settings);
+            setError(null);
+          }}
+          unchangedStatus={saved ? undefined : "Nothing saved yet"}
           onCancelRename={() => {}}
         />
       </div>

@@ -187,7 +187,11 @@ export function EmailAlertsSummary({
         </div>
       </section>
       <section className={styles.managementSection}>
-        <h3 className={styles.managementTitle}>Your watchlist</h3>
+        <h3 className={styles.managementTitle}>
+          {settings.enabled
+            ? "What you're told about"
+            : "What you'd be told about"}
+        </h3>
         <ul className={styles.onOffList} aria-label="Watchlist alert">
           {ALERT_TRIGGERS.map((trigger) => (
             <OnOffItem

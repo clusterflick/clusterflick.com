@@ -14,9 +14,19 @@ import { useUserContext } from "@/state/user-context";
 import profileStyles from "@/app/personalise/profile/page.module.css";
 import styles from "./page.module.css";
 
-const MODES: { mode: PreviewMode; label: string }[] = [
-  { mode: "sinceLastRun", label: "Tonight so far" },
-  { mode: "everythingShowing", label: "Everything showing" },
+const MODES: { mode: PreviewMode; label: string; about: string }[] = [
+  {
+    mode: "sinceLastRun",
+    label: "What's new tonight",
+    about:
+      "If tonight's check ran now, with the switches as they are: what's new since the last one.",
+  },
+  {
+    mode: "everythingShowing",
+    label: "Example email",
+    about:
+      "Every film on your watchlist that's showing, as if all of it were new, to show what an email looks like.",
+  },
 ];
 
 /** Waits this long after a switch is flipped before asking again. */
@@ -78,7 +88,7 @@ export default function AlertsPreview({ notify }: { notify: AlertTrigger[] }) {
 
   return (
     <aside className={profileStyles.previewColumn} aria-label="Preview">
-      <p className={profileStyles.previewLabel}>Preview · not sent</p>
+      <p className={profileStyles.previewLabel}>Preview · never sent</p>
       <div className={styles.previewModes} role="group" aria-label="Preview">
         {MODES.map(({ mode: each, label }) => (
           <Button
@@ -92,6 +102,9 @@ export default function AlertsPreview({ notify }: { notify: AlertTrigger[] }) {
           </Button>
         ))}
       </div>
+      <p className={styles.previewAbout}>
+        {MODES.find((each) => each.mode === mode)?.about}
+      </p>
       <PreviewBody state={state} />
     </aside>
   );
@@ -112,9 +125,9 @@ function PreviewBody({ state }: { state: PreviewState }) {
   if (preview.baseline) {
     return (
       <p className={styles.previewNote}>
-        Alerts haven&apos;t run for you yet. The first night remembers your
-        watchlist as it stands, and from then on each night&apos;s email has
-        what&apos;s new since. Try &ldquo;Everything showing&rdquo; to see what
+        Nothing to compare with yet: tonight&apos;s check will be the first, and
+        it remembers your watchlist as it stands. From the night after, this
+        shows what&apos;s new since. Try &ldquo;Example email&rdquo; to see what
         one looks like.
       </p>
     );
@@ -123,7 +136,7 @@ function PreviewBody({ state }: { state: PreviewState }) {
     return (
       <p className={styles.previewNote}>
         {preview.mode === "everythingShowing"
-          ? "Nothing on your watchlist is showing right now."
+          ? "Nothing on your watchlist is showing right now, so there's no example to show."
           : `Nothing new${
               preview.lastRun
                 ? ` since the last check, on ${formatDateLong(preview.lastRun)}`

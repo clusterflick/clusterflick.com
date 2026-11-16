@@ -26,6 +26,7 @@ export default function SaveBar({
   onDiscard,
   onCancelRename,
   onPreview,
+  unchangedStatus = "All changes saved",
 }: {
   changed: boolean;
   canSave: boolean;
@@ -41,6 +42,8 @@ export default function SaveBar({
   onCancelRename: () => void;
   /** Absent where the preview is already beside the settings. */
   onPreview?: () => void;
+  /** What it says with nothing to save, when "All changes saved" isn't so. */
+  unchangedStatus?: string;
 }) {
   const state = error ? "error" : changed ? "changed" : "saved";
   const status = error
@@ -48,7 +51,7 @@ export default function SaveBar({
     : confirmingRename && renameFrom
       ? `${getProfileDisplayAddress(renameFrom)} will stop working straight away, and anyone can claim it.`
       : !changed
-        ? "All changes saved"
+        ? unchangedStatus
         : blocker
           ? blocker
           : "Unsaved changes";

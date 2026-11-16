@@ -178,7 +178,7 @@ export const WithPreview: Story = {
       await canvas.findByText(/Nothing new since the last check/),
     ).toBeInTheDocument();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Everything showing" }),
+      canvas.getByRole("button", { name: "Example email" }),
     );
     await expect(
       await canvas.findByText("Halloween: Now showing"),
