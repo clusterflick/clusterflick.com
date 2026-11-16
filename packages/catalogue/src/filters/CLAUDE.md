@@ -407,7 +407,8 @@ no second implementation of the filter logic to drift out of sync.
 - **Correct** — a near-miss film title replacing the query ("Did you mean …?"). Ranks below
   a redirect, because it rewrites what the reader asked for. Generated only when _no_ title
   matches the query, tested via `matchesSearchQuery` so a query that lands only through a
-  spelling variant ("godfather part 2") still counts as correct. Only the main `Search` box
+  spelling variant ("godfather part 2") still counts as correct, as does a query naming a film
+  a multi-film event screens, since the search finds the event by it. Only the main `Search` box
   is corrected: it is the only field drawn from a fixed vocabulary of titles.
 
   Matching compares the query against **runs of whole words** (`normalizeToWords`), scored by
