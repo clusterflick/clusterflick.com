@@ -15,7 +15,7 @@ function VenueBlurb() {
         The floor is shared with Hidden Sounds, a vinyl shop, and with artist
         studios, and the room has played host to exhibitions, performances and
         live music. The café doesn&apos;t programme films itself: screenings
-        there are put on by an outside film club that uses the space for its
+        there are put on by outside organisers who use the space in the
         evenings.
       </p>
     </section>
