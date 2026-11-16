@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 // Change this whenever the page's substance changes, so a reader coming back
 // can tell whether anything has moved since they last read it.
-const LAST_UPDATED = "15 November 2026";
+const LAST_UPDATED = "16 November 2026";
 
 const ICO_COMPLAIN = "https://ico.org.uk/make-a-complaint/";
 
@@ -50,7 +50,7 @@ const PROCESSORS: Entry[] = [
   {
     name: "Cloudflare",
     value:
-      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below), the one that reads a public profile from Firebase to show it, and the one AI assistants you connect search through.",
+      "Sits in front of the whole site, so it sees the IP address and browser details of every request, as any web host does. It also runs the small service that searches TheMovieDB for you (below), the one that reads a public profile from Firebase to show it, the one AI assistants you connect search through, and the one that works out and sends your email alerts, through its own email service, which sees your address and what each email says.",
   },
   {
     name: "GitHub Pages",
@@ -184,6 +184,18 @@ export default function PrivacyPage() {
             itself hidden. Never your email address.
           </li>
           <li>
+            <strong>Your email alerts</strong>, if we have given you access and
+            you switch them on: what they&apos;re for, the address they go to
+            (the one you sign in with), and a record of each night&apos;s check,
+            with what each film on your watchlist was doing then (which cinemas,
+            and if you ask to hear about every new showing, when), so the next
+            check can tell what&apos;s new. If your email provider refuses our
+            emails, or one is marked as spam, we switch your alerts off and note
+            why, and Cloudflare stops sending to the address. You can
+            unsubscribe from any email in one click, or switch alerts off on
+            your account page.
+          </li>
+          <li>
             <strong>AI assistants you connect</strong>, if we have given you
             access: which assistant, when you connected it, and whether you let
             it see your lists. It searches the listings as you, and if you let
@@ -268,13 +280,15 @@ export default function PrivacyPage() {
           Deleting your account from{" "}
           <Link href="/personalise">Personalise</Link> deletes your lists, the
           film details that go with them, any features switched on for you, your
-          public profile and its handle, your connected AI assistants (which are
-          disconnected), and the account itself, straight away. A handle you
-          change or delete is free for someone else to use at once. Removing a
-          single film from a list removes it from that list. Metadata about the
-          film (duration, director, etc.) remains until the account is deleted.
-          The hosts above keep their own request logs for as long as their own
-          terms say.
+          public profile and its handle, your email alerts and their record,
+          your connected AI assistants (which are disconnected), and the account
+          itself, straight away. Cloudflare keeps its own list of addresses that
+          refused our emails or marked one as spam, so as not to send to them
+          again. A handle you change or delete is free for someone else to use
+          at once. Removing a single film from a list removes it from that list.
+          Metadata about the film (duration, director, etc.) remains until the
+          account is deleted. The hosts above keep their own request logs for as
+          long as their own terms say.
         </p>
       </ContentSection>
 
