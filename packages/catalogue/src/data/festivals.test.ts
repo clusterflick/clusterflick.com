@@ -26,6 +26,7 @@ const GARDEN_NOTES: [note: string, festivalId: string][] = [
     "Part of London International Animation Festival 2026\nThe screening will be introduced.",
     "london-international-animation-festival",
   ],
+  ["Part of London Film Week 2026", "london-film-week"],
 ];
 
 // Notes from venues other than the Garden, worded as each venue words them
