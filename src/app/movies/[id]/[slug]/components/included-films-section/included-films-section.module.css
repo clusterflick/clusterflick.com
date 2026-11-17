@@ -106,13 +106,26 @@
   width: 100%;
 }
 
+.inlineHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 0 16px 0;
+}
+
 .inlineLabel {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-muted-gray);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin: 0 0 16px 0;
+  margin: 0;
+}
+
+/* Empty unless signed in with lists loaded, when it holds the seen count */
+.progress:not(:empty) {
+  margin-bottom: 16px;
 }
 
 .filmsGridInline {
@@ -211,6 +224,10 @@
 @media (max-width: 900px) {
   .inlineLabel {
     text-align: center;
+  }
+
+  .inlineHeader {
+    justify-content: center;
   }
 
   /* Centre the row when the films fit; "safe" falls back to start-alignment

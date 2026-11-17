@@ -4,6 +4,8 @@ import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { formatDuration } from "@clusterflick/catalogue/utils/format-date";
 import { ButtonLink } from "@/components/button";
 import MoviePoster from "@/components/movie-poster";
+import ListProgress from "@/components/list-progress";
+import PosterStatusMarkers from "@/components/poster-status-markers";
 import ContentSection from "@/components/content-section";
 import styles from "./included-films-section.module.css";
 
@@ -30,6 +32,12 @@ export default function IncludedFilmsSection({
     ? `${styles.filmsGrid} ${styles.filmsGridInline}`
     : styles.filmsGrid;
 
+  // How many of the event's films the reader has seen, beside the heading.
+  // Each poster's own markers say which, and which are on their watchlist.
+  const progress = (
+    <ListProgress tmdbIds={includedListings.map(({ film }) => film.id)} />
+  );
+
   const filmsGrid = (
     <div className={gridClassName}>
       {includedListings.map(({ film: movie, listing: standaloneMovie }) => {
@@ -37,6 +45,9 @@ export default function IncludedFilmsSection({
           <div key={movie.id} className={styles.filmCardWrapper}>
             <div className={styles.filmCard}>
               <div className={styles.posterWrapper}>
+                {/* First, as the direct child of the wrapper: hovering it is
+                    what fans a stack of markers out */}
+                <PosterStatusMarkers movieId={movie.id} />
                 <MoviePoster
                   posterPath={movie.posterPath}
                   title={movie.title}
@@ -74,7 +85,10 @@ export default function IncludedFilmsSection({
   if (inline) {
     return (
       <div className={styles.inlineWrapper}>
-        <h3 className={styles.inlineLabel}>Included Films</h3>
+        <div className={styles.inlineHeader}>
+          <h3 className={styles.inlineLabel}>Included Films</h3>
+          {progress}
+        </div>
         {filmsGrid}
       </div>
     );
@@ -90,6 +104,7 @@ export default function IncludedFilmsSection({
         className: styles.filmIcon,
       }}
     >
+      <div className={styles.progress}>{progress}</div>
       {filmsGrid}
     </ContentSection>
   );
