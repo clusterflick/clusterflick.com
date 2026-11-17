@@ -13,8 +13,8 @@ function FestivalBlurb() {
         Many of its selections are UK or London premieres, some presented with
         partners such as Cine Brazil. Previous editions have shown work by Wim
         Wenders, Céline Sciamma, Noah Baumbach, Laura Poitras, Takashi Miike and
-        Lee Chang-dong. The festival runs for five days in December at The
-        Garden Cinema in Covent Garden.
+        Lee Chang-dong. The festival runs for five days in December; its 2025
+        and 2026 editions are at The Garden Cinema in Covent Garden.
       </p>
     </section>
   );
