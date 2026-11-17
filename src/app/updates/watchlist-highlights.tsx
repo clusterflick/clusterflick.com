@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 import Button from "@/components/button";
 import EventPoster from "@/components/event-poster";
 import { useUserContext } from "@/state/user-context";
@@ -14,6 +15,13 @@ import styles from "./updates.module.css";
 
 /** A watchlist rarely meets a day this often; past two rows, ask first. */
 const INITIAL_COUNT = 6;
+
+/** Films shown on a phone before the button, where the grid is one column and
+ *  six made the panel a screen tall above the day's runs. Matches
+ *  `.watchlistPhoneCapped` in updates.module.css, which can't read it:
+ *  `nth-child` takes no variables. CSS rather than a smaller slice, as in
+ *  `CappedList`, so the cap follows the width without a resize listener. */
+const PHONE_COUNT = 3;
 
 // get-updates.ts reads from disk, so its `pluralise` can't come to the browser
 const count = (value: number, word: string) =>
@@ -48,6 +56,7 @@ export default function WatchlistHighlights({
   // Collapsing to hide a single film costs a click and saves nothing
   const isCollapsed = !showAll && matches.length > INITIAL_COUNT + 1;
   const visible = isCollapsed ? matches.slice(0, INITIAL_COUNT) : matches;
+  const isPhoneCollapsed = !showAll && matches.length > PHONE_COUNT + 1;
   const Heading = `h${headingLevel}` as const;
 
   return (
@@ -75,7 +84,12 @@ export default function WatchlistHighlights({
         </Link>
       </div>
 
-      <ul className={styles.watchlistFilms}>
+      <ul
+        className={clsx(
+          styles.watchlistFilms,
+          isPhoneCollapsed && styles.watchlistPhoneCapped,
+        )}
+      >
         {visible.map((film) => (
           <li key={film.movieId} className={styles.watchlistFilm}>
             <div className={styles.watchlistPoster}>
@@ -107,8 +121,13 @@ export default function WatchlistHighlights({
         ))}
       </ul>
 
-      {isCollapsed && (
-        <div className={styles.watchlistMore}>
+      {(isCollapsed || isPhoneCollapsed) && (
+        <div
+          className={clsx(
+            styles.watchlistMore,
+            !isCollapsed && styles.showMorePhoneOnly,
+          )}
+        >
           <Button variant="secondary" onClick={() => setShowAll(true)}>
             {`Show all ${count(matches.length, "film")}`}
           </Button>

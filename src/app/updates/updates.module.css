@@ -110,6 +110,15 @@
   margin-top: 20px;
 }
 
+/* One column on a phone, so the desktop cap of six was six rows. Three, set as
+   PHONE_COUNT in watchlist-highlights.tsx; the button shows only on a phone
+   when the desktop cap hides nothing (`.showMorePhoneOnly`, below). */
+@media (max-width: 599px) {
+  .watchlistPhoneCapped > li:nth-child(n + 4) {
+    display: none;
+  }
+}
+
 /* After a title in More showings: the poster markers' yellow and icon, so a
    watchlist film reads the same here as on the posters above. */
 .watchlistTag {
