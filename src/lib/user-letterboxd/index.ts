@@ -73,12 +73,11 @@ export async function deleteLetterboxdSync(
 }
 
 /**
- * The sync Worker (clusterflick/api-letterboxd).
- * `NEXT_PUBLIC_LETTERBOXD_SYNC_ORIGIN` points a local build at `wrangler dev`.
+ * The sync Worker (clusterflick/api-letterboxd), same-origin with the site
+ * as the TMDB search is. `next dev` rewrites it to the Worker's
+ * `wrangler dev` on port 8791.
  */
-export const LETTERBOXD_SYNC_ORIGIN =
-  process.env.NEXT_PUBLIC_LETTERBOXD_SYNC_ORIGIN ||
-  "https://letterboxd.clusterflick.com";
+export const LETTERBOXD_LINK_PATH = "/api/letterboxd/link";
 
 /** Why the Worker refused to link a username, as it answers. */
 export type LinkRefusal =
@@ -100,7 +99,7 @@ export async function linkLetterboxd(
   idToken: string,
   username: string,
 ): Promise<LinkResult> {
-  const response = await fetch(`${LETTERBOXD_SYNC_ORIGIN}/link`, {
+  const response = await fetch(LETTERBOXD_LINK_PATH, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${idToken}`,

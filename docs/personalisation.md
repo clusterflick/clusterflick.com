@@ -511,7 +511,8 @@ lists every night. The account bar's "Letterboxd sync" panel
 (`letterboxd-sync.tsx`) takes a username, shows the account linked and the
 newest run, names the films the last run couldn't add, and unlinks. Both
 documents are the sync Worker's (`clusterflick/api-letterboxd`): it writes
-the link (`users/{uid}/meta/letterboxd`) only from its `POST /link`, after
+the link (`users/{uid}/meta/letterboxd`) only from its
+`POST /api/letterboxd/link`, after
 Letterboxd has confirmed the username, and the ledger
 (`users/{uid}/meta/letterboxd-ledger`) after each run. The rules let the
 reader read and delete both, never write them, so unlinking is deleting the
@@ -533,8 +534,8 @@ link; deleting an account deletes both. Their shapes are
 - **Added on the night it's synced** (`addedAt`), so alerts don't treat a
   first sync's films as news when they were already showing.
 
-`NEXT_PUBLIC_LETTERBOXD_SYNC_ORIGIN` points the panel at a local
-`wrangler dev`.
+The Worker answers on `clusterflick.com/api/letterboxd/*`, same-origin as the
+TMDB search is, and `next dev` rewrites it to its `wrangler dev` on port 8791.
 
 **Capabilities are features granted one account at a time**
 (`@/lib/user-capabilities`): `emailAlerts`, `publicProfile`, `assistantAccess` and `letterboxdSync` so far, each
