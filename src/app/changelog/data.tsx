@@ -74,6 +74,20 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-17",
     changes: [
       {
+        tag: "New venue",
+        body: ({ Venue }) => (
+          <>
+            Added{" "}
+            <Venue
+              name="St John the Evangelist, Shirley"
+              url="https://www.stjohnsshirley.org.uk"
+            />
+            , a Gilbert Scott parish church in Croydon that runs its own
+            subtitled cinema nights.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
