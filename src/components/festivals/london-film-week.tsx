@@ -23,6 +23,6 @@ function FestivalBlurb() {
 export const seoDescription =
   "an independent international festival of seven carefully selected features";
 export const seoHighlights =
-  "UK and London premieres of new international films at The Garden Cinema";
+  "UK and London premieres of new international films, a handful each December";
 
 export default FestivalBlurb;
