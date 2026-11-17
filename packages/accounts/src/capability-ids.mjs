@@ -14,6 +14,8 @@ export const CapabilityId = Object.freeze({
   PublicProfile: "publicProfile",
   /** Searching the listings from the reader's own AI assistant (api-mcp). */
   AssistantAccess: "assistantAccess",
+  /** A Letterboxd account's watchlist and films synced in (api-letterboxd). */
+  LetterboxdSync: "letterboxdSync",
 });
 
 /** Every capability id, for a script that checks one it was given. */

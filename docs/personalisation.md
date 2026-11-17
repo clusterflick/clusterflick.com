@@ -505,8 +505,39 @@ alerts are still on and the page says the first email may come a day later.
 `NEXT_PUBLIC_ALERTS_ORIGIN`
 points it at a local `wrangler dev`.
 
+**Letterboxd sync** (`letterboxdSync`, `@/lib/user-letterboxd`) adds a
+reader's Letterboxd watchlist and watched films to their Watchlist and Seen
+lists every night. The account bar's "Letterboxd sync" panel
+(`letterboxd-sync.tsx`) takes a username, shows the account linked and the
+newest run, names the films the last run couldn't add, and unlinks. Both
+documents are the sync Worker's (`clusterflick/api-letterboxd`): it writes
+the link (`users/{uid}/meta/letterboxd`) only from its `POST /link`, after
+Letterboxd has confirmed the username, and the ledger
+(`users/{uid}/meta/letterboxd-ledger`) after each run. The rules let the
+reader read and delete both, never write them, so unlinking is deleting the
+link; deleting an account deletes both. Their shapes are
+`@clusterflick/accounts/letterboxd`'.
+
+- **Additive.** Nothing is taken off a list, and a listed film keeps its
+  entry. Unlike an add or import to Seen, a film synced to Seen stays on the
+  watchlist: the sync only knows it's on both on Letterboxd, and copies that.
+- **Every film comes with its details**, from one TheMovieDB lookup by the
+  Worker (which has its own key), with the rules of `addToLists` in
+  `@clusterflick/accounts/list-writes`: the site's add rules, for a Worker.
+  Change `@/lib/user-lists` and it together.
+- **Matched by TheMovieDB id**, which Letterboxd's API gives each film, so
+  nothing is matched by title. A film without one is named in the panel.
+- **Public data only.** Letterboxd lets third-party apps read what any
+  visitor can see, so a private Letterboxd watchlist leaves only watched films
+  to sync, and the panel says so.
+- **Added on the night it's synced** (`addedAt`), so alerts don't treat a
+  first sync's films as news when they were already showing.
+
+`NEXT_PUBLIC_LETTERBOXD_SYNC_ORIGIN` points the panel at a local
+`wrangler dev`.
+
 **Capabilities are features granted one account at a time**
-(`@/lib/user-capabilities`): `emailAlerts`, `publicProfile` and `assistantAccess` so far, each
+(`@/lib/user-capabilities`): `emailAlerts`, `publicProfile`, `assistantAccess` and `letterboxdSync` so far, each
 in `CAPABILITIES` with its copy, a `Record` so a new one won't compile
 without. A capability says a reader _may_ use a feature, and whether they do
 is their own setting, so everything acting on one checks both: the alerts job
