@@ -1127,4 +1127,22 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-film-week",
+    name: "London Film Week",
+    url: "https://www.londonfilmweek.com/",
+    aliases: ["film-week"],
+    matchers: [
+      {
+        // Matches "London Film Week presents The Gate of Murder (UK Premiere)"
+        // and, from 2025, "London Film Week and Cine Brazil present: Manas" at
+        // The Garden Cinema, December 16–20 2026. The full name rather than
+        // "Film Week", which "Family Film Week" seasons share.
+        [FilterId.ShowingTitleSearch]: "London Film Week",
+      },
+      {
+        [FilterId.PerformanceNotesSearch]: "London Film Week",
+      },
+    ],
+  },
 ];

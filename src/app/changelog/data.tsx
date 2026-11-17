@@ -71,6 +71,26 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-17",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="London Film Week"
+              url="https://www.londonfilmweek.com/"
+            />
+            , an international festival of a handful of carefully chosen
+            features, mostly UK premieres, at The Garden Cinema from 16 to 20
+            December.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-16",
     changes: [
       {
