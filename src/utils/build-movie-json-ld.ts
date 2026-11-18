@@ -34,6 +34,12 @@ const toIsoDuration = (duration: number) => {
 };
 
 /**
+ * The `@id` of a movie page's Movie node, which each ScreeningEvent's
+ * `workPresented` points back at.
+ */
+export const getMovieJsonLdId = (url: string) => `${url}#movie`;
+
+/**
  * Build the schema.org Movie object for a movie page.
  *
  * Shared by the live page and the page a film keeps once its run has ended.
@@ -59,6 +65,7 @@ export function buildMovieJsonLd({
   return {
     "@context": "https://schema.org",
     "@type": "Movie",
+    "@id": getMovieJsonLdId(url),
     name: movie.title,
     url,
     dateModified,
