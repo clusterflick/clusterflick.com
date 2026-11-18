@@ -157,6 +157,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* A nowrap line's min-content is its whole length, and the grids these cards
+     sit in (`1fr`, whose minimum is auto) grow a column to fit it - so a long
+     title ("VHS Late Tapes Takeover: …") pushed every card in the column past
+     the screen's edge on a phone. Contained, the line adds nothing to the
+     card's intrinsic width and is cut to the width it is given. */
+  contain: inline-size;
 }
 
 .nextLabel {
