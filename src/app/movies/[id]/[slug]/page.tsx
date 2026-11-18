@@ -318,8 +318,12 @@ export default async function MovieDetailPage({
 
   const breadcrumbJsonLd = buildMovieBreadcrumbJsonLd(movie, movieUrl);
 
+  // The next fortnight, and at most 50 of those: a fortnight covers a rep
+  // film's whole run, and the count keeps a multiplex's from bloating the
+  // HTML.
+  const screeningEventsUntil = buildTime + 14 * 24 * 60 * 60 * 1000;
   const screeningEvents = movie.performances
-    .filter((p) => p.time >= buildTime)
+    .filter((p) => p.time >= buildTime && p.time < screeningEventsUntil)
     .sort((a, b) => a.time - b.time)
     .flatMap((performance) => {
       const showing = movie.showings[performance.showingId];
