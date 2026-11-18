@@ -77,7 +77,9 @@ export const ACCESSIBILITY_FEATURES: AccessibilityFeatureDefinition[] = [
   {
     id: AccessibilityFeature.Relaxed,
     slug: "relaxed",
-    title: "Relaxed Screenings",
+    // "Autism friendly" is what many readers search for and what several
+    // venues call these; it is the same screening, so it shares the page.
+    title: "Relaxed & Autism Friendly Screenings",
     shortDescription: "For neurodiverse audiences",
     description:
       "Screenings with adjustments for neurodiverse audiences, including autistic viewers and people with learning disabilities or sensory sensitivities. Features lower sound, slightly raised lights, no trailers, and a calm, tolerant atmosphere.",
