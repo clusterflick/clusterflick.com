@@ -340,6 +340,92 @@ export const SignedInLetterboxdLinked: Story = {
   },
 };
 
+const IMDB_READER = {
+  status: "signed-in",
+  email: "reader@example.com",
+  lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+  favouriteVenues: {},
+  readCapabilities: async () => ({
+    [CapabilityId.ImdbSync]: { grantedAt: 0 },
+  }),
+} satisfies Partial<UserContextType>;
+
+async function openImdbSync(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "IMDb sync" }),
+  );
+  return canvas;
+}
+
+/** Granted the IMDb sync, nothing linked: the panel asks for a profile. */
+export const SignedInImdbNotLinked: Story = {
+  args: { user: IMDB_READER },
+  play: async ({ canvasElement }) => {
+    const canvas = await openImdbSync(canvasElement);
+    await expect(
+      canvas.getByRole("textbox", { name: "Your IMDb profile address" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Link" })).toBeDisabled();
+  },
+};
+
+/**
+ * Linked and synced last night: what was added, and the films that couldn't
+ * be matched, each linking to its IMDb page.
+ */
+export const SignedInImdbLinked: Story = {
+  args: {
+    user: {
+      ...IMDB_READER,
+      readImdbSync: async () => ({
+        link: {
+          userId: "ur240131748",
+          profileId: "p.filmfan",
+          username: "film_fan",
+          linkedAt: 0,
+        },
+        ledger: {
+          runs: [
+            {
+              on: "2026-11-17",
+              at: SYNCED_AT,
+              outcome: "synced",
+              added: { watchlist: 3, seen: 2 },
+            },
+          ],
+          unmatched: [
+            {
+              list: "seen",
+              name: "A Short Film",
+              year: 2021,
+              imdbId: "tt0000001",
+              reason: "noTmdbFilm",
+            },
+          ],
+        },
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openImdbSync(canvasElement);
+    await expect(
+      canvas.getByText(
+        "Last synced Tuesday, 17 November 2026 at 04:17: added 3 films to your watchlist and 2 films to Seen.",
+      ),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "film_fan" }),
+    ).toHaveAttribute("href", "https://www.imdb.com/user/p.filmfan/");
+    await expect(
+      canvas.getByRole("link", { name: "A Short Film (2021)" }),
+    ).toHaveAttribute("href", "https://www.imdb.com/title/tt0000001/");
+    await expect(
+      canvas.getByRole("button", { name: "Unlink" }),
+    ).toBeInTheDocument();
+  },
+};
+
 const PROFILE_READER = {
   status: "signed-in",
   email: "reader@example.com",

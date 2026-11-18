@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
         source: "/api/letterboxd/:path*",
         destination: "http://localhost:8791/api/letterboxd/:path*",
       },
+      {
+        source: "/api/imdb/:path*",
+        destination: "http://localhost:8792/api/imdb/:path*",
+      },
       { source: "/u", destination: "http://localhost:8788/u" },
       { source: "/u/:path*", destination: "http://localhost:8788/u/:path*" },
     ],

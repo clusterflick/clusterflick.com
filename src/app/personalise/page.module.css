@@ -932,8 +932,8 @@
   overflow-wrap: anywhere;
 }
 
-/* The films a Letterboxd sync couldn't add, named with their pages. */
-.letterboxdUnmatched {
+/* The films a sync couldn't add (Letterboxd, IMDb), named with their pages. */
+.syncUnmatched {
   display: grid;
   gap: 4px;
   margin: 0 0 12px;

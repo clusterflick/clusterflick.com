@@ -96,7 +96,7 @@ published as the catalogue is (`publish-accounts.yml`): a reader's account as
 a Worker reads it. Firebase ID token checks, a service account's access token,
 Firestore over REST, the lists decoded, and capabilities. The Workers that act
 for a reader install it from npm (`api-profiles`, `api-tmdb-search`,
-`api-mcp`, `api-alerts`, `api-letterboxd`).
+`api-mcp`, `api-alerts`, `api-letterboxd`, `api-imdb`).
 
 Its `lists` module decodes the same documents as
 `src/lib/user-profile/page-data.ts`, with the same rules: change the two

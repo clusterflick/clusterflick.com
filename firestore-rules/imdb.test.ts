@@ -1,0 +1,172 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
+  type RulesTestEnvironment,
+} from "@firebase/rules-unit-testing";
+import { deleteApp, initializeApp, type FirebaseApp } from "firebase/app";
+import {
+  connectFirestoreEmulator,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+  setLogLevel,
+  type Firestore,
+} from "firebase/firestore/lite";
+import { doc as fullDoc, setDoc as fullSetDoc } from "firebase/firestore";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from "vitest";
+import {
+  deleteImdbSync,
+  fetchImdbLedger,
+  fetchImdbLink,
+  toImdbLinkDocument,
+  unlinkImdb,
+} from "@/lib/user-imdb";
+
+// The project `npm run test:rules` starts the emulator for; a demo- project
+// can never reach a real one.
+const PROJECT_ID = "demo-clusterflick";
+const [HOST, PORT] = (
+  process.env.FIRESTORE_EMULATOR_HOST ?? "127.0.0.1:8080"
+).split(":");
+
+let env: RulesTestEnvironment;
+const apps: FirebaseApp[] = [];
+
+/**
+ * Firestore Lite signed in as `uid`, as the site uses it: by email link, so
+ * with a verified address unless told otherwise.
+ */
+function signedInAs(uid: string, { verified = true } = {}): Firestore {
+  const app = initializeApp({ projectId: PROJECT_ID }, `${uid}-${apps.length}`);
+  apps.push(app);
+  const db = getFirestore(app);
+  connectFirestoreEmulator(db, HOST, Number(PORT), {
+    mockUserToken: {
+      sub: uid,
+      user_id: uid,
+      email: address(uid),
+      email_verified: verified,
+    },
+  });
+  return db;
+}
+
+const address = (uid: string) => `${uid}@example.com`;
+
+/** Writes as the Admin SDK would, as the sync Worker does: no rules. */
+async function seed(documents: Record<string, Record<string, unknown>>) {
+  await env.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    for (const [docPath, data] of Object.entries(documents)) {
+      await fullSetDoc(fullDoc(db, docPath), data);
+    }
+  });
+}
+
+const GRANTED = { imdbSync: { grantedAt: 1 } };
+const LINK = toImdbLinkDocument({
+  userId: "ur240131748",
+  profileId: "p.filmfan",
+  username: "film_fan",
+  linkedAt: 1,
+});
+const LEDGER = {
+  runs: [{ on: "2026-11-16", at: 1, outcome: "nothingNew" }],
+  unmatched: [],
+};
+
+beforeAll(async () => {
+  setLogLevel("silent");
+  env = await initializeTestEnvironment({
+    projectId: PROJECT_ID,
+    firestore: {
+      host: HOST,
+      port: Number(PORT),
+      rules: readFileSync(
+        path.join(import.meta.dirname, "..", "firestore.rules"),
+        "utf8",
+      ),
+    },
+  });
+});
+
+beforeEach(async () => {
+  await env.clearFirestore();
+});
+
+afterAll(async () => {
+  await Promise.all(apps.map((app) => deleteApp(app)));
+  await env.cleanup();
+});
+
+describe("the IMDb link", () => {
+  test("the reader can read it", async () => {
+    await seed({ "users/alice/meta/imdb": LINK });
+    expect(await fetchImdbLink(signedInAs("alice"), "alice")).toEqual({
+      userId: "ur240131748",
+      profileId: "p.filmfan",
+      username: "film_fan",
+      linkedAt: 1,
+    });
+  });
+
+  test("but never write it, even with the capability", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    await assertFails(
+      setDoc(doc(signedInAs("alice"), "users/alice/meta/imdb"), LINK),
+    );
+  });
+
+  test("and can unlink by deleting it", async () => {
+    await seed({ "users/alice/meta/imdb": LINK });
+    const alice = signedInAs("alice");
+    await assertSucceeds(unlinkImdb(alice, "alice"));
+    expect(await fetchImdbLink(alice, "alice")).toBeNull();
+  });
+
+  test("nobody else can read it", async () => {
+    await seed({ "users/bob/meta/imdb": LINK });
+    await assertFails(getDoc(doc(signedInAs("alice"), "users/bob/meta/imdb")));
+  });
+});
+
+describe("the IMDb ledger", () => {
+  test("the reader can read it", async () => {
+    await seed({ "users/alice/meta/imdb-ledger": LEDGER });
+    expect(await fetchImdbLedger(signedInAs("alice"), "alice")).toEqual(LEDGER);
+  });
+
+  test("but never write it, or read anyone else's", async () => {
+    const alice = signedInAs("alice");
+    await assertFails(
+      setDoc(doc(alice, "users/alice/meta/imdb-ledger"), LEDGER),
+    );
+    await seed({ "users/bob/meta/imdb-ledger": LEDGER });
+    await assertFails(getDoc(doc(alice, "users/bob/meta/imdb-ledger")));
+  });
+});
+
+test("deleting the account deletes both", async () => {
+  await seed({
+    "users/alice/meta/imdb": LINK,
+    "users/alice/meta/imdb-ledger": LEDGER,
+  });
+  const alice = signedInAs("alice");
+  await assertSucceeds(deleteImdbSync(alice, "alice"));
+  expect(await fetchImdbLink(alice, "alice")).toBeNull();
+  expect(await fetchImdbLedger(alice, "alice")).toEqual({
+    runs: [],
+    unmatched: [],
+  });
+});

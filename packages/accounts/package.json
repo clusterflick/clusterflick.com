@@ -1,6 +1,6 @@
 {
   "name": "@clusterflick/accounts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A Clusterflick reader's account as a Worker reads it: Firebase ID tokens, Firestore over REST with a service account, the reader's lists and capabilities.",
   "license": "MIT",
   "repository": {

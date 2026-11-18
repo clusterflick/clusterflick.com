@@ -61,6 +61,7 @@ import {
   useLetterboxdSync,
   type LetterboxdSyncState,
 } from "./letterboxd-sync";
+import { ImdbSyncSummary, useImdbSync, type ImdbSyncState } from "./imdb-sync";
 import {
   EmailAlertsSummary,
   useEmailAlerts,
@@ -364,6 +365,7 @@ function SignedIn({
   const assistantAccess = useAssistantAccess();
   const emailAlerts = useEmailAlerts();
   const letterboxdSync = useLetterboxdSync();
+  const imdbSync = useImdbSync();
 
   // The empty watchlist's "search for a film" takes the reader to the search
   // above it.
@@ -387,6 +389,7 @@ function SignedIn({
         publicProfile={publicProfile?.granted ? publicProfile : null}
         emailAlerts={emailAlerts?.granted ? emailAlerts : null}
         letterboxdSync={letterboxdSync?.granted ? letterboxdSync : null}
+        imdbSync={imdbSync?.granted ? imdbSync : null}
         assistantAccess={assistantAccess}
       />
       <ComingSoon />
@@ -441,6 +444,7 @@ type AccountPanel =
   | "profile"
   | "alerts"
   | "letterboxd"
+  | "imdb"
   | "assistant"
   | "account";
 
@@ -452,6 +456,7 @@ function AccountBar({
   publicProfile,
   emailAlerts,
   letterboxdSync,
+  imdbSync,
   assistantAccess,
 }: {
   panel: AccountPanel | null;
@@ -464,6 +469,8 @@ function AccountBar({
   emailAlerts: EmailAlertsState | null;
   /** Only for a reader with `letterboxdSync`: everyone else sees no panel. */
   letterboxdSync: LetterboxdSyncState | null;
+  /** Only for a reader with `imdbSync`: everyone else sees no panel. */
+  imdbSync: ImdbSyncState | null;
   /** Whether the reader has `assistantAccess`: nobody else sees its panel. */
   assistantAccess: boolean;
 }) {
@@ -496,6 +503,7 @@ function AccountBar({
           {publicProfile && panelToggle("profile", "Public profile")}
           {emailAlerts && panelToggle("alerts", "Email alerts")}
           {letterboxdSync && panelToggle("letterboxd", "Letterboxd sync")}
+          {imdbSync && panelToggle("imdb", "IMDb sync")}
           {assistantAccess && panelToggle("assistant", "AI assistant")}
           {panelToggle("account", "Manage account")}
         </div>
@@ -541,6 +549,17 @@ function AccountBar({
               link={letterboxdSync.link}
               ledger={letterboxdSync.ledger}
               onLinkChange={letterboxdSync.onLinkChange}
+            />
+          )}
+        </div>
+      )}
+      {imdbSync && (
+        <div id="personalise-imdb" hidden={panel !== "imdb"}>
+          {panel === "imdb" && (
+            <ImdbSyncSummary
+              link={imdbSync.link}
+              ledger={imdbSync.ledger}
+              onLinkChange={imdbSync.onLinkChange}
             />
           )}
         </div>

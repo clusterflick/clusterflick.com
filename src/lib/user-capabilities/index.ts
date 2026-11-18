@@ -64,6 +64,10 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
     title: "Letterboxd sync",
     comingSoon: null,
   },
+  [CapabilityId.ImdbSync]: {
+    title: "IMDb sync",
+    comingSoon: null,
+  },
 };
 
 const CAPABILITY_IDS = new Set<string>(Object.values(CapabilityId));

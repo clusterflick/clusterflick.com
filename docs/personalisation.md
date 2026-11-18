@@ -537,8 +537,37 @@ link; deleting an account deletes both. Their shapes are
 The Worker answers on `clusterflick.com/api/letterboxd/*`, same-origin as the
 TMDB search is, and `next dev` rewrites it to its `wrangler dev` on port 8791.
 
+**IMDb sync** (`imdbSync`, `@/lib/user-imdb`) is the same for IMDb: a
+reader's IMDb watchlist goes to their Watchlist, and the films they've rated
+or reviewed there to Seen, every night. The account bar's "IMDb sync" panel
+(`imdb-sync.tsx`) takes a profile's address or either id (`p.…` or `ur…`,
+read by `readImdbUser`), and otherwise works as the Letterboxd one does. Its
+Worker is `clusterflick/api-imdb`, with the link at `users/{uid}/meta/imdb`
+(written only from `POST /api/imdb/link`, once IMDb has confirmed the user)
+and the ledger at `users/{uid}/meta/imdb-ledger`, under the same rules; their
+shapes are `@clusterflick/accounts/imdb`'. Where it differs:
+
+- **IMDb has no API for a member's lists.** The Worker reads the GraphQL API
+  IMDb's own pages call, which answers without a sign-in for what any visitor
+  can see; the pages themselves challenge anything but a browser. It's
+  undocumented, so a query IMDb stops taking fails the run loudly, and
+  `api-imdb`'s `scripts/check-imdb.mjs` checks them from a person's machine.
+- **Seen is ratings and reviews.** IMDb's watch history answers only the user
+  signed in to IMDb, so it can't be read, and the panel says to rate a film to
+  have it marked seen. The import has the same limit.
+- **Matched by IMDb id**, through TheMovieDB's find endpoint, as the import
+  matches one. The Worker keeps the ids it has found in its ledger, so a title
+  is looked up once. Series, episodes and games are left out, as the import
+  leaves them out.
+- **IMDb can't say "no such user".** It answers a user it doesn't know with
+  the same error as an outage, so linking one is "couldn't confirm that
+  profile", never "not found".
+
+It answers on `clusterflick.com/api/imdb/*`, and `next dev` rewrites it to its
+`wrangler dev` on port 8792.
+
 **Capabilities are features granted one account at a time**
-(`@/lib/user-capabilities`): `emailAlerts`, `publicProfile`, `assistantAccess` and `letterboxdSync` so far, each
+(`@/lib/user-capabilities`): `emailAlerts`, `publicProfile`, `assistantAccess`, `letterboxdSync` and `imdbSync` so far, each
 in `CAPABILITIES` with its copy, a `Record` so a new one won't compile
 without. A capability says a reader _may_ use a feature, and whether they do
 is their own setting, so everything acting on one checks both: the alerts job
