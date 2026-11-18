@@ -96,7 +96,7 @@ published as the catalogue is (`publish-accounts.yml`): a reader's account as
 a Worker reads it. Firebase ID token checks, a service account's access token,
 Firestore over REST, the lists decoded, and capabilities. The Workers that act
 for a reader install it from npm (`api-profiles`, `api-tmdb-search`,
-`api-mcp`, the alerts next).
+`api-mcp`, `api-alerts`, `api-letterboxd`).
 
 Its `lists` module decodes the same documents as
 `src/lib/user-profile/page-data.ts`, with the same rules: change the two
@@ -109,8 +109,10 @@ the Worker both parse; `firestore.rules` repeats the settings' shape, held to
 it by `firestore-rules/rules-copy.test.ts`. It writes (`commit`, with
 preconditions) and finds documents by a field across a collection group, for
 the alerts Worker; a field queried that way needs a `COLLECTION_GROUP` index in
-`firestore.indexes.json`. The list invariants aren't in it yet: they come with
-the first Worker that writes lists.
+`firestore.indexes.json`. Its `list-writes` module holds the list invariants a
+Worker must keep when it adds films (details with every film, a listed film's
+entry kept, stored entries never lost), first used by the Letterboxd sync
+Worker; change it with `@/lib/user-lists` and the two stay alike.
 See `packages/accounts/README.md`.
 
 ## Project Structure

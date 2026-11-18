@@ -3,7 +3,8 @@ rules_version = '2';
 // Each user may read and write only their own documents, and only the fields
 // the site writes: the film lists and the favourite venues, and the listed
 // films' details, their public profile with its handle, and their email
-// alerts. Their capabilities and the alerts' ledger they may only read.
+// alerts. Their capabilities, the alerts' ledger and their Letterboxd sync
+// they may only read (and delete).
 // Everything else is denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -93,6 +94,18 @@ service cloud.firestore {
     // what it has already told them about. Written only with the Admin SDK,
     // so the reader may read it and delete it with their account.
     match /users/{userId}/meta/alert-ledger {
+      allow read, delete: if isOwner(userId);
+    }
+
+    // The Letterboxd member whose lists are synced into the reader's (see
+    // @clusterflick/accounts/letterboxd), and the sync Worker's record of each
+    // night's run. Both written only by the Worker, which links a member only
+    // once Letterboxd has confirmed them, so the reader may read them and
+    // delete them: deleting the link is unlinking.
+    match /users/{userId}/meta/letterboxd {
+      allow read, delete: if isOwner(userId);
+    }
+    match /users/{userId}/meta/letterboxd-ledger {
       allow read, delete: if isOwner(userId);
     }
 

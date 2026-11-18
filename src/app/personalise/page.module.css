@@ -932,6 +932,17 @@
   overflow-wrap: anywhere;
 }
 
+/* The films a Letterboxd sync couldn't add, named with their pages. */
+.letterboxdUnmatched {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
 .assistantList {
   display: grid;
   gap: 8px;

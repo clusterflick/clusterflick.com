@@ -259,6 +259,87 @@ export const SignedInAlertsUnsubscribed: Story = {
   },
 };
 
+const LETTERBOXD_READER = {
+  status: "signed-in",
+  email: "reader@example.com",
+  lists: { [UserListId.Watchlist]: {}, [UserListId.Seen]: {} },
+  favouriteVenues: {},
+  readCapabilities: async () => ({
+    [CapabilityId.LetterboxdSync]: { grantedAt: 0 },
+  }),
+} satisfies Partial<UserContextType>;
+
+async function openLetterboxdSync(canvasElement: HTMLElement) {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    await canvas.findByRole("button", { name: "Letterboxd sync" }),
+  );
+  return canvas;
+}
+
+/** 04:17 on 17 November 2026, London time. */
+const SYNCED_AT = Date.UTC(2026, 10, 17, 4, 17);
+
+/** Granted the sync, nothing linked: the panel asks for a username. */
+export const SignedInLetterboxdNotLinked: Story = {
+  args: { user: LETTERBOXD_READER },
+  play: async ({ canvasElement }) => {
+    const canvas = await openLetterboxdSync(canvasElement);
+    await expect(
+      canvas.getByRole("textbox", { name: "Your Letterboxd username" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Link" })).toBeDisabled();
+  },
+};
+
+/**
+ * Linked and synced last night: what was added, and the films that couldn't
+ * be matched, each linking to its Letterboxd page.
+ */
+export const SignedInLetterboxdLinked: Story = {
+  args: {
+    user: {
+      ...LETTERBOXD_READER,
+      readLetterboxdSync: async () => ({
+        link: { username: "film_fan", memberId: "1Qma", linkedAt: 0 },
+        ledger: {
+          runs: [
+            {
+              on: "2026-11-17",
+              at: SYNCED_AT,
+              outcome: "synced",
+              added: { watchlist: 3, seen: 1 },
+            },
+          ],
+          unmatched: [
+            {
+              list: "seen",
+              name: "A Short Film",
+              year: 2021,
+              url: "https://letterboxd.com/film/a-short-film/",
+              reason: "noTmdbFilm",
+            },
+          ],
+        },
+      }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = await openLetterboxdSync(canvasElement);
+    await expect(
+      canvas.getByText(
+        "Last synced Tuesday, 17 November 2026 at 04:17: added 3 films to your watchlist and 1 film to Seen.",
+      ),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("link", { name: "A Short Film (2021)" }),
+    ).toHaveAttribute("href", "https://letterboxd.com/film/a-short-film/");
+    await expect(
+      canvas.getByRole("button", { name: "Unlink" }),
+    ).toBeInTheDocument();
+  },
+};
+
 const PROFILE_READER = {
   status: "signed-in",
   email: "reader@example.com",

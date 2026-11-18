@@ -60,6 +60,10 @@ export const CAPABILITIES: Record<CapabilityId, CapabilityDefinition> = {
     title: "AI assistant access",
     comingSoon: null,
   },
+  [CapabilityId.LetterboxdSync]: {
+    title: "Letterboxd sync",
+    comingSoon: null,
+  },
 };
 
 const CAPABILITY_IDS = new Set<string>(Object.values(CapabilityId));

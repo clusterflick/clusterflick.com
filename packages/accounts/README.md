@@ -66,6 +66,16 @@ if (await hasCapability(db, uid, "emailAlerts")) {
   what Firestore sent. `firestore.rules` repeats the settings' shape, held to
   this module by a test.
 
+- **`list-writes`**: films added to a reader's lists by a Worker, with the
+  site's rules: each film with its details for `users/{uid}/meta/films`, a
+  listed film's entry left as it is, and everything already stored kept as it
+  was stored. `addToLists` works out both documents' new fields from the
+  documents as read, for the caller to commit together with an `updateTime`
+  precondition on each. It never takes a film off the watchlist.
+- **`letterboxd`**: the Letterboxd sync's link (`users/{uid}/meta/letterboxd`)
+  and ledger (`users/{uid}/meta/letterboxd-ledger`), both written only by the
+  sync Worker (clusterflick/api-letterboxd), parsed for the site to show.
+
 Anything Firestore can't answer throws `UpstreamError`, rather than being read
 as "no". It's plain ESM with type declarations; its one dependency is `jose`.
 It uses only `fetch` and Web Crypto, so it runs in a Worker and in Node.

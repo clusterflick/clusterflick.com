@@ -13,9 +13,10 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_DATA_FILENAME: getMetaDataFilename(),
     NEXT_PUBLIC_VENUE_COUNT_FLOOR: String(getVenueCountFloor()),
   },
-  // In production two Workers sit in front of the static site: the TMDB
-  // search (clusterflick/api-tmdb-search) and public profiles
-  // (clusterflick/api-profiles). `next dev` sends their paths to each one's
+  // In production three Workers sit in front of the static site: the TMDB
+  // search (clusterflick/api-tmdb-search), public profiles
+  // (clusterflick/api-profiles) and the Letterboxd sync
+  // (clusterflick/api-letterboxd). `next dev` sends their paths to each one's
   // `wrangler dev` instead; a static export can't have rewrites.
   ...(process.env.NODE_ENV === "development" && {
     rewrites: async () => [
@@ -26,6 +27,10 @@ const nextConfig: NextConfig = {
       {
         source: "/api/profiles/:path*",
         destination: "http://localhost:8788/api/profiles/:path*",
+      },
+      {
+        source: "/api/letterboxd/:path*",
+        destination: "http://localhost:8791/api/letterboxd/:path*",
       },
       { source: "/u", destination: "http://localhost:8788/u" },
       { source: "/u/:path*", destination: "http://localhost:8788/u/:path*" },

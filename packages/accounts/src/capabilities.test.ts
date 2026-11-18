@@ -33,6 +33,7 @@ describe("capability ids", () => {
     expect([...CAPABILITY_IDS].sort()).toEqual([
       "assistantAccess",
       "emailAlerts",
+      "letterboxdSync",
       "publicProfile",
     ]);
     expect(CapabilityId.AssistantAccess).toBe("assistantAccess");

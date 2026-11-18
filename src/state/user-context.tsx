@@ -41,6 +41,14 @@ import {
 } from "@/lib/user-lists/film-details";
 import { disconnectAllAssistants } from "@/lib/assistant-access";
 import {
+  deleteLetterboxdSync,
+  fetchLetterboxdLedger,
+  fetchLetterboxdLink,
+  unlinkLetterboxd as unlinkLetterboxdInDocs,
+  type LetterboxdLedger,
+  type LetterboxdLink,
+} from "@/lib/user-letterboxd";
+import {
   deleteAlerts,
   fetchAlertLedger,
   fetchAlertSettings,
@@ -179,6 +187,17 @@ export type UserContextType = {
   saveAlertSettings: (settings: AlertSettings) => Promise<void>;
   /** The alerts Worker's record of the reader's runs, read afresh. */
   readAlertLedger: () => Promise<AlertLedger>;
+  /**
+   * The Letterboxd member linked, or null, and the sync Worker's record of
+   * its runs — see `@/lib/user-letterboxd`. Read afresh each time: only the
+   * Worker writes them.
+   */
+  readLetterboxdSync: () => Promise<{
+    link: LetterboxdLink | null;
+    ledger: LetterboxdLedger;
+  }>;
+  /** Stops the sync; the films it added stay on the lists. */
+  unlinkLetterboxd: () => Promise<void>;
 };
 
 /**
@@ -388,6 +407,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     profileRef.current = null;
     // The alert settings and the Worker's ledger of them, both at once.
     await deleteAlerts(db, current.uid);
+    // The Letterboxd link first, so no night's run starts for a reader whose
+    // account is going, and its ledger with it.
+    await deleteLetterboxdSync(db, current.uid);
     await deleteCapabilities(db, current.uid);
     capabilitiesRef.current = null;
     await deleteUserLists(db, current.uid);
@@ -675,6 +697,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return fetchAlertLedger(db, user.uid);
   }, [getServices, user]);
 
+  const readLetterboxdSync = useCallback<
+    UserContextType["readLetterboxdSync"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    const [link, ledger] = await Promise.all([
+      fetchLetterboxdLink(db, user.uid),
+      fetchLetterboxdLedger(db, user.uid),
+    ]);
+    return { link, ledger };
+  }, [getServices, user]);
+
+  const unlinkLetterboxd = useCallback<
+    UserContextType["unlinkLetterboxd"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    await unlinkLetterboxdInDocs(db, user.uid);
+  }, [getServices, user]);
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -701,6 +743,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readAlertSettings,
       saveAlertSettings,
       readAlertLedger,
+      readLetterboxdSync,
+      unlinkLetterboxd,
     }),
     [
       status,
@@ -726,6 +770,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readAlertSettings,
       saveAlertSettings,
       readAlertLedger,
+      readLetterboxdSync,
+      unlinkLetterboxd,
     ],
   );
 
@@ -769,6 +815,11 @@ export function MockUserProvider({
     readAlertSettings: async () => null,
     saveAlertSettings: noop,
     readAlertLedger: async () => ({ runs: [] }),
+    readLetterboxdSync: async () => ({
+      link: null,
+      ledger: { runs: [], unmatched: [] },
+    }),
+    unlinkLetterboxd: noop,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;

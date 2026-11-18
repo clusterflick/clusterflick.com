@@ -57,6 +57,11 @@ import SeenStats, { type MovieListProgressItem } from "./seen-stats";
 import ComingSoon from "./coming-soon";
 import { AssistantAccessSummary, useAssistantAccess } from "./assistant-access";
 import {
+  LetterboxdSyncSummary,
+  useLetterboxdSync,
+  type LetterboxdSyncState,
+} from "./letterboxd-sync";
+import {
   EmailAlertsSummary,
   useEmailAlerts,
   type EmailAlertsState,
@@ -358,6 +363,7 @@ function SignedIn({
   const publicProfile = usePublicProfile();
   const assistantAccess = useAssistantAccess();
   const emailAlerts = useEmailAlerts();
+  const letterboxdSync = useLetterboxdSync();
 
   // The empty watchlist's "search for a film" takes the reader to the search
   // above it.
@@ -380,6 +386,7 @@ function SignedIn({
         onShowEditingChange={setShowEditing}
         publicProfile={publicProfile?.granted ? publicProfile : null}
         emailAlerts={emailAlerts?.granted ? emailAlerts : null}
+        letterboxdSync={letterboxdSync?.granted ? letterboxdSync : null}
         assistantAccess={assistantAccess}
       />
       <ComingSoon />
@@ -429,7 +436,13 @@ function SignedIn({
   );
 }
 
-type AccountPanel = "lists" | "profile" | "alerts" | "assistant" | "account";
+type AccountPanel =
+  | "lists"
+  | "profile"
+  | "alerts"
+  | "letterboxd"
+  | "assistant"
+  | "account";
 
 function AccountBar({
   panel,
@@ -438,6 +451,7 @@ function AccountBar({
   onShowEditingChange,
   publicProfile,
   emailAlerts,
+  letterboxdSync,
   assistantAccess,
 }: {
   panel: AccountPanel | null;
@@ -448,6 +462,8 @@ function AccountBar({
   publicProfile: PublicProfileState | null;
   /** Only for a reader with `emailAlerts`: everyone else sees no panel. */
   emailAlerts: EmailAlertsState | null;
+  /** Only for a reader with `letterboxdSync`: everyone else sees no panel. */
+  letterboxdSync: LetterboxdSyncState | null;
   /** Whether the reader has `assistantAccess`: nobody else sees its panel. */
   assistantAccess: boolean;
 }) {
@@ -479,6 +495,7 @@ function AccountBar({
           {panelToggle("lists", "Manage lists")}
           {publicProfile && panelToggle("profile", "Public profile")}
           {emailAlerts && panelToggle("alerts", "Email alerts")}
+          {letterboxdSync && panelToggle("letterboxd", "Letterboxd sync")}
           {assistantAccess && panelToggle("assistant", "AI assistant")}
           {panelToggle("account", "Manage account")}
         </div>
@@ -513,6 +530,17 @@ function AccountBar({
               settings={emailAlerts.settings}
               saved={emailAlerts.saved}
               ledger={emailAlerts.ledger}
+            />
+          )}
+        </div>
+      )}
+      {letterboxdSync && (
+        <div id="personalise-letterboxd" hidden={panel !== "letterboxd"}>
+          {panel === "letterboxd" && (
+            <LetterboxdSyncSummary
+              link={letterboxdSync.link}
+              ledger={letterboxdSync.ledger}
+              onLinkChange={letterboxdSync.onLinkChange}
             />
           )}
         </div>
