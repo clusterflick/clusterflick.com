@@ -320,3 +320,30 @@ describe("Native Spirit Festival title matchers", () => {
     expect(claims("Native Spirit")).toBe(false);
   });
 });
+
+describe("SET Film Festival title matchers", () => {
+  const festival = FESTIVALS.find(({ id }) => id === "set-film-festival")!;
+
+  // Each matcher's title query, checked only where its venue scope allows
+  const claims = (title: string, venueId: string): boolean =>
+    festival.matchers.some((matcher) => {
+      const query = matcher[FilterId.ShowingTitleSearch];
+      if (typeof query !== "string") return false;
+      const venues = matcher[FilterId.Venues];
+      if (venues && !venues.includes(venueId)) return false;
+      return matchesSearchQuery(title, normalizeForSearch(query));
+    });
+
+  it.each([
+    "SET Film Festival 2026 – Night #3: A Conjuring, A Summoning",
+    "SET Film Festival 2026 – Night #5: The Zerda, or the Songs of Forgetting",
+    "SET Film Festival 2026 – Night #4: Body Mapping [Online]",
+    "SET Film Festival 2026 - Peckham, London",
+  ])("claims %s at SET Social", (title) => {
+    expect(claims(title, "setspace.uk")).toBe(true);
+  });
+
+  it("does not claim a Sunset Film Festival at another venue", () => {
+    expect(claims("Sunset Film Festival", "riocinema.org.uk")).toBe(false);
+  });
+});
