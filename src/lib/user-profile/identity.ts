@@ -118,11 +118,11 @@ export const PROFILE_LINK_IDS: readonly ProfileLinkId[] =
   Object.values(ProfileLinkId);
 
 /**
- * A Letterboxd username: letters, numbers and underscores, which is what
- * Letterboxd allows (no hyphens). Its length limit isn't published, so 50 is
- * a generous cap rather than Letterboxd's own.
+ * A Letterboxd username, as Letterboxd's API documents them: 2 to 15
+ * letters, numbers or underscores (no hyphens). The same rule as the
+ * Letterboxd sync's `isLetterboxdUsername` in `@clusterflick/accounts`.
  */
-const LETTERBOXD_PATTERN = /^[A-Za-z0-9_]{1,50}$/;
+const LETTERBOXD_PATTERN = /^[A-Za-z0-9_]{2,15}$/;
 
 /**
  * IMDb's user ids, as they appear in `imdb.com/user/<id>/`: `ur` and digits
