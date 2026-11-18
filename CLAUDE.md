@@ -1013,9 +1013,8 @@ indexed more slowly than old ones left; the durable pages (venues, boroughs,
 groups, clubs, festivals, genres, formats) are the ones search can build on.
 A film that returns drops the tag on the next build.
 
-**The hub pages are landing pages** — the formats, the accessibility
-features and `/live-score` (silents with live music and films in concert,
-from the pipeline's `occasions.liveScore`). Each has a title naming the
+**The hub pages are landing pages** — the formats and the accessibility
+features. Each has a title naming the
 search it answers, an intro, a count dated by the build's `generatedAt`
 ("Updated 05:20, Wed 18 Nov", the `updatedAt` prop of
 `EventDetailPageContent`) and `ScreeningEvent`s for its soonest screenings

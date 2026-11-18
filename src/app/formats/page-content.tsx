@@ -90,9 +90,7 @@ export default function FormatsPageContent({
         depth of {formatLink("70mm")}, the grain of {formatLink("35mm")} or the
         immersion of {formatLink("IMAX")}. Below they&apos;re grouped by the{" "}
         <strong>source</strong> a screening plays from, and the{" "}
-        <strong>presentation</strong> it&apos;s shown in. For silents with live
-        music and films in concert, see{" "}
-        <Link href="/live-score">films with a live score</Link>.
+        <strong>presentation</strong> it&apos;s shown in.
       </p>
       {figures.length > 0 && (
         <div className={styles.figures}>
