@@ -12,6 +12,7 @@ import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { getMovieFormats } from "@/utils/get-movie-formats";
 import { getMovieListsForMovie } from "@/utils/get-movie-list-movies";
 import { getMovieCollections } from "@/utils/get-movie-collections";
+import { getMovieSeoLead } from "@/utils/get-seo-copy";
 import type {
   Genre,
   Person,
@@ -102,9 +103,13 @@ export async function generateMetadata({
   // so. A departed film has no showtimes to offer, and claiming them would
   // promise a search something the page can't give.
   const title = departedMovie ? name : `${name} — Showtimes in London`;
+  // Where it's on this week is what a searcher can't get from every other
+  // site carrying the same synopsis. A film with nothing in the coming week
+  // (it's listed further ahead) makes no claim about it.
   const leadSentence = departedMovie
     ? `${movie.title} is not currently screening at cinemas in London.`
-    : `Find screenings for ${movie.title} at cinemas across London.`;
+    : (getMovieSeoLead(movie, data.venues, Date.now()) ??
+      `Find screenings for ${movie.title} at cinemas across London.`);
   const description = buildMovieDescription(leadSentence, movie.overview);
 
   const genreLookup = departedMovie ? departed.genres : data.genres;
@@ -318,8 +323,12 @@ export default async function MovieDetailPage({
 
   const breadcrumbJsonLd = buildMovieBreadcrumbJsonLd(movie, movieUrl);
 
+  // The next fortnight, and at most 50 of those: a fortnight covers a rep
+  // film's whole run, and the count keeps a multiplex's from bloating the
+  // HTML.
+  const screeningEventsUntil = buildTime + 14 * 24 * 60 * 60 * 1000;
   const screeningEvents = movie.performances
-    .filter((p) => p.time >= buildTime)
+    .filter((p) => p.time >= buildTime && p.time < screeningEventsUntil)
     .sort((a, b) => a.time - b.time)
     .flatMap((performance) => {
       const showing = movie.showings[performance.showingId];
