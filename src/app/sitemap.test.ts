@@ -39,6 +39,8 @@ describe("sitemap", () => {
     const urls = (await sitemap()).map(({ url }) => url);
 
     expect(urls.filter((url) => !url.endsWith("/"))).toEqual([]);
+    // robots.txt blocks every address with a query string.
+    expect(urls.filter((url) => url.includes("?"))).toEqual([]);
     expect(urls).toContain("https://clusterflick.com/");
     expect(urls).toContain("https://clusterflick.com/movies/100/heat/");
     expect(urls).toContain(

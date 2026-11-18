@@ -1000,6 +1000,15 @@ it to that. Departed films are left out: their pages stay up so links land,
 but each says little more than that the film has stopped showing, and they
 were two fifths of the sitemap.
 
+**robots.txt blocks every address with a query string** (`/*?`). The
+export is static, so a filtered address (`/catalogue/?letterboxd=4.0`, a film
+page with `?base=all&venues=…`) serves the same HTML as its bare page, and
+crawling it spent crawl budget to find nothing new. Readers still get filtered
+links; only crawlers skip them. The canonical tags stay but go unread on those
+addresses, which is fine because the sitemap lists the bare ones. So no page
+meant to be indexed may depend on a query string, and the sitemap may never
+list one (`sitemap.test.ts` checks).
+
 **`lastmod` only where a page has a date of its own** (update days, their
 landing page, reports). Stamping every entry with the build time claimed 2,500
 pages changed on every deploy, several times a day, and Google stops trusting
