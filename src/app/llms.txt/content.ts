@@ -54,7 +54,7 @@ ${datasets}
 - [Cinemas by borough](${pageUrl("/london-cinemas")}) and [cinema chains](${pageUrl("/cinema-groups")})
 - [Film clubs](${pageUrl("/film-clubs")}) and [festivals](${pageUrl("/festivals")})
 - [Film lists](${pageUrl("/lists")}): award winners and top-film lists, with which members are showing
-- [Genres](${pageUrl("/genres")}) and [formats](${pageUrl("/formats")}) (35mm, 70mm, IMAX and others)
+- [Genres](${pageUrl("/genres")}) and [formats](${pageUrl("/formats")}) (35mm, 70mm, IMAX and others), and [films with a live score](${pageUrl("/live-score")}): silents with live music and films in concert
 - [Accessible screenings](${pageUrl("/accessibility")}): audio described, hard of hearing, relaxed, baby friendly, dog friendly and subtitled screenings, each with a page of its own
 - [Updates](${pageUrl("/updates")}): films and showings added in each release, also as an [RSS feed](${SITE}/updates/feed.xml)
 

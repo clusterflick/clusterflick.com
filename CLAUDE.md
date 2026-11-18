@@ -1013,6 +1013,19 @@ indexed more slowly than old ones left; the durable pages (venues, boroughs,
 groups, clubs, festivals, genres, formats) are the ones search can build on.
 A film that returns drops the tag on the next build.
 
+**The hub pages are landing pages** — the formats, the accessibility
+features and `/live-score` (silents with live music and films in concert,
+from the pipeline's `occasions.liveScore`). Each has a title naming the
+search it answers, an intro, a count dated by the build's `generatedAt`
+("Updated 05:20, Wed 18 Nov", the `updatedAt` prop of
+`EventDetailPageContent`) and `ScreeningEvent`s for its soonest screenings
+beside the `ItemList` (`buildHubScreeningEvents`, capped so the HTML stays
+small; the film pages carry every screening). The counts are every upcoming
+screening, not this week's, so no title says "this week". Accessibility is
+split only as far as the data can tell features apart: BSL sits inside Hard
+of Hearing and subtitles aren't told from captions, so neither gets a page
+until the pipeline can.
+
 **`/llms.txt` leads agents to the datasets** (`src/app/llms.txt/`). Little is
 known to read it, which is why it is small: the published datasets first, by
 the constants in `@/app/datasets/data`, then the site's URL shapes and index

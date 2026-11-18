@@ -19,6 +19,7 @@ import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getVenueImagePath } from "@/utils/get-venue-image";
 import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import EventDetailPageContent from "@/components/event-detail-page-content";
+import { buildHubScreeningEvents } from "@/utils/build-hub-screening-events";
 import styles from "./page.module.css";
 
 export const dynamicParams = false;
@@ -244,6 +245,12 @@ export default async function FormatDetailPage({
         },
       ],
     },
+    // The soonest screenings, so the page says what is on and when, not
+    // only which films.
+    ...buildHubScreeningEvents(
+      formatMovies.map(({ movie }) => movie),
+      data.venues,
+    ),
   ];
 
   return (
@@ -258,6 +265,7 @@ export default async function FormatDetailPage({
         imagePath={null}
         movieCount={movieCount}
         performanceCount={performanceCount}
+        updatedAt={data.generatedAt}
         backUrl="/formats"
         backText="All formats"
         gridMovies={gridMovies}

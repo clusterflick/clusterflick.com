@@ -5,6 +5,8 @@ import HeroSection from "@/components/hero-section";
 import OutlineHeading from "@/components/outline-heading";
 import {
   formatDateShort,
+  formatDayAndDate,
+  formatShowingTime,
   isInPast,
 } from "@clusterflick/catalogue/utils/format-date";
 import styles from "./detail-page-hero.module.css";
@@ -27,6 +29,8 @@ interface DetailPageHeroProps {
    * to next month.
    */
   lastPerformance?: number;
+  /** See `DetailPageStatusCardProps.updatedAt`. */
+  updatedAt?: string;
   /** Optional content rendered between the URL link and the status card, e.g. a tag/social row */
   children?: ReactNode;
   /**
@@ -41,6 +45,14 @@ interface DetailPageStatusCardProps {
   performanceCount: number;
   /** See `DetailPageHeroProps.lastPerformance`. */
   lastPerformance?: number;
+  /**
+   * When the listings behind the count were built (the dataset's
+   * `generatedAt`), shown beneath it as "Updated 05:20, Wed 18 Nov". A count
+   * with no date says nothing about whether it is still true. It is the build
+   * time, so it is right whenever the page is read; a stale build shows its
+   * age rather than hiding it.
+   */
+  updatedAt?: string;
   className?: string;
 }
 
@@ -53,6 +65,7 @@ export function DetailPageStatusCard({
   movieCount,
   performanceCount,
   lastPerformance,
+  updatedAt,
   className,
 }: DetailPageStatusCardProps) {
   const hasEvents = performanceCount > 0;
@@ -87,6 +100,15 @@ export function DetailPageStatusCard({
           )}
         </>
       )}
+      {updatedAt && (
+        <p className={styles.statusDetail}>
+          Updated{" "}
+          <time dateTime={updatedAt}>
+            {formatShowingTime(Date.parse(updatedAt))},{" "}
+            {formatDayAndDate(Date.parse(updatedAt))}
+          </time>
+        </p>
+      )}
     </div>
   );
 }
@@ -101,6 +123,7 @@ export default function DetailPageHero({
   backgroundImage = "/images/light-circles.jpg",
   backgroundImageAlt = "Decorative light circles",
   lastPerformance,
+  updatedAt,
   children,
   showStatusCard = true,
 }: DetailPageHeroProps) {
@@ -142,6 +165,7 @@ export default function DetailPageHero({
           movieCount={movieCount}
           performanceCount={performanceCount}
           lastPerformance={lastPerformance}
+          updatedAt={updatedAt}
         />
       )}
     </HeroSection>

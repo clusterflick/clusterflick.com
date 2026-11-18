@@ -42,6 +42,11 @@ export interface EventDetailPageContentProps {
   imagePath: string | null;
   movieCount: number;
   performanceCount: number;
+  /**
+   * The dataset's `generatedAt`, to date the hero's count ("Updated 05:20,
+   * Wed 18 Nov"). Given by the hub pages, whose count is the point of the page.
+   */
+  updatedAt?: string;
   backUrl: string;
   backText: string;
   gridMovies: FilmPosterGridMovie[];
@@ -138,6 +143,7 @@ export default function EventDetailPageContent({
   imagePath,
   movieCount,
   performanceCount,
+  updatedAt,
   backUrl,
   backText,
   gridMovies,
@@ -261,6 +267,7 @@ export default function EventDetailPageContent({
             url={url}
             movieCount={movieCount}
             performanceCount={performanceCount}
+            updatedAt={updatedAt}
             backgroundImage={heroBackgroundImage}
             backgroundImageAlt={heroBackgroundImageAlt}
           >
