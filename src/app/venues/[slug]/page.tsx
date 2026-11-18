@@ -8,6 +8,7 @@ import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 import { getDistanceInMiles } from "@clusterflick/catalogue/utils/geo-distance";
 import { getVenueBorough } from "@/utils/get-borough-venues";
 import { getBoroughUrl } from "@/utils/get-borough-url";
+import { getVenueTitleArea } from "@/utils/get-seo-copy";
 import {
   getVenueGroupUrl,
   getVenueGroupProseName,
@@ -142,8 +143,14 @@ export async function generateMetadata({
     alt: "Clusterflick",
   };
 
+  // The area tells apart venues whose names don't say where they are, and
+  // matches searches for a cinema in a part of London.
+  const area = getVenueTitleArea(venue.name, getVenueBorough(venue)?.name);
+
   return {
-    title: `${venue.name} — What's On & Showtimes`,
+    title: area
+      ? `${venue.name}, ${area} — What's On & Showtimes`
+      : `${venue.name} — What's On & Showtimes`,
     description,
     alternates: {
       canonical: getVenueUrl(venue),

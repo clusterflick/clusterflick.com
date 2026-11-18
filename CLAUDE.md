@@ -1032,8 +1032,17 @@ that every page it links is one the site builds, at its canonical address.
 **A page's `<title>` names what it is found by**, not just what it is called.
 Film pages read "Heat (1995) — Showtimes in London" (a departed film keeps
 the bare name, having none), venue pages "Prince Charles Cinema — What's On
-& Showtimes", and `/venues` is "Every Cinema in London". Social titles keep
-the short name.
+& Showtimes", and `/venues` is "Every Cinema in London". A venue whose name
+doesn't say where it is gets its borough ("Rio Cinema, Hackney — …",
+`getVenueTitleArea`). Social titles keep the short name.
+
+**A film's description leads with where it's on this week**
+(`getMovieSeoLead`): how many venues show it in the next seven days, the
+home page's window, and the busiest by name. Counts stay out of titles, which
+would then change on most builds. There is no next screening time or format
+list either: the page is a build-time snapshot that a search result quotes for
+days, so a time would soon be past, and naming formats a film doesn't have
+would make a claim the page can't back up.
 
 ## Documented Elsewhere
 
