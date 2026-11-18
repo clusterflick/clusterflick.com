@@ -1145,4 +1145,21 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "set-film-festival",
+    name: "SET Film Festival",
+    url: "https://setspace.uk/set-film-festival/",
+    aliases: [],
+    matchers: [
+      {
+        // Matches "SET Film Festival 2026 – Night #3: A Conjuring, A Summoning"
+        // and "SET Film Festival 2026 - Peckham, London" at SET Social,
+        // Peckham, 5 November – 5 December 2026. Scoped to the venue because
+        // search runs words together, so "SET Film Festival" alone would also
+        // catch "Sunset Film Festival" anywhere else.
+        [FilterId.ShowingTitleSearch]: "SET Film Festival",
+        [FilterId.Venues]: ["setspace.uk"],
+      },
+    ],
+  },
 ];

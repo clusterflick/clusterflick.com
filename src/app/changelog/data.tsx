@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-18",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="SET Film Festival"
+              url="https://setspace.uk/set-film-festival/"
+            />
+            , a month of weekly nights of contemporary, artist and archival film
+            at SET Social in Peckham, running until 5 December.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-17",
     changes: [
       {
