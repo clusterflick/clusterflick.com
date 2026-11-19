@@ -90,6 +90,11 @@ export type LetterboxdRun = {
   /** For `synced`: films added to each list. */
   added?: { watchlist: number; seen: number };
   /**
+   * For `synced`: films taken off the watchlist here because they moved to
+   * Seen on Letterboxd (watched, and off the Letterboxd watchlist).
+   */
+  moved?: number;
+  /**
    * For `synced` and `nothingNew`: films found new on Letterboxd and left for
    * the next run, since one run adds at most so many.
    */
@@ -144,7 +149,8 @@ const REASONS: readonly unknown[] = Object.values(UnmatchedReason);
 
 function readRun(value: unknown): LetterboxdRun | null {
   if (!isRecord(value)) return null;
-  const { on, at, outcome, added, remaining, watchlistPrivate, reason } = value;
+  const { on, at, outcome, added, moved, remaining, watchlistPrivate, reason } =
+    value;
   if (typeof on !== "string" || !DATE.test(on)) return null;
   if (typeof at !== "number" || !OUTCOMES.includes(outcome)) return null;
   return {
@@ -156,6 +162,7 @@ function readRun(value: unknown): LetterboxdRun | null {
       typeof added.seen === "number" && {
         added: { watchlist: added.watchlist, seen: added.seen },
       }),
+    ...(typeof moved === "number" && moved > 0 && { moved }),
     ...(typeof remaining === "number" && { remaining }),
     ...(watchlistPrivate === true && { watchlistPrivate }),
     ...(typeof reason === "string" && { reason }),

@@ -91,6 +91,72 @@ describe("addToLists", () => {
     expect(write.lists.watchlist).toBeUndefined();
   });
 
+  describe("seenLeavesWatchlist", () => {
+    const onWatchlist = {
+      watchlist: {
+        "949": { title: "Heat", addedAt: 1 },
+        "680": { title: "Pulp Fiction", addedAt: 2 },
+      },
+    };
+
+    it("takes a film newly added to Seen off the watchlist", () => {
+      const write = addToLists(
+        onWatchlist,
+        null,
+        { seen: [film("949")] },
+        { seenLeavesWatchlist: () => true },
+      );
+      expect(write.added.seen).toEqual(["949"]);
+      expect(write.removed.watchlist).toEqual(["949"]);
+      expect(write.lists.watchlist).toEqual({
+        "680": { title: "Pulp Fiction", addedAt: 2 },
+      });
+      // Its details are saved with the add, and stay.
+      expect(write.details?.films).toHaveProperty("949");
+    });
+
+    it("leaves it when the caller says it stays", () => {
+      const write = addToLists(
+        onWatchlist,
+        null,
+        { seen: [film("949")] },
+        { seenLeavesWatchlist: (id) => id !== "949" },
+      );
+      expect(write.removed.watchlist).toEqual([]);
+      expect(write.lists.watchlist).toBeUndefined();
+    });
+
+    it("never takes off a film that was already in Seen", () => {
+      const write = addToLists(
+        { ...onWatchlist, seen: { "949": { title: "Heat", addedAt: 0 } } },
+        null,
+        { seen: [film("949")] },
+        { seenLeavesWatchlist: () => true },
+      );
+      expect(write.added.seen).toEqual([]);
+      expect(write.removed.watchlist).toEqual([]);
+      expect(write.lists).toEqual({});
+    });
+
+    it("keeps a film added to both lists in the same write", () => {
+      const write = addToLists(
+        null,
+        null,
+        { watchlist: [film("949")], seen: [film("949")] },
+        { seenLeavesWatchlist: () => true },
+      );
+      expect(write.added).toEqual({ watchlist: ["949"], seen: ["949"] });
+      expect(write.removed.watchlist).toEqual([]);
+      expect(write.lists.watchlist).toHaveProperty("949");
+    });
+
+    it("takes nothing off by default", () => {
+      const write = addToLists(onWatchlist, null, { seen: [film("949")] });
+      expect(write.removed.watchlist).toEqual([]);
+      expect(write.lists.watchlist).toBeUndefined();
+    });
+  });
+
   it("leaves out fields a film doesn't have", () => {
     const bare: FilmToAdd = {
       id: "7",

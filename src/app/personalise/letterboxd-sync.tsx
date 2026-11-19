@@ -90,9 +90,14 @@ export function describeSyncRun(run: LetterboxdRun): string {
   switch (run.outcome) {
     case LetterboxdRunOutcome.Synced: {
       const { watchlist: toWatchlist = 0, seen = 0 } = run.added ?? {};
+      // Moved films are among those added to Seen: watched on Letterboxd,
+      // which took them off its watchlist, and so off this one.
+      const moved = run.moved
+        ? ` (${run.moved} moved from your watchlist)`
+        : "";
       const parts = [
         toWatchlist > 0 && `${films(toWatchlist)} to your watchlist`,
-        seen > 0 && `${films(seen)} to Seen`,
+        seen > 0 && `${films(seen)} to Seen${moved}`,
       ].filter(Boolean);
       return `Last synced ${when}: added ${parts.join(" and ")}.${waiting}${watchlist}`;
     }
@@ -229,7 +234,9 @@ function Linked({
           {link.username}
         </a>
         . Every night, films on your Letterboxd watchlist and films you&apos;ve
-        watched there are added to your lists here. Nothing is taken off.
+        watched there are added to your lists here. A film you&apos;ve watched
+        that has left your Letterboxd watchlist leaves your watchlist here too,
+        as marking it seen here would; nothing else is taken off.
       </p>
       <p className={styles.managementText}>
         {latest ? describeSyncRun(latest) : "The first sync runs tonight."}
@@ -297,8 +304,9 @@ function LinkForm({
     <form onSubmit={submit}>
       <p className={styles.managementText}>
         Add your Letterboxd watchlist and the films you&apos;ve watched there to
-        your lists here, every night. Nothing is ever taken off your lists, and
-        only what anyone can see on your Letterboxd profile is read.
+        your lists here, every night. When you watch a film from your watchlist
+        there, it moves to Seen here too; nothing else is taken off, and only
+        what anyone can see on your Letterboxd profile is read.
       </p>
       <div className={styles.assistantAddressRow}>
         <input

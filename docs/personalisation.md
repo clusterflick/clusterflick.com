@@ -519,9 +519,18 @@ reader read and delete both, never write them, so unlinking is deleting the
 link; deleting an account deletes both. Their shapes are
 `@clusterflick/accounts/letterboxd`'.
 
-- **Additive.** Nothing is taken off a list, and a listed film keeps its
-  entry. Unlike an add or import to Seen, a film synced to Seen stays on the
-  watchlist: the sync only knows it's on both on Letterboxd, and copies that.
+- **Additive, but for one move.** A listed film keeps its entry, and the
+  only thing ever taken off a list is a film moving from the watchlist to
+  Seen, as Letterboxd moves it. Marking a film watched on Letterboxd takes it
+  off the Letterboxd watchlist, so a film the sync newly adds to Seen leaves
+  the watchlist here too, as an add to Seen on the site does, unless it's
+  still on the Letterboxd watchlist (put back on purpose, to watch again), in
+  which case it's on both here as there.
+  - Only on the night it arrives in Seen. A film already in Seen that the
+    reader puts on their watchlist here, to catch a re-release, stays.
+  - Not while the Letterboxd watchlist is private: there's no telling a film
+    still on it from one that left it, so nothing is moved.
+  - Each run records how many moved (`moved`), and the panel says so.
 - **Every film comes with its details**, from one TheMovieDB lookup by the
   Worker (which has its own key), with the rules of `addToLists` in
   `@clusterflick/accounts/list-writes`: the site's add rules, for a Worker.

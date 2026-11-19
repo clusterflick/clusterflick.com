@@ -13,10 +13,12 @@ import type { FilmDetails, ListEntry } from "./lists";
  *   document rather than through `readList`, which drops what it can't read:
  *   writing a list back must never lose an entry the site might read.
  *
- * Unlike the site's add to Seen, nothing here takes a film off the
- * watchlist. The site does that because a reader marking a film seen has
- * finished wanting to see it; a sync only knows that a film is on both lists
- * somewhere else, and copies that.
+ * By default nothing here takes a film off a list. A caller can ask for a
+ * film added to Seen to leave the watchlist (`seenLeavesWatchlist`), as the
+ * site's add to Seen does: a reader marking a film seen has finished wanting
+ * to see it. Only a film newly added to Seen in this write is ever taken off,
+ * never one that was already there, so a film the reader has seen and put on
+ * their watchlist here to see again stays on it.
  */
 
 /** The lists a film can be added to, as the site's `UserListId`. */
@@ -61,6 +63,17 @@ export type ListWrite = {
   } | null;
   /** The ids added to each list. */
   added: Record<ListField, string[]>;
+  /** The ids taken off the watchlist, having been added to Seen. */
+  removed: { watchlist: string[] };
+};
+
+export type AddToListsOptions = {
+  /**
+   * Whether a film newly added to Seen leaves the watchlist, by id. Not
+   * given, none does. A film added to the watchlist in the same write
+   * always stays.
+   */
+  seenLeavesWatchlist?: (id: string) => boolean;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -108,6 +121,7 @@ export function addToLists(
   user: DocumentData | null,
   films: DocumentData | null,
   additions: Partial<Record<ListField, FilmToAdd[]>>,
+  { seenLeavesWatchlist }: AddToListsOptions = {},
 ): ListWrite {
   const lists: ListWrite["lists"] = {};
   const added: ListWrite["added"] = { watchlist: [], seen: [] };
@@ -143,6 +157,19 @@ export function addToLists(
     if (added[field].length > 0) lists[field] = list;
   }
 
+  const removed: ListWrite["removed"] = { watchlist: [] };
+  if (seenLeavesWatchlist) {
+    const watchlist = { ...(lists.watchlist ?? storedMap(user, "watchlist")) };
+    for (const id of added.seen) {
+      if (!(id in watchlist) || added.watchlist.includes(id)) continue;
+      if (!seenLeavesWatchlist(id)) continue;
+      // Its details stay, as the site's removal leaves them.
+      delete watchlist[id];
+      removed.watchlist.push(id);
+    }
+    if (removed.watchlist.length > 0) lists.watchlist = watchlist;
+  }
+
   const details =
     Object.keys(newFilms).length === 0
       ? null
@@ -151,5 +178,5 @@ export function addToLists(
           films: { ...storedMap(films, "films"), ...newFilms },
           people: { ...storedMap(films, "people"), ...newPeople },
         };
-  return { lists, details, added };
+  return { lists, details, added, removed };
 }
