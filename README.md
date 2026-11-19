@@ -16,7 +16,7 @@ the tooling, live across the
 
 ## Features
 
-- **Unified Cinema Listings** — Browse film screenings from 450+ London venues
+- **Unified Cinema Listings** — Browse film screenings from 500+ London venues
   in one place
 - **Rich Movie Data** — View ratings and reviews from IMDb, Letterboxd,
   Metacritic, and Rotten Tomatoes

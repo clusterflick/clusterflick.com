@@ -3,7 +3,7 @@
 ## Project Overview
 
 Clusterflick is a static Next.js web application that aggregates film screenings
-from 450+ London venues into a single searchable interface. It uses a data
+from 500+ London venues into a single searchable interface. It uses a data
 pipeline from separate repos (`clusterflick/data-combined`,
 `clusterflick/data-matched`) and outputs a fully static site deployed to GitHub
 Pages at clusterflick.com.
