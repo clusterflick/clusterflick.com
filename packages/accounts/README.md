@@ -75,6 +75,10 @@ if (await hasCapability(db, uid, "emailAlerts")) {
 - **`letterboxd`**: the Letterboxd sync's link (`users/{uid}/meta/letterboxd`)
   and ledger (`users/{uid}/meta/letterboxd-ledger`), both written only by the
   sync Worker (clusterflick/api-letterboxd), parsed for the site to show.
+- **`imdb`**: the IMDb sync's link (`users/{uid}/meta/imdb`) and ledger
+  (`users/{uid}/meta/imdb-ledger`), the same shape as Letterboxd's and written
+  only by its sync Worker (clusterflick/api-imdb); and `readImdbUser`, which
+  finds the user id in what a reader typed or pasted.
 
 Anything Firestore can't answer throws `UpstreamError`, rather than being read
 as "no". It's plain ESM with type declarations; its one dependency is `jose`.

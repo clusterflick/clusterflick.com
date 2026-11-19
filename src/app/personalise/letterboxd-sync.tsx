@@ -166,7 +166,7 @@ export function LetterboxdSyncSummary({
             These are on your Letterboxd lists, but couldn&apos;t be matched to
             a film here.
           </p>
-          <ul className={styles.letterboxdUnmatched}>
+          <ul className={styles.syncUnmatched}>
             {ledger.unmatched.slice(0, UNMATCHED_SHOWN).map((film) => (
               <li key={`${film.list}-${film.url}`}>
                 <a href={film.url} target="_blank" rel="noopener noreferrer">

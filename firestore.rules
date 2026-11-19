@@ -3,8 +3,8 @@ rules_version = '2';
 // Each user may read and write only their own documents, and only the fields
 // the site writes: the film lists and the favourite venues, and the listed
 // films' details, their public profile with its handle, and their email
-// alerts. Their capabilities, the alerts' ledger and their Letterboxd sync
-// they may only read (and delete).
+// alerts. Their capabilities, the alerts' ledger and their Letterboxd and
+// IMDb syncs they may only read (and delete).
 // Everything else is denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -106,6 +106,16 @@ service cloud.firestore {
       allow read, delete: if isOwner(userId);
     }
     match /users/{userId}/meta/letterboxd-ledger {
+      allow read, delete: if isOwner(userId);
+    }
+
+    // The same for the IMDb sync (see @clusterflick/accounts/imdb): the IMDb
+    // user whose lists are synced in, linked only once IMDb has confirmed
+    // them, and the sync Worker's record of each night's run.
+    match /users/{userId}/meta/imdb {
+      allow read, delete: if isOwner(userId);
+    }
+    match /users/{userId}/meta/imdb-ledger {
       allow read, delete: if isOwner(userId);
     }
 

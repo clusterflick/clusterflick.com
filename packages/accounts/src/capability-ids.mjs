@@ -16,6 +16,8 @@ export const CapabilityId = Object.freeze({
   AssistantAccess: "assistantAccess",
   /** A Letterboxd account's watchlist and films synced in (api-letterboxd). */
   LetterboxdSync: "letterboxdSync",
+  /** An IMDb account's watchlist, ratings and reviews synced in (api-imdb). */
+  ImdbSync: "imdbSync",
 });
 
 /** Every capability id, for a script that checks one it was given. */

@@ -49,6 +49,14 @@ import {
   type LetterboxdLink,
 } from "@/lib/user-letterboxd";
 import {
+  deleteImdbSync,
+  fetchImdbLedger,
+  fetchImdbLink,
+  unlinkImdb as unlinkImdbInDocs,
+  type ImdbLedger,
+  type ImdbLink,
+} from "@/lib/user-imdb";
+import {
   deleteAlerts,
   fetchAlertLedger,
   fetchAlertSettings,
@@ -198,6 +206,17 @@ export type UserContextType = {
   }>;
   /** Stops the sync; the films it added stay on the lists. */
   unlinkLetterboxd: () => Promise<void>;
+  /**
+   * The IMDb user linked, or null, and the sync Worker's record of its runs
+   * — see `@/lib/user-imdb`. Read afresh each time: only the Worker writes
+   * them.
+   */
+  readImdbSync: () => Promise<{
+    link: ImdbLink | null;
+    ledger: ImdbLedger;
+  }>;
+  /** Stops the sync; the films it added stay on the lists. */
+  unlinkImdb: () => Promise<void>;
 };
 
 /**
@@ -407,9 +426,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     profileRef.current = null;
     // The alert settings and the Worker's ledger of them, both at once.
     await deleteAlerts(db, current.uid);
-    // The Letterboxd link first, so no night's run starts for a reader whose
-    // account is going, and its ledger with it.
+    // The Letterboxd and IMDb links first, so no night's run starts for a
+    // reader whose account is going, and their ledgers with them.
     await deleteLetterboxdSync(db, current.uid);
+    await deleteImdbSync(db, current.uid);
     await deleteCapabilities(db, current.uid);
     capabilitiesRef.current = null;
     await deleteUserLists(db, current.uid);
@@ -717,6 +737,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
     await unlinkLetterboxdInDocs(db, user.uid);
   }, [getServices, user]);
 
+  const readImdbSync = useCallback<
+    UserContextType["readImdbSync"]
+  >(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    const [link, ledger] = await Promise.all([
+      fetchImdbLink(db, user.uid),
+      fetchImdbLedger(db, user.uid),
+    ]);
+    return { link, ledger };
+  }, [getServices, user]);
+
+  const unlinkImdb = useCallback<UserContextType["unlinkImdb"]>(async () => {
+    const { db } = await getServices();
+    if (!user) throw new Error("Not signed in");
+    await unlinkImdbInDocs(db, user.uid);
+  }, [getServices, user]);
+
   const contextValue = useMemo<UserContextType>(
     () => ({
       status,
@@ -745,6 +783,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readAlertLedger,
       readLetterboxdSync,
       unlinkLetterboxd,
+      readImdbSync,
+      unlinkImdb,
     }),
     [
       status,
@@ -772,6 +812,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       readAlertLedger,
       readLetterboxdSync,
       unlinkLetterboxd,
+      readImdbSync,
+      unlinkImdb,
     ],
   );
 
@@ -820,6 +862,11 @@ export function MockUserProvider({
       ledger: { runs: [], unmatched: [] },
     }),
     unlinkLetterboxd: noop,
+    readImdbSync: async () => ({
+      link: null,
+      ledger: { runs: [], unmatched: [] },
+    }),
+    unlinkImdb: noop,
     ...value,
   };
   return <Context.Provider value={full}>{children}</Context.Provider>;
