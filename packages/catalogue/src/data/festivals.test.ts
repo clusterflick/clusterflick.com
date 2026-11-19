@@ -347,3 +347,29 @@ describe("SET Film Festival title matchers", () => {
     expect(claims("Sunset Film Festival", "riocinema.org.uk")).toBe(false);
   });
 });
+
+describe("London Independent Short Film Festival title matchers", () => {
+  const claimedBy = (title: string): string[] =>
+    FESTIVALS.filter(({ matchers }) =>
+      matchers.some((matcher) => {
+        const query = matcher[FilterId.ShowingTitleSearch];
+        if (typeof query !== "string") return false;
+        return matchesSearchQuery(title, normalizeForSearch(query));
+      }),
+    ).map(({ id }) => id);
+
+  it.each([
+    "London Independent Short Film Festival Screenings 1",
+    "London Independent Short Film Festival Screenings 2",
+  ])("claims %s and nothing else claims it", (title) => {
+    expect(claimedBy(title)).toEqual([
+      "london-independent-short-film-festival",
+    ]);
+  });
+
+  it("does not claim a London Independent Film Festival screening", () => {
+    expect(
+      claimedBy("London Independent Film Festival Opening Night"),
+    ).not.toContain("london-independent-short-film-festival");
+  });
+});

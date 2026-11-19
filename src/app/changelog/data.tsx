@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-19",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="London Independent Short Film Festival"
+              url="https://www.lisff.org/"
+            />
+            , screening its award-winning independent shorts at The Soho
+            Screening Rooms on 23 November, followed by its awards ceremony.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-18",
     changes: [
       {
