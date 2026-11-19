@@ -74,6 +74,16 @@ export const CHANGELOG: ChangelogDay[] = [
     date: "2026-11-19",
     changes: [
       {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added <Link href="/film-clubs/siren-screen">Siren Screen</Link>, a
+            community film club celebrating myths in motion with fantastical,
+            esoteric and cult cinema at venues across London.
+          </>
+        ),
+      },
+      {
         tag: "New festival",
         body: ({ Festival }) => (
           <>
