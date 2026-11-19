@@ -1022,6 +1022,23 @@ indexed more slowly than old ones left; the durable pages (venues, boroughs,
 groups, clubs, festivals, genres, formats) are the ones search can build on.
 A film that returns drops the tag on the next build.
 
+**A film URL that has moved is redirected, not left a 404**, by the
+[movie-redirects](https://github.com/clusterflick/movie-redirects) Worker on
+`clusterflick.com/movies/*`. GitHub Pages can't redirect, and the 404 page's
+own redirect (`not-found-content.tsx`) runs too late for a crawler, which has
+already seen the 404. The Worker passes every request through and only looks
+at a 404, against `/movie-urls.json`, which the build writes from the
+listings and the departed films (`getMovieUrlMap`, `@/utils/get-movie-url-map`):
+every page's slug, so a known id under an old slug gets a 301; the hash of
+every showing film's venue titles, which is the id the listing had before it
+was matched (the pipeline's `getId`), for another 301; and every slug a
+showing film is listed under, for a 302 when one film matches. The map is a
+contract with the Worker: raise `MOVIE_URL_MAP_VERSION` on both sides when a
+field is removed, renamed or changes meaning. It has a fixed name, so the
+"Cache JSON blobs" rule would hold it for a year at the edge, and the Worker
+fetches it with `cache: "no-store"`. See the Worker's README for the rules
+and why each is what it is.
+
 **The hub pages are landing pages** — the formats and the accessibility
 features. Each has a title naming the
 search it answers, an intro, a count dated by the build's `generatedAt`
