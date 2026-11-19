@@ -293,8 +293,9 @@ export const SignedInLetterboxdNotLinked: Story = {
 };
 
 /**
- * Linked and synced last night: what was added, and the films that couldn't
- * be matched, each linking to its Letterboxd page.
+ * Linked and synced last night: what was added, the film that moved from the
+ * watchlist to Seen, and the films that couldn't be matched, each linking to
+ * its Letterboxd page.
  */
 export const SignedInLetterboxdLinked: Story = {
   args: {
@@ -309,6 +310,7 @@ export const SignedInLetterboxdLinked: Story = {
               at: SYNCED_AT,
               outcome: "synced",
               added: { watchlist: 3, seen: 1 },
+              moved: 1,
             },
           ],
           unmatched: [
@@ -328,7 +330,7 @@ export const SignedInLetterboxdLinked: Story = {
     const canvas = await openLetterboxdSync(canvasElement);
     await expect(
       canvas.getByText(
-        "Last synced Tuesday, 17 November 2026 at 04:17: added 3 films to your watchlist and 1 film to Seen.",
+        "Last synced Tuesday, 17 November 2026 at 04:17: added 3 films to your watchlist and 1 film to Seen (1 moved from your watchlist).",
       ),
     ).toBeInTheDocument();
     await expect(

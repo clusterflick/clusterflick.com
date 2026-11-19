@@ -71,7 +71,9 @@ if (await hasCapability(db, uid, "emailAlerts")) {
   listed film's entry left as it is, and everything already stored kept as it
   was stored. `addToLists` works out both documents' new fields from the
   documents as read, for the caller to commit together with an `updateTime`
-  precondition on each. It never takes a film off the watchlist.
+  precondition on each. It takes nothing off a list unless asked:
+  `seenLeavesWatchlist` takes a film newly added to Seen off the watchlist,
+  as the site's add to Seen does, for the Letterboxd sync.
 - **`letterboxd`**: the Letterboxd sync's link (`users/{uid}/meta/letterboxd`)
   and ledger (`users/{uid}/meta/letterboxd-ledger`), both written only by the
   sync Worker (clusterflick/api-letterboxd), parsed for the site to show.
