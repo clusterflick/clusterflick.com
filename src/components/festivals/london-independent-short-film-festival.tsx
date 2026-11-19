@@ -13,12 +13,13 @@ function FestivalBlurb() {
         on D&rsquo;Arblay Street.
       </p>
       <p>
-        Every film submitted is watched by a viewing panel and graded RADA-style
-        across six crafts &mdash; directing, cinematography, design, acting,
-        music and sound, and editing &mdash; and every filmmaker receives their
-        score and a short report. Five films in each of seventeen categories are
-        nominated, one in each wins, and the winners are screened at the
-        festival ahead of an awards ceremony that evening.
+        In the organisers&rsquo; words, its screenings and conversations connect
+        filmmakers with engaged audiences and celebrate &ldquo;stories that stay
+        with you long after the lights come up&rdquo;. A viewing panel picks
+        five nominees in each of seventeen categories and a winner from each,
+        and the festival builds to a single evening of those winners: two
+        programmes of shorts on 23 November 2026, followed by an awards ceremony
+        and prize giving that night.
       </p>
     </section>
   );
