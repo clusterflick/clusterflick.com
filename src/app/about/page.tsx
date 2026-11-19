@@ -5,11 +5,12 @@ import { getLondonMidnightTimestamp } from "@clusterflick/catalogue/utils/format
 import { getStatusStats } from "./components/status-section/get-status-stats";
 import AboutPageContent from "./about-page-content";
 import { VENUE_COUNT } from "@/utils/venue-count";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 
 export const metadata: Metadata = {
   title: "About",
-  description:
-    "Learn more about Clusterflick – the open source project helping you find film screenings across London cinemas.",
+  description: `Why Clusterflick is the most complete guide to film in London: every listing from ${VENUE_COUNT} venues combined, film clubs and festivals matched, and open data.`,
   alternates: {
     canonical: "/about",
   },
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     question: "What is Clusterflick?",
-    answer: `Clusterflick is a free site listing every film showing in London — ${VENUE_COUNT} venues, one search.`,
+    answer: `Clusterflick is the most complete guide to film in London: a free site combining every listing from ${VENUE_COUNT} venues, from multiplexes to pubs and community halls, into one search. It reads each listing for format, accessibility and occasion so you can filter for exactly the screening you want, matches ${FILM_CLUBS.length} film clubs and ${FESTIVALS.length} festivals across the venues they screen at, and shows ratings from IMDb, Letterboxd, Rotten Tomatoes and Metacritic side by side. It's independent, nobody pays to be listed, and its code and data are open.`,
   },
   {
     question: "Where does Clusterflick's film data come from?",

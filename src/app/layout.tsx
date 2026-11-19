@@ -28,7 +28,7 @@ export const metadata: Metadata = {
       "Every Film Showing in London — Search London Cinema Listings | Clusterflick",
     template: "%s | Clusterflick",
   },
-  description: `Every film showing in London, from ${VENUE_COUNT} venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.`,
+  description: `Every film showing in London, from ${VENUE_COUNT} venues in one search: cinemas, pubs and community halls, film clubs and festivals, with ratings side by side.`,
   keywords: [
     "cinema",
     "movies",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     url: "https://clusterflick.com",
     siteName: "Clusterflick",
     title: "Clusterflick – Every film showing in London",
-    description: `Every film showing in London, from ${VENUE_COUNT} venues in one search. Whether you're chasing new releases or cult classics, see what's on, where and when.`,
+    description: `Every film showing in London, from ${VENUE_COUNT} venues in one search: cinemas, pubs and community halls, film clubs and festivals, with ratings side by side.`,
     images: [
       {
         url: "/images/og-image.png",

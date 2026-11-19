@@ -29,7 +29,7 @@ export function buildLlmsTxt(): string {
 
   return `# Clusterflick
 
-> Every film showing in London, from ${VENUE_COUNT} cinemas and venues in one search: showtimes, venues, film clubs and festivals, updated several times a day.
+> The most complete guide to film in London: every listing from ${VENUE_COUNT} cinemas and venues in one search, with showtimes, film clubs and festivals, and each screening's format, accessibility and occasion, updated several times a day.
 
 Listings come from each venue's own website, matched to TheMovieDB and to IMDb, Letterboxd and Rotten Tomatoes ratings. For machine use, prefer the datasets below to the pages: they have fixed addresses and a schema, while the pages' markup can change at any time.
 
