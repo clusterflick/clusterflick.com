@@ -401,6 +401,17 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "siren-screen",
+    name: "Siren Screen",
+    kind: "cult",
+    url: "https://www.instagram.com/siren.screen",
+    aliases: [],
+    matchers: [
+      { [FilterId.ShowingTitleSearch]: "Siren Screen" },
+      { [FilterId.PerformanceNotesSearch]: "Siren Screen" },
+    ],
+  },
+  {
     id: "offbeat-folk-film-club",
     name: "OffBeat Folk Film Club",
     kind: "rare",
