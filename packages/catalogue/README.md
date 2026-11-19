@@ -57,6 +57,18 @@ venue pages' addresses (`utils/get-movie-url`, `utils/get-venue-url`), so a
 link from anywhere is the page the site built. It has no React, and never reads `window`,
 `document` or `process`.
 
+## Film URLs that moved
+
+`utils/movie-url-map` is the shape of the site's `/movie-urls.json`
+(`MovieUrlMap`, `MOVIE_URL_MAP_VERSION`) and the rules that read it.
+`resolve(path, map)` is what the movie-redirects Worker does with a 404 under
+`/movies/*`: a 301 for a known id or a matched listing's old id, a 302 for one
+showing film under the slug or close to it, and otherwise the 404.
+`findLostUrls(previous, current)` lists every film URL a deploy left behind,
+why it went, and what `resolve` does with it now, which is how data-analysed
+reports a deploy's 404s before anyone follows one. The site builds the map
+itself (`src/utils/get-movie-url-map.ts`), since that needs Node's crypto.
+
 ## What goes in
 
 Code about the listings that something outside the site needs. Anything only

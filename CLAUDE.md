@@ -1033,12 +1033,23 @@ listings and the departed films (`getMovieUrlMap`, `@/utils/get-movie-url-map`):
 every page's slug, so a known id under an old slug gets a 301; the hash of
 every showing film's venue titles, which is the id the listing had before it
 was matched (the pipeline's `getId`), for another 301; and every slug a
-showing film is listed under, for a 302 when one film matches. The map is a
-contract with the Worker: raise `MOVIE_URL_MAP_VERSION` on both sides when a
-field is removed, renamed or changes meaning. It has a fixed name, so the
-"Cache JSON blobs" rule would hold it for a year at the edge, and the Worker
-fetches it with `cache: "no-store"`. See the Worker's README for the rules
-and why each is what it is.
+showing film is listed under, for a 302 when one film matches. The map's
+shape and the rules that read it are the catalogue package's
+(`@clusterflick/catalogue/utils/movie-url-map`: `MovieUrlMap`, `resolve`),
+which the Worker installs from npm, so a change to either is a package
+release; raise `MOVIE_URL_MAP_VERSION` there when a field is removed, renamed
+or changes meaning. It has a fixed name, so the "Cache JSON blobs" rule would
+hold it for a year at the edge, and the Worker fetches it with
+`cache: "no-store"`. See the Worker's README for the rules and why each is
+what it is.
+
+**Every deploy's lost film URLs are logged before anyone follows one.** After
+a deploy is verified live, `trigger_downstream` dispatches `data-analysed`'s
+film 404 log, which compares the new `/movie-urls.json` with the one it saw
+last (`findLostUrls`, in the same module) and records each URL that stopped
+being a page, why it went (`departed` and `unmatched` in the map say which
+kind of film it was) and what the Worker now does with it.
+It is the log manage.clusterflick.com reads to show them.
 
 **The hub pages are landing pages** — the formats and the accessibility
 features. Each has a title naming the
