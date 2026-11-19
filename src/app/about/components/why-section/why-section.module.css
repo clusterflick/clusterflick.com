@@ -1,0 +1,87 @@
+.section {
+  max-width: var(--page-default);
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+  text-align: center;
+  /* Above the hero's extended backdrop, which reaches down past the hero,
+     as the page's other content blocks are. */
+  position: relative;
+  z-index: 1;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.leads,
+.more {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  text-align: left;
+}
+
+.leads {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* A neon rule over each lead point stands in for a card edge: it groups the
+   text without making it look like something to press. */
+.lead {
+  border-top: 3px solid var(--color-neon-pink);
+  padding-top: 16px;
+}
+
+.leadTitle {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.leadDescription {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-light-gray);
+  margin-bottom: 12px;
+}
+
+/* The supporting points: one quieter row under a hairline. */
+.more {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.15);
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.moreTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.moreDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}

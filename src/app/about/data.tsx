@@ -6,6 +6,8 @@ import {
   XIcon,
   BlueskyIcon,
 } from "@/components/icons";
+import { FILM_CLUBS } from "@clusterflick/catalogue/data/film-clubs";
+import { FESTIVALS } from "@clusterflick/catalogue/data/festivals";
 
 export const socialLinks = [
   {
@@ -134,6 +136,60 @@ interface Feature {
   description: string;
   href: string;
 }
+
+interface Reason {
+  title: string;
+  description: string;
+  href: string;
+  /** The lead reasons end on a text link, so it says where it goes. */
+  linkLabel?: string;
+}
+
+// Why Clusterflick rather than another guide, under the hero's claim. The
+// lead three are what no other guide does; the rest back them up beneath.
+export const leadReasons: Reason[] = [
+  {
+    title: "Nothing Slips Through",
+    description:
+      "We gather every venue's own listings and every ticketing and events site it sells through, then combine them, so a showing listed in only one place still turns up. And not just cinemas: the pubs, churches, libraries and community halls that screen films too.",
+    href: "/venues",
+    linkLabel: "See the venues",
+  },
+  {
+    title: "More Than the Listing Says",
+    description:
+      "We read each listing's title, labels, notes and description for format, accessibility and occasion, from 35mm and IMAX to relaxed, dog-friendly and live-scored screenings, so you can filter all of London for exactly the one you want.",
+    href: "/formats",
+    linkLabel: "See the formats",
+  },
+  {
+    title: "Clubs & Festivals, Joined Up",
+    description: `We follow ${FILM_CLUBS.length} film clubs and ${FESTIVALS.length} festivals, matching their screenings wherever they're held, so a programme spread across a dozen venues sits on one page. Filter the films or the planner down to any of them, or see what each has on next.`,
+    href: "/film-clubs",
+    linkLabel: "See the film clubs",
+  },
+];
+
+export const moreReasons: Reason[] = [
+  {
+    title: "Ratings Side by Side",
+    description:
+      "IMDb, Letterboxd, Rotten Tomatoes, Metacritic and the Bechdel Test, with cast, synopsis and trailer from TMDB.",
+    href: "/catalogue?base=default&dateRange=all",
+  },
+  {
+    title: "Works With Letterboxd & IMDb",
+    description:
+      "Bring your watchlist and what you've seen, star your venues, and see what's on that you want to watch.",
+    href: "/personalise",
+  },
+  {
+    title: "Free, Independent & Open",
+    description:
+      "No one pays to be listed, and no chain or ticket seller owns us. You book direct with the venue. Open code, open data.",
+    href: "/data-licence",
+  },
+];
 
 // What a first-time reader can do here, each pointing at the page that does it.
 export const features: Feature[] = [

@@ -18,8 +18,10 @@ import GroupHeader from "@/components/group-header";
 import CardGrid from "@/components/card-grid";
 import PopcornLogo from "@/components/popcorn-logo";
 import StatusSection from "./components/status-section";
+import WhySection from "./components/why-section";
 import type { StatusStats } from "./components/status-section/get-status-stats";
 import { socialLinks, partnerSites, features, ratingSources } from "./data";
+import { VENUE_COUNT } from "@/utils/venue-count";
 import styles from "./page.module.css";
 
 interface AboutPageContentProps {
@@ -49,13 +51,16 @@ export default function AboutPageContent({ stats }: AboutPageContentProps) {
         <OutlineHeading className={styles.title}>Clusterflick</OutlineHeading>
         <p className={styles.headline}>Every film showing in London.</p>
         <p className={styles.tagline}>
-          Whether you&apos;re chasing new releases or cult classics, we make it
-          easy to see what&apos;s on, where, and&nbsp;when.
+          The most complete guide to film in London: every listing from{" "}
+          {VENUE_COUNT} venues, from the multiplexes to the pub back room, in
+          one&nbsp;search.
         </p>
         <div className={styles.stats}>
           <StatusSection stats={stats} />
         </div>
       </HeroSection>
+
+      <WhySection />
 
       <Divider />
 
