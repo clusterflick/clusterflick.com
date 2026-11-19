@@ -19,10 +19,12 @@ const film = (
   title: string,
   venueTitles: (string | undefined)[] = [],
   alternativeTitles?: string[],
+  isUnmatched?: boolean,
 ) => ({
   id,
   title,
   alternativeTitles,
+  isUnmatched,
   showings: Object.fromEntries(
     venueTitles.map((venueTitle, i) => [`${id}-${i}`, showing(venueTitle)]),
   ),
@@ -115,5 +117,18 @@ describe("getMovieUrlMap", () => {
     );
     expect(map.liveSlugs).toEqual({ carrie: ["7340"] });
     expect(Object.values(map.titleHashes)).toEqual(["7340"]);
+  });
+
+  it("lists the departed films and the unmatched listings, sorted", () => {
+    const id = getListingId("Short Film Open Screen");
+    const map = build(
+      [film("949", "Heat"), film(id, "Short Film Open Screen", [], [], true)],
+      [
+        { id: "7340", title: "Carrie" },
+        { id: "10542", title: "Killer Condom" },
+      ],
+    );
+    expect(map.departed).toEqual(["10542", "7340"]);
+    expect(map.unmatched).toEqual([id]);
   });
 });

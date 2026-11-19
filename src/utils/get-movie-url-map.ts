@@ -1,46 +1,32 @@
 import { createHash } from "node:crypto";
 import slugify from "@sindresorhus/slugify";
 import type { Movie } from "@clusterflick/catalogue/types";
+import {
+  MOVIE_URL_MAP_VERSION,
+  type MovieUrlMap,
+} from "@clusterflick/catalogue/utils/movie-url-map";
 
-/**
+/*
  * What the movie-redirects Worker reads to send a dead film URL somewhere
- * better than a 404. It is a contract with that Worker, which refuses any
- * other version: raise this when a field is removed, renamed or changes
- * meaning.
+ * better than a 404, and what data-analysed compares between deploys. The
+ * shape and its version live with the rules that read it, in the catalogue
+ * package (`utils/movie-url-map`); this builds it, with Node's crypto, which
+ * the package can't use. In the titles a showing film carries, an unmatched
+ * listing's id is recovered exactly: a matched film keeps the venue's title
+ * on its showing, and hashing it gives back the id the listing had (`getId`
+ * in clusterflick/scripts' `common/utils.js`). A hash two films carry says
+ * nothing about which, and is left out.
  */
-export const MOVIE_URL_MAP_VERSION = 1;
 
-export type MovieUrlMap = {
-  version: typeof MOVIE_URL_MAP_VERSION;
-  generatedAt: string;
-  /**
-   * Every film with a page, showing or departed: its id and the slug of its
-   * page, `/movies/<id>/<slug>/`. A known id under the wrong slug is a page
-   * that moved, when TheMovieDB or a venue retitled it.
-   */
-  slugs: Record<string, string>;
-  /**
-   * Showing films only: the id an unmatched listing would have had, mapped to
-   * the film that listing is now part of. An unmatched listing is keyed by
-   * the first 8 hex characters of the SHA-256 of the venue's title (`getId`
-   * in clusterflick/scripts' `common/utils.js`), and a matched film keeps the
-   * venue's title on its showing, so hashing those titles recovers the old
-   * id exactly. A hash two films carry says nothing about which, and is left
-   * out.
-   */
-  titleHashes: Record<string, string>;
-  /**
-   * Showing films only: every slug a film can be found under (its title, its
-   * other English titles and its venues' titles) and the films under it. For
-   * a URL whose id is unknown, one film under its slug, or close to it, is
-   * the likeliest page.
-   */
-  liveSlugs: Record<string, string[]>;
-};
+export { MOVIE_URL_MAP_VERSION };
+export type { MovieUrlMap };
 
 type MovieUrlMapInput = {
   /** The films showing now. */
-  live: Record<string, Pick<Movie, "title" | "alternativeTitles" | "showings">>;
+  live: Record<
+    string,
+    Pick<Movie, "title" | "alternativeTitles" | "showings" | "isUnmatched">
+  >;
   /** The films that have finished their run but keep their page. */
   departed: Record<string, Pick<Movie, "title">>;
   generatedAt: string;
@@ -119,5 +105,10 @@ export function getMovieUrlMap({
     ),
     titleHashes,
     liveSlugs,
+    departed: Object.keys(departed).sort(),
+    unmatched: Object.entries(live)
+      .filter(([, movie]) => movie.isUnmatched)
+      .map(([id]) => id)
+      .sort(),
   };
 }

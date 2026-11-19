@@ -244,3 +244,14 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: clusterflick/manage.clusterflick.com
           event-type: release_event
+      # Compares this deploy's /movie-urls.json with the last one data-analysed
+      # saw, and logs every film URL the deploy left behind with what the
+      # movie-redirects Worker now does with it. After verify-hash, so the map
+      # it fetches is this deploy's. It carries nothing: a dispatch that's lost
+      # folds this deploy's changes into the next one's comparison.
+      - name: Repository Dispatch for data-analysed's film 404 log
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.PAT }}
+          repository: clusterflick/data-analysed
+          event-type: movie_url_changes
