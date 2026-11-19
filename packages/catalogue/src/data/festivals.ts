@@ -1162,4 +1162,20 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "london-independent-short-film-festival",
+    name: "London Independent Short Film Festival",
+    url: "https://www.lisff.org/",
+    aliases: ["lisff"],
+    matchers: [
+      {
+        // Matches "London Independent Short Film Festival Screenings 1" and
+        // "... Screenings 2" at The Soho Screening Rooms, 23 November 2026.
+        // Left unscoped because the full name is distinctive: it does not run
+        // into the London Independent Film Festival, which never bills itself
+        // with "Short" and is matched on "LIFF" at the Genesis only.
+        [FilterId.ShowingTitleSearch]: "London Independent Short Film Festival",
+      },
+    ],
+  },
 ];
