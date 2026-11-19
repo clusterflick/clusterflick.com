@@ -3,6 +3,7 @@ import StandardPageLayout from "@/components/standard-page-layout";
 import LinkedList from "@/components/linked-list";
 import { REPORTS, getReportUrl } from "@/data/reports";
 import { formatReportDate } from "./format-report-date";
+import { VENUE_COUNT } from "@/utils/venue-count";
 import styles from "./page.module.css";
 
 const title = "Reports";
@@ -25,10 +26,11 @@ export default function ReportsPage() {
   return (
     <StandardPageLayout title={title} subtitle={description}>
       <p className={styles.intro}>
-        Clusterflick gathers the listings of 450+ London venues every day, which
-        adds up to a record of what London actually screened. These reports are
-        what that record shows. The numbers are fixed at the date given, and
-        like the data behind them they&apos;re free to use with credit.
+        Clusterflick gathers the listings of {VENUE_COUNT} London venues every
+        day, which adds up to a record of what London actually screened. These
+        reports are what that record shows. The numbers are fixed at the date
+        given, and like the data behind them they&apos;re free to use with
+        credit.
       </p>
       <LinkedList
         items={REPORTS.map((report) => ({
