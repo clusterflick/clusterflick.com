@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useCinemaData } from "@/state/cinema-data-context";
-import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { trackEvent } from "@/utils/track-event";
 import { ButtonLink } from "@/components/button";
-import LoadingIndicator from "@/components/loading-indicator";
-import StatusPage, { StatusPageLoading } from "@/components/status-page";
-import slugify from "@sindresorhus/slugify";
+import StatusPage from "@/components/status-page";
 
 function GenericNotFound() {
   return (
@@ -99,82 +95,14 @@ function VenueNotFound() {
   );
 }
 
-function MovieNotFound({ pathname }: { pathname: string }) {
-  const router = useRouter();
-  const { movies, isLoading, getData } = useCinemaData();
-  const isRedirectingRef = useRef(false);
-
-  const isWaitingForData = useMemo(
-    () => isLoading || Object.keys(movies).length === 0,
-    [isLoading, movies],
-  );
-
-  // Grab the piece of the URL after `/movies` which should be an ID
-  const movieIdMatch = pathname.match(/^\/movies\/([^/]+)\/?/i);
-  const movieId = movieIdMatch?.[1];
-  // Grab the piece of the URL after `/movies` which should be an ID and a slug.
-  // Used as a fallback if the ID doesn't match any movies.
-  const movieSlugMatch = pathname.match(/^\/movies\/([^/]+)\/([^/]+)\/?/i);
-  const movieSlug = movieSlugMatch?.[2];
-
-  const movieCheckResult = useMemo(() => {
-    if (!movieId || !movieSlug) {
-      return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
-    }
-    if (isWaitingForData) {
-      return { hasChecked: false, shouldRedirect: false, redirectUrl: null };
-    }
-    const movieFromId = movies[movieId];
-    if (movieFromId) {
-      return {
-        hasChecked: true,
-        shouldRedirect: true,
-        redirectUrl: `${getMovieUrl(movieFromId)}/`,
-      };
-    }
-    const moviesFromSlug = Object.values(movies).filter(
-      (movie) => slugify(movie.title) === movieSlug,
-    );
-    if (moviesFromSlug.length === 1) {
-      return {
-        hasChecked: true,
-        shouldRedirect: true,
-        redirectUrl: `${getMovieUrl(moviesFromSlug[0])}/`,
-      };
-    }
-    return { hasChecked: true, shouldRedirect: false, redirectUrl: null };
-  }, [movieId, movieSlug, movies, isWaitingForData]);
-
-  useEffect(() => {
-    if (movieId) getData();
-  }, [movieId, getData]);
-
-  useEffect(() => {
-    if (
-      movieCheckResult.shouldRedirect &&
-      movieCheckResult.redirectUrl &&
-      !isRedirectingRef.current
-    ) {
-      isRedirectingRef.current = true;
-      router.replace(movieCheckResult.redirectUrl);
-    }
-  }, [movieCheckResult, router]);
-
-  if (!movieCheckResult.hasChecked || movieCheckResult.shouldRedirect) {
-    return (
-      <StatusPageLoading>
-        <LoadingIndicator
-          size="lg"
-          message={
-            movieCheckResult.shouldRedirect
-              ? "Redirecting..."
-              : "Looking for that film..."
-          }
-        />
-      </StatusPageLoading>
-    );
-  }
-
+/**
+ * A film URL that moved never gets here: the movie-redirects Worker in front
+ * of `/movies/*` answers the 404 with a redirect, before the page loads, when
+ * it can tell where the film went (by id, by the old id of a listing since
+ * matched, or by one showing film under the slug). So this is a film that has
+ * finished with nothing like it showing, or two that a link could mean.
+ */
+function MovieNotFound() {
   return (
     <StatusPage
       iconSrc="/images/icons/neon-ticket-ripped.svg"
@@ -218,8 +146,7 @@ export default function NotFoundContent() {
   }, [mountedPathname]);
 
   if (!mountedPathname) return <GenericNotFound />;
-  if (/^\/movies\//i.test(mountedPathname))
-    return <MovieNotFound pathname={mountedPathname} />;
+  if (/^\/movies\//i.test(mountedPathname)) return <MovieNotFound />;
   if (/^\/festivals\//i.test(mountedPathname)) return <FestivalNotFound />;
   if (/^\/film-clubs\//i.test(mountedPathname)) return <FilmClubNotFound />;
   if (/^\/collections\//i.test(mountedPathname)) return <CollectionNotFound />;
