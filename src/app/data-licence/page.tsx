@@ -62,7 +62,7 @@ export default function DataLicencePage() {
         <p className={styles.body}>
           The licence covers our own contribution. Which film is showing, at
           which venue, on which screen, at what time. The booking link, the
-          performance notes, the accessibility and format flags. The venue
+          screening notes, the accessibility and format flags. The venue
           records, with their addresses and coordinates. And the normalisation
           and film matching that turns {VENUE_COUNT} venues&apos; wildly
           different listings into one consistent shape.

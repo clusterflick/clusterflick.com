@@ -151,7 +151,7 @@ export const leadReasons: Reason[] = [
   {
     title: "Nothing Slips Through",
     description:
-      "We gather every venue's own listings and every ticketing and events site it sells through, then combine them, so a showing listed in only one place still turns up. And not just cinemas: the pubs, churches, libraries and community halls that screen films too.",
+      "We gather every venue's own listings and every ticketing and events site it sells through, then combine them, so a screening listed in only one place still turns up. And not just cinemas: the pubs, churches, libraries and community halls that screen films too.",
     href: "/venues",
     linkLabel: "See the venues",
   },

@@ -61,7 +61,7 @@ export const FinalShowing: Story = {
       href: "/movies/1488459/the-scarecrows-wedding",
       title: "The Scarecrows' Wedding",
       posterPath: "/qoLvoJy0tnlxJ7jYVwXdPFf7oCe.jpg",
-      label: "Final showing",
+      label: "Final screening",
       labelColor: "yellow",
       credit: "Samantha Cutler & Jeroen Jaspaert · 2026",
       when: "Thursday, 10:25",
@@ -81,7 +81,7 @@ export const Reach: Story = {
       label: "Showing at 96 venues",
       labelColor: "gray",
       credit: "Martin McDonagh · 2026",
-      when: "2,642 showings this week",
+      when: "2,642 screenings this week",
     },
   },
 };

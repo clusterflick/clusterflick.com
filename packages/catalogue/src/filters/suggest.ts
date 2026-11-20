@@ -123,8 +123,8 @@ const REDIRECT_FIELDS: { id: SearchFieldId; noun: string; label: string }[] = [
   },
   {
     id: FilterId.PerformanceNotesSearch,
-    noun: "performance notes",
-    label: "Performance note",
+    noun: "screening notes",
+    label: "Screening note",
   },
 ];
 
@@ -201,13 +201,13 @@ const WIDENABLE: { id: FilterId; label: string; action: string }[] = [
   },
   {
     id: FilterId.HideFinished,
-    label: "Finished showings shown",
-    action: "Include finished showings",
+    label: "Finished screenings shown",
+    action: "Include finished screenings",
   },
   {
     id: FilterId.HideSoldOut,
-    label: "Sold-out showings shown",
-    action: "Include sold-out showings",
+    label: "Sold-out screenings shown",
+    action: "Include sold-out screenings",
   },
   { id: FilterId.Venues, label: "All venues", action: "Search all venues" },
   // Below venues because giving up a name discards the reader's stated
@@ -548,8 +548,8 @@ function describeEarliestPerformance(result: MoviesRecord): string | undefined {
   // itself is the more useful answer.
   const days = getDaysFromNow(earliest, RELATIVE_DAY_LIMIT);
   return days === null
-    ? `next showing ${formatDateLong(earliest)}`
-    : `next showing ${formatDaysFromNow(days)}`;
+    ? `next screening ${formatDateLong(earliest)}`
+    : `next screening ${formatDaysFromNow(days)}`;
 }
 
 /** The categories the widening let in, which the current selection excludes. */

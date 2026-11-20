@@ -29,7 +29,7 @@ import styles from "./page.module.css";
 export const TRIGGER_NAMES: Record<AlertTrigger, string> = {
   [AlertTrigger.FirstListing]: "When it's first listed",
   [AlertTrigger.NewVenue]: "When it's showing somewhere new",
-  [AlertTrigger.NewPerformance]: "When any showing is added",
+  [AlertTrigger.NewPerformance]: "When any screening is added",
 };
 
 export const TRIGGER_DESCRIPTIONS: Record<AlertTrigger, string> = {

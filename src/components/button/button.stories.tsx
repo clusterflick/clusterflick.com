@@ -64,7 +64,7 @@ export const LinkVariant: Story = {
   name: "Link",
   args: {
     variant: "link",
-    children: "Show all 24 showings",
+    children: "Show all 24 screenings",
   },
 };
 

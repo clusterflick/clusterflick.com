@@ -132,7 +132,7 @@ export default function DepartedContent({
 
       <div className={styles.detailsContainer}>
         <ContentSection
-          title="Showings"
+          title="Screenings"
           icon={{
             src: "/images/icons/neon-ticket.svg",
             width: 58,

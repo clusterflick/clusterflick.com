@@ -159,7 +159,7 @@ export default function BoroughPageContent({
           ) : (
             <p>
               <strong>{venues.length.toLocaleString("en-GB")}</strong>{" "}
-              {venues.length === 1 ? "venue" : "venues"} &middot; No showings
+              {venues.length === 1 ? "venue" : "venues"} &middot; No screenings
               currently listed
             </p>
           )}

@@ -87,11 +87,11 @@ function buildVenueDescription(
   const filmWord = movieCount === 1 ? "film" : "films";
 
   if (seoDescription && seoHighlights && movieCount > 0) {
-    return `${venue.name} showings - ${seoDescription}. ${movieCount} ${filmWord} showing, including ${seoHighlights}. Find screenings and book tickets.`;
+    return `${venue.name} screenings - ${seoDescription}. ${movieCount} ${filmWord} showing, including ${seoHighlights}. Find screenings and book tickets.`;
   }
 
   if (seoDescription) {
-    return `${venue.name} showings - ${seoDescription}. Find screenings and book tickets.`;
+    return `${venue.name} screenings - ${seoDescription}. Find screenings and book tickets.`;
   }
 
   const typePart = venue.type !== "Other" ? venue.type : "venue";

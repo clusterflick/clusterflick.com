@@ -123,7 +123,7 @@ export const Large: Story = {
 export const WithSubtitle: Story = {
   args: {
     mainTitle: "Forrest Gump",
-    subtitle: "3 showings this week",
+    subtitle: "3 screenings this week",
     showOverlay: true,
     includedMovies: [
       { title: "Forrest Gump", posterPath: "/saHP97rTPS5eLmrLQEcANmKrsFl.jpg" },

@@ -40,7 +40,7 @@ export const WithEvents: Story = {
   },
 };
 
-/** Venue with no upcoming screenings — shows "No showings currently listed". */
+/** Venue with no upcoming screenings — shows "No screenings currently listed". */
 export const NoEvents: Story = {
   args: {
     name: "Electric Cinema",

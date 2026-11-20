@@ -293,7 +293,7 @@ export default function FilterOverlay({
     if (nearby.length === 0 || !point) {
       if (point) {
         setNearbyNotice(
-          "No venues with showings found near you — your filters are unchanged.",
+          "No venues with screenings found near you — your filters are unchanged.",
         );
       }
       return;
@@ -746,13 +746,13 @@ export default function FilterOverlay({
       <div className={styles.showingSwitches}>
         <Switch
           id="hide-finished"
-          label="Hide past showings"
+          label="Hide past screenings"
           checked={filterState.hideFinished}
           onChange={toggleHideFinished}
         />
         <Switch
           id="hide-sold-out"
-          label="Hide sold out showings"
+          label="Hide sold out screenings"
           checked={filterState.hideSoldOut}
           onChange={toggleHideSoldOut}
         />
@@ -780,7 +780,7 @@ export default function FilterOverlay({
       >
         <div className={styles.counts} aria-live="polite" aria-atomic="true">
           {movieCount.toLocaleString("en-GB")} events,{" "}
-          {performanceCount.toLocaleString("en-GB")} showings
+          {performanceCount.toLocaleString("en-GB")} screenings
         </div>
         <div className={styles.filterControls}>
           <QuickFiltersSection
@@ -895,8 +895,8 @@ export default function FilterOverlay({
             />
             <SearchInput
               id="filter-performance-notes-search"
-              placeholder="Search performance notes..."
-              ariaLabel="Search performance notes"
+              placeholder="Search screening notes..."
+              ariaLabel="Search screening notes"
               value={filterState.performanceNotesSearch}
               onChange={setPerformanceNotesSearchQuery}
             />

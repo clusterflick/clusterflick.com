@@ -10,7 +10,7 @@ import Switch from "@/components/switch";
  * required.
  *
  * **When to use:**
- * - Single boolean settings (e.g. "Show all showings", "Use current location").
+ * - Single boolean settings (e.g. "Show all screenings", "Use current location").
  * - Toggling accessibility filter mode on/off.
  *
  * **When NOT to use:**
@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 /** Switch in its off/unchecked state. */
 export const Off: Story = {
   args: {
-    label: "Show all showings",
+    label: "Show all screenings",
     id: "show-all",
     checked: false,
     onChange: () => {},
@@ -46,7 +46,7 @@ export const Off: Story = {
 /** Switch in its on/checked state. */
 export const On: Story = {
   args: {
-    label: "Show all showings",
+    label: "Show all screenings",
     id: "show-all",
     checked: true,
     onChange: () => {},

@@ -7,7 +7,7 @@ import {
 /** The Refine rows, in display order. */
 export const REFINE_ROWS = [
   { id: "accessibility", title: "Accessibility" },
-  { id: "showings", title: "Showings" },
+  { id: "showings", title: "Screenings" },
   { id: "format", title: "Format" },
   { id: "occasions", title: "Occasions" },
   { id: "genre", title: "Genre" },

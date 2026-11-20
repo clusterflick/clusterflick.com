@@ -127,7 +127,7 @@ export default function CalendarView({
         // Fills the wrapper, which the stylesheet floors at the viewport height.
         height="100%"
         stickyHeaderDates
-        noEventsText="No showings listed in this period"
+        noEventsText="No screenings listed in this period"
         eventDidMount={onEventMount}
         eventClick={onEventClick}
         eventSourceFailure={() => setHasError(true)}

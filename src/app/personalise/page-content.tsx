@@ -1001,7 +1001,7 @@ export function UserListSection({
       title: "Last chance",
       tiles: ending.map((entry) =>
         toTile(entry, true, {
-          label: "Final showing",
+          label: "Final screening",
           ...describeShowing(entry.id, finalShowing(entry.id)!),
           color: "yellow",
         }),

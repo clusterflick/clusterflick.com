@@ -17,7 +17,7 @@ import styles from "./filter-overlay.module.css";
 export type SearchRedirect = "showingTitleSearch" | "performanceNotesSearch";
 
 const REDIRECTS: { field: SearchRedirect; label: string }[] = [
-  { field: "performanceNotesSearch", label: "performance notes" },
+  { field: "performanceNotesSearch", label: "screening notes" },
   { field: "showingTitleSearch", label: "original venue titles" },
 ];
 

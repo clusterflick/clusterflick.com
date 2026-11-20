@@ -80,7 +80,7 @@ export const Unlinked: Story = {
     label: "Friday, 6 November 2026",
     items: [
       { id: "films", value: 10, label: "New films" },
-      { id: "showings", value: 219, label: "New showings" },
+      { id: "showings", value: 219, label: "New screenings" },
       {
         id: "venues",
         value: 18,

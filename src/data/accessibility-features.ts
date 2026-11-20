@@ -51,7 +51,7 @@ export const ACCESSIBILITY_FEATURES: AccessibilityFeatureDefinition[] = [
     description:
       "Screenings designed to welcome parents or carers with babies and young children. Typically includes lower volume, lights slightly raised, and pram parking. Also covers kids club and family programming.",
     seoDescription:
-      "Parent and baby film screenings in London, plus kids clubs and family showings — every baby friendly screening and the cinemas running them, updated daily.",
+      "Parent and baby film screenings in London, plus kids clubs and family screenings — every baby friendly screening and the cinemas running them, updated daily.",
   },
   {
     id: AccessibilityFeature.DogFriendly,

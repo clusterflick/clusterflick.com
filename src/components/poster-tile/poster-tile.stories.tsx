@@ -43,7 +43,7 @@ export const Linked: Story = {
     title: "Apocalypse Now",
     posterPath: "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
     href: "/movies/28/apocalypse-now",
-    details: ["Prince Charles Cinema", "3 showings"],
+    details: ["Prince Charles Cinema", "3 screenings"],
   },
 };
 
@@ -56,7 +56,7 @@ export const Event: Story = {
       { title: "Alien", posterPath: "/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg" },
       { title: "Aliens", posterPath: "/r1x5JGpyqZU8PYhbs4UcrO1Xb6x.jpg" },
     ],
-    details: ["2 venues", "4 showings"],
+    details: ["2 venues", "4 screenings"],
   },
 };
 
@@ -105,7 +105,7 @@ export const WithLastChanceNote: Story = {
     href: "/movies/28/apocalypse-now",
     details: ["1979"],
     note: {
-      label: "Final showing",
+      label: "Final screening",
       detail: "Tomorrow, 20:30",
       venue: "Prince Charles Cinema",
       color: "yellow",

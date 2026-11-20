@@ -72,7 +72,7 @@ export default function CinemaGroupsPageContent({
                       ` · ${group.onlyHere.toLocaleString("en-GB")} only here`}
                   </span>
                   <span className={styles.detail}>
-                    {plural(group.screenings, "showing", "showings")} at{" "}
+                    {plural(group.screenings, "screening", "screenings")} at{" "}
                     {plural(group.venueCount, "venue", "venues")}
                   </span>
                 </span>

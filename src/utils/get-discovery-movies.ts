@@ -231,7 +231,7 @@ export function getPopularMovies(
     .map(({ movie, performanceCount, venueCount }) => ({
       movie,
       performanceCount,
-      subtitle: `${formatCount(venueCount, "venue")} · ${formatCount(performanceCount, "showing")}`,
+      subtitle: `${formatCount(venueCount, "venue")} · ${formatCount(performanceCount, "screening")}`,
     }));
 }
 
@@ -377,7 +377,7 @@ export function getNewAdditionsAtVenues(
 }
 
 function formatLastShowing(time: number): string {
-  return `Last showing ${formatDayAndDate(time)}`;
+  return `Last screening ${formatDayAndDate(time)}`;
 }
 
 /**
@@ -839,7 +839,7 @@ export function getWatchlistRow(
       subtitle =
         final && final.time <= lastChanceDeadline
           ? formatLastShowing(final.time)
-          : `Next showing ${formatDayAndDate(bookable[0].time)}`;
+          : `Next screening ${formatDayAndDate(bookable[0].time)}`;
     }
 
     scored.push({

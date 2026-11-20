@@ -690,7 +690,7 @@ describe("summariseDay", () => {
     });
 
     // Showings count the new films' as well as the rollouts': 3 + 4 + 1
-    expect(summary).toBe("2 films added, 8 showings added, 1 venue added");
+    expect(summary).toBe("2 films added, 8 screenings added, 1 venue added");
   });
 
   it("names only the kinds of change the day actually brought", () => {
@@ -703,7 +703,7 @@ describe("summariseDay", () => {
       ],
     });
 
-    expect(summary).toBe("1 showing added");
+    expect(summary).toBe("1 screening added");
   });
 });
 

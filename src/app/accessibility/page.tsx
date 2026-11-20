@@ -27,7 +27,7 @@ import { getAccessibilityFeatureUrl } from "@/utils/get-accessibility-feature-ur
 
 export const metadata: Metadata = {
   title: "Accessible Cinema",
-  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly, dog friendly and subtitled showings at ${VENUE_COUNT} venues.`,
+  description: `Find accessible film screenings across London — audio described, captioned, relaxed, baby friendly, dog friendly and subtitled screenings at ${VENUE_COUNT} venues.`,
   alternates: {
     canonical: "/accessibility",
   },
@@ -295,7 +295,7 @@ export default async function AccessibilityPage() {
               <span className={styles.overviewStatValue}>
                 {overall.performanceCount.toLocaleString("en-GB")}
               </span>
-              <span className={styles.overviewStatLabel}>Showings</span>
+              <span className={styles.overviewStatLabel}>Screenings</span>
             </div>
             <div className={styles.overviewStat}>
               <span className={styles.overviewStatValue}>
@@ -345,7 +345,9 @@ export default async function AccessibilityPage() {
                       {venue.filmCount === 1 ? "film" : "films"}
                       {" · "}
                       {venue.performanceCount.toLocaleString("en-GB")}{" "}
-                      {venue.performanceCount === 1 ? "showing" : "showings"}
+                      {venue.performanceCount === 1
+                        ? "screening"
+                        : "screenings"}
                     </span>
                   </a>
                 </li>
@@ -403,7 +405,7 @@ export default async function AccessibilityPage() {
                           {featureStat.performanceCount.toLocaleString("en-GB")}
                         </span>
                         <span className={styles.featureStatLabel}>
-                          Showings
+                          Screenings
                         </span>
                       </div>
                       <div className={styles.featureStatCard}>
@@ -430,7 +432,7 @@ export default async function AccessibilityPage() {
                               includedWithPosters.length;
                             const useStacked =
                               included.length > 1 && totalPosters >= 2;
-                            const subtitle = `${movie.performanceCount.toLocaleString("en-GB")} ${movie.performanceCount === 1 ? "showing" : "showings"}`;
+                            const subtitle = `${movie.performanceCount.toLocaleString("en-GB")} ${movie.performanceCount === 1 ? "screening" : "screenings"}`;
 
                             return (
                               <Link

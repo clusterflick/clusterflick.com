@@ -218,7 +218,7 @@ describe("suggestFilterRelaxations", () => {
         changes: [
           {
             label: "Any date",
-            detail: `next showing ${formatDateLong(BEYOND_WINDOW)}`,
+            detail: `next screening ${formatDateLong(BEYOND_WINDOW)}`,
           },
         ],
         count: 1,
@@ -310,8 +310,8 @@ describe("suggestFilterRelaxations", () => {
 
       const [suggestion] = suggestFilterRelaxations({ movies, state });
       expect(lines(suggestion)).toEqual([
-        "Clear the performance note search for “Q&A”",
-        "Any performance note: “Alien” & “Aliens”",
+        "Clear the screening note search for “Q&A”",
+        "Any screening note: “Alien” & “Aliens”",
       ]);
       expect(suggestion.count).toBe(2);
       // The film title query is kept; only the stale one goes.
@@ -348,7 +348,7 @@ describe("suggestFilterRelaxations", () => {
       state = set(state, FilterId.Search, "alien");
 
       expect(labels(movies, state)).toEqual([
-        "Clear the performance note search for “Q&A”",
+        "Clear the screening note search for “Q&A”",
         "Show “Aliens”",
       ]);
     });
@@ -366,10 +366,10 @@ describe("suggestFilterRelaxations", () => {
 
       const [suggestion] = suggestFilterRelaxations({ movies, state });
       expect(suggestion.headline).toBe(
-        "Clear the performance note search for “Q&A”",
+        "Clear the screening note search for “Q&A”",
       );
       expect(suggestion.changes.map((change) => change.label)).toEqual([
-        "Any performance note",
+        "Any screening note",
         "Any date",
       ]);
     });
@@ -410,7 +410,7 @@ describe("suggestFilterRelaxations", () => {
     expect(lines(suggestFilterRelaxations({ movies, state })[0])).toEqual([
       "Search original venue titles instead",
       "Original venue title: “Community Film Screening”",
-      `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+      `Any date: next screening ${formatDateLong(BEYOND_WINDOW)}`,
     ]);
   });
 
@@ -426,7 +426,7 @@ describe("suggestFilterRelaxations", () => {
     const state = set(getDefaultState(), FilterId.Search, "word");
 
     expect(labels(movies, state)).toEqual([
-      "Search performance notes instead",
+      "Search screening notes instead",
       "Show “Words”",
     ]);
   });
@@ -1109,7 +1109,7 @@ describe("suggestFilterRelaxations", () => {
           changes: [
             {
               label: "Any date",
-              detail: `next showing ${formatDateLong(BEYOND_WINDOW)}`,
+              detail: `next screening ${formatDateLong(BEYOND_WINDOW)}`,
             },
           ],
           count: 1,
@@ -1299,7 +1299,7 @@ describe("suggestFilterRelaxations", () => {
       const [suggestion] = suggestFilterRelaxations({ movies, state });
       expect(lines(suggestion)).toEqual([
         "Show “Eternal Sunshine” & “Eternal Sunshine Two”",
-        `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+        `Any date: next screening ${formatDateLong(BEYOND_WINDOW)}`,
       ]);
     });
 
@@ -1313,7 +1313,7 @@ describe("suggestFilterRelaxations", () => {
 
       const [suggestion] = suggestFilterRelaxations({ movies, state });
       expect(suggestion.changes).toEqual([
-        { label: "Any date", detail: `next showing ${formatDateLong(far)}` },
+        { label: "Any date", detail: `next screening ${formatDateLong(far)}` },
       ]);
     });
 
@@ -1326,7 +1326,7 @@ describe("suggestFilterRelaxations", () => {
 
       const [suggestion] = suggestFilterRelaxations({ movies, state });
       expect(suggestion.changes).toEqual([
-        { label: "Any date", detail: "next showing in 8 days" },
+        { label: "Any date", detail: "next screening in 8 days" },
       ]);
     });
 
@@ -1392,7 +1392,7 @@ describe("suggestFilterRelaxations", () => {
         (s) => s.kind === "redirect",
       )!;
       expect(redirect.changes).toEqual([
-        { label: "Performance note", detail: "“Presented in 70mm”" },
+        { label: "Screening note", detail: "“Presented in 70mm”" },
       ]);
     });
 
@@ -1561,7 +1561,7 @@ describe("suggestShowingRelaxations", () => {
     const [suggestion] = suggestShowingRelaxations({ movie, state });
     expect(lines(suggestion)).toEqual([
       "Search all dates",
-      `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+      `Any date: next screening ${formatDateLong(BEYOND_WINDOW)}`,
     ]);
   });
 
@@ -1615,7 +1615,7 @@ describe("suggestShowingRelaxations", () => {
     expect(suggestions.map(lines)).toEqual([
       [
         "Search all dates and search all venues",
-        `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+        `Any date: next screening ${formatDateLong(BEYOND_WINDOW)}`,
         "All venues: at BFI Southbank",
       ],
     ]);
@@ -1630,7 +1630,7 @@ describe("suggestShowingRelaxations", () => {
     );
 
     expect(suggestShowingRelaxations({ movie, state }).map(lines)).toEqual([
-      ["Clear the performance note search for “Q&A”"],
+      ["Clear the screening note search for “Q&A”"],
     ]);
   });
 
@@ -1758,7 +1758,7 @@ describe("venues picked around a place", () => {
     });
     expect(lines(suggestion)).toEqual([
       "Show “A”",
-      `Any date: next showing ${formatDateLong(BEYOND_WINDOW)}`,
+      `Any date: next screening ${formatDateLong(BEYOND_WINDOW)}`,
       "Within 2 miles of you: at BFI Southbank",
     ]);
     expect(suggestion.venueOrigin?.radius).toBe(2);

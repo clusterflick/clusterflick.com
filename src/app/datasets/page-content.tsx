@@ -86,8 +86,8 @@ export default function DatasetsPageContent({
               <FileCodeIcon size={22} />
             </span>
             <p className={styles.datasetText}>
-              <strong>A JSON file for each venue</strong>, listing its showings
-              in{" "}
+              <strong>A JSON file for each venue</strong>, listing its
+              screenings in{" "}
               <a
                 href={DATA_SCHEMA_URL}
                 target="_blank"

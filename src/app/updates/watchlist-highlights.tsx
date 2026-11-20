@@ -71,7 +71,7 @@ export default function WatchlistHighlights({
             id="watchlist-highlights"
             className={styles.watchlistHeading}
           >
-            {count(matches.length, "film")} on your watchlist got new showings
+            {count(matches.length, "film")} on your watchlist got new screenings
           </Heading>
         </div>
         <Link
@@ -110,8 +110,8 @@ export default function WatchlistHighlights({
               )}
               <span>
                 {film.isNew
-                  ? `Now showing: ${count(film.performanceCount, "showing")}`
-                  : count(film.performanceCount, "new showing")}
+                  ? `Now showing: ${count(film.performanceCount, "screening")}`
+                  : count(film.performanceCount, "new screening")}
               </span>
               <span className={styles.watchlistVenue}>
                 {film.soleVenue ?? count(film.venueCount, "venue")}

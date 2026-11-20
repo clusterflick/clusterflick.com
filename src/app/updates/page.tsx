@@ -26,7 +26,7 @@ import styles from "./updates.module.css";
 export const metadata: Metadata = {
   title: "Recently Added London Cinema Listings",
   description:
-    "New films, new showings and new venues added to Clusterflick's London cinema listings, updated with every run of the data pipeline.",
+    "New films, new screenings and new venues added to Clusterflick's London cinema listings, updated with every run of the data pipeline.",
   alternates: {
     canonical: "/updates",
     // Autodiscovery: this is what a reader looks for when given the page URL,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Recently Added London Cinema Listings | Clusterflick",
     description:
-      "New films, new showings and new venues added to Clusterflick's London cinema listings.",
+      "New films, new screenings and new venues added to Clusterflick's London cinema listings.",
     url: "https://clusterflick.com/updates",
     siteName: "Clusterflick",
   },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Recently Added London Cinema Listings | Clusterflick",
     description:
-      "New films, new showings and new venues added to Clusterflick's London cinema listings.",
+      "New films, new screenings and new venues added to Clusterflick's London cinema listings.",
     creator: "@clusterflick",
   },
 };
@@ -79,7 +79,7 @@ export default async function UpdatesPage() {
   return (
     <StandardPageLayout
       title="Updates"
-      subtitle="New films, new showings and new venues, each time the listings are refreshed."
+      subtitle="New films, new screenings and new venues, each time the listings are refreshed."
       heroExtra={
         <p className={styles.heroNote}>
           Listings are refreshed automatically throughout the day —{" "}

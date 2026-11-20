@@ -103,7 +103,7 @@ export default function CollapsibleBoard({
             onClick={handleToggle}
             aria-expanded={expanded}
           >
-            {expanded ? "Hide performances" : "Show all performances"}
+            {expanded ? "Hide screenings" : "Show all screenings"}
           </Button>
         </div>
       )}
