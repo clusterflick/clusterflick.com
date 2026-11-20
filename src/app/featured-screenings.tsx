@@ -19,7 +19,7 @@ const HERO_LIMIT = 4;
 function getWhen(item: FeaturedScreening, now: number): string {
   return item.performance
     ? formatFeaturedWhen(item.performance.time, now)
-    : `${item.weekShowings.toLocaleString("en-GB")} showings this week`;
+    : `${item.weekShowings.toLocaleString("en-GB")} screenings this week`;
 }
 
 /**

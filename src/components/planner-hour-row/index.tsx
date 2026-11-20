@@ -95,7 +95,7 @@ export default function PlannerHourRow({
         {label}
         <span className={styles.count}>
           {items.length.toLocaleString("en-GB")}{" "}
-          {items.length === 1 ? "showing" : "showings"}
+          {items.length === 1 ? "screening" : "screenings"}
         </span>
       </h2>
       <PlannerLane>
@@ -114,9 +114,9 @@ export default function PlannerHourRow({
                   aria-expanded={isOpen}
                   aria-label={
                     isOpen
-                      ? `Hide the other ${first.film.title} showings at ${time}`
+                      ? `Hide the other ${first.film.title} screenings at ${time}`
                       : `Show ${rest.length} more ${first.film.title} ${
-                          rest.length === 1 ? "showing" : "showings"
+                          rest.length === 1 ? "screening" : "screenings"
                         } at ${time}`
                   }
                 >

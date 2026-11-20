@@ -50,7 +50,7 @@ export default function FormatsPageContent({
       id: f.id,
       value: f.performanceCount,
       label: f.name,
-      detail: f.performanceCount === 1 ? "showing" : "showings",
+      detail: f.performanceCount === 1 ? "screening" : "screenings",
       href: f.href,
     }));
   const figures: StatsBandItem[] = [
@@ -61,7 +61,9 @@ export default function FormatsPageContent({
             value: onFilm,
             label: "On film",
             detail:
-              onFilm === 1 ? "showing from a print" : "showings from a print",
+              onFilm === 1
+                ? "screening from a print"
+                : "screenings from a print",
             href: getFilmSourcesUrl(),
             highlight: true,
           },
@@ -118,7 +120,11 @@ export default function FormatsPageContent({
                     <span className={styles.meta}>
                       <span className={styles.filmCount}>
                         {plural(format.movieCount, "film", "films")} ·{" "}
-                        {plural(format.performanceCount, "showing", "showings")}
+                        {plural(
+                          format.performanceCount,
+                          "screening",
+                          "screenings",
+                        )}
                       </span>
                       <span className={styles.venues}>
                         {format.onlyVenue

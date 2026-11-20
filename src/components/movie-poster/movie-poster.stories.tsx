@@ -81,7 +81,7 @@ export const TextPatternLarge: Story = {
 export const TextPatternWithOverlay: Story = {
   args: {
     title: "Dune: Part Two",
-    subtitle: "12 showings this week",
+    subtitle: "12 screenings this week",
     showOverlay: true,
   },
 };

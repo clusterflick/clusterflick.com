@@ -271,7 +271,7 @@ export default function ShowingsSection({
 
   return (
     <ContentSection
-      title="Showings"
+      title="Screenings"
       icon={{
         src: "/images/icons/neon-ticket.svg",
         width: 58,
@@ -285,7 +285,7 @@ export default function ShowingsSection({
             width: 120,
             height: 80,
           }}
-          message="Failed to load showings"
+          message="Failed to load screenings"
           hint={error.message}
           actions={<Button onClick={retry}>Try Again</Button>}
         />
@@ -294,7 +294,7 @@ export default function ShowingsSection({
         // list (guaranteed on the server + first client render, since isLoading
         // starts true), so crawlers and no-JS users see real showings. Falls
         // back to the spinner when there's no static content to show.
-        (staticContent ?? <LoadingIndicator message="Loading showings..." />)
+        (staticContent ?? <LoadingIndicator message="Loading screenings..." />)
       ) : (
         <>
           {showFilterBanner && filterDescription && (
@@ -303,7 +303,8 @@ export default function ShowingsSection({
                 {showingAll ? (
                   <span className={styles.filterLabel}>
                     Showing all{" "}
-                    {unfilteredPerformanceCount.toLocaleString("en-GB")} showing
+                    {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
+                    screening
                     {unfilteredPerformanceCount === 1 ? "" : "s"}
                   </span>
                 ) : (
@@ -327,13 +328,13 @@ export default function ShowingsSection({
                         Showing{" "}
                         {filteredPerformanceCount.toLocaleString("en-GB")} of{" "}
                         {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
-                        showing{unfilteredPerformanceCount === 1 ? "" : "s"}
+                        screening{unfilteredPerformanceCount === 1 ? "" : "s"}
                       </span>
                     ) : (
                       <span className={styles.filterCount}>
                         Hiding all{" "}
                         {unfilteredPerformanceCount.toLocaleString("en-GB")}{" "}
-                        showing{unfilteredPerformanceCount === 1 ? "" : "s"}
+                        screening{unfilteredPerformanceCount === 1 ? "" : "s"}
                       </span>
                     )}
                   </>
@@ -353,8 +354,8 @@ export default function ShowingsSection({
               }}
               message={
                 unfilteredPerformanceCount > 0
-                  ? "No showings match your current filters"
-                  : "No showings currently available"
+                  ? "No screenings match your current filters"
+                  : "No screenings currently available"
               }
               hint={
                 unfilteredPerformanceCount === 0
@@ -368,7 +369,7 @@ export default function ShowingsSection({
                   <FilterSuggestions
                     suggestions={suggestions}
                     onApply={onApplySuggestion}
-                    unit="showing"
+                    unit="screening"
                   />
                 )
               }
@@ -415,7 +416,9 @@ export default function ShowingsSection({
                                 <span className={styles.finishedCount}>
                                   {group.pastCount.toLocaleString("en-GB")}
                                 </span>{" "}
-                                {group.pastCount === 1 ? "showing" : "showings"}{" "}
+                                {group.pastCount === 1
+                                  ? "screening"
+                                  : "screenings"}{" "}
                                 which {group.pastCount === 1 ? "has" : "have"}{" "}
                                 already finished
                               </>
@@ -425,7 +428,9 @@ export default function ShowingsSection({
                                 <span className={styles.finishedCount}>
                                   {group.pastCount.toLocaleString("en-GB")}
                                 </span>{" "}
-                                {group.pastCount === 1 ? "showing" : "showings"}{" "}
+                                {group.pastCount === 1
+                                  ? "screening"
+                                  : "screenings"}{" "}
                                 which {group.pastCount === 1 ? "has" : "have"}{" "}
                                 already finished
                               </>

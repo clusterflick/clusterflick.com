@@ -85,11 +85,11 @@ export function DetailPageStatusCard({
           <strong>{movieCount.toLocaleString("en-GB")}</strong>{" "}
           {movieCount === 1 ? "film" : "films"} &middot;{" "}
           <strong>{performanceCount.toLocaleString("en-GB")}</strong>{" "}
-          {performanceCount === 1 ? "showing" : "showings"}
+          {performanceCount === 1 ? "screening" : "screenings"}
         </p>
       ) : (
         <>
-          <p>No showings currently listed</p>
+          <p>No screenings currently listed</p>
           {showLastPerformance && (
             <p className={styles.statusDetail}>
               Last screening was{" "}

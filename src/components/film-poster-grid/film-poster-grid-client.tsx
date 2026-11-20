@@ -74,8 +74,8 @@ export default function FilmPosterGridClient({
           width: 120,
           height: 80,
         }}
-        message="No showings currently listed"
-        hint="Check back soon — new showings are added regularly"
+        message="No screenings currently listed"
+        hint="Check back soon — new screenings are added regularly"
       />
     );
   }

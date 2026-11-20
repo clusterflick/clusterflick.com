@@ -723,7 +723,7 @@ export function describeFilters(options: DescribeOptions): FilterDescription {
       eventsDesc += ` matching "${searchQuery}"`;
     }
     if (showingTitleQuery) {
-      eventsDesc += ` with showing title "${showingTitleQuery}"`;
+      eventsDesc += ` with venue title "${showingTitleQuery}"`;
     }
     if (performanceNotesQuery) {
       eventsDesc += ` with notes "${performanceNotesQuery}"`;

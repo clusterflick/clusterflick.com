@@ -92,15 +92,15 @@ function describeRelease(release: UpdateRelease): string {
   if (release.newFilms.length > 0) {
     sections.push(
       `<h2>${escapeXml(pluralise(release.newFilms.length, "new film"))}</h2>` +
-        `<ul>${release.newFilms.map((film) => filmLine(film, "showing")).join("")}</ul>`,
+        `<ul>${release.newFilms.map((film) => filmLine(film, "screening")).join("")}</ul>`,
     );
   }
 
   if (release.moreShowings.length > 0) {
     sections.push(
-      `<h2>More showings</h2>` +
+      `<h2>More screenings</h2>` +
         `<ul>${release.moreShowings
-          .map((film) => filmLine(film, "new showing"))
+          .map((film) => filmLine(film, "new screening"))
           .join("")}</ul>`,
     );
   }
@@ -140,7 +140,7 @@ export async function GET() {
   <channel>
     <title>Clusterflick — Updates</title>
     <link>${SITE}/updates/</link>
-    <description>New films, new showings and new venues added to Clusterflick's London cinema listings.</description>
+    <description>New films, new screenings and new venues added to Clusterflick's London cinema listings.</description>
     <language>en-GB</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <atom:link href="${FEED_URL}" rel="self" type="application/rss+xml" />

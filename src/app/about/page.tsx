@@ -29,9 +29,9 @@ const faqs = [
       "Clusterflick gets showing details directly from each venue and event source. The film-related metadata (including actor, director, synopses, release dates, trailers and poster art) is supplied by The Movie Database (TMDB). Clusterflick uses the TMDB API but is not endorsed or certified by TMDB.",
   },
   {
-    question: "How often is the showing data updated?",
+    question: "How often is the screening data updated?",
     answer:
-      "The showing data is refreshed from each venue and event source several times a day.",
+      "The screening data is refreshed from each venue and event source several times a day.",
   },
   {
     question: "Is Clusterflick open source?",
@@ -41,7 +41,7 @@ const faqs = [
   {
     question: "Can I use Clusterflick's screening data in my own project?",
     answer:
-      "Yes. The showing data is refreshed several times a day, available in two formats, and free to use — including commercially — under CC BY 4.0, as long as you credit us. Film metadata supplied by TMDB is excluded and stays subject to TMDB's own terms; the data licence page has the full terms.",
+      "Yes. The screening data is refreshed several times a day, available in two formats, and free to use — including commercially — under CC BY 4.0, as long as you credit us. Film metadata supplied by TMDB is excluded and stays subject to TMDB's own terms; the data licence page has the full terms.",
   },
 ];
 

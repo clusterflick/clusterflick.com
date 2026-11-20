@@ -129,7 +129,7 @@ export function summariseRelease(release: UpdateRelease): string {
       0,
     );
     parts.push(
-      `${pluralise(showings, "showing")} added to ${pluralise(
+      `${pluralise(showings, "screening")} added to ${pluralise(
         release.moreShowings.length,
         "film",
       )}`,
@@ -628,7 +628,7 @@ export function summariseDay(day: UpdateDay): string {
 
   const parts: string[] = [];
   if (newFilms > 0) parts.push(`${pluralise(newFilms, "film")} added`);
-  if (showings > 0) parts.push(`${pluralise(showings, "showing")} added`);
+  if (showings > 0) parts.push(`${pluralise(showings, "screening")} added`);
   if (newVenues > 0) parts.push(`${pluralise(newVenues, "venue")} added`);
 
   const sentence = parts.join(", ");

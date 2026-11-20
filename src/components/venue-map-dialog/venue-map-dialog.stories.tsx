@@ -58,7 +58,7 @@ function venue(
     lat,
     lon,
     filmCount: showings,
-    detail: `${showings} ${showings === 1 ? "showing" : "showings"}`,
+    detail: `${showings} ${showings === 1 ? "screening" : "screenings"}`,
   };
 }
 

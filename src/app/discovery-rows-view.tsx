@@ -117,7 +117,7 @@ export default function DiscoveryRowsView({
 
       <PosterRow
         title="Last Chance"
-        intro="Films with their final showing coming up soon!"
+        intro="Films with their final screening coming up soon!"
         movies={lastChance}
         showAll
       />

@@ -461,7 +461,7 @@ function computeSignals(meta, movies, now) {
             rating: rating?.text ?? null,
             highlight: highlightFor(
               "final-showing",
-              "Final showing",
+              "Final screening",
               finalTime,
               finalShowing?.venueId,
             ),

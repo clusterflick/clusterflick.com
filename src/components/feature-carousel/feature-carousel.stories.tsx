@@ -74,7 +74,7 @@ const items: FeatureCarouselItem[] = [
     labelColor: "gray",
     credit: "Martin McDonagh · 2026",
     rating: "4.1/5 on Letterboxd",
-    when: "2,642 showings this week",
+    when: "2,642 screenings this week",
     overview:
       "Shortly before the 1973 Chilean coup, CIA agents Chris and Lee are dispatched from Santiago to Easter Island by their bureau chief, MJ.",
     trailerUrl: "https://www.youtube.com/watch?v=kqxuamKxRTo",
@@ -84,7 +84,7 @@ const items: FeatureCarouselItem[] = [
     href: "/movies/1488459/the-scarecrows-wedding",
     title: "The Scarecrows' Wedding",
     posterPath: "/qoLvoJy0tnlxJ7jYVwXdPFf7oCe.jpg",
-    label: "Final showing",
+    label: "Final screening",
     labelColor: "yellow",
     credit: "Samantha Cutler & Jeroen Jaspaert · 2026",
     when: "Thursday, 10:25",

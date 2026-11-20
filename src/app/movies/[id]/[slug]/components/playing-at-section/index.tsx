@@ -48,7 +48,7 @@ interface VenueEntry {
 }
 
 function formatShowings(count: number): string {
-  return `${count} showing${count === 1 ? "" : "s"}`;
+  return `${count} screening${count === 1 ? "" : "s"}`;
 }
 
 function formatMeta(entry: VenueEntry): string {

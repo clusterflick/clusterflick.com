@@ -50,13 +50,13 @@ ${datasets}
 - [Home](${SITE}/): highlights of what's showing
 - [Catalogue](${pageUrl("/catalogue")}): every film showing, searchable and filterable. Filters are kept in the query string; \`base=all\` widens past the default of films in the next seven days
 - [Venues](${pageUrl("/venues")}): every venue. A venue's page is ${SITE}/venues/<venue-name-slug>/
-- Films: ${SITE}/movies/<movie-id>/<title-slug>/, with every showing, venue and rating
+- Films: ${SITE}/movies/<movie-id>/<title-slug>/, with every screening, venue and rating
 - [Cinemas by borough](${pageUrl("/london-cinemas")}) and [cinema chains](${pageUrl("/cinema-groups")})
 - [Film clubs](${pageUrl("/film-clubs")}) and [festivals](${pageUrl("/festivals")})
 - [Film lists](${pageUrl("/lists")}): award winners and top-film lists, with which members are showing
 - [Genres](${pageUrl("/genres")}) and [formats](${pageUrl("/formats")}) (35mm, 70mm, IMAX and others)
 - [Accessible screenings](${pageUrl("/accessibility")}): audio described, hard of hearing, relaxed, baby friendly, dog friendly and subtitled screenings, each with a page of its own
-- [Updates](${pageUrl("/updates")}): films and showings added in each release, also as an [RSS feed](${SITE}/updates/feed.xml)
+- [Updates](${pageUrl("/updates")}): films and screenings added in each release, also as an [RSS feed](${SITE}/updates/feed.xml)
 
 ## Optional
 

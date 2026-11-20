@@ -158,7 +158,7 @@ export default function FeatureCarousel({
           )}
           {item.overview && <p className={styles.overview}>{item.overview}</p>}
           <div className={styles.actions}>
-            <ButtonLink href={item.href}>See showings →</ButtonLink>
+            <ButtonLink href={item.href}>See screenings →</ButtonLink>
             {item.trailerUrl && (
               <ButtonAnchor
                 href={item.trailerUrl}

@@ -567,7 +567,7 @@ export default function PageContent() {
               detail={
                 listView === "time"
                   ? `${showingCount.toLocaleString("en-GB")} ${
-                      showingCount === 1 ? "showing" : "showings"
+                      showingCount === 1 ? "screening" : "screenings"
                     }`
                   : `${rows.length.toLocaleString("en-GB")} ${
                       rows.length === 1 ? "film" : "films"

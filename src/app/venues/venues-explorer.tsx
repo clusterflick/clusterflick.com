@@ -156,7 +156,7 @@ export default function VenuesExplorer({
 
             <Switch
               id="venues-hide-empty"
-              label="Hide venues with no showings"
+              label="Hide venues with no screenings"
               checked={hideEmpty}
               onChange={setHideEmpty}
             />
@@ -204,7 +204,7 @@ export default function VenuesExplorer({
               No venues match &ldquo;{query}&rdquo;
             </p>
           ) : (
-            <p className={styles.noResults}>No venues have showings listed</p>
+            <p className={styles.noResults}>No venues have screenings listed</p>
           ))}
       </div>
     </div>

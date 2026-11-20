@@ -145,7 +145,7 @@ describe("getPopularMovies", () => {
     const result = getPopularMovies(asRecord([deep, wide]), WINDOW);
 
     expect(result.map((r) => r.movie.id)).toEqual(["wide", "deep"]);
-    expect(result[0].subtitle).toBe("3 venues · 3 showings");
+    expect(result[0].subtitle).toBe("3 venues · 3 screenings");
   });
 
   it("excludes single-venue runs and respects excludeIds", () => {
@@ -282,7 +282,7 @@ describe("getLastChanceMovies", () => {
     ]);
     const result = getLastChanceMovies(asRecord([ending]), NOW);
     expect(result.map((r) => r.movie.id)).toEqual(["ending"]);
-    expect(result[0].subtitle).toMatch(/^Last showing /);
+    expect(result[0].subtitle).toMatch(/^Last screening /);
   });
 
   it("labels the poster with the day the run ends", () => {
@@ -763,8 +763,8 @@ describe("getWatchlistRow", () => {
     );
     expect(fav.subtitle).toMatch(/^Rio ·\u00A0Wed\u00A015\u00A0Nov$/);
     expect(rest.map((s) => s.subtitle)).toEqual([
-      "Last showing Thu 16 Nov",
-      "Next showing Thu 16 Nov",
+      "Last screening Thu 16 Nov",
+      "Next screening Thu 16 Nov",
     ]);
   });
 });

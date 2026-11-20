@@ -37,7 +37,7 @@ function FilmTile({ film }: { film: UpdateFilm }) {
       posterPath={film.posterPath}
       includedMovies={film.includedMovies}
       href={film.href ?? undefined}
-      details={[venueLabel, pluralise(film.performanceCount, "showing")]}
+      details={[venueLabel, pluralise(film.performanceCount, "screening")]}
       movieId={film.movieId ?? undefined}
     />
   );
@@ -108,7 +108,7 @@ export default function ReleaseSection({
       {release.moreShowings.length > 0 && (
         <section className={styles.section}>
           <SectionHeading className={styles.sectionHeading}>
-            More showings
+            More screenings
           </SectionHeading>
           <CappedList
             className={styles.showings}
@@ -123,7 +123,7 @@ export default function ReleaseSection({
                 )}
                 {film.movieId && <WatchlistTag movieId={film.movieId} />}
                 {" — "}
-                {pluralise(film.performanceCount, "new showing")}
+                {pluralise(film.performanceCount, "new screening")}
                 {" at "}
                 {/* One venue names itself; more than one leads with the count,
                     so the reach is clear before the list */}

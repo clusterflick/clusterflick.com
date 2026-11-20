@@ -84,7 +84,7 @@ export const WithSeeAll: Story = {
     title: "Last Chance",
     movies: POSTER_FILMS.map((movie) => ({
       movie,
-      subtitle: "Last showing Sun",
+      subtitle: "Last screening Sun",
     })),
     seeAllHref: "/catalogue",
     seeAllLabel: "Browse all",
@@ -99,7 +99,7 @@ export const WithBadges: Story = {
       const day = ["Thu 5", "Fri 6", "Sat 7", "Sun 8", "Mon 9"][index];
       return {
         movie,
-        subtitle: `Last showing ${day} Nov`,
+        subtitle: `Last screening ${day} Nov`,
         badge: { label: `Ends ${day} Nov`, color: "yellow" as const },
       };
     }),

@@ -39,8 +39,8 @@ export default function VenueCard({
   const countText = !hasCounts
     ? null
     : filmCount > 0
-      ? `${filmCount.toLocaleString("en-GB")} ${filmCount === 1 ? "film" : "films"} · ${performanceCount.toLocaleString("en-GB")} ${performanceCount === 1 ? "showing" : "showings"}`
-      : "No showings currently listed";
+      ? `${filmCount.toLocaleString("en-GB")} ${filmCount === 1 ? "film" : "films"} · ${performanceCount.toLocaleString("en-GB")} ${performanceCount === 1 ? "screening" : "screenings"}`
+      : "No screenings currently listed";
   const stats = [detail, countText].filter(Boolean).join(" · ");
 
   const card = (

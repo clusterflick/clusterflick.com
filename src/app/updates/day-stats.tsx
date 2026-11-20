@@ -19,7 +19,7 @@ export default function DayStats({ day }: { day: UpdateDay }) {
 
   const items: StatsBandItem[] = [
     { id: "films", value: totals.newFilms, label: "New films" },
-    { id: "showings", value: totals.showings, label: "New showings" },
+    { id: "showings", value: totals.showings, label: "New screenings" },
     // In the label rather than a detail line: a figure with a detail sits
     // higher than its neighbours, and the band reads as a row of equals
     { id: "venues", value: totals.venuesUpdated, label: "Venues updated" },

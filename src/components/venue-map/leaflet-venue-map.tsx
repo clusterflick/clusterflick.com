@@ -160,7 +160,7 @@ function renderVenueMarker(
               ? `${venue.filmCount.toLocaleString("en-GB")} ${
                   venue.filmCount === 1 ? "film" : "films"
                 } showing`
-              : "No showings currently listed")}
+              : "No screenings currently listed")}
         </span>
       </Popup>
     </Marker>

@@ -73,7 +73,7 @@ export default function StatusSection({ stats }: StatusSectionProps) {
       href: ALL_EVENTS_HREF,
     },
     {
-      label: "Showings",
+      label: "Screenings",
       value: stats.showings,
       // Every showing, laid out by day: what this figure counts.
       href: "/planner?base=all",

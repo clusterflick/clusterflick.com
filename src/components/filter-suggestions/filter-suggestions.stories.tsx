@@ -77,7 +77,7 @@ export const SingleWidening: Story = {
         id: "widen:dateRange",
         kind: "widen",
         headline: "Show “Eternal Sunshine of the Spotless Mind”",
-        changes: [{ label: "Any date", detail: "next showing in 8 days" }],
+        changes: [{ label: "Any date", detail: "next screening in 8 days" }],
         count: 1,
       }),
     ],
@@ -96,7 +96,7 @@ export const MultipleWidenings: Story = {
         id: "widen:dateRange",
         kind: "widen",
         headline: "Show “Eternal Sunshine…” & “Little Miss Sunshine”",
-        changes: [{ label: "Any date", detail: "next showing in 8 days" }],
+        changes: [{ label: "Any date", detail: "next screening in 8 days" }],
         count: 2,
       }),
       suggestion({
@@ -208,8 +208,8 @@ export const RedirectAndWidening: Story = {
       suggestion({
         id: "redirect:search:performanceNotesSearch",
         kind: "redirect",
-        headline: "Search performance notes instead",
-        changes: [{ label: "Performance note", detail: "“Presented in 70mm”" }],
+        headline: "Search screening notes instead",
+        changes: [{ label: "Screening note", detail: "“Presented in 70mm”" }],
         count: 2,
       }),
       suggestion({
@@ -239,7 +239,7 @@ export const CombinedPair: Story = {
             label: "Original venue title",
             detail: "“Loved & Wanted: Community Film Screening”",
           },
-          { label: "Any date", detail: "next showing in 11 days" },
+          { label: "Any date", detail: "next screening in 11 days" },
         ],
         count: 1,
       }),
@@ -277,7 +277,7 @@ export const CorrectionAndWidening: Story = {
         id: "correct:Little Miss Sunshine+widen:dateRange",
         kind: "correct",
         headline: "Did you mean “Little Miss Sunshine”?",
-        changes: [{ label: "Any date", detail: "next showing in 8 days" }],
+        changes: [{ label: "Any date", detail: "next screening in 8 days" }],
         count: 1,
       }),
       suggestion({
@@ -298,8 +298,8 @@ export const AllKinds: Story = {
       suggestion({
         id: "redirect:search:performanceNotesSearch",
         kind: "redirect",
-        headline: "Search performance notes instead",
-        changes: [{ label: "Performance note", detail: "“Watchword”" }],
+        headline: "Search screening notes instead",
+        changes: [{ label: "Screening note", detail: "“Watchword”" }],
         count: 5,
       }),
       suggestion({
@@ -314,7 +314,7 @@ export const AllKinds: Story = {
         kind: "widen",
         headline: "Show “Words”",
         changes: [
-          { label: "Any date", detail: "next showing in 12 days" },
+          { label: "Any date", detail: "next screening in 12 days" },
           { label: "All event types", detail: "found in TV" },
         ],
         count: 1,
@@ -354,13 +354,13 @@ export const LongDetail: Story = {
  */
 export const FilmPage: Story = {
   args: {
-    unit: "showing",
+    unit: "screening",
     suggestions: [
       suggestion({
         id: "widen:dateRange",
         kind: "widen",
         headline: "Search all dates",
-        changes: [{ label: "Any date", detail: "next showing in 12 days" }],
+        changes: [{ label: "Any date", detail: "next screening in 12 days" }],
         count: 4,
       }),
       suggestion({
