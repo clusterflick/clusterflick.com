@@ -40,6 +40,14 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: "clusterflick/data-matched"
           out-file-path: "matched-data"
+      # Reviewed facts about each venue's building and screens, read by the
+      # venue pages at build time (see src/utils/get-venue-accessibility.ts)
+      - name: Download venue accessibility
+        uses: ./.github/actions/download-release
+        with:
+          token: ${{ secrets.PAT }}
+          repository: "clusterflick/venue-accessibility"
+          out-file-path: "venue-accessibility"
       # A window of releases rather than just the latest, so the updates feed
       # covers more than a single pipeline run
       - run: npm run fetch-diffed-data

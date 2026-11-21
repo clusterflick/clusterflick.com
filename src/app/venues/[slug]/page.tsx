@@ -25,6 +25,7 @@ import { getFilmClubImagePath } from "@/utils/get-film-club-image";
 import { summariseFilmClub } from "@/utils/get-movie-film-clubs";
 import { getVenueSchedule } from "@/utils/get-venue-schedule";
 import { getVenueNewAdditions } from "@/utils/get-discovery-movies";
+import { getVenueAccessibility } from "@/utils/get-venue-accessibility";
 import {
   AccessibilityFeature,
   type Movie,
@@ -388,6 +389,7 @@ export default async function VenueDetailPage({
         activeFestivals={activeFestivalsAtVenue}
         filmClubs={filmClubsAtVenue}
         accessibilityStats={venueAccessibilityStats}
+        access={getVenueAccessibility(venue.id)}
       />
     </>
   );
