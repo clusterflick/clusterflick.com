@@ -37,7 +37,17 @@
   justify-content: center;
 }
 
+/* The link's text is the venue's address, which has no spaces, and a browser
+   won't break it at a slash. Its longest run between hyphens became its
+   narrowest width ("https://www.picturehouses.com/cinema/greenwich-"), which
+   pushed a phone page sideways. BreakableUrl offers a break after each slash;
+   `anywhere` is the fallback for a part still too long on its own, and lets
+   the flex item shrink below it. */
 .heroLink {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
   color: var(--color-electric-blue);
   text-decoration: none;
   font-size: 16px;
