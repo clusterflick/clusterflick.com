@@ -98,6 +98,9 @@ async function loadVenueDetailData(): Promise<VenueDetailData | null> {
     activeFestivals: [],
     filmClubs: [],
     accessibilityStats: [],
+    // Nobody has reviewed the Prince Charles's access yet, so its page has no
+    // access section; VenueAccess has stories of its own.
+    access: null,
   };
 }
 

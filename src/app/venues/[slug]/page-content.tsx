@@ -32,6 +32,8 @@ import type { VenueScheduleDay } from "@/utils/get-venue-schedule";
 import type { ScoredMovie } from "@/utils/get-discovery-movies";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
+import VenueAccess from "@/components/venue-access";
+import type { VenueAccess as VenueAccessRecord } from "@/utils/venue-access-types";
 import styles from "./page.module.css";
 
 export type NearbyVenue = {
@@ -71,6 +73,8 @@ export interface VenueDetailPageContentProps {
     filmCount: number;
     performanceCount: number;
   }[];
+  /** The building and its screens, when someone has checked them. */
+  access: VenueAccessRecord | null;
 }
 
 export default function VenueDetailPageContent({
@@ -90,6 +94,7 @@ export default function VenueDetailPageContent({
   activeFestivals,
   filmClubs,
   accessibilityStats,
+  access,
 }: VenueDetailPageContentProps) {
   const venueMovieParams = `venues=${encodeURIComponent(venue.id)}`;
   // `base=all` starts from a fully permissive state (all dates, all categories)
@@ -135,7 +140,9 @@ export default function VenueDetailPageContent({
 
   const accessibilitySection = hasAccessibility ? (
     <ContentSection
-      title="Accessibility"
+      // "Accessibility" alone would read as the access section below, about
+      // the building; this one is about screenings, as the nav names it.
+      title="Accessible Screenings"
       as="h2"
       className={styles.accessibilitySection}
       intro={
@@ -310,6 +317,11 @@ export default function VenueDetailPageContent({
           main={programmesSection}
           sidebar={accessibilitySection}
         />
+      )}
+      {access && (
+        <ContentSection title={`Access at ${venue.name}`} as="h2" id="access">
+          <VenueAccess access={access} venueName={venue.name} />
+        </ContentSection>
       )}
       {nearbyVenues.length > 0 && (
         <div>

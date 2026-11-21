@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import HeroSection from "@/components/hero-section";
@@ -10,6 +10,24 @@ import {
   isInPast,
 } from "@clusterflick/catalogue/utils/format-date";
 import styles from "./detail-page-hero.module.css";
+
+/**
+ * An address with a break opportunity after each path slash, so a long one
+ * wraps between its parts ("…/cinema/" then "greenwich-picturehouse") rather
+ * than mid-word. The "//" after the scheme stays together.
+ */
+function BreakableUrl({ url }: { url: string }) {
+  return (
+    <>
+      {url.split(/(?<=\/)(?!\/)/).map((part, index) => (
+        <Fragment key={index}>
+          {index > 0 && <wbr />}
+          {part}
+        </Fragment>
+      ))}
+    </>
+  );
+}
 
 interface DetailPageHeroProps {
   name: string;
@@ -155,7 +173,7 @@ export default function DetailPageHero({
             rel="noopener noreferrer"
             className={styles.heroLink}
           >
-            {url}
+            <BreakableUrl url={url} />
           </a>
         </div>
       )}

@@ -14,6 +14,7 @@
     "fetch-diffed-data": "node ./scripts/fetch-diffed-data.js",
     "fetch-published-data": "node ./scripts/fetch-published-data.js",
     "fetch-release-log": "node ./scripts/fetch-release-log.js",
+    "fetch-venue-accessibility": "node ./scripts/fetch-venue-accessibility.js",
     "migrate-film-details": "node ./scripts/migrate-film-details.js",
     "grant-capability": "node ./scripts/grant-capability.js",
     "add-movie-list-tmdb-ids": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./scripts/add-movie-list-tmdb-ids.mjs",

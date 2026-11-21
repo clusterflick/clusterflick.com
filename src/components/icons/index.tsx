@@ -115,6 +115,36 @@ export function TickIcon({ size = 24, ...props }: IconProps) {
   );
 }
 
+// A triangle with an exclamation mark: something to check before relying on
+// it, as where a venue's sources disagree. Drawn in the tick's stroke, so the
+// marks read as one set.
+export function WarningIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      {...props}
+    >
+      <path
+        d="M10.3 4.2L2.6 17.5a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 4.2a2 2 0 00-3.4 0z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 9.5v4.5M12 17.25v.01"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 // Geometrically the same mark as CloseIcon, kept separate because it means
 // "no" rather than "dismiss" - the two want to be restyled independently.
 export function CrossIcon({ size = 24, ...props }: IconProps) {

@@ -1,0 +1,476 @@
+{
+  "access_contact": "Picturehouse accessibility line 03330 527 300 (Text Relay 18001 03330 527 300)",
+  "access_page_url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility",
+  "accessible_toilet": {
+    "conflict": null,
+    "last_found": null,
+    "note": "Ground floor, on the corridor to the screens",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "An adapted toilet for wheelchair users is located on the ground floor on the main corridor to the screens.",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "alt_accessible_entrance": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "assistance_dogs": {
+    "conflict": null,
+    "last_found": null,
+    "note": "Tell them when booking, for an aisle seat",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "Guide dogs and assistance dogs are welcome",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "changing_places": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "entrance_step_free": {
+    "conflict": null,
+    "last_found": null,
+    "note": "The main entrance leads to the box office, bar and four screens",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "hearing_assist_counters": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "id": "picturehouses.com-the-ritzy",
+  "lift": {
+    "conflict": null,
+    "last_found": null,
+    "note": "To Screen 5 and the café's main floor",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "The fifth screen and main floor of the café can be accessed via a lift to the first floor.",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "notes": null,
+  "quiet_space": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "screens": [
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Headphones",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "We offer headphones to those with impaired hearing in all our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "name": "Screen 1",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Front row",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All wheelchair spaces are positioned on the front row.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes",
+        "value": "front"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "From the main entrance",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 6,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Our main auditorium (Screen 1) has six wheelchair spaces",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Headphones",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "We offer headphones to those with impaired hearing in all our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "name": "Screen 2",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Front row",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All wheelchair spaces are positioned on the front row.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes",
+        "value": "front"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "From the main entrance",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "the other four (Screens 2-5) have two each",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Headphones",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "We offer headphones to those with impaired hearing in all our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "name": "Screen 3",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Front row",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All wheelchair spaces are positioned on the front row.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes",
+        "value": "front"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "From the main entrance",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "the other four (Screens 2-5) have two each",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Headphones",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "We offer headphones to those with impaired hearing in all our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "name": "Screen 4",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Front row",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All wheelchair spaces are positioned on the front row.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes",
+        "value": "front"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "From the main entrance",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "the other four (Screens 2-5) have two each",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Headphones",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "We offer headphones to those with impaired hearing in all our screens.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "name": "Screen 5",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Front row",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All wheelchair spaces are positioned on the front row.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes",
+        "value": "front"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "By lift",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "The fifth screen and main floor of the café can be accessed via a lift to the first floor.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "the other four (Screens 2-5) have two each",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    }
+  ],
+  "step_free_access": {
+    "conflict": null,
+    "last_found": null,
+    "note": "Through the main entrance",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "The main entrance gives access to the Box Office, kiosk, bar and four of our screens.",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/the-ritzy/accessibility"
+      }
+    ],
+    "status": "yes"
+  }
+}

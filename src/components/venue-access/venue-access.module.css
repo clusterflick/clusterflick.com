@@ -1,0 +1,344 @@
+.access {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Getting in and Facilities side by side once there's room; a phone stacks
+   them. */
+.groups {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+@media (min-width: 768px) {
+  .groups {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+/* Section headings in the link blue, so each block is easy to find. */
+.heading {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+}
+
+/* At a glance: the few facts that say whether a visit will be easy, as
+   tiles above the detail. */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Each tile spans three rows of the summary grid and shares them with its
+   neighbours (subgrid), so a label that wraps to two lines moves its whole
+   row's values down together rather than only its own. */
+.summaryItem {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 6px;
+  align-items: end;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+.summaryLabel {
+  align-self: start;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-muted-gray);
+}
+
+.summaryDetail {
+  align-self: start;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.facts {
+  margin: 0;
+}
+
+/* Label left, value right, always: a grid rather than a wrapping flex row, so
+   a long note wraps inside the value's column instead of dropping the whole
+   value onto a line of its own. */
+.fact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
+  column-gap: 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+.fact:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 15px;
+  color: var(--color-light-gray);
+}
+
+.value {
+  margin: 0;
+  text-align: right;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.statusLarge {
+  font-size: 20px;
+}
+
+.mark {
+  flex-shrink: 0;
+}
+
+/* The marks are the personalise page's on and off: green tick, pink cross.
+   Partly is the tick in yellow. */
+.yes .mark {
+  color: var(--color-release-green);
+}
+
+.no .mark {
+  color: var(--color-neon-pink);
+}
+
+.partial .mark {
+  color: var(--color-buttery-yellow);
+}
+
+/* Not published is an answer, but a quieter one than the facts we have. */
+.unknown,
+.not_applicable {
+  font-weight: 400;
+  color: var(--color-muted-gray);
+}
+
+.refs {
+  margin-left: 2px;
+  font-size: 11px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--color-muted-gray);
+  text-align: left;
+}
+
+.value .details {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* A fact's status, footnotes and details, held together as one value. */
+.cell {
+  display: block;
+}
+
+/* How sources disagree, closed to a marker until asked for. The marker is the
+   only yellow in the section: something to check, not a status. */
+.conflict {
+  max-width: 100%;
+}
+
+.conflictSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--color-light-gray);
+}
+
+.conflictSummary::-webkit-details-marker {
+  display: none;
+}
+
+.conflictMark {
+  flex-shrink: 0;
+  color: var(--color-buttery-yellow);
+}
+
+.conflictChevron {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.conflict[open] .conflictChevron {
+  transform: rotate(180deg);
+}
+
+.conflictText {
+  display: block;
+  margin-top: 4px;
+}
+
+/* The table scrolls inside itself on a phone rather than widening the page. */
+.tableScroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px 10px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+.table thead th {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted-gray);
+}
+
+.table tbody th {
+  font-weight: 600;
+  color: var(--color-light-gray);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* On a phone five columns are too narrow to read, so each screen becomes a
+   block: its name, then each column's label beside its value, the same layout
+   as the facts above. The column headings are hidden visually but kept for
+   screen readers, which still read a table. */
+@media (max-width: 639px) {
+  .table {
+    min-width: 0;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table tbody tr {
+    display: block;
+    padding: 6px 0 10px;
+    border-bottom: 1px solid rgba(var(--color-white-rgb), 0.16);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table tbody th,
+  .table tbody td {
+    display: block;
+    padding: 4px 0;
+    border-bottom: none;
+  }
+
+  .table tbody th {
+    padding-top: 8px;
+    white-space: normal;
+  }
+
+  .table tbody td {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
+    column-gap: 12px;
+    align-items: baseline;
+    text-align: right;
+  }
+
+  .table tbody td::before {
+    content: attr(data-label);
+    font-size: 14px;
+    color: var(--color-muted-gray);
+    text-align: left;
+  }
+
+  .table tbody td .details {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+.recordNotes,
+.footer {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-gray);
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer p + p,
+.footer ol + p {
+  margin-top: 6px;
+}
+
+.sources {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.sources li + li {
+  margin-top: 4px;
+}
+
+/* A footnote link lands its source under the sticky header rather than
+   behind it. */
+.sources li {
+  scroll-margin-top: 100px;
+}
+
+/* Lets a long note wrap inside its grid column rather than widening it. */
+.group {
+  min-width: 0;
+}

@@ -37,6 +37,7 @@ done
 npm run fetch-diffed-data
 npm run fetch-published-data
 npm run fetch-release-log
+npm run fetch-venue-accessibility
 
 rm -rf ./public/data
 npm run process-combined-data

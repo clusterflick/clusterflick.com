@@ -1,0 +1,478 @@
+{
+  "access_contact": "Picturehouse accessibility line 03330 527 300 (Text Relay 18001 03330 527 300)",
+  "access_page_url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility",
+  "accessible_toilet": {
+    "conflict": null,
+    "last_found": null,
+    "note": "First floor, next to Screen 3, by lift",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "Our accessible toilet is located on the first floor, next to screen three",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "alt_accessible_entrance": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "assistance_dogs": {
+    "conflict": null,
+    "last_found": null,
+    "note": "Tell them when booking, for an aisle seat",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "Guide dogs and assistance dogs are welcome",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "changing_places": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "entrance_step_free": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "hearing_assist_counters": {
+    "conflict": null,
+    "last_found": null,
+    "note": "At all counters",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "We have hearing loops at all counters",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "id": "picturehouses.com-greenwich",
+  "lift": {
+    "conflict": null,
+    "last_found": null,
+    "note": "To the first floor",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "The customer lift allows one to access the first floor located upstairs, which includes an accessible toilet.",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+      }
+    ],
+    "status": "yes"
+  },
+  "notes": null,
+  "quiet_space": {
+    "conflict": null,
+    "last_found": null,
+    "note": null,
+    "sources": [],
+    "status": "unknown"
+  },
+  "screens": [
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "name": "Screen 1",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown",
+        "value": "unknown"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Ground floor, slight ramp at the door",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen one is fully accessible and includes a slight ramp as you enter the screen.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": "All seats have fixed armrests",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All seats have immovable armrests, and chairs are fixed together.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": "Row G, seats 1 and 15",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 1 No. of seats: 172 No. of wheelchair spaces: 2",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 1: Row G, Seat 1 & 15",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "name": "Screen 2",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown",
+        "value": "unknown"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "By lift",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screens two, three and four are located on the first floor and can be accessed via the customer lift or via the stairs; these are 2 flights of 20 steps each. These screens are accessible to customers with limited mobility and wheelchair users.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": "All seats have fixed armrests",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All seats have immovable armrests, and chairs are fixed together.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": "Row G, seats 1 and 13",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 2 No. of seats: 127 No. of wheelchair spaces: 2",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 2: Row G, Seats 1 & 13",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "name": "Screen 3",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown",
+        "value": "unknown"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "By lift",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screens two, three and four are located on the first floor and can be accessed via the customer lift or via the stairs; these are 2 flights of 20 steps each. These screens are accessible to customers with limited mobility and wheelchair users.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": "All seats have fixed armrests",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All seats have immovable armrests, and chairs are fixed together.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "wheelchair_spaces": {
+        "conflict": "The screens table gives Screen 3 no wheelchair spaces, but the page says every screen has them and gives Screen 3's as Row G, seats 1 and 13.",
+        "count": null,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 3 No. of seats: 113 No. of wheelchair spaces: 0",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 3: Row G, Seats 1 & 13",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "unknown"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "name": "Screen 4",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown",
+        "value": "unknown"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "By lift",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screens two, three and four are located on the first floor and can be accessed via the customer lift or via the stairs; these are 2 flights of 20 steps each. These screens are accessible to customers with limited mobility and wheelchair users.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": "All seats have fixed armrests",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All seats have immovable armrests, and chairs are fixed together.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "wheelchair_spaces": {
+        "conflict": null,
+        "count": 2,
+        "last_found": null,
+        "note": "Row G, seats 1 and 7",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 4 No. of seats: 72 No. of wheelchair spaces: 2",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 4: Row G, Seats 1 & 7",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    },
+    {
+      "hearing_assist": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown"
+      },
+      "name": "Screen 5",
+      "notes": null,
+      "space_position": {
+        "conflict": null,
+        "last_found": null,
+        "note": null,
+        "sources": [],
+        "status": "unknown",
+        "value": "unknown"
+      },
+      "step_free": {
+        "conflict": null,
+        "last_found": null,
+        "note": "Down 21 steps",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Our cinema is currently without any step-free access to screen 5.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen five is located down a flight of 21 steps and does not have step free access.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "transfer_seating": {
+        "conflict": null,
+        "last_found": null,
+        "note": "All seats have fixed armrests",
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "All seats have immovable armrests, and chairs are fixed together.",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "no"
+      },
+      "wheelchair_spaces": {
+        "conflict": "The screens table gives 2 wheelchair spaces; the seat list names one seat (Row A, seat 1). Either way the screen has no step-free access.",
+        "count": null,
+        "last_found": null,
+        "note": null,
+        "sources": [
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 5 No. of seats: 53 No. of wheelchair spaces: 2 (note screen 5 currently has no step free access)",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          },
+          {
+            "checked_on": "2026-11-21",
+            "quote": "Screen 5: Row A, Seat 1",
+            "source_last_updated": null,
+            "tier": 1,
+            "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+          }
+        ],
+        "status": "yes"
+      }
+    }
+  ],
+  "step_free_access": {
+    "conflict": null,
+    "last_found": null,
+    "note": "Ground floor",
+    "sources": [
+      {
+        "checked_on": "2026-11-21",
+        "quote": "Screen one on the ground floor is fully accessible to customers with limited mobility including wheelchair users",
+        "source_last_updated": null,
+        "tier": 1,
+        "url": "https://www.picturehouses.com/cinema/greenwich-picturehouse/accessibility"
+      }
+    ],
+    "status": "yes"
+  }
+}
