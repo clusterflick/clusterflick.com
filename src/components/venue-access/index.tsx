@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import { CrossIcon, TickIcon } from "@/components/icons";
+import {
+  ChevronDownIcon,
+  CrossIcon,
+  TickIcon,
+  WarningIcon,
+} from "@/components/icons";
 import type {
   AccessFact,
   AccessPositionFact,
@@ -112,10 +117,18 @@ function FactDetails({ facts }: { facts: AccessFact[] }) {
       );
     }
     if (fact.conflict) {
+      // Collapsed to its marker: how the sources disagree is detail for a
+      // reader who wants it, and spelled out under every such fact it
+      // crowded out the facts themselves.
       lines.push(
-        <span key={`conflict-${index}`} className={styles.conflict}>
-          <strong>Sources disagree.</strong> {fact.conflict}
-        </span>,
+        <details key={`conflict-${index}`} className={styles.conflict}>
+          <summary className={styles.conflictSummary}>
+            <WarningIcon size={14} className={styles.conflictMark} />
+            Sources disagree
+            <ChevronDownIcon size={14} className={styles.conflictChevron} />
+          </summary>
+          <span className={styles.conflictText}>{fact.conflict}</span>
+        </details>,
       );
     }
     if (fact.status === "unknown" && fact.last_found) {
@@ -195,7 +208,9 @@ function SummaryItem({
     <li className={styles.summaryItem}>
       <span className={styles.summaryLabel}>{label}</span>
       <StatusMark status={status} text={text} large />
-      {detail && <span className={styles.summaryDetail}>{detail}</span>}
+      {/* Always rendered, empty or not, so each tile keeps the row's three
+          tracks and the values line up across tiles. */}
+      <span className={styles.summaryDetail}>{detail}</span>
     </li>
   );
 }

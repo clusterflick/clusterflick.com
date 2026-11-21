@@ -32,7 +32,8 @@
 .summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -44,22 +45,31 @@
   }
 }
 
+/* Each tile spans three rows of the summary grid and shares them with its
+   neighbours (subgrid), so a label that wraps to two lines moves its whole
+   row's values down together rather than only its own. */
 .summaryItem {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 6px;
+  align-items: end;
   padding: 14px 16px;
+  margin-bottom: 12px;
   border-radius: 8px;
   background: rgba(var(--color-white-rgb), 0.04);
   border: 1px solid rgba(var(--color-white-rgb), 0.08);
 }
 
 .summaryLabel {
+  align-self: start;
   font-size: 13px;
+  line-height: 1.35;
   color: var(--color-muted-gray);
 }
 
 .summaryDetail {
+  align-self: start;
   font-size: 13px;
   color: var(--color-muted-gray);
 }
@@ -140,9 +150,10 @@
 .details {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 2px;
+  gap: 4px;
+  margin-top: 3px;
   font-size: 13px;
+  line-height: 1.45;
   font-weight: 400;
   color: var(--color-muted-gray);
   text-align: left;
@@ -158,11 +169,42 @@
   display: block;
 }
 
-/* Kept in the note colour: a conflict is detail behind the status, not a
-   warning to read first. */
-.conflict strong {
-  font-weight: 600;
+/* How sources disagree, closed to a marker until asked for. The marker is the
+   only yellow in the section: something to check, not a status. */
+.conflict {
+  max-width: 100%;
+}
+
+.conflictSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  list-style: none;
   color: var(--color-light-gray);
+}
+
+.conflictSummary::-webkit-details-marker {
+  display: none;
+}
+
+.conflictMark {
+  flex-shrink: 0;
+  color: var(--color-buttery-yellow);
+}
+
+.conflictChevron {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.conflict[open] .conflictChevron {
+  transform: rotate(180deg);
+}
+
+.conflictText {
+  display: block;
+  margin-top: 4px;
 }
 
 /* The table scrolls inside itself on a phone rather than widening the page. */
