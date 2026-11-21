@@ -19,7 +19,10 @@ Pages at clusterflick.com.
 - `npm run fetch-published-data` — Download the latest `data-transformed` and
   `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s
-  release log into `/release-log/`, for `/datasets/status` (see Data Status)
+- `npm run fetch-venue-accessibility` — Download the latest
+  `venue-accessibility` release into `/venue-accessibility/`, for the venue
+  pages' access sections (see Venue Access) release log into `/release-log/`,
+  for `/datasets/status` (see Data Status)
 - `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB
   ids (see Film Lists); a dry run unless given `-- --write`; review the diff and
   commit it
