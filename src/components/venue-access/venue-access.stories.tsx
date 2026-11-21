@@ -4,8 +4,8 @@ import type {
   AccessFact,
   VenueAccess as VenueAccessRecord,
   VenueAccessField,
-} from "@/utils/get-venue-accessibility";
-import { VENUE_ACCESS_FIELDS } from "@/utils/get-venue-accessibility";
+} from "@/utils/venue-access-types";
+import { VENUE_ACCESS_FIELDS } from "@/utils/venue-access-types";
 import greenwich from "./fixtures/greenwich.json";
 import ritzy from "./fixtures/the-ritzy.json";
 

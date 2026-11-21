@@ -33,7 +33,7 @@ import type { ScoredMovie } from "@/utils/get-discovery-movies";
 import VenueDistance from "./venue-distance";
 import NearbyVenues from "./nearby-venues";
 import VenueAccess from "@/components/venue-access";
-import type { VenueAccess as VenueAccessRecord } from "@/utils/get-venue-accessibility";
+import type { VenueAccess as VenueAccessRecord } from "@/utils/venue-access-types";
 import styles from "./page.module.css";
 
 export type NearbyVenue = {

@@ -12,7 +12,7 @@ import type {
   AccessScreen,
   AccessStatus,
   VenueAccess as VenueAccessRecord,
-} from "@/utils/get-venue-accessibility";
+} from "@/utils/venue-access-types";
 import {
   VENUE_ACCESS_GROUPS,
   VENUE_ACCESS_LABELS,

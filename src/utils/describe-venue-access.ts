@@ -4,7 +4,7 @@ import type {
   AccessStatus,
   VenueAccess,
   VenueAccessField,
-} from "@/utils/get-venue-accessibility";
+} from "@/utils/venue-access-types";
 
 /**
  * How a venue access record reads on its venue page. Kept apart from the

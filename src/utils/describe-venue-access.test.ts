@@ -14,7 +14,7 @@ import {
   type AccessFact,
   type AccessSource,
   type VenueAccess,
-} from "./get-venue-accessibility";
+} from "./venue-access-types";
 
 const source = (url: string, checkedOn = "2026-11-21"): AccessSource => ({
   url,

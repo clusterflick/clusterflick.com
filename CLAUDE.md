@@ -19,10 +19,10 @@ Pages at clusterflick.com.
 - `npm run fetch-published-data` — Download the latest `data-transformed` and
   `data-calendar` releases into `/public/datasets/` (see Published Data)
 - `npm run fetch-release-log` — Download every month of `data-analysed`'s
+  release log into `/release-log/`, for `/datasets/status` (see Data Status)
 - `npm run fetch-venue-accessibility` — Download the latest
   `venue-accessibility` release into `/venue-accessibility/`, for the venue
-  pages' access sections (see Venue Access) release log into `/release-log/`,
-  for `/datasets/status` (see Data Status)
+  pages' access sections (see Venue Access)
 - `npm run add-movie-list-tmdb-ids` — Give curated movie list entries their TMDB
   ids (see Film Lists); a dry run unless given `-- --write`; review the diff and
   commit it
@@ -515,12 +515,12 @@ share a name.
 **The facts come from `clusterflick/venue-accessibility`**, reviewed there and
 published as one release asset, `venue-accessibility.json`, which the build
 downloads into `venue-accessibility/`. `getVenueAccessibility`
-(`src/utils/get-venue-accessibility.ts`) reads it at build time only, like the
-departed films: none of it belongs in the payload every reader downloads. The
-release carries only venues with something to say, so a venue missing from it
-has had nobody check it and gets no section; a missing file is the same for
-every venue. A `formatVersion` the site doesn't read fails the build rather than
-risk misreading an access fact.
+(`src/utils/get-venue-accessibility.ts`, types in `venue-access-types.ts`) reads
+it at build time only, like the departed films: none of it belongs in the
+payload every reader downloads. The release carries only venues with something
+to say, so a venue missing from it has had nobody check it and gets no section;
+a missing file is the same for every venue. A `formatVersion` the site doesn't
+read fails the build rather than risk misreading an access fact.
 
 **It opens with a summary**, so a reader can tell at a glance whether a visit
 will be easy: step-free access, how many screens are step-free and have
