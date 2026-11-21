@@ -163,3 +163,90 @@ export function getFactNoteNumbers(
     (a, b) => a - b,
   );
 }
+
+export type ScreenCount = {
+  total: number;
+  yes: number;
+  partial: number;
+  no: number;
+  /** Not published, or unclear because the sources disagree. */
+  unknown: number;
+};
+
+/**
+ * The few facts that say at a glance whether a visit will be easy: getting
+ * in, the screens, the toilet. Counted straight from the record, with no
+ * judgement added: "4 of 5 screens step-free" rather than "mostly accessible".
+ */
+export type AccessSummary = {
+  stepFreeAccess: AccessFact;
+  accessibleToilet: AccessFact;
+  stepFreeScreens: ScreenCount;
+  screensWithSpaces: ScreenCount;
+};
+
+function countScreens(facts: AccessFact[]): ScreenCount {
+  const count: ScreenCount = {
+    total: facts.length,
+    yes: 0,
+    partial: 0,
+    no: 0,
+    unknown: 0,
+  };
+  facts.forEach(({ status }) => {
+    if (status === "yes") count.yes += 1;
+    else if (status === "partial") count.partial += 1;
+    else if (status === "no") count.no += 1;
+    else count.unknown += 1;
+  });
+  return count;
+}
+
+export function getAccessSummary(access: VenueAccess): AccessSummary {
+  return {
+    stepFreeAccess: access.step_free_access,
+    accessibleToilet: access.accessible_toilet,
+    stepFreeScreens: countScreens(access.screens.map((s) => s.step_free)),
+    screensWithSpaces: countScreens(
+      access.screens.map((s) => s.wheelchair_spaces),
+    ),
+  };
+}
+
+/**
+ * A screen count as the summary says it: "4 of 5", with any partly or
+ * unknown screens named so the figure isn't read as a full answer.
+ */
+export function describeScreenCount(count: ScreenCount): {
+  text: string;
+  detail: string | null;
+} {
+  const detail = [
+    count.partial ? `${count.partial} partly` : null,
+    count.unknown ? `${count.unknown} not known` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  return {
+    text:
+      count.yes === count.total && count.total > 0
+        ? count.total === 1
+          ? "Yes"
+          : `All ${count.total}`
+        : `${count.yes} of ${count.total}`,
+    detail: detail || null,
+  };
+}
+
+/**
+ * Which mark a screen count gets: a tick when every screen has it, a cross
+ * when none is known to, and partly otherwise.
+ */
+export function getScreenCountStatus(count: ScreenCount): AccessStatus {
+  if (count.total === 0) return "unknown";
+  if (count.yes === count.total) return "yes";
+  if (count.yes === 0 && count.partial === 0) {
+    return count.no > 0 ? "no" : "unknown";
+  }
+  return "partial";
+}

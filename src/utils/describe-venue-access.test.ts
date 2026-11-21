@@ -5,6 +5,9 @@ import {
   getSourceNotes,
   getFactLabel,
   getStatusLabel,
+  describeScreenCount,
+  getScreenCountStatus,
+  type ScreenCount,
 } from "./describe-venue-access";
 import {
   VENUE_ACCESS_FIELDS,
@@ -112,5 +115,38 @@ describe("getFactNoteNumbers", () => {
     expect(
       getFactNoteNumbers(fact([source(B), source(A), source(A)]), numberOf),
     ).toEqual([1, 2]);
+  });
+});
+
+describe("screen counts", () => {
+  const count = (overrides: Partial<ScreenCount>): ScreenCount => ({
+    total: 5,
+    yes: 0,
+    partial: 0,
+    no: 0,
+    unknown: 0,
+    ...overrides,
+  });
+
+  it("says every screen when every screen has it", () => {
+    expect(describeScreenCount(count({ yes: 5 }))).toEqual({
+      text: "All 5",
+      detail: null,
+    });
+    expect(getScreenCountStatus(count({ yes: 5 }))).toBe("yes");
+    expect(describeScreenCount(count({ total: 1, yes: 1 })).text).toBe("Yes");
+  });
+
+  it("names the screens it can't count as yes", () => {
+    expect(
+      describeScreenCount(count({ yes: 3, partial: 1, unknown: 1 })),
+    ).toEqual({ text: "3 of 5", detail: "1 partly, 1 not known" });
+    expect(getScreenCountStatus(count({ yes: 3, no: 2 }))).toBe("partial");
+  });
+
+  it("only crosses when a screen is known not to", () => {
+    expect(getScreenCountStatus(count({ no: 2, unknown: 3 }))).toBe("no");
+    expect(getScreenCountStatus(count({ unknown: 5 }))).toBe("unknown");
+    expect(getScreenCountStatus(count({ total: 0 }))).toBe("unknown");
   });
 });

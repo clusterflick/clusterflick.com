@@ -19,11 +19,49 @@
   }
 }
 
+/* Section headings in the link blue, so each block is easy to find. */
 .heading {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: var(--color-light-gray);
+  color: var(--color-electric-blue);
+}
+
+/* At a glance: the few facts that say whether a visit will be easy, as
+   tiles above the detail. */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+}
+
+.summaryLabel {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.summaryDetail {
+  font-size: 13px;
+  color: var(--color-muted-gray);
 }
 
 .facts {
@@ -57,13 +95,39 @@
 }
 
 .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 15px;
   font-weight: 600;
   color: var(--color-white);
 }
 
+.statusLarge {
+  font-size: 20px;
+}
+
+.mark {
+  flex-shrink: 0;
+}
+
+/* The marks are the personalise page's on and off: green tick, pink cross.
+   Partly is the tick in yellow. */
+.yes .mark {
+  color: var(--color-release-green);
+}
+
+.no .mark {
+  color: var(--color-neon-pink);
+}
+
+.partial .mark {
+  color: var(--color-buttery-yellow);
+}
+
 /* Not published is an answer, but a quieter one than the facts we have. */
-.unknown {
+.unknown,
+.not_applicable {
   font-weight: 400;
   color: var(--color-muted-gray);
 }
@@ -94,8 +158,11 @@
   display: block;
 }
 
-.conflict {
-  color: var(--color-buttery-yellow);
+/* Kept in the note colour: a conflict is detail behind the status, not a
+   warning to read first. */
+.conflict strong {
+  font-weight: 600;
+  color: var(--color-light-gray);
 }
 
 /* The table scrolls inside itself on a phone rather than widening the page. */
@@ -201,6 +268,15 @@
   margin: 0;
   font-size: 14px;
   color: var(--color-muted-gray);
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer p + p,
+.footer ol + p {
+  margin-top: 6px;
 }
 
 .sources {

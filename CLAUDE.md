@@ -522,12 +522,20 @@ has had nobody check it and gets no section; a missing file is the same for
 every venue. A `formatVersion` the site doesn't read fails the build rather than
 risk misreading an access fact.
 
+**It opens with a summary**, so a reader can tell at a glance whether a visit
+will be easy: step-free access, how many screens are step-free and have
+wheelchair spaces, and the toilet, counted straight from the record with no
+verdict of our own ("4 of 5", not "mostly accessible"). Statuses carry the
+personalise page's marks, a green tick for yes and a pink cross for no, with the
+word beside them.
+
 **Every fact shows where it came from.** Each status is footnoted to the page it
-was quoted from, one footnote per page, with the day it was checked. An unknown
-reads "Not published" rather than being hidden, since knowing a venue doesn't
-say is itself worth knowing before a visit; where the sources disagree, the page
-says so and shows how; a wheelchair-space count a page contradicts itself on is
-left out rather than picked. The wording lives in
+was quoted from, one footnote per page, with the day it was checked; with a
+single source the footnotes are dropped and one line names it. An unknown reads
+"Not published" rather than being hidden, since knowing a venue doesn't say is
+itself worth knowing before a visit; where the sources disagree, the page says
+so and shows how; a wheelchair-space count a page contradicts itself on is left
+out rather than picked. The wording lives in
 `src/utils/describe-venue-access.ts`, and the rules behind the data in that
 repository's README.
 

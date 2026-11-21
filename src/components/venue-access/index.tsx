@@ -1,18 +1,23 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
+import { CrossIcon, TickIcon } from "@/components/icons";
 import type {
   AccessFact,
   AccessPositionFact,
   AccessScreen,
+  AccessStatus,
   VenueAccess as VenueAccessRecord,
 } from "@/utils/get-venue-accessibility";
 import {
   VENUE_ACCESS_GROUPS,
   VENUE_ACCESS_LABELS,
+  describeScreenCount,
   formatAccessDate,
-  getFactNoteNumbers,
-  getSourceNotes,
+  getAccessSummary,
   getFactLabel,
+  getFactNoteNumbers,
+  getScreenCountStatus,
+  getSourceNotes,
 } from "@/utils/describe-venue-access";
 import styles from "./venue-access.module.css";
 
@@ -31,6 +36,9 @@ const POSITION_LABELS: Record<AccessPositionFact["value"], string | null> = {
 
 const CORRECTION_ADDRESS = "hello@clusterflick.com";
 
+/** The footnote numbers for some facts, or none when there's one source. */
+type RefsFor = (facts: AccessFact[]) => number[];
+
 function NoteRefs({ numbers }: { numbers: number[] }) {
   if (numbers.length === 0) return null;
   return (
@@ -44,6 +52,47 @@ function NoteRefs({ numbers }: { numbers: number[] }) {
         </span>
       ))}
     </sup>
+  );
+}
+
+/**
+ * A status as a mark and its word: a green tick for yes, a pink cross for
+ * no, as the personalise page marks on and off, and a yellow tick for partly.
+ * The word stays beside the mark, so it reads without colour or the icon.
+ * Unknown and not applicable get no mark: they aren't an answer either way.
+ */
+function StatusMark({
+  status,
+  text,
+  large = false,
+}: {
+  status: AccessStatus;
+  text: string;
+  large?: boolean;
+}) {
+  const Icon =
+    status === "yes" || status === "partial"
+      ? TickIcon
+      : status === "no"
+        ? CrossIcon
+        : null;
+  return (
+    <span
+      className={clsx(
+        styles.status,
+        styles[status],
+        large && styles.statusLarge,
+      )}
+    >
+      {Icon && (
+        <Icon
+          size={large ? 20 : 16}
+          aria-hidden="true"
+          className={styles.mark}
+        />
+      )}
+      {text}
+    </span>
   );
 }
 
@@ -65,7 +114,7 @@ function FactDetails({ facts }: { facts: AccessFact[] }) {
     if (fact.conflict) {
       lines.push(
         <span key={`conflict-${index}`} className={styles.conflict}>
-          <strong>Sources disagree:</strong> {fact.conflict}
+          <strong>Sources disagree.</strong> {fact.conflict}
         </span>,
       );
     }
@@ -86,26 +135,12 @@ function FactDetails({ facts }: { facts: AccessFact[] }) {
   return <span className={styles.details}>{lines}</span>;
 }
 
-function Status({ text, unknown }: { text: string; unknown: boolean }) {
-  return (
-    <span className={clsx(styles.status, unknown && styles.unknown)}>
-      {text}
-    </span>
-  );
-}
-
-/** A fact as its status, footnotes and details. */
-function Fact({
-  fact,
-  numberOf,
-}: {
-  fact: AccessFact;
-  numberOf: (url: string) => number;
-}) {
+/** A fact as its mark, footnotes and details. */
+function Fact({ fact, refsFor }: { fact: AccessFact; refsFor: RefsFor }) {
   return (
     <span className={styles.cell}>
-      <Status text={getFactLabel(fact)} unknown={fact.status === "unknown"} />
-      <NoteRefs numbers={getFactNoteNumbers(fact, numberOf)} />
+      <StatusMark status={fact.status} text={getFactLabel(fact)} />
+      <NoteRefs numbers={refsFor([fact])} />
       <FactDetails facts={[fact]} />
     </span>
   );
@@ -118,10 +153,10 @@ function Fact({
  */
 function WheelchairSpaces({
   screen,
-  numberOf,
+  refsFor,
 }: {
   screen: AccessScreen;
-  numberOf: (url: string) => number;
+  refsFor: RefsFor;
 }) {
   const spaces = screen.wheelchair_spaces;
   const position = screen.space_position;
@@ -133,34 +168,62 @@ function WheelchairSpaces({
   }
   const where =
     position.status !== "unknown" ? POSITION_LABELS[position.value] : null;
-  const numbers = [
-    ...new Set([
-      ...getFactNoteNumbers(spaces, numberOf),
-      ...getFactNoteNumbers(position, numberOf),
-    ]),
-  ].sort((a, b) => a - b);
   return (
     <span className={styles.cell}>
-      <Status
+      <StatusMark
+        status={spaces.status}
         text={where ? `${text}, ${where}` : text}
-        unknown={spaces.status === "unknown"}
       />
-      <NoteRefs numbers={numbers} />
+      <NoteRefs numbers={refsFor([spaces, position])} />
       <FactDetails facts={[spaces, position]} />
     </span>
   );
 }
 
+function SummaryItem({
+  label,
+  status,
+  text,
+  detail,
+}: {
+  label: string;
+  status: AccessStatus;
+  text: string;
+  detail?: string | null;
+}) {
+  return (
+    <li className={styles.summaryItem}>
+      <span className={styles.summaryLabel}>{label}</span>
+      <StatusMark status={status} text={text} large />
+      {detail && <span className={styles.summaryDetail}>{detail}</span>}
+    </li>
+  );
+}
+
 /**
- * A venue's building and screens: getting in, each screen, and its
- * facilities, every fact footnoted to the page it came from and the day it
- * was checked.
+ * A venue's building and screens. A short summary first, for whether a visit
+ * will be easy at a glance, then getting in, facilities and each screen, every
+ * fact traceable to the page it came from and the day it was checked.
  *
  * "Not published" is shown rather than hidden: knowing a venue doesn't say is
  * itself worth knowing before a visit.
  */
 export default function VenueAccess({ access, venueName }: VenueAccessProps) {
   const { notes, numberOf } = getSourceNotes(access);
+  // With one source every fact would carry the same footnote; the sources
+  // line says it once instead.
+  const refsFor: RefsFor =
+    notes.length > 1
+      ? (facts) =>
+          [
+            ...new Set(
+              facts.flatMap((fact) => getFactNoteNumbers(fact, numberOf)),
+            ),
+          ].sort((a, b) => a - b)
+      : () => [];
+  const summary = getAccessSummary(access);
+  const stepFreeScreens = describeScreenCount(summary.stepFreeScreens);
+  const screensWithSpaces = describeScreenCount(summary.screensWithSpaces);
   const correctionHref = `mailto:${CORRECTION_ADDRESS}?subject=${encodeURIComponent(
     `Access information for ${venueName}`,
   )}`;
@@ -173,7 +236,7 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
           <div className={styles.fact} key={field}>
             <dt className={styles.label}>{VENUE_ACCESS_LABELS[field]}</dt>
             <dd className={styles.value}>
-              <Fact fact={access[field]} numberOf={numberOf} />
+              <Fact fact={access[field]} refsFor={refsFor} />
             </dd>
           </div>
         ))}
@@ -182,9 +245,49 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
   );
 
   const [gettingIn, facilities] = VENUE_ACCESS_GROUPS;
+  const sourceLine = (note: (typeof notes)[number]) => (
+    <>
+      <a href={note.url} target="_blank" rel="noopener noreferrer">
+        {note.host}
+      </a>
+      {note.tier === 1 ? ", the venue's own site" : ""}, checked{" "}
+      {formatAccessDate(note.checkedOn)}
+      {note.sourceLastUpdated &&
+        `; the source was last updated ${formatAccessDate(note.sourceLastUpdated)}`}
+    </>
+  );
 
   return (
     <div className={styles.access}>
+      <ul className={styles.summary} aria-label="At a glance">
+        <SummaryItem
+          label="Step-free access"
+          status={summary.stepFreeAccess.status}
+          text={getFactLabel(summary.stepFreeAccess)}
+        />
+        {summary.stepFreeScreens.total > 0 && (
+          <SummaryItem
+            label="Step-free screens"
+            status={getScreenCountStatus(summary.stepFreeScreens)}
+            text={stepFreeScreens.text}
+            detail={stepFreeScreens.detail}
+          />
+        )}
+        {summary.screensWithSpaces.total > 0 && (
+          <SummaryItem
+            label="Screens with wheelchair spaces"
+            status={getScreenCountStatus(summary.screensWithSpaces)}
+            text={screensWithSpaces.text}
+            detail={screensWithSpaces.detail}
+          />
+        )}
+        <SummaryItem
+          label="Accessible toilet"
+          status={summary.accessibleToilet.status}
+          text={getFactLabel(summary.accessibleToilet)}
+        />
+      </ul>
+
       <div className={styles.groups}>
         {group(gettingIn)}
         {group(facilities)}
@@ -214,19 +317,16 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
                       )}
                     </th>
                     <td data-label="Step-free">
-                      <Fact fact={screen.step_free} numberOf={numberOf} />
+                      <Fact fact={screen.step_free} refsFor={refsFor} />
                     </td>
                     <td data-label="Wheelchair spaces">
-                      <WheelchairSpaces screen={screen} numberOf={numberOf} />
+                      <WheelchairSpaces screen={screen} refsFor={refsFor} />
                     </td>
                     <td data-label="Transfer seats">
-                      <Fact
-                        fact={screen.transfer_seating}
-                        numberOf={numberOf}
-                      />
+                      <Fact fact={screen.transfer_seating} refsFor={refsFor} />
                     </td>
                     <td data-label="Hearing help">
-                      <Fact fact={screen.hearing_assist} numberOf={numberOf} />
+                      <Fact fact={screen.hearing_assist} refsFor={refsFor} />
                     </td>
                   </tr>
                 ))}
@@ -238,42 +338,34 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
 
       {access.notes && <p className={styles.recordNotes}>{access.notes}</p>}
 
-      {notes.length > 0 && (
-        <div className={styles.group}>
-          <h3 className={styles.heading}>Sources</h3>
+      <div className={styles.footer}>
+        {notes.length === 1 && <p>From {sourceLine(notes[0])}.</p>}
+        {notes.length > 1 && (
           <ol className={styles.sources}>
             {notes.map((note) => (
               <li key={note.url} id={`access-source-${note.number}`}>
-                <a href={note.url} target="_blank" rel="noopener noreferrer">
-                  {note.host}
-                </a>
-                {note.tier === 1 ? ", the venue's own site" : ""}. Checked{" "}
-                {formatAccessDate(note.checkedOn)}
-                {note.sourceLastUpdated &&
-                  `; the source was last updated ${formatAccessDate(note.sourceLastUpdated)}`}
-                .
+                {sourceLine(note)}.
               </li>
             ))}
           </ol>
-        </div>
-      )}
-
-      <p className={styles.footer}>
-        {access.access_page_url && (
-          <>
-            <a
-              href={access.access_page_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {venueName}&rsquo;s own access information
-            </a>
-            .{" "}
-          </>
         )}
-        {access.access_contact && <>Contact: {access.access_contact}. </>}
-        Something wrong or out of date? <a href={correctionHref}>Tell us</a>.
-      </p>
+        <p>
+          {access.access_page_url && (
+            <>
+              <a
+                href={access.access_page_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {venueName}&rsquo;s own access information
+              </a>
+              .{" "}
+            </>
+          )}
+          {access.access_contact && <>Contact: {access.access_contact}. </>}
+          Something wrong or out of date? <a href={correctionHref}>Tell us</a>.
+        </p>
+      </div>
     </div>
   );
 }
