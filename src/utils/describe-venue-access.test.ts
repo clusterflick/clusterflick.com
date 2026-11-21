@@ -3,6 +3,7 @@ import {
   formatAccessDate,
   getFactNoteNumbers,
   getSourceNotes,
+  getFactLabel,
   getStatusLabel,
 } from "./describe-venue-access";
 import {
@@ -46,6 +47,20 @@ describe("getStatusLabel", () => {
   it("says an unknown is not published rather than that it's missing", () => {
     expect(getStatusLabel("unknown")).toBe("Not published");
     expect(getStatusLabel("partial")).toBe("Partly");
+  });
+});
+
+describe("getFactLabel", () => {
+  it("says a fact left unknown by contradicting sources is unclear", () => {
+    expect(
+      getFactLabel({
+        ...fact([source(A)]),
+        status: "unknown",
+        conflict: "2 or 3",
+      }),
+    ).toBe("Unclear");
+    expect(getFactLabel(fact())).toBe("Not published");
+    expect(getFactLabel(fact([source(A)]))).toBe("Yes");
   });
 });
 

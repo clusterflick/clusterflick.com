@@ -30,13 +30,14 @@
   margin: 0;
 }
 
+/* Label left, value right, always: a grid rather than a wrapping flex row, so
+   a long note wraps inside the value's column instead of dropping the whole
+   value onto a line of its own. */
 .fact {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
   column-gap: 12px;
-  row-gap: 2px;
+  align-items: baseline;
   padding: 10px 0;
   border-bottom: 1px solid rgba(var(--color-white-rgb), 0.08);
 }
@@ -53,7 +54,6 @@
 .value {
   margin: 0;
   text-align: right;
-  max-width: 100%;
 }
 
 .status {
@@ -85,7 +85,13 @@
 }
 
 .value .details {
+  align-items: flex-end;
   text-align: right;
+}
+
+/* A fact's status, footnotes and details, held together as one value. */
+.cell {
+  display: block;
 }
 
 .conflict {
@@ -121,11 +127,73 @@
 .table tbody th {
   font-weight: 600;
   color: var(--color-light-gray);
+  white-space: nowrap;
 }
 
 .table tbody tr:last-child th,
 .table tbody tr:last-child td {
   border-bottom: none;
+}
+
+/* On a phone five columns are too narrow to read, so each screen becomes a
+   block: its name, then each column's label beside its value, the same layout
+   as the facts above. The column headings are hidden visually but kept for
+   screen readers, which still read a table. */
+@media (max-width: 639px) {
+  .table {
+    min-width: 0;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table tbody tr {
+    display: block;
+    padding: 6px 0 10px;
+    border-bottom: 1px solid rgba(var(--color-white-rgb), 0.16);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table tbody th,
+  .table tbody td {
+    display: block;
+    padding: 4px 0;
+    border-bottom: none;
+  }
+
+  .table tbody th {
+    padding-top: 8px;
+    white-space: normal;
+  }
+
+  .table tbody td {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
+    column-gap: 12px;
+    align-items: baseline;
+    text-align: right;
+  }
+
+  .table tbody td::before {
+    content: attr(data-label);
+    font-size: 14px;
+    color: var(--color-muted-gray);
+    text-align: left;
+  }
+
+  .table tbody td .details {
+    align-items: flex-end;
+    text-align: right;
+  }
 }
 
 .recordNotes,

@@ -66,6 +66,16 @@ export function getStatusLabel(status: AccessStatus): string {
 }
 
 /**
+ * A fact's status as the page says it. A fact left unknown because its sources
+ * contradict each other was published, just not consistently, so it reads
+ * "Unclear" rather than "Not published"; the conflict beneath it says why.
+ */
+export function getFactLabel(fact: AccessFact): string {
+  if (fact.status === "unknown" && fact.conflict) return "Unclear";
+  return getStatusLabel(fact.status);
+}
+
+/**
  * A "YYYY-MM-DD" date as "21 November 2026". The date is a calendar day, not
  * an instant, so it is read and written in UTC to stay that day everywhere.
  */

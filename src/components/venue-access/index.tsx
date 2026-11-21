@@ -12,7 +12,7 @@ import {
   formatAccessDate,
   getFactNoteNumbers,
   getSourceNotes,
-  getStatusLabel,
+  getFactLabel,
 } from "@/utils/describe-venue-access";
 import styles from "./venue-access.module.css";
 
@@ -103,14 +103,11 @@ function Fact({
   numberOf: (url: string) => number;
 }) {
   return (
-    <>
-      <Status
-        text={getStatusLabel(fact.status)}
-        unknown={fact.status === "unknown"}
-      />
+    <span className={styles.cell}>
+      <Status text={getFactLabel(fact)} unknown={fact.status === "unknown"} />
       <NoteRefs numbers={getFactNoteNumbers(fact, numberOf)} />
       <FactDetails facts={[fact]} />
-    </>
+    </span>
   );
 }
 
@@ -128,7 +125,7 @@ function WheelchairSpaces({
 }) {
   const spaces = screen.wheelchair_spaces;
   const position = screen.space_position;
-  let text = getStatusLabel(spaces.status);
+  let text = getFactLabel(spaces);
   if (spaces.status === "yes" && spaces.count !== null) {
     text = `${spaces.count}`;
   } else if (spaces.status === "no") {
@@ -143,14 +140,14 @@ function WheelchairSpaces({
     ]),
   ].sort((a, b) => a - b);
   return (
-    <>
+    <span className={styles.cell}>
       <Status
         text={where ? `${text}, ${where}` : text}
         unknown={spaces.status === "unknown"}
       />
       <NoteRefs numbers={numbers} />
       <FactDetails facts={[spaces, position]} />
-    </>
+    </span>
   );
 }
 
@@ -216,19 +213,19 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
                         <span className={styles.details}>{screen.notes}</span>
                       )}
                     </th>
-                    <td>
+                    <td data-label="Step-free">
                       <Fact fact={screen.step_free} numberOf={numberOf} />
                     </td>
-                    <td>
+                    <td data-label="Wheelchair spaces">
                       <WheelchairSpaces screen={screen} numberOf={numberOf} />
                     </td>
-                    <td>
+                    <td data-label="Transfer seats">
                       <Fact
                         fact={screen.transfer_seating}
                         numberOf={numberOf}
                       />
                     </td>
-                    <td>
+                    <td data-label="Hearing help">
                       <Fact fact={screen.hearing_assist} numberOf={numberOf} />
                     </td>
                   </tr>
