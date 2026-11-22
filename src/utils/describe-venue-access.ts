@@ -154,6 +154,35 @@ export function getSourceNotes(access: VenueAccess): {
   };
 }
 
+/**
+ * Where a record came from and when, said once for the notice above it: each
+ * site once (a site cited for several pages is one place to check), the
+ * venue's own first, and the day it was checked, or the span of days when the
+ * sources were checked on different ones.
+ */
+export function describeAccessProvenance(notes: AccessSourceNote[]): {
+  sites: { host: string; venueOwn: boolean }[];
+  checked: string;
+} {
+  if (notes.length === 0) throw new Error("A record with no sources");
+  const sites = new Map<string, boolean>();
+  notes.forEach(({ host, tier }) =>
+    sites.set(host, (sites.get(host) ?? false) || tier === 1),
+  );
+  const dates = notes.map(({ checkedOn }) => checkedOn).sort();
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  return {
+    sites: [...sites]
+      .map(([host, venueOwn]) => ({ host, venueOwn }))
+      .sort((a, b) => Number(b.venueOwn) - Number(a.venueOwn)),
+    checked:
+      first === last
+        ? `on ${formatAccessDate(first)}`
+        : `between ${formatAccessDate(first)} and ${formatAccessDate(last)}`,
+  };
+}
+
 /** The footnote numbers a fact cites, each once, in order. */
 export function getFactNoteNumbers(
   fact: AccessFact,

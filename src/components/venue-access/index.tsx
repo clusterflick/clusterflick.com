@@ -16,6 +16,7 @@ import type {
 import {
   VENUE_ACCESS_GROUPS,
   VENUE_ACCESS_LABELS,
+  describeAccessProvenance,
   describeScreenCount,
   formatAccessDate,
   getAccessSummary,
@@ -236,6 +237,7 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
             ),
           ].sort((a, b) => a - b)
       : () => [];
+  const provenance = describeAccessProvenance(notes);
   const summary = getAccessSummary(access);
   const stepFreeScreens = describeScreenCount(summary.stepFreeScreens);
   const screensWithSpaces = describeScreenCount(summary.screensWithSpaces);
@@ -274,6 +276,39 @@ export default function VenueAccess({ access, venueName }: VenueAccessProps) {
 
   return (
     <div className={styles.access}>
+      {/* Above the facts rather than only in the footer: a reader planning a
+          visit should know before they rely on any of it that it is a
+          snapshot of someone else's pages, and that the venue has the final
+          word. */}
+      <aside className={styles.notice} aria-label="About this information">
+        <WarningIcon size={18} className={styles.noticeMark} />
+        <p>
+          <strong>Check before you go.</strong> Gathered from{" "}
+          {provenance.sites.map(({ host, venueOwn }, index) => (
+            <span key={host}>
+              {index > 0 &&
+                (index === provenance.sites.length - 1 ? " and " : ", ")}
+              {host}
+              {venueOwn && " (the venue's own site)"}
+            </span>
+          ))}{" "}
+          {provenance.checked}. Buildings and policies change, so please confirm
+          anything you rely on with{" "}
+          {access.access_page_url ? (
+            <a
+              href={access.access_page_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {venueName}
+            </a>
+          ) : (
+            venueName
+          )}{" "}
+          before your visit.
+        </p>
+      </aside>
+
       <ul className={styles.summary} aria-label="At a glance">
         <SummaryItem
           label="Step-free access"
