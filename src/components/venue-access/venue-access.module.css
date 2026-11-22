@@ -4,6 +4,36 @@
   gap: 28px;
 }
 
+/* Check before you go: where the record came from, when, and that the venue
+   has the final word. Quiet enough not to outweigh the facts, marked so it
+   isn't skipped as boilerplate. */
+.notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-left: 3px solid var(--color-buttery-yellow);
+  border-radius: 4px;
+  background: rgba(var(--color-white-rgb), 0.04);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-gray);
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice strong {
+  color: var(--color-white);
+}
+
+.noticeMark {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-buttery-yellow);
+}
+
 /* Getting in and Facilities side by side once there's room; a phone stacks
    them. */
 .groups {

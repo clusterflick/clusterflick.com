@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  describeAccessProvenance,
   formatAccessDate,
   getFactNoteNumbers,
   getSourceNotes,
@@ -104,6 +105,51 @@ describe("getSourceNotes", () => {
   it("refuses to number a page the record doesn't cite", () => {
     const { numberOf } = getSourceNotes(record());
     expect(() => numberOf(A)).toThrow(`${A} isn't a source of this record`);
+  });
+});
+
+describe("describeAccessProvenance", () => {
+  const thirdParty = (url: string, checkedOn?: string): AccessSource => ({
+    ...source(url, checkedOn),
+    tier: 2,
+  });
+
+  it("names each site once, the venue's own first", () => {
+    const { notes } = getSourceNotes(
+      record({
+        step_free_access: fact([thirdParty(B)]),
+        lift: fact([source(A), source("https://www.example.com/screens")]),
+      }),
+    );
+    expect(describeAccessProvenance(notes).sites).toEqual([
+      { host: "example.com", venueOwn: true },
+      { host: "example.org", venueOwn: false },
+    ]);
+  });
+
+  it("gives the day when every source was checked on it", () => {
+    const { notes } = getSourceNotes(
+      record({ lift: fact([source(A), thirdParty(B)]) }),
+    );
+    expect(describeAccessProvenance(notes).checked).toBe("on 21 November 2026");
+  });
+
+  it("gives the span when the sources were checked on different days", () => {
+    const { notes } = getSourceNotes(
+      record({
+        lift: fact([source(A, "2026-11-21")]),
+        step_free_access: fact([thirdParty(B, "2026-10-03")]),
+      }),
+    );
+    expect(describeAccessProvenance(notes).checked).toBe(
+      "between 3 October 2026 and 21 November 2026",
+    );
+  });
+
+  it("refuses a record with no sources", () => {
+    expect(() => describeAccessProvenance([])).toThrow(
+      "A record with no sources",
+    );
   });
 });
 

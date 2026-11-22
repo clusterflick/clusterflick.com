@@ -529,6 +529,13 @@ verdict of our own ("4 of 5", not "mostly accessible"). Statuses carry the
 personalise page's marks, a green tick for yes and a pink cross for no, with the
 word beside them.
 
+**It opens with a notice to check before visiting**: which sites the record
+was gathered from (the venue's own first) and the day it was checked, or the
+span of days, from `describeAccessProvenance`, and that the reader should
+confirm with the venue, linked to its access page when there is one. The facts
+are a snapshot of someone else's pages, so a reader is told that before they
+rely on any of them, not only in the footnotes at the bottom.
+
 **Every fact shows where it came from.** Each status is footnoted to the page it
 was quoted from, one footnote per page, with the day it was checked; with a
 single source the footnotes are dropped and one line names it. An unknown reads
