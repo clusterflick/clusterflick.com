@@ -57,6 +57,13 @@
 .title {
   font-size: clamp(1.75rem, 5vw, 3rem);
   margin-bottom: 16px;
+  text-wrap: balance;
+}
+
+/* An event listing with its whole lineup in the title is set smaller rather
+   than truncated: the page is the one place the full name can be read. */
+.longTitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
 }
 
 .originalTitle {

@@ -42,7 +42,9 @@ import {
 import { formatLanguage } from "@/utils/format-language";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
+import clsx from "clsx";
 import OutlineHeading from "@/components/outline-heading";
+import { isLongTitle } from "@/utils/is-long-title";
 import { ButtonAnchor } from "@/components/button";
 import EventPoster, { getPrimaryPosterPath } from "@/components/event-poster";
 import { PlayIcon } from "@/components/icons";
@@ -366,7 +368,12 @@ export default function PageContent({
         </div>
 
         <div className={styles.mainInfo}>
-          <OutlineHeading className={styles.title}>
+          <OutlineHeading
+            className={clsx(
+              styles.title,
+              isLongTitle(movie.title) && styles.longTitle,
+            )}
+          >
             {movie.title}
           </OutlineHeading>
 
