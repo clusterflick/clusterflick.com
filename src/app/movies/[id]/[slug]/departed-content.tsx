@@ -7,7 +7,9 @@ import {
 import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import PageHeader from "@/components/page-header";
 import HeroSection from "@/components/hero-section";
+import clsx from "clsx";
 import OutlineHeading from "@/components/outline-heading";
+import { isLongTitle } from "@/utils/is-long-title";
 import MoviePoster from "@/components/movie-poster";
 import ContentSection from "@/components/content-section";
 import EmptyState from "@/components/empty-state";
@@ -81,7 +83,12 @@ export default function DepartedContent({
         </div>
 
         <div className={styles.mainInfo}>
-          <OutlineHeading className={styles.title}>
+          <OutlineHeading
+            className={clsx(
+              styles.title,
+              isLongTitle(movie.title) && styles.longTitle,
+            )}
+          >
             {movie.title}
           </OutlineHeading>
 

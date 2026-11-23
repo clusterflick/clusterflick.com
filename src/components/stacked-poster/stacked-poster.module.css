@@ -203,6 +203,13 @@
   font-weight: 600;
   line-height: 1.3;
   margin: 0 0 4px 0;
+  /* An event with its lineup in the title would otherwise cover the poster;
+     the full title is still read out and shown on the film page. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   text-shadow:
     0 1px 4px rgba(var(--color-black-rgb), 0.8),
     0 2px 8px rgba(var(--color-black-rgb), 0.6);
