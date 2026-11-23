@@ -71,6 +71,38 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-23",
+    changes: [
+      {
+        tag: "New venue",
+        body: ({ VenueList }) => (
+          <>
+            Added{" "}
+            <VenueList
+              items={[
+                {
+                  name: "33's The Old Grocery Store",
+                  url: "https://thirtythrees.co.uk",
+                },
+                {
+                  name: "Seven Sisters Market",
+                  url: "https://sevensisters.market",
+                },
+                {
+                  name: "New River Studios",
+                  url: "https://newriverstudios.com",
+                },
+              ]}
+            />
+            : a café and cocktail bar on the Harringay Ladder, Tottenham&apos;s
+            Latin American market opposite Seven Sisters station, and an arts
+            centre in a converted furniture warehouse in Manor House.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-19",
     changes: [
       {
