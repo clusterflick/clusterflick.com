@@ -79,6 +79,8 @@ export const FILM_CLUBS: FilmClub[] = [
     matchers: [
       { [FilterId.ShowingTitleSearch]: "Bar Trash" },
       { [FilterId.PerformanceNotesSearch]: "Bar Trash" },
+      // Known typo
+      { [FilterId.ShowingTitleSearch]: "Bat Trash:" },
     ],
   },
   {
