@@ -7,6 +7,7 @@ import {
   type AlertLedger,
   type AlertSettings,
   type AlertTrigger,
+  type AlertVenueScope,
 } from "@clusterflick/accounts/alerts";
 
 export * from "@clusterflick/accounts/alerts";
@@ -119,13 +120,15 @@ export async function rememberWatchlist(idToken: string): Promise<void> {
 }
 
 /**
- * The email the reader's alerts would send, with the triggers being edited,
- * worked out by the Worker now and never sent. Throws on any refusal.
+ * The email the reader's alerts would send, with the triggers and new-venue
+ * scope being edited, worked out by the Worker now and never sent. Throws on
+ * any refusal.
  */
 export async function previewAlerts(
   idToken: string,
   mode: PreviewMode,
   notify: AlertTrigger[],
+  newVenueScope: AlertVenueScope,
   signal?: AbortSignal,
 ): Promise<AlertPreview> {
   const response = await fetch(`${ALERTS_ORIGIN}/preview`, {
@@ -134,7 +137,7 @@ export async function previewAlerts(
       Authorization: `Bearer ${idToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ mode, notify }),
+    body: JSON.stringify({ mode, notify, newVenueScope }),
     signal,
   });
   if (!response.ok) throw new Error(`Preview failed: ${response.status}`);

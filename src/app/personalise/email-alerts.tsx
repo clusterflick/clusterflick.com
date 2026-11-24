@@ -14,6 +14,7 @@ import {
   AlertRunOutcome,
   AlertStopReason,
   AlertTrigger,
+  AlertVenueScope,
   DEFAULT_ALERT_SETTINGS,
   type AlertLedger,
   type AlertRun,
@@ -38,6 +39,11 @@ export const TRIGGER_DESCRIPTIONS: Record<AlertTrigger, string> = {
   [AlertTrigger.NewVenue]: "A cinema that wasn't showing it adds it.",
   [AlertTrigger.NewPerformance]:
     "Any new time at any cinema. Films showing across a chain get these almost every day.",
+};
+
+export const VENUE_SCOPE_NAMES: Record<AlertVenueScope, string> = {
+  [AlertVenueScope.Any]: "At any cinema",
+  [AlertVenueScope.Favourites]: "Only my favourite venues",
 };
 
 export type EmailAlertsState = {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/button";
+import Chip from "@/components/chip";
 import EmptyState from "@/components/empty-state";
 import LoadingIndicator from "@/components/loading-indicator";
 import StandardPageLayout from "@/components/standard-page-layout";
@@ -10,7 +11,9 @@ import { useUserContext } from "@/state/user-context";
 import {
   rememberWatchlist,
   ALERT_TRIGGERS,
+  ALERT_VENUE_SCOPES,
   AlertTrigger,
+  AlertVenueScope,
   type AlertSettings,
   type WatchlistAlert,
 } from "@/lib/user-alerts";
@@ -18,6 +21,7 @@ import {
   describeStop,
   TRIGGER_DESCRIPTIONS,
   TRIGGER_NAMES,
+  VENUE_SCOPE_NAMES,
   useEmailAlerts,
   type EmailAlertsState,
 } from "@/app/personalise/email-alerts";
@@ -118,7 +122,8 @@ function Editor({
   /** Without the capability: only switching off is allowed. */
   offOnly?: boolean;
 }) {
-  const { email, saveAlertSettings, getIdToken } = useUserContext();
+  const { email, saveAlertSettings, getIdToken, favouriteVenues } =
+    useUserContext();
   const { settings, saved, ledger, onSaved } = state;
   const [draft, setDraft] = useState<AlertSettings>(settings);
   const [saving, setSaving] = useState(false);
@@ -127,7 +132,14 @@ function Editor({
 
   const watchlist: WatchlistAlert = draft.alerts.find(
     (alert) => alert.type === "watchlist",
-  ) ?? { type: "watchlist", notify: [] };
+  ) ?? { type: "watchlist", notify: [], newVenueScope: AlertVenueScope.Any };
+  // Favourites with none yet would never tell them about a new venue. Not
+  // said while they're still loading (null), when there may be some.
+  const noFavourites =
+    watchlist.notify.includes(AlertTrigger.NewVenue) &&
+    watchlist.newVenueScope === AlertVenueScope.Favourites &&
+    favouriteVenues !== null &&
+    Object.keys(favouriteVenues).length === 0;
   // Against what the page opened with, saved or the defaults: opening it
   // changes nothing.
   const changed = !isSame(draft, settings);
@@ -156,7 +168,11 @@ function Editor({
     const notify = ALERT_TRIGGERS.filter((each) =>
       each === trigger ? on : watchlist.notify.includes(each),
     );
-    update({ ...draft, alerts: [{ type: "watchlist", notify }] });
+    update({ ...draft, alerts: [{ ...watchlist, notify }] });
+  };
+
+  const setVenueScope = (newVenueScope: AlertVenueScope) => {
+    update({ ...draft, alerts: [{ ...watchlist, newVenueScope }] });
   };
 
   const onSave = async () => {
@@ -252,6 +268,36 @@ function Editor({
                 >
                   {TRIGGER_DESCRIPTIONS[trigger]}
                 </p>
+                {trigger === AlertTrigger.NewVenue &&
+                  watchlist.notify.includes(trigger) && (
+                    <>
+                      <div
+                        className={styles.scopes}
+                        role="radiogroup"
+                        aria-label="Which cinemas count"
+                      >
+                        {ALERT_VENUE_SCOPES.map((scope) => (
+                          <Chip
+                            key={scope}
+                            type="radio"
+                            name="alerts-new-venue-scope"
+                            label={VENUE_SCOPE_NAMES[scope]}
+                            value={scope}
+                            checked={watchlist.newVenueScope === scope}
+                            onChange={(value) =>
+                              setVenueScope(value as AlertVenueScope)
+                            }
+                          />
+                        ))}
+                      </div>
+                      {noFavourites && (
+                        <p className={profileStyles.sectionHelp} role="status">
+                          You haven&apos;t favourited any venues yet, so this
+                          won&apos;t tell you about any until you do.
+                        </p>
+                      )}
+                    </>
+                  )}
               </li>
             ))}
           </ul>
@@ -273,7 +319,12 @@ function Editor({
           onCancelRename={() => {}}
         />
       </div>
-      {!offOnly && <AlertsPreview notify={watchlist.notify} />}
+      {!offOnly && (
+        <AlertsPreview
+          notify={watchlist.notify}
+          newVenueScope={watchlist.newVenueScope}
+        />
+      )}
     </div>
   );
 }

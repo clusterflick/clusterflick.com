@@ -20,8 +20,26 @@ describe("parseAlertSettings", () => {
       }),
     ).toEqual({
       enabled: true,
-      alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      alerts: [
+        {
+          type: "watchlist",
+          notify: ["firstListing", "newVenue"],
+          newVenueScope: "any",
+        },
+      ],
     });
+  });
+
+  it("reads where a new venue counts, as any for settings saved before", () => {
+    const read = (newVenueScope?: unknown) =>
+      parseAlertSettings({
+        enabled: true,
+        alerts: [{ type: "watchlist", notify: ["newVenue"], newVenueScope }],
+      })?.alerts[0]?.newVenueScope;
+    expect(read("favourites")).toBe("favourites");
+    expect(read("any")).toBe("any");
+    expect(read(undefined)).toBe("any");
+    expect(read("nearby")).toBe("any");
   });
 
   it("drops what it can't read, and reads anything but true as off", () => {
@@ -36,7 +54,9 @@ describe("parseAlertSettings", () => {
       }),
     ).toEqual({
       enabled: false,
-      alerts: [{ type: "watchlist", notify: ["newPerformance"] }],
+      alerts: [
+        { type: "watchlist", notify: ["newPerformance"], newVenueScope: "any" },
+      ],
     });
   });
 
@@ -49,7 +69,7 @@ describe("parseAlertSettings", () => {
 });
 
 describe("toAlertSettingsDocument", () => {
-  it("writes the triggers once each, in order, with the address", () => {
+  it("writes the triggers once each, in order, with the address and scope", () => {
     expect(
       toAlertSettingsDocument(
         {
@@ -58,6 +78,7 @@ describe("toAlertSettingsDocument", () => {
             {
               type: "watchlist",
               notify: ["newVenue", "firstListing", "newVenue"],
+              newVenueScope: "favourites",
             },
           ],
         },
@@ -66,7 +87,13 @@ describe("toAlertSettingsDocument", () => {
     ).toEqual({
       enabled: true,
       email: "reader@example.com",
-      alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+      alerts: [
+        {
+          type: "watchlist",
+          notify: ["firstListing", "newVenue"],
+          newVenueScope: "favourites",
+        },
+      ],
     });
   });
 

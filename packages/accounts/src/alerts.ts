@@ -15,6 +15,8 @@
  *
  * Anything that can't be read is dropped rather than guessed at, as the lists
  * are: an unknown trigger, an alert of an unknown type, a run with no date.
+ * The one default is a watchlist alert's `newVenueScope`, which settings saved
+ * before it existed don't have, and which reads as what they did then.
  */
 
 export const alertSettingsPath = (uid: string) => `users/${uid}/meta/alerts`;
@@ -45,8 +47,32 @@ export const DEFAULT_WATCHLIST_TRIGGERS: readonly AlertTrigger[] = [
   AlertTrigger.NewVenue,
 ];
 
+/**
+ * Where a showing counts as somewhere new, for `newVenue`: any cinema, or
+ * only the reader's favourite venues, since a film on general release
+ * reaches more multiplexes almost every night.
+ */
+export const AlertVenueScope = Object.freeze({
+  Any: "any",
+  Favourites: "favourites",
+});
+export type AlertVenueScope =
+  (typeof AlertVenueScope)[keyof typeof AlertVenueScope];
+
+/** In the order the site offers them. */
+export const ALERT_VENUE_SCOPES: readonly AlertVenueScope[] =
+  Object.values(AlertVenueScope);
+
 /** The films on the reader's watchlist. The only kind there is, for now. */
-export type WatchlistAlert = { type: "watchlist"; notify: AlertTrigger[] };
+export type WatchlistAlert = {
+  type: "watchlist";
+  notify: AlertTrigger[];
+  /**
+   * Narrows `newVenue`, and nothing else. Settings saved before there was a
+   * choice read as `any`, which is what they did.
+   */
+  newVenueScope: AlertVenueScope;
+};
 
 export type Alert = WatchlistAlert;
 
@@ -62,7 +88,13 @@ export type AlertSettings = {
 /** What a reader starts from: off, with the watchlist alert ready. */
 export const DEFAULT_ALERT_SETTINGS: AlertSettings = {
   enabled: false,
-  alerts: [{ type: "watchlist", notify: [...DEFAULT_WATCHLIST_TRIGGERS] }],
+  alerts: [
+    {
+      type: "watchlist",
+      notify: [...DEFAULT_WATCHLIST_TRIGGERS],
+      newVenueScope: AlertVenueScope.Any,
+    },
+  ],
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -73,8 +105,14 @@ function readAlert(value: unknown): Alert | null {
   if (!isRecord(value) || value.type !== "watchlist") return null;
   const saved: unknown[] = Array.isArray(value.notify) ? value.notify : [];
   const notify = ALERT_TRIGGERS.filter((trigger) => saved.includes(trigger));
+  // An unknown scope is the one choice there was before there were two.
+  const newVenueScope =
+    ALERT_VENUE_SCOPES.find((scope) => scope === value.newVenueScope) ??
+    AlertVenueScope.Any;
   // An alert that nothing sets off isn't one.
-  return notify.length > 0 ? { type: "watchlist", notify } : null;
+  return notify.length > 0
+    ? { type: "watchlist", notify, newVenueScope }
+    : null;
 }
 
 /**
@@ -108,6 +146,7 @@ export function toAlertSettingsDocument(
       notify: ALERT_TRIGGERS.filter((trigger) =>
         alert.notify.includes(trigger),
       ),
+      newVenueScope: alert.newVenueScope,
     })),
   };
 }

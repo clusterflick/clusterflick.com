@@ -8,6 +8,7 @@ import {
   previewAlerts,
   type AlertPreview,
   type AlertTrigger,
+  type AlertVenueScope,
   type PreviewMode,
 } from "@/lib/user-alerts";
 import { useUserContext } from "@/state/user-context";
@@ -49,12 +50,18 @@ type Answer = { request: string } & (
  * or one with everything on the watchlist that's showing, to see the email
  * with real listings. Shown in a sandboxed frame, as the email it is.
  */
-export default function AlertsPreview({ notify }: { notify: AlertTrigger[] }) {
+export default function AlertsPreview({
+  notify,
+  newVenueScope,
+}: {
+  notify: AlertTrigger[];
+  newVenueScope: AlertVenueScope;
+}) {
   const { getIdToken } = useUserContext();
   const [mode, setMode] = useState<PreviewMode>("sinceLastRun");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const triggers = notify.join(",");
-  const request = `${mode}|${triggers}`;
+  const request = `${mode}|${triggers}|${newVenueScope}`;
   // Until the answer to these switches arrives, it's loading.
   const state: PreviewState =
     answer?.request === request ? answer : { step: "loading" };
@@ -68,6 +75,7 @@ export default function AlertsPreview({ notify }: { notify: AlertTrigger[] }) {
             token,
             mode,
             triggers ? (triggers.split(",") as AlertTrigger[]) : [],
+            newVenueScope,
             controller.signal,
           ),
         )
@@ -84,7 +92,7 @@ export default function AlertsPreview({ notify }: { notify: AlertTrigger[] }) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [getIdToken, mode, triggers, request]);
+  }, [getIdToken, mode, triggers, newVenueScope, request]);
 
   return (
     <aside className={profileStyles.previewColumn} aria-label="Preview">

@@ -85,14 +85,20 @@ export const NotSetUp: Story = {
       canvas.getByRole("checkbox", { name: "When it's first listed" }),
     ).toBeChecked();
     await expect(
-      canvas.getByRole("checkbox", { name: "When any showing is added" }),
+      canvas.getByRole("checkbox", { name: "When any screening is added" }),
     ).not.toBeChecked();
     await userEvent.click(enabled);
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     await waitFor(() =>
       expect(args.user.saveAlertSettings).toHaveBeenCalledWith({
         enabled: true,
-        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
       }),
     );
   },
@@ -142,7 +148,9 @@ export const NeedsATrigger: Story = {
       ...READER,
       readAlertSettings: async () => ({
         enabled: true,
-        alerts: [{ type: "watchlist", notify: ["newVenue"] }],
+        alerts: [
+          { type: "watchlist", notify: ["newVenue"], newVenueScope: "any" },
+        ],
       }),
     },
   },
@@ -157,6 +165,53 @@ export const NeedsATrigger: Story = {
       canvas.getByText("Choose at least one thing to be told about"),
     ).toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Save" })).toBeDisabled();
+  },
+};
+
+/**
+ * Somewhere new, only at favourite venues: chosen under that switch, saved
+ * with the triggers, and a reader with no favourites yet is told it won't
+ * find anything until they have some.
+ */
+export const FavouriteVenuesOnly: Story = {
+  args: {
+    user: {
+      ...READER,
+      favouriteVenues: {},
+      saveAlertSettings: fn(async () => {}),
+      readAlertSettings: async () => ({
+        enabled: true,
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
+      }),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("radio", { name: "Only my favourite venues" }),
+    );
+    await expect(
+      canvas.getByText(/You haven't favourited any venues yet/),
+    ).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(args.user.saveAlertSettings).toHaveBeenCalledWith({
+        enabled: true,
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "favourites",
+          },
+        ],
+      }),
+    );
   },
 };
 
@@ -186,7 +241,13 @@ export const WithPreview: Story = {
       ...READER,
       readAlertSettings: async () => ({
         enabled: true,
-        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
       }),
     },
   },
