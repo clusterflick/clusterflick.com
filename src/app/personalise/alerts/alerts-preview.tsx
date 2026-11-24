@@ -162,10 +162,21 @@ function PreviewBody({ state }: { state: PreviewState }) {
       <iframe
         title="The email, as it would arrive"
         className={clsx(profileStyles.previewFrame, styles.previewFrame)}
-        // An email, not a page: nothing in it runs.
-        sandbox=""
-        srcDoc={preview.digest.html}
+        // An email, not a page: nothing in it runs. Its links open in a new
+        // window, as they would from a mail client, and that window is an
+        // ordinary page rather than inheriting the sandbox.
+        sandbox="allow-popups allow-popups-to-escape-sandbox"
+        srcDoc={withLinksInNewWindow(preview.digest.html)}
       />
     </>
   );
+}
+
+/** Gives the email a `<base target="_blank">`, so its links leave the frame. */
+function withLinksInNewWindow(html: string): string {
+  const base = '<base target="_blank">';
+  const head = /<head[^>]*>/i.exec(html);
+  if (!head) return base + html;
+  const at = head.index + head[0].length;
+  return html.slice(0, at) + base + html.slice(at);
 }
