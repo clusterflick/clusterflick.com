@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { ALERT_TRIGGERS, MAX_ALERTS } from "@clusterflick/accounts/alerts";
+import {
+  ALERT_TRIGGERS,
+  ALERT_VENUE_SCOPES,
+  MAX_ALERTS,
+} from "@clusterflick/accounts/alerts";
 import {
   DISPLAY_NAME_MAX_LENGTH,
   FAVOURITE_PATTERN_SOURCES,
@@ -168,5 +172,14 @@ describe("the rules' copy of the alert checks", () => {
       ),
     ].map(([, trigger]) => trigger);
     expect(listed.sort()).toEqual([...ALERT_TRIGGERS].sort());
+  });
+
+  test("allows exactly the module's new-venue scopes", () => {
+    const listed = [
+      ...(watchlist?.match(/newVenueScope in \[(.*?)\]/)?.[1] ?? "").matchAll(
+        /'([^']+)'/g,
+      ),
+    ].map(([, scope]) => scope);
+    expect(listed.sort()).toEqual([...ALERT_VENUE_SCOPES].sort());
   });
 });

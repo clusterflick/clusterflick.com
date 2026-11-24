@@ -158,8 +158,9 @@ service cloud.firestore {
     return request.auth != null && request.auth.uid == userId;
   }
 
-  // As MAX_ALERTS and ALERT_TRIGGERS in @clusterflick/accounts/alerts: at
-  // most one alert, the watchlist's, set off by at least one known trigger.
+  // As MAX_ALERTS, ALERT_TRIGGERS and ALERT_VENUE_SCOPES in
+  // @clusterflick/accounts/alerts: at most one alert, the watchlist's, set off
+  // by at least one known trigger, with where a new venue counts, if it says.
   // A test holds these to the module's.
   function isAlerts(alerts) {
     return alerts is list
@@ -169,11 +170,13 @@ service cloud.firestore {
 
   function isWatchlistAlert(alert) {
     return alert is map
-      && alert.keys().hasOnly(['type', 'notify'])
+      && alert.keys().hasOnly(['type', 'notify', 'newVenueScope'])
       && alert.type == 'watchlist'
       && alert.notify is list
       && alert.notify.size() >= 1
-      && alert.notify.hasOnly(['firstListing', 'newVenue', 'newPerformance']);
+      && alert.notify.hasOnly(['firstListing', 'newVenue', 'newPerformance'])
+      && (!('newVenueScope' in alert)
+        || alert.newVenueScope in ['any', 'favourites']);
   }
 
   // As ProfileSectionId in @/lib/user-profile: every section, each shown or

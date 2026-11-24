@@ -153,6 +153,26 @@ describe("alert settings", () => {
     );
   });
 
+  test("only at favourite venues, or as saved before there was a choice", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    const alice = signedInAs("alice");
+    const favourites = {
+      ...ON,
+      alerts: [{ ...ON.alerts[0], newVenueScope: "favourites" as const }],
+    };
+    await assertSucceeds(
+      saveAlertSettings(alice, "alice", favourites, address("alice")),
+    );
+    expect(await fetchAlertSettings(alice, "alice")).toEqual(favourites);
+    await assertSucceeds(
+      setDoc(doc(alice, "users/alice/meta/alerts"), {
+        enabled: true,
+        email: address("alice"),
+        alerts: [{ type: "watchlist", notify: ["newVenue"] }],
+      }),
+    );
+  });
+
   test("only their own", async () => {
     await seed({ "users/alice/meta/capabilities": GRANTED });
     await assertFails(
@@ -187,6 +207,15 @@ describe("alert settings", () => {
     [
       "no trigger",
       { enabled: false, alerts: [{ type: "watchlist", notify: [] }] },
+    ],
+    [
+      "an unknown new-venue scope",
+      {
+        enabled: false,
+        alerts: [
+          { type: "watchlist", notify: ["newVenue"], newVenueScope: "nearby" },
+        ],
+      },
     ],
   ])("refuse %s", async (name, data) => {
     const db = signedInAs("alice");

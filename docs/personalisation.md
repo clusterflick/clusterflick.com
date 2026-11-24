@@ -505,6 +505,16 @@ alerts are still on and the page says the first email may come a day later.
 `NEXT_PUBLIC_ALERTS_ORIGIN`
 points it at a local `wrangler dev`.
 
+"When it's showing somewhere new" can count **any cinema or only the reader's
+favourite venues** (`newVenueScope`), chosen under that switch, because a film
+on general release reaches more multiplexes almost every night and filled the
+emails with them. It narrows that trigger only: a first listing is news
+wherever it is. Settings saved before the choice existed have no
+`newVenueScope` and read as `any`, which is what they did, so the rules accept
+both shapes. Favourites with none favourited would never find a new venue, and
+the page says so. "Only when it first appears" needs no option of its own:
+it's that switch off and "When it's first listed" on.
+
 **Letterboxd sync** (`letterboxdSync`, `@/lib/user-letterboxd`) adds a
 reader's Letterboxd watchlist and watched films to their Watchlist and Seen
 lists every night. The account bar's "Letterboxd sync" panel

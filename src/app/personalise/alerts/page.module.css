@@ -2,6 +2,14 @@
   margin: 12px 0 0;
 }
 
+/* Which cinemas count as somewhere new, under that switch's help. */
+.scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
 .previewModes {
   display: flex;
   flex-wrap: wrap;

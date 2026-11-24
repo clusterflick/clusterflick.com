@@ -176,7 +176,13 @@ export const SignedInAlertsOn: Story = {
       ...ALERTS_READER,
       readAlertSettings: async () => ({
         enabled: true,
-        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
       }),
       readAlertLedger: async () => ({
         runs: [{ on: "2026-11-16", at: RAN_AT, outcome: "nothingNew" }],
@@ -204,7 +210,13 @@ export const SignedInAlertsFirstCheck: Story = {
       ...ALERTS_READER,
       readAlertSettings: async () => ({
         enabled: true,
-        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
       }),
       readAlertLedger: async () => ({
         runs: [
@@ -236,7 +248,13 @@ export const SignedInAlertsUnsubscribed: Story = {
       ...ALERTS_READER,
       readAlertSettings: async () => ({
         enabled: false,
-        alerts: [{ type: "watchlist", notify: ["firstListing", "newVenue"] }],
+        alerts: [
+          {
+            type: "watchlist",
+            notify: ["firstListing", "newVenue"],
+            newVenueScope: "any",
+          },
+        ],
       }),
       readAlertLedger: async () => ({
         runs: [{ on: "2026-11-16", at: RAN_AT, outcome: "sent", films: 2 }],
