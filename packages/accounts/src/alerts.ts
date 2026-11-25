@@ -15,8 +15,14 @@
  *
  * Anything that can't be read is dropped rather than guessed at, as the lists
  * are: an unknown trigger, an alert of an unknown type, a run with no date.
- * The one default is a watchlist alert's `newVenueScope`, which settings saved
- * before it existed don't have, and which reads as what they did then.
+ * The one default is an alert's `newVenueScope`, which settings saved before
+ * it existed don't have, and which reads as what they did then.
+ *
+ * Two kinds of alert: the reader's watchlist, and saved searches. A saved
+ * search's `query` is the catalogue's own query string, kept opaque here:
+ * `@clusterflick/catalogue/filters/saved-search` is what reads it, so a
+ * filter the catalogue renames drops out of the search rather than failing
+ * the reader's whole settings.
  */
 
 export const alertSettingsPath = (uid: string) => `users/${uid}/meta/alerts`;
@@ -63,9 +69,8 @@ export type AlertVenueScope =
 export const ALERT_VENUE_SCOPES: readonly AlertVenueScope[] =
   Object.values(AlertVenueScope);
 
-/** The films on the reader's watchlist. The only kind there is, for now. */
-export type WatchlistAlert = {
-  type: "watchlist";
+/** What sets an alert off, whichever kind it is. */
+type AlertTriggers = {
   notify: AlertTrigger[];
   /**
    * Narrows `newVenue`, and nothing else. Settings saved before there was a
@@ -74,10 +79,48 @@ export type WatchlistAlert = {
   newVenueScope: AlertVenueScope;
 };
 
-export type Alert = WatchlistAlert;
+/** The films on the reader's watchlist. At most one per reader. */
+export type WatchlistAlert = { type: "watchlist" } & AlertTriggers;
 
-/** How many alerts a reader may have: one watchlist alert, for now. */
-export const MAX_ALERTS = 1;
+/** A catalogue search the reader saved. */
+export type SearchAlert = {
+  type: "search";
+  /** Stable, so the ledger can keep each search's memory by it. */
+  id: string;
+  /** The catalogue's query string for the search, without a leading "?". */
+  query: string;
+  /** The reader's name for it; without one, the search is described. */
+  label?: string;
+} & AlertTriggers;
+
+export type Alert = WatchlistAlert | SearchAlert;
+
+/**
+ * How many alerts a reader may have: the watchlist and four searches. Raising
+ * it is this and the rules' copy: nothing stored has to change.
+ */
+export const MAX_ALERTS = 5;
+
+/** A search alert's id: short, and safe as a key in the ledger. */
+export const ALERT_ID_PATTERN = /^[a-z0-9-]{1,32}$/;
+/** The longest query a search alert keeps. */
+export const SEARCH_QUERY_MAX_LENGTH = 2000;
+/** The longest name a reader can give a search alert. */
+export const ALERT_LABEL_MAX_LENGTH = 80;
+
+/**
+ * An id for a new search alert, unused by any of `alerts`: `s1`, `s2`, …
+ * Never reused while the alert holding it exists, so the ledger's memory for
+ * a deleted search can't be mistaken for a new one's.
+ */
+export function nextSearchAlertId(alerts: readonly Alert[]): string {
+  const taken = new Set(
+    alerts.flatMap((alert) => (alert.type === "search" ? [alert.id] : [])),
+  );
+  let n = 1;
+  while (taken.has(`s${n}`)) n++;
+  return `s${n}`;
+}
 
 export type AlertSettings = {
   /** Off sends nothing, whatever the alerts say. */
@@ -101,8 +144,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function readAlert(value: unknown): Alert | null {
-  if (!isRecord(value) || value.type !== "watchlist") return null;
+function readTriggers(value: Record<string, unknown>): AlertTriggers | null {
   const saved: unknown[] = Array.isArray(value.notify) ? value.notify : [];
   const notify = ALERT_TRIGGERS.filter((trigger) => saved.includes(trigger));
   // An unknown scope is the one choice there was before there were two.
@@ -110,9 +152,50 @@ function readAlert(value: unknown): Alert | null {
     ALERT_VENUE_SCOPES.find((scope) => scope === value.newVenueScope) ??
     AlertVenueScope.Any;
   // An alert that nothing sets off isn't one.
-  return notify.length > 0
-    ? { type: "watchlist", notify, newVenueScope }
-    : null;
+  return notify.length > 0 ? { notify, newVenueScope } : null;
+}
+
+function readAlert(value: unknown): Alert | null {
+  if (!isRecord(value)) return null;
+  const triggers = readTriggers(value);
+  if (!triggers) return null;
+  if (value.type === "watchlist") return { type: "watchlist", ...triggers };
+  if (value.type !== "search") return null;
+  const { id, query, label } = value;
+  if (typeof id !== "string" || !ALERT_ID_PATTERN.test(id)) return null;
+  if (
+    typeof query !== "string" ||
+    query.length === 0 ||
+    query.length > SEARCH_QUERY_MAX_LENGTH
+  ) {
+    return null;
+  }
+  // A name that can't be read is dropped, not the search: it's described.
+  const name = typeof label === "string" ? label.trim() : "";
+  return {
+    type: "search",
+    id,
+    query,
+    ...(name && name.length <= ALERT_LABEL_MAX_LENGTH && { label: name }),
+    ...triggers,
+  };
+}
+
+/**
+ * The alerts a reader keeps, in their order: at most one watchlist alert and
+ * one alert per id, the first of each kept, and at most `MAX_ALERTS`.
+ */
+function keepAlerts(alerts: readonly (Alert | null)[]): Alert[] {
+  const kept: Alert[] = [];
+  const ids = new Set<string>();
+  for (const alert of alerts) {
+    if (!alert || kept.length === MAX_ALERTS) continue;
+    const key = alert.type === "search" ? `search:${alert.id}` : "watchlist";
+    if (ids.has(key)) continue;
+    ids.add(key);
+    kept.push(alert);
+  }
+  return kept;
 }
 
 /**
@@ -122,17 +205,15 @@ function readAlert(value: unknown): Alert | null {
 export function parseAlertSettings(data: unknown): AlertSettings | null {
   if (!isRecord(data)) return null;
   const alerts = Array.isArray(data.alerts)
-    ? data.alerts
-        .map(readAlert)
-        .filter((alert): alert is Alert => alert !== null)
-        .slice(0, MAX_ALERTS)
+    ? keepAlerts(data.alerts.map(readAlert))
     : [];
   return { enabled: data.enabled === true, alerts };
 }
 
 /**
  * The document as the rules accept it: the triggers deduplicated, in order,
- * and the address the reader is signed in with, which the Worker sends to.
+ * one alert per id, an empty name left out, and the address the reader is
+ * signed in with, which the Worker sends to.
  */
 export function toAlertSettingsDocument(
   settings: AlertSettings,
@@ -141,13 +222,23 @@ export function toAlertSettingsDocument(
   return {
     enabled: settings.enabled,
     email,
-    alerts: settings.alerts.slice(0, MAX_ALERTS).map((alert) => ({
-      type: alert.type,
-      notify: ALERT_TRIGGERS.filter((trigger) =>
-        alert.notify.includes(trigger),
-      ),
-      newVenueScope: alert.newVenueScope,
-    })),
+    alerts: keepAlerts(settings.alerts).map((alert) => {
+      const triggers = {
+        notify: ALERT_TRIGGERS.filter((trigger) =>
+          alert.notify.includes(trigger),
+        ),
+        newVenueScope: alert.newVenueScope,
+      };
+      if (alert.type === "watchlist") return { type: alert.type, ...triggers };
+      const label = alert.label?.trim();
+      return {
+        type: alert.type,
+        id: alert.id,
+        query: alert.query,
+        ...(label && { label }),
+        ...triggers,
+      };
+    }),
   };
 }
 

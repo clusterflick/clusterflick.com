@@ -15,6 +15,7 @@ Import modules by their subpaths, which follow `src/`:
 
 ```ts
 import { matchAny, getDefaultState } from "@clusterflick/catalogue/filters";
+import { readSavedSearch } from "@clusterflick/catalogue/filters/saved-search";
 import type { Movie, MoviePerformance } from "@clusterflick/catalogue/types";
 import { getNearbyVenueIds } from "@clusterflick/catalogue/places";
 import { formatShowingTime } from "@clusterflick/catalogue/utils/format-date";

@@ -114,6 +114,23 @@ function NotGranted({ state }: { state: EmailAlertsState }) {
 const isSame = (a: AlertSettings, b: AlertSettings) =>
   JSON.stringify(a) === JSON.stringify(b);
 
+/**
+ * `settings` with the watchlist alert replaced where it stood, or left out
+ * when `watchlist` is null. Every other alert is kept as it is: this page
+ * edits the watchlist's, and saving it must not drop a reader's searches.
+ */
+function withWatchlist(
+  settings: AlertSettings,
+  watchlist: WatchlistAlert | null,
+): AlertSettings {
+  const others = settings.alerts.filter((alert) => alert.type !== "watchlist");
+  if (!watchlist) return { ...settings, alerts: others };
+  const at = settings.alerts.findIndex((alert) => alert.type === "watchlist");
+  const alerts: AlertSettings["alerts"] = [...others];
+  alerts.splice(at === -1 ? 0 : at, 0, watchlist);
+  return { ...settings, alerts };
+}
+
 function Editor({
   state,
   offOnly = false,
@@ -143,9 +160,13 @@ function Editor({
   // Against what the page opened with, saved or the defaults: opening it
   // changes nothing.
   const changed = !isSame(draft, settings);
-  // Off with no triggers is fine to save; on needs at least one.
+  // Off with no triggers is fine to save; on needs something to be told
+  // about: a watchlist trigger, or a saved search.
+  const hasAlert =
+    watchlist.notify.length > 0 ||
+    draft.alerts.some((alert) => alert.type === "search");
   const blocker =
-    draft.enabled && watchlist.notify.length === 0
+    draft.enabled && !hasAlert
       ? "Choose at least one thing to be told about"
       : offOnly && draft.enabled
         ? "Alerts can only be switched off"
@@ -168,20 +189,20 @@ function Editor({
     const notify = ALERT_TRIGGERS.filter((each) =>
       each === trigger ? on : watchlist.notify.includes(each),
     );
-    update({ ...draft, alerts: [{ ...watchlist, notify }] });
+    update(withWatchlist(draft, { ...watchlist, notify }));
   };
 
   const setVenueScope = (newVenueScope: AlertVenueScope) => {
-    update({ ...draft, alerts: [{ ...watchlist, newVenueScope }] });
+    update(withWatchlist(draft, { ...watchlist, newVenueScope }));
   };
 
   const onSave = async () => {
     if (blocker) return;
     // An alert nothing sets off isn't saved: it would read back as none.
-    const next: AlertSettings = {
-      ...draft,
-      alerts: watchlist.notify.length > 0 ? [watchlist] : [],
-    };
+    const next = withWatchlist(
+      draft,
+      watchlist.notify.length > 0 ? watchlist : null,
+    );
     // Switched on by this save, so news starts from now.
     const switchingOn = next.enabled && !(saved && settings.enabled);
     setSaving(true);

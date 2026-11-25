@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  ALERT_LABEL_MAX_LENGTH,
   DEFAULT_ALERT_SETTINGS,
+  MAX_ALERTS,
+  SEARCH_QUERY_MAX_LENGTH,
+  nextSearchAlertId,
   parseAlertLedger,
   parseAlertSettings,
   readAlertEmail,
@@ -65,6 +69,141 @@ describe("parseAlertSettings", () => {
     expect(
       parseAlertSettings({ enabled: true, alerts: [alert, alert] })?.alerts,
     ).toHaveLength(1);
+  });
+});
+
+describe("search alerts", () => {
+  const search = (extra: Record<string, unknown> = {}) => ({
+    type: "search",
+    id: "s1",
+    query: "venues=rio",
+    notify: ["firstListing"],
+    ...extra,
+  });
+  const read = (...alerts: unknown[]) =>
+    parseAlertSettings({ enabled: true, alerts })?.alerts;
+
+  it("reads one beside the watchlist alert, in the reader's order", () => {
+    expect(
+      read(search({ label: "  Rio  " }), {
+        type: "watchlist",
+        notify: ["newVenue"],
+      }),
+    ).toEqual([
+      {
+        type: "search",
+        id: "s1",
+        query: "venues=rio",
+        label: "Rio",
+        notify: ["firstListing"],
+        newVenueScope: "any",
+      },
+      { type: "watchlist", notify: ["newVenue"], newVenueScope: "any" },
+    ]);
+  });
+
+  it("drops one it can't read: a bad id, no query, or too long a query", () => {
+    expect(
+      read(
+        search({ id: "Not An Id" }),
+        search({ id: "s2", query: "" }),
+        search({ id: "s3", query: 42 }),
+        search({ id: "s4", query: "x".repeat(SEARCH_QUERY_MAX_LENGTH + 1) }),
+        search({ id: "s5", notify: [] }),
+      ),
+    ).toEqual([]);
+  });
+
+  it("drops a name it can't read, and keeps the search", () => {
+    const [long] = read(
+      search({ label: "x".repeat(ALERT_LABEL_MAX_LENGTH + 1) }),
+    )!;
+    const [blank] = read(search({ label: "   " }))!;
+    expect(long).not.toHaveProperty("label");
+    expect(blank).not.toHaveProperty("label");
+  });
+
+  it("keeps one watchlist alert and one alert per id, the first of each", () => {
+    const alerts = read(
+      { type: "watchlist", notify: ["newVenue"] },
+      search(),
+      { type: "watchlist", notify: ["firstListing"] },
+      search({ query: "venues=pcc" }),
+    )!;
+    expect(alerts.map((alert) => alert.type)).toEqual(["watchlist", "search"]);
+    expect(alerts[0].notify).toEqual(["newVenue"]);
+    expect(alerts[1]).toMatchObject({ query: "venues=rio" });
+  });
+
+  it(`keeps at most ${MAX_ALERTS}`, () => {
+    const many = Array.from({ length: MAX_ALERTS + 2 }, (_, n) =>
+      search({ id: `s${n + 1}` }),
+    );
+    expect(read(...many)).toHaveLength(MAX_ALERTS);
+  });
+
+  it("round-trips through the document", () => {
+    const settings = {
+      enabled: true,
+      alerts: [
+        {
+          type: "search" as const,
+          id: "s1",
+          query: "directors=1032",
+          label: "Scorsese",
+          notify: ["newVenue" as const, "firstListing" as const],
+          newVenueScope: "favourites" as const,
+        },
+      ],
+    };
+    const document = toAlertSettingsDocument(settings, "reader@example.com");
+    expect(document.alerts[0]).toEqual({
+      type: "search",
+      id: "s1",
+      query: "directors=1032",
+      label: "Scorsese",
+      notify: ["firstListing", "newVenue"],
+      newVenueScope: "favourites",
+    });
+    expect(parseAlertSettings(document)).toEqual({
+      ...settings,
+      alerts: [{ ...settings.alerts[0], notify: ["firstListing", "newVenue"] }],
+    });
+  });
+
+  it("writes no name when it's empty", () => {
+    const document = toAlertSettingsDocument(
+      {
+        enabled: true,
+        alerts: [
+          {
+            type: "search",
+            id: "s1",
+            query: "venues=rio",
+            label: " ",
+            notify: ["firstListing"],
+            newVenueScope: "any",
+          },
+        ],
+      },
+      "reader@example.com",
+    );
+    expect(document.alerts[0]).not.toHaveProperty("label");
+  });
+});
+
+describe("nextSearchAlertId", () => {
+  it("is the first unused s-number", () => {
+    const alert = (id: string) => ({
+      type: "search" as const,
+      id,
+      query: "venues=rio",
+      notify: ["firstListing" as const],
+      newVenueScope: "any" as const,
+    });
+    expect(nextSearchAlertId([])).toBe("s1");
+    expect(nextSearchAlertId([alert("s1"), alert("s3")])).toBe("s2");
+    expect(nextSearchAlertId(DEFAULT_ALERT_SETTINGS.alerts)).toBe("s1");
   });
 });
 
