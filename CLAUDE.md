@@ -173,8 +173,9 @@ covers the need. The canonical components are:
   deals out into it)
 - **Home page:** `FeatureCarousel` (a few films rotating full-width), `PickCard`
   (a film picked for a reason, with when and where), `StatsBand` (large linked
-  figures that count up), `OccasionRow` (wide cards leading with what makes a
-  screening an occasion)
+  figures that count up), `OccasionRow` (a row of `OccasionCard`s: wide cards
+  leading with why a showing is worth catching, an occasion or a final
+  screening; the watchlist's Don't miss row uses the card on its own)
 - **Programmes:** `ProgrammeCard` (a festival, club or list with films showing:
   logo, a fan of posters, the next screening), `EventCard` (the same with
   nothing showing), `FestivalTimeline` (festivals as bars across the coming

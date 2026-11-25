@@ -215,9 +215,8 @@ query, so the posters it lays out and the room it leaves agree; at 630px a
 media query on the window put it beside posters laid out for the full width. The pile is a picture, not links: the button carries the name, and
 focus moves to the first tile on opening and back to the button on closing.
 A group that fits on one row is drawn as it is, since a pile of three hides
-nothing. **Last chance and More than a screening are never stacked**: they
-are the news a reader comes for, and a click between them and it would cost
-the page its point. Not showing opens from the start when nothing on the list
+nothing. **Don't miss is never stacked**: it is the news a reader comes for,
+and a click between them and it would cost the page its point. Not showing opens from the start when nothing on the list
 is showing, so the watchlist never looks empty, and turning on the editing
 buttons opens every stack, since a closed one would hide them. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
@@ -265,46 +264,37 @@ taken out; it didn't earn its place.
   page.
 
 **The watchlist says what's time-sensitive** (`getWatchlistHighlights`), in
-two groups above Showing now, each soonest first:
+one row above Showing now, "Don't miss", soonest first across both kinds:
 
-- **Last chance** — the last bookable showing is within the home page's Last
-  Chance window. The definition is shared, so a film can't be ending on one
-  page and not the other.
-- **More than a screening** — an upcoming occasion (a Q&A, a live score). This
-  is the home row's scoring with no end date: scored over the whole dataset
-  (house style is judged per venue) and then filtered to the watchlist, so
-  what the home row wouldn't call rare isn't flagged here either. Sold-out
-  occasions are skipped.
+- **A final screening** — the last bookable showing is within the home page's
+  Last Chance window. The definition is shared, so a film can't be ending on
+  one page and not the other.
+- **An occasion** — an upcoming Q&A, live score and so on. This is the home
+  row's scoring with no end date: scored over the whole dataset (house style
+  is judged per venue) and then filtered to the watchlist, so what the home
+  row wouldn't call rare isn't flagged here either. Sold-out occasions are
+  skipped.
 
-A film is in one at most: an ending run is Last chance even with a Q&A on its
-last night, since missing the film entirely is the more pressing news. Either
-takes it out of Showing now. The why goes in a `PosterTile` `note` — a small box
-above Remove, with a label ("Final showing", "Q&A with Mike Leigh") and a
-plain day and time ("Tomorrow, 20:30") with the venue on a line of its own,
-which truncates rather than wraps so a long name can't make one note taller
-than its row. Final
-showing is yellow, the colour of the planner's "Last chance" tag, so the two
-read as the same warning; occasions keep the pink. It sits
-at the foot of the tile rather than among the details, where it pushed that
-tile's title out of line with the rest of the row.
+A film is in it once at most: an ending run is a final screening even with a
+Q&A on its last night, since missing the film entirely is the more pressing
+news. Either takes it out of Showing now. One row rather than a group per
+kind, because soonest first across both is the order to book them in.
 
-The two groups **share a row while they fit**. Each is a flex item whose
-basis is the width its own tiles need. When both fit they sit side by side (8
-films beside 2 fits a 12-poster width) and split the leftover space equally, so
-a lone group fills the row and two equal ones go 50/50. A group too long to
-share wraps onto a row of its own. Each has a floor at the width of the longest
-heading, since a wrapped heading drops its lane out of line with its
-neighbour's, and the lanes stretch so neighbours end on the same line.
+**Each is an `OccasionCard`**, the home page's More Than a Screening card,
+leading with why in large type ("Final screening", "Q&A with Mike Leigh"),
+with a plain day and time ("Tomorrow, 20:30") above it and the film and venue
+beneath. A final screening is yellow, the colour of the planner's "Last
+chance" tag, so the two read as the same warning; occasions keep the pink.
+The cards sit in a `PosterScroller`, so the row costs one card's height
+however many films are in it. The groups were poster tiles with a note under
+each, two grids sharing a row while they fit, sized from the measured width so
+their tiles matched Showing now's; they wrapped onto row after row as they
+grew, and were the tallest thing on the page. The cards carry no list markers
+(`showMarkers={false}`), since every film is on the list, and the editing
+buttons sit under the card's link, outside it.
 
-**Tiles are the same size in every group.** PosterTileList's tracks stretch to
-fill whatever width they're given, so a group taking a share of the row would
-size its tiles differently from its neighbour and from Showing now. The groups
-instead get fixed tracks at `--tile`, the width a full-width list produces,
-computed from the measured row width (`useElementWidth`,
-`getFullWidthTileWidth`). The space a group grows into stays empty at the end of
-its lane.
-
-**Removing offers an undo in place** (`RemovedPosterTile`). The removal is
+**Removing offers an undo in place** (`RemovedPosterTile`, and
+`RemovedOccasionCard` in Don't miss). The removal is
 written straight away — closing the tab never loses it — and the page holds the
 entry locally so its tile keeps its place, with **Undo** where **Remove** was.
 Undo writes the entry back as it was (`restoreToList`: original `addedAt`, and

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getShowingThisWeek } from "@/lib/user-profile/showing-this-week";
@@ -13,10 +13,12 @@ import PosterStack, { type PosterStackItem } from "@/components/poster-stack";
 import PosterTile, {
   PosterTileList,
   RemovedPosterTile,
-  TILE_GAP,
-  getTileColumnCount,
-  type PosterTileNote,
 } from "@/components/poster-tile";
+import OccasionCard, {
+  RemovedOccasionCard,
+  type OccasionCardTone,
+} from "@/components/occasion-card";
+import PosterScroller from "@/components/poster-row/scroller";
 import LoadingIndicator from "@/components/loading-indicator";
 import VenueMapDialog, {
   type VenueMapDialogVenue,
@@ -39,7 +41,6 @@ import {
   collectFilmDetails,
   EMPTY_FILM_DETAILS,
 } from "@/lib/user-lists/film-details";
-import { useElementWidth } from "@/hooks/use-element-width";
 import { getMovieUrl } from "@clusterflick/catalogue/utils/get-movie-url";
 import { getVenueUrl } from "@clusterflick/catalogue/utils/get-venue-url";
 // Direct from the module: the filters barrel would bundle the whole engine.
@@ -241,15 +242,6 @@ function getSortTitle(title: string) {
  */
 function formatShowing(time: number) {
   return `${formatRelativeDay(time, Date.now())}, ${formatShowingTime(time)}`;
-}
-
-/**
- * The width PosterTileList's `auto-fill, minmax(140px, 1fr)` gives each tile
- * across a full-width list — the width the tiles in Showing now come out at.
- */
-function getFullWidthTileWidth(width: number) {
-  const columns = getTileColumnCount(width);
-  return (width - (columns - 1) * TILE_GAP) / columns;
 }
 
 const STORE_NOTE = (
@@ -679,8 +671,6 @@ export function UserListSection({
   const { addToList, removeFromList, restoreToList } = useUserContext();
   const { movies, metaData, hasAttemptedLoad, isLoading, error } =
     useCinemaData();
-  const [highlightGroupsRef, highlightGroupsWidth] =
-    useElementWidth<HTMLDivElement>();
   // Held while their undo is on offer, so each keeps its place in the grid
   // rather than the films after it closing up under the pointer.
   const [removed, setRemoved] = useState<Record<string, Removal>>({});
@@ -800,24 +790,50 @@ export function UserListSection({
   const describeShowing = (id: string, performance: MoviePerformance) => {
     const venueId = movies[id]?.showings[performance.showingId]?.venueId;
     const venueName = venueId ? metaData?.venues[venueId]?.name : undefined;
-    return { detail: formatShowing(performance.time), venue: venueName };
+    return { when: formatShowing(performance.time), venue: venueName };
   };
+
+  const removalMessage = (removal: Removal) =>
+    removal.seen === undefined
+      ? `Removed from ${title}`
+      : `Moved to ${LIST_TITLES[UserListId.Seen]}`;
+
+  const editButtons = (id: string, entry: UserListEntry) =>
+    showEditing && (
+      <div className={styles.editButtons}>
+        {listId === UserListId.Watchlist && (
+          <button
+            type="button"
+            className={styles.markSeen}
+            onClick={() => onMarkSeen(id, entry)}
+            aria-label={`Mark ${entry.title} as seen`}
+          >
+            <EyeIcon size={14} />
+            Seen it
+          </button>
+        )}
+        <button
+          type="button"
+          className={styles.remove}
+          onClick={() => onRemove(id, entry)}
+          aria-label={`Remove ${entry.title} from ${title}`}
+        >
+          <CloseIcon size={14} />
+          Remove
+        </button>
+      </div>
+    );
 
   const toTile = (
     { id, entry, removal }: (typeof entries)[number],
     showing: boolean,
-    note?: PosterTileNote,
   ) => {
     if (removal) {
       return (
         <RemovedPosterTile
           key={id}
           title={entry.title}
-          message={
-            removal.seen === undefined
-              ? `Removed from ${title}`
-              : `Moved to ${LIST_TITLES[UserListId.Seen]}`
-          }
+          message={removalMessage(removal)}
           onUndo={() => onUndo(id, removal)}
           onExpire={() => forget(id)}
         />
@@ -837,33 +853,7 @@ export function UserListSection({
         // only known at build time, and a dead link is worse than none.
         href={showing ? getMovieUrl({ id, title: entry.title }) : undefined}
         details={entry.year ? [entry.year] : undefined}
-        note={note}
-        action={
-          showEditing && (
-            <div className={styles.editButtons}>
-              {listId === UserListId.Watchlist && (
-                <button
-                  type="button"
-                  className={styles.markSeen}
-                  onClick={() => onMarkSeen(id, entry)}
-                  aria-label={`Mark ${entry.title} as seen`}
-                >
-                  <EyeIcon size={14} />
-                  Seen it
-                </button>
-              )}
-              <button
-                type="button"
-                className={styles.remove}
-                onClick={() => onRemove(id, entry)}
-                aria-label={`Remove ${entry.title} from ${title}`}
-              >
-                <CloseIcon size={14} />
-                Remove
-              </button>
-            </div>
-          )
-        }
+        action={editButtons(id, entry)}
       />
     );
   };
@@ -976,49 +966,48 @@ export function UserListSection({
     );
   }
 
-  // Each soonest first: the order to book them in. A film is in one at most —
-  // an ending run is Last chance even with a Q&A on its last night — and
-  // either takes it out of Showing now.
+  type Highlighted = {
+    item: (typeof entries)[number];
+    performance: MoviePerformance;
+    lead: string;
+    tone: OccasionCardTone;
+  };
+  // One row, soonest first: the order to book them in. A film is in it once
+  // at most — an ending run is a final screening even with a Q&A on its last
+  // night — and either takes it out of Showing now.
   const finalShowing = (id: string) => highlights.get(id)?.finalShowing;
   const occasion = (id: string) => highlights.get(id)?.occasion;
-  const ending = entries
-    .filter(({ id }) => movies[id] && finalShowing(id))
-    .sort((a, b) => finalShowing(a.id)!.time - finalShowing(b.id)!.time);
-  const occasions = entries
-    .filter(({ id }) => movies[id] && occasion(id))
-    .sort(
-      (a, b) =>
-        occasion(a.id)!.performance.time - occasion(b.id)!.performance.time,
-    );
+  const highlighted = entries
+    .flatMap((item): Highlighted[] => {
+      if (!movies[item.id]) return [];
+      const final = finalShowing(item.id);
+      if (final) {
+        return [
+          {
+            item,
+            performance: final,
+            lead: "Final screening",
+            tone: "yellow",
+          },
+        ];
+      }
+      const found = occasion(item.id);
+      return found
+        ? [
+            {
+              item,
+              performance: found.performance,
+              lead: found.label,
+              tone: "pink",
+            },
+          ]
+        : [];
+    })
+    .sort((a, b) => a.performance.time - b.performance.time);
   const showing = entries.filter(
     ({ id }) => movies[id] && !finalShowing(id) && !occasion(id),
   );
   const notShowing = entries.filter(({ id }) => !movies[id]);
-
-  const highlightGroups = [
-    {
-      key: "ending",
-      title: "Last chance",
-      tiles: ending.map((entry) =>
-        toTile(entry, true, {
-          label: "Final screening",
-          ...describeShowing(entry.id, finalShowing(entry.id)!),
-          color: "yellow",
-        }),
-      ),
-    },
-    {
-      key: "occasions",
-      title: "More than a screening",
-      tiles: occasions.map((entry) => {
-        const { label, performance } = occasion(entry.id)!;
-        return toTile(entry, true, {
-          label,
-          ...describeShowing(entry.id, performance),
-        });
-      }),
-    },
-  ].filter(({ tiles }) => tiles.length > 0);
 
   return (
     <ContentSection
@@ -1027,36 +1016,45 @@ export function UserListSection({
       action={action}
       intro={showingThisWeekLine}
     >
-      {highlightGroups.length > 0 && (
-        // Side by side while both are short, each on its own row once either
-        // needs the width. See `.highlightGroup`.
-        <div
-          ref={highlightGroupsRef}
-          className={styles.highlightGroups}
-          // A group narrower than the page would size its tiles to its own
-          // width, so each would come out a different size from the others and
-          // from Showing now. They're given the full-width size instead.
-          style={
-            highlightGroupsWidth
-              ? ({
-                  "--tile": `${getFullWidthTileWidth(highlightGroupsWidth)}px`,
-                } as CSSProperties)
-              : undefined
-          }
-        >
-          {highlightGroups.map((group) => (
-            <section
-              key={group.key}
-              className={styles.highlightGroup}
-              style={{ "--tiles": group.tiles.length } as CSSProperties}
-            >
-              <h3 className={styles.groupTitle}>{group.title}</h3>
-              <div className={styles.lane}>
-                <PosterTileList>{group.tiles}</PosterTileList>
-              </div>
-            </section>
-          ))}
-        </div>
+      {highlighted.length > 0 && (
+        // Wide cards in one scrolling row: the showing is the news, and a row
+        // costs one card's height however many films are in it.
+        <section className={styles.highlights}>
+          <h3 className={styles.groupTitle}>Don&apos;t miss</h3>
+          <PosterScroller scrollKey={`${listId}-highlights`}>
+            {highlighted.map(({ item, performance, lead, tone }) => {
+              const { id, entry, removal } = item;
+              if (removal) {
+                return (
+                  <RemovedOccasionCard
+                    key={id}
+                    title={entry.title}
+                    message={removalMessage(removal)}
+                    onUndo={() => onUndo(id, removal)}
+                    onExpire={() => forget(id)}
+                  />
+                );
+              }
+              return (
+                <OccasionCard
+                  key={id}
+                  id={id}
+                  href={getMovieUrl({ id, title: entry.title })}
+                  title={entry.title}
+                  posterPath={movies[id]?.posterPath ?? entry.posterPath}
+                  includedMovies={movies[id]?.includedMovies}
+                  lead={lead}
+                  tone={tone}
+                  headingLevel="h4"
+                  // Every film here is on the list already.
+                  showMarkers={false}
+                  {...describeShowing(id, performance)}
+                  action={editButtons(id, entry)}
+                />
+              );
+            })}
+          </PosterScroller>
+        </section>
       )}
       {/* Each a stack once it is longer than a row: the news is above, and
           these are the films to come back to. Opened by the editing buttons,
@@ -1085,9 +1083,7 @@ export function UserListSection({
           <PosterStack
             items={toStackItems(notShowing)}
             label="Not showing"
-            defaultExpanded={
-              showing.length === 0 && highlightGroups.length === 0
-            }
+            defaultExpanded={showing.length === 0 && highlighted.length === 0}
             expandWhen={showEditing}
           >
             <div className={styles.lane}>
