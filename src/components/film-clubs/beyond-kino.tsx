@@ -4,26 +4,28 @@ function FilmClubBlurb() {
   return (
     <section>
       <p>
-        Beyond Kino is a London film club dedicated to discovering Hungarian
-        cinema through shared experiences and meaningful conversations, and a
-        welcoming space for film lovers from all backgrounds to explore
-        &quot;stories that go beyond borders&quot;. Every screening is followed
-        by a moderated discussion of the film, its cultural significance and its
-        influences: &quot;Come for the film. Stay for the conversation.&quot;
-      </p>
-      <p>
-        Its nights are held at the{" "}
+        Beyond Kino is a London community film club dedicated to Hungarian cult
+        cinema. Since February 2025 it has run free monthly screenings at the{" "}
         <Link href="/venues/liszt-institute">Liszt Institute</Link>, the
         Hungarian Cultural Centre in{" "}
-        <Link href="/london-cinemas/westminster">Westminster</Link>. Past
-        screenings include István Szabó&apos;s <em>Colonel Redl</em> and Zoltán
-        Huszárik&apos;s <em>Sinbad</em>.
+        <Link href="/london-cinemas/westminster">Westminster</Link>, for film
+        lovers, Hungarian expats and culturally curious Londoners. Films are
+        shown in Hungarian with English subtitles, and each is followed by a
+        moderated discussion and time to meet: &quot;Come for the film. Stay for
+        the conversation.&quot;
+      </p>
+      <p>
+        Past screenings include István Szabó&apos;s <em>Colonel Redl</em> and
+        Zoltán Huszárik&apos;s <em>Sinbad</em>, and the club has also taken a
+        night to <Link href="/venues/genesis-cinema">Genesis Cinema</Link>, for{" "}
+        <em>Stars of Little Importance</em> with a Q&amp;A with its director,
+        Renátó Olasz.
       </p>
     </section>
   );
 }
 
 export const seoDescription =
-  "a London film club discovering Hungarian cinema, with a moderated discussion after every screening at the Liszt Institute";
+  "a London community film club with free monthly screenings of Hungarian cult cinema at the Liszt Institute, each followed by a discussion";
 
 export default FilmClubBlurb;
