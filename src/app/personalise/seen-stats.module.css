@@ -39,25 +39,46 @@
   white-space: nowrap;
 }
 
-/* Four records across or two by two, never three and one: the tile list's
-   own columns fit as many as the width allows. Capped, so a single column
-   page doesn't blow the posters up, and centred under the figures there. */
+/* Two by two where two cards fit across; on a phone, one row that scrolls
+   sideways, so four records cost one card's height. Capped, so a single
+   column page doesn't stretch the cards, and centred under the figures
+   there. */
 .records {
   container-type: inline-size;
 }
 
-.records .recordList {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  /* The width, or auto margins in the block's flex column shrink the list
-     to its content and the posters with it. */
-  width: 100%;
-  max-width: 680px;
-  margin-inline: auto;
+.recordList {
+  list-style: none;
+  margin: 0;
+  /* Room above the cards for their hover lift, which the scroll would clip. */
+  padding: 4px 0 8px;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-white-rgb), 0.2) transparent;
 }
 
-@container (min-width: 520px) {
-  .records .recordList {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+.recordList > li {
+  display: flex;
+  flex: 0 0 min(320px, 85%);
+  scroll-snap-align: start;
+}
+
+.recordList > li > * {
+  flex: 1;
+}
+
+@container (min-width: 540px) {
+  .recordList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 760px;
+    margin-inline: auto;
+    overflow: visible;
+    padding: 0;
   }
 }
 
@@ -133,15 +154,6 @@
 }
 
 /* Laid out as My Venues lays out its cards. */
-.listsProgress {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .allLists {
   align-self: flex-start;
   font-size: 14px;

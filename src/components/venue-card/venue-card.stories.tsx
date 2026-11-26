@@ -51,6 +51,17 @@ export const WithCounts: Story = {
 };
 
 /** Card without counts — shown when the venue has no upcoming screenings. */
+/**
+ * On a reader's My Venues: what from their watchlist is on there this week,
+ * by the watchlist's bookmark. A long line is cut short.
+ */
+export const WithWatchlistNote: Story = {
+  args: {
+    ...WithCounts.args,
+    watchlistNote: "In the Mood for Love + 2 more",
+  },
+};
+
 export const WithoutCounts: Story = {
   args: {
     href: "/venues/rio-cinema",

@@ -1,0 +1,240 @@
+/* Wide rather than tall: the occasion is the headline, not the poster. A
+   column, so an action sits under the link and the card stretches to its row's
+   height. */
+.card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(360px, 82vw);
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(var(--color-white-rgb), 0.03);
+  border: 1px solid rgba(var(--color-white-rgb), 0.08);
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+  --tone: var(--color-neon-pink);
+  --tone-rgb: var(--color-neon-pink-rgb);
+}
+
+/* The planner's "Last chance" yellow, softened as its tag is: it is far
+   lighter than the pink. */
+.yellow {
+  --tone: rgba(var(--color-buttery-yellow-rgb), 0.85);
+  --tone-rgb: var(--color-buttery-yellow-rgb);
+}
+
+/* A fact with nothing to book: no call to act in the eyebrow. */
+.gray {
+  --tone: var(--color-light-gray);
+  --tone-rgb: var(--color-white-rgb);
+}
+
+/* Lifted by the link only, not by the action beneath it. */
+.card:has(> a.link:hover),
+.card:has(> a.link:focus-visible) {
+  border-color: rgba(var(--tone-rgb), 0.55);
+  transform: translateY(-2px);
+}
+
+.link {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 16px;
+  color: inherit;
+  font-weight: 400;
+  border-bottom: none;
+}
+
+.link:hover {
+  color: inherit;
+}
+
+/* The card's border carries focus; an outline round the link inside it would
+   draw a second box. */
+.link:focus-visible {
+  outline: none;
+}
+
+.card:has(> a.link:focus-visible) {
+  outline: 2px solid var(--color-electric-blue);
+  /* Within the scroller's padding above, which would clip anything further. */
+  outline-offset: 0;
+}
+
+/* The poster blurred behind the card, as the home page's feature does. */
+.wash {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) saturate(1.4);
+  opacity: 0.28;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.card:has(> a.link:hover) .wash {
+  opacity: 0.4;
+}
+
+.poster {
+  align-self: start;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px -10px rgba(var(--color-black-rgb), 0.9);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.lead {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-white);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.film {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-light-gray);
+  transition: color 0.25s ease;
+}
+
+a.link:hover .film {
+  color: var(--color-neon-pink);
+}
+
+.detail {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+/* ---- Removed ---- */
+
+/* The card's footprint, as an outline: present enough to hold the place,
+   empty enough to read as gone. Stretched to the row by its flex parent. */
+.removed {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: min(360px, 82vw);
+  min-height: 190px;
+  padding: 14px;
+  text-align: center;
+  border: 1px dashed rgba(var(--color-white-rgb), 0.2);
+  border-radius: 12px;
+}
+
+.removedMessage {
+  font-size: 13px;
+  color: var(--color-muted-gray);
+}
+
+.removedTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted-gray);
+}
+
+/* The personalise page's Remove pill, in the accent colour: this one puts
+   something back. As RemovedPosterTile's. */
+.undo {
+  padding: 6px 24px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-neon-pink);
+  background: rgba(var(--color-neon-pink-rgb), 0.1);
+  border: 1px solid rgba(var(--color-neon-pink-rgb), 0.6);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.undo:hover {
+  color: var(--color-white);
+  background: rgba(var(--color-neon-pink-rgb), 0.25);
+}
+
+.undo:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+/* Drains from full to empty; its end is the expiry. */
+.countdown {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-neon-pink);
+  transform-origin: left;
+  animation-name: countdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.removed:has(:focus-visible) .countdown {
+  animation-play-state: paused;
+}
+
+/* Still running — it is the timer — but not moving. */
+@media (prefers-reduced-motion: reduce) {
+  .countdown {
+    visibility: hidden;
+  }
+}
+
+@keyframes countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* In a grid, the cell decides the width. Last, so it wins over the card's
+   and the placeholder's fixed widths. */
+.fluid {
+  width: auto;
+  min-width: 0;
+}

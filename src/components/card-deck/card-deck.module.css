@@ -1,0 +1,97 @@
+.root {
+  min-width: 0;
+}
+
+/* The column count comes from the measured width (--columns), so the rows the
+   component counts are the rows drawn. The gap matches its GAP. */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+  gap: 16px;
+  /* Cards stretch to their row's height, so a row ends on one line. */
+  align-items: stretch;
+}
+
+.item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.item > * {
+  flex: 1;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* The deck's top: the next row, a little smaller and cut off where it fades.
+   Enough shows to see there are cards there and what they look like, not to
+   read them. It sits below the row above rather than tucked under it: the
+   cards are translucent, so one tucked under showed through. */
+.peek {
+  z-index: 0;
+  max-height: 64px;
+  margin-top: -6px;
+  overflow: hidden;
+  transform: scale(0.96);
+  transform-origin: top center;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
+.buried {
+  display: none;
+}
+
+/* Over the faded foot of the deck. */
+.more {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  margin-top: -28px;
+}
+
+.moreButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-electric-blue);
+  background: rgba(var(--color-midnight-navy-rgb), 0.9);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.moreButton:hover {
+  color: var(--color-neon-pink);
+  border-color: rgba(var(--color-neon-pink-rgb), 0.55);
+}
+
+.moreButton:focus-visible {
+  outline: 2px solid var(--color-electric-blue);
+  outline-offset: 2px;
+}
+
+.collapse {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}

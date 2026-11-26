@@ -1,6 +1,5 @@
 import Link from "next/link";
-import MoviePoster from "@/components/movie-poster";
-import PosterStatusMarkers from "@/components/poster-status-markers";
+import HeadlineCard from "@/components/headline-card";
 import PosterScroller from "@/components/poster-row/scroller";
 import styles from "./occasion-row.module.css";
 
@@ -29,10 +28,9 @@ interface OccasionRowProps {
 }
 
 /**
- * A titled, horizontally-scrolling row of wide cards that lead with what makes
- * a screening an occasion — the guest, the live score — in large type, with the
- * film beneath it. The poster sits beside it and is blurred behind the card as a
- * wash. Renders nothing when empty.
+ * A titled, horizontally-scrolling row of `HeadlineCard`s, which lead with what
+ * makes a screening an occasion — the guest, the live score — in large type,
+ * with the film beneath it. Renders nothing when empty.
  *
  * **When to use:**
  * - "More Than a Screening" on the home page, where the occasion is the reason
@@ -64,32 +62,16 @@ export default function OccasionRow({
       {intro && <p className={styles.intro}>{intro}</p>}
       <PosterScroller scrollKey={title}>
         {items.map((item) => (
-          <Link key={item.id} href={item.href} className={styles.card}>
-            {item.posterPath && (
-              <span
-                className={styles.wash}
-                style={{
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w342${item.posterPath})`,
-                }}
-                aria-hidden="true"
-              />
-            )}
-            <div className={styles.poster}>
-              <MoviePoster
-                posterPath={item.posterPath}
-                title={item.title}
-                size="xsmall"
-                interactive={false}
-              />
-            </div>
-            <div className={styles.body}>
-              <span className={styles.when}>{item.when}</span>
-              <h3 className={styles.occasion}>{item.occasion}</h3>
-              <span className={styles.film}>{item.title}</span>
-              {item.venue && <span className={styles.venue}>{item.venue}</span>}
-            </div>
-            <PosterStatusMarkers movieId={item.id} />
-          </Link>
+          <HeadlineCard
+            key={item.id}
+            id={item.id}
+            href={item.href}
+            title={item.title}
+            posterPath={item.posterPath}
+            lead={item.occasion}
+            eyebrow={item.when}
+            detail={item.venue}
+          />
         ))}
       </PosterScroller>
     </section>
