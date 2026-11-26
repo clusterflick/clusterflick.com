@@ -70,6 +70,29 @@ a.card:hover .name {
   margin-top: 2px;
 }
 
+/* The reader's own news about the venue, in the watchlist's pink so it
+   reads as theirs rather than one more count. One line, cut short: the full
+   text is still read whole by a screen reader. */
+.watchlistNote {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--color-neon-pink);
+}
+
+.watchlistNote svg {
+  flex-shrink: 0;
+}
+
+.watchlistText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .aside {
   flex: none;
   margin-left: auto;

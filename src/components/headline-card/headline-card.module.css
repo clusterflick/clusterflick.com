@@ -28,9 +28,15 @@
   --tone-rgb: var(--color-buttery-yellow-rgb);
 }
 
+/* A fact with nothing to book: no call to act in the eyebrow. */
+.gray {
+  --tone: var(--color-light-gray);
+  --tone-rgb: var(--color-white-rgb);
+}
+
 /* Lifted by the link only, not by the action beneath it. */
-.card:has(> .link:hover),
-.card:has(> .link:focus-visible) {
+.card:has(> a.link:hover),
+.card:has(> a.link:focus-visible) {
   border-color: rgba(var(--tone-rgb), 0.55);
   transform: translateY(-2px);
 }
@@ -56,7 +62,7 @@
   outline: none;
 }
 
-.card:has(> .link:focus-visible) {
+.card:has(> a.link:focus-visible) {
   outline: 2px solid var(--color-electric-blue);
   /* Within the scroller's padding above, which would clip anything further. */
   outline-offset: 0;
@@ -75,7 +81,7 @@
   pointer-events: none;
 }
 
-.card:has(> .link:hover) .wash {
+.card:has(> a.link:hover) .wash {
   opacity: 0.4;
 }
 
@@ -93,7 +99,7 @@
   min-width: 0;
 }
 
-.when {
+.eyebrow {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.09em;
@@ -122,11 +128,11 @@
   transition: color 0.25s ease;
 }
 
-.link:hover .film {
+a.link:hover .film {
   color: var(--color-neon-pink);
 }
 
-.venue {
+.detail {
   margin-top: auto;
   padding-top: 8px;
   border-top: 1px solid rgba(var(--color-white-rgb), 0.08);
@@ -224,4 +230,11 @@
   to {
     transform: scaleX(0);
   }
+}
+
+/* In a grid, the cell decides the width. Last, so it wins over the card's
+   and the placeholder's fixed widths. */
+.fluid {
+  width: auto;
+  min-width: 0;
 }

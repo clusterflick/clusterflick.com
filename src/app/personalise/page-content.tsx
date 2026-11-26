@@ -14,11 +14,15 @@ import PosterTile, {
   PosterTileList,
   RemovedPosterTile,
 } from "@/components/poster-tile";
-import OccasionCard, {
-  RemovedOccasionCard,
-  type OccasionCardTone,
-} from "@/components/occasion-card";
-import PosterScroller from "@/components/poster-row/scroller";
+import HeadlineCard, {
+  RemovedHeadlineCard,
+  type HeadlineCardTone,
+} from "@/components/headline-card";
+import CardDeck from "@/components/card-deck";
+import {
+  formatWatchlistAtVenue,
+  getWatchlistAtVenues,
+} from "@/utils/get-watchlist-at-venues";
 import LoadingIndicator from "@/components/loading-indicator";
 import VenueMapDialog, {
   type VenueMapDialogVenue,
@@ -790,7 +794,7 @@ export function UserListSection({
   const describeShowing = (id: string, performance: MoviePerformance) => {
     const venueId = movies[id]?.showings[performance.showingId]?.venueId;
     const venueName = venueId ? metaData?.venues[venueId]?.name : undefined;
-    return { when: formatShowing(performance.time), venue: venueName };
+    return { eyebrow: formatShowing(performance.time), detail: venueName };
   };
 
   const removalMessage = (removal: Removal) =>
@@ -970,7 +974,7 @@ export function UserListSection({
     item: (typeof entries)[number];
     performance: MoviePerformance;
     lead: string;
-    tone: OccasionCardTone;
+    tone: HeadlineCardTone;
   };
   // One row, soonest first: the order to book them in. A film is in it once
   // at most — an ending run is a final screening even with a Q&A on its last
@@ -1017,17 +1021,25 @@ export function UserListSection({
       intro={showingThisWeekLine}
     >
       {highlighted.length > 0 && (
-        // Wide cards in one scrolling row: the showing is the news, and a row
-        // costs one card's height however many films are in it.
-        <section className={styles.highlights}>
+        // Wide cards in a grid, the first rows in full and the rest a deck:
+        // every card shown can be read whole, and the deck says how many more.
+        // Opened by the editing buttons, which a deck would hide.
+        <section>
           <h3 className={styles.groupTitle}>Don&apos;t miss</h3>
-          <PosterScroller scrollKey={`${listId}-highlights`}>
+          <CardDeck
+            label="Don't miss"
+            noun={["film", "films"]}
+            minColumnWidth={320}
+            minOpen={3}
+            expandWhen={showEditing}
+          >
             {highlighted.map(({ item, performance, lead, tone }) => {
               const { id, entry, removal } = item;
               if (removal) {
                 return (
-                  <RemovedOccasionCard
+                  <RemovedHeadlineCard
                     key={id}
+                    fluid
                     title={entry.title}
                     message={removalMessage(removal)}
                     onUndo={() => onUndo(id, removal)}
@@ -1036,8 +1048,9 @@ export function UserListSection({
                 );
               }
               return (
-                <OccasionCard
+                <HeadlineCard
                   key={id}
+                  fluid
                   id={id}
                   href={getMovieUrl({ id, title: entry.title })}
                   title={entry.title}
@@ -1053,7 +1066,7 @@ export function UserListSection({
                 />
               );
             })}
-          </PosterScroller>
+          </CardDeck>
         </section>
       )}
       {/* Each a stack once it is longer than a row: the news is above, and
@@ -1117,8 +1130,20 @@ export function FavouriteVenuesSection({
   /** Someone else's venues, on their public profile. */
   publicView?: boolean;
 }) {
-  const { addFavouriteVenue, removeFavouriteVenue } = useUserContext();
+  const { addFavouriteVenue, removeFavouriteVenue, lists } = useUserContext();
   const { movies, metaData } = useCinemaData();
+  // Fixed for the visit, as the watchlist's "now" is.
+  const [now] = useState(() => Date.now());
+  // What from the reader's watchlist each venue has on this week. Their own
+  // page only: on a profile it would show a watchlist the owner may have kept
+  // private.
+  const watchlistAtVenues = publicView
+    ? new Map<string, string[]>()
+    : getWatchlistAtVenues(
+        movies,
+        Object.keys(lists?.[UserListId.Watchlist] ?? {}),
+        now,
+      );
   // Kept in place with an Undo until the reader leaves, rather than on a
   // timer like a film's: a greyed-out card is no trouble to leave behind.
   const [removed, setRemoved] = useState<Record<string, FavouriteVenueEntry>>(
@@ -1252,54 +1277,64 @@ export function FavouriteVenuesSection({
       }
     >
       <div className={styles.lane}>
-        <ul className={styles.venueList}>
+        {/* The deck keeps a long list from filling a phone. Opened by the
+            editing buttons, which it would hide. */}
+        <CardDeck
+          label={title}
+          noun={["venue", "venues"]}
+          minColumnWidth={300}
+          minOpen={4}
+          expandWhen={showEditing}
+        >
           {entries.map(({ id, name, entry, isRemoved, isKnown }) => {
             const counts = venueCounts.get(id);
             return (
-              <li key={id}>
-                <VenueCard
-                  // A venue that has left the dataset has no page to link to.
-                  href={
-                    isKnown && !isRemoved ? getVenueUrl({ name }) : undefined
-                  }
-                  name={name}
-                  type={metaData?.venues[id]?.type}
-                  imagePath={venueImagePaths[id] ?? null}
-                  filmCount={isKnown ? (counts?.films ?? 0) : undefined}
-                  performanceCount={
-                    isKnown ? (counts?.performances ?? 0) : undefined
-                  }
-                  detail={isKnown ? undefined : "No longer listed"}
-                  muted={isRemoved}
-                  action={
-                    isRemoved ? (
+              <VenueCard
+                key={id}
+                // A venue that has left the dataset has no page to link to.
+                href={isKnown && !isRemoved ? getVenueUrl({ name }) : undefined}
+                name={name}
+                type={metaData?.venues[id]?.type}
+                imagePath={venueImagePaths[id] ?? null}
+                filmCount={isKnown ? (counts?.films ?? 0) : undefined}
+                performanceCount={
+                  isKnown ? (counts?.performances ?? 0) : undefined
+                }
+                detail={isKnown ? undefined : "No longer listed"}
+                watchlistNote={formatWatchlistAtVenue(
+                  (watchlistAtVenues.get(id) ?? []).map(
+                    (movieId) => movies[movieId].title,
+                  ),
+                )}
+                muted={isRemoved}
+                action={
+                  isRemoved ? (
+                    <button
+                      type="button"
+                      className={clsx(styles.remove, styles.venueRemove)}
+                      onClick={() => onUndo(id, entry.name)}
+                      aria-label={`Undo removing ${name} from My Venues`}
+                    >
+                      Undo
+                    </button>
+                  ) : (
+                    showEditing && (
                       <button
                         type="button"
-                        className={styles.remove}
-                        onClick={() => onUndo(id, entry.name)}
-                        aria-label={`Undo removing ${name} from My Venues`}
+                        className={clsx(styles.remove, styles.venueRemove)}
+                        onClick={() => onRemove(id, entry)}
+                        aria-label={`Remove ${name} from My Venues`}
                       >
-                        Undo
+                        <CloseIcon size={14} />
+                        Remove
                       </button>
-                    ) : (
-                      showEditing && (
-                        <button
-                          type="button"
-                          className={styles.remove}
-                          onClick={() => onRemove(id, entry)}
-                          aria-label={`Remove ${name} from My Venues`}
-                        >
-                          <CloseIcon size={14} />
-                          Remove
-                        </button>
-                      )
                     )
-                  }
-                />
-              </li>
+                  )
+                }
+              />
             );
           })}
-        </ul>
+        </CardDeck>
       </div>
       {isMapOpen && (
         <VenueMapDialog

@@ -433,13 +433,6 @@
   flex-shrink: 0;
 }
 
-/* The watchlist's final screenings and occasions, as one row of cards. */
-.highlights {
-  /* Room above the cards for their hover lift, which the scroller would
-     otherwise clip: a horizontal scroller clips vertically too. */
-  --poster-scroller-padding-top: 4px;
-}
-
 .groupTitle {
   margin: 24px 0 12px;
   font-size: 16px;
@@ -791,16 +784,8 @@
 }
 
 /* My Venues: venue cards in columns, each with Remove (or Undo) beneath it. */
-.venueList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px 16px;
-}
-
-.venueList .remove {
+/* A venue card's Remove and Undo sit at their own width, at its right. */
+.venueRemove {
   width: auto;
 }
 

@@ -215,8 +215,9 @@ query, so the posters it lays out and the room it leaves agree; at 630px a
 media query on the window put it beside posters laid out for the full width. The pile is a picture, not links: the button carries the name, and
 focus moves to the first tile on opening and back to the button on closing.
 A group that fits on one row is drawn as it is, since a pile of three hides
-nothing. **Don't miss is never stacked**: it is the news a reader comes for,
-and a click between them and it would cost the page its point. Not showing opens from the start when nothing on the list
+nothing. **Don't miss is never piled up**: it is the news a reader comes for,
+and a click between them and it would cost the page its point. Its first rows
+are always drawn whole; only what is past them waits behind its deck. Not showing opens from the start when nothing on the list
 is showing, so the watchlist never looks empty, and turning on the editing
 buttons opens every stack, since a closed one would hide them. Signed in, the page renders in `StandardPageLayout`'s
 `afterContent` rather than the 1000px column, which fits only four posters
@@ -230,12 +231,17 @@ they are what a reader with a long list comes back for, and the lists below
 are long. They are read from the film details document, which only this page
 loads, again whenever the Seen list's films change: the headline figures in
 a `StatsBand` and the records (longest and shortest sit by runtime, oldest
-and newest by year with how long ago) as `PosterTile`s, side by side from
-1000px with the band two figures to a row (`layout="grid"`): four figures
-across and four posters across each left half the row empty. Below that the
-band is its usual row of four, with the records centred under it. The records
-are their own grid, four across or two by two, never the three-and-one the
-tile list's fitted columns gave at some widths. "Show more stats" doesn't
+and newest by year), side by side from 1000px with the band two figures to a
+row (`layout="grid"`): four figures across and four records across each left
+half the row empty. Below that the band is its usual row of four, with the
+records centred under it. **The records are gray `HeadlineCard`s** leading
+with the figure that makes them the record ("3h 27m", "1927"), the film
+beneath and its year, or how long ago, at the foot. Gray because a record is
+a fact about the reader with nothing to book, where the pink and yellow of
+Don't miss say "go". Linked only while the film is showing. Two by two where
+two fit across (a 540px container); on a phone, one row that scrolls sideways,
+so four records cost one card's height. They were poster tiles with a note,
+which took 2×2 posters' height and put the record in small type under them. "Show more stats" doesn't
 scroll on opening (`ExpandableSection`'s `scrollOnExpand`): the charts open
 right beneath it, so centring the trigger only moved the page. Directors,
 actors, genres, decades and languages sit behind "Show more stats", as
@@ -280,21 +286,30 @@ Q&A on its last night, since missing the film entirely is the more pressing
 news. Either takes it out of Showing now. One row rather than a group per
 kind, because soonest first across both is the order to book them in.
 
-**Each is an `OccasionCard`**, the home page's More Than a Screening card,
+**Each is a `HeadlineCard`**, the home page's More Than a Screening card,
 leading with why in large type ("Final screening", "Q&A with Mike Leigh"),
 with a plain day and time ("Tomorrow, 20:30") above it and the film and venue
 beneath. A final screening is yellow, the colour of the planner's "Last
 chance" tag, so the two read as the same warning; occasions keep the pink.
-The cards sit in a `PosterScroller`, so the row costs one card's height
-however many films are in it. The groups were poster tiles with a note under
-each, two grids sharing a row while they fit, sized from the measured width so
-their tiles matched Showing now's; they wrapped onto row after row as they
-grew, and were the tallest thing on the page. The cards carry no list markers
-(`showMarkers={false}`), since every film is on the list, and the editing
-buttons sit under the card's link, outside it.
+The cards carry no list markers (`showMarkers={false}`), since every film is
+on the list, and the editing buttons sit under the card's link, outside it.
+
+**The cards sit in a `CardDeck`**: a grid whose first two rows (at least three
+cards, on a phone's one column) are drawn whole, with the next row below them
+smaller and fading out under "Show 4 more films". Soonest first, so what is
+held back is what can wait. The groups were poster tiles with a note under
+each, which wrapped onto row after row and were the tallest thing on the page;
+a scrolling row of cards came next, and cost one card's height, but showed so
+few at once that a reader got no sense of how much was there. A deck of
+half-covered cards was considered and not built: a card's top half is its
+date and headline, so a pile would show "Final screening" over and over and
+hide which film, the part a poster's top shows. The deck's top row sits below
+the row above rather than tucked under it, because the cards are translucent
+and one tucked under showed through. A list that fits, or would hide a single
+card, has no deck, and the editing buttons open it.
 
 **Removing offers an undo in place** (`RemovedPosterTile`, and
-`RemovedOccasionCard` in Don't miss). The removal is
+`RemovedHeadlineCard` in Don't miss). The removal is
 written straight away — closing the tab never loses it — and the page holds the
 entry locally so its tile keeps its place, with **Undo** where **Remove** was.
 Undo writes the entry back as it was (`restoreToList`: original `addedAt`, and
@@ -436,7 +451,16 @@ It is hidden while signed out or with none known, and it is checked before the
 other presets, so a favourite set that happens to equal one still reads as
 My Venues. `/personalise` lists them between the watchlist and Seen as `VenueCard`s, with the
 same Remove toggle, and "See on a map" opens the film page's `VenueMapDialog`
-over the ones the dataset still knows. Empty, it offers the venue indexes (`/venues`, `/near-me`,
+over the ones the dataset still knows. They sit in a `CardDeck` (at least four
+open, two rows on a wider screen), since a long list was one card per row on
+a phone. **Each card says what from the reader's watchlist is on there this
+week** ("Taxi Driver + 2 more", in pink by the watchlist's bookmark;
+`getWatchlistAtVenues`): bookable showings in the next seven days, soonest
+first, the home page's week. It is what turns a list of favourites into a
+reason to go. Only on the reader's own page: on a public profile it would show
+a watchlist its owner may keep private. An inline map with a list/map toggle
+was considered and left out: for one's own venues it mostly shows a handful of
+dots one already knows, and the dialog keeps it a click away. Empty, it offers the venue indexes (`/venues`, `/near-me`,
 `/london-cinemas`, `/cinema-groups`) as the empty watchlist offers places to
 find films.
 

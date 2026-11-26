@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import styles from "./occasion-card.module.css";
+import clsx from "clsx";
+import styles from "./headline-card.module.css";
 
-export interface RemovedOccasionCardProps {
+export interface RemovedHeadlineCardProps {
   title: string;
   /** What happened, drawn where the card was — "Removed from Watchlist". */
   message: string;
@@ -12,10 +13,12 @@ export interface RemovedOccasionCardProps {
   onUndo: () => void;
   /** Called once the time runs out, to drop the placeholder. */
   onExpire: () => void;
+  /** Fills its grid cell, as `HeadlineCard`'s `fluid`. */
+  fluid?: boolean;
 }
 
 /**
- * The space an `OccasionCard` leaves behind while its removal can still be
+ * The space an `HeadlineCard` leaves behind while its removal can still be
  * undone, as `RemovedPosterTile` is for a tile: the card's footprint as an
  * outline, so the row doesn't close up under the pointer, with **Undo** where
  * the card's own control was. In a row it stretches to its neighbours'
@@ -24,13 +27,14 @@ export interface RemovedOccasionCardProps {
  * The countdown is a CSS animation whose end is the expiry. It pauses on
  * keyboard focus only, for `RemovedPosterTile`'s reasons.
  */
-export default function RemovedOccasionCard({
+export default function RemovedHeadlineCard({
   title,
   message,
   duration = 3000,
   onUndo,
   onExpire,
-}: RemovedOccasionCardProps) {
+  fluid = false,
+}: RemovedHeadlineCardProps) {
   const undoRef = useRef<HTMLButtonElement>(null);
 
   // The card replaces the button that was just pressed, so focus would
@@ -40,7 +44,7 @@ export default function RemovedOccasionCard({
   }, []);
 
   return (
-    <div className={styles.removed}>
+    <div className={clsx(styles.removed, fluid && styles.fluid)}>
       <span className={styles.removedMessage} role="status">
         {message}
       </span>

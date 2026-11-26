@@ -6,13 +6,14 @@ import ContentSection from "@/components/content-section";
 import StatsBand from "@/components/stats-band";
 import RankedBarChart from "@/components/ranked-bar-chart";
 import ExpandableSection from "@/components/expandable-section";
-import PosterTile, { PosterTileList } from "@/components/poster-tile";
+import HeadlineCard from "@/components/headline-card";
 import { useUserContext } from "@/state/user-context";
 import { useCinemaData } from "@/state/cinema-data-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import Link from "next/link";
 import { ProgressRing } from "@/components/list-progress";
 import VenueCard from "@/components/venue-card";
+import CardDeck from "@/components/card-deck";
 import { getListProgress } from "@/lib/user-lists/list-progress";
 import { GENRES } from "@/data/genres";
 import { FilterId } from "@clusterflick/catalogue/filters/types";
@@ -197,19 +198,25 @@ function ListsProgress({
       <h3 className={styles.groupTitle}>
         {publicView ? "Progress" : "Your progress"} through the lists
       </h3>
-      <ul className={styles.listsProgress}>
+      {/* Furthest through first, so the deck keeps back the lists least
+          begun, which say least about the reader. */}
+      <CardDeck
+        label={`${publicView ? "Progress" : "Your progress"} through the lists`}
+        noun={["list", "lists"]}
+        minColumnWidth={300}
+        minOpen={4}
+      >
         {ranked.map(({ list, progress }) => (
-          <li key={list.id}>
-            <VenueCard
-              href={list.href}
-              name={list.name}
-              imagePath={list.imagePath}
-              detail={`${progress.seen.toLocaleString("en-GB")} of ${progress.total.toLocaleString("en-GB")} seen`}
-              aside={<ProgressRing share={progress.seen / progress.total} />}
-            />
-          </li>
+          <VenueCard
+            key={list.id}
+            href={list.href}
+            name={list.name}
+            imagePath={list.imagePath}
+            detail={`${progress.seen.toLocaleString("en-GB")} of ${progress.total.toLocaleString("en-GB")} seen`}
+            aside={<ProgressRing share={progress.seen / progress.total} />}
+          />
         ))}
-      </ul>
+      </CardDeck>
       <Link href="/lists" className={styles.allLists}>
         All film lists
       </Link>
@@ -231,50 +238,70 @@ function Records({ stats }: { stats: Stats }) {
     return `${years} years ago`;
   };
   // A list of one film's length, or one year, has a single record of each
-  // pair, not two of the same.
+  // pair, not two of the same. Each leads with the figure that makes it the
+  // record: the runtime for the sits, the year for the oldest and newest.
   const cards = [
     longest && {
       label: "Longest sit",
       record: longest,
-      detail: runtime(longest),
+      lead: runtime(longest),
+      detail: longest.entry.year,
     },
     shortest &&
       shortest.id !== longest?.id && {
         label: "Shortest sit",
         record: shortest,
-        detail: runtime(shortest),
+        lead: runtime(shortest),
+        detail: shortest.entry.year,
       },
-    oldest && { label: "Oldest", record: oldest, detail: yearsAgo(oldest) },
+    oldest && {
+      label: "Oldest",
+      record: oldest,
+      lead: oldest.entry.year,
+      detail: yearsAgo(oldest),
+    },
     newest &&
       newest.id !== oldest?.id &&
       newest.entry.year !== oldest?.entry.year && {
         label: "Newest",
         record: newest,
+        lead: newest.entry.year,
         detail: yearsAgo(newest),
       },
-  ].flatMap((card) => card || []);
+  ].flatMap((card) =>
+    card && card.lead ? [{ ...card, lead: card.lead }] : [],
+  );
   if (cards.length === 0) return null;
 
   return (
     <div className={clsx(styles.block, styles.records)}>
-      {/* Each tile's note says which record it is; the heading is for
-          screen readers, so the tiles line up with the figures beside them. */}
+      {/* Each card's eyebrow says which record it is; the heading is for
+          screen readers, so the cards line up with the figures beside them. */}
       <h3 className={styles.visuallyHidden}>Records</h3>
-      <PosterTileList className={styles.recordList}>
-        {cards.map(({ label, record, detail }) => {
+      <ul className={styles.recordList}>
+        {cards.map(({ label, record, lead, detail }) => {
           const movie = movies[record.id];
           return (
-            <PosterTile
-              key={label}
-              title={record.entry.title}
-              posterPath={record.entry.posterPath}
-              href={movie ? getMovieUrl(movie) : undefined}
-              details={record.entry.year ? [record.entry.year] : []}
-              note={{ label, ...(detail && { detail }) }}
-            />
+            <li key={label}>
+              {/* Gray: a record is a fact about the reader, with nothing to
+                  book. Linked only while the film is showing. */}
+              <HeadlineCard
+                id={record.id}
+                title={record.entry.title}
+                posterPath={record.entry.posterPath}
+                href={movie ? getMovieUrl(movie) : undefined}
+                eyebrow={label}
+                lead={lead}
+                detail={detail}
+                tone="gray"
+                headingLevel="h4"
+                showMarkers={false}
+                fluid
+              />
+            </li>
           );
         })}
-      </PosterTileList>
+      </ul>
     </div>
   );
 }

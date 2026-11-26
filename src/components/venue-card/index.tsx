@@ -3,6 +3,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import NavCard from "@/components/nav-card";
 import Tag from "@/components/tag";
+import { BookmarkIcon } from "@/components/icons";
 import styles from "./venue-card.module.css";
 
 interface VenueCardProps {
@@ -21,6 +22,11 @@ interface VenueCardProps {
   muted?: boolean;
   /** Drawn at the card's right edge, e.g. a film list's progress ring. */
   aside?: ReactNode;
+  /**
+   * A line of the reader's own under the counts, marked with the watchlist's
+   * bookmark: what from their watchlist is on there.
+   */
+  watchlistNote?: string;
 }
 
 export default function VenueCard({
@@ -34,6 +40,7 @@ export default function VenueCard({
   action,
   muted = false,
   aside,
+  watchlistNote,
 }: VenueCardProps) {
   const hasCounts = filmCount !== undefined && performanceCount !== undefined;
   const countText = !hasCounts
@@ -68,6 +75,12 @@ export default function VenueCard({
           </div>
         )}
         {stats && <span className={styles.stats}>{stats}</span>}
+        {watchlistNote && (
+          <span className={styles.watchlistNote}>
+            <BookmarkIcon size={12} filled aria-hidden="true" />
+            <span className={styles.watchlistText}>{watchlistNote}</span>
+          </span>
+        )}
       </div>
       {aside && <div className={styles.aside}>{aside}</div>}
     </NavCard>

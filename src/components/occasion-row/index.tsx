@@ -1,5 +1,5 @@
 import Link from "next/link";
-import OccasionCard from "@/components/occasion-card";
+import HeadlineCard from "@/components/headline-card";
 import PosterScroller from "@/components/poster-row/scroller";
 import styles from "./occasion-row.module.css";
 
@@ -28,7 +28,7 @@ interface OccasionRowProps {
 }
 
 /**
- * A titled, horizontally-scrolling row of `OccasionCard`s, which lead with what
+ * A titled, horizontally-scrolling row of `HeadlineCard`s, which lead with what
  * makes a screening an occasion — the guest, the live score — in large type,
  * with the film beneath it. Renders nothing when empty.
  *
@@ -62,15 +62,15 @@ export default function OccasionRow({
       {intro && <p className={styles.intro}>{intro}</p>}
       <PosterScroller scrollKey={title}>
         {items.map((item) => (
-          <OccasionCard
+          <HeadlineCard
             key={item.id}
             id={item.id}
             href={item.href}
             title={item.title}
             posterPath={item.posterPath}
             lead={item.occasion}
-            when={item.when}
-            venue={item.venue}
+            eyebrow={item.when}
+            detail={item.venue}
           />
         ))}
       </PosterScroller>

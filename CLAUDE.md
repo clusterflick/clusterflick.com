@@ -161,7 +161,9 @@ Before writing any UI code, check whether an existing shared component already
 covers the need. The canonical components are:
 
 - **Layout:** `StandardPageLayout`, `HeroSection`, `ContentSection`,
-  `GroupHeader`, `Divider`, `CardGrid`
+  `GroupHeader`, `Divider`, `CardGrid`, `CardDeck` (a grid of cards whose
+  first rows show in full and the rest wait behind a fading row and "Show N
+  more": Don't miss, My Venues, list progress)
 - **Navigation / links:** `LinkGrid` (multi-column scannable lists),
   `LinkedList` (single-column with optional detail + "show all"), `LinkCard`
   (rich card with icon/description)
@@ -173,9 +175,9 @@ covers the need. The canonical components are:
   deals out into it)
 - **Home page:** `FeatureCarousel` (a few films rotating full-width), `PickCard`
   (a film picked for a reason, with when and where), `StatsBand` (large linked
-  figures that count up), `OccasionRow` (a row of `OccasionCard`s: wide cards
-  leading with why a showing is worth catching, an occasion or a final
-  screening; the watchlist's Don't miss row uses the card on its own)
+  figures that count up), `OccasionRow` (a scrolling row of `HeadlineCard`s:
+  wide cards leading with one fact about a film in large type — an occasion, a
+  final screening, a reader's record)
 - **Programmes:** `ProgrammeCard` (a festival, club or list with films showing:
   logo, a fan of posters, the next screening), `EventCard` (the same with
   nothing showing), `FestivalTimeline` (festivals as bars across the coming
@@ -631,7 +633,8 @@ bottom right; on the list's page a line saying how many unseen films are
 showing, linking to the catalogue with just those films selected
 (`getMoviesFilterUrl`); and on `/personalise`, under the Seen stats, every list
 the reader has seen a film from, furthest through first, as `VenueCard`s with
-the ring as the card's `aside` (lists with none seen are left to `/lists`).
+the ring as the card's `aside`, in a `CardDeck` so a long run of lists doesn't
+fill a phone (lists with none seen are left to `/lists`).
 Curated lists only — a computed list's membership changes every build, so "of Y"
 would too. A multi-part work counts once its first part is seen.
 

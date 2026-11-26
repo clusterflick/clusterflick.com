@@ -1,26 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { expect, fn, userEvent, within } from "storybook/test";
 import PosterScroller from "@/components/poster-row/scroller";
-import OccasionCard, { RemovedOccasionCard } from ".";
+import HeadlineCard, { RemovedHeadlineCard } from ".";
 
 /**
- * `OccasionCard` is a wide card that leads with why a showing is worth
- * catching — a guest, a live score, the last night of a run — in large type,
- * with the day above it and the film and venue beneath. The poster sits beside
- * it and is blurred behind the card as a wash.
+ * `HeadlineCard` is a wide card that leads with one fact about a film in large
+ * type — a guest, a live score, the last night of a run, a record — with a
+ * small line above it and the film and a detail beneath. The poster sits
+ * beside it and is blurred behind the card as a wash.
  *
- * **When to use:** in a horizontal row where one showing is the reason to go:
- * the home page's More Than a Screening (through `OccasionRow`), and the
- * watchlist's Don't miss on `/personalise`, where it replaced poster tiles that
- * wrapped onto row after row.
+ * **When to use:** where one fact about a film is the point: the home page's
+ * More Than a Screening (through `OccasionRow`), the watchlist's Don't miss on
+ * `/personalise` (in a `CardDeck`), and the Seen records.
  *
  * **When NOT to use:** where the film is the point — use `PosterRow` or
  * `PosterTile`; a short grid of picks each with a reason label — use
  * `PickCard`.
  */
 const meta = {
-  title: "Components/OccasionCard",
-  component: OccasionCard,
+  title: "Components/HeadlineCard",
+  component: HeadlineCard,
   parameters: {
     layout: "padded",
     backgrounds: { default: "dark" },
@@ -32,10 +31,10 @@ const meta = {
     title: "Ran",
     posterPath: "/dGgiXMWDcS5aJTBEFu7bmaQPNox.jpg",
     lead: "With an introduction",
-    when: "Sun 8 Nov, 19:30",
-    venue: "The Chiswick Cinema",
+    eyebrow: "Sun 8 Nov, 19:30",
+    detail: "The Chiswick Cinema",
   },
-} satisfies Meta<typeof OccasionCard>;
+} satisfies Meta<typeof HeadlineCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -47,8 +46,20 @@ export const Occasion: Story = {};
 export const FinalScreening: Story = {
   args: {
     lead: "Final screening",
-    when: "Tomorrow, 20:30",
+    eyebrow: "Tomorrow, 20:30",
     tone: "yellow",
+  },
+};
+
+/** A record: gray, since there's nothing to book, and unlinked for a film no longer showing. */
+export const Record: Story = {
+  args: {
+    href: undefined,
+    lead: "2h 42m",
+    eyebrow: "Longest sit",
+    detail: "1985",
+    tone: "gray",
+    showMarkers: false,
   },
 };
 
@@ -60,7 +71,7 @@ export const LongLeadNoPoster: Story = {
     title: "The Lodger",
     posterPath: undefined,
     lead: "In conversation with the director and the editor, followed by a panel on the archive",
-    venue: "Cinema Museum",
+    detail: "Cinema Museum",
   },
 };
 
@@ -76,9 +87,9 @@ export const DoubleBill: Story = {
       { title: "Aliens", posterPath: "/r1x5JGpyqZU8PYhbs4UcrO1Xb6x.jpg" },
     ],
     lead: "Final screening",
-    when: "Fri 13 Nov, 18:00",
+    eyebrow: "Fri 13 Nov, 18:00",
     tone: "yellow",
-    venue: "Prince Charles Cinema",
+    detail: "Prince Charles Cinema",
   },
 };
 
@@ -104,23 +115,23 @@ export const WithAction: Story = {
 export const InARow: Story = {
   render: (args) => (
     <PosterScroller bleed={false}>
-      <OccasionCard
+      <HeadlineCard
         {...args}
         lead="Final screening"
-        when="Tomorrow, 20:30"
+        eyebrow="Tomorrow, 20:30"
         tone="yellow"
       />
-      <OccasionCard
+      <HeadlineCard
         {...args}
         id="309"
         href="/movies/309/the-celebration"
         title="The Celebration"
         posterPath="/2LRzNq41yrY8EjCnD1S8sCCPvKk.jpg"
         lead="Q&A with the director"
-        when="Wed 4 Nov, 19:30"
-        venue="The Cinema Museum"
+        eyebrow="Wed 4 Nov, 19:30"
+        detail="The Cinema Museum"
       />
-      <RemovedOccasionCard
+      <RemovedHeadlineCard
         title="Coup 53"
         message="Removed from Watchlist"
         duration={60_000}
@@ -136,7 +147,7 @@ const onUndo = fn();
 /** The space a removed card leaves, with Undo where its buttons were. */
 export const Removed: Story = {
   render: () => (
-    <RemovedOccasionCard
+    <RemovedHeadlineCard
       title="Ran"
       message="Moved to Seen"
       duration={60_000}
