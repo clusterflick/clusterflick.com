@@ -751,6 +751,19 @@ export const FILM_CLUBS: FilmClub[] = [
     ],
   },
   {
+    id: "beyond-kino",
+    name: "Beyond Kino",
+    kind: "world",
+    url: "https://www.instagram.com/beyond.kino/",
+    aliases: [],
+    matchers: [
+      // Its screenings are at the Liszt Institute, sold on Eventbrite and
+      // titled "Beyond Kino presents: <film> (<year>)".
+      { [FilterId.ShowingTitleSearch]: "Beyond Kino" },
+      { [FilterId.PerformanceNotesSearch]: "Beyond Kino" },
+    ],
+  },
+  {
     id: "stow-film-lounge",
     name: "Stow Film Lounge",
     kind: "community",
