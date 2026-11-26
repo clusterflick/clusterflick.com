@@ -1113,11 +1113,23 @@ citable claim.
 
 **The sitemap lists canonical addresses only.** The export uses
 `trailingSlash: true`, so a page lives at its path plus `/` and the bare path
-301s there. `sitemap.ts` builds every entry through `pageUrl`, from the same
-`get*Url` helpers the pages use for their canonicals; `sitemap.test.ts` holds it
-to that. Departed films are left out: their pages stay up so links land, but
-each says little more than that the film has stopped showing, and they were two
-fifths of the sitemap.
+301s there. `src/app/sitemap.xml/sections.ts` builds every entry through
+`pageUrl`, from the same `get*Url` helpers the pages use for their canonicals;
+`sections.test.ts` holds it to that. Departed films are left out: their pages
+stay up so links land, but each says little more than that the film has stopped
+showing, and they were two fifths of the sitemap.
+
+**The sitemap is split by section.** `/sitemap.xml` is a sitemap index of
+`/sitemaps/<section>.xml` (`SITEMAP_SECTION_IDS`: films, venues, boroughs,
+cinema groups, film clubs, festivals, formats, genres, accessibility, lists,
+collections, updates, and the remaining pages), each with its own index page.
+It changes nothing about crawling; it is there so Search Console's Page indexing
+report can be filtered to one section. With a single sitemap the durable pages
+only this site has were lost among the film pages, which churn weekly and made
+up most of every count. A new kind of page goes into the section a reader would
+file it under, or a section of its own. The XML is written by hand
+(`sitemap.xml/xml.ts`) because Next's `generateSitemaps` writes no index at
+`/sitemap.xml`, the address robots.txt and Search Console already use.
 
 **robots.txt blocks every address with a query string** (`/*?`). The export is
 static, so a filtered address (`/catalogue/?letterboxd=4.0`, a film page with
