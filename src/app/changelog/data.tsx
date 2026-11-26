@@ -71,6 +71,21 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-26",
+    changes: [
+      {
+        tag: "New film club",
+        body: () => (
+          <>
+            Added <Link href="/film-clubs/beyond-kino">Beyond Kino</Link>, a
+            London film club discovering Hungarian cinema, with a moderated
+            discussion after every screening at the Liszt Institute.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-23",
     changes: [
       {
