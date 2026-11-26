@@ -78,8 +78,8 @@ export const CHANGELOG: ChangelogDay[] = [
         body: () => (
           <>
             Added <Link href="/film-clubs/beyond-kino">Beyond Kino</Link>, a
-            London film club discovering Hungarian cinema through screenings and
-            conversation.
+            London film club discovering Hungarian cinema, with a moderated
+            discussion after every screening at the Liszt Institute.
           </>
         ),
       },
