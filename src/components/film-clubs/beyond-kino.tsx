@@ -15,11 +15,9 @@ function FilmClubBlurb() {
         Its nights are held at the{" "}
         <Link href="/venues/liszt-institute">Liszt Institute</Link>, the
         Hungarian Cultural Centre in{" "}
-        <Link href="/london-cinemas/westminster">Westminster</Link>, and the
-        programme runs from István Szabó&apos;s <em>Colonel Redl</em> and{" "}
-        <em>Hanussen</em> and Zoltán Huszárik&apos;s <em>Sinbad</em> to the
-        animated classic <em>Cat City</em> and recent films such as{" "}
-        <em>Larry</em>.
+        <Link href="/london-cinemas/westminster">Westminster</Link>. Past
+        screenings include István Szabó&apos;s <em>Colonel Redl</em> and Zoltán
+        Huszárik&apos;s <em>Sinbad</em>.
       </p>
     </section>
   );
