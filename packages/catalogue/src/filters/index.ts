@@ -77,6 +77,14 @@ export {
 } from "./manager";
 export type { FilterBase } from "./manager";
 
+// Saved searches, for email alerts
+export {
+  readSavedSearch,
+  toSavedSearchQuery,
+  getUnsavedFilterIds,
+  UNSAVED_FILTER_IDS,
+} from "./saved-search";
+
 // Description utilities
 export { describeFilters, describeFilterChips } from "./describe";
 export type {

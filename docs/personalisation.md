@@ -529,6 +529,24 @@ both shapes. Favourites with none favourited would never find a new venue, and
 the page says so. "Only when it first appears" needs no option of its own:
 it's that switch off and "When it's first listed" on.
 
+**Saved searches** are the other kind of alert: a catalogue search a reader
+saves, and news about whatever matches it, built in three steps (the shapes,
+then the Worker, then the "Alert me" button). The shapes are in: a
+`SearchAlert` (`type: "search"`, an `id` like `s1` from `nextSearchAlertId`,
+the catalogue's `query` string, an optional `label`, and the same `notify` and
+`newVenueScope`) beside the watchlist alert, up to `MAX_ALERTS` (5) in all.
+The query is opaque to the accounts package: `@clusterflick/catalogue`'s
+`filters/saved-search` writes it (`toSavedSearchQuery`) and reads it back
+(`readSavedSearch`), so the site and the Worker drop the same filters. A
+saved search keeps everything the reader set, event types included, and
+leaves out the date range (fixed days, which would pass), hide finished
+(always on) and hide sold out; the query holds only what differs from the
+catalogue's defaults and is read back over them, never over `base=all`. The
+rules check a search alert's shape and lengths, not its filters, and don't
+count watchlist alerts or ids: `parseAlertSettings` keeps the first of each.
+The alerts page edits only the watchlist's alert and keeps every other alert
+as it is when it saves.
+
 **Letterboxd sync** (`letterboxdSync`, `@/lib/user-letterboxd`) adds a
 reader's Letterboxd watchlist and watched films to their Watchlist and Seen
 lists every night. The account bar's "Letterboxd sync" panel

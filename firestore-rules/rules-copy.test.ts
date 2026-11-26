@@ -2,9 +2,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
+  ALERT_ID_PATTERN,
+  ALERT_LABEL_MAX_LENGTH,
   ALERT_TRIGGERS,
   ALERT_VENUE_SCOPES,
   MAX_ALERTS,
+  SEARCH_QUERY_MAX_LENGTH,
 } from "@clusterflick/accounts/alerts";
 import {
   DISPLAY_NAME_MAX_LENGTH,
@@ -154,20 +157,20 @@ describe("the rules' copy of the alert checks", () => {
     "utf8",
   );
   const alerts = rules.match(/function isAlerts[\s\S]*?\n {2}\}/)?.[0];
-  const watchlist = rules.match(
-    /function isWatchlistAlert[\s\S]*?\n {2}\}/,
-  )?.[0];
+  const triggers = rules.match(/function isAlertTriggers[\s\S]*?\n {2}\}/)?.[0];
+  const search = rules.match(/function isSearchAlert[\s\S]*?\n {2}\}/)?.[0];
 
   test("allows the same number of alerts, and checks every place", () => {
     expect(alerts).toContain(`alerts.size() <= ${MAX_ALERTS}`);
+    expect(alerts).not.toContain(`isAlert(alerts[${MAX_ALERTS}])`);
     for (let place = 0; place < MAX_ALERTS; place++) {
-      expect(alerts).toContain(`isWatchlistAlert(alerts[${place}])`);
+      expect(alerts).toContain(`isAlert(alerts[${place}])`);
     }
   });
 
   test("allows exactly the module's triggers", () => {
     const listed = [
-      ...(watchlist?.match(/notify\.hasOnly\(\[(.*?)\]/)?.[1] ?? "").matchAll(
+      ...(triggers?.match(/notify\.hasOnly\(\[(.*?)\]/)?.[1] ?? "").matchAll(
         /'([^']+)'/g,
       ),
     ].map(([, trigger]) => trigger);
@@ -176,10 +179,18 @@ describe("the rules' copy of the alert checks", () => {
 
   test("allows exactly the module's new-venue scopes", () => {
     const listed = [
-      ...(watchlist?.match(/newVenueScope in \[(.*?)\]/)?.[1] ?? "").matchAll(
+      ...(triggers?.match(/newVenueScope in \[(.*?)\]/)?.[1] ?? "").matchAll(
         /'([^']+)'/g,
       ),
     ].map(([, scope]) => scope);
     expect(listed.sort()).toEqual([...ALERT_VENUE_SCOPES].sort());
+  });
+
+  test("checks a search alert as the module reads one", () => {
+    expect(search).toContain(`alert.id.matches('${ALERT_ID_PATTERN.source}')`);
+    expect(search).toContain(
+      `alert.query.size() <= ${SEARCH_QUERY_MAX_LENGTH}`,
+    );
+    expect(search).toContain(`alert.label.size() <= ${ALERT_LABEL_MAX_LENGTH}`);
   });
 });

@@ -26,7 +26,11 @@ import {
   test,
 } from "vitest";
 import {
+  ALERT_LABEL_MAX_LENGTH,
   DEFAULT_ALERT_SETTINGS,
+  DEFAULT_WATCHLIST_TRIGGERS,
+  MAX_ALERTS,
+  SEARCH_QUERY_MAX_LENGTH,
   deleteAlerts,
   fetchAlertLedger,
   fetchAlertSettings,
@@ -76,6 +80,16 @@ async function seed(documents: Record<string, Record<string, unknown>>) {
 
 const GRANTED = { emailAlerts: { grantedAt: 1 } };
 const ON = { ...DEFAULT_ALERT_SETTINGS, enabled: true };
+
+/** A saved search as the site writes one, with these fields changed. */
+const searchAlert = (extra: Record<string, unknown> = {}) => ({
+  type: "search",
+  id: "s1",
+  query: "venues=rio",
+  notify: ["firstListing"],
+  newVenueScope: "any",
+  ...extra,
+});
 
 beforeAll(async () => {
   setLogLevel("silent");
@@ -173,6 +187,29 @@ describe("alert settings", () => {
     );
   });
 
+  test("with saved searches beside the watchlist, as many as allowed", async () => {
+    await seed({ "users/alice/meta/capabilities": GRANTED });
+    const alice = signedInAs("alice");
+    const withSearches = {
+      ...ON,
+      alerts: [
+        ...ON.alerts,
+        ...Array.from({ length: MAX_ALERTS - 1 }, (_, n) => ({
+          type: "search" as const,
+          id: `s${n + 1}`,
+          query: "venues=rio",
+          label: `Rio ${n + 1}`,
+          notify: [...DEFAULT_WATCHLIST_TRIGGERS],
+          newVenueScope: "any" as const,
+        })),
+      ],
+    };
+    await assertSucceeds(
+      saveAlertSettings(alice, "alice", withSearches, address("alice")),
+    );
+    expect(await fetchAlertSettings(alice, "alice")).toEqual(withSearches);
+  });
+
   test("only their own", async () => {
     await seed({ "users/alice/meta/capabilities": GRANTED });
     await assertFails(
@@ -187,14 +224,43 @@ describe("alert settings", () => {
     ["no address", { enabled: false, alerts: [] }],
     ["enabled that isn't a boolean", { enabled: "yes", alerts: [] }],
     [
-      "two alerts",
+      "more alerts than a reader may have",
+      {
+        enabled: false,
+        alerts: Array.from({ length: MAX_ALERTS + 1 }, (_, n) =>
+          searchAlert({ id: `s${n + 1}` }),
+        ),
+      },
+    ],
+    [
+      "a search alert with a bad id",
+      { enabled: false, alerts: [searchAlert({ id: "Not An Id" })] },
+    ],
+    [
+      "a search alert with no query",
+      { enabled: false, alerts: [searchAlert({ query: "" })] },
+    ],
+    [
+      "a search alert with too long a query",
       {
         enabled: false,
         alerts: [
-          { type: "watchlist", notify: ["newVenue"] },
-          { type: "watchlist", notify: ["newVenue"] },
+          searchAlert({ query: "x".repeat(SEARCH_QUERY_MAX_LENGTH + 1) }),
         ],
       },
+    ],
+    [
+      "a search alert with too long a name",
+      {
+        enabled: false,
+        alerts: [
+          searchAlert({ label: "x".repeat(ALERT_LABEL_MAX_LENGTH + 1) }),
+        ],
+      },
+    ],
+    [
+      "a search alert with an unknown field",
+      { enabled: false, alerts: [searchAlert({ filters: {} })] },
     ],
     [
       "an alert of another type",

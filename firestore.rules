@@ -158,21 +158,50 @@ service cloud.firestore {
     return request.auth != null && request.auth.uid == userId;
   }
 
-  // As MAX_ALERTS, ALERT_TRIGGERS and ALERT_VENUE_SCOPES in
-  // @clusterflick/accounts/alerts: at most one alert, the watchlist's, set off
-  // by at least one known trigger, with where a new venue counts, if it says.
-  // A test holds these to the module's.
+  // As @clusterflick/accounts/alerts: at most MAX_ALERTS alerts, each the
+  // watchlist's or a saved search, set off by at least one of ALERT_TRIGGERS,
+  // with where a new venue counts (ALERT_VENUE_SCOPES), if it says. Only one
+  // watchlist alert and one alert per id are read back; the rules don't count
+  // them, since the module drops the rest. A test holds these to the module.
   function isAlerts(alerts) {
     return alerts is list
-      && alerts.size() <= 1
-      && (alerts.size() < 1 || isWatchlistAlert(alerts[0]));
+      && alerts.size() <= 5
+      && (alerts.size() < 1 || isAlert(alerts[0]))
+      && (alerts.size() < 2 || isAlert(alerts[1]))
+      && (alerts.size() < 3 || isAlert(alerts[2]))
+      && (alerts.size() < 4 || isAlert(alerts[3]))
+      && (alerts.size() < 5 || isAlert(alerts[4]));
+  }
+
+  function isAlert(alert) {
+    return alert is map && (isWatchlistAlert(alert) || isSearchAlert(alert));
   }
 
   function isWatchlistAlert(alert) {
-    return alert is map
-      && alert.keys().hasOnly(['type', 'notify', 'newVenueScope'])
+    return alert.keys().hasOnly(['type', 'notify', 'newVenueScope'])
       && alert.type == 'watchlist'
-      && alert.notify is list
+      && isAlertTriggers(alert);
+  }
+
+  // A saved catalogue search: its query is the catalogue's to read, so only
+  // its length is checked here, as ALERT_ID_PATTERN, SEARCH_QUERY_MAX_LENGTH
+  // and ALERT_LABEL_MAX_LENGTH say.
+  function isSearchAlert(alert) {
+    return alert.keys().hasOnly(['type', 'id', 'query', 'label', 'notify', 'newVenueScope'])
+      && alert.keys().hasAll(['type', 'id', 'query', 'notify'])
+      && alert.type == 'search'
+      && alert.id is string
+      && alert.id.matches('^[a-z0-9-]{1,32}$')
+      && alert.query is string
+      && alert.query.size() >= 1
+      && alert.query.size() <= 2000
+      && (!('label' in alert)
+        || (alert.label is string && alert.label.size() >= 1 && alert.label.size() <= 80))
+      && isAlertTriggers(alert);
+  }
+
+  function isAlertTriggers(alert) {
+    return alert.notify is list
       && alert.notify.size() >= 1
       && alert.notify.hasOnly(['firstListing', 'newVenue', 'newPerformance'])
       && (!('newVenueScope' in alert)

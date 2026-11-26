@@ -215,6 +215,61 @@ export const FavouriteVenuesOnly: Story = {
   },
 };
 
+/**
+ * A saved search beside the watchlist alert: this page edits only the
+ * watchlist's, keeps the search when it saves, and lets the watchlist's
+ * triggers all go off, since the search still has something to say.
+ */
+export const KeepsSavedSearches: Story = {
+  args: {
+    user: {
+      ...READER,
+      saveAlertSettings: fn(async () => {}),
+      readAlertSettings: async () => ({
+        enabled: true,
+        alerts: [
+          { type: "watchlist", notify: ["newVenue"], newVenueScope: "any" },
+          {
+            type: "search",
+            id: "s1",
+            query: "venues=rio",
+            label: "Rio",
+            notify: ["firstListing"],
+            newVenueScope: "any",
+          },
+        ],
+      }),
+    },
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("checkbox", {
+        name: "When it's showing somewhere new",
+      }),
+    );
+    await expect(
+      canvas.queryByText("Choose at least one thing to be told about"),
+    ).not.toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(args.user.saveAlertSettings).toHaveBeenCalledWith({
+        enabled: true,
+        alerts: [
+          {
+            type: "search",
+            id: "s1",
+            query: "venues=rio",
+            label: "Rio",
+            notify: ["firstListing"],
+            newVenueScope: "any",
+          },
+        ],
+      }),
+    );
+  },
+};
+
 /** Not granted, and never on: nothing to set up. */
 export const NotGranted: Story = {
   args: { user: { ...READER, readCapabilities: async () => ({}) } },
