@@ -171,6 +171,8 @@ jobs:
           # pages have updated so they recrawl sooner. Only the high-value index
           # pages are submitted, not the full sitemap — IndexNow expects changed
           # URLs, and blasting every movie/venue URL each deploy invites throttling.
+          # Each is the page's canonical, trailing slash included: the bare path
+          # is a 301 to it.
           RESPONSE=$(curl -sS -w '\n%{http_code}' -X POST 'https://api.indexnow.org/indexnow' \
             -H 'Content-Type: application/json; charset=utf-8' \
             -d @- <<JSON
@@ -180,14 +182,14 @@ jobs:
             "keyLocation": "https://clusterflick.com/${INDEXNOW_KEY}.txt",
             "urlList": [
               "https://clusterflick.com/",
-              "https://clusterflick.com/catalogue",
-              "https://clusterflick.com/festivals",
-              "https://clusterflick.com/film-clubs",
-              "https://clusterflick.com/cinema-groups",
-              "https://clusterflick.com/genres",
-              "https://clusterflick.com/formats",
-              "https://clusterflick.com/venues",
-              "https://clusterflick.com/london-cinemas"
+              "https://clusterflick.com/catalogue/",
+              "https://clusterflick.com/festivals/",
+              "https://clusterflick.com/film-clubs/",
+              "https://clusterflick.com/cinema-groups/",
+              "https://clusterflick.com/genres/",
+              "https://clusterflick.com/formats/",
+              "https://clusterflick.com/venues/",
+              "https://clusterflick.com/london-cinemas/"
             ]
           }
           JSON
