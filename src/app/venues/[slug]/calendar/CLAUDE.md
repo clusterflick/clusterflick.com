@@ -61,7 +61,7 @@ since a static export has no dynamic route to catch a near-miss.
 The library is client-only (`ssr: false` via a client wrapper, since a Server Component may not
 set that) and pulls in ~300KB, so it stays on this route. That leaves the page with no crawlable
 content, and what it shows already exists on the venue page — hence `noindex` with a canonical
-pointing at the venue page, and no entry in `sitemap.ts`.
+pointing at the venue page, and no entry in the sitemap (`src/app/sitemap.xml/sections.ts`).
 
 The calendar goes in `StandardPageLayout`'s `afterContent` slot, not `children`, so it spans the
 window rather than the 1000px content column — the page is one calendar and reads like a desktop

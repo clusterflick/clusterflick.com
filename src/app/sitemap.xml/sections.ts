@@ -31,9 +31,41 @@ import {
   readDiffBlobs,
 } from "@/utils/get-updates";
 
-export const dynamic = "force-static";
+export const SITE = "https://clusterflick.com";
 
-const SITE = "https://clusterflick.com";
+export type SitemapEntry = MetadataRoute.Sitemap[number];
+
+/**
+ * The sitemap is split by section so that Search Console reports each one on
+ * its own. Its Page indexing report can be filtered by sitemap, and with one
+ * sitemap for everything the venue, club and festival pages - the durable
+ * pages only this site has - were lost in the churn of the film pages.
+ * Nothing else changes: Google reads a sitemap index as the sitemaps it lists.
+ *
+ * Each id is the section's file, `/sitemaps/<id>.xml`, and every section
+ * carries its own index page, so none is ever empty.
+ */
+export const SITEMAP_SECTION_IDS = [
+  "pages",
+  "films",
+  "venues",
+  "boroughs",
+  "cinema-groups",
+  "film-clubs",
+  "festivals",
+  "formats",
+  "genres",
+  "accessibility",
+  "lists",
+  "collections",
+  "updates",
+] as const;
+
+export type SitemapSectionId = (typeof SITEMAP_SECTION_IDS)[number];
+
+export function getSitemapSectionUrl(id: SitemapSectionId): string {
+  return `${SITE}/sitemaps/${id}.xml`;
+}
 
 // The export is built with `trailingSlash: true`, so every page is served at
 // its path plus "/" — the address its canonical tag names — and the bare path
@@ -48,7 +80,9 @@ function pageUrl(path: string): string {
 // 2,500 entries claimed to have changed in the last hour, the licence and the
 // bot page included. Google stops trusting a sitemap's dates once they are
 // routinely wrong, which would discard the true ones too; no date is better.
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function getSitemapSections(): Promise<
+  Record<SitemapSectionId, SitemapEntry[]>
+> {
   const data = await getStaticData();
 
   const moviePages = Object.values(data.movies).map((movie: Movie) => ({
@@ -218,19 +252,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: pageUrl("/updates"),
-      lastModified: updateDayPages[0]?.lastModified,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
       url: pageUrl("/about"),
       changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: pageUrl("/accessibility"),
-      changeFrequency: "daily" as const,
       priority: 0.8,
     },
     {
@@ -264,43 +287,50 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
     {
-      url: pageUrl("/venues"),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-    {
-      url: pageUrl("/london-cinemas"),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-    {
       url: pageUrl("/near-me"),
       changeFrequency: "daily" as const,
       priority: 0.7,
     },
   ];
 
-  return [
-    ...staticPages,
-    ...updateDayPages,
-    ...reportPages,
-    festivalListPage,
-    filmClubListPage,
-    cinemaGroupListPage,
-    genreListPage,
-    ...genrePages,
-    formatListPage,
-    ...formatPages,
-    ...accessibilityFeaturePages,
-    movieListListPage,
-    ...movieListPages,
-    collectionListPage,
-    ...collectionPages,
-    ...moviePages,
-    ...venuePages,
-    ...boroughPages,
-    ...festivalPages,
-    ...filmClubPages,
-    ...cinemaGroupPages,
-  ];
+  const updatesPage = {
+    url: pageUrl("/updates"),
+    lastModified: updateDayPages[0]?.lastModified,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  };
+
+  const accessibilityPage = {
+    url: pageUrl("/accessibility"),
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  };
+
+  const venueListPage = {
+    url: pageUrl("/venues"),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  };
+
+  const boroughListPage = {
+    url: pageUrl("/london-cinemas"),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  };
+
+  return {
+    pages: [...staticPages, ...reportPages],
+    films: moviePages,
+    venues: [venueListPage, ...venuePages],
+    boroughs: [boroughListPage, ...boroughPages],
+    "cinema-groups": [cinemaGroupListPage, ...cinemaGroupPages],
+    "film-clubs": [filmClubListPage, ...filmClubPages],
+    festivals: [festivalListPage, ...festivalPages],
+    formats: [formatListPage, ...formatPages],
+    genres: [genreListPage, ...genrePages],
+    accessibility: [accessibilityPage, ...accessibilityFeaturePages],
+    lists: [movieListListPage, ...movieListPages],
+    collections: [collectionListPage, ...collectionPages],
+    updates: [updatesPage, ...updateDayPages],
+  };
 }
