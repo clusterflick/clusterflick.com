@@ -1178,4 +1178,25 @@ export const FESTIVALS: Festival[] = [
       },
     ],
   },
+  {
+    id: "super-shorts-film-festival",
+    name: "Super Shorts Film Festival",
+    url: "https://www.supershorts.org/",
+    aliases: ["super-shorts"],
+    matchers: [
+      {
+        // The festival's Wix events are sourced with this note on every
+        // performance - its London sessions at BFI Stephen Street are titled
+        // "Super Shorts London - Session 1" and so on, 8–10 December 2026.
+        [FilterId.PerformanceNotesSearch]: "Super Shorts Film Festival",
+      },
+      {
+        // A session listed by the venue itself rather than sourced. Kept to
+        // the London edition's name, so neither "SUPERSHORTS by Earthrise" at
+        // Everyman King's Cross nor the unrelated Super Shorts Hackney nights
+        // are claimed.
+        [FilterId.ShowingTitleSearch]: "Super Shorts London",
+      },
+    ],
+  },
 ];

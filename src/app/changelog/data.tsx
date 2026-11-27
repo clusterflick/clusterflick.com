@@ -71,6 +71,25 @@ export interface ChangelogDay {
  */
 export const CHANGELOG: ChangelogDay[] = [
   {
+    date: "2026-11-27",
+    changes: [
+      {
+        tag: "New festival",
+        body: ({ Festival }) => (
+          <>
+            Added{" "}
+            <Festival
+              name="Super Shorts Film Festival"
+              url="https://www.supershorts.org/"
+            />
+            , three evenings of short films from around the world at BFI Stephen
+            Street, 8–10 December.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     date: "2026-11-26",
     changes: [
       {

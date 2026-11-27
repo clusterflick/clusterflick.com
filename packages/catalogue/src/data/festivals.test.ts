@@ -373,3 +373,43 @@ describe("London Independent Short Film Festival title matchers", () => {
     ).not.toContain("london-independent-short-film-festival");
   });
 });
+
+describe("Super Shorts Film Festival matchers", () => {
+  const claimedBy = (title: string, notes = ""): string[] =>
+    FESTIVALS.filter(({ matchers }) =>
+      matchers.some((matcher) => {
+        const titleQuery = matcher[FilterId.ShowingTitleSearch];
+        if (typeof titleQuery === "string") {
+          return matchesSearchQuery(title, normalizeForSearch(titleQuery));
+        }
+        const notesQuery = matcher[FilterId.PerformanceNotesSearch];
+        if (typeof notesQuery === "string") {
+          return matchesSearchQuery(notes, normalizeForSearch(notesQuery));
+        }
+        return false;
+      }),
+    ).map(({ id }) => id);
+
+  it.each([
+    "Super Shorts London - Session 1",
+    "Super Shorts London - Session 2",
+    "Super Shorts London - Session 3",
+  ])("claims %s by its sourced note", (title) => {
+    expect(claimedBy(title, "Part of Super Shorts Film Festival")).toEqual([
+      "super-shorts-film-festival",
+    ]);
+  });
+
+  it("claims a London session listed without the note", () => {
+    expect(claimedBy("Super Shorts London - Session 1")).toEqual([
+      "super-shorts-film-festival",
+    ]);
+  });
+
+  it.each(["SUPERSHORTS by Earthrise", "Super Shorts Hackney: Winter Shorts"])(
+    "does not claim %s",
+    (title) => {
+      expect(claimedBy(title)).not.toContain("super-shorts-film-festival");
+    },
+  );
+});
